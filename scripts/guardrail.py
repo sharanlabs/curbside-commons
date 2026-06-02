@@ -49,6 +49,29 @@ _COMPILED = {
     for cat, pats in PATTERNS.items()
 }
 
+# Completion claims for state_mismatch: (pattern, min steps_completed for the claim
+# to be TRUE). If a draft's prose asserts a step is done that the merchant has not
+# reached, flag state_mismatch. Keyword-then-done-verb phrasing only, so the TODO
+# phrasing in clean drafts ("upload your menu") does not match completion phrasing
+# ("menu uploaded"). Scanned over subject+body only (not machine blocker codes).
+COMPLETION_CLAIMS = [
+    (re.compile(r"\bbusiness\b.{0,25}\bverif(ied|ication)\b", re.IGNORECASE), 1),
+    (re.compile(r"\bmenu\b.{0,15}\b(uploaded|live|complete|added)\b", re.IGNORECASE), 2),
+    (re.compile(r"\bphotos?\b.{0,15}\b(added|uploaded|live|complete|done)\b", re.IGNORECASE), 3),
+    (re.compile(r"\bhours\b.{0,15}\b(set|configured|complete|done)\b", re.IGNORECASE), 4),
+    (re.compile(r"\bbank\b.{0,25}\bverif(ied|ication)\b", re.IGNORECASE), 5),
+    (re.compile(r"\b(fully verified|onboarding (is )?complete|you(?:'re| are) (now )?live)\b", re.IGNORECASE), 5),
+    # Verb-before-step phrasing ("We've added your photos"). PAST-TENSE / completed
+    # forms only, so imperative TODO phrasing ("add photos", "upload your menu",
+    # "verify your bank") is NOT caught. "set" is ambiguous (imperative == past), so
+    # it is gated behind a completion auxiliary ("we've/have/already set ... hours").
+    (re.compile(r"\bverified\b.{0,15}\bbusiness\b", re.IGNORECASE), 1),
+    (re.compile(r"\b(uploaded|added)\b.{0,15}\bmenu\b", re.IGNORECASE), 2),
+    (re.compile(r"\b(added|uploaded)\b.{0,15}\bphotos?\b", re.IGNORECASE), 3),
+    (re.compile(r"\b(we'?ve|we have|have|already)\b.{0,20}\bset\b.{0,15}\bhours\b", re.IGNORECASE), 4),
+    (re.compile(r"\bverified\b.{0,15}\bbank\b", re.IGNORECASE), 5),
+]
+
 
 def scan_text(text: str) -> list:
     """Return sorted regex-based flags present in text (empty = clean)."""
@@ -74,5 +97,15 @@ def run_guardrail(draft: dict, merchant: dict) -> list:
     # deterministically computed next-best-action for this merchant.
     if draft.get("next_best_action") != merchant.get("next_best_action"):
         flags.add("state_mismatch")
+
+    # state_mismatch (prose): the merchant-facing text must not claim a step is
+    # done that the merchant has not yet completed. Scan subject+body only so
+    # internal blocker codes (e.g., "business_verification_needed") don't trip it.
+    prose = " ".join(str(draft.get(k, "")) for k in ("draft_subject", "draft_body"))
+    steps_completed = int(merchant.get("steps_completed", 0))
+    for pattern, required_steps in COMPLETION_CLAIMS:
+        if required_steps > steps_completed and pattern.search(prose):
+            flags.add("state_mismatch")
+            break
 
     return sorted(flags)

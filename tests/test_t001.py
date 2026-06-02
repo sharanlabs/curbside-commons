@@ -19,6 +19,7 @@ sys.path.insert(0, str(REPO))
 
 from scripts import config as C  # noqa: E402
 from scripts import pipeline as P  # noqa: E402
+from scripts import run as R  # noqa: E402
 from scripts.guardrail import run_guardrail, scan_text  # noqa: E402
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
@@ -251,6 +252,75 @@ class T001(unittest.TestCase):
         wrong = next(a for a in P.NEXT_ACTIONS if a != m["next_best_action"])
         mismatch["next_best_action"] = wrong
         self.assertIn("state_mismatch", run_guardrail(mismatch, m))
+
+    # ----- Codex P2 fix coverage (added 2026-06-02) -----
+
+    # P2-1: the documented app command (scripts/run.py) preserves audit history,
+    # so a re-run dedups instead of re-sending; --fresh is an explicit reset.
+    def test_p2_1_app_command_preserves_idempotency(self):
+        tmp = Path(tempfile.mkdtemp())
+        r1 = R.main(out_dir=tmp)                 # default = preserve history
+        r2 = R.main(out_dir=tmp)                 # second documented run
+        n = r1["counts"]["simulated_send_events"]
+        self.assertGreater(n, 0)
+        self.assertEqual(r2["counts"]["simulated_send_events"], 0, "app re-run must not re-send")
+        self.assertEqual(r2["counts"]["skipped_duplicate_events"], n)
+        sends = [e for e in _read_csv(tmp / "audit_log.csv") if e["event_type"] == "simulated_send"]
+        self.assertEqual(len(sends), n, "audit_log keeps exactly one simulated_send per merchant")
+        r3 = R.main(out_dir=tmp, fresh=True)     # explicit reset re-sends
+        self.assertEqual(r3["counts"]["simulated_send_events"], n)
+
+    # P2-2: integer fields reject genuinely fractional values (fail fast).
+    def test_p2_2_reject_fractional(self):
+        self.assertEqual(P.parse_int("3.00"), 3)
+        self.assertEqual(P.parse_int("5"), 5)
+        for bad in ("3.50", "2.9"):
+            with self.assertRaises(ValueError):
+                P.parse_int(bad)
+        # end-to-end: a malformed source row makes the pipeline fail fast
+        tmp = Path(tempfile.mkdtemp())
+        bad_csv = tmp / "bad.csv"
+        bad_csv.write_text(
+            "Merchant Name,Merchant Name,Days Since Signup,Steps Completed,"
+            "Last Login (days ago),Risk Score,Risk Level,AI Nudge Message,Estimated Time Saved (min)\n"
+            "Test Cafe,Restaurant,3.00,2.50,2.00,42.00,Low Risk,hi,15\n",
+            encoding="utf-8",
+        )
+        with self.assertRaises(ValueError):
+            P.run_pipeline(bad_csv, tmp / "out")
+
+    # P2-3: appended model_runs.csv IDs stay unique across repeated runs.
+    def test_p2_3_unique_model_run_ids(self):
+        tmp = Path(tempfile.mkdtemp())
+        P.run_pipeline(C.SOURCE_CSV, tmp)
+        P.run_pipeline(C.SOURCE_CSV, tmp)
+        ids = [r["model_run_id"] for r in _read_csv(tmp / "model_runs.csv")]
+        self.assertEqual(len(ids), 40)
+        self.assertEqual(len(set(ids)), 40, "model_run_id must be unique across appended runs")
+
+    # P2-4: prose claiming a not-yet-completed step is done is flagged, even when
+    # next_best_action is correct.
+    def test_p2_4_state_mismatch_prose(self):
+        _, res = _run()
+        m = next(x for x in res["merchants"] if x["steps_completed"] == 2)  # steps 3/4 not done
+        cases = json.loads((FIXTURES / "guardrail_cases.json").read_text(encoding="utf-8"))
+        draft = P.make_draft(m)
+        self.assertEqual(draft["next_best_action"], m["next_best_action"])  # action still correct
+        draft["draft_body"] = cases["_state_mismatch_prose_body"]            # but prose lies
+        self.assertIn("state_mismatch", run_guardrail(draft, m))
+
+    # P2-A (final review): verb-before-step false completion is also flagged,
+    # while imperative TODO phrasing ("add photos"/"set your hours") is not.
+    def test_p2_5_state_mismatch_verb_first(self):
+        _, res = _run()
+        m = next(x for x in res["merchants"] if x["steps_completed"] == 2)  # steps 3+ not done
+        cases = json.loads((FIXTURES / "guardrail_cases.json").read_text(encoding="utf-8"))
+        draft = P.make_draft(m)
+        self.assertEqual(draft["next_best_action"], m["next_best_action"])   # action still correct
+        draft["draft_body"] = cases["_state_mismatch_verb_first_body"]        # "we've added your photos..."
+        self.assertIn("state_mismatch", run_guardrail(draft, m))
+        # negative control: the clean stub draft (TODO phrasing) must NOT be flagged
+        self.assertEqual(run_guardrail(P.make_draft(m), m), [])
 
 
 if __name__ == "__main__":

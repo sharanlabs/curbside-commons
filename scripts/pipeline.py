@@ -40,7 +40,12 @@ def slugify(name: str) -> str:
 
 
 def parse_int(value) -> int:
-    return int(float(str(value).strip()))
+    """Parse an integer field. Accepts integer-valued decimals like "3.00"; fails
+    fast on genuinely fractional values like "3.50" (slice-plan edge case)."""
+    f = float(str(value).strip())
+    if f != int(f):
+        raise ValueError(f"non-integer value not allowed for an integer field: {value!r}")
+    return int(f)
 
 
 def date_minus_days(as_of: str, days: int) -> str:
@@ -227,6 +232,15 @@ def _next_audit_seq(out_dir: Path) -> int:
         return sum(1 for _ in csv.DictReader(fh))
 
 
+def _next_model_seq(out_dir: Path) -> int:
+    """Existing model_runs.csv row count, so appended runs get unique IDs."""
+    path = Path(out_dir) / "model_runs.csv"
+    if not path.exists():
+        return 0
+    with open(path, newline="", encoding="utf-8") as fh:
+        return sum(1 for _ in csv.DictReader(fh))
+
+
 def read_source(source_path: Path) -> list:
     with open(source_path, newline="", encoding="utf-8") as fh:
         rows = list(csv.reader(fh))
@@ -340,6 +354,7 @@ def run_pipeline(source_path=None, out_dir=None, approvals=None) -> dict:
             log("review_queued", m["merchant_id"], details=m["review_reason"])
 
     # drafts + guardrail
+    model_offset = _next_model_seq(out_dir)  # keep model_run_id unique across appends
     for i, m in enumerate(merchants, start=1):
         draft = make_draft(m)
         flags = run_guardrail(draft, m)
@@ -354,7 +369,7 @@ def run_pipeline(source_path=None, out_dir=None, approvals=None) -> dict:
             m["outreach_status"] = "draft_rejected"
             log("draft_rejected", m["merchant_id"], details=";".join(flags + schema_errors))
         model_runs.append({
-            "model_run_id": f"MR-{C.TASK_ID}-{i:03d}",
+            "model_run_id": f"MR-{C.TASK_ID}-{model_offset + i:03d}",
             "task_id": C.TASK_ID,
             "merchant_id": m["merchant_id"],
             "generator": "stub",

@@ -4,5 +4,7 @@
   "unsupported_metric": "Merchants like you typically see 30% more orders within the first month.",
   "false_impact_claim": "DoorDash officially guarantees you premium placement at the top of search.",
   "pii_or_secret": "Just email me directly at growth-team@gmail.com and I will fast-track your account.",
-  "aggressive_urgency": "Act now or you will lose your account before the end of the day."
+  "aggressive_urgency": "Act now or you will lose your account before the end of the day.",
+  "_state_mismatch_prose_body": "Great news - your photos are added and your business hours are set, so you are nearly done!",
+  "_state_mismatch_verb_first_body": "Great news - we've added your photos and verified your bank account, so you are nearly done!"
 }

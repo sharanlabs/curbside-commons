@@ -1,5 +1,102 @@
 # Task Log
 
+## 2026-06-02 (T-001 — final-review P2 fix pass)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Fix pass for the 2 final-review P2s. No integrations, no external calls.
+
+### Files Changed
+
+- `scripts/guardrail.py` — added verb-before-step completion patterns (past-tense forms; "set" gated by a completion auxiliary).
+- `tests/test_t001.py` — added `test_p2_5_state_mismatch_verb_first` (+ negative control); `tests/fixtures/guardrail_cases.json` — added `_state_mismatch_verb_first_body`.
+- `CURRENT_TASK.md`, `PROJECT_STATE.md` — corrected git-state wording (implementation committed at `653245b`; only P2-fix/hygiene uncommitted).
+- Updated `docs/implementation-journal.md`, `HANDOFF.md`, `docs/task-log.md`.
+
+### Result
+
+- **23/23 pass** (T1–T18 + P2-1..P2-5). T11/T12 still green (no over-flagging; clean drafts not flagged).
+- Both final-review P2s resolved: verb-first `state_mismatch` now caught; commit-state docs corrected.
+
+### Compliance Result
+
+Passed. No CSV change, no integrations, no credentials, no commit.
+
+### Next Step
+
+Owner decides on the P2-fix/hygiene commit (impl already at `653245b`).
+
+## 2026-06-02 (T-001 — final Codex review, result checked)
+
+- Job `bmyf43y0x` (`/codex:review --background`). **2 × P2**, no P0/P1.
+- P2-A (`scripts/guardrail.py`): the prose `state_mismatch` check only matches keyword-then-verb order ("photos ... added"); verb-first phrasing like "We've added your photos" for `steps_completed==2` still passes. Fix must add past-tense verb-first patterns **without** flagging the clean drafts' imperative TODO phrasing ("add photos", "set hours") — care needed on ambiguous "set".
+- P2-B (state docs): `CURRENT_TASK.md`/`HANDOFF.md`/`PROJECT_STATE.md` said "nothing committed", but HEAD is already `653245b "Implement T-001 offline thin slice"`; only the P2-fix + hygiene work is uncommitted. Corrected in `HANDOFF.md` this turn; `CURRENT_TASK.md` + `PROJECT_STATE.md` still to correct in the fix pass.
+- Both assessed valid. No code changed this turn (review only); awaiting owner go for the fix pass.
+
+## 2026-06-02 (Hygiene — .gitignore)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Tiny hygiene pass. No code/tests/CSV change.
+
+### Files Changed
+
+- Created `.gitignore` (`__pycache__/`, `*.pyc`, `.pytest_cache/`, `.DS_Store`).
+- Updated `docs/task-log.md`, `HANDOFF.md`.
+
+### Notes / decisions
+
+- **`out/` left tracked (not ignored), with reasoning recorded in `.gitignore`:** it's a portfolio demo artifact (reviewer can see V1's output without running it). Caveat: `model_runs.csv`/`audit_log.csv` are append-only and currently reflect the 2-run idempotency demo; regenerate with `python3 scripts/run.py --fresh` before committing for a clean single-run state.
+- **Already-tracked bytecode not auto-removed:** `.gitignore` only stops *future* tracking. The 6 committed `scripts/__pycache__/*.pyc` + `tests/__pycache__/*.pyc` need a one-time `git rm -r --cached scripts/__pycache__ tests/__pycache__` (then commit) to untrack — flagged for the owner; not done here (git-index change beyond this pass's file scope).
+
+### Compliance Result
+
+Passed. No product code/tests/CSV change; `out/` untouched; no commit.
+
+### Next Step
+
+Final Codex review, then owner commit decision.
+
+## 2026-06-02 (T-001 — Codex P2 fix pass)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Fix pass for the 4 P2 review findings. No integrations, no external calls.
+
+### Files Changed
+
+- `scripts/run.py` — preserve audit history by default; `--fresh` is explicit; `out_dir` parameterized.
+- `scripts/pipeline.py` — `parse_int` rejects fractional values; `model_run_id` offset by existing row count (`_next_model_seq`).
+- `scripts/guardrail.py` — `state_mismatch` now also flags prose claiming a not-yet-completed step is done (`COMPLETION_CLAIMS`, subject+body only).
+- `tests/test_t001.py` — added `test_p2_1..p2_4`; `tests/fixtures/guardrail_cases.json` — added `_state_mismatch_prose_body`.
+- Updated `docs/implementation-journal.md`, `docs/task-log.md`, `HANDOFF.md`, `CURRENT_TASK.md`, `PROJECT_STATE.md`.
+
+### Result
+
+- **22/22 pass** (T1–T18 + P2-1..P2-4).
+- Documented path verified: `scripts/run.py --fresh` → 12 simulated_send; `scripts/run.py` again → 0 new sends, 12 `skipped_duplicate`. `model_runs.csv` 40 rows / 40 unique IDs. Source CSV sha256 unchanged.
+
+### Doc-sync flagged
+
+`docs/v1-slice-plan.md` should enumerate the 4 P2 tests and note `run.py --fresh` vs preserve-history (docs-allowed task).
+
+### Compliance Result
+
+Passed. No CSV change, no integrations, no credentials, no commit.
+
+### Next Step
+
+Owner commit decision (optionally a confirming `/codex:review`).
+
+## 2026-06-02 (T-001 — Codex changed-files review, result checked)
+
+- Job `bbvaa9pmp` (`/codex:review --background --scope working-tree`). Verdict: substantive issues, **4 × P2**, no P0/P1.
+- P2-1: `scripts/run.py` deletes `audit_log.csv` before the canonical run → re-running the documented app command bypasses the send-idempotency control (guarantee only holds when calling `run_pipeline` directly).
+- P2-2: `scripts/pipeline.py` `parse_int` truncates `3.50`→`3` instead of rejecting non-integer decimals (contradicts slice-plan edge case).
+- P2-3: appended `model_runs.csv` reuses `MR-T-001-00x` IDs across repeated runs (ambiguous provenance vs append-only intent).
+- P2-4: `scripts/guardrail.py` `state_mismatch` only checks `next_best_action`, not prose claims that a not-yet-completed step is done (data-dictionary §9 requires both).
+- Assessment: all four valid. Next: owner decides on a single fix pass vs accept/defer; nothing committed.
+
 ## 2026-06-02 (T-001 — documentation sync)
 
 ### Tool/Session

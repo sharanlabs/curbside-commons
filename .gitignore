@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store
+
+# NOTE on out/ — intentionally NOT ignored.
+# out/ is treated as a portfolio demo artifact (a reviewer can see what V1 produces
+# without running anything), so it stays tracked. Two of its files are deterministic
+# snapshots (merchants_v1.csv, review_queue.csv); the other two are append-only logs
+# (model_runs.csv, audit_log.csv) that grow on re-runs — regenerate with
+# `python3 scripts/run.py --fresh` before committing so they reflect one clean run.

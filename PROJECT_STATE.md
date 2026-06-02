@@ -1,14 +1,14 @@
 # Project State
 
-Last updated: 2026-06-02 (T-001 implemented — T1–T18 pass)
+Last updated: 2026-06-02 (T-001 committed at 653245b; P2 fixes uncommitted — 23/23 pass)
 
 > Date note: the folder's earlier docs are dated 2026-06-02 while the current date is 2026-06-01; Git is now initialized (commit `b57cf2c`) so chronology is tracked going forward. Step order: (1) Codex initial review, (2) Codex open-source validation, (3) Claude governance review, (4) Claude plan reconciliation, (5) operating-system setup, (6) operating-system cleanup, (7) T-001 planning.
 
 ## Current Phase
 
-**Stage 1 (T-001) is implemented and green.** The offline pipeline (`scripts/`), tests (`tests/`, T1–T18 all pass), and generated artifacts (`out/`) exist. Canonical run: 20 merchants → 8 review queue (High, held), 12 simulated_sent, 0 rejected; source CSV byte-identical before/after; send gate verified (T17). Stdlib only — no network, no AI call, no integrations.
+**Stage 1 (T-001) is implemented, Codex-reviewed (twice), and green.** The offline pipeline (`scripts/`), tests (`tests/`, **23/23 pass** = T1–T18 + P2-1..P2-5), and generated artifacts (`out/`) exist. Canonical run: 20 merchants → 8 review queue (High, held), 12 simulated_sent, 0 rejected; source CSV byte-identical; send gate verified (T17); app re-run dedups (P2-1). Two Codex review rounds returned 4 + 2 × P2, **all fixed** (no P0/P1). Stdlib only — no network, no AI call, no integrations.
 
-The next gate is a **Codex changed-files review → owner commit decision.** Nothing is committed (owner's call, `RULES.md` §12).
+**Git state:** the T-001 implementation **is committed** at `HEAD = 653245b "Implement T-001 offline thin slice"`. The Codex P2 fixes (incl. the verb-first follow-up), the `.gitignore` hygiene, and the doc updates are **uncommitted** on top. The next gate is the **owner P2-fix/hygiene commit decision** — not a first implementation commit (`RULES.md` §12).
 
 ## Decision Status (2026-06-01)
 
@@ -76,23 +76,20 @@ On GO, the remaining pre-build item (§7) is `docs/v1-data-dictionary.md` (the f
 
 ## Current Next Step
 
-1. ~~Plan adversarial review → revise → human GO → implement T-001~~ — **done**; T1–T18 pass, `out/` generated.
-2. **Codex changed-files review** of the slice — run `/codex:review --background` (use `docs/prompts/codex-changed-files-review-template.md`); address findings.
-3. **Owner commit decision** — nothing is committed yet (`RULES.md` §12).
-4. **Doc-sync (docs-allowed task):** update `docs/v1-data-dictionary.md` §1/§3 (risk_level `… Risk`→enum normalization) and §9 (two corrected regexes) to match the code.
-5. Then scope **T-002**.
+1. ~~Implement T-001 → two Codex review rounds → fix all P2 findings~~ — **done**; 23/23 pass, `out/` generated, app-path idempotency + verb-first state_mismatch verified.
+2. **Owner P2-fix/hygiene commit decision** — the implementation is already committed at `653245b`; the P2 fixes + `.gitignore` + doc updates are uncommitted on top (`RULES.md` §12). Before committing `out/`, optionally regenerate with `python3 scripts/run.py --fresh` for a clean single-run state; also consider `git rm -r --cached scripts/__pycache__ tests/__pycache__` to untrack bytecode.
+3. **Doc-sync (docs-allowed task):** data dictionary already synced; still to do — `docs/v1-slice-plan.md` enumerate the P2 tests + note `run.py --fresh` vs preserve-history.
+4. Then scope **T-002**.
 
 Off the table until far later: live Supabase, n8n, Slack, Resend, or real Gemini calls; real credentials; any real merchant data; live outbound email.
 
 ## Files Created Or Updated This Session
 
-T-001 implementation (latest, 2026-06-02):
+T-001 Codex P2 fix pass (latest, 2026-06-02):
 
-- Created: `scripts/__init__.py`, `scripts/config.py`, `scripts/guardrail.py`, `scripts/pipeline.py`, `scripts/run.py`, `tests/__init__.py`, `tests/test_t001.py`, `tests/fixtures/*` (3).
-- Generated: `out/merchants_v1.csv`, `out/review_queue.csv`, `out/model_runs.csv`, `out/audit_log.csv`.
-- Updated: `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`, `docs/implementation-journal.md`.
+- Updated: `scripts/run.py` (preserve history; `--fresh`), `scripts/pipeline.py` (reject fractional ints; unique model IDs), `scripts/guardrail.py` (prose state_mismatch), `tests/test_t001.py` (+P2 tests), `tests/fixtures/guardrail_cases.json`; plus `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`, `docs/implementation-journal.md`. Regenerated `out/`.
 
-Full per-step history (governance review, plan reconciliation, OS setup, OS cleanup, T-001 planning, T-001 revision, T-001 implementation): see `docs/task-log.md`.
+Earlier T-001 implementation (2026-06-02): created `scripts/*` (5), `tests/*`, `tests/fixtures/*` (3); generated `out/*` (4). Full per-step history (governance review → reconciliation → OS setup → OS cleanup → T-001 planning → revision → implementation → doc-sync → P2 fixes): see `docs/task-log.md`.
 
 ## Open Questions
 
