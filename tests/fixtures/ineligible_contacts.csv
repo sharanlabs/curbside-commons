@@ -1,0 +1,4 @@
+fixture_id,contact_email,email_opt_in_status,suppression_reason,note
+FX01,foo@example.com,opted_out,,opted out
+FX02,bar@example.com,unknown,bounced,suppressed
+FX03,not-an-email,unknown,,invalid email format

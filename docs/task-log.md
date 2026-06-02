@@ -1,5 +1,76 @@
 # Task Log
 
+## 2026-06-02 (T-001 — documentation sync)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Docs only — no code, tests, or CSV touched.
+
+### Task
+
+Sync `docs/v1-data-dictionary.md` with the shipped implementation (resolves the doc-sync flag from the implementation entry).
+
+### Files Changed
+
+- `docs/v1-data-dictionary.md`: status line (plan → implemented); §1 new row 11 + §3/§6 (source `… Risk` → canonical `Low/Medium/High` normalization); §9 two regex fixes to the implemented versions (`%` not `%\b`; inflected verbs `guarantee[sd]?` etc.) + explanatory note; §2 "proposed location" → "location".
+- `docs/task-log.md`, `HANDOFF.md`: brief updates.
+
+### Verification
+
+- Confirmed the two §9 regex lines now match `scripts/guardrail.py` verbatim; no stale regex forms remain in the doc.
+
+### Compliance Result
+
+Passed. No product code/tests/CSV change; no commit.
+
+### Next Step
+
+Codex changed-files review (`/codex:review --background`), then owner commit decision.
+
+## 2026-06-02 (T-001 — implementation)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. First product code for the project.
+
+### Task
+
+Implement the offline T-001 thin slice per `docs/v1-slice-plan.md` + `docs/v1-data-dictionary.md`.
+
+### Skills check
+
+- Task type: deterministic Python implementation + tests. Relevant skills: none required (no UI/framework/data-viz; test-driven-development principles applied inline). Conflicts with RULES.md: none.
+
+### Files Changed
+
+- Created: `scripts/__init__.py`, `scripts/config.py`, `scripts/guardrail.py`, `scripts/pipeline.py`, `scripts/run.py`, `tests/__init__.py`, `tests/test_t001.py`, `tests/fixtures/ineligible_contacts.csv`, `tests/fixtures/approvals.csv`, `tests/fixtures/guardrail_cases.json`.
+- Generated: `out/merchants_v1.csv`, `out/review_queue.csv`, `out/model_runs.csv`, `out/audit_log.csv`.
+- Updated: `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`, `docs/implementation-journal.md`.
+
+### Result
+
+- **T1–T18: 18/18 pass** (`python3 -m unittest tests.test_t001 -v`).
+- Canonical run: 20 merchants, 8 in review queue (the 8 High), 12 simulated_sent (Low/Medium), 8 High held (`drafted`, `pending_review`), 0 draft_rejected, 12 simulated_send events, 0 skipped.
+- Source CSV sha256 identical before/after (`43fb21f6…`).
+- Send gate verified: no High/review-required merchant is sent without an explicit synthetic approval (T17).
+- Three issues caught by tests and fixed in the logic (not the tests): risk_level enum normalization; two guardrail regex bugs (`%\b`, inflected-verb `\b`). See implementation journal.
+
+### Stdlib / offline confirmation
+
+Standard library only; no network, no AI/LLM call (draft generator is a deterministic stub), no Supabase/n8n/Slack/Resend/Gemini/Apps Script, no real email, no secrets.
+
+### Doc-sync flagged
+
+`docs/v1-data-dictionary.md` §1/§3 (risk_level `… Risk`→enum normalization) and §9 (two corrected regexes) need a follow-up edit in a docs-allowed task; code matches the documented intent.
+
+### Compliance Result
+
+Passed. No CSV modification, no integrations, no credentials, no commit.
+
+### Next Step
+
+Codex changed-files review (`/codex:review`); then human decision on commit.
+
 ## 2026-06-01 (T-001 — plan revision after Codex round-1)
 
 ### Tool/Session

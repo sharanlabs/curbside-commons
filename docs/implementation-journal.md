@@ -30,6 +30,25 @@ Newest entries on top.
 
 ---
 
+## 2026-06-02 T-001 — Offline thin slice implementation
+
+- What changed: Implemented the V1 offline pipeline (`scripts/config.py`, `scripts/guardrail.py`, `scripts/pipeline.py`, `scripts/run.py`), tests `tests/test_t001.py` (T1–T18, all passing), fixtures, and generated `out/` artifacts. Stdlib only; no network, no AI call, no integrations; source CSV read-only (hash-verified unchanged).
+- Why it changed: human GO on the revised T-001 plan.
+- Challenges / failures that appeared (caught by the tests):
+  1. **risk_level enum mismatch.** Source CSV uses `Low Risk`/`Medium Risk`/`High Risk`; the data-dictionary enum is `Low`/`Medium`/`High`. The pipeline failed validation on row 1 until normalization stripped `" Risk"`.
+  2. **Guardrail regex bug — `%\b`.** `unsupported_metric` used `\b\d+\s?%\b`; `\b` after `%` can't match before a space ("30% more"), so the category never fired. Fixed to `\b\d+\s?%` (still context-bound).
+  3. **Guardrail regex bug — trailing `\b` on inflected verbs.** `false_impact_claim` used `\b(guarantee|endorses|…)\b`, which fails on "guarantee**s**" (s is a word char). Fixed to `(guarantee[sd]?|endorse[sd]?|recommend[sd]?|…)`.
+- How diagnosed: T16 surfaced (1); T18 (under-flag coverage) surfaced (2) and (3) — exactly the test Codex asked for. Verified (2)/(3) with a one-off `re.search` probe before fixing.
+- Options considered: loosen the tests (rejected — per RULES/advisor, fix the logic) vs. fix the code (chosen).
+- Final fix: as above. Re-ran the full suite → 18/18 pass; canonical `out/` shows 12 simulated_sent, 8 High held, 0 rejected, source unchanged.
+- Prevention: T18 now permanently guards every guardrail category against under-flagging; T16 guards the row schema/enum.
+- **Doc-sync needed (out of scope this task — data dictionary not in allowed files):** `docs/v1-data-dictionary.md` should be updated in a docs-allowed task to (a) note the source `… Risk` → enum normalization in §1/§3, and (b) carry the corrected §9 regex for `unsupported_metric` and `false_impact_claim`. The code matches the documented *intent*; the doc has the same two regex typos. Flagged for the next Codex review.
+- Files changed: see the 2026-06-02 task-log entry.
+- Reviewer notes: ready for `/codex:review` of the changed files.
+- Human decision: GO was given; commit is still the human owner's call (not committed).
+
+---
+
 ## 2026-06-01 OS-SETUP — Project operating system
 
 - What changed: Created the project's operating-system files (rules, role files, continuity/handoff, dual-model workflow, narrative, journals/logs, checklist, prompt templates, first-pass visuals).

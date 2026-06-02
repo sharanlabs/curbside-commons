@@ -1,14 +1,14 @@
 # Project State
 
-Last updated: 2026-06-01 (T-001 plan revised after Codex review)
+Last updated: 2026-06-02 (T-001 implemented — T1–T18 pass)
 
 > Date note: the folder's earlier docs are dated 2026-06-02 while the current date is 2026-06-01; Git is now initialized (commit `b57cf2c`) so chronology is tracked going forward. Step order: (1) Codex initial review, (2) Codex open-source validation, (3) Claude governance review, (4) Claude plan reconciliation, (5) operating-system setup, (6) operating-system cleanup, (7) T-001 planning.
 
 ## Current Phase
 
-**Stage 1 (T-001) planning is drafted, Codex-reviewed, and revised.** The V1 data dictionary, slice plan, and review packet exist (`docs/v1-data-dictionary.md`, `docs/v1-slice-plan.md`, `docs/review-packets/T-001-review-packet.md`). Codex round-1 (NO-SHIP, 2 findings) is resolved: a contact-vs-send eligibility + `approval_state` gate (T17) and 6-category guardrail with per-category fixtures (T18). The next gate is **human GO → a separate implementation task.**
+**Stage 1 (T-001) is implemented and green.** The offline pipeline (`scripts/`), tests (`tests/`, T1–T18 all pass), and generated artifacts (`out/`) exist. Canonical run: 20 merchants → 8 review queue (High, held), 12 simulated_sent, 0 rejected; source CSV byte-identical before/after; send gate verified (T17). Stdlib only — no network, no AI call, no integrations.
 
-No product code has been written.
+The next gate is a **Codex changed-files review → owner commit decision.** Nothing is committed (owner's call, `RULES.md` §12).
 
 ## Decision Status (2026-06-01)
 
@@ -76,20 +76,23 @@ On GO, the remaining pre-build item (§7) is `docs/v1-data-dictionary.md` (the f
 
 ## Current Next Step
 
-1. ~~Codex adversarial review of the T-001 plan~~ — **done** (job `review-mpw2j628-ncd4my`, NO-SHIP, 2 findings).
-2. ~~Resolve/accept findings~~ — **done** (send-gate + T17; guardrail coverage + T18; fenced regex).
-3. **Human approval (GO)** of the revised plan against the GO/NO-GO criteria in `docs/v1-slice-plan.md` — **outstanding (this is the gate).**
-4. Then a **separate implementation task**: `scripts/` + `tests/` (+ `tests/fixtures/`) producing `out/merchants_v1.csv` and the two append-only logs, satisfying tests **T1–T18**.
+1. ~~Plan adversarial review → revise → human GO → implement T-001~~ — **done**; T1–T18 pass, `out/` generated.
+2. **Codex changed-files review** of the slice — run `/codex:review --background` (use `docs/prompts/codex-changed-files-review-template.md`); address findings.
+3. **Owner commit decision** — nothing is committed yet (`RULES.md` §12).
+4. **Doc-sync (docs-allowed task):** update `docs/v1-data-dictionary.md` §1/§3 (risk_level `… Risk`→enum normalization) and §9 (two corrected regexes) to match the code.
+5. Then scope **T-002**.
 
-No product code until step 3 clears. A second Codex pass is optional. Off the table until far later: live Supabase, n8n, Slack, Resend, or real Gemini calls; real credentials; any real merchant data; live outbound email.
+Off the table until far later: live Supabase, n8n, Slack, Resend, or real Gemini calls; real credentials; any real merchant data; live outbound email.
 
 ## Files Created Or Updated This Session
 
-T-001 plan revision after Codex round-1 (latest):
+T-001 implementation (latest, 2026-06-02):
 
-- Updated: `docs/v1-data-dictionary.md` (§3, §7, §7.1, §9 send-gate + guardrail), `docs/v1-slice-plan.md` (steps, T17/T18, edge cases, GO/NO-GO), `docs/review-packets/T-001-review-packet.md` (findings + resolutions), `docs/decision-log.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`.
+- Created: `scripts/__init__.py`, `scripts/config.py`, `scripts/guardrail.py`, `scripts/pipeline.py`, `scripts/run.py`, `tests/__init__.py`, `tests/test_t001.py`, `tests/fixtures/*` (3).
+- Generated: `out/merchants_v1.csv`, `out/review_queue.csv`, `out/model_runs.csv`, `out/audit_log.csv`.
+- Updated: `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`, `docs/implementation-journal.md`.
 
-Earlier T-001 planning (same day): created the three planning docs above. Full per-step history (governance review, plan reconciliation, OS setup, OS cleanup, T-001 planning, T-001 revision): see `docs/task-log.md`.
+Full per-step history (governance review, plan reconciliation, OS setup, OS cleanup, T-001 planning, T-001 revision, T-001 implementation): see `docs/task-log.md`.
 
 ## Open Questions
 

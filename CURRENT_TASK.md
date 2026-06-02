@@ -3,20 +3,16 @@
 The single active task. Update this whenever the active task changes or pauses.
 
 - **Task ID:** T-001
-- **Task name:** Offline thin slice — planning + data dictionary
-- **Current stage:** Planning docs **revised after Codex round-1** (both findings fixed) — **ready for human GO**; no implementation yet.
-- **Owner:** Claude Code (planner); the human owner approves GO and the plan.
-- **Goal:** Produce the plan for the V1 offline thin slice and write `docs/v1-data-dictionary.md`. **No product code yet.** The data dictionary defines: the V1 field list; the deterministic risk formula and thresholds; the onboarding step order and blocker taxonomy; and the duplicate-send idempotency key. The plan defines the slice stages and the acceptance tests for each.
-- **Allowed files:** `docs/v1-data-dictionary.md` (new), a short slice-plan doc such as `docs/v1-slice-plan.md` (new), `docs/task-log.md`, `docs/implementation-journal.md`, `docs/decision-log.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`.
-- **Files NOT to touch:** `DoorDash Merchant Nudge Engine - Merchant Directory.csv` (read-only source). `scripts/` and any product code (this task is planning only). Any integration code or schemas (Supabase / n8n / Slack / Resend / Gemini are out of scope).
-- **Acceptance criteria:**
-  - `docs/v1-data-dictionary.md` covers fields, risk formula + thresholds, step/blocker taxonomy, and the idempotency-key definition;
-  - the slice plan lists stages and the acceptance tests for each;
-  - the plan passes a Codex adversarial review (`/codex:adversarial-review`) — **done 2026-06-01; round-1 findings resolved**;
-  - the human owner approves the plan before any implementation task starts (**outstanding**).
-- **As-of date:** **June 1, 2026** (2026-06-01) — the fixed reference for deriving timestamps from the relative day counts. Change only if the human owner says so.
-- **Current status:** Planning docs created and **revised after Codex round-1** (2026-06-01): `docs/v1-data-dictionary.md`, `docs/v1-slice-plan.md`, `docs/review-packets/T-001-review-packet.md`. Defines the entity schema, risk/blocker rules, review queue, **contact-vs-send eligibility + `approval_state` gate**, stubbed draft + 6-category guardrail, two append-only logs, idempotency, and acceptance tests **T1–T18**.
-- **Last known progress:** Codex adversarial review (job `review-mpw2j628-ncd4my`) returned NO-SHIP with 2 findings; both fixed (send-gate + guardrail under-flag coverage). Awaiting human GO.
-- **Unfinished work:** human approval (GO) of the revised plan. Then implementation (separate later task): `scripts/` + `tests/` (+ `tests/fixtures/`) producing `out/merchants_v1.csv` and the two logs, satisfying T1–T18.
-- **Known risks:** thresholds under-constrained (carried source label; T5 consistency-only — do not overclaim); stubbed generator means the guardrail passes by construction (T11 + T18 bound its coverage); temptation to over-model V1 — keep to one entity CSV + two append-only logs.
-- **Next safe step:** human GO on the revised plan (GO/NO-GO criteria in `docs/v1-slice-plan.md`). Then implementation. A second Codex pass is optional, not required. Do not write product code until human GO.
+- **Task name:** Offline thin slice — implementation
+- **Current stage:** **Implemented; T1–T18 pass.** Pending Codex changed-files review and the owner's commit decision.
+- **Owner:** Claude Code (builder); the human owner decides on commit and the next task.
+- **Goal (met):** offline pipeline that normalizes the 20-row CSV → `out/merchants_v1.csv`, computes deterministic risk/blocker, builds a review queue, generates one stubbed guardrailed draft, gates simulated sends behind approval, and writes two append-only logs — with tests T1–T18. No integrations, no AI call, source CSV untouched.
+- **Allowed files (this task):** `scripts/`, `tests/`, `tests/fixtures/`, `out/`, `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`, `docs/implementation-journal.md`.
+- **Files NOT to touch:** `DoorDash Merchant Nudge Engine - Merchant Directory.csv` (read-only); Supabase/n8n/Slack/Resend/Gemini/Apps Script (none exist; do not create). `docs/v1-data-dictionary.md` and other docs were out of allowed scope this task (see doc-sync note below).
+- **Acceptance criteria:** **met** — `python3 -m unittest tests.test_t001 -v` → 18/18; canonical `python3 scripts/run.py` produces `out/`; source CSV byte-identical before/after.
+- **How to run:** app `python3 scripts/run.py`; tests `python3 -m unittest tests.test_t001 -v`.
+- **Current status:** Implementation complete and green; nothing committed (owner's call, `RULES.md` §12).
+- **Last known progress:** 12 simulated_sent (Low/Medium), 8 High held (`pending_review`), 0 draft_rejected; send gate verified by T17.
+- **Unfinished work:** Codex changed-files review; owner commit decision; doc-sync of `docs/v1-data-dictionary.md` (§1/§3 risk_level normalization, §9 two regex fixes) in a docs-allowed task.
+- **Known risks:** thresholds remain a documented assumption (T5 consistency-only); the stub guardrail is only as strong as its fixtures (T18 covers all 6 categories now); data-dictionary lags code on two minor regex typos (flagged).
+- **Next safe step:** run `/codex:review --background` (changed-files), address findings, then owner decides on commit. After that, a follow-up docs task to sync the data dictionary, then scope T-002.

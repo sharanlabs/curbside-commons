@@ -1,6 +1,6 @@
 # V1 Data Dictionary
 
-Status: **plan / not yet implemented.** This defines the V1 offline thin-slice data contract for ActivationOps AI. It is the schema the future ingest/normalize task must satisfy. No code or output files exist yet.
+Status: **implemented (T-001, 2026-06-02).** This defines the V1 offline thin-slice data contract for ActivationOps AI. `scripts/` implements it, `out/` holds the generated artifacts, and tests T1–T18 pass. Keep this doc in sync with `scripts/` on any schema/guardrail change.
 
 Dummy data only. No real DoorDash access, no real merchants, no real impact. All seeded values are labeled synthetic.
 
@@ -22,10 +22,11 @@ Source: `DoorDash Merchant Nudge Engine - Merchant Directory.csv` (20 rows, 9 co
 | 8 | `Estimated Time Saved (min)` constant = 15 | all 20 rows | Exclude from decisioning; mark simulated; out of scope (§16) |
 | 9 | `AI Nudge Message` already generated with no provenance | no prompt/model/guardrail record | Do not reuse as truth; regenerate via stubbed generator with provenance (§13–14) |
 | 10 | No contact, owner, consent, review, send, outcome, or audit state | absent | Seed labeled-synthetic contact defaults; add state columns (§3–§11) |
+| 11 | Risk level uses a `… Risk` suffix | values `Low Risk`, `Medium Risk`, `High Risk` | Normalize to the canonical enum `Low`/`Medium`/`High` by stripping `" Risk"`; carry as authoritative (§3, §6) |
 
 ## 2. Normalized output files
 
-V1 storage = **one entity table + two append-only event logs** (not a 14-table schema; not a database). Proposed location `out/` to keep generated artifacts separate from the read-only source.
+V1 storage = **one entity table + two append-only event logs** (not a 14-table schema; not a database). Location `out/` keeps generated artifacts separate from the read-only source.
 
 | File | Kind | Purpose |
 | --- | --- | --- |
@@ -73,7 +74,7 @@ Types: `string`, `integer`, `date` (ISO-8601 `YYYY-MM-DD`), `datetime` (ISO-8601
 | --- | --- | --- | --- | --- |
 | `risk_score` | integer | 0–200 | 69 | **recomputed**; must equal source `Risk Score` (genuine check) |
 | `risk_score_formula_version` | string | `risk.v1` | `risk.v1` | constant |
-| `risk_level` | enum | `Low`,`Medium`,`High` | `Medium` | **carried from source** (authoritative) |
+| `risk_level` | enum | `Low`,`Medium`,`High` | `Medium` | **carried from source** (authoritative), normalized from the source `… Risk` form (e.g., `Medium Risk` → `Medium`) |
 | `risk_level_source` | string | `source_csv` | `source_csv` | constant — records that the label is carried, not asserted |
 | `risk_reason_codes` | list<string> | `tenure_pressure`,`inactivity`,`low_completion` | `inactivity;low_completion` | derived (§6); each in enum |
 
@@ -164,7 +165,7 @@ Verified to reproduce the source `Risk Score` on all 20 rows. The 20 rows over-d
 (Thresholds for reason codes are descriptive labels, not gating logic.)
 
 **Risk level — carried from source, NOT asserted by us.** The source labels imply only: Low ≤ 48, Medium = {69, 69}, High ≥ 89. The gaps (48→69, 69→89) mean the true boundaries are **unconstrained** by 20 rows. Therefore:
-- `merchants_v1.csv.risk_level` = the source label (authoritative).
+- `merchants_v1.csv.risk_level` = the source label (authoritative), normalized from the source `… Risk` form to the canonical enum (`Low Risk` → `Low`, etc.).
 - A documented assumption set `risk_level_thresholds = {Low: <50, Medium: 50–79, High: ≥80}` (version `thresholds.v1`) is recorded for classifying *future/unseen* merchants and for a consistency check only.
 - The consistency check (test T5) confirms these thresholds do not contradict the 20 source labels. **It does not prove the thresholds are correct** — any boundary inside the gaps would also pass. This distinction is deliberate and must not be overstated.
 
@@ -224,7 +225,7 @@ Categories (one flag each):
 | `aggressive_urgency` | misleading or high-pressure urgency (false deadlines, account-loss threats) |
 | `state_mismatch` | draft `next_best_action` ≠ computed value, or claims a not-yet-completed step is done |
 
-Detection patterns are kept in a code block (not a Markdown table) so the alternation `|` is never miscopied as literal `\|`. All patterns are case-insensitive. **Numeric/percentage patterns are deliberately bound to revenue/performance context** so legitimate onboarding-progress text ("60% complete", "80% done", "20% of the way there") does NOT flag — this is what lets the 20 real nudges pass T11.
+Detection patterns are kept in a code block (not a Markdown table) so the alternation `|` is never miscopied as literal `\|`. All patterns are case-insensitive. **Numeric/percentage patterns are deliberately bound to revenue/performance context** so legitimate onboarding-progress text ("60% complete", "80% done", "20% of the way there") does NOT flag — this is what lets the 20 real nudges pass T11. **Authority/impact verbs allow inflections** (e.g., `guarantee[sd]?`) so a trailing word boundary still matches plurals like "guarantees". (These two refinements landed during T-001 implementation, caught by tests T11/T18; the patterns below are the implemented versions.)
 
 ```regex
 # forbidden_revenue_claim
@@ -236,12 +237,17 @@ Detection patterns are kept in a code block (not a Markdown table) so the altern
 \b\d+\s?%\s*(more|increase)\b.{0,20}\b(sales|revenue|orders|income|customers)\b
 
 # unsupported_metric  (numbers tied to performance, NOT bare "% complete/done/of")
-\b\d+\s?%\b.{0,15}\b(more|increase|boost|growth)\b
+# NB: no \b immediately after %, since % is non-word and the next char is a space
+# ("30% more") — a \b there would never match. Still bound to performance words.
+\b\d+\s?%.{0,15}\b(more|increase|boost|growth)\b
 \b\d+\s?x\b.{0,15}\b(more|sales|revenue|orders|income|customers)\b
 
 # false_impact_claim
+# NB: verbs allow inflections (guarantee[sd]?, endorse[sd]?, recommend[sd]?) so the
+# trailing \b still matches "guarantees"/"endorsed" (a bare \bguarantee\b would fail
+# on "guarantees" because the trailing s is a word char).
 \bofficial(ly)?\b.{0,15}\bdoordash\b
-\bdoordash\b.{0,15}\b(guarantee|endorses|recommends|partner of the year)\b
+\bdoordash\b.{0,15}\b(guarantee[sd]?|endorse[sd]?|recommend[sd]?|partner of the year)\b
 \b(proven|guaranteed)\b.{0,15}\b(results|growth|sales)\b
 
 # pii_or_secret

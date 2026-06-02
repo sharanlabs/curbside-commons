@@ -1,0 +1,2 @@
+merchant_id,approval,note
+M006,approved,"synthetic approval of one High-risk merchant (Bella Italia) to exercise the approved->sent path"

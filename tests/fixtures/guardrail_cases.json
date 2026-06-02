@@ -1,0 +1,8 @@
+{
+  "_note": "One planted bad-draft body per forbidden category (T18). state_mismatch is exercised structurally in the test (a draft whose next_best_action differs from the merchant's computed action), not via text here.",
+  "forbidden_revenue_claim": "We guarantee you will earn $500 more every single week once you are live.",
+  "unsupported_metric": "Merchants like you typically see 30% more orders within the first month.",
+  "false_impact_claim": "DoorDash officially guarantees you premium placement at the top of search.",
+  "pii_or_secret": "Just email me directly at growth-team@gmail.com and I will fast-track your account.",
+  "aggressive_urgency": "Act now or you will lose your account before the end of the day."
+}

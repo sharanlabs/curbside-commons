@@ -1,0 +1,9 @@
+merchant_id,merchant_name,merchant_category,risk_level,risk_score,current_blocker_code,next_best_action,review_reason,approval_state
+M006,Bella Italia,Restaurant,High,114,photos_needed,add_photos,high_risk,pending_review
+M008,Tech Gadgets Plus,Retail,High,94,business_verification_needed,verify_business,high_risk,pending_review
+M010,Metro Pharmacy,Retail,High,159,menu_upload_needed,upload_menu,high_risk,pending_review
+M012,Organic Foods Hub,Grocery,High,90,photos_needed,add_photos,high_risk,pending_review
+M014,Fashion Forward,Retail,High,91,menu_upload_needed,upload_menu,high_risk,pending_review
+M016,Downtown Deli,Restaurant,High,102,photos_needed,add_photos,high_risk,pending_review
+M017,Sports Gear Pro,Retail,High,89,business_verification_needed,verify_business,high_risk,pending_review
+M020,Urban Grocery,Grocery,High,125,menu_upload_needed,upload_menu,high_risk,pending_review

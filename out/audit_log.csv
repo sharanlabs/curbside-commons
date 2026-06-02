@@ -1,0 +1,102 @@
+audit_event_id,task_id,merchant_id,event_type,actor,idempotency_key,details,created_at
+AE-000001,T-001,,source_read,system,,source=DoorDash Merchant Nudge Engine - Merchant Directory.csv,2026-06-01T00:00:00Z
+AE-000002,T-001,M001,normalized,system,,row=1,2026-06-01T00:00:00Z
+AE-000003,T-001,M001,risk_scored,system,,42/Low,2026-06-01T00:00:00Z
+AE-000004,T-001,M001,blocker_diagnosed,system,,photos_needed,2026-06-01T00:00:00Z
+AE-000005,T-001,M002,normalized,system,,row=2,2026-06-01T00:00:00Z
+AE-000006,T-001,M002,risk_scored,system,,69/Medium,2026-06-01T00:00:00Z
+AE-000007,T-001,M002,blocker_diagnosed,system,,menu_upload_needed,2026-06-01T00:00:00Z
+AE-000008,T-001,M003,normalized,system,,row=3,2026-06-01T00:00:00Z
+AE-000009,T-001,M003,risk_scored,system,,2/Low,2026-06-01T00:00:00Z
+AE-000010,T-001,M003,blocker_diagnosed,system,,final_verification_needed,2026-06-01T00:00:00Z
+AE-000011,T-001,M004,normalized,system,,row=4,2026-06-01T00:00:00Z
+AE-000012,T-001,M004,risk_scored,system,,69/Medium,2026-06-01T00:00:00Z
+AE-000013,T-001,M004,blocker_diagnosed,system,,business_hours_needed,2026-06-01T00:00:00Z
+AE-000014,T-001,M005,normalized,system,,row=5,2026-06-01T00:00:00Z
+AE-000015,T-001,M005,risk_scored,system,,17/Low,2026-06-01T00:00:00Z
+AE-000016,T-001,M005,blocker_diagnosed,system,,bank_verification_needed,2026-06-01T00:00:00Z
+AE-000017,T-001,M006,normalized,system,,row=6,2026-06-01T00:00:00Z
+AE-000018,T-001,M006,risk_scored,system,,114/High,2026-06-01T00:00:00Z
+AE-000019,T-001,M006,blocker_diagnosed,system,,photos_needed,2026-06-01T00:00:00Z
+AE-000020,T-001,M006,review_queued,system,,high_risk,2026-06-01T00:00:00Z
+AE-000021,T-001,M007,normalized,system,,row=7,2026-06-01T00:00:00Z
+AE-000022,T-001,M007,risk_scored,system,,39/Low,2026-06-01T00:00:00Z
+AE-000023,T-001,M007,blocker_diagnosed,system,,business_hours_needed,2026-06-01T00:00:00Z
+AE-000024,T-001,M008,normalized,system,,row=8,2026-06-01T00:00:00Z
+AE-000025,T-001,M008,risk_scored,system,,94/High,2026-06-01T00:00:00Z
+AE-000026,T-001,M008,blocker_diagnosed,system,,business_verification_needed,2026-06-01T00:00:00Z
+AE-000027,T-001,M008,review_queued,system,,high_risk,2026-06-01T00:00:00Z
+AE-000028,T-001,M009,normalized,system,,row=9,2026-06-01T00:00:00Z
+AE-000029,T-001,M009,risk_scored,system,,24/Low,2026-06-01T00:00:00Z
+AE-000030,T-001,M009,blocker_diagnosed,system,,bank_verification_needed,2026-06-01T00:00:00Z
+AE-000031,T-001,M010,normalized,system,,row=10,2026-06-01T00:00:00Z
+AE-000032,T-001,M010,risk_scored,system,,159/High,2026-06-01T00:00:00Z
+AE-000033,T-001,M010,blocker_diagnosed,system,,menu_upload_needed,2026-06-01T00:00:00Z
+AE-000034,T-001,M010,review_queued,system,,high_risk,2026-06-01T00:00:00Z
+AE-000035,T-001,M011,normalized,system,,row=11,2026-06-01T00:00:00Z
+AE-000036,T-001,M011,risk_scored,system,,15/Low,2026-06-01T00:00:00Z
+AE-000037,T-001,M011,blocker_diagnosed,system,,final_verification_needed,2026-06-01T00:00:00Z
+AE-000038,T-001,M012,normalized,system,,row=12,2026-06-01T00:00:00Z
+AE-000039,T-001,M012,risk_scored,system,,90/High,2026-06-01T00:00:00Z
+AE-000040,T-001,M012,blocker_diagnosed,system,,photos_needed,2026-06-01T00:00:00Z
+AE-000041,T-001,M012,review_queued,system,,high_risk,2026-06-01T00:00:00Z
+AE-000042,T-001,M013,normalized,system,,row=13,2026-06-01T00:00:00Z
+AE-000043,T-001,M013,risk_scored,system,,48/Low,2026-06-01T00:00:00Z
+AE-000044,T-001,M013,blocker_diagnosed,system,,business_hours_needed,2026-06-01T00:00:00Z
+AE-000045,T-001,M014,normalized,system,,row=14,2026-06-01T00:00:00Z
+AE-000046,T-001,M014,risk_scored,system,,91/High,2026-06-01T00:00:00Z
+AE-000047,T-001,M014,blocker_diagnosed,system,,menu_upload_needed,2026-06-01T00:00:00Z
+AE-000048,T-001,M014,review_queued,system,,high_risk,2026-06-01T00:00:00Z
+AE-000049,T-001,M015,normalized,system,,row=15,2026-06-01T00:00:00Z
+AE-000050,T-001,M015,risk_scored,system,,4/Low,2026-06-01T00:00:00Z
+AE-000051,T-001,M015,blocker_diagnosed,system,,final_verification_needed,2026-06-01T00:00:00Z
+AE-000052,T-001,M016,normalized,system,,row=16,2026-06-01T00:00:00Z
+AE-000053,T-001,M016,risk_scored,system,,102/High,2026-06-01T00:00:00Z
+AE-000054,T-001,M016,blocker_diagnosed,system,,photos_needed,2026-06-01T00:00:00Z
+AE-000055,T-001,M016,review_queued,system,,high_risk,2026-06-01T00:00:00Z
+AE-000056,T-001,M017,normalized,system,,row=17,2026-06-01T00:00:00Z
+AE-000057,T-001,M017,risk_scored,system,,89/High,2026-06-01T00:00:00Z
+AE-000058,T-001,M017,blocker_diagnosed,system,,business_verification_needed,2026-06-01T00:00:00Z
+AE-000059,T-001,M017,review_queued,system,,high_risk,2026-06-01T00:00:00Z
+AE-000060,T-001,M018,normalized,system,,row=18,2026-06-01T00:00:00Z
+AE-000061,T-001,M018,risk_scored,system,,47/Low,2026-06-01T00:00:00Z
+AE-000062,T-001,M018,blocker_diagnosed,system,,bank_verification_needed,2026-06-01T00:00:00Z
+AE-000063,T-001,M019,normalized,system,,row=19,2026-06-01T00:00:00Z
+AE-000064,T-001,M019,risk_scored,system,,36/Low,2026-06-01T00:00:00Z
+AE-000065,T-001,M019,blocker_diagnosed,system,,business_hours_needed,2026-06-01T00:00:00Z
+AE-000066,T-001,M020,normalized,system,,row=20,2026-06-01T00:00:00Z
+AE-000067,T-001,M020,risk_scored,system,,125/High,2026-06-01T00:00:00Z
+AE-000068,T-001,M020,blocker_diagnosed,system,,menu_upload_needed,2026-06-01T00:00:00Z
+AE-000069,T-001,M020,review_queued,system,,high_risk,2026-06-01T00:00:00Z
+AE-000070,T-001,M001,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000071,T-001,M002,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000072,T-001,M003,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000073,T-001,M004,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000074,T-001,M005,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000075,T-001,M006,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000076,T-001,M007,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000077,T-001,M008,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000078,T-001,M009,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000079,T-001,M010,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000080,T-001,M011,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000081,T-001,M012,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000082,T-001,M013,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000083,T-001,M014,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000084,T-001,M015,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000085,T-001,M016,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000086,T-001,M017,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000087,T-001,M018,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000088,T-001,M019,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000089,T-001,M020,draft_generated,system,,ok,2026-06-01T00:00:00Z
+AE-000090,T-001,M001,simulated_send,system,M001:photos_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000091,T-001,M002,simulated_send,system,M002:menu_upload_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000092,T-001,M003,simulated_send,system,M003:final_verification_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000093,T-001,M004,simulated_send,system,M004:business_hours_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000094,T-001,M005,simulated_send,system,M005:bank_verification_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000095,T-001,M007,simulated_send,system,M007:business_hours_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000096,T-001,M009,simulated_send,system,M009:bank_verification_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000097,T-001,M011,simulated_send,system,M011:final_verification_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000098,T-001,M013,simulated_send,system,M013:business_hours_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000099,T-001,M015,simulated_send,system,M015:final_verification_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000100,T-001,M018,simulated_send,system,M018:bank_verification_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
+AE-000101,T-001,M019,simulated_send,system,M019:business_hours_needed:blocker_nudge.v1:2026-06-01,simulated (no real email),2026-06-01T00:00:00Z
