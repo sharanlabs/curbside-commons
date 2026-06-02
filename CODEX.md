@@ -40,6 +40,18 @@ Per `docs/enterprise-delivery-playbook.md`, Codex also verifies whether Claude *
 - public-claim control (nothing unsupported; "simulated" labels; dev tools not presented as runtime);
 - whether the process weight (lightweight vs full) fits the risk.
 
+Every Codex review (plan or changed-files) verifies the **Mandatory Startup Contract** (`RULES.md` §15) for meaningful tasks:
+
+- whether Claude followed the Enterprise Delivery Playbook;
+- whether the task classification is correct;
+- whether the chosen process is lightweight or full **for the right reason**;
+- whether sources / framework / tool rationale are sufficient;
+- whether assumptions, risks, validation, and artifacts are handled correctly;
+- whether there is **silent scope expansion**;
+- whether handoff and **git state** are accurate (re-derived, not assumed).
+
+**If Claude skipped the playbook/startup contract for a meaningful task, flag it as a process finding** (not just a code finding). Do not flag trivial low-risk edits where a one-line Professional Process Applied block is sufficient.
+
 ## Standard
 
 Find root causes and operational failure modes, not just surface issues. Tie every finding to evidence: a file, a diff, a row, or a cited source. Mark platform claims UNVERIFIED unless backed by current docs or the installed tool (`RULES.md` §6).

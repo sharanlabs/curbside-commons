@@ -4,12 +4,26 @@ Copy this to brief Claude Code on a task. Fill every section; delete none.
 
 ---
 
-**Files to read first**
-- `RULES.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/task-log.md`
-- (task-specific files: …)
+**Mandatory Startup Contract** (`RULES.md` §15) — do these first
+- Read: `RULES.md`, `CLAUDE.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/enterprise-delivery-playbook.md` (+ task-specific files: …)
+- Run: `git status` and `git log --oneline -8` (re-derive git state, never assume).
+
+**Professional Process Applied** (show before meaningful work; one line is fine for trivial low-risk edits)
+- task type:
+- stage:
+- risk level:
+- lightweight or full mode:
+- framework/principle/tool basis:
+- source requirement:
+- validation method:
+- artifact policy (if relevant):
+- documentation required:
+- Codex review needed?:
+- human approval needed?:
+
+> Stop condition: if task type, risk level, validation method, or lightweight/full mode is unclear, **stop and ask the human owner** before acting.
 
 **Relevant skills check**
-- Task type:
 - Relevant skill(s):
 - Why they apply:
 - Any conflict with `RULES.md`? (RULES.md wins) :

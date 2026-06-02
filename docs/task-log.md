@@ -1,5 +1,28 @@
 # Task Log
 
+## 2026-06-02 (Enforcement — Mandatory Startup Contract)
+
+### Professional Process Applied (short — low-risk docs edit)
+
+Task type: process/enforcement docs · Stage: post-T-001.5 · Risk: low · Mode: lightweight · Basis: the just-created playbook + the audit's recurring git-state finding · Sources: repo only (no external) · Validation: section-coverage vs spec + git re-derived · Docs: the listed files · Codex review: optional · Human approval: not needed (no scope/tool/architecture change).
+
+### Files Changed
+
+- `RULES.md` (new §15 Mandatory Startup Contract), `CLAUDE.md` (startup section → contract), `CODEX.md` (startup-contract enforcement + process-finding rule), `docs/prompts/claude-task-template.md` (Professional Process Applied block + read list), `docs/prompts/codex-changed-files-review-template.md` + `docs/prompts/codex-plan-review-template.md` (process/playbook compliance checks), `docs/checklists/prevent-repeat-checklist.md` (startup-contract item).
+- Updated `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`.
+
+### Result
+
+Mandatory Startup Contract is now enforced: 10-step session start, the Professional Process Applied block (with anti-bloat one-line allowance for trivial edits), a stop condition, and Codex process-finding enforcement. Git re-derived: `HEAD = cd4c188` (playbook + audit committed; tree was clean before this update).
+
+### Compliance Result
+
+Passed. No product code/tests/CSV/`out`/integration changes. No commit.
+
+### Next Step
+
+Owner commits this enforcement update. Then close T-001's remaining doc follow-up (`v1-slice-plan` test-list sync) and ratify the T-002 ordering in `docs/decision-log.md`. Do not start T-002.
+
 ## 2026-06-02 (T-001.5 — Enterprise Delivery Playbook created)
 
 ### Tool/Session

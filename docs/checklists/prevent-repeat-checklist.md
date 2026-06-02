@@ -19,6 +19,7 @@ If the issue changed scope or architecture, also log it in `docs/decision-log.md
 
 From `docs/enterprise-delivery-playbook.md`. Keep this lightweight — for low-risk offline work most answers are one word.
 
+- [ ] Did we run the **Mandatory Startup Contract** (`RULES.md` §15 — read the startup files + playbook) and show a **Professional Process Applied** block (proportional to risk) before meaningful work?
 - [ ] Did we **re-derive Git state** from `git status` and `git log --oneline -8` (never from memory)?
 - [ ] Did we **classify task type and risk level**?
 - [ ] Did we use **lightweight or full mode** appropriately for that risk?

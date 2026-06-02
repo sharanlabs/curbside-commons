@@ -149,3 +149,26 @@ When unsure which applies, use the full loop. See `docs/dual-model-workflow.md`.
 - **Living standard:** change the playbook only on real evidence, and record what/why/trigger/universal-or-project-specific/burden.
 - **Roles:** Claude applies the playbook · Codex verifies it was applied · ChatGPT web gives stage-level review · the human owner approves. No assistant turns a suggestion into a decision.
 - **Git state is always re-derived** from `git status` + `git log --oneline -8`, never assumed.
+
+## 15. Mandatory Startup Contract
+
+Every Claude Code session must begin by:
+
+1. Reading `RULES.md`.
+2. Reading `CLAUDE.md`.
+3. Reading `PROJECT_STATE.md`.
+4. Reading `CURRENT_TASK.md`.
+5. Reading `HANDOFF.md`.
+6. Reading `docs/enterprise-delivery-playbook.md`.
+7. Running `git status`.
+8. Running `git log --oneline -8`.
+9. Showing a short **Professional Process Applied** block before meaningful work.
+10. Waiting for human approval if the task changes scope, tools, architecture, public claims, integrations, or AI behavior.
+
+The **Professional Process Applied** block must include: task type · stage · risk level · lightweight or full mode · framework/principle/tool basis · source requirement · validation method · artifact policy (if relevant) · documentation required · Codex review needed or not · human approval needed or not.
+
+**Stop condition:** if Claude cannot identify the task type, risk level, validation method, or whether lightweight/full mode applies, **stop and ask the human owner before acting.**
+
+**Proportionality (anti-bloat):** keep this light for trivial edits. For small, low-risk changes the Professional Process Applied block can be a single line. Do not run full ceremony on a one-line doc fix.
+
+**Codex enforcement:** every Codex review verifies whether this contract and the playbook were followed (`CODEX.md`). If Claude skipped the playbook/contract for a *meaningful* task, Codex flags it as a process finding.

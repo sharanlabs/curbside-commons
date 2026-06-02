@@ -4,11 +4,26 @@ Claude Code is the **main planner and builder** for ActivationOps AI.
 
 `RULES.md` is the source of truth. If this file and `RULES.md` ever disagree, `RULES.md` wins.
 
-## On session start (every time, every account, including CLI)
+## Mandatory Startup Contract (every session, every account, including CLI)
 
-Read, in order: `RULES.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/task-log.md`. Then run `git status`. Then summarize current phase, active task, changed files, unfinished work, risks, and the next safest step — and **wait for human approval before continuing**.
+Begin every session by:
 
-You are continuing one shared project from the repo, not starting your own from memory.
+1. Reading `RULES.md`.
+2. Reading `CLAUDE.md`.
+3. Reading `PROJECT_STATE.md`.
+4. Reading `CURRENT_TASK.md`.
+5. Reading `HANDOFF.md`.
+6. Reading `docs/enterprise-delivery-playbook.md`.
+7. Running `git status`.
+8. Running `git log --oneline -8`.
+9. Showing a short **Professional Process Applied** block before meaningful work.
+10. Waiting for human approval if the task changes scope, tools, architecture, public claims, integrations, or AI behavior.
+
+Then summarize current phase, active task, changed files, unfinished work, risks, and the next safest step. You are continuing one shared project from the repo, not starting your own from memory.
+
+**Professional Process Applied** (show before acting) — include: task type · stage · risk level · lightweight or full mode · framework/principle/tool basis · source requirement · validation method · artifact policy (if relevant) · documentation required · Codex review needed or not · human approval needed or not. Keep it clear enough for a nontechnical reviewer. **For a small, low-risk edit this can be one line** — do not over-ceremony trivial work.
+
+**Stop condition:** if you cannot identify the task type, risk level, validation method, or whether lightweight/full mode applies, **stop and ask the human owner before acting** (`RULES.md` §15).
 
 ## Skills (required)
 

@@ -18,5 +18,11 @@ Use as the focus text for `/codex:adversarial-review` when reviewing a plan (not
 - Scope drift — does the plan quietly exceed the agreed V1 scope (`docs/plan-reconciliation.md`)?
 - Wrong approach — is there a simpler or safer design that meets the goal?
 
+**Process / playbook compliance (`RULES.md` §15 + `docs/enterprise-delivery-playbook.md`)**
+- Is the task classified (type, stage, risk, lightweight/full) and is the mode chosen for the right reason?
+- Are source / framework / tool rationale and alternatives sufficient for the risk level?
+- Are assumptions and validation method stated? Any silent scope expansion vs. the agreed scope?
+- If the playbook/Mandatory Startup Contract was skipped for a meaningful task → raise a **process finding**.
+
 **Recommendation**
 - Ask Codex for a clear verdict: proceed / revise / reconsider — with reasons tied to evidence.
