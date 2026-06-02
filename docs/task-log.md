@@ -1,5 +1,31 @@
 # Task Log
 
+## 2026-06-02 (T-001.6 — source-intake CORRECTION pass: direct PDF + repo inspection)
+
+### Professional Process Applied (full, narrow)
+
+Task type: source-intake correction / source verification · Stage: T-001.6 · Risk: medium · Mode: full-but-narrow · Source requirement: **open the actual PDFs** + Tier 1 official docs (live, dated) + direct GitHub repo inspection · Validation: explicit source-status separation (directly inspected / summary-only / Tier 1 / repos / gaps) · Docs: `docs/research/source-intake-review.md` + state docs · Human approval: required before adopting anything (nothing adopted).
+
+### What was corrected
+
+- Replaced the summary-only basis with **direct reads** of 3 PDFs: `dynamic_workflows_prompt_pack.pdf`, `obsidian-setup-guide.pdf`, `codex_loop_field_guide.pdf`.
+- **Honest gap kept:** `claude_architect_study_guide.pdf` (55 MB) **not loaded** — unsafe native load + `poppler` not installed (not installing per task); its principles verified instead against official docs.
+- **Tier 1 official (live 2026-06-02):** fetched best-practices, features-overview, hooks, sub-agents — they **confirm** the Architect principles and **validate** the hooks recommendation (official example: a hook that blocks writes to a folder) and the over-flagging caution. Changelog URL 404'd (gap).
+- **All 5 GitHub repos web-inspected** (prior review inspected none): claudex (MIT, ~75★, teaching artifact, read-only review), kepano/obsidian-skills (MIT, ~34k★, Obsidian CEO — reputable), second-brain (license unspecified, risky installers), agentic-design-patterns-docs (~19★), n8n-powerhouse (~4★). Nothing cloned/adopted.
+- **Model freshness:** `GPT-5.5` UNVERIFIED; Anthropic/OpenAI model docs not fetched (no model decision) → documented gap.
+
+### Decisions unchanged
+
+Nothing adopted; Obsidian stays external/non-authoritative (now confirmed by the guide's own "global CLAUDE.md" advice, which official docs warn against); claudex/n8n deferred (human-approved); the **enforcement-hooks** recommendation is now strongly official-backed but remains a recommendation (no `decision-log` entry until approved).
+
+### Compliance Result
+
+Passed. Review-only; no code/tests/CSV/`out`/integration changes; nothing installed/cloned/adopted; no commit.
+
+### Next Step
+
+Owner reviews the corrected `docs/research/source-intake-review.md`; commits it; decides on the enforcement-hooks recommendation; (optional) provides a text export of the architect guide or permits a model-freshness sweep at decision time. Do not start T-002.
+
 ## 2026-06-02 (T-001.6 — Source intake & applicability review, addendum)
 
 ### Professional Process Applied (full mode — research/source-intake)
