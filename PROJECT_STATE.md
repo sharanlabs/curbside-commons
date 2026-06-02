@@ -1,14 +1,14 @@
 # Project State
 
-Last updated: 2026-06-01 (operating-system setup)
+Last updated: 2026-06-01 (T-001 plan revised after Codex review)
 
-> Date note: prior sessions are dated 2026-06-02; the current date is 2026-06-01. The folder is not under version control, so there is no reliable chronology to arbitrate. Treat session ordering as: (1) Codex initial review, (2) Codex open-source validation, (3) Claude governance review, (4) Claude plan reconciliation.
+> Date note: the folder's earlier docs are dated 2026-06-02 while the current date is 2026-06-01; Git is now initialized (commit `b57cf2c`) so chronology is tracked going forward. Step order: (1) Codex initial review, (2) Codex open-source validation, (3) Claude governance review, (4) Claude plan reconciliation, (5) operating-system setup, (6) operating-system cleanup, (7) T-001 planning.
 
 ## Current Phase
 
-Planning is **closing**. Codex and Claude findings have been reconciled into one buildable decision in `docs/plan-reconciliation.md`. The only remaining planning step is a user **GO / NO-GO** on that document.
+**Stage 1 (T-001) planning is drafted, Codex-reviewed, and revised.** The V1 data dictionary, slice plan, and review packet exist (`docs/v1-data-dictionary.md`, `docs/v1-slice-plan.md`, `docs/review-packets/T-001-review-packet.md`). Codex round-1 (NO-SHIP, 2 findings) is resolved: a contact-vs-send eligibility + `approval_state` gate (T17) and 6-category guardrail with per-category fixtures (T18). The next gate is **human GO → a separate implementation task.**
 
-No production build has started.
+No product code has been written.
 
 ## Decision Status (2026-06-01)
 
@@ -76,27 +76,20 @@ On GO, the remaining pre-build item (§7) is `docs/v1-data-dictionary.md` (the f
 
 ## Current Next Step
 
-Decide **GO / NO-GO** on `docs/plan-reconciliation.md`. Then:
+1. ~~Codex adversarial review of the T-001 plan~~ — **done** (job `review-mpw2j628-ncd4my`, NO-SHIP, 2 findings).
+2. ~~Resolve/accept findings~~ — **done** (send-gate + T17; guardrail coverage + T18; fenced regex).
+3. **Human approval (GO)** of the revised plan against the GO/NO-GO criteria in `docs/v1-slice-plan.md` — **outstanding (this is the gate).**
+4. Then a **separate implementation task**: `scripts/` + `tests/` (+ `tests/fixtures/`) producing `out/merchants_v1.csv` and the two append-only logs, satisfying tests **T1–T18**.
 
-- GO → **T-001: offline thin slice planning + data dictionary** (`CURRENT_TASK.md`). Write `docs/v1-data-dictionary.md` and a short slice plan, run a Codex adversarial review, and get human approval. No product code in T-001. (Git is already initialized and `RULES.md` already exists, so neither is a step.) Implementation — ingest/normalize → `merchants_v1.csv` with tests — is a separate later task.
-- NO-GO → declare this a docs-only artifact in the README and stop.
-
-Off the table regardless until far later: live Supabase, n8n, Slack, Resend, or real Gemini calls; real credentials; any real merchant data; live outbound email.
+No product code until step 3 clears. A second Codex pass is optional. Off the table until far later: live Supabase, n8n, Slack, Resend, or real Gemini calls; real credentials; any real merchant data; live outbound email.
 
 ## Files Created Or Updated This Session
 
-Operating-system setup (latest):
+T-001 plan revision after Codex round-1 (latest):
 
-- Created: `RULES.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/dual-model-workflow.md`, `docs/project-narrative.md`, `docs/implementation-journal.md`, `docs/decision-log.md`, `docs/checklists/prevent-repeat-checklist.md`, `docs/prompts/*` (4), `docs/visuals/*` (4).
-- Updated: `CLAUDE.md`, `CODEX.md`, `PROJECT_STATE.md`, `docs/task-log.md`, `docs/open-questions.md`.
+- Updated: `docs/v1-data-dictionary.md` (§3, §7, §7.1, §9 send-gate + guardrail), `docs/v1-slice-plan.md` (steps, T17/T18, edge cases, GO/NO-GO), `docs/review-packets/T-001-review-packet.md` (findings + resolutions), `docs/decision-log.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`.
 
-Plan-reconciliation step (earlier, same session):
-
-- `docs/plan-reconciliation.md` (created)
-
-Governance-review step (earlier, same session):
-
-- `docs/reviews/claude-governance-and-idea-review.md`, `docs/audits/claude-governance-compliance-audit.md` (created)
+Earlier T-001 planning (same day): created the three planning docs above. Full per-step history (governance review, plan reconciliation, OS setup, OS cleanup, T-001 planning, T-001 revision): see `docs/task-log.md`.
 
 ## Open Questions
 
@@ -126,5 +119,5 @@ Honest answers, per the project's "be critical, do not flatter" standard.
 
 ## Handoff Notes
 
-Next session: `docs/plan-reconciliation.md` is the authoritative pre-build decision — read it, not the older review docs, for what to build. Do not write another review/governance document; planning is closed once GO/NO-GO is given. Do not re-log the prompt-invented "mandatory files" as blockers. On GO, start **T-001: offline thin slice planning + data dictionary** (`CURRENT_TASK.md`) — write `docs/v1-data-dictionary.md` and the slice plan, get a Codex adversarial review and human approval; do not write product code in T-001. Implementation (ingest/normalize → `merchants_v1.csv` with tests) follows the §5 definition of done as a later task. Live integrations (Supabase, n8n, Slack, Resend, Gemini), real credentials, and real data remain out of scope.
+Next session: the T-001 plan is **drafted and in review** — read `docs/v1-slice-plan.md` + `docs/v1-data-dictionary.md` (and `docs/review-packets/T-001-review-packet.md`) for what V1 is. The next gate is a Codex `/codex:adversarial-review` of the plan, then human approval, then a **separate implementation task**. Do not write product code, scripts, schemas, or integrations until the plan clears review and the human says GO. Do not modify the source CSV. Do not write another governance/review document. Live integrations (Supabase, n8n, Slack, Resend, Gemini), real credentials, and real data remain out of scope.
 

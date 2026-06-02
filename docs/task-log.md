@@ -1,5 +1,85 @@
 # Task Log
 
+## 2026-06-01 (T-001 — plan revision after Codex round-1)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Planning/docs only — no product code.
+
+### Task
+
+Apply the human-approved revision pass addressing Codex's two round-1 findings.
+
+### Skills check
+
+- Task type: documentation revision. Relevant skills: none required. Conflicts with RULES.md: none.
+
+### Verification
+
+- Confirmed the new guardrail patterns are bound to revenue/performance context so the 20 real nudges (which contain progress percentages like "60% complete", "80% done") still produce 0 flags under T11, while T18 negative fixtures are still caught.
+
+### Files Changed
+
+- `docs/v1-data-dictionary.md` — added `contact_eligible`, `approval_state`, `send_eligible`; new §7.1 send-gate; §9 guardrail moved to fenced regex, added `aggressive_urgency` (6 categories), context-bound numeric patterns.
+- `docs/v1-slice-plan.md` — send-gated steps; added T17 (send gate) and T18 (per-category guardrail fixtures); approval edge cases; GO/NO-GO updated.
+- `docs/review-packets/T-001-review-packet.md` — Codex round-1 findings + resolutions; assumptions/scope/tests updated; recommendation now "human GO".
+- `docs/decision-log.md` — added the contact-vs-send eligibility decision.
+- Updated `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`.
+
+### Compliance Result
+
+Passed. No product code, no scripts, no CSV change, no schema, no integration, no credentials, no commit.
+
+### Next Step
+
+Human **GO** on the revised plan (criteria in `docs/v1-slice-plan.md`); then implementation (separate task). Second Codex pass optional.
+
+## 2026-06-01 (T-001 — planning + data dictionary)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Planning only — no product code.
+
+### Task
+
+Create the plan for the first offline thin slice: data dictionary, slice plan, and a Codex review packet.
+
+### Skills check
+
+- Task type: technical planning / data-contract design. Relevant skills: none required (no UI, no framework, no data-viz). Conflicts with RULES.md: none.
+
+### Verification
+
+- Re-confirmed from the source CSV: risk formula `2*days + 3*last_login + 10*(5−steps)` reproduces `Risk Score` on all 20 rows; step order recovered from the nudge messages; both Medium rows = 69 (threshold gap 48→69, 69→89).
+
+### Files Changed
+
+- Created: `docs/v1-data-dictionary.md`, `docs/v1-slice-plan.md`, `docs/review-packets/T-001-review-packet.md`.
+- Updated: `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/decision-log.md`, `docs/task-log.md`.
+- Not updated: `docs/implementation-journal.md` (nothing built or debugged yet — journal is for build challenges).
+
+### Key decisions (see `docs/decision-log.md`)
+
+- Recompute + validate `risk_score`; carry source `risk_level` (thresholds = documented assumption; T5 consistency-only, not correctness).
+- Synthetic ineligibility in test fixtures, not product output.
+- One entity CSV + two append-only logs; idempotency `cooldown_window` = as-of date; guardrail also run over the 20 real nudges.
+
+### Compliance Result
+
+Passed. No product code, no scripts, no CSV change, no schema, no integration, no credentials, no commit.
+
+### Next Step
+
+Run `/codex:adversarial-review` on the plan (focus: `docs/review-packets/T-001-review-packet.md`); resolve blocking findings; get human GO; then implementation (separate task).
+
+### Codex Review Result (checked)
+
+- Job `review-mpw2j628-ncd4my` (background, `--scope working-tree`). Verdict: **needs-attention / NO-SHIP**.
+- [high] Review-required merchants can reach `simulated_send` with no approval gate — the slice's human-review control is not actually enforced or tested.
+- [medium] Guardrail tests only cover over-flagging (T11) + one planted revenue case; no under-flag fixtures for the other categories; documented regex alternation is ambiguous in the Markdown table.
+- Confirmed as-planned: carry source `risk_level` (Q1), CSV + two logs (Q4), fixtures-not-product for ineligibility (Q5), row-order IDs with hash assertion (Q6). Idempotency (Q3) OK only after the review-gate fix.
+- Next: one Claude revision pass to address both findings, then human approval. No implementation until then.
+
 ## 2026-06-01 (Session 3d — Operating-system cleanup)
 
 ### Tool/Session

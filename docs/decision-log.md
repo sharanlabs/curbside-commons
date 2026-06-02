@@ -14,6 +14,11 @@ Format: `[date] | decision | status | rationale (short) | reference`
 | 2026-06-01 | Retire the single blended readiness score | Accepted | It rose without build progress; track shippable vs planning separately | `PROJECT_STATE.md` |
 | 2026-06-01 | Adopt repo-as-source-of-truth operating system (this file set) | Accepted | Enable safe continuity across accounts/tools without repeated instructions | `RULES.md` |
 | 2026-06-01 | Planning exit = human GO / NO-GO on the reconciliation | Accepted | Give the planning phase a single, checkable end | `docs/plan-reconciliation.md` §8 |
+| 2026-06-01 | V1 recomputes + validates `risk_score`, but **carries the source `risk_level`**; thresholds are a documented assumption (`thresholds.v1`) | Accepted | 20 rows over-determine the formula but under-constrain the level boundaries (both Medium rows = 69; gaps 48→69, 69→89) — honest not to assert thresholds | `docs/v1-data-dictionary.md` §6 |
+| 2026-06-01 | V1 store = one entity CSV + **two** append-only logs (`audit_log`, `model_runs`); a send is an audit event | Accepted | Smaller than three logs; consistent with "one entity table + append-only events" | `docs/v1-data-dictionary.md` §2, §10 |
+| 2026-06-01 | Synthetic ineligibility lives in **test fixtures**, not in `merchants_v1.csv` | Accepted | Keep the product output an honest normalization of the 20 real rows; don't invent opted-out merchants to populate the queue | `docs/v1-data-dictionary.md` §3 |
+| 2026-06-01 | Guardrail also tested over the 20 real source nudges (over-flagging check); idempotency `cooldown_window` = as-of date (discrete bucket) | Accepted | Use real-ish text, not only planted strings; a duration can't dedup a key | `docs/v1-slice-plan.md` T11, `docs/v1-data-dictionary.md` §10 |
+| 2026-06-01 | **Contact eligibility and send eligibility are separate**; `send_eligible = contact_eligible AND (review_required=false OR approval_state=approved)` | Accepted | Review-required/High merchants must not reach simulated send without explicit approval — proves human-review gating in V1 even without live Slack or a UI (closes Codex round-1 [high]) | `docs/v1-data-dictionary.md` §7.1, `docs/v1-slice-plan.md` T17 |
 
 ## How to add a decision
 
