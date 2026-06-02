@@ -63,6 +63,26 @@ Use Tier 1 first for correctness; use lower tiers for practical examples, edge c
 
 **→ ActivationOps AI:** the Codex command surface was verified against the installed plugin (Tier 1, local), and vendor behaviors (Slack/Resend/Supabase/n8n/Gemini/Sheets) were cited to official docs in the initial review — generalize that, lightly.
 
+### Open Source Discovery (named sources are candidates, not constraints)
+
+Sources, frameworks, repos, tools, examples, communities, and patterns named anywhere in this repo (or in a task prompt) are **starting points / prior references — not boundaries.** For any meaningful task, do **not** limit research to previously named sources, uploaded documents, familiar repos, known frameworks, official docs alone, or prior examples. **Search broadly and task-specifically**, then choose what fits ActivationOps AI by source **quality, relevance, freshness, maturity, validation value, and risk**.
+
+Search breadth (as the task warrants): official docs · standards bodies · vendor docs · mature open-source repos · GitHub issues / discussions / PRs / examples / changelogs · reputable company engineering blogs · product / UX / UI / design / portfolio references · LLMOps / MLOps / agent / eval / guardrail references · security / privacy / compliance references · automation/workflow examples (incl. n8n / Zapier / Pipedream / Slack / Resend / Supabase / Postgres / Gemini *when relevant*) · practitioner blogs & newsletters · Reddit & relevant subreddits · forums · YouTube videos/transcripts · Discord/community where accessible & appropriate · Stack Overflow / Q&A · recent changelogs / release notes / migration guides / issue threads.
+
+**Use the source tiers (above) to judge quality, not to restrict discovery.** If a source list appears in a task prompt, treat it as a **seed list, not a complete list**, unless the owner explicitly says it is complete.
+
+**"Maximum useful research" ≠ endless.** It means: search broadly enough to avoid blind spots; include current official sources where claims matter; include mature OSS / real-world examples where useful; check Reddit/forums/YouTube/community for **field signals** (pain points, failure modes, user language, adoption gotchas); compare against similar or better alternatives; verify community claims against stronger sources; then **stop when more research is unlikely to change the decision, and document remaining uncertainty.** Proportional to risk — a one-line scan for trivial edits; broad discovery for high-risk / AI / integration / security / public-facing / tool-selection work.
+
+**Source-use distinction (how much weight each carries):**
+- Official / current docs = **source of truth** for factual platform / API / model / tool / security / pricing / deprecation / legal / privacy / compatibility claims.
+- Mature open-source repos = implementation & architecture evidence.
+- Company engineering blogs = professional-practice evidence.
+- GitHub issues / discussions = real-world failure / adoption signals.
+- Reddit / forums / YouTube / community posts = **field signals, not proof by themselves** — not authoritative unless backed by official docs, source code, maintainers, or multiple independent credible signals.
+- Generic / SEO blogs = low-confidence background only.
+
+When sources disagree, **state the disagreement, weigh by credibility and recency, and do not overstate the conclusion.**
+
 ## Source Sufficiency Rule
 
 Research must be enough, not endless. Before acting, state: what was checked, used, rejected; why it is enough now; what uncertainty remains; whether that uncertainty blocks action.

@@ -1,5 +1,83 @@
 # Task Log
 
+## 2026-06-02 (Codex review of the Source Openness pass + continuity doc-sync correction — lightweight)
+
+### Professional Process Applied (lightweight)
+
+Task type: dual-model review + continuity doc-sync correction · Stage: post-Source-Openness-pass, pre-commit · Risk: low · Mode: lightweight · Validation: Codex `adversarial-review` (review-only, `sandbox: read-only`) on the working tree, then fix only the flagged stale wording + re-run `git diff` · Human approval: required before commit.
+
+### Codex review
+
+Ran the installed `openai-codex` plugin `adversarial-review` (review-only) over the working-tree diff with the 16 source-openness/cross-verification/synthesis review goals as focus. **Verdict: needs-revision (native `needs-attention`).** The **Open Source Discovery rule itself was approved** — treats named sources as seeds not boundaries, preserves official/current-source authority for factual claims, demotes community content to field-signals, includes proportional stop conditions; **scope-safety PASS** (no product code/tests/CSV/integration/plugin/Obsidian-link in the diff; `out/` changes match the stated prior-pass exception); **no process bloat**. The needs-revision was solely two stale continuity docs riding along in the tree.
+
+### Findings fixed (this correction)
+
+- **[high] `PROJECT_STATE.md`** — refreshed the stale lower sections (Current Readiness Score, Current Blockers, Current Next Step, Decision Status, Open Questions, Handoff Notes, and — in a final sweep — the Current Evidence line that still said "operating-system files are currently uncommitted pending review," now corrected to "committed; OS setup at `49408d3`") from old pre-build framing (readiness ~0/10; blocker = GO/NO-GO on plan-reconciliation; "next session is a T-001 plan review"; "do not write product code until the plan clears") to current reality: T-001 implemented/green (23/23)/closed with minor follow-ups; Source Openness pass + this correction pending commit; remaining items are the three hygiene/decision follow-ups; roadmap/lifecycle review is next only after commit; T-002 not started.
+- **[medium] `CURRENT_TASK.md`** — rewritten to docs-only active scope (Source Openness clarification + continuity doc-sync); T-001 implementation details (Goal/Allowed `scripts`+`tests`+`out`/Acceptance) moved into a clearly labeled "Completed stage (historical)" summary; product code/tests/CSV/`out`/integrations/plugins/hooks/Obsidian-linking/roadmap/T-002 marked out of scope.
+- Also kept `HANDOFF.md` + this log accurate. Source-openness rule wording left intact (no contradiction found).
+
+### Result
+
+No product code/tests/CSV/`out`/integration change; no new files; no commit (owner decides). Next: owner reviews + commits, then the roadmap/lifecycle applicability review, then ratify eval-first T-002 in `docs/decision-log.md`.
+
+## 2026-06-02 (Source Openness Clarification Pass — lightweight, wording-only)
+
+### Professional Process Applied (lightweight)
+
+Task type: playbook/rules clarification · Stage: post-T-001.7, pre-roadmap applicability review · Risk: low-medium · Mode: lightweight · Source requirement: repo only (no new web research; this clarifies *how* to research, it does not research) · Validation: grep for restrictive wording + read-back of each edited file · Artifact policy: edit-in-place (no new standing files) · Codex review: optional (wording-only) · Human approval: required before commit.
+
+### What / why
+
+Make explicit that sources, frameworks, repos, vendors, communities, and examples **named in the repo are candidates and seeds, not boundaries** — Claude must search broadly and task-specifically, then choose by quality/relevance/freshness/maturity/validation/risk. Goal is *not* to remove source discipline; the tiers and intake rule stay.
+
+### Files Changed (wording only)
+
+- `docs/enterprise-delivery-playbook.md` — added an **Open Source Discovery (named sources are candidates, not constraints)** subsection inside the Source-Backed Research Standard: broad search breadth (official/vendor/standards docs, mature OSS, GitHub issues/PRs, eng blogs, **Reddit/forums/YouTube/SO/community field-signals**, changelogs); "use tiers to judge quality, not restrict discovery"; "seed list, not complete list"; **maximum useful research ≠ endless** (stop at sufficiency, document uncertainty); source-use weighting (official = source of truth; community = signal not proof unless corroborated).
+- `RULES.md` §14 — added an open-source-discovery bullet (pointer to the playbook rule).
+- `CLAUDE.md` — added a "Search broadly (Open Source Discovery)" obligation bullet.
+- `CODEX.md` — added discovery-openness verification with **8 flag conditions** (exhaustive-list assumption; forcing a named framework without applicability; ignoring stronger/current sources; ignoring OSS/field-signal sources when needed; stale sources for current claims; community treated as authoritative without verification; failing to search beyond user examples when risk requires; over-researching low-risk past sufficiency).
+- `docs/prompts/claude-task-template.md` — source-requirement line now says *named sources are seeds, not boundaries; search broadly + use field-signal sources, proportional to risk*.
+- `docs/prompts/codex-plan-review-template.md` + `docs/prompts/codex-changed-files-review-template.md` — added a "source discovery open enough for the risk?" check.
+- `docs/checklists/prevent-repeat-checklist.md` — added a discovery-openness check item.
+- Updated `CURRENT_TASK.md` / `HANDOFF.md` / `PROJECT_STATE.md` / this log.
+
+### Result
+
+Restrictive wording search = **no genuine matches** (only false positives like "deterministic"/"skills"); the "at minimum" phrasing existed only in prior prompts, not the repo. So this pass **clarifies** openness rather than removing restrictions. Source quality tiers preserved. No new standing files; **no decision-log entry** (no decision made); no product code/tests/CSV/`out`/integration/scope change; no commit (owner approves commits).
+
+### Next Step
+
+Owner reviews + commits (with the T-001.7 audit). Stop after this clarification pass — do not start the roadmap or T-002.
+
+## 2026-06-02 (T-001.7 — Post-Playbook Alignment Audit)
+
+### Professional Process Applied (full, narrow)
+
+Task type: post-playbook alignment audit · Stage: T-001.7 · Risk: medium · Mode: full-but-narrow · Source requirement: repo + vault (read-only) + prescribed commands (no new web research) · Validation: git/tests/run-path/docs/vault/stage-readiness · Codex review: optional (minor doc-sync only) · Human approval: required before T-002.
+
+### Commands / evidence
+
+- `HEAD = 63e3332`, tree clean before audit. `python3 -m unittest tests.test_t001` → **Ran 23, OK**. `run.py --fresh` (12 send) → `run.py` (0 new + 12 skipped) = app-path idempotency. No tracked pycache. CSV sha `43fb21f6…` unchanged. Global `~/.claude/CLAUDE.md` has no vault link.
+
+### Files Changed
+
+- Created `docs/audits/post-playbook-alignment-audit.md`.
+- Fixed `docs/v1-slice-plan.md` (known-stale item): test list → T1–T18 + P2-1..P2-5 (23); added `--fresh` vs preserve note; status → implemented.
+- Corrected git-state in `PROJECT_STATE.md` / `CURRENT_TASK.md` / `HANDOFF.md`; updated `docs/task-log.md`.
+- **Not touched:** product code, tests, CSV, `out/` (beyond prescribed validation runs), vault files, integration files. No `decision-log`/journal entry (no decision/implementation issue).
+
+### Verdict
+
+Still on track. T-001 holds under updated standards (23/23, all guarantees intact); new standards break nothing retroactively; vault boundary exemplary & separate. **T-001 → closed with minor follow-ups.** Next stage = **offline eval harness first** (not Gemini) — owner to ratify reorder in `docs/decision-log.md`.
+
+### Compliance Result
+
+Passed. Review-only; no code/tests/CSV changes; nothing installed/adopted; no commit. (`out/` logs regenerated by the prescribed `run.py` — restore with `git checkout -- out/`.)
+
+### Next Step
+
+Owner commits the audit + doc-sync; restores `out/`; ratifies the eval-first ordering; then scopes T-002 (offline evaluation harness).
+
 ## 2026-06-02 (T-001.6 — source-intake CORRECTION pass: direct PDF + repo inspection)
 
 ### Professional Process Applied (full, narrow)

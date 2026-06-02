@@ -1,6 +1,6 @@
 # V1 Thin-Slice Plan (T-001)
 
-Status: **plan / not yet implemented.** Companion to `docs/v1-data-dictionary.md`. This plans the smallest credible offline workflow. No code exists yet.
+Status: **implemented (T-001, committed; 23/23 tests pass).** Companion to `docs/v1-data-dictionary.md`. The plan below is the as-built spec; `scripts/` implements it and `out/` holds the artifacts. Keep in sync with `scripts/`/`tests/` on change.
 
 ## Problem this slice proves
 
@@ -23,6 +23,8 @@ No credentials, no network, no vendor accounts, nothing irreversible. It is full
 - `out/audit_log.csv` (workflow events incl. simulated sends).
 - A review-queue view (printed and/or `out/review_queue.csv`).
 - Passing test suite.
+
+**Run modes (implemented):** `python3 scripts/run.py` **preserves** the append-only logs by default, so a re-run dedups (emits `skipped_duplicate`, no new `simulated_send`) — this is what makes app-path idempotency real (P2-1). `python3 scripts/run.py --fresh` is the **explicit** reset that clears `out/` and regenerates a clean single-run artifact. `merchants_v1.csv`/`review_queue.csv` are deterministic snapshots; `audit_log.csv`/`model_runs.csv` are append-only and grow on preserve-mode re-runs.
 
 ## File structure (proposed)
 
@@ -76,6 +78,16 @@ docs/v1-slice-plan.md
 | T17 | **Send gate:** every `review_required=true`/High merchant produces **no** `simulated_send` unless a synthetic approval fixture sets `approval_state=approved` (with approval + valid contact → exactly one send) |
 | T18 | **Guardrail under-flag coverage:** one negative fixture per category (`forbidden_revenue_claim`, `unsupported_metric`, `false_impact_claim`, `pii_or_secret`, `aggressive_urgency`, `state_mismatch`) is flagged |
 
+**Fix-coverage tests added during implementation (from the two Codex review rounds).** The implemented suite is **23 tests = T1–T18 + P2-1..P2-5** (`tests/test_t001.py`):
+
+| ID | Check |
+| --- | --- |
+| P2-1 | **App-path idempotency:** `python3 scripts/run.py` (preserve-history, default) re-run emits only `skipped_duplicate`, no new `simulated_send`; `--fresh` is an explicit reset |
+| P2-2 | `parse_int` rejects fractional values (e.g. `3.50`) instead of truncating |
+| P2-3 | `model_run_id` stays unique across appended runs (offset by existing row count) |
+| P2-4 | `state_mismatch` flags prose claiming a not-yet-completed step is done (keyword-first) |
+| P2-5 | `state_mismatch` also flags verb-first completion prose ("We've added your photos"); clean draft not flagged |
+
 ## Edge cases
 
 - `steps_completed = 5` → blocker `final_verification_needed`; still eligible for a "final nudge"; usually Low risk.
@@ -108,7 +120,7 @@ Live Supabase/n8n/Slack/Resend/Gemini; real credentials; real contacts/consent; 
 **GO when all are true:**
 - This plan and the data dictionary are approved by the human owner.
 - Codex `/codex:adversarial-review` has been run and blocking findings are resolved (round 1 done 2026-06-01: the review-gate [high] and guardrail-coverage [medium] findings are addressed by the send-gate model + T17/T18).
-- The test list (**T1–T18**) is agreed as the acceptance criteria.
+- The test list (**T1–T18**, plus the **P2-1..P2-5** fix-coverage tests added during implementation = **23 total**) is the acceptance criteria.
 - The as-of date is confirmed (currently `2026-06-01`).
 
 **NO-GO if any:**

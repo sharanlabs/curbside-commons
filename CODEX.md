@@ -47,6 +47,7 @@ Every Codex review (plan or changed-files) verifies the **Mandatory Startup Cont
 - whether the chosen process is lightweight or full **for the right reason**;
 - whether sources / framework / tool rationale are sufficient;
 - whether **source/pattern/reference intake** was applied before adopting anything external (no default adoption; borrow/reject/adapt/defer classified; approval gate for high-impact);
+- whether **source discovery was open enough** for the risk (named lists treated as seeds, not boundaries). Flag a process finding if Claude: treats an example/source list as exhaustive; forces a named framework without checking applicability; ignores stronger/current sources; ignores mature OSS or field-signal sources when the task needs them; uses stale sources for current claims; relies on Reddit/forums/YouTube/community content as authoritative without verification; fails to search beyond user-provided examples when the risk requires it; **or** over-researches low-risk work after source sufficiency was reached;
 - whether assumptions, risks, validation, and artifacts are handled correctly;
 - whether there is **silent scope expansion**;
 - whether handoff and **git state** are accurate (re-derived, not assumed).

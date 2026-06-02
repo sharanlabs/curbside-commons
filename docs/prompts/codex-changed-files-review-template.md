@@ -20,6 +20,7 @@ For reviewing a built slice. `/codex:review` reviews local git state natively (n
 - Did Claude follow the Enterprise Delivery Playbook + Mandatory Startup Contract for a meaningful task?
 - Is the task classification correct, and is lightweight/full mode chosen for the right reason?
 - Are source / framework / tool rationale sufficient; assumptions, risks, validation, and artifacts handled?
+- **Source discovery open enough for the risk?** Named lists treated as seeds (not exhaustive); stronger/current + mature-OSS + field-signal sources used where needed; community content not treated as authoritative without verification; low-risk work not over-researched past sufficiency.
 - Any **silent scope expansion**? Are handoff and **git state** accurate (re-derived, not assumed)?
 - If the playbook/contract was skipped for a meaningful task → raise a **process finding**. (Don't penalize a trivial low-risk edit with a one-line process block.)
 

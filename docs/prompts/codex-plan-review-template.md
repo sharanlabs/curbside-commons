@@ -21,6 +21,7 @@ Use as the focus text for `/codex:adversarial-review` when reviewing a plan (not
 **Process / playbook compliance (`RULES.md` §15 + `docs/enterprise-delivery-playbook.md`)**
 - Is the task classified (type, stage, risk, lightweight/full) and is the mode chosen for the right reason?
 - Are source / framework / tool rationale and alternatives sufficient for the risk level?
+- **Was source discovery open enough?** Named lists treated as seeds (not exhaustive); broader/current + mature-OSS + field-signal sources considered where the risk warrants; community content not over-trusted; low-risk work not over-researched.
 - Are assumptions and validation method stated? Any silent scope expansion vs. the agreed scope?
 - If the playbook/Mandatory Startup Contract was skipped for a meaningful task → raise a **process finding**.
 

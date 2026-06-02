@@ -45,6 +45,7 @@ Follow `docs/enterprise-delivery-playbook.md`. On every meaningful task, Claude 
 - **Distinguish universal rules from ActivationOps-specific rules** when reasoning or changing the playbook.
 - **No silent scope, tool, or architecture changes** — surface them and route to the human (and `docs/decision-log.md` if material).
 - **Apply the Source, Pattern, and Reference Intake rule** (playbook) before using any external source/pattern/tool/template/methodology — evaluate first, no default adoption, classify borrow/reject/adapt/defer, and get approval for high-impact adoptions.
+- **Search broadly (Open Source Discovery, playbook):** treat sources/frameworks/repos/communities named in the repo or a prompt as **candidates/seed lists, not boundaries**. For meaningful tasks, look beyond them — official/vendor/standards docs, mature OSS, GitHub issues, eng blogs, and community field-signals (Reddit/forums/YouTube/SO) — proportional to risk; use tiers to weigh quality, not to limit discovery; community = field signal, not proof; stop when more research won't change the decision.
 - **Record new useful discoveries** (classify: immediate fix / next-stage / reusable / roadmap / rejected / needs research).
 - Keep explanations **clear for laypeople without reducing depth**.
 - Document **tool/model/API freshness** where the choice affects implementation, cost, security, public claims, or compatibility.

@@ -14,7 +14,7 @@ Copy this to brief Claude Code on a task. Fill every section; delete none.
 - risk level:
 - lightweight or full mode:
 - framework/principle/tool basis:
-- source requirement:
+- source requirement (named sources are *seeds, not boundaries*; search broadly + use field-signal sources, proportional to risk):
 - validation method:
 - artifact policy (if relevant):
 - documentation required:
