@@ -1,0 +1,22 @@
+---
+title: "Dual-Model Build Loop (INTERNAL — not a product diagram)"
+---
+%% Internal engineering method. Do NOT place in the public README (RULES.md section 8).
+%% Describes how work is built and reviewed, not the product runtime.
+flowchart TB
+  P["Human owner:<br/>goal / scope"] --> Q["Claude: focused plan"]
+  Q --> R["Codex: /codex:adversarial-review<br/>(challenge the approach)"]
+  R --> S["Claude: revise once"]
+  S --> T{"Human approves plan?"}
+  T -- no --> Q
+  T -- yes --> U["Claude: build one small slice<br/>+ run checks"]
+  U --> V["Codex: /codex:review --background<br/>(changed files)"]
+  V --> W{"Tests pass &<br/>review clean?"}
+  W -- no --> X["/codex:rescue<br/>(fix, or diagnosis-only)"]
+  X --> U
+  W -- yes --> Y["Update docs + journal + handoff"]
+  Y --> Z["Commit (human-approved)"]
+  Z --> AA{"Milestone or pre-publish?"}
+  AA -- yes --> AB["Codex rescue / pre-ship audit;<br/>review-gate only for high-risk"]
+  AA -- no --> P
+  AB --> P

@@ -1,0 +1,39 @@
+---
+title: "ActivationOps AI — Target Architecture (ROADMAP — not yet built)"
+---
+%% STATUS: target architecture. As of 2026-06-01 only the source CSV exists.
+%% Dashed nodes are roadmap / not yet built. Do not present this as current state.
+flowchart TB
+  subgraph BUILT["Built today"]
+    CSV["Source CSV<br/>(20 dummy merchants)"]
+  end
+
+  subgraph V1["V1 offline thin slice (target — not yet built)"]
+    NORM["Normalize to merchants_v1.csv"]
+    RISK["Deterministic risk + blocker"]
+    QUEUE["Human review queue"]
+    DRAFT["Structured draft (stubbed) + guardrails"]
+    SIM["Simulated send + audit / model_runs log"]
+  end
+
+  subgraph ROADMAP["Roadmap runtime (not yet built)"]
+    SHEETS["Google Sheets<br/>(import / export, dashboard)"]
+    GEMINI["Gemini<br/>(structured drafts)"]
+    SUPA["Supabase Postgres<br/>(state, RLS)"]
+    N8N["n8n<br/>(orchestration)"]
+    SLACK["Slack<br/>(human approval)"]
+    RESEND["Resend<br/>(approved email + webhooks)"]
+    DASH["Dashboard / docs"]
+  end
+
+  CSV --> NORM --> RISK --> QUEUE --> DRAFT --> SIM
+  GEMINI -. replaces stub .-> DRAFT
+  SIM -. later .-> SUPA
+  SUPA -. later .-> N8N
+  N8N -. later .-> SLACK
+  SLACK -. later .-> RESEND
+  SHEETS -. visibility .-> CSV
+  SUPA -. feeds .-> DASH
+
+  classDef roadmap stroke-dasharray: 5 5,stroke:#888,color:#555;
+  class NORM,RISK,QUEUE,DRAFT,SIM,SHEETS,GEMINI,SUPA,N8N,SLACK,RESEND,DASH roadmap;

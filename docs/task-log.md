@@ -1,5 +1,76 @@
 # Task Log
 
+## 2026-06-01 (Session 3d — Operating-system cleanup)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Cleanup only — no product build.
+
+### Task
+
+Small operating-system cleanup: reconcile AGENTS.md with RULES.md, make README product-focused, add secrets/commit-hygiene rules, correct git status, set the as-of date, and reframe the next task.
+
+### Skills check
+
+- Task type: documentation cleanup. Relevant skills: none required. Conflicts with RULES.md: none.
+
+### Verification
+
+- Confirmed Git is initialized (`git rev-parse --is-inside-work-tree` → true; commit `b57cf2c`). This corrects earlier docs that said "not initialized" (stale — the owner initialized git after the prior session).
+
+### Files Changed
+
+- `AGENTS.md` — now defers to `RULES.md`; dropped "reviewer-first only" framing; added start sequence + summarized ground rules.
+- `README.md` — product-focused; Claude Code/Codex moved to a short Development Workflow section and removed from the runtime stack; V1 = "AI-assisted workflow automation", "agentic" reserved for roadmap.
+- `RULES.md` — added §11 Secrets, §12 Commit hygiene, §13 Lightweight vs full workflow.
+- `CURRENT_TASK.md` — T-001 reframed to "offline thin slice planning + data dictionary"; removed git init; as-of date set to June 1, 2026.
+- `PROJECT_STATE.md` — git status corrected; next step/handoff reframed (no git init); as-of date set; Claude Suggestions reconciled.
+- `HANDOFF.md` — latest block updated to this cleanup (also touched beyond the listed files because the prior block stated the wrong git status).
+- `docs/open-questions.md` — as-of date marked resolved (also touched for consistency with the as-of-date instruction).
+- `docs/task-log.md` — this entry.
+
+### Compliance Result
+
+Passed. No product code, no CSV change, no schema, no integration, no credentials, no commit.
+
+### Next Step
+
+Human GO / NO-GO on `docs/plan-reconciliation.md`. On GO, start T-001 (planning + data dictionary only).
+
+## 2026-06-01 (Session 3c — Operating-system setup)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Setup only — no product build.
+
+### Task
+
+Create the project operating system so Claude (account 1/2), Claude CLI, Codex, and the human owner can continue from the repo without repeated instructions.
+
+### Skills check
+
+- Task type: governance / process scaffolding (documentation).
+- Relevant skills: none required; no UI, data-analysis, or framework skill applied. (Per `RULES.md` §5, recorded that the smallest relevant set was "none.")
+- Conflicts with RULES.md: none.
+
+### Files Changed
+
+- Created: `RULES.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/dual-model-workflow.md`, `docs/project-narrative.md`, `docs/implementation-journal.md`, `docs/decision-log.md`, `docs/checklists/prevent-repeat-checklist.md`, `docs/prompts/claude-task-template.md`, `docs/prompts/codex-plan-review-template.md`, `docs/prompts/codex-changed-files-review-template.md`, `docs/prompts/codex-rescue-template.md`, `docs/visuals/README.md`, `docs/visuals/architecture.mmd`, `docs/visuals/v1-thin-slice-flow.mmd`, `docs/visuals/dual-model-workflow.mmd`.
+- Updated: `CLAUDE.md`, `CODEX.md`, `PROJECT_STATE.md`, `docs/task-log.md`, `docs/open-questions.md`.
+
+### Verification
+
+- Codex command surface verified against the installed plugin: `~/.claude/plugins/cache/openai-codex/codex/1.0.4/commands/` (v1.0.4). All seven commands confirmed; review-only vs. can-edit distinction taken from the command definitions.
+- Mermaid not validated by CLI (mmdc not installed); diagrams use standard syntax.
+
+### Compliance Result
+
+Passed. No product code, no CSV change, no schema, no integration, no credentials.
+
+### Next Step
+
+Human GO / NO-GO on `docs/plan-reconciliation.md`. On GO, start T-001 (`CURRENT_TASK.md`).
+
 ## 2026-06-01 (Session 3b — Plan reconciliation)
 
 ### Tool/Session

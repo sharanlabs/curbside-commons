@@ -5,7 +5,7 @@
 `docs/plan-reconciliation.md` proposes answers to the governance-review questions; they take effect on user GO. Resolved (proposed):
 
 - Planning termination → exit condition defined: user GO/NO-GO on the reconciliation; no further review docs (§8).
-- Where rules live → one-page repo `RULES.md` on GO; prompt-supplied rules retired (§7).
+- Where rules live → **DONE: `RULES.md` created** (2026-06-01) as the repo-resident source of truth; prompt-supplied rules retired (`RULES.md` §1, §6).
 - V1 size → one entity CSV + append-only event logs, not 14 tables (§5). Supersedes the `product-brief` vs `data-audit` mismatch.
 - Naming → drop "agentic" for V1 (§3).
 - Readiness metric → blended score retired in favor of separate shippable/planning measures (`PROJECT_STATE.md`).
@@ -14,8 +14,9 @@
 ### Still genuinely open (only the user can decide)
 
 1. **GO or NO-GO** on `docs/plan-reconciliation.md`.
-2. **As-of date** for deriving `signup_at` / `last_login_at` from the relative day counts (proposed 2026-06-01).
-3. **Project-level definition of done / audience.** The reconciliation sets a DoD for the *V1 slice*; it does not define what "success" means for the project as a portfolio piece (runnable demo vs. docs artifact vs. job exhibit). Answer this to know when to stop building, not just when V1 is done.
+2. **Project-level definition of done / audience.** The reconciliation sets a DoD for the *V1 slice*; it does not define what "success" means for the project as a portfolio piece (runnable demo vs. docs artifact vs. job exhibit). Answer this to know when to stop building, not just when V1 is done.
+
+Resolved in the 2026-06-01 cleanup: **as-of date** for deriving `signup_at` / `last_login_at` is set to **June 1, 2026** (default; the owner may change it).
 
 ## Governance And Compliance
 

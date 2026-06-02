@@ -1,0 +1,21 @@
+---
+title: "V1 Offline Thin Slice — Flow (TARGET — not yet built)"
+---
+%% STATUS: target for tasks T-001..T-004. Nothing here is built as of 2026-06-01.
+%% Fully offline: no external services, no credentials, model call is stubbed.
+flowchart TB
+  A["Read source CSV (read-only)"] --> B["Fix header:<br/>merchant_name / merchant_category"]
+  B --> C["Add stable IDs +<br/>derive timestamps (as-of date)"]
+  C --> D["Write merchants_v1.csv"]
+  D --> E["Deterministic risk score + reason codes"]
+  E --> F["Deterministic blocker + next-best-action"]
+  F --> G{"High risk or ineligible?"}
+  G -- yes --> H["Human review queue<br/>(approval required)"]
+  G -- no --> I["Eligible for drafting"]
+  H --> I
+  I --> J["Generate ONE structured draft<br/>(stubbed model)"]
+  J --> K{"Guardrails pass?<br/>forbidden claims + facts match state"}
+  K -- no --> L["Reject + log; back to review"]
+  K -- yes --> M["Simulated send (no real email)<br/>+ idempotency key"]
+  M --> N["Append audit_log + model_runs"]
+  L --> N
