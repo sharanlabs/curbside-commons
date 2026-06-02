@@ -69,6 +69,21 @@ Research must be enough, not endless. Before acting, state: what was checked, us
 - If uncertainty does **not** block a low-risk task → document it and proceed.
 - If uncertainty touches **security, architecture, public claims, integrations, AI behavior, or tool choice** → stop and ask the human owner.
 
+## Source, Pattern, and Reference Intake
+
+Applies to **every task**, not just research tasks. **Do not adopt anything by default** — no source, repo, template, workflow, tool, code/prompt/UI/design pattern, doc style, automation example, architecture, framework, or methodology — until it passes intake. Covers planning · code · data modeling · testing · AI prompts/agent patterns · guardrails · evals · security/privacy · n8n/Zapier/Pipedream · Slack/Resend/Supabase · Gemini/other models · Claude skills · Codex workflows · MCP · knowledge-management (e.g., Obsidian) · dashboards · UI/UX · visual design · README · portfolio case study · demo · docs · publishing.
+
+Before adopting, evaluate (**proportional to risk** — one line for low-risk; full for high-risk):
+1. problem it solves · 2. relevance to the task · 3. currency · 4. official / reputable / mature / experimental · 5. stronger or official confirming sources · 6. similar alternatives · 7. what to borrow · 8. what to reject · 9. what to adapt · 10. what to defer · 11. universal/reusable vs · 12. ActivationOps-specific · 13. risk / scope creep / bloat it could add · 14. validation that proves the adapted version works.
+
+Classify each useful discovery: immediate fix · playbook improvement · future-stage input · reusable standard · roadmap reference · project-specific note · rejected/no action · needs more research. (Reuse the **source tiers** above and the **Reuse Classification** section — do not duplicate them.)
+
+Preference order: official/current → mature open-source examples → reputable company engineering references → practitioner examples (field signals) → generic content (low-confidence background only).
+
+**Approval gate:** do not install / clone / copy / adopt / build from any source until the intake decision is clear, **and** get human approval when the adoption affects scope, architecture, tools, data model, AI behavior, integrations, public claims, or publishing.
+
+Claude applies this before using any external reference or pattern. Codex verifies it and flags **skipped intake on a meaningful task** as a process finding. Keep it short for trivial edits; use full intake for high-risk, AI, integration, architecture, security, public-facing, or tool-selection work.
+
 ## Framework, Principle, and Approach Selection Rationale
 
 Don't just name a method. For each meaningful framework/principle/approach, record (proportional to risk): the problem it solves · the source/evidence for it · why it fits this task · alternatives considered · why alternatives were rejected/deferred · who/what kinds of teams use it (where evidence exists) · what is adopted as-is · what is adapted · what is intentionally not used · remaining assumptions · how success is validated · what is reusable. Applies to planning, architecture, data, code, AI workflow, security, reliability, design, docs, demo, publishing.

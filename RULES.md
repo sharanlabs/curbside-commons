@@ -142,6 +142,7 @@ When unsure which applies, use the full loop. See `docs/dual-model-workflow.md`.
 - **Core traceability:** every meaningful task runs idea → use-case classification → source scan → framework/tool selection → alternatives → assumptions → approach → validation evidence → failure handling → reuse → expansion → handoff → human approval — *proportional to risk*.
 - **Lightweight vs full** (per §13) governs how much of that chain applies.
 - **Source-backed standard:** important claims use source tiers (Tier 1 official first) with a stated sufficiency/stop point; no memory for platform behavior (extends §6).
+- **Source/pattern/reference intake:** evaluate before adopting *anything* external (source, repo, template, workflow, tool, code/prompt/UI/design pattern, architecture, framework, methodology) — no default adoption, no cargo-culting; classify borrow/reject/adapt/defer; approval gate when it affects scope, architecture, tools, data model, AI behavior, integrations, public claims, or publishing. Proportional to risk.
 - **Model/API/tool freshness:** model/API/platform choices that affect implementation, cost, security, public claims, or compatibility carry a dated freshness check.
 - **Artifact policy:** every generated artifact is classified (commit / regenerate / ignore / examples / internal).
 - **Stage closure criteria:** a stage closes only on the playbook's checklist + human approval.

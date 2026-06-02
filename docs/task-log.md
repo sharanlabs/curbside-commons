@@ -1,5 +1,55 @@
 # Task Log
 
+## 2026-06-02 (T-001.6 — Source intake & applicability review, addendum)
+
+### Professional Process Applied (full mode — research/source-intake)
+
+Task type: research / source-intake + applicability review · Stage: T-001.6 · Risk: medium · Mode: full · Basis: playbook Source/Pattern/Reference Intake + Freshness rules · Source requirement: **Tier 1 official Claude Code docs checked live (`code.claude.com/docs`), date 2026-06-02, not memory** · Validation: each idea classified borrow/reject/adapt/defer + verified/UNVERIFIED tags + Missing Addendum self-audit · Docs: `docs/research/source-intake-review.md` + state docs · Codex review: recommended · Human approval: required before adopting anything (nothing adopted).
+
+### Files Changed
+
+- Created `docs/research/source-intake-review.md` (new dir `docs/research/`). Updated `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`.
+- **Not edited:** playbook / `RULES` / `CLAUDE` / `CODEX` — the intake rule is already integrated; the addendum required no governance edit.
+
+### Key results
+
+- Evaluated the **summaries pasted** (uploaded files were not in the session — stated honestly). Nothing installed/cloned/adopted.
+- Live Tier 1 check (official Claude Code docs, 2026-06-02) **confirmed** the Architect principles: hooks = deterministic enforcement (`PreToolUse` deny / `exit 2`); CLAUDE.md = guidance/"a request, not a guarantee"; skills = on-demand (keep CLAUDE.md < 200 lines); subagents = isolated review with restrictable tools; layered scoping + path-specific `.claude/rules/`.
+- **Highest-value finding:** the project's hardest invariants (CSV-immutability, no-secrets) are prompt-only "requests" today; official docs say make must-hold rules **hooks**. Recommended (not adopted) `PreToolUse` hooks — human-approval-gated roadmap item.
+- **Honest gaps (in Missing Addendum Checks):** uploaded originals not provided; changelog + Anthropic model release-notes + OpenAI/Codex model docs not fetched this pass (no model decision made) → small optional freshness correction pass recommended at model-decision time.
+
+### Compliance Result
+
+Passed. No product code/tests/CSV/`out`/integration changes; nothing installed/adopted; no commit.
+
+### Next Step
+
+Owner reviews `docs/research/source-intake-review.md`; commits the still-uncommitted intake-rule edits + this review. Then close T-001's `v1-slice-plan` doc-sync; consider the hooks recommendation; ratify T-002 ordering in `docs/decision-log.md`. Do not start T-002.
+
+## 2026-06-02 (Standard — Source/Pattern/Reference Intake rule)
+
+### Professional Process Applied (short — low-risk docs edit)
+
+Task type: governance/process standard · Stage: post-T-001.5 enforcement · Risk: low–medium · Mode: lightweight–medium · Basis: extends the playbook's Source-Backed Research Standard / Selection Rationale / New-Info / Reuse Classification · Sources: none external adopted (repo-internal standard) · Validation: coverage vs the owner's rule + no-duplication check + git re-derived (`HEAD = f28ae90`) · Docs: playbook + RULES/CLAUDE/CODEX/checklist/decision-log + state docs · Codex review: optional · Human approval: owner directed the rule (= approval); no product/scope/tool change.
+
+### Files Changed
+
+- `docs/enterprise-delivery-playbook.md` (new "Source, Pattern, and Reference Intake" section — integrated, cross-referencing existing source tiers + reuse classification, not duplicating them).
+- `RULES.md` §14 (intake bullet), `CLAUDE.md` (intake obligation), `CODEX.md` (intake verification item), `docs/checklists/prevent-repeat-checklist.md` (intake check), `docs/decision-log.md` (decision row).
+- Updated `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`.
+
+### Scope discipline / honest note
+
+- The rule overlaps the existing source-tier + reuse sections; **integrated as one section** to avoid the process-bloat the project already flagged. Net new standing files: **0**. The governance surface continues to grow — future tasks must keep intake proportional (one line for trivial edits).
+
+### Compliance Result
+
+Passed. No product code/tests/CSV/`out`/integration changes. No commit.
+
+### Next Step
+
+Owner commits this standard. Then close T-001's remaining doc follow-up (`v1-slice-plan` test-list sync) and ratify the T-002 ordering in `docs/decision-log.md`. Do not start T-002.
+
 ## 2026-06-02 (Enforcement — Mandatory Startup Contract)
 
 ### Professional Process Applied (short — low-risk docs edit)

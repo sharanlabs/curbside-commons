@@ -46,6 +46,7 @@ Every Codex review (plan or changed-files) verifies the **Mandatory Startup Cont
 - whether the task classification is correct;
 - whether the chosen process is lightweight or full **for the right reason**;
 - whether sources / framework / tool rationale are sufficient;
+- whether **source/pattern/reference intake** was applied before adopting anything external (no default adoption; borrow/reject/adapt/defer classified; approval gate for high-impact);
 - whether assumptions, risks, validation, and artifacts are handled correctly;
 - whether there is **silent scope expansion**;
 - whether handoff and **git state** are accurate (re-derived, not assumed).

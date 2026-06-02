@@ -1,6 +1,6 @@
 # Project State
 
-Last updated: 2026-06-02 (Mandatory Startup Contract enforced; playbook + T-001 audit committed at cd4c188 — 23/23 pass)
+Last updated: 2026-06-02 (T-001.6 source-intake review done; startup contract committed at f28ae90 — 23/23 pass)
 
 > Date note: the folder's earlier docs are dated 2026-06-02 while the current date is 2026-06-01; Git is now initialized (commit `b57cf2c`) so chronology is tracked going forward. Step order: (1) Codex initial review, (2) Codex open-source validation, (3) Claude governance review, (4) Claude plan reconciliation, (5) operating-system setup, (6) operating-system cleanup, (7) T-001 planning.
 
@@ -8,7 +8,7 @@ Last updated: 2026-06-02 (Mandatory Startup Contract enforced; playbook + T-001 
 
 **Stage 1 (T-001) is implemented, Codex-reviewed (twice), and green.** The offline pipeline (`scripts/`), tests (`tests/`, **23/23 pass** = T1–T18 + P2-1..P2-5), and generated artifacts (`out/`) exist. Canonical run: 20 merchants → 8 review queue (High, held), 12 simulated_sent, 0 rejected; source CSV byte-identical; send gate verified (T17); app re-run dedups (P2-1). Two Codex review rounds returned 4 + 2 × P2, **all fixed** (no P0/P1). Stdlib only — no network, no AI call, no integrations.
 
-**Git state (re-derived 2026-06-02):** `HEAD = cd4c188 "Add enterprise delivery playbook and T-001 audit"` — T-001 code/tests/hygiene, the Enterprise Delivery Playbook, the T-001 ground-rules audit, and the blindspot review are all committed; the earlier `out/` log delta is resolved (tree was clean before this update). **Uncommitted:** only the Mandatory Startup Contract enforcement update (this turn). Product code/tests/CSV/`out` unchanged.
+**Git state (re-derived 2026-06-02):** `HEAD = f28ae90 "Enforce enterprise playbook startup contract"`. **Uncommitted (owner hasn't committed since):** last turn's Source/Pattern/Reference Intake-rule edits (playbook + `RULES`/`CLAUDE`/`CODEX`/checklist/decision-log) **and** this turn's T-001.6 `docs/research/source-intake-review.md` + state-doc updates. Product code/tests/CSV/`out` unchanged.
 
 **T-001.5 (2026-06-02):** the **Enterprise Delivery Playbook** (`docs/enterprise-delivery-playbook.md`) codifies the professional delivery standard (traceability spine, lightweight-vs-full, source tiers, freshness, artifact policy, stage closure, failure taxonomy, public-claim control, handoff-proof, living-standard) with a Universal vs ActivationOps-specific split. **Mandatory Startup Contract** now enforces it at session start (`RULES.md` §15; `CLAUDE.md`; `CODEX.md` process-finding rule; task/review templates; checklist), with an anti-bloat one-line allowance for trivial edits.
 
@@ -88,7 +88,11 @@ Off the table until far later: live Supabase, n8n, Slack, Resend, or real Gemini
 
 ## Files Created Or Updated This Session
 
-Mandatory Startup Contract enforcement (latest, 2026-06-02): `RULES.md` (§15), `CLAUDE.md` (startup section), `CODEX.md` (process-finding rule), `docs/prompts/claude-task-template.md` (Professional Process Applied block), `docs/prompts/codex-changed-files-review-template.md` + `docs/prompts/codex-plan-review-template.md` (process checks), `docs/checklists/prevent-repeat-checklist.md`; updated `CURRENT_TASK.md` / `HANDOFF.md` / `PROJECT_STATE.md` / `docs/task-log.md`. No product code/tests/CSV/`out`/integration changes.
+T-001.6 source-intake review (latest, 2026-06-02): created `docs/research/source-intake-review.md` (evaluated pasted summaries; live Tier 1 verification of Claude Code docs; model-freshness check; Missing Addendum self-audit); updated `CURRENT_TASK.md` / `HANDOFF.md` / `PROJECT_STATE.md` / `docs/task-log.md`. Nothing adopted; no governance edit required. No product code/tests/CSV/`out`/integration changes.
+
+Source/Pattern/Reference Intake rule (2026-06-02): `docs/enterprise-delivery-playbook.md` (new section), `RULES.md` (§14 bullet), `CLAUDE.md`, `CODEX.md`, `docs/checklists/prevent-repeat-checklist.md`, `docs/decision-log.md` (row); updated `CURRENT_TASK.md` / `HANDOFF.md` / `PROJECT_STATE.md` / `docs/task-log.md`. Integrated into the playbook, no new files. No product code/tests/CSV/`out`/integration changes.
+
+Mandatory Startup Contract enforcement (2026-06-02): `RULES.md` (§15), `CLAUDE.md` (startup section), `CODEX.md` (process-finding rule), `docs/prompts/claude-task-template.md` (Professional Process Applied block), `docs/prompts/codex-changed-files-review-template.md` + `docs/prompts/codex-plan-review-template.md` (process checks), `docs/checklists/prevent-repeat-checklist.md`; updated `CURRENT_TASK.md` / `HANDOFF.md` / `PROJECT_STATE.md` / `docs/task-log.md`. No product code/tests/CSV/`out`/integration changes.
 
 T-001.5 Enterprise Delivery Playbook (2026-06-02): created `docs/enterprise-delivery-playbook.md`; pointer/obligation edits to `RULES.md` (§14), `CLAUDE.md`, `CODEX.md`, `docs/checklists/prevent-repeat-checklist.md`; updated `CURRENT_TASK.md` / `HANDOFF.md` / `PROJECT_STATE.md` / `docs/task-log.md`. Reduced single-doc form (no separate matrix/log files). No product code/tests/CSV/`out`/integration changes.
 

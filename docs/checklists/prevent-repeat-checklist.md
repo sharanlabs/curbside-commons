@@ -24,6 +24,7 @@ From `docs/enterprise-delivery-playbook.md`. Keep this lightweight — for low-r
 - [ ] Did we **classify task type and risk level**?
 - [ ] Did we use **lightweight or full mode** appropriately for that risk?
 - [ ] Did we **record the source basis** when the task needed it (and mark UNVERIFIED otherwise)?
+- [ ] Did we run **source/pattern/reference intake** before adopting any external source/pattern/tool/template/methodology (no default adoption; borrow/reject/adapt/defer; proportional to risk)?
 - [ ] Did we **explain why the selected approach fits** (and note alternatives considered)?
 - [ ] Did we **classify generated artifacts** where relevant (commit / regenerate / ignore / examples / internal)?
 - [ ] Did we **check model/API/tool freshness** where the choice matters?

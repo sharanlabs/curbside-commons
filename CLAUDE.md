@@ -44,6 +44,7 @@ Follow `docs/enterprise-delivery-playbook.md`. On every meaningful task, Claude 
 - Open with a short **Professional Process Applied** block before substantive work (task type · stage · risk · mode · framework/tool/source basis · validation · docs required · artifact policy if relevant · Codex review needed? · human approval needed?) — clear enough for a nontechnical reviewer.
 - **Distinguish universal rules from ActivationOps-specific rules** when reasoning or changing the playbook.
 - **No silent scope, tool, or architecture changes** — surface them and route to the human (and `docs/decision-log.md` if material).
+- **Apply the Source, Pattern, and Reference Intake rule** (playbook) before using any external source/pattern/tool/template/methodology — evaluate first, no default adoption, classify borrow/reject/adapt/defer, and get approval for high-impact adoptions.
 - **Record new useful discoveries** (classify: immediate fix / next-stage / reusable / roadmap / rejected / needs research).
 - Keep explanations **clear for laypeople without reducing depth**.
 - Document **tool/model/API freshness** where the choice affects implementation, cost, security, public claims, or compatibility.
