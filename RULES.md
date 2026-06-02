@@ -134,3 +134,18 @@ Match the process weight to the risk.
 - **Full loop** — for integrations, live sends, auth/security, data writes, and publishing: plan adversarial review, build, changed-files review, rescue if needed, journal + decision-log, prevent-repeat checklist, and (for high-risk sessions only) the Codex review gate.
 
 When unsure which applies, use the full loop. See `docs/dual-model-workflow.md`.
+
+## 14. Enterprise Delivery Playbook (pointer)
+
+`docs/enterprise-delivery-playbook.md` is the living "how" for professional execution. `RULES.md` stays the constitution; the playbook elaborates it. Key rules it carries:
+
+- **Core traceability:** every meaningful task runs idea → use-case classification → source scan → framework/tool selection → alternatives → assumptions → approach → validation evidence → failure handling → reuse → expansion → handoff → human approval — *proportional to risk*.
+- **Lightweight vs full** (per §13) governs how much of that chain applies.
+- **Source-backed standard:** important claims use source tiers (Tier 1 official first) with a stated sufficiency/stop point; no memory for platform behavior (extends §6).
+- **Model/API/tool freshness:** model/API/platform choices that affect implementation, cost, security, public claims, or compatibility carry a dated freshness check.
+- **Artifact policy:** every generated artifact is classified (commit / regenerate / ignore / examples / internal).
+- **Stage closure criteria:** a stage closes only on the playbook's checklist + human approval.
+- **No new standing logs unless justified:** prefer updating existing docs.
+- **Living standard:** change the playbook only on real evidence, and record what/why/trigger/universal-or-project-specific/burden.
+- **Roles:** Claude applies the playbook · Codex verifies it was applied · ChatGPT web gives stage-level review · the human owner approves. No assistant turns a suggestion into a decision.
+- **Git state is always re-derived** from `git status` + `git log --oneline -8`, never assumed.

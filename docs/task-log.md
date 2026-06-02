@@ -1,5 +1,97 @@
 # Task Log
 
+## 2026-06-02 (T-001.5 — Enterprise Delivery Playbook created)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Standards/process task — no product code/tests/CSV/`out`/integration changes.
+
+### Professional Process Applied
+
+- Task type: documentation / process standard. Stage: T-001.5. Risk: low-medium (governance, no code). Mode: full-ish (it sets standards) but kept to one doc + pointer edits. Sources: the repo's own RULES/audit/review + the approved blindspot review (reduced scope). Validation: section-coverage vs spec + the "no new standing files" constraint. Human approval: pending.
+
+### Files Changed
+
+- Created `docs/enterprise-delivery-playbook.md` (Universal Professional Delivery Standard + ActivationOps AI Application + Living Standard rule; ~30 sections, one file).
+- Updated `RULES.md` (new §14 pointer), `CLAUDE.md` (apply-playbook obligations), `CODEX.md` (playbook-verification duties), `docs/checklists/prevent-repeat-checklist.md` (process checks incl. git-state re-derivation — closes the audit's recurring finding), `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`.
+
+### Scope discipline
+
+- Built the **reduced single-playbook** form (per the approved blindspot review). **Did not** create separate source-scan / evidence-matrix / framework-matrix / assumptions files (deferred). Net new standing files: **+1** (the playbook). No product code/tests/CSV/`out`/integrations touched.
+
+### Compliance Result
+
+Passed. Git state re-derived (`HEAD = 2ccafce`). No commit.
+
+### Next Step
+
+Owner reviews + approves the playbook, commits the pending audit + review + playbook, closes T-001's open follow-ups; then T-002 (after ratifying the eval-vs-Gemini ordering in `docs/decision-log.md`).
+
+## 2026-06-02 (T-001.5 — standards blindspot pre-flight review)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Review only — playbook not created; no code/tests/CSV/out edits.
+
+### Task
+
+Review whether the planned T-001.5 "Enterprise Professional Delivery Playbook" (15 additions) is complete, practical, and not overbuilt.
+
+### Files Changed
+
+- Created `docs/review-packets/T-001.5-standards-blindspot-review.md`.
+- Updated `CURRENT_TASK.md`, `HANDOFF.md`, `docs/task-log.md`.
+
+### Verdict
+
+- Core intent (traceability: messy input → professional execution; source-backed reasoning; alternatives) is **sound and worth codifying once, lightly**.
+- The **15-artifact plan is over-built** — would ~double the governance surface and re-trigger the governance-over-product failure already diagnosed (governance review; reconciliation §4 rejected docs-first gates).
+- **Recommended:** collapse to ONE ~1–2 page `docs/enterprise-delivery-playbook.md` + small edits to existing files (merge the 4 prompt templates; add a decision-log "alternatives" field; add the git-state re-derivation step to the prevent-repeat checklist). Net file change ≈ −2.
+- **Reject** standalone source-scan log / evidence matrix / framework matrix / assumption log / failure-taxonomy / blindspot log, and "deep rationale always" (use proportional rationale). **Defer** integration security/cost/reliability rules + the eval harness.
+- Must-add before building: git-state re-derivation checklist step; "no new standing logs" constraint. Close T-001's 3 follow-ups first.
+
+### Compliance Result
+
+Passed. Review-only; no code/tests/CSV/integration/`out/` edits; no commit. (Pre-existing uncommitted work from the T-001 audit remains; `HEAD = 2ccafce`.)
+
+### Next Step
+
+Owner approves the reduced T-001.5 scope; commits the pending audit + review; closes T-001 follow-ups; then creates the single playbook.
+
+## 2026-06-02 (T-001 — ground-rules checkpoint audit)
+
+### Tool/Session
+
+Claude Code (Opus 4.8), account 1. Checkpoint audit — review only, no product build.
+
+### Commands run
+
+- `git status` / `git log --oneline -8` → `HEAD = 2ccafce` (T-001 + P2 fixes committed); tree was clean before the audit.
+- `python3 -m unittest tests.test_t001 -v` → **23/23 pass**.
+- `python3 scripts/run.py --fresh` (12 sent) then `python3 scripts/run.py` (0 new + 12 skipped_duplicate) → app-path idempotency confirmed.
+- `git ls-files | grep pycache/pyc` → none tracked. Secrets grep → no real credentials (matches are rule text / guardrail pattern definitions / a synthetic fixture email).
+
+### Files Changed
+
+- Created `docs/audits/T-001-ground-rules-audit.md`.
+- Corrected stale git-state wording in `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md` (and rewrote the HANDOFF latest block, which had accreted 4 turns of layers).
+- Added a process note to `docs/implementation-journal.md`.
+- **Not touched:** product code, tests, CSV, integration files, `out/`.
+
+### Result
+
+- Verdict: **ground rules followed; close T-001 with minor follow-ups.** No blockers.
+- Three follow-ups (none break guarantees): `out/` volatile-log policy + restore; `v1-slice-plan.md` test-list doc-sync; make git-state re-derivation a required prevent-repeat-checklist step.
+- Note: the prescribed `run.py` commands left `out/audit_log.csv` + `out/model_runs.csv` modified vs HEAD (snapshots unchanged) — owner to restore or set a policy.
+
+### Compliance Result
+
+Passed. Review-only; no code/tests/CSV/integration/`out/` edits; no commit.
+
+### Next Step
+
+Owner closes T-001 (commit audit + doc corrections; `out/` decision); then doc-sync + checklist follow-ups; then ratify the next-stage reorder in `docs/decision-log.md`.
+
 ## 2026-06-02 (T-001 — final-review P2 fix pass)
 
 ### Tool/Session

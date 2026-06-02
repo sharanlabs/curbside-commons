@@ -23,6 +23,23 @@ Full workflow and exact commands: `docs/dual-model-workflow.md`. In short:
 - Unsupported claims, including AI-honesty (`RULES.md` §4) and no-fake-impact rules.
 - A clear **ship / no-ship** recommendation with reasons.
 
+## Playbook verification (required)
+
+Per `docs/enterprise-delivery-playbook.md`, Codex also verifies whether Claude *applied* the standard — not just whether the code is correct:
+
+- task classification present and appropriate;
+- framework / tool / source rationale given where required;
+- alternatives and assumptions stated;
+- validation evidence real (tests/output), not asserted;
+- scope control (no silent scope/tool/architecture drift);
+- source sufficiency (important claims sourced or marked UNVERIFIED);
+- model/API/tool freshness where the choice matters;
+- artifact policy applied where relevant;
+- new-information discoveries classified;
+- handoff accuracy (incl. git state re-derived, not assumed);
+- public-claim control (nothing unsupported; "simulated" labels; dev tools not presented as runtime);
+- whether the process weight (lightweight vs full) fits the risk.
+
 ## Standard
 
 Find root causes and operational failure modes, not just surface issues. Tie every finding to evidence: a file, a diff, a row, or a cited source. Mark platform claims UNVERIFIED unless backed by current docs or the installed tool (`RULES.md` §6).

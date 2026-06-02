@@ -21,6 +21,20 @@ Claude Code must use relevant skills from the configured skills folder when they
 
 If a skill conflicts with project rules, `RULES.md` wins. Use the smallest relevant set, not every skill. Record skill usage in `docs/task-log.md`.
 
+## Enterprise Delivery Playbook (required)
+
+Follow `docs/enterprise-delivery-playbook.md`. On every meaningful task, Claude Code must:
+
+- **Apply the playbook** and **classify the task** (type, stage, risk, public/internal, lightweight or full).
+- Open with a short **Professional Process Applied** block before substantive work (task type · stage · risk · mode · framework/tool/source basis · validation · docs required · artifact policy if relevant · Codex review needed? · human approval needed?) — clear enough for a nontechnical reviewer.
+- **Distinguish universal rules from ActivationOps-specific rules** when reasoning or changing the playbook.
+- **No silent scope, tool, or architecture changes** — surface them and route to the human (and `docs/decision-log.md` if material).
+- **Record new useful discoveries** (classify: immediate fix / next-stage / reusable / roadmap / rejected / needs research).
+- Keep explanations **clear for laypeople without reducing depth**.
+- Document **tool/model/API freshness** where the choice affects implementation, cost, security, public claims, or compatibility.
+- **Classify generated artifacts** (commit / regenerate / ignore / examples / internal) where relevant.
+- Translate the owner's rough request into a professional workstream before acting; **input can be messy, execution must be professional.**
+
 ## What Claude does
 
 - Plans focused, small slices (use `docs/prompts/claude-task-template.md`).

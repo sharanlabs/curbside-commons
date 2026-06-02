@@ -14,3 +14,18 @@ Run this before closing any task that hit a problem. The point is simple: a fail
 - [ ] Was the implementation journal updated? (`docs/implementation-journal.md`)
 
 If the issue changed scope or architecture, also log it in `docs/decision-log.md`.
+
+## Playbook / process checks (every meaningful task)
+
+From `docs/enterprise-delivery-playbook.md`. Keep this lightweight — for low-risk offline work most answers are one word.
+
+- [ ] Did we **re-derive Git state** from `git status` and `git log --oneline -8` (never from memory)?
+- [ ] Did we **classify task type and risk level**?
+- [ ] Did we use **lightweight or full mode** appropriately for that risk?
+- [ ] Did we **record the source basis** when the task needed it (and mark UNVERIFIED otherwise)?
+- [ ] Did we **explain why the selected approach fits** (and note alternatives considered)?
+- [ ] Did we **classify generated artifacts** where relevant (commit / regenerate / ignore / examples / internal)?
+- [ ] Did we **check model/API/tool freshness** where the choice matters?
+- [ ] Did we **define stage-closure criteria** before claiming a stage closed?
+- [ ] Did we **capture reusable lessons or blind spots** (without inventing a new permanent file)?
+- [ ] Did we **avoid adding a new standing log** unnecessarily?

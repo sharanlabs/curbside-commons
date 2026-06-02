@@ -30,6 +30,18 @@ Newest entries on top.
 
 ---
 
+## 2026-06-02 T-001 — Audit finding: recurring git-state doc staleness (process)
+
+- What changed: process note only (no code). The ground-rules audit found the state docs had again drifted from git.
+- What failed: `PROJECT_STATE`/`CURRENT_TASK`/`HANDOFF` said "P2-fix uncommitted" while `HEAD` was already `2ccafce` (owner had committed). This is the **3rd** time the git-state line has gone stale between turns.
+- Why it happened: intermediate turns edited the git-state wording from the in-session assumption of what was committed, rather than re-deriving it from `git log -1` + `git status`. The previous journal entry already wrote that exact prevention — and it still recurred, which means a "be careful" note is not a real control.
+- Fix: corrected the three docs in the audit; rewrote the HANDOFF latest block (it had accreted 4 turns of layers).
+- Prevention (structural, since the soft version failed): the session-start routine (RULES/CLAUDE already require `git status` on start) and `docs/checklists/prevent-repeat-checklist.md` must make "re-derive the PROJECT_STATE/HANDOFF git-state line from `git log -1` + `git status`" a **required, checked** step. Flagged for a docs-allowed task (the checklist is not in this audit's editable set).
+- Files changed: `docs/audits/T-001-ground-rules-audit.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/task-log.md`, this file.
+- Human decision: owner to commit the audit + corrections (not done here).
+
+---
+
 ## 2026-06-02 T-001 — Final Codex review fixes (verb-first guardrail + git-state docs)
 
 - What changed: closed the two P2s from the final Codex review (job `bmyf43y0x`). Suite now 23 (added `test_p2_5`).
