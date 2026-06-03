@@ -1,5 +1,58 @@
 # Task Log
 
+## 2026-06-02 (Codex adversarial review of the roadmap applicability packet + one revision pass — lightweight)
+
+### Professional Process Applied (lightweight)
+
+Task type: Codex-review revision / roadmap-applicability cleanup · Stage: post-Codex, pre-roadmap · Risk: low-medium · Mode: lightweight but precise · Validation: address only the Codex findings + the owner's `git status`/`grep` checks + an internal-consistency pass · Human approval: required before commit.
+
+### Codex review (read-only, working-tree)
+
+Ran the installed `openai-codex` adversarial review (`adversarial-review`, `sandbox: read-only`) on the packet + working-tree diff. **Verdict: needs-revision** (not reject). Direction sound; four findings: (1) [high] eval-first ratification gate too late for roadmap creation (a roadmap encodes the sequence, so ratify before roadmap finalization or mark proposed); (2) [medium] stale `PROJECT_STATE.md` git/current-state line (said HEAD `63e3332` + old uncommitted batch); (3) [medium] governance-mapping appendix risks reintroducing bloat in the roadmap; (4) [medium] EDD source overstated as Tier-1/peer-reviewed (arXiv = preprint).
+
+### Findings fixed (this revision)
+
+- **Eval-first ratified:** owner approved the eval-before-Gemini reorder of `plan-reconciliation.md` §6; recorded a row in `docs/decision-log.md`. **T-002 named "Offline Evaluation and Regression Harness"** (TEVV only a background reference term, not the title).
+- **`PROJECT_STATE.md`** stale git/current-state lines corrected (HEAD `cb80286`; uncommitted = this revision batch; no `out/` dirty; T-002 not started); the 4→5 uncommitted-doc count fixed across the state docs.
+- **Packet de-bloated:** roadmap is product-first and short; **no framework-mapping section (NIST/SSDF/DORA/SRE) by default**; at most a tiny artifact-tied terminology note; no "aligned/compliant/enterprise-scale/production-grade" language.
+- **EDD source downgraded** to preprint/practice reference; eval-first rests on `RULES.md` §3, the data-dictionary §9 guardrail caveat, the T-001.7 audit, the baseline-before-Gemini need, and regression-testing discipline. Added a top revision note to the packet.
+
+### Compliance / scope
+
+Updated only the six named docs (packet, `PROJECT_STATE`, `CURRENT_TASK`, `HANDOFF`, `docs/task-log`, `docs/decision-log`). **No** `docs/roadmap.md`; **no** new files; **no** product code/tests/CSV/`out`/integration change; nothing installed/adopted; **no commit** (owner decides). T-002 not started.
+
+### Next step
+
+Owner approval of the revised packet → then write `docs/roadmap.md` (product-first, short). Eval-first T-002 already ratified in `docs/decision-log.md`.
+
+## 2026-06-02 (Roadmap / Lifecycle / Build-Phase Applicability Review — full-but-narrow, review/planning only)
+
+### Professional Process Applied (full-but-narrow)
+
+Task type: roadmap/lifecycle/build-phase terminology applicability review · Stage: post-T-001.7, pre-roadmap, pre-T-002 · Risk: medium (weak terminology makes a roadmap look fake/overbuilt) · Mode: full-but-narrow · Source requirement: broad external discovery (named frameworks = candidates, not commands) weighted by source tiers + the open-source-discovery rule · Validation: applicability classification + Codex review recommended before any roadmap · Human approval: required before writing the roadmap or starting T-002.
+
+### Skills
+
+Used the project's open-source-discovery + source-intake rules (playbook/`RULES.md` §14) to drive broad, tiered discovery; no external skill conflicted with `RULES.md`.
+
+### What was done
+
+- Read the startup-contract evidence set (`RULES.md`, decision-log, `plan-reconciliation.md` §1–9, `v1-slice-plan.md`, `v1-data-dictionary.md`, T-001.7 audit, source-intake-review) + re-derived git (`HEAD = cb80286`, clean).
+- Broad web discovery (2026-06-02, ~11 searches): NIST AI RMF (Govern/Map/Measure/Manage), NIST GenAI Profile (12 risks), NIST SSDF (Prepare/Protect/Produce/Respond), DORA four keys, Google SRE (SLI/SLO/error-budget), MLOps/LLMOps lifecycle, LLM eval (golden dataset / offline evals / regression / evaluation harness), **Evaluation-Driven Development**, HITL (workflow/control/approval gates; CI-CD `require_review` analogy), walking-skeleton/tracer-bullet/**vertical slice** (Cockburn/Thomas), data provenance / model lineage / audit trail, and AI-portfolio red-flags (field signal).
+- Classified every candidate use-now / use-later / reference-only / reject; wrote `docs/review-packets/roadmap-lifecycle-applicability-review.md` (Executive Verdict, Sources, Source-Quality Notes, Project Evidence, Candidate Terms, Applicability Matrix, selected-term 12-field analysis, Recommended Roadmap Language / Build Phases / Lifecycle, Why-not-Gemini-first, Risks of Over-Formalizing, What Codex Should Challenge, Final Recommendation).
+
+### Verdict (summary)
+
+Use industry terms **selectively, as honest mapping** (plainest term first, each tied to a real artifact), not as the roadmap skeleton. **Use now:** vertical/thin slice, HITL approval gate, deterministic guardrails, provenance + audit trail, idempotency, offline evaluation harness / golden labels / regression testing, evaluation-driven, test-driven. **Avoid:** SRE/SLO/error-budget, DORA-as-current-claim, MLOps training, agentic, "production-grade/deployed-to-production/enterprise-scale." NIST RMF/GenAI/SSDF + DORA = mapping sidebar only. **T-002 = "Offline Evaluation Harness"** (evaluation-first); eval-before-Gemini justified on four independent grounds but a `plan-reconciliation.md` §6 reorder → owner ratifies in `docs/decision-log.md`. Recommend Codex adversarial review of the packet before writing `docs/roadmap.md`.
+
+### Compliance / scope
+
+Review/planning only. **Created** one review packet; **updated** the four state docs. **No** `docs/roadmap.md`; **no** `decision-log` entry (no decision made — recommendation only); **no** product code/tests/CSV/`out`/vault/integration change; nothing installed/cloned/adopted; no commit (owner decides). Web sources cited inline in the packet with tiers + dates.
+
+### Next step
+
+Codex `/codex:adversarial-review` of the packet → revise once → owner approval → then write the roadmap and (if ratified) record eval-first T-002.
+
 ## 2026-06-02 (Codex review of the Source Openness pass + continuity doc-sync correction — lightweight)
 
 ### Professional Process Applied (lightweight)
