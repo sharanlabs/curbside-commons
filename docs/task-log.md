@@ -1,5 +1,53 @@
 # Task Log
 
+## 2026-06-02 (Roadmap Codex-review correction — `docs/roadmap.md` + state docs, lightweight)
+
+### Professional Process Applied (lightweight)
+
+Task type: roadmap doc correction after Codex review · Stage: post-roadmap-review, pre-commit · Risk: low · Mode: lightweight · Validation: owner's grep checks + a phase-number consistency sweep · Human approval: required before commit.
+
+### Codex review (read-only, working-tree)
+
+Ran the installed `openai-codex` adversarial review (`sandbox: read-only`) on the roadmap batch. **Verdict: needs-attention.** Two [medium] findings: (1) the roadmap made **Project Operating Model and Governance** a numbered product build phase (process-as-product, against the ratified applicability packet's product-first principle); (2) two state docs still listed the **eval-first T-002 ratification** as an open follow-up although it is already ratified in `docs/decision-log.md`.
+
+### Fixes applied (this correction)
+
+- **Fix 1 — governance recast as Foundation.** In `docs/roadmap.md`, **Project Operating Model and Governance** is now a completed **Foundation** (kept as context — it was real work and protects execution), not a numbered phase. The product phases are renumbered **1–7** (1 Offline Vertical Slice **done**, 2 Offline Evaluation and Regression Harness = T-002 **next**, 3 Bounded LLM Drafting, 4 Persistence & Provenance Upgrade, 5 HITL Delivery Workflow, 6 Orchestration & Monitoring, 7 Public Demo & Portfolio Narrative). All in-doc phase-number cross-references updated. No framework appendix; no forbidden public-claim terms.
+- **Fix 2 — stale ratification follow-ups cleared.** Removed the "ratify eval-first T-002 ordering" open item from `CURRENT_TASK.md` (hygiene follow-ups) and `PROJECT_STATE.md` (Open Questions); kept the genuinely-open items (`out/` log policy; enforcement-hooks decision). Eval-first T-002 is ratified in `docs/decision-log.md`.
+- Synced the "8 phases" framing to **Foundation + 7 phases** across the state docs.
+
+### Compliance / scope
+
+Updated only `docs/roadmap.md` + the four state docs. **No** `decision-log` change; **no** new files; **no** product code/tests/CSV/`out`/integration change; nothing installed/adopted; **no commit** (owner decides). **T-002 not started.**
+
+### Next step
+
+Owner reviews + (if satisfied) commits the roadmap batch; then scope **T-002 — Offline Evaluation and Regression Harness** as a separate task.
+
+## 2026-06-02 (Roadmap creation — `docs/roadmap.md`, lightweight, documentation only)
+
+### Professional Process Applied (lightweight)
+
+Task type: roadmap documentation · Stage: post-applicability-review, pre-T-002 · Risk: low-medium · Mode: lightweight · Basis: the Codex-revised + ratified applicability review + the built T-001 state; product-first, layperson-legible, public-claim controlled (`RULES.md` §4/§7/§8) · Validation: forbidden-term grep on the roadmap + consistency with built state · Human approval: required before commit.
+
+### What was done
+
+- Created `docs/roadmap.md` — a short, product-first roadmap: **Current Status**, a plain **Product Lifecycle** loop (Discover → Source Intake → Plan → Build → Validate → Review → Document → Handoff → Decide Next Stage), **product-first Build Phases**, a plain **Why T-002 Comes Before Gemini**, **per-phase details** (goal / build / validation / out-of-scope / trigger), a tiny **Terminology note** (no framework-mapping section), and a **What Not To Do Yet** list. *(Phase structure was corrected in the follow-on Codex-review correction above: governance → Foundation; product phases renumbered 1–7.)*
+- Uses the ratified **T-002 = Offline Evaluation and Regression Harness**. Honest framing throughout: simulation on dummy data, CSV protected, fully offline, T-002 ratified but not started, Obsidian vault separate.
+- Synced `CURRENT_TASK.md` / `HANDOFF.md` / `PROJECT_STATE.md` / this log; re-derived git (`HEAD = 78dc694` — the applicability review + revision are committed).
+
+### Validation
+
+- Forbidden-term grep on `docs/roadmap.md` → **0** real matches (production-grade / enterprise-scale / autonomous / deployed-to-production / real-impact / NIST / SSDF / DORA / SRE / SOTA / benchmark / agentic / compliant all absent; the only "NIST" hits were the substring inside "deter**minist**ic"). Ratified T-002 name present (3×), no stale name. All 8 required sections present.
+
+### Compliance / scope
+
+Documentation only. Created `docs/roadmap.md`; updated the four state docs. **No** `decision-log` change (no new decision); **no** product code/tests/CSV/`out`/integration change; nothing installed/adopted; **no commit** (owner decides). **T-002 not started.**
+
+### Next step
+
+Owner reviews + approves `docs/roadmap.md` (and commits this batch) → then scope **T-002 — Offline Evaluation and Regression Harness** as a separate task.
+
 ## 2026-06-02 (Codex adversarial review of the roadmap applicability packet + one revision pass — lightweight)
 
 ### Professional Process Applied (lightweight)
