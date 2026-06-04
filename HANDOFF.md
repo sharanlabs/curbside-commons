@@ -4,15 +4,15 @@ Point-in-time handoff for the next session. Overwrite the top block each time a 
 
 ## Latest handoff
 
-- **Last session tool:** Claude Code (Opus 4.8)
-- **Account / session:** account 1 (mithulshyam4@gmail.com)
-- **Task ID:** **`docs/roadmap.md` created → Codex-reviewed (needs-attention) → corrected (this session)**. The applicability review + its Codex revision (incl. the eval-first `decision-log` ratification) are **committed at `78dc694`**.
-- **What was done (this session, lightweight):** wrote `docs/roadmap.md`, ran a read-only Codex review of it (verdict **needs-attention**), and applied both findings — recast **Project Operating Model and Governance** from a numbered phase to a completed **Foundation**, renumbering the product phases to **1–7** (1 Offline Vertical Slice **done**, 2 **Offline Evaluation and Regression Harness = T-002, next**, 3 Bounded LLM Drafting, 4 Persistence & Provenance, 5 HITL Delivery, 6 Orchestration & Monitoring, 7 Public Demo & Portfolio); and cleared the stale eval-first-T-002 ratification follow-ups in `CURRENT_TASK.md` + `PROJECT_STATE.md`. The roadmap keeps the plain Product Lifecycle loop, "Why T-002 Comes Before Gemini," per-phase details, a tiny Terminology note (**no** framework-mapping section), and a "What Not To Do Yet" list. **No `decision-log` change; no product code/tests/CSV/`out`/integration touched; nothing installed; no commit.**
-- **Reflects reality:** T-001 built + green (23/23); original CSV protected; fully offline (no Gemini/API/live sends); Obsidian vault separate / not runtime; T-002 ratified + next but **not started**.
-- **T-002 (ratified, not started):** **"Offline Evaluation and Regression Harness"** — golden labels + guardrail regression set + baseline, fully offline; comes **before** any live Gemini (build the measuring stick first).
-- **Git state (re-derived 2026-06-02):** `HEAD = 78dc694 "Revise roadmap applicability review after Codex"` (applicability review + revision committed; tree was clean before this task). **Uncommitted now:** `docs/roadmap.md` (new) + four state-doc syncs (`CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`). No `out/` logs dirty; product code/tests/CSV/`out`/integrations unchanged.
-- **What not to do:** do not start T-002 (the roadmap names it; it does not start it); do not jump to Gemini before the T-002 eval baseline + secrets + offline mock; do not add integrations/plugins/hooks; do not link the vault globally; do not commit unless the owner says so.
-- **Next step:** owner reviews + approves `docs/roadmap.md` (and commits this batch); then **scope T-002 — Offline Evaluation and Regression Harness** as a separate task. Tests still green: `python3 -m unittest tests.test_t001 -v`.
+- **Last session tool:** Cursor (Composer)
+- **Account / session:** Cursor IDE
+- **Task ID:** **T-002-PLAN — `docs/t002-slice-plan.md` created (docs only).** Roadmap committed at `df2b986`. T-001 green (23/23). **T-002 implementation not started.**
+- **What was done (this session, lightweight):** created [docs/t002-slice-plan.md](docs/t002-slice-plan.md) from the approved Cursor T-002 plan — golden label schema (`eval/golden_merchants.v1.json`), guardrail regression corpus (`eval/guardrail_regression.v1.json`), metrics baseline (`out/eval_baseline.v1.json`), tests E1–E10, validation commands, GO/NO-GO, file layout. Synced `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`. **No `decision-log` change; no `scripts/`/`tests/`/CSV/`out/`/`eval/`/integration change; no commit.**
+- **Reflects reality:** T-001 built + green; [docs/roadmap.md](docs/roadmap.md) on `main`; T-002 ratified + scoped on paper only; fully offline.
+- **T-002 (planned, not built):** Offline Evaluation and Regression Harness — golden labels + regression set + `scripts/eval.py` + baseline metrics; see slice plan.
+- **Git state (re-derived):** `HEAD = df2b986 "Add ActivationOps AI roadmap"`; tree was clean before this task. **Uncommitted now:** `docs/t002-slice-plan.md` + four state-doc syncs. Product code/tests/CSV/`out`/integrations unchanged.
+- **What not to do:** do not implement T-002 without owner approval; do not jump to Gemini; do not add integrations/plugins/hooks; do not modify source CSV; do not commit unless the owner says so.
+- **Next step:** owner reviews `docs/t002-slice-plan.md` → approves T-002 implementation task → build on branch (e.g. `feature/t002-eval-harness`) per slice plan. Tests still green: `python3 -m unittest tests.test_t001 -v`.
 - **If unsure, stop and ask.**
 
 ## Standing continuity procedures

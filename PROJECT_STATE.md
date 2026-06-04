@@ -1,6 +1,6 @@
 # Project State
 
-Last updated: 2026-06-02 (**`docs/roadmap.md` created + Codex-reviewed + corrected** — product-first, a governance Foundation + **7 build phases**, **T-002 = Offline Evaluation and Regression Harness** is Phase 2 / next; applicability review + Codex revision **committed at `78dc694`**; eval-first T-002 ratified in `docs/decision-log.md`; **T-002 not started**; T-001 green — 23/23)
+Last updated: 2026-06-04 (**`docs/t002-slice-plan.md` created** — T-002 scoped on paper; **T-002 implementation not started**; roadmap committed at `df2b986`; eval-first T-002 ratified in `docs/decision-log.md`; T-001 green — 23/23)
 
 > Date note: the folder's earlier docs are dated 2026-06-02 while the current date is 2026-06-01; Git is now initialized (commit `b57cf2c`) so chronology is tracked going forward. Step order: (1) Codex initial review, (2) Codex open-source validation, (3) Claude governance review, (4) Claude plan reconciliation, (5) operating-system setup, (6) operating-system cleanup, (7) T-001 planning.
 
@@ -8,7 +8,7 @@ Last updated: 2026-06-02 (**`docs/roadmap.md` created + Codex-reviewed + correct
 
 **Stage 1 (T-001) is implemented, Codex-reviewed (twice), and green.** The offline pipeline (`scripts/`), tests (`tests/`, **23/23 pass** = T1–T18 + P2-1..P2-5), and generated artifacts (`out/`) exist. Canonical run: 20 merchants → 8 review queue (High, held), 12 simulated_sent, 0 rejected; source CSV byte-identical; send gate verified (T17); app re-run dedups (P2-1). Two Codex review rounds returned 4 + 2 × P2, **all fixed** (no P0/P1). Stdlib only — no network, no AI call, no integrations.
 
-**Git state (re-derived 2026-06-02):** `HEAD = 78dc694 "Revise roadmap applicability review after Codex"` — the roadmap applicability review + its Codex revision (incl. the eval-first `decision-log` ratification) are **committed**; tree was **clean** before this task. **Uncommitted now:** `docs/roadmap.md` (new) + four state-doc syncs (`CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`). No `decision-log` change this task; no `out/` logs dirty; product code/tests/CSV/`out`/integrations unchanged.
+**Git state (re-derived 2026-06-04):** `HEAD = df2b986 "Add ActivationOps AI roadmap"` — roadmap on `main`; tree was **clean** before this task. **Uncommitted now:** `docs/t002-slice-plan.md` (new) + four state-doc syncs (`CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`). No `decision-log` change; product code/tests/CSV/`out`/integrations unchanged.
 
 **T-001.5 (2026-06-02):** the **Enterprise Delivery Playbook** (`docs/enterprise-delivery-playbook.md`) codifies the professional delivery standard (traceability spine, lightweight-vs-full, source tiers, freshness, artifact policy, stage closure, failure taxonomy, public-claim control, handoff-proof, living-standard) with a Universal vs ActivationOps-specific split. **Mandatory Startup Contract** now enforces it at session start (`RULES.md` §15; `CLAUDE.md`; `CODEX.md` process-finding rule; task/review templates; checklist), with an anti-bloat one-line allowance for trivial edits.
 
@@ -79,18 +79,20 @@ The only open items are hygiene/decision follow-ups (see Current Next Step); non
 ## Current Next Step
 
 1. ~~Implement T-001 → Codex review rounds → fix P2 → commit → ground-rules audit → T-001.7 post-playbook alignment audit~~ — **done**; 23/23 pass; T-001 **closed with minor follow-ups** (`docs/audits/post-playbook-alignment-audit.md`).
-2. **Owner: review + commit the uncommitted work** — the **roadmap batch**: `docs/roadmap.md` (new) + four state-doc syncs. (The applicability review + Codex revision + eval-first ratification are already committed at `78dc694`.) The commit decision stays with the owner.
-3. **Hygiene / decision follow-ups (non-blocking):**
+2. ~~Roadmap batch commit~~ — **done** at `df2b986` (`docs/roadmap.md` on `main`).
+3. **Owner: review + commit the uncommitted work** — **`docs/t002-slice-plan.md`** + four state-doc syncs. Commit decision stays with the owner.
+4. **Hygiene / decision follow-ups (non-blocking):**
    1. restore or decide the `out/` generated-log tracking policy (`git checkout -- out/audit_log.csv out/model_runs.csv`, or gitignore the two volatile logs);
-   2. ~~ratify the **eval-first T-002 ordering** in `docs/decision-log.md`~~ — **done** (ratified 2026-06-02; reorders `plan-reconciliation.md` §6);
-   3. decide whether **enforcement hooks** for CSV-immutability / secrets-blocking should become a future approved task.
-4. **Roadmap — `docs/roadmap.md` created + Codex-reviewed + corrected** (product-first): a governance **Foundation** (done) + **7 build phases** — Offline Vertical Slice **done**; **Offline Evaluation and Regression Harness = T-002 (Phase 2), next**; Bounded LLM Drafting → Persistence → HITL Delivery → Orchestration → Public Demo planned. Codex (needs-attention) flagged governance-as-a-numbered-phase + two stale ratification follow-ups; both fixed (governance recast as Foundation; follow-ups cleared). Reflects: T-001 green (23/23), CSV protected, fully offline, T-002 ratified but not started, Obsidian vault separate. **Next:** owner reviews + approves the roadmap (and commits this batch) → then **scope T-002** as a separate task. **T-002 has not started.**
+   2. decide whether **enforcement hooks** for CSV-immutability / secrets-blocking should become a future approved task.
+5. **T-002 plan — `docs/t002-slice-plan.md` created** (docs only): golden schema, regression corpus spec, metrics baseline, tests E1–E10, validation commands, GO/NO-GO. Aligns with [docs/roadmap.md](docs/roadmap.md) Phase 2 and eval-first ratification. **Next:** owner approves slice plan → **implement T-002** as a separate task (no code in repo yet). **T-002 implementation has not started.**
 
 Off the table until far later: live Supabase, n8n, Slack, Resend, or real Gemini calls; real credentials; any real merchant data; live outbound email.
 
 ## Files Created Or Updated This Session
 
-Roadmap Codex-review correction (latest, 2026-06-02, lightweight): applied the two Codex findings to `docs/roadmap.md` — recast **Project Operating Model and Governance** from a numbered build phase to a completed **Foundation** (renumbered the product phases to 1–7; updated all in-doc phase cross-references), and cleared the stale eval-first-T-002 ratification follow-ups in `CURRENT_TASK.md` + `PROJECT_STATE.md` (Open Questions). Kept genuinely-open items (`out/` log policy; enforcement-hooks). **No new roadmap scope; no `decision-log` change; no product code/tests/CSV/`out`/integration change; no commit (owner decides). T-002 not started.**
+T-002 slice plan (latest, 2026-06-04, lightweight, docs only): created `docs/t002-slice-plan.md` from the approved Cursor T-002 plan; synced `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`. **No `decision-log` change; no `eval/`/`scripts/`/`tests/`/CSV/`out`/integration change; no commit (owner decides). T-002 implementation not started.**
+
+Roadmap Codex-review correction (2026-06-02, lightweight): applied the two Codex findings to `docs/roadmap.md` — recast **Project Operating Model and Governance** from a numbered build phase to a completed **Foundation** (renumbered the product phases to 1–7; updated all in-doc phase cross-references), and cleared the stale eval-first-T-002 ratification follow-ups in `CURRENT_TASK.md` + `PROJECT_STATE.md` (Open Questions). Kept genuinely-open items (`out/` log policy; enforcement-hooks). **No new roadmap scope; no `decision-log` change; no product code/tests/CSV/`out`/integration change; no commit (owner decides). T-002 not started.**
 
 Roadmap creation (2026-06-02, lightweight): created `docs/roadmap.md` — a short, product-first roadmap (Current Status; Product Lifecycle loop; a governance Foundation + 7 product-first Build Phases with per-phase goal / build / validation / out-of-scope / trigger; a plain "Why T-002 Comes Before Gemini"; a tiny Terminology note with **no** framework-mapping section; a "What Not To Do Yet" list). Uses the ratified **T-002 = Offline Evaluation and Regression Harness**. Synced `CURRENT_TASK.md` / `HANDOFF.md` / `PROJECT_STATE.md` / `docs/task-log.md`. **No `decision-log` change (no new decision); no product code/tests/CSV/`out`/integration change; nothing installed/adopted; no commit (owner decides). T-002 not started.**
 
@@ -150,5 +152,5 @@ Honest answers, per the project's "be critical, do not flatter" standard.
 
 ## Handoff Notes
 
-Next session: **T-001 (the offline thin slice) is built, green (23/23), and closed with minor follow-ups**; **`docs/roadmap.md` now exists** (product-first — a governance Foundation + 7 phases) — read it for the build sequence, and `docs/review-packets/roadmap-lifecycle-applicability-review.md` for the reasoning behind it. The uncommitted work is the **roadmap batch**: `docs/roadmap.md` (new) + four state-doc syncs — **pending owner review + commit** (the applicability review + revision + eval-first ratification are committed at `78dc694`). **T-002 = Offline Evaluation and Regression Harness is ratified and is the next phase, but has not started.** Next step after commit: owner approval → **scope T-002** as a separate task. Do not modify the source CSV. Do not start integrations (Supabase, n8n, Slack, Resend, Gemini), real credentials, or real data — all out of scope. Do not start T-002 before the owner approves.
+Next session: **T-001** green (23/23); **`docs/roadmap.md`** on `main` (`df2b986`); **`docs/t002-slice-plan.md`** exists (uncommitted batch with state docs). **T-002 is ratified and scoped on paper; implementation not started.** Next: owner reviews slice plan → approves T-002 build (golden JSON, regression JSON, `scripts/eval.py`, `tests/test_t002.py`). Do not modify the source CSV. No integrations, credentials, or live Gemini until T-002 baseline exists.
 

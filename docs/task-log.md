@@ -1,5 +1,25 @@
 # Task Log
 
+## 2026-06-04 (T-002 slice plan — `docs/t002-slice-plan.md`, docs only, lightweight)
+
+### Professional Process Applied (lightweight)
+
+Task type: T-002 planning documentation · Stage: post-roadmap, pre-T-002 implementation · Risk: low · Mode: lightweight · Basis: approved Cursor T-002 plan + [docs/roadmap.md](roadmap.md) Phase 2 + [docs/decision-log.md](decision-log.md) eval-first ratification · Validation: slice plan completeness vs ratified scope; no product files touched · Human approval: required before T-002 implementation · Codex review: deferred until implementation slice.
+
+### What was done
+
+- Created [docs/t002-slice-plan.md](t002-slice-plan.md) — build spec for **Offline Evaluation and Regression Harness**: problem statement, proposed file layout (`eval/`, `scripts/eval.py`, `tests/test_t002.py`, `out/eval_baseline.v1.json`), golden label schema (`golden_merchants.v1`), regression corpus (`guardrail_regression.v1`), metrics object, tests **E1–E10**, validation commands, GO/NO-GO, out-of-scope list.
+- Synced `CURRENT_TASK.md` (active task = T-002-PLAN, implementation not started), `HANDOFF.md`, `PROJECT_STATE.md`, this log.
+- Tool: Cursor (Composer). **No** `decision-log` entry (no new architecture decision).
+
+### Compliance / scope
+
+**No** `scripts/`, `tests/`, source CSV, `out/`, `eval/`, integrations, plugins, hooks, or commit. T-002 **implementation not started**.
+
+### Next step
+
+Owner reviews slice plan → approves separate T-002 implementation task (golden JSON, regression JSON, eval runner, E1–E10 tests) → Codex review before merge.
+
 ## 2026-06-02 (Roadmap Codex-review correction — `docs/roadmap.md` + state docs, lightweight)
 
 ### Professional Process Applied (lightweight)
