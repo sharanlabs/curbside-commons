@@ -1,6 +1,6 @@
 # T-002 Slice Plan — Offline Evaluation and Regression Harness
 
-Status: **implemented (T-002, branch `feature/t002-eval-harness`; 35/35 tests = T-001 23 + T-002 12).** Companion to [docs/v1-data-dictionary.md](v1-data-dictionary.md) §9 and [docs/roadmap.md](roadmap.md) Phase 2. Artifacts: `eval/golden_merchants.v1.json`, `eval/guardrail_regression.v1.json` (45 cases), `scripts/eval.py`, `tests/test_t002.py`, generated `eval/eval_baseline.v1.json` (not `out/`).
+Status: **implemented and merged to `main` at `a95c0f1` (35/35 tests = T-001 23 + T-002 12).** Companion to [docs/v1-data-dictionary.md](v1-data-dictionary.md) §9 and [docs/roadmap.md](roadmap.md) Phase 2. Artifacts: `eval/golden_merchants.v1.json`, `eval/guardrail_regression.v1.json` (45 cases), `scripts/eval.py`, `tests/test_t002.py`, generated `eval/eval_baseline.v1.json` (not `out/`).
 
 Ratified in [docs/decision-log.md](decision-log.md) (2026-06-02): eval-first sequencing — T-002 before any live Gemini.
 
