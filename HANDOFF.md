@@ -5,14 +5,15 @@ Point-in-time handoff for the next session. Overwrite the top block each time a 
 ## Latest handoff
 
 - **Last session tool:** Cursor (Composer)
-- **Account / session:** Cursor IDE
-- **Task ID:** **T-002-PLAN — `docs/t002-slice-plan.md` created (docs only).** Roadmap committed at `df2b986`. T-001 green (23/23). **T-002 implementation not started.**
-- **What was done (this session, lightweight):** created [docs/t002-slice-plan.md](docs/t002-slice-plan.md) from the approved Cursor T-002 plan — golden label schema (`eval/golden_merchants.v1.json`), guardrail regression corpus (`eval/guardrail_regression.v1.json`), metrics baseline (`out/eval_baseline.v1.json`), tests E1–E10, validation commands, GO/NO-GO, file layout. Synced `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`, `docs/task-log.md`. **No `decision-log` change; no `scripts/`/`tests/`/CSV/`out/`/`eval/`/integration change; no commit.**
-- **Reflects reality:** T-001 built + green; [docs/roadmap.md](docs/roadmap.md) on `main`; T-002 ratified + scoped on paper only; fully offline.
-- **T-002 (planned, not built):** Offline Evaluation and Regression Harness — golden labels + regression set + `scripts/eval.py` + baseline metrics; see slice plan.
-- **Git state (re-derived):** `HEAD = df2b986 "Add ActivationOps AI roadmap"`; tree was clean before this task. **Uncommitted now:** `docs/t002-slice-plan.md` + four state-doc syncs. Product code/tests/CSV/`out`/integrations unchanged.
-- **What not to do:** do not implement T-002 without owner approval; do not jump to Gemini; do not add integrations/plugins/hooks; do not modify source CSV; do not commit unless the owner says so.
-- **Next step:** owner reviews `docs/t002-slice-plan.md` → approves T-002 implementation task → build on branch (e.g. `feature/t002-eval-harness`) per slice plan. Tests still green: `python3 -m unittest tests.test_t001 -v`.
+- **Task ID:** **T-002 implemented** on `feature/t002-eval-harness` (not committed).
+- **What was done:** built offline eval harness per [docs/t002-slice-plan.md](docs/t002-slice-plan.md) — `eval/golden_merchants.v1.json`, `eval/guardrail_regression.v1.json` (45 cases: 5 T-001 regex parity + 1 structural + extras), `scripts/eval.py`, `tests/test_t002.py` (E1–E10). Baseline writes to **`eval/eval_baseline.v1.json`** (not `out/`). Flag rules: inclusion for positives; exact-empty for negatives/source/stub.
+- **Validation:** `python3 -m unittest tests.test_t001 tests.test_t002 -v` → **35/35 OK** (T-001 23 + T-002 12); `python3 scripts/eval.py` → **MERCHANT 20/20 | GUARDRAIL 45/45 | PASS**.
+- **Corpus note:** `GR-POS-009` (`pii_or_secret`) uses sentinel `__REGRESSION_PII_API_KEY_ASSIGNMENT__` in JSON; `scripts/eval.py` assembles the assignment-form scan text from fragments (no contiguous live-key literal in repo).
+- **T-001 guardrail change:** `scripts/guardrail.py` hardened `pii_or_secret` with an assignment-form detector (`api_key=sk_live_…` pattern). T-001 pipeline outputs/behavior unchanged; **`python3 -m unittest tests.test_t001 -v` still passes** (23/23).
+- **Unchanged:** source CSV; `out/` T-001 artifacts; no integrations.
+- **Git (re-derived):** branch `feature/t002-eval-harness`; `HEAD = 1a0dbd0`; uncommitted — `eval/`, `scripts/eval.py`, `tests/test_t002.py`, doc/state updates.
+- **What not to do:** do not commit unless owner says so; do not start Gemini; do not modify source CSV or `out/`.
+- **Next step:** owner review → Codex changed-files review → commit/merge T-002 branch.
 - **If unsure, stop and ask.**
 
 ## Standing continuity procedures

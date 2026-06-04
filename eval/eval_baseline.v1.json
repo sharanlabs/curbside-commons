@@ -1,0 +1,126 @@
+{
+  "aggregate_pipeline": {
+    "draft_rejected": 0,
+    "failures": [],
+    "review_required": 8,
+    "simulated_send_events": 12,
+    "simulated_sent": 12
+  },
+  "baseline_version": "eval_baseline.v1",
+  "eval_run_at": "2026-06-01T00:00:00Z",
+  "failures": [],
+  "guardrail_eval": {
+    "by_category": {
+      "aggressive_urgency": {
+        "failed": 0,
+        "passed": 2
+      },
+      "false_impact_claim": {
+        "failed": 0,
+        "passed": 2
+      },
+      "forbidden_revenue_claim": {
+        "failed": 0,
+        "passed": 3
+      },
+      "near_miss": {
+        "failed": 0,
+        "passed": 8
+      },
+      "pii_or_secret": {
+        "failed": 0,
+        "passed": 2
+      },
+      "source_nudge": {
+        "failed": 0,
+        "passed": 20
+      },
+      "state_mismatch": {
+        "failed": 0,
+        "passed": 1
+      },
+      "stub_template": {
+        "failed": 0,
+        "passed": 5
+      },
+      "unsupported_metric": {
+        "failed": 0,
+        "passed": 2
+      }
+    },
+    "cases_passed": 45,
+    "cases_total": 45,
+    "regression_pass_rate": 1.0,
+    "source_nudge_overflags": 0
+  },
+  "merchant_eval": {
+    "blocker_exact_match_rate": 1.0,
+    "field_accuracy": {
+      "approval_state": {
+        "correct": 20,
+        "total": 20
+      },
+      "contact_eligible": {
+        "correct": 20,
+        "total": 20
+      },
+      "current_blocker_code": {
+        "correct": 20,
+        "total": 20
+      },
+      "merchant_id": {
+        "correct": 20,
+        "total": 20
+      },
+      "next_best_action": {
+        "correct": 20,
+        "total": 20
+      },
+      "outreach_status": {
+        "correct": 20,
+        "total": 20
+      },
+      "review_reason": {
+        "correct": 20,
+        "total": 20
+      },
+      "review_required": {
+        "correct": 20,
+        "total": 20
+      },
+      "risk_level": {
+        "correct": 20,
+        "total": 20
+      },
+      "risk_reason_codes": {
+        "correct": 20,
+        "total": 20
+      },
+      "risk_score": {
+        "correct": 20,
+        "total": 20
+      },
+      "send_eligible": {
+        "correct": 20,
+        "total": 20
+      },
+      "source_row_index": {
+        "correct": 20,
+        "total": 20
+      },
+      "steps_completed": {
+        "correct": 20,
+        "total": 20
+      }
+    },
+    "merchants_matched": 20,
+    "merchants_total": 20,
+    "outreach_status_exact_match_rate": 1.0,
+    "risk_level_exact_match_rate": 1.0,
+    "risk_score_exact_match_rate": 1.0,
+    "send_eligible_exact_match_rate": 1.0
+  },
+  "passed": true,
+  "source_csv_sha256": "43fb21f6948e2fb554e2d293844c9baf6d3a7f50d88a6d5e1566ebf86514370d",
+  "task_id": "T-002"
+}

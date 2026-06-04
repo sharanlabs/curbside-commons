@@ -1,5 +1,33 @@
 # Task Log
 
+## 2026-06-04 (T-002 implementation — eval harness, branch `feature/t002-eval-harness`)
+
+### Professional Process Applied (lightweight)
+
+Task type: offline eval harness implementation · Stage: Phase 2 build · Risk: low-medium · Mode: lightweight · Basis: [docs/t002-slice-plan.md](t002-slice-plan.md) · Validation: `python3 -m unittest tests.test_t001 tests.test_t002 -v` + `python3 scripts/eval.py` · Codex review: pending · Human approval: required before commit/merge.
+
+### What was done
+
+- `eval/golden_merchants.v1.json` — 20 merchants + aggregate expectations + `source_csv_sha256` from canonical pipeline.
+- `eval/guardrail_regression.v1.json` — **45** cases (5 T-001 regex parity, 1 structural `state_mismatch`, 6 extra positives, 8 near-miss negatives, 20 source nudges, 5 stub-clean).
+- `scripts/eval.py` — golden compare, regression scoring (inclusion for positives; exact-empty for negatives/source/stub), CLI; default baseline `eval/eval_baseline.v1.json` (not `out/`).
+- `tests/test_t002.py` — E1–E10.
+- Updated `docs/t002-slice-plan.md` status, `CURRENT_TASK.md`, `HANDOFF.md`, `PROJECT_STATE.md`.
+
+### Validation
+
+- **35/35 OK** (T-001 23 + T-002 12).
+- `python3 scripts/eval.py` → **MERCHANT 20/20 | GUARDRAIL 45/45 | PASS** (exit 0).
+
+### Notes
+
+- `GR-POS-009` text adjusted for `pii_or_secret` regex (original api_key string did not flag).
+- Source CSV and `out/` not modified. T-001 behavior/tests unchanged. **No commit.**
+
+### Next step
+
+Owner review → Codex `/codex:review` → commit/merge when approved.
+
 ## 2026-06-04 (T-002 slice plan — `docs/t002-slice-plan.md`, docs only, lightweight)
 
 ### Professional Process Applied (lightweight)

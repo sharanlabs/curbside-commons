@@ -253,6 +253,7 @@ Detection patterns are kept in a code block (not a Markdown table) so the altern
 # pii_or_secret
 [A-Za-z0-9._%+-]+@(?!example\.com)[A-Za-z0-9.-]+\.[A-Za-z]{2,}
 \b(sk|pk|api[_-]?key|token|secret|bearer)[-_]?[A-Za-z0-9]{8,}\b
+\bapi[_-]?key\s*=\s*sk[_-]?live[-_]?[A-Za-z0-9]{8,}\b
 
 # aggressive_urgency
 \bact now\b

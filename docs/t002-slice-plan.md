@@ -1,6 +1,6 @@
 # T-002 Slice Plan — Offline Evaluation and Regression Harness
 
-Status: **planned (not implemented).** Companion to [docs/v1-data-dictionary.md](v1-data-dictionary.md) §9 (guardrail honesty caveat) and [docs/roadmap.md](roadmap.md) Phase 2. T-001 is implemented ([docs/v1-slice-plan.md](v1-slice-plan.md), **23/23** tests). This document is the build spec for T-002; no `eval/`, `scripts/eval.py`, or `tests/test_t002.py` exist until a separate implementation task.
+Status: **implemented (T-002, branch `feature/t002-eval-harness`; 35/35 tests = T-001 23 + T-002 12).** Companion to [docs/v1-data-dictionary.md](v1-data-dictionary.md) §9 and [docs/roadmap.md](roadmap.md) Phase 2. Artifacts: `eval/golden_merchants.v1.json`, `eval/guardrail_regression.v1.json` (45 cases), `scripts/eval.py`, `tests/test_t002.py`, generated `eval/eval_baseline.v1.json` (not `out/`).
 
 Ratified in [docs/decision-log.md](decision-log.md) (2026-06-02): eval-first sequencing — T-002 before any live Gemini.
 
@@ -14,7 +14,7 @@ Without this harness, claims about guardrail strength or model improvement would
 
 - No API keys, network, cost, or non-determinism.
 - Reuses [scripts/pipeline.py](../scripts/pipeline.py) and [scripts/guardrail.py](../scripts/guardrail.py) — eval **calls** T-001, does not replace it.
-- Produces `out/eval_baseline.v1.json` as the evidence object for Phase 3 (Bounded LLM Drafting).
+- Produces `eval/eval_baseline.v1.json` as the evidence object for Phase 3 (Bounded LLM Drafting).
 - Matches [RULES.md](../RULES.md) §3: evaluation before claims.
 
 ## Inputs
@@ -33,7 +33,7 @@ Without this harness, claims about guardrail strength or model improvement would
 | --- | --- | --- |
 | `eval/golden_merchants.v1.json` | committed fixture | Per-merchant expected fields + aggregate counts |
 | `eval/guardrail_regression.v1.json` | committed fixture | Expanded guardrail cases |
-| `out/eval_baseline.v1.json` | generated metrics | Versioned baseline snapshot (owner: commit first green baseline or gitignore + regen command) |
+| `eval/eval_baseline.v1.json` | generated metrics | Versioned baseline snapshot (default path for `scripts/eval.py`; owner: commit or gitignore) |
 | `scripts/eval.py` | CLI | Run eval, print summary, write baseline |
 | `tests/test_t002.py` | tests | E1–E10 acceptance for the harness |
 
@@ -63,7 +63,7 @@ docs/
 
 1. **Seed golden labels:** run `run_pipeline` once on a clean temp dir; serialize 20 merchants + `aggregate_expectations`; record `source_csv_sha256`; commit `eval/golden_merchants.v1.json`.
 2. **Author regression corpus:** migrate T18 regex cases from `guardrail_cases.json` (5 categories as `regex_positive`; `state_mismatch` as the single `structural_positive` case); add near-miss negatives, extra positives, 20 source nudges (`GR-SRC-*`), stub-clean samples (~43–53 cases total).
-3. **Implement `scripts/eval.py`:** load golden + regression; score merchant fields; run guardrail cases; write `out/eval_baseline.v1.json`; exit non-zero on failure.
+3. **Implement `scripts/eval.py`:** load golden + regression; score merchant fields; run guardrail cases; write `eval/eval_baseline.v1.json`; exit non-zero on failure.
 4. **Implement `tests/test_t002.py`:** E1–E10 (see below).
 5. **Validate:** full command list in § Validation; Codex changed-files review; owner approval before merge.
 6. **Baseline policy:** owner decides whether to commit the first green `eval_baseline.v1.json` or gitignore it.
@@ -193,7 +193,7 @@ Let `actual` = sorted flag list from `scan_text` or `run_guardrail`, and `expect
 }
 ```
 
-## Metrics (`out/eval_baseline.v1.json`)
+## Metrics (`eval/eval_baseline.v1.json`)
 
 Written by `scripts/eval.py`. Top-level shape:
 
@@ -254,7 +254,7 @@ Written by `scripts/eval.py`. Top-level shape:
 | Flag | Purpose |
 | --- | --- |
 | `--out-dir PATH` | Pipeline temp output (default: tempfile) |
-| `--baseline-path PATH` | Default `out/eval_baseline.v1.json` |
+| `--baseline-path PATH` | Default `eval/eval_baseline.v1.json` |
 | `--fail-fast` | Stop on first failure |
 
 ## Tests / checks (acceptance criteria for T-002)

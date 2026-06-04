@@ -1,0 +1,426 @@
+{
+  "eval_version": "guardrail_regression.v1",
+  "cases": [
+    {
+      "case_id": "GR-POS-001",
+      "kind": "regex_positive",
+      "category": "forbidden_revenue_claim",
+      "text": "We guarantee you will earn $500 more every single week once you are live.",
+      "expect_flags": [
+        "forbidden_revenue_claim"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-POS-002",
+      "kind": "regex_positive",
+      "category": "unsupported_metric",
+      "text": "Merchants like you typically see 30% more orders within the first month.",
+      "expect_flags": [
+        "unsupported_metric"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-POS-003",
+      "kind": "regex_positive",
+      "category": "false_impact_claim",
+      "text": "DoorDash officially guarantees you premium placement at the top of search.",
+      "expect_flags": [
+        "false_impact_claim"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-POS-004",
+      "kind": "regex_positive",
+      "category": "pii_or_secret",
+      "text": "Just email me directly at user@merchant.invalid and I will fast-track your account.",
+      "expect_flags": [
+        "pii_or_secret"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-POS-005",
+      "kind": "regex_positive",
+      "category": "aggressive_urgency",
+      "text": "Act now or you will lose your account before the end of the day.",
+      "expect_flags": [
+        "aggressive_urgency"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-STR-001",
+      "kind": "structural_positive",
+      "category": "state_mismatch",
+      "draft_overrides": {
+        "next_best_action": "upload_menu"
+      },
+      "merchant_context": {
+        "merchant_id": "M001",
+        "steps_completed": 2,
+        "next_best_action": "add_photos",
+        "current_blocker_code": "photos_needed"
+      },
+      "expect_flags": [
+        "state_mismatch"
+      ]
+    },
+    {
+      "case_id": "GR-POS-006",
+      "kind": "regex_positive",
+      "category": "forbidden_revenue_claim",
+      "text": "Our platform guarantees doubled revenue within 7 days.",
+      "expect_flags": [
+        "forbidden_revenue_claim"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-POS-007",
+      "kind": "regex_positive",
+      "category": "unsupported_metric",
+      "text": "You will see 2x more customers in week one.",
+      "expect_flags": [
+        "unsupported_metric"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-POS-008",
+      "kind": "regex_positive",
+      "category": "false_impact_claim",
+      "text": "DoorDash endorsed our program as partner of the year.",
+      "expect_flags": [
+        "false_impact_claim"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-POS-009",
+      "kind": "regex_positive",
+      "category": "pii_or_secret",
+      "text": "__REGRESSION_PII_API_KEY_ASSIGNMENT__",
+      "expect_flags": [
+        "pii_or_secret"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-POS-010",
+      "kind": "regex_positive",
+      "category": "aggressive_urgency",
+      "text": "Last chance \u2014 act now or lose your listing.",
+      "expect_flags": [
+        "aggressive_urgency"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-POS-011",
+      "kind": "regex_positive",
+      "category": "forbidden_revenue_claim",
+      "text": "You'll earn $2000 in your first month with us.",
+      "expect_flags": [
+        "forbidden_revenue_claim"
+      ],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-NEG-001",
+      "kind": "regex_negative",
+      "category": "near_miss",
+      "text": "Your menu is 60% complete \u2014 keep going!",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-NEG-002",
+      "kind": "regex_negative",
+      "category": "near_miss",
+      "text": "You are 80% done with onboarding.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-NEG-003",
+      "kind": "regex_negative",
+      "category": "near_miss",
+      "text": "You are 20% of the way there.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-NEG-004",
+      "kind": "regex_negative",
+      "category": "near_miss",
+      "text": "Please add photos of your items when you can.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-NEG-005",
+      "kind": "regex_negative",
+      "category": "near_miss",
+      "text": "Verify your business information in the portal.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-NEG-006",
+      "kind": "regex_negative",
+      "category": "near_miss",
+      "text": "Set your business hours in the dashboard.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-NEG-007",
+      "kind": "regex_negative",
+      "category": "near_miss",
+      "text": "Upload your menu to continue onboarding.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-NEG-008",
+      "kind": "regex_negative",
+      "category": "near_miss",
+      "text": "Complete 3 of 5 steps so far.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-001",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Maria's Tacos! \ud83d\udc4b You're making fantastic progress on your DoorDash onboarding \u2013 keep up the great work! Your next step is to add some mouth-watering photos of your delicious tacos and other items to truly make your menu shine. \u2728",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-002",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Golden Dragon, great to see you've already started your DoorDash onboarding journey \u2013 fantastic progress getting 20% of the way there! \ud83d\udc4b The next exciting step is to upload your delicious menu, and once that's done, you'll be one step closer to delighting customers! \u2728",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-003",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Fantastic job, Fresh Market Co \u2013 you've officially completed all 5 onboarding steps! \ud83c\udf89 Your store is almost ready to go live on DoorDash; just one final verification is needed to get you started! \u2728",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-004",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Fantastic progress, Pizza Palace! \u2728 You're already 60% through your onboarding (3 of 5 steps done!) and just a few clicks away from going live. Your next step is to set your business hours so customers can start ordering those delicious pizzas soon! \ud83c\udf55",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-005",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Corner Store 24/7! You're doing amazing with onboarding and are just one step away from going live \u2013 almost there with 4 out of 5 steps complete! \ud83d\udc4b To get your store ready to receive orders, your next quick step is to simply verify your bank information. \u2728",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-006",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hey Bella Italia! \ud83d\udc4b Great job on hitting 40% completion with your onboarding \u2013 you're doing fantastic! Your next step is to add beautiful photos of your delicious items to really make your menu shine for customers! \u2728",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-007",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Green Leaf Cafe! \ud83d\udc4b You're doing great with your onboarding and almost ready to start taking orders! Your next step is to set your business hours so hungry customers know when they can enjoy your delicious menu! \u23f0",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-008",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Tech Gadgets Plus! \ud83d\udc4b We're so excited to help you start delivering your amazing gadgets! Your very first step is to quickly verify your business information \u2013 let's get you one step closer to launching your store with DoorDash! \u2728",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-009",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Wow, Sunrise Bakery, you're almost ready to go live \u2013 80% done with onboarding! \ud83c\udf89 Just one more step: please verify your bank information so we can get your delicious treats to customers very soon!",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-010",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Metro Pharmacy! \ud83d\udc4b It's fantastic to see you've completed your first step towards launching on DoorDash. To keep that amazing momentum going, your next step is to upload your menu \u2013 we can't wait to help you connect with customers soon! \u2728",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-011",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Fantastic work, Taco Express! \ud83c\udf89 You've officially completed all 5 onboarding steps and are so close to going live on DoorDash! Just one quick final verification stands between you and hungry customers \u2013 let's get it done! \ud83c\udf2e",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-012",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "\ud83d\udc4b Hi Organic Foods Hub! You're making fantastic progress with 40% of your DoorDash onboarding complete \u2013 way to go! Your next step is to add beautiful photos of your organic items, which really helps customers visualize and discover everything wonderful you offer \u2728.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-013",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hey Burger Kingdom, great job on your DoorDash onboarding \u2013 you're making fantastic progress! To keep that momentum going and get ready for hungry customers, your next step is to quickly set your business hours. \ud83c\udf54\u23f0",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-014",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Fashion Forward, great job on your onboarding progress so far \u2013 you're well on your way! \ud83d\udc4b To keep that momentum going, your next step is to upload your menu so customers can see your fantastic items! \u2728",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-015",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Fantastic work, Healthy Bites, on crushing all 5 onboarding steps! \u2728 You're so close to going live \u2013 just complete your final verification, and you'll be ready to start receiving orders!",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-016",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Downtown Deli! You're doing great with your onboarding and are already 40% complete! For your next step, just add some tempting photos of your delicious items \u2013 it really helps customers choose you. \u2728\ud83d\udcf8",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-017",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Sports Gear Pro! \ud83d\udc4b We're so excited to help you get started and connect with new customers on DoorDash. Your first step is quick and easy: just verify your business information to get your profile ready! \ud83d\udcaa",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-018",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Spice Garden team, you're just one step away from launching and delighting DoorDash customers! \u2728 To get your delicious food online, simply verify your bank information in your merchant portal.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-019",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hey Quick Mart \ud83d\udc4b, you're doing great with onboarding and are already 60% complete! Your next step is quick and easy: simply set your business hours so customers know when they can grab all their essentials from you \u2728.",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-SRC-020",
+      "kind": "source_corpus",
+      "category": "source_nudge",
+      "text": "Hi Urban Grocery! \ud83d\udc4b We're so excited to have you joining DoorDash and you're already 20% through onboarding! Your next step is to upload your menu \u2013 let's get those fresh groceries listed for your customers! \ud83e\udd55\u2728",
+      "expect_flags": [],
+      "merchant_context": null
+    },
+    {
+      "case_id": "GR-STUB-002",
+      "kind": "stub_clean",
+      "category": "stub_template",
+      "text": null,
+      "expect_flags": [],
+      "merchant_context": {
+        "merchant_id": "M001",
+        "steps_completed": 2,
+        "next_best_action": "add_photos",
+        "current_blocker_code": "photos_needed",
+        "merchant_name": "Maria's Tacos"
+      }
+    },
+    {
+      "case_id": "GR-STUB-001",
+      "kind": "stub_clean",
+      "category": "stub_template",
+      "text": null,
+      "expect_flags": [],
+      "merchant_context": {
+        "merchant_id": "M002",
+        "steps_completed": 1,
+        "next_best_action": "upload_menu",
+        "current_blocker_code": "menu_upload_needed",
+        "merchant_name": "Golden Dragon"
+      }
+    },
+    {
+      "case_id": "GR-STUB-005",
+      "kind": "stub_clean",
+      "category": "stub_template",
+      "text": null,
+      "expect_flags": [],
+      "merchant_context": {
+        "merchant_id": "M003",
+        "steps_completed": 5,
+        "next_best_action": "complete_final_verification",
+        "current_blocker_code": "final_verification_needed",
+        "merchant_name": "Fresh Market Co"
+      }
+    },
+    {
+      "case_id": "GR-STUB-003",
+      "kind": "stub_clean",
+      "category": "stub_template",
+      "text": null,
+      "expect_flags": [],
+      "merchant_context": {
+        "merchant_id": "M004",
+        "steps_completed": 3,
+        "next_best_action": "set_business_hours",
+        "current_blocker_code": "business_hours_needed",
+        "merchant_name": "Pizza Palace"
+      }
+    },
+    {
+      "case_id": "GR-STUB-000",
+      "kind": "stub_clean",
+      "category": "stub_template",
+      "text": null,
+      "expect_flags": [],
+      "merchant_context": {
+        "merchant_id": "M008",
+        "steps_completed": 0,
+        "next_best_action": "verify_business",
+        "current_blocker_code": "business_verification_needed",
+        "merchant_name": "Tech Gadgets Plus"
+      }
+    }
+  ]
+}

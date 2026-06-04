@@ -34,6 +34,8 @@ PATTERNS = {
     "pii_or_secret": [
         r"[A-Za-z0-9._%+-]+@(?!example\.com)[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
         r"\b(sk|pk|api[_-]?key|token|secret|bearer)[-_]?[A-Za-z0-9]{8,}\b",
+        # api_key=sk_live_... assignment form (Codex/T-002 gap; = breaks the generic suffix pattern)
+        r"\bapi[_-]?key\s*=\s*sk[_-]?live[-_]?[A-Za-z0-9]{8,}\b",
     ],
     "aggressive_urgency": [
         r"\bact now\b",
