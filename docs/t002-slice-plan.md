@@ -33,7 +33,7 @@ Without this harness, claims about guardrail strength or model improvement would
 | --- | --- | --- |
 | `eval/golden_merchants.v1.json` | committed fixture | Per-merchant expected fields + aggregate counts |
 | `eval/guardrail_regression.v1.json` | committed fixture | Expanded guardrail cases |
-| `eval/eval_baseline.v1.json` | generated metrics | Versioned baseline snapshot (default path for `scripts/eval.py`; owner: commit or gitignore) |
+| `eval/eval_baseline.v1.json` | committed baseline evidence | Versioned baseline snapshot (default path for `scripts/eval.py`); **intentionally committed under `eval/`** as the locked pre-Gemini baseline (decision-log 2026-06-04) |
 | `scripts/eval.py` | CLI | Run eval, print summary, write baseline |
 | `tests/test_t002.py` | tests | E1–E10 acceptance for the harness |
 
@@ -45,14 +45,13 @@ Eval runs use **temp directories by default** so committed `out/` from T-001 is 
 eval/
   golden_merchants.v1.json
   guardrail_regression.v1.json
+  eval_baseline.v1.json               # generated baseline; committed under eval/ (decision-log 2026-06-04)
   schema/
     golden_merchants.v1.schema.json   # optional
 scripts/
   eval.py                             # optional eval_lib.py if shared helpers needed
 tests/
   test_t002.py
-out/
-  eval_baseline.v1.json               # generated
 docs/
   t002-slice-plan.md                  # this file
 ```
@@ -66,7 +65,7 @@ docs/
 3. **Implement `scripts/eval.py`:** load golden + regression; score merchant fields; run guardrail cases; write `eval/eval_baseline.v1.json`; exit non-zero on failure.
 4. **Implement `tests/test_t002.py`:** E1–E10 (see below).
 5. **Validate:** full command list in § Validation; Codex changed-files review; owner approval before merge.
-6. **Baseline policy:** owner decides whether to commit the first green `eval_baseline.v1.json` or gitignore it.
+6. **Baseline policy:** **decided 2026-06-04** — `eval/eval_baseline.v1.json` is intentionally committed under `eval/` as the locked pre-Gemini baseline evidence (see `docs/decision-log.md`).
 
 ## Golden label schema (`eval/golden_merchants.v1.json`)
 
@@ -317,7 +316,7 @@ Live Gemini or any API; secrets; Slack / Resend / Supabase / n8n; changes to sou
 
 1. Is the golden field set minimal but sufficient to catch real pipeline regressions?
 2. Will the regression corpus actually stress near-miss cases (T11 protection) without bloating maintenance?
-3. Is committing `eval_baseline.v1.json` the right artifact policy vs gitignore?
+3. Is committing `eval_baseline.v1.json` the right artifact policy vs gitignore? → **resolved 2026-06-04: committed under `eval/`** (decision-log).
 4. Does eval stay stdlib-only and temp-dir-safe?
 5. Any scope creep into changing T-001 behavior?
 

@@ -1,6 +1,6 @@
 # Project State
 
-Last updated: 2026-06-04 (**T-002 implemented** on `feature/t002-eval-harness` — 35/35 tests (T-001 23 + T-002 12); eval CLI green; **not committed**; T-001 still 23/23; source CSV and `out/` untouched)
+Last updated: 2026-06-04 (**T-002 merged to `main`** at `a95c0f1`, cleanup `dc7d131` — 35/35 tests (T-001 23 + T-002 12); eval CLI green; **closed with minor follow-ups**; T-001 still 23/23; source CSV and `out/` untouched; git-state corrected by [docs/audits/build-process-compliance-audit.md](docs/audits/build-process-compliance-audit.md))
 
 > Date note: the folder's earlier docs are dated 2026-06-02 while the current date is 2026-06-01; Git is now initialized (commit `b57cf2c`) so chronology is tracked going forward. Step order: (1) Codex initial review, (2) Codex open-source validation, (3) Claude governance review, (4) Claude plan reconciliation, (5) operating-system setup, (6) operating-system cleanup, (7) T-001 planning.
 
@@ -8,7 +8,7 @@ Last updated: 2026-06-04 (**T-002 implemented** on `feature/t002-eval-harness` �
 
 **Stage 1 (T-001) is implemented, Codex-reviewed (twice), and green.** The offline pipeline (`scripts/`), tests (`tests/`, **23/23 pass** = T1–T18 + P2-1..P2-5), and generated artifacts (`out/`) exist. Canonical run: 20 merchants → 8 review queue (High, held), 12 simulated_sent, 0 rejected; source CSV byte-identical; send gate verified (T17); app re-run dedups (P2-1). Two Codex review rounds returned 4 + 2 × P2, **all fixed** (no P0/P1). Stdlib only — no network, no AI call, no integrations.
 
-**Git state (re-derived 2026-06-04):** branch `feature/t002-eval-harness`; `HEAD = 1a0dbd0` (T-002 plan commit on branch). **Uncommitted T-002 implementation:** `eval/`, `scripts/eval.py`, `tests/test_t002.py`, doc/state updates. `main` tip for roadmap = `df2b986`. No `decision-log` change; source CSV and `out/` unchanged.
+**Git state (re-derived 2026-06-04):** branch `main`; `HEAD = dc7d131` ("Clean up T-002 merge status"); the audit/decision/state-doc batch is currently uncommitted pending owner review — re-run `git status` before continuing. **T-002 implementation committed at `a95c0f1`** and fast-forwarded into `main`; branch `feature/t002-eval-harness` remains at `a95c0f1` (1 behind, not deleted). Source CSV and `out/` unchanged; the `pii_or_secret` guardrail hardening and the `eval/` baseline artifact policy are now recorded in `docs/decision-log.md` (2026-06-04). *(This line previously read `feature/t002-eval-harness` / `HEAD = 1a0dbd0` / "uncommitted" after the merge had already landed — the recurring git-line-drift failure; corrected by the build-process compliance audit.)*
 
 **T-001.5 (2026-06-02):** the **Enterprise Delivery Playbook** (`docs/enterprise-delivery-playbook.md`) codifies the professional delivery standard (traceability spine, lightweight-vs-full, source tiers, freshness, artifact policy, stage closure, failure taxonomy, public-claim control, handoff-proof, living-standard) with a Universal vs ActivationOps-specific split. **Mandatory Startup Contract** now enforces it at session start (`RULES.md` §15; `CLAUDE.md`; `CODEX.md` process-finding rule; task/review templates; checklist), with an anti-bloat one-line allowance for trivial edits.
 
@@ -27,7 +27,7 @@ The project operating system is now in place so any tool/account can continue fr
 - Parsed merchant records: 20
 - CSV header issue: first two columns are both named `Merchant Name`; second column values indicate merchant category/type.
 - Risk score is synthetic and matches the inferred formula across all rows.
-- Git repository: **initialized** (initial commit `b57cf2c "Initial reviewed planning state"`). The operating system, Enterprise Delivery Playbook, Mandatory Startup Contract, source-intake standards, the Source Openness / state-sync batch, and the roadmap applicability review + Codex revision (incl. the eval-first ratification) are **committed** (OS setup at `49408d3`). **The current HEAD and the exact uncommitted set are tracked only in the canonical "Git state" line under Current Phase above — not restated here, to avoid git-line drift.**
+- Git repository: **initialized** (initial commit `b57cf2c "Initial reviewed planning state"`). The operating system, Enterprise Delivery Playbook, Mandatory Startup Contract, source-intake standards, the Source Openness / state-sync batch, and the roadmap applicability review + Codex revision (incl. the eval-first ratification) are **committed** (OS setup at `49408d3`). **The current HEAD and working-tree state are tracked only in the canonical "Git state" line under Current Phase above — not restated here, to avoid git-line drift.**
 - Files named "required"/"mandatory" by past prompts but never defined in the repo: `ALWAYS_READ.md`, `docs/audits/codex-compliance-audit.md`, `docs/audits/session-compliance-template.md`. Recorded as evidence of the rules-live-in-prompts problem (see Current Blockers), not as standing build blockers.
 
 ## What The Prior Validation Session Did (open-source validation, Session 2)
@@ -80,17 +80,17 @@ The only open items are hygiene/decision follow-ups (see Current Next Step); non
 
 1. ~~Implement T-001 → Codex review rounds → fix P2 → commit → ground-rules audit → T-001.7 post-playbook alignment audit~~ — **done**; 23/23 pass; T-001 **closed with minor follow-ups** (`docs/audits/post-playbook-alignment-audit.md`).
 2. ~~Roadmap batch commit~~ — **done** at `df2b986` (`docs/roadmap.md` on `main`).
-3. **Owner: review + commit the uncommitted work** — **`docs/t002-slice-plan.md`** + four state-doc syncs. Commit decision stays with the owner.
+3. ~~Owner: review + commit the uncommitted work — `docs/t002-slice-plan.md` + four state-doc syncs~~ — **done**; committed at `a95c0f1` and merged to `main` (`dc7d131`). *(This item was left stale post-merge — the recurring git-line-drift failure — and is corrected by [docs/audits/build-process-compliance-audit.md](docs/audits/build-process-compliance-audit.md).)*
 4. **Hygiene / decision follow-ups (non-blocking):**
    1. restore or decide the `out/` generated-log tracking policy (`git checkout -- out/audit_log.csv out/model_runs.csv`, or gitignore the two volatile logs);
    2. decide whether **enforcement hooks** for CSV-immutability / secrets-blocking should become a future approved task.
-5. **T-002 — implemented on `feature/t002-eval-harness` (uncommitted):** golden + regression JSON, `scripts/eval.py`, `tests/test_t002.py` (E1–E10), baseline `eval/eval_baseline.v1.json`. **35/35** tests (T-001 23 + T-002 12); `python3 scripts/eval.py` PASS. **Next:** owner review → Codex review → commit/merge. Phase 3 (Gemini) still after baseline acceptance.
+5. **T-002 — merged to `main`** (`a95c0f1`; cleanup `dc7d131`): golden + regression JSON, `scripts/eval.py`, `tests/test_t002.py` (E1–E10 + E1b/E2b), baseline `eval/eval_baseline.v1.json`. **35/35** tests (T-001 23 + T-002 12); `python3 scripts/eval.py` PASS. **8 Codex review rounds completed before commit (all findings resolved).** **Next:** clear the pre-Phase-3 gate ([docs/audits/build-process-compliance-audit.md](docs/audits/build-process-compliance-audit.md)). Phase 3 (Gemini) still after baseline acceptance.
 
 Off the table until far later: live Supabase, n8n, Slack, Resend, or real Gemini calls; real credentials; any real merchant data; live outbound email.
 
 ## Files Created Or Updated This Session
 
-T-002 implementation (latest, 2026-06-04, branch `feature/t002-eval-harness`): `eval/golden_merchants.v1.json`, `eval/guardrail_regression.v1.json` (45 cases), `scripts/eval.py`, `tests/test_t002.py`, `eval/eval_baseline.v1.json`; **35/35** tests (T-001 23 + T-002 12); eval CLI PASS. Source CSV and `out/` untouched. **No commit** (owner decides). Codex review pending.
+T-002 implementation (2026-06-04, **merged to `main` at `a95c0f1`**, cleanup `dc7d131`): `eval/golden_merchants.v1.json`, `eval/guardrail_regression.v1.json` (45 cases), `scripts/eval.py`, `tests/test_t002.py`, `eval/eval_baseline.v1.json`, plus a +1-line `scripts/guardrail.py` `pii_or_secret` hardening and the matching `docs/v1-data-dictionary.md` §9 sync; **35/35** tests (T-001 23 + T-002 12); eval CLI PASS. Source CSV and `out/` untouched. **8 Codex review rounds completed before commit** (all findings resolved).
 
 T-002 slice plan (2026-06-04, docs): created `docs/t002-slice-plan.md`; now marked implemented.
 
@@ -154,5 +154,5 @@ Honest answers, per the project's "be critical, do not flatter" standard.
 
 ## Handoff Notes
 
-Next session: checkout `feature/t002-eval-harness`; **T-002 implemented, uncommitted** — run `python3 -m unittest tests.test_t001 tests.test_t002 -v` and `python3 scripts/eval.py`. Owner review + Codex review before merge. Do not start Gemini until baseline is accepted. Source CSV and `out/` must stay untouched.
+Next session: on branch `main` (`HEAD = dc7d131`; audit/decision/state-doc batch currently uncommitted pending owner review — re-run `git status` before continuing) — re-run `python3 -m unittest tests.test_t001 tests.test_t002` (35/35) and `python3 scripts/eval.py` (PASS) to reconfirm. **T-002 is merged**; before any Phase-3 code, clear the pre-Phase-3 gate in [docs/audits/build-process-compliance-audit.md](docs/audits/build-process-compliance-audit.md). Do not start Gemini until the baseline is accepted. Source CSV and `out/` must stay untouched.
 

@@ -1,5 +1,51 @@
 # Task Log
 
+## 2026-06-04 (Decision-log ratifications — guardrail hardening + baseline artifact policy)
+
+### Professional Process Applied (lightweight)
+
+Task type: governance/decision documentation · Stage: post-T-002-merge, pre-Phase-3 · Risk: low · Mode: lightweight · Basis: owner directive ratifying two recommendations from the build-process compliance audit · Validation: decision-log row-format consistency; facts already verified in the audit (35/35 + eval PASS + 8 Codex rounds) · Human approval: owner-directed (= approval) · Codex review: optional.
+
+### What was done
+
+- Added two `docs/decision-log.md` rows (2026-06-04): (1) **`pii_or_secret` guardrail hardening** (assignment-form detector; safety-improving T-001 behavior change exposed by T-002; closes the audit's traceability finding, check #5); (2) **`eval/eval_baseline.v1.json` committed under `eval/` (not `out/`)** as the locked pre-Gemini baseline evidence.
+- Synced the dependent docs in the same task (to avoid the partial-drift the audit flags): `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md` next-step lines, and the audit's Recommendations + pre-Phase-3 checklist items #2/#3 (marked done).
+
+### Compliance / scope
+
+Docs only. **No** change to `scripts/`, `tests/`, source CSV, `out/`, `eval/`, integrations. **No commit** (owner decides). Tests reconfirmed 35/35.
+
+### Next step
+
+Owner clears the remaining pre-Phase-3 gate items (git-state enforcement at task-close; `out/` log + enforcement-hooks decisions; baseline acceptance) before any Phase-3 work.
+
+## 2026-06-04 (Retrospective build-process compliance audit — planning → T-002 merge)
+
+### Professional Process Applied (full-but-narrow)
+
+Task type: post-stage build-process compliance audit · Stage: post-T-002-merge, pre-Phase-3 · Risk: low–medium · Mode: full-but-narrow (reads broadly, edits surgically) · Basis: `RULES.md`, `CLAUDE.md`, `CODEX.md`, `docs/enterprise-delivery-playbook.md`, the 8 in-session Codex reviews, git history · Source requirement: repo + git + **live test/eval execution** (primary evidence) · Validation: re-ran 35/35 tests + eval PASS; re-derived git state; verified each Codex finding's resolution in the committed tree · Codex review: recommended (confirming `/codex:review` of this batch) · Human approval: not required for the audit + continuity corrections (task pre-authorized "update state docs only if needed"); required for the recommended decision-log row, the `t002-slice-plan.md` fix, and any commit.
+
+### What was done
+
+- Created [docs/audits/build-process-compliance-audit.md](audits/build-process-compliance-audit.md) — answers all 11 audit checks with evidence, verdict, what-worked, repeated-failure-patterns, and a **pre-Phase-3 lightweight checklist**.
+- **Corrected the recurring git-state drift** in `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`: they still read `feature/t002-eval-harness` / `HEAD = 1a0dbd0` / "uncommitted" after T-002 had been committed (`a95c0f1`) and merged to `main` (`dc7d131`). As-found text is quoted verbatim in the audit before correction.
+
+### Verdict (summary)
+
+Process followed well. **Strong:** every phase had planning → validation → Codex review → owner gate; T-002 passed 8 Codex rounds with **every finding resolved before commit** (two became permanent tests E1b/E2b; one became a hardened detector); 35/35 tests + eval PASS verified by re-execution; no integrations/secrets/CSV-edits/`out/`-pollution. **Material recurring failure:** git-state line drifted again at the merge gate — a control for exactly this exists (it was created because the line went stale 3× in T-001) but was not run at task-close. **Traceability gap:** the `pii_or_secret` guardrail hardening (a T-001 behavior change) was folded into T-002 without a decision-log row and initially mis-stated as "T-001 unchanged" — beneficial, low-risk, and caught by Codex.
+
+### Recommendations (proposed, not done — owner disposes)
+
+Add a `docs/decision-log.md` row for the guardrail change; fix the residual `out/eval_baseline.v1.json` reference in `docs/t002-slice-plan.md`; run a confirming `/codex:review`; optionally delete/fast-forward the stale `feature/t002-eval-harness` branch.
+
+### Compliance / scope
+
+Review + continuity-doc corrections only. **No** change to `scripts/`, `tests/`, source CSV, `out/`, `eval/`, integrations; **no** `decision-log` edit (recommended only); **no commit** (owner decides).
+
+### Next step
+
+Owner reviews the audit; decides the recommendations; clears the pre-Phase-3 gate before any Phase-3 (Gemini) work.
+
 ## 2026-06-04 (T-002 implementation — eval harness, branch `feature/t002-eval-harness`)
 
 ### Professional Process Applied (lightweight)
