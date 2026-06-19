@@ -1,0 +1,11 @@
+---
+title: "ActivationOps AI — Autonomy Ladder (authority earned by evidence)"
+---
+%% Each rung unlocks only when guardrails + evals + audit prove the rung below.
+%% At every rung there is a complete, demonstrable artifact — never a half-built agent.
+flowchart TB
+  L0["L0 Deterministic - no LLM<br/>BUILT (T-001)"] -->|"gate: tested + reproducible"| L1
+  L1["L1 Suggest - drafts language under guardrails<br/>NEXT (T-003 -> Phase 3)"] -->|"gate: generator-agnostic draft eval + guardrail pass"| L2
+  L2["L2 Draft + per-action approval (HITL)<br/>gate built; live Phase 4"] -->|"gate: live approval + delivery idempotency proven"| L3
+  L3["L3 Act within policy envelope (low-risk, pre-approved)<br/>target"] -->|"gate: adversarial evals + incident runbook + observability"| L4
+  L4["L4 Bounded multi-step planning (orchestrator-worker over safe tools)<br/>ceiling"] -->|"gate: trajectory evals green + threat-model verified"| DONE["Governed agency"]

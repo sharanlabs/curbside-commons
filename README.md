@@ -25,7 +25,7 @@ V1 is **AI-assisted workflow automation**, not an autonomous agent. The model dr
 
 CSV / Google Sheets · Python or Apps Script · Gemini (structured drafts) · Supabase Postgres (state) · n8n (orchestration) · Slack (human approval) · Resend (approved email + webhooks) · dashboard / docs.
 
-Most of this is roadmap. Today only the dummy CSV and the planning/operating docs exist; see `docs/visuals/architecture.mmd` for what is built versus target.
+Most of this is roadmap. Built today: the offline deterministic pipeline (`scripts/`), its tests (`tests/`, 35/35), and the offline evaluation harness (`scripts/eval.py` + `eval/`) — no external services, no credentials. See `docs/visuals/architecture.mmd` for what is built versus target.
 
 ## Roadmap / target architecture
 
@@ -48,6 +48,6 @@ Built under human direction with **Claude Code** (planning and implementation su
 
 ## Status and limitations
 
-Planning is closing; the next step is the V1 offline slice (planning and data dictionary first). The data is simulated; "learning from outcomes" is simulated until real outcome events exist; the risk score is a transparent synthetic formula, not a trained model; and V1 sends nothing — it simulates sends.
+The V1 offline slice (T-001) and the offline evaluation/regression harness (T-002) are built and green: `python3 scripts/run.py` runs the pipeline, `python3 -m unittest tests.test_t001 tests.test_t002` passes 35/35, and `python3 scripts/eval.py` reports MERCHANT 20/20 | GUARDRAIL 45/45 | PASS. The next step is T-003 (pre-Phase-3 hardening: company-agnostic de-brand, generated-draft evaluation coverage, a v2 demo/eval dataset, and enforcement hooks), then bounded LLM drafting (Phase 3). The data is simulated; "learning from outcomes" is simulated until real outcome events exist; the risk score is a transparent synthetic formula, not a trained model; and V1 sends nothing — it simulates sends.
 
 Human-led, AI-assisted, professionally reviewed.

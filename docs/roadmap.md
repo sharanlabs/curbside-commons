@@ -1,137 +1,110 @@
 # ActivationOps AI Roadmap
 
-> ActivationOps AI is a **simulation on dummy merchant data** — a **human-led, AI-assisted, professionally reviewed** build. It models a DoorDash-style merchant-onboarding "nudge" workflow. It does **not** use real DoorDash systems, real merchants, or real outreach, and every metric is simulated. This roadmap describes what is built today and the order of what comes next.
+> ActivationOps AI is a **simulation on dummy merchant data** — a **human-led, AI-assisted, professionally reviewed** build. It models a merchant-onboarding "nudge" workflow for a **fictional** marketplace (**"Curbside Commons"**); real marketplaces (DoorDash/Uber Eats/Instacart) are referenced only as **comparisons**, never as the project's identity. No real systems, merchants, or outreach; every metric is **simulated**.
+>
+> **North-star (set 2026-06-09):** a **bounded, human-in-the-loop *agentic* system** — agentic where it earns it, deterministic where safety/correctness demand it, human-gated for every consequential action. Architecture detail: [`docs/architecture/agentic-architecture-blueprint.md`](architecture/agentic-architecture-blueprint.md). The ladder below is how authority would be earned **safely**, one rung at a time — and it is the **designed ceiling, not the completion bar**.
+>
+> **⚠️ SUPERSEDED 2026-06-19 (owner full-liberty GO; plan approved):** the canonical goal/DoD/phases now live in **`~/.claude/plans/gentle-forging-starlight.md`** (+ decision-log 2026-06-19 row) — a rebuild to a real, industry-adoptable, **deployed Next.js/TS desktop AI product** with real bounded Gemini + the eval harness as spine + hybrid data, equal-weight Strategy/Ops/BA & deep applied-AI, a full why-chain, universally legible, desktop-only. The **use case (merchant activation), deterministic-first→bounded-LLM, eval-first, free-first, prototype-not-service, and honesty all carry forward**; the *delivery shape* changed (Python-CLI+docs → deployed product). The block below is **historical**.
+>
+> **Definition of Done (ratified 2026-06-11, owner GO):** the project is **complete** when a company-agnostic public repo holds an **on-demand prototype** (a prototype solving a use case — no 24/7 operation, hosting, or ops) for **merchant onboarding & activation on a local-commerce delivery marketplace**: deterministic triage · bounded Gemini drafting (best current model, **<$5 total**; everything else free/free-tier) measured against the **v2 baseline** · human approval gate · idempotent simulated sends · a walkthrough showing the **hold / reject / send** paths (the **reject** path, until Phase 3's live model, is demonstrated via an **S4 eval-corpus replay** of a planted bad draft the guardrail catches — labeled as an injected case, since the deterministic stub can't produce a live rejection; see T-003·S3) · public docs honestly separating built from designed. **Done = T-003 → Phase 3 → Phase 7 (pulled forward).** Phases 4–6 are **optional roadmap**, re-decided by the owner only after Phase 3 evidence. Effort: **auto-adjusted by task** (ship-gating/high-risk → max; supersedes the earlier "max every stage" — `docs/decision-log.md` 2026-06-12).
 
-Last updated: 2026-06-02
+Last updated: 2026-06-11 (Definition of Done ratified; Phases 4–6 → optional; Phase 7 pulled forward to directly after Phase 3).
 
 ## Current Status
 
-- **The Offline Vertical Slice (Phase 1) is built and green.** The offline pipeline turns the 20-row dummy CSV into a normalized merchant table, scores onboarding risk with a transparent formula, diagnoses each merchant's blocker, queues high-risk merchants for human review, writes one guardrailed outreach draft per merchant, and records a *simulated* send that cannot duplicate — all with an audit trail.
-- **Tests: 23/23 pass.** Run the tests with `python3 -m unittest tests.test_t001 -v`; run the pipeline with `python3 scripts/run.py`.
-- **The original CSV is protected** — opened read-only and byte-identical before and after every run.
-- **Fully offline.** No Gemini, no API calls, no live email, no Slack / Resend / Supabase / n8n. The draft generator is a deterministic stub.
-- **Next up: Phase 2 — T-002, the Offline Evaluation and Regression Harness**, ratified in `docs/decision-log.md` (2026-06-02). **Not started yet.**
-- The personal Obsidian knowledge vault is **separate** from this project and is not part of how it runs.
+- **Phases 1–2 are built and green.** The offline pipeline normalizes the dummy CSV, scores risk deterministically, diagnoses blockers, queues high-risk merchants for human review, writes one guardrailed draft per merchant, and records a *simulated*, non-duplicating send with a full audit trail (Phase 1 / T-001). The **offline evaluation + regression harness** with golden labels and a locked baseline is built (Phase 2 / T-002).
+- **Tests: 35/35 pass** (`python3 -m unittest tests.test_t001 tests.test_t002`); eval `python3 scripts/eval.py` → `MERCHANT 20/20 | GUARDRAIL 45/45 | PASS`.
+- **The original CSV is protected** — read-only, byte-identical before/after every run; hash-pinned in the golden file.
+- **Fully offline.** No live model, API, email, Slack/Resend/Supabase/n8n. The draft generator is a deterministic stub.
+- **Next: T-003 — pre-agentic hardening** (de-brand to Curbside Commons; the add-alongside v1/v2 data split; a generator-agnostic draft-quality contract; adversarial guardrail probes; blocking secrets + git-state hooks). Then Phase 3 (bounded LLM drafting).
+
+## The Autonomy Ladder (how "agentic" is earned)
+
+Authority increases only when the rung below is **proven** by guardrails + evals + audit. At every rung there is a complete, demonstrable artifact — never a half-built agent.
+
+| Rung | Model authority | Human role | Status |
+|---|---|---|---|
+| **L0 — Deterministic** | none | owns logic | ✅ built (Phase 1) |
+| **L1 — Suggest** | drafts language under guardrails | reads all; nothing auto-sends | ⏳ next (T-003 → Phase 3) |
+| **L2 — Draft + per-action approval** | proposes the action | approves each consequential action | ◑ gate built (offline); live form optional (Phase 4) |
+| **L3 — Act within policy** | auto-acts on low-risk pre-approved classes; circuit breakers | monitors; can stop | ○ optional (post-Phase-3 owner decision) |
+| **L4 — Bounded multi-step planning** | plans + uses safe documented tools (orchestrator-worker) | sets policy; reviews trajectories | ○ designed ceiling — never the completion bar |
 
 ## Product Lifecycle
 
-Every stage of this project moves through the same simple loop:
+Every stage moves through the same loop:
 
 **Discover → Source Intake → Plan → Build → Validate → Review → Document → Handoff → Decide Next Stage**
 
 - **Discover** — name the problem and the smallest useful next step.
-- **Source Intake** — check any outside idea, tool, or pattern before using it; nothing is adopted by default.
-- **Plan** — write a short, testable plan.
-- **Build** — build one small slice.
-- **Validate** — prove it with tests and real output, not assertions.
-- **Review** — a second model (Codex) challenges the work; the human owner decides.
-- **Document** — update the project's records so anyone can continue.
-- **Handoff** — leave the repo clear enough for the next session to pick up.
-- **Decide Next Stage** — the human owner approves what happens next.
+- **Source Intake** — evaluate any outside idea/tool/pattern before using it; nothing adopted by default; **multiple validated sources**, not one.
+- **Plan** — write a short, testable plan. **Build** — one small slice. **Validate** — prove it with tests + real output.
+- **Review** — Codex (5.5/xhigh) challenges the work; the human owner decides. **Document → Handoff → Decide** — repo stays the source of truth.
 
 ## Build Phases
 
-The build sequence below is product-first. The project's operating model and governance is the **Foundation** it rests on — already done, and context rather than a product phase.
+Product-first, mapped to the autonomy ladder. Governance, evaluation, guardrails, HITL, security, observability, and cost are **cross-cutting** — applied every phase, not a phase of their own.
 
-| Stage | Item | Status |
-|---|---|---|
-| Foundation | Project Operating Model and Governance | Done |
-| Phase 1 | Offline Vertical Slice | Done |
-| Phase 2 | Offline Evaluation and Regression Harness (T-002) | Next — ratified, not started |
-| Phase 3 | Bounded LLM Drafting | Planned |
-| Phase 4 | Persistence and Provenance Upgrade | Planned |
-| Phase 5 | Human-in-the-Loop Delivery Workflow | Planned |
-| Phase 6 | Orchestration and Monitoring | Planned |
-| Phase 7 | Public Demo and Portfolio Narrative | Planned |
+| Stage | Item | Rung | Status |
+|---|---|---|---|
+| Foundation | Operating model + governance (RULES, playbook, dual-model review) | — | Done |
+| Phase 1 | Offline Vertical Slice (T-001) | L0 | **Done** |
+| Phase 2 | Offline Evaluation & Regression Harness (T-002) | L0 | **Done** |
+| Phase 2.5 | **T-003 — Pre-agentic hardening** (de-brand · v1/v2 split · generator-agnostic draft contract · adversarial probes · blocking hooks) | L0→L1 | **Next** |
+| Phase 3 | Bounded LLM Drafting (Gemini behind guardrails, eval-gated) | L1 | Planned — **in the DoD** |
+| Phase 7 | Public Demo & Portfolio Narrative | — | **Pulled forward — directly after Phase 3; completes the DoD** |
+| Phase 4 | Human-in-the-Loop Delivery Workflow (live approval + send, idempotent) | L2 | **Optional** — owner re-decision after Phase 3; if built, a transient demo, never standing infra |
+| Phase 5 | Persistence, Provenance & Observability (datastore + OTel GenAI tracing) | L2 | **Optional** — same gate |
+| Phase 6 | Bounded Agentic Orchestration (orchestrator-worker over safe tools; trajectory evals) | L3→L4 | **Optional** — same gate; L4 = designed ceiling |
 
-## Why T-002 Comes Before Gemini
+## Why hardening + evaluation come before the model (and before agency)
 
-The next phase is an evaluation harness, not a live AI model — on purpose:
-
-- **Today's safety checks pass partly "for free."** The draft generator is a stub, so the guardrails are only tested against the cases we feed them; their real strength is unproven.
-- **Before adding Gemini, the project needs a baseline.** That means golden labels (the known-correct risk and blocker answer for each merchant), a set of guardrail regression cases, and a measured starting point.
-- **This prevents claims without evidence.** With a baseline, the project can actually show whether a live model helps or hurts — instead of guessing.
-- **It lowers risk.** Bringing in a live model first would add API secrets, cost, non-deterministic output, and model-version churn *before* there is any way to measure whether the output is good.
-
-In short: build the measuring stick before swapping in the thing that needs measuring.
+- **Today's safety checks pass partly "for free."** The draft generator is a stub, so guardrails are only tested on the cases we feed them; the T-002 baseline scores **deterministic fields**, not the generated text Phase 3 changes.
+- **Before adding a model — and long before adding agency — there must be a measuring stick.** T-003 adds a **generator-agnostic draft contract** (runs unchanged on the stub now and Gemini later) and **adversarial probes** (measured catch-rate, not assumed). This is "evaluation before claims" (RULES §3) and the way to make Phase 3's "meets/beats baseline" trigger real.
+- **It lowers risk.** A live model first would add secrets, cost, non-determinism, and version churn before anything can measure whether the output is good — and agency on top of an unmeasured model is exactly OWASP's *Excessive Agency* failure.
 
 ## Phase Details
 
-### Foundation — Project Operating Model and Governance — Done
-- **Goal:** make the repo the single source of truth so any session or tool can continue safely. This is the **foundation** the product phases rest on — context and protection for execution, not a product phase itself.
-- **What was built:** the rules file, the enterprise delivery playbook, the mandatory startup contract, the source-intake rule, the decision / journal / task logs, and the two-model (build + review) workflow.
-- **Validation evidence:** every later task opens from these files and is reviewed against them.
-- **Out of scope:** product features — this layer is process, not product.
-- **Trigger that was met:** the operating model was needed before writing any product code.
+### Foundation — Operating model & governance — Done
+- Repo-as-source-of-truth, RULES, Enterprise Delivery Playbook, mandatory startup contract, source-intake rule, decision/journal/task logs, dual-model (build + review) workflow, operating doctrine (model/cost/honesty). Maps to NIST **Govern**.
 
-### Phase 1 — Offline Vertical Slice (T-001) — Done
-- **Goal:** prove the boring, load-bearing parts of the workflow on dummy data before any outside system.
-- **What was built:** stable IDs and a clean schema; a transparent risk score; deterministic blocker diagnosis; a human-review queue; a **human-in-the-loop approval gate** (high-risk and ineligible merchants are held, never auto-sent); one structured, guardrailed draft per merchant; a *simulated* send with an **idempotency** key so it cannot repeat; and two append-only logs — one for generation **provenance**, one for the **audit trail**.
-- **Validation evidence:** 23/23 tests pass; canonical run = 20 merchants → 8 held for review, 12 simulated sends, 0 rejected; re-running sends nothing new; the source CSV is unchanged.
-- **Out of scope:** any live model, real email, or external service.
-- **Trigger that was met:** all tests green and the slice runs end-to-end offline.
+### Phase 1 — Offline Vertical Slice (T-001, L0) — Done
+- Stable IDs + clean schema; transparent risk score; deterministic blocker diagnosis; human-review queue; **HITL approval gate** (high-risk/ineligible held, never auto-sent); one structured guardrailed draft; *simulated* idempotent send; append-only provenance + audit logs. 23/23 tests; source CSV unchanged.
 
-### Phase 2 — Offline Evaluation and Regression Harness (T-002) — Next
-- **Goal:** create an honest, fully offline way to measure quality *before* any live model.
-- **What gets built:** golden labels for the 20 merchants (the known-correct risk and blocker), a guardrail **regression testing** set (planted bad drafts, the real sample messages, and one case per guardrail category), and a small metrics summary that becomes the baseline.
-- **Validation evidence:** the evaluation runs offline and deterministically, extends the existing 23-test discipline, and records the baseline numbers.
-- **Out of scope:** Gemini or any live model; secrets; cost; new integrations.
-- **Trigger to move forward:** a recorded baseline exists, so a later model change can be measured against it.
+### Phase 2 — Offline Evaluation & Regression Harness (T-002, L0) — Done
+- Golden labels for the 20 merchants; guardrail regression corpus; a locked, versioned baseline; the eval CLI. 35/35 tests; `scripts/eval.py` PASS. Maps to NIST **Measure**.
 
-### Phase 3 — Bounded LLM Drafting — Planned
-- **Goal:** replace the stubbed draft generator with a real, bounded model (e.g. Gemini), measured against the Phase-2 baseline.
-- **What gets built:** a single, schema-constrained drafting step that sits behind the existing guardrails; environment-variable secrets; an offline mock so tests stay offline; guardrails hardened with real adversarial cases.
-- **Validation evidence:** the model output is measured against the baseline and must not regress safety or state-consistency.
-- **Out of scope:** multi-step tool use that runs without human approval; any live send.
-- **Trigger to move forward:** the model meets or beats the baseline behind the guardrails.
+### Phase 2.5 — T-003 pre-agentic hardening (L0→L1) — Next
+- **Goal:** make the baseline measure what the model will change, de-brand for public posting, and add the controls agency depends on — all offline.
+- **Build:** de-brand (`PLATFORM_NAME = "Curbside Commons"`; keep v1 frozen); **add-alongside v1/v2** data lane (new `DEMO_CSV` + `golden.v2` + `baseline.v2` + `test_t003`, de-identified, hash-pinned, with a synthetic edge overlay + coverage matrix); a **generator-agnostic draft contract** (state-consistency / structure / policy, on independent fixtures); **adversarial guardrail probes** (measured catch-rate, split from blocking regression); **blocking** secrets + git-state close-out hooks; `false_impact_claim` matching both `PLATFORM_NAME` and real marketplace names.
+- **Validation:** `test_t001`+`test_t002` stay green (v1 frozen); new `test_t003` green; v2 baseline recorded; source CSV **content** hash-unchanged (the OQ-1 *filename* rename is content-preserving); `out/` **regenerated once under the commit-fresh policy** (2026-06-12), not untouched; v2 outputs isolated from the v1 `out/` snapshots.
+- **Out of scope:** any live model/secret/network/send.
 
-### Phase 4 — Persistence and Provenance Upgrade — Planned
-- **Goal:** move from CSV files to a real datastore only when the simple store is genuinely outgrown.
-- **What gets built:** a database (e.g. Postgres / Supabase) with migrations, the deferred normalized schema as needed, and the same provenance and audit guarantees.
-- **Validation evidence:** parity tests against the current outputs.
-- **Out of scope:** any change not required by real data growth.
-- **Trigger to move forward:** one entity file plus two logs is no longer enough.
+### Phase 3 — Bounded LLM Drafting (L1) — Planned
+- Schema-constrained drafting step (Gemini — current latest, freshness-checked, **<$5**) behind the existing guardrails; env-var secrets; offline mock for tests; guardrails hardened with the adversarial probes. **Trigger:** model meets/beats the v2 baseline behind guardrails.
 
-### Phase 5 — Human-in-the-Loop Delivery Workflow — Planned
-- **Goal:** turn the simulated send into a real (still rate-limited, test-keyed) approval-and-send flow.
-- **What gets built:** real approval callbacks (e.g. Slack) and real sending (e.g. Resend) with delivery idempotency and suppression handling.
-- **Validation evidence:** no message sends without explicit human approval; no duplicate sends.
-- **Out of scope:** unattended, automatic sending.
-- **Trigger to move forward:** the offline workflow and its safety controls are proven.
+### Phase 4 — Human-in-the-Loop Delivery (L2) — Optional (post-Phase-3 owner decision)
+- Real approval callbacks (Slack; OSS alt: Mattermost/email) + real sending (Resend; OSS alt: SMTP) with delivery idempotency + suppression. **No send without explicit human approval; no duplicates.**
 
-### Phase 6 — Orchestration and Monitoring — Planned
-- **Goal:** connect the steps into a reliable workflow with visibility.
-- **What gets built:** workflow orchestration (e.g. n8n) with error handling, plus monitoring and an outcome-feedback loop.
-- **Validation evidence:** failures are caught and retried safely; runs are observable.
-- **Out of scope:** anything not yet proven in an earlier phase.
-- **Trigger to move forward:** the delivery workflow is stable and worth automating.
+### Phase 5 — Persistence, Provenance & Observability (L2) — Optional (post-Phase-3 owner decision)
+- Datastore (Supabase/Postgres; OSS alt: self-hosted Postgres) with migrations + the same provenance/audit guarantees; **OpenTelemetry GenAI** tracing (OSS backends: Langfuse/Phoenix). **Trigger:** one-file+logs outgrown.
 
-### Phase 7 — Public Demo and Portfolio Narrative — Planned
-- **Goal:** explain the work clearly to both a general and a technical audience.
-- **What gets built:** a focused walkthrough and demo that shows the problem, the workflow, where AI helps, where deterministic logic controls risk, where humans approve, and what is simulated.
-- **Validation evidence:** every public claim is backed by a test, demo output, or a clear "simulated" label.
-- **Out of scope:** any claim not supported by evidence.
-- **Trigger to move forward:** there is a real capability worth showing.
+### Phase 6 — Bounded Agentic Orchestration (L3→L4) — Optional (post-Phase-3 owner decision)
+- A **single bounded agent** using orchestrator-worker over the deterministic tools, per-tool guardrails, circuit breakers, and **trajectory/component evals**; policy-envelope auto-act only for low-risk pre-approved classes. **Trigger:** adversarial evals green + threat-model controls verified + observability in place.
+
+### Phase 7 — Public Demo & Portfolio Narrative — Pulled forward (directly after Phase 3; completes the DoD)
+- A focused walkthrough: the problem, the workflow, where AI helps, where deterministic logic controls risk, where humans approve, what is simulated. Every public claim backed by a test, demo output, or a "simulated" label.
+- **Specific expansion & adoption path (owner standing constraint, 2026-06-12 — part of "done," not boilerplate "future work"):** the final docs must name (a) **future expansion** — the concrete features/scale work needed past the shipped wedge, in order, each tied to its trigger (the existing Enterprise Expansion Path entries, made task-convertible); and (b) **adoption** — the explicit adopter class (here: merchant-onboarding/activation ops teams at local-commerce delivery marketplaces), what that adopter would require before using it (named compliance frameworks where applicable, the actual systems it must integrate with, security/support expectations, rollout path: one team → process-owner sign-off → org rollout). Every item names the thing, why, and roughly what it takes — if it can't become a task, it's not specific enough. The **product's target market is an intake question for the owner** (never defaulted to US; see `docs/open-questions.md`).
 
 ## Terminology Note
 
-A few plain terms, each tied to something actually built:
-
-- **vertical slice / thin slice** — the smallest end-to-end piece of the workflow (Phase 1).
-- **human-in-the-loop approval gate** — high-risk merchants are held for a person to approve before any send.
-- **deterministic guardrails** — fixed rules that reject unsafe draft text.
-- **provenance / audit trail** — records of what was generated and what happened.
-- **idempotency** — the same send cannot happen twice.
-- **regression testing / golden labels** — known-correct answers used to catch quality drops (Phase 2).
-
-These terms are descriptive, not compliance claims; there is no framework-mapping section by design.
+Descriptive terms, each tied to something built or planned: **vertical slice** (smallest end-to-end piece), **HITL approval gate** (held for a person before any send), **deterministic guardrails** (fixed rules rejecting unsafe text), **provenance/audit trail**, **idempotency** (a send can't repeat), **golden labels / regression** (known-correct answers catching drops), **autonomy ladder** (earned increases in model authority), **trajectory eval** (judging the path/tool-use, not just the answer). These are descriptive, not compliance claims.
 
 ## What Not To Do Yet
 
-These are explicitly **not** the next step:
-
-- a live Gemini integration before T-002 (the evaluation baseline) exists;
-- Slack, Resend, n8n, or Supabase integration before the evaluation baseline exists;
-- any public claim that isn't backed by a test, demo output, or a "simulated" label;
-- linking the personal Obsidian vault into the project as if it were authoritative;
-- adding more governance or process unless a real, named blocker appears.
+- No live Gemini before the T-003 draft contract + v2 baseline exist.
+- No Slack/Resend/n8n/Supabase before the offline HITL workflow + safety controls are proven.
+- **No autonomy above L2 before its adversarial evals + threat-model controls + observability exist** (OWASP *Excessive Agency*).
+- No public claim unbacked by a test, demo output, or "simulated" label; no public post before the de-brand + a trademark/web check on "Curbside Commons".
+- No multi-agent framework — a single bounded agent is the simplest pattern that works (Anthropic).
+- No new governance/process unless a real, named blocker appears.

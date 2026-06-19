@@ -8,6 +8,8 @@ Claude Code plans and builds. Codex adversarially reviews, reviews changed files
 
 Source: the installed Codex plugin command definitions at `~/.claude/plugins/cache/openai-codex/codex/1.0.4/commands/`, read 2026-06-01 (plugin `codex@openai-codex` v1.0.4). Re-verify after any plugin update (`RULES.md` §6).
 
+> **Cross-project serialization (2026-06-13):** when invoking Codex via the CLI directly (`codex exec` / `codex exec resume`, e.g. inside grill-me-codex), route it through the shared queue wrapper **`~/claude-os/bin/codex-guarded`** (drop-in for `codex`). The machine has ONE Codex seat shared by all the owner's concurrent projects; the wrapper serializes runs (auto-queues; atomic-mkdir mutex + dead-holder/stale reclaim) and, with per-project namespaced `-o` output paths, makes cross-project collision/contamination structurally impossible. The `/codex:*` plugin commands above are the normal build path; the wrapper matters for raw-CLI calls. Built + verified 2026-06-13 (decision-log).
+
 | Command | Purpose | Edits files? | Notable flags |
 | --- | --- | --- | --- |
 | `/codex:adversarial-review` | Challenge the approach, design, tradeoffs, assumptions, failure modes | **No** (review-only) | `--wait` / `--background`, `--base <ref>`, `--scope auto\|working-tree\|branch`, plus free-text focus |

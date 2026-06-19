@@ -13,10 +13,16 @@
 
 ### Still genuinely open (only the user can decide)
 
-1. **GO or NO-GO** on `docs/plan-reconciliation.md`.
-2. **Project-level definition of done / audience.** The reconciliation sets a DoD for the *V1 slice*; it does not define what "success" means for the project as a portfolio piece (runnable demo vs. docs artifact vs. job exhibit). Answer this to know when to stop building, not just when V1 is done.
+*Both items below are now resolved — none genuinely open at the project level as of 2026-06-11.*
+
+1. ~~**GO or NO-GO** on `docs/plan-reconciliation.md`.~~ — **Resolved (2026-06-01):** owner gave GO; T-001 was built, tested, and closed (see `PROJECT_STATE.md`).
+2. ~~**Project-level definition of done / audience.**~~ — **Resolved (2026-06-11, owner GO):** the **Portfolio Definition of Done** is ratified — a company-agnostic, de-branded public repo holding an **on-demand prototype** (no 24/7 operation) solving **merchant onboarding & activation for a local-commerce delivery marketplace**: deterministic triage + bounded Gemini drafting (best current model, <$5 total) measured against the v2 baseline + human approval gate + idempotent simulated sends + a hold/reject/send walkthrough + public docs honestly separating built from designed. Audience = portfolio/interview reviewers. **Done = T-003 → Phase 3 → Phase 7 (pulled forward).** Phases 4–6 are optional roadmap (owner re-decision after Phase 3 evidence); L4 = designed ceiling, not the completion bar. See `docs/decision-log.md` (2026-06-11) and `docs/roadmap.md` (DoD block).
 
 Resolved in the 2026-06-01 cleanup: **as-of date** for deriving `signup_at` / `last_login_at` is set to **June 1, 2026** (default; the owner may change it).
+
+### New intake question (2026-06-12, from the owner's standing PROJECT-CONSTRAINTS)
+
+3. ~~**Product target market/location**~~ — **Resolved (2026-06-12, owner at the T-003 grill): US.** Anchors the T-003·S3 v2 dataset's Source-Intake pick (US states, phone/email formats) and the Phase-7 adoption framing. See `docs/decision-log.md` (2026-06-12) and `PLAN-REVIEW-LOG.md` (Act 1). Also resolved at the same grill: **OQ-1** (v1 CSV filename → rename via `git mv` + 1 config re-pin; content frozen + provenance-labeled; Phase-7 publish-vs-exclude still open), **OQ-2** (`out/` policy → commit-fresh), **PLATFORM_NAME** ("Curbside Commons", S1 collision check pending).
 
 ## Governance And Compliance
 

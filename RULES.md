@@ -174,3 +174,12 @@ The **Professional Process Applied** block must include: task type · stage · r
 **Proportionality (anti-bloat):** keep this light for trivial edits. For small, low-risk changes the Professional Process Applied block can be a single line. Do not run full ceremony on a one-line doc fix.
 
 **Codex enforcement:** every Codex review verifies whether this contract and the playbook were followed (`CODEX.md`). If Claude skipped the playbook/contract for a *meaningful* task, Codex flags it as a process finding.
+
+## 16. Prompt Intake (Intent Capture & Prompt Synthesis) — non-negotiable
+
+Owner input may be rough, broken, or ungrammatical; that must **never** degrade output. Before acting on owner input, every agent (any account, any IDE) applies the **Prompt Intake Protocol** (`docs/prompt-intake-protocol.md`): **preserve the raw input verbatim**, reconstruct the true intent, and synthesize an effective prompt aligned to the current model + playbook — **without diluting, summarizing, or dropping** anything.
+
+- **Principle-based, self-updating:** durable principles live in the protocol; specific prompting *techniques* are delegated to current model docs + updatable prompt skills (re-verified per §6). Do not hardcode tricks.
+- **Proportional (anti-bloat):** default to silent intent-capture; surface a structured interpretation or a confirm only when the request is ambiguous or consequential. No friction on trivial edits.
+- **Fidelity over fluency:** raw input is authoritative; any added assumption is surfaced explicitly, never buried. When intent is unclear on consequential work, ask.
+- **Portable:** the protocol's core works with zero skills installed; skills are optional accelerators.

@@ -1,0 +1,24 @@
+---
+title: "ActivationOps AI — Data Lineage (add-alongside v1/v2)"
+---
+%% v1 stays FROZEN as the regression proof (untouched); v2 = de-identified 'Curbside Commons' demo/eval lane.
+%% Solid = built; dashed = target (T-003).
+flowchart LR
+  subgraph V1LANE["v1 - FROZEN regression proof (BUILT)"]
+    SRC1["Original CSV<br/>hash-pinned, read-only"] --> GOLD1["golden_merchants.v1"]
+    GOLD1 --> T12["test_t001 + test_t002 (35/35)"]
+  end
+  subgraph V2LANE["v2 - Curbside Commons demo/eval (target)"]
+    OPEN["Open business dataset<br/>(fetched once)"] --> NORMV["Normalize + quality check"]
+    NORMV --> DEID["De-identify: synthetic names / @example.com<br/>+ de-id mapping (internal only)"]
+    DEID --> OVER["+ synthetic edge overlay:<br/>opted-out - suppression - bad email - rejected draft"]
+    OVER --> FREEZE["Freeze + hash-pin -> DEMO_CSV"]
+    FREEZE --> GOLD2["golden_merchants.v2 + baseline.v2"]
+    GOLD2 --> T3["test_t003 + coverage matrix"]
+  end
+  PROV["Provenance on every artifact:<br/>prompt/model/schema version - source hash"]
+  T12 -.-> PROV
+  T3 -.-> PROV
+
+  classDef target stroke-dasharray:5 5,stroke:#888,color:#555;
+  class OPEN,NORMV,DEID,OVER,FREEZE,GOLD2,T3 target;

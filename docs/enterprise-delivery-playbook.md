@@ -83,6 +83,22 @@ Search breadth (as the task warrants): official docs · standards bodies · vend
 
 When sources disagree, **state the disagreement, weigh by credibility and recency, and do not overstate the conclusion.**
 
+### Source & Validation Depth (how many is enough)
+
+Grounded in professional norms — journalism's **two-source rule** (≥2 independent sources with direct knowledge), research **triangulation** (≥3 converging sources/methods), and the **IFCN fact-checking code** (use the best-available **primary** source; check each key claim against **more than one** named source; cite so the check is replicable). **Independence + primary-source quality matter more than raw count.**
+
+| Bar | Depth | When |
+| --- | --- | --- |
+| **Minimum** | **≥2 independent**, **≥1 primary/Tier-1** | any load-bearing claim |
+| **Good** (default) | **3 independent (triangulated)**, ≥1 Tier-1, cross-checked + cited | normal professional work |
+| **Strong** | **5+ across tiers** (official + mature OSS + field-signal), disagreements surfaced | architecture · security · public claims · AI behavior · tool selection |
+
+Single-source only when it is the sole authority on the topic — and label it. Prefer primary/official over secondary. Cite so another person can replicate the check.
+
+### Expert & Industry-Practice Validation
+
+For meaningful work, validate the approach against **how leading practitioners and enterprises actually do it** — not merely whether it is internally consistent. Mechanisms: the Open Source Discovery sweep (above) · a **Codex adversarial review** · and, on demand, the **`guidelines-monitor`** agent (independent best-practice authority across domains). Verify for accuracy; surface where our approach diverges from best practice and why.
+
 ## Source Sufficiency Rule
 
 Research must be enough, not endless. Before acting, state: what was checked, used, rejected; why it is enough now; what uncertainty remains; whether that uncertainty blocks action.

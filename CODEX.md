@@ -50,7 +50,8 @@ Every Codex review (plan or changed-files) verifies the **Mandatory Startup Cont
 - whether **source discovery was open enough** for the risk (named lists treated as seeds, not boundaries). Flag a process finding if Claude: treats an example/source list as exhaustive; forces a named framework without checking applicability; ignores stronger/current sources; ignores mature OSS or field-signal sources when the task needs them; uses stale sources for current claims; relies on Reddit/forums/YouTube/community content as authoritative without verification; fails to search beyond user-provided examples when the risk requires it; **or** over-researches low-risk work after source sufficiency was reached;
 - whether assumptions, risks, validation, and artifacts are handled correctly;
 - whether there is **silent scope expansion**;
-- whether handoff and **git state** are accurate (re-derived, not assumed).
+- whether handoff and **git state** are accurate (re-derived, not assumed);
+- whether the **Prompt Intake Protocol** (`RULES.md` §16) was applied for owner-driven work — raw input preserved, intent captured without dilution, added assumptions surfaced (not buried), proportionality right (no friction on trivial, no silent guessing on consequential).
 
 **If Claude skipped the playbook/startup contract for a meaningful task, flag it as a process finding** (not just a code finding). Do not flag trivial low-risk edits where a one-line Professional Process Applied block is sufficient.
 

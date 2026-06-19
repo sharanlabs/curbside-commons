@@ -2,32 +2,22 @@
 
 The single active task. Update this whenever the active task changes or pauses.
 
-- **Task ID:** T-002 — Offline Evaluation and Regression Harness
-- **Task name:** Implement T-002 eval harness (golden labels, regression corpus, eval runner, E1–E10)
-- **Current stage:** **Merged to `main`** (`a95c0f1`; cleanup `dc7d131`) — **35/35 tests pass** (T-001 23 + T-002 12); `python3 scripts/eval.py` → MERCHANT 20/20 | GUARDRAIL 45/45 | PASS; baseline at `eval/eval_baseline.v1.json`. **Closed with minor follow-ups** (see the pre-Phase-3 gate below).
-- **Mode / risk:** lightweight · low-medium · offline deterministic extension.
-- **Implementer:** Cursor (Composer). 8 Codex review rounds ran before the commit; merge committed by the owner.
-- **Goal:** measuring stick before Gemini — golden merchants, guardrail regression, baseline JSON.
-- **Key outputs:** `eval/golden_merchants.v1.json`, `eval/guardrail_regression.v1.json` (45 cases), `scripts/eval.py`, `tests/test_t002.py`, `eval/eval_baseline.v1.json`.
-- **Out of scope (unchanged):** source CSV, `out/` T-001 artifacts, live integrations, Gemini.
-- **Commit status:** committed at `a95c0f1` and merged to `main` (`dc7d131`).
+- **Task ID:** REBUILD (supersedes T-003)
+- **Task name:** Rebuild ActivationOps AI into a real, industry-adoptable, **deployed desktop AI product** for stalled/long-tail **merchant activation** on a local-commerce delivery marketplace — single-stack **Next.js + TypeScript + Tailwind + React on Vercel (free tier)**, **porting** the proven deterministic core, integrating **real bounded Gemini** (eval-gated · claims-gatekeeper · <$5), on **hybrid data** (real open-source entities + synthetic activation overlay). **Canonical goal · DoD · phases · blindspots: `~/.claude/plans/gentle-forging-starlight.md`** (+ decision-log 2026-06-19 row).
+- **Current stage:** **Execution IN PROGRESS via `/autopilot`** (owner full-liberty GO, plan approved 2026-06-19). **Build session 1 (2026-06-19) delivered + verified GREEN:** (a) Next.js 16/React 19/TS/Tailwind v4/Vitest scaffold — `npm run typecheck/lint/test/build` all pass; (b) the deterministic core ported to TS (`lib/core/{constants,types,guardrail,pipeline}.ts`) with a **byte-for-byte differential test vs the Python oracle on all 20 merchants** (`evals/core-differential.test.ts`) — the Phase A faithful-port gate, met early; (c) **dataset Source-Intake decided** (owner): SF "Registered Business Locations" / DataSF, PDDL 1.0 (decision-log 2026-06-19). **Next:** surface the commit gate, then the rest of the thin vertical slice — SF ingestion adapter (NAICS crosswalk) + hybrid dataset (sanitized) → bounded Gemini draft (mocked in tests) → claims-gatekeeper → eval scoring → one desktop surface → REPLAY. See HANDOFF for the paste-ready resume prompt.
+- **Mode / risk / effort:** **FULL** · high risk (scope · architecture · public claims · data sourcing) · **Effort: MAX, auto-routed** (ship-gating/architecture).
+- **Build order (each slice shippable + gated):** **thin vertical slice FIRST** (one merchant end-to-end → deployed REPLAY) → **A** faithful TS port (differential test: TS deterministic == Python golden) → **B** eval-gated real Gemini + domain depth + hybrid data + adapter → **C** desktop console (Overview · Activation Queue · Merchant Detail · Drafted Outreach+Approval · Eval/Quality · Metrics/Impact · Audit Trail · Cost ledger; *evaluate `DesignSync`/`claude-design` as a UI accelerator*) → **D** deploy + adoption path + why-chain docs.
+- **Gates (per slice):** typecheck/lint/test (Vitest) + differential test + eval + (Phase C+) Playwright/a11y (WCAG AA, settled DOM); **every Blindspots-section mitigation in the plan is binding**; Codex changed-files review via `~/claude-os/bin/codex-guarded` (namespaced output).
+- **Owner-gated stops (do NOT bypass):** commits/pushes (RULES §12) · dataset-source check-in (if a richer real/live free source is viable) · platform-name confirm ("Curbside Commons", 2-min trademark/web check) · public posting · anything irreversible/external.
+- **First build steps:** (1) **dataset Source-Intake** (license/PII/quality/freshness; safe default = synthetic-primary with real open-source entities layered in so nothing blocks); (2) scaffold Next.js/TS; (3) the thin vertical slice.
+- **Out of scope (post-DoD optional):** live-public LLM, agentic orchestration, live Slack/Resend sends, persistence/observability, multi-tenancy, mobile/responsive.
+- **Commit status:** **uncommitted** — build session 1's new TS app (`package.json`, configs, `app/`, `lib/core/`, `lib/utils.ts`, `evals/`, extended `.gitignore`) + state-doc/decision-log updates, on top of the prior pivot-recording + governance batches. **A clean commit point is ready** (scaffold + faithful core port, green); commits await owner approval (RULES §12) — surfaced in HANDOFF.
 
-## Completed (historical)
+## Carried forward (unchanged by the pivot)
+Merchant-activation use case · deterministic-first → bounded-LLM · eval-first · free-first (Gemini sole paid, <$5) · prototype-not-service (deploy = transient demonstration) · honesty (simulated labels, no real merchant data/access). The Python prototype is kept (tag `v1-python-prototype`, move to `reference/`) as lineage + the **differential-test oracle**; 35/35 tests + eval 20/20|45/45 remain the v1 proof.
 
-- **T-002 plan** — [docs/t002-slice-plan.md](docs/t002-slice-plan.md) (now marked implemented).
-- **T-001** — 23/23; [docs/v1-slice-plan.md](docs/v1-slice-plan.md).
-- **Roadmap** — [docs/roadmap.md](docs/roadmap.md) on `main` at `df2b986`.
+## Reference
+Approved plan (canonical): `~/.claude/plans/gentle-forging-starlight.md`. Superseded as the active plan: `docs/phase3-prep-slice-plan.md`, `PLAN.md` (their S1/S2/S3/S5 specs fold into Phases A–B). Patterns: resilix `/Users/sharan_98/Desktop/supply-chain-ai-resilix/` (design tokens · gatekeeper · Gemini wiring + cost ledger · hybrid data · `enterprise_readiness`); procureguard-ai = deploy/demo shape.
 
-## Hygiene / decision follow-ups
-
-*"Non-blocking" applied to **closing T-002** — it did not require these. Items 1–2 are **pre-Phase-3 blockers**: resolve them before any Gemini/Phase-3 work (see the pre-Phase-3 gate in [docs/audits/build-process-compliance-audit.md](docs/audits/build-process-compliance-audit.md)).*
-
-1. `out/` generated-log tracking policy. — **pre-Phase-3 blocker.**
-2. Enforcement hooks (CSV/secrets) — future approved task. — **pre-Phase-3 blocker.**
-3. ~~Commit vs gitignore policy for `eval/eval_baseline.v1.json`~~ — decided 2026-06-04 (committed under `eval/`; see `docs/decision-log.md`).
-
-## Status / continuity
-
-- **Git (re-derived 2026-06-04):** branch `main`; `HEAD = dc7d131` ("Clean up T-002 merge status"); the audit/decision/state-doc batch is currently uncommitted pending owner review — re-run `git status` before continuing. This batch is docs-only (no code, tests, source CSV, `out/`, or `eval/` changes). T-002 committed at `a95c0f1`, fast-forwarded into `main`; `feature/t002-eval-harness` at `a95c0f1` (1 behind). *(Corrected by the build-process compliance audit — the prior line first read `feature/t002-eval-harness` / `HEAD = 1a0dbd0` / uncommitted after the merge, then wrongly read "tree clean" while this audit batch was still pending.)*
-- **Validation (re-run 2026-06-04):** `python3 -m unittest tests.test_t001 tests.test_t002` → `Ran 35 … OK`; `python3 scripts/eval.py` → `MERCHANT 20/20 | GUARDRAIL 45/45 | PASS` (exit 0).
-- **Next safe step:** clear the remaining **pre-Phase-3 gate** items ([docs/audits/build-process-compliance-audit.md](docs/audits/build-process-compliance-audit.md)) before any Phase-3 code — enforce git-state re-derivation at task-close; resolve the `out/` log + enforcement-hooks follow-ups; confirm baseline acceptance. *(Done 2026-06-04: `docs/decision-log.md` rows for the `pii_or_secret` guardrail change + the `eval/` baseline artifact policy.)* Phase 3 (Gemini) = **FULL** workflow, still blocked until the baseline is accepted.
+### Prior task — T-003 (superseded by the rebuild)
+T-003 plan was Codex-approved (Act 2, 2026-06-12) but is **superseded** as the active plan by the 2026-06-19 rebuild; its hardening specs (de-brand, draft contract, hybrid lane, hooks) fold into Phases A–B. T-002 remained merged (`a95c0f1`); the Python core + tests are kept as the reference oracle.

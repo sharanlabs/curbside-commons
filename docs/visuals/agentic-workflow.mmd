@@ -1,0 +1,26 @@
+---
+title: "ActivationOps AI — Agentic Workflow with Control Points (built vs. target)"
+---
+%% Solid = BUILT; dashed = target. Key invariant: the model NEVER triggers an action directly —
+%% deterministic gates + the HITL approval gate stand between model output and any send.
+flowchart TB
+  IN["Merchant record (dummy)"] --> CORE["Deterministic core:<br/>risk - blocker - eligibility - send-gate"]
+  CORE --> PLAN["Plan next-best-action (deterministic)"]
+  PLAN --> DRAFT["Generate structured draft<br/>(stub now - Gemini target)"]
+  DRAFT --> SCHEMA{"Schema valid?"}
+  SCHEMA -- no --> REJECT["Reject + log -> review"]
+  SCHEMA -- yes --> GUARD{"Guardrails pass?<br/>forbidden claims - PII/secret - state-consistency"}
+  GUARD -- no --> REJECT
+  GUARD -- yes --> RISKY{"High-risk or ineligible?"}
+  RISKY -- yes --> HOLD["HOLD for human approval (HITL gate)"]
+  RISKY -- no --> ELIGIBLE["Eligible for send"]
+  HOLD --> APPROVE{"Human approves?"}
+  APPROVE -- no --> REJECT
+  APPROVE -- yes --> ELIGIBLE
+  ELIGIBLE --> SEND["Simulated send + idempotency key<br/>(real Resend = target)"]
+  SEND --> AUDIT["Append audit_log + model_runs<br/>(OTel traces = target)"]
+  REJECT --> AUDIT
+  CB["Circuit breaker: max-iteration / no-progress -> escalate (target)"] -. guards .-> DRAFT
+
+  classDef target stroke-dasharray:5 5,stroke:#888,color:#555;
+  class CB target;

@@ -1,5 +1,178 @@
 # Task Log
 
+## 2026-06-19 (MAJOR PIVOT — goal rebuilt to a deployed, industry-adoptable AI product; owner full-liberty GO; plan approved; /autopilot engaged; build deferred to a fresh session)
+
+### Professional Process Applied
+Task type: strategy + architecture re-scope (goal finalization) · Stage: research→plan→execution-boundary · Risk: HIGH (scope · architecture · public claims · data sourcing) · Mode: FULL · **Effort: MAX (auto-routed)** · Basis: 2026 US AI-demand research + competitive-gap research + 4-specialized-agent positioning validation (all cited/dated) + ~5 advisor cross-checks + resilix house-style lessons · Validation: positioning corrected against live sources (EU AI Act high-risk→Art 50; FTC *Air AI*→*Moffatt v. Air Canada*; governance-as-headline→domain-led) · Docs: approved plan `~/.claude/plans/gentle-forging-starlight.md` + decision-log row + state-doc syncs · Codex review: per-slice during the build (not this planning session) · Human approval: **plan APPROVED in plan mode; owner granted full liberty to rebuild.**
+
+### What was done
+- Reanalyzed the whole project under updated doctrine + the owner's question "is this a good 2026 US AI project that fills a real industry gap?" Verdict: strong rigor (evals/guardrails/HITL/deterministic-first) but the offline Python artifact reads as **"designed, not built"** (LLM still a stub; nothing deployed; no UI).
+- **Goal PIVOTED + approved (owner full liberty):** rebuild as a real, industry-ADOPTABLE, **deployed desktop AI product** for stalled/long-tail **merchant activation** — single-stack **Next.js+TS+Tailwind+React on Vercel (free)**, **port** the Python core (kept as `v1-python-prototype` tag + differential-test oracle), **real bounded Gemini** (eval-gated · claims-gatekeeper · <$5), **eval harness = spine**, **hybrid data** (real open-source + synthetic overlay), **equal-weight** Strategy/Ops/BA + deep applied-AI, full **why-chain**, **universally legible**, **desktop-only**, **adoption-grade**, job search in background. Canonical plan: `~/.claude/plans/gentle-forging-starlight.md` (incl. a binding Blindspots section).
+- **Pivot recorded across the repo:** decision-log 2026-06-19 row · PROJECT_STATE header · CURRENT_TASK (→ REBUILD) · HANDOFF (+ paste-ready resume prompt) · tooling ledger (this session's agents/tools) · roadmap DoD superseded-note.
+- **`/autopilot` engaged**; build order = thin vertical slice first → Phases A→D, each gated + Codex-reviewed; owner-gated stops = commits · dataset check-in · platform-name · public posting · irreversible.
+- Owner pointers handled: ignore AI Portfolio · keep merchant core · equal-weight AI + why-chain · hybrid data · universal legibility · job-in-background · `DesignSync`/`claude-design` flagged for Phase-C UI · `competitor-analysis` skill install **blocked** (untrusted-code classifier; non-blocking; owner can `!`-run it).
+
+### Compliance / scope
+Docs/planning only — **no** change to `scripts/`, `tests/`, source CSV, `out/`, `eval/`. **No commit** (owner decides — RULES §12). 35/35 + eval 20/20|45/45 remain the v1 proof + the differential oracle. Carried forward unchanged: merchant use case · deterministic-first→bounded-LLM · eval-first · free-first · prototype-not-service · honesty.
+
+### Next step
+**Build runs in a FRESH session** (context hygiene): paste the HANDOFF resume prompt → startup contract → `/autopilot` → dataset Source-Intake (safe default: synthetic-primary + real open-source entities) → thin vertical slice → Phases A→D.
+
+## 2026-06-12, second session (grill-me-codex Act 1 complete — 4 owner decisions locked; Act 2 blocked on the seat)
+
+### Professional Process Applied
+
+Task type: planning review gate (grill + cross-model review) + owner-input collection · Stage: T-003 pre-build · Risk: HIGH (AI-behavior-adjacent, public claims, data lane) · Mode: FULL · **Effort: MAX** · Basis: grill-me-codex skill (owner-chosen flow) + live code verification (grep before locking OQ-1) · Validation: 35/35 + eval 20/20|45/45 PASS re-run live at session start; OQ-1 rename verified safe against live code before locking · Docs: PLAN.md + PLAN-REVIEW-LOG.md + plan draft 3 + 4 decision-log rows + state-doc syncs · Codex review: Act 2 attempted — **seat dead, deferred with written reason (RULES §9)** · Human approval: 4 grill decisions collected; build GO withheld until Act 2 runs.
+
+### What was done
+
+- **Startup contract run; green reconfirmed live** (35/35 OK; eval MERCHANT 20/20 | GUARDRAIL 45/45 PASS; outputs to temp dirs; `out/` untouched).
+- **Codex seat smoke test FAILED** — `codex exec` (session `019ebd3f-d8f5-7090-bef3-c321256b272d`, gpt-5.5 @ xhigh) exited 1; raw usage-limit error preserved **verbatim** in `PLAN-REVIEW-LOG.md`. Per owner standing order: no retry/switch/cap-tracking; Act 2 deferred with written reason — **not skipped**; build stays blocked behind it.
+- **grill-me-codex Act 1 run with the owner — one question at a time, all 4 locked:**
+  - **OQ-1 (owner OVERRODE the keep+label recommendation):** "dont anything related doordash. keep company agnostic" → **rename the v1 CSV**. Live verification during the grill made it proof-safe: the filename literal exists only at [scripts/config.py:10](../scripts/config.py); frozen tests use `C.SOURCE_CSV`; the golden pins content sha256 (name-independent) → `git mv` + 1 config line, frozen tests unmodified. Follow-up surfaced live: the fixture *content* holds 11 DoorDash mentions + the v1 corpus keeps DoorDash test strings (un-editable without destroying the proof) → owner chose **label now + decide publish-vs-exclude at Phase 7** ("also scrub content" offered, not chosen).
+  - **OQ-2:** owner asked what the plan said (draft 2 left it open by design), then chose **COMMIT-FRESH** (gitignore rejected).
+  - **PLATFORM_NAME = "Curbside Commons"** (recommendation accepted; 2-min trademark/web collision check at S1, RULES §6).
+  - **Target market = US** (recommendation accepted; standing-constraints intake question closed).
+- **Artifacts written:** `PLAN.md` (grill-locked summary — the Act-2 entry point) · `PLAN-REVIEW-LOG.md` (Act 1 record; Act 2 BLOCKED with the verbatim error; carried challenge list + the new rename-re-pin completeness challenge) · [docs/phase3-prep-slice-plan.md](phase3-prep-slice-plan.md) → **draft 3** (decisions folded into S1/S3/S5, frozen-lane table, out-of-scope, OQ section, Codex-challenge list, next actions) · 4 decision-log rows (OQ-1 as a documented partial reversal) · open-questions intake Q3 resolved · CURRENT_TASK/HANDOFF/PROJECT_STATE synced; fresh paste-ready resume prompt.
+
+### Compliance / scope
+
+Docs/planning only — **no** change to `scripts/`, `tests/`, source CSV, `out/`, `eval/`, integrations. **No commit** (owner decides — RULES §12). Advisor tool unavailable this session (error surfaced; judgment proceeded per doctrine).
+
+### Update (same session): Codex Act 2 RAN + CONVERGED — VERDICT: APPROVED (4 rounds)
+
+Seat reset early (owner: "limits have resetted"); ran Act 2 live instead of the scheduled retry. **Converged in 4 read-only rounds** on a single Codex thread `019ebedb-da03-7db2-83c3-cc395e298e1a` (latest model @ xhigh; fixed harness — full `~/.npm-global/bin/codex` path, namespaced `/tmp/codex-verdict-activationops.txt`, full-stream capture, no `head`-pipe): **R1** 15 findings (all execution, none reopening a locked decision — all accepted → slice plan draft 4: mechanical hash-pins, anti-stub-leak fixtures, header-aware v2 adapter, lane-isolated v2 + lane-aware `eval.py`, committed nonzero-exit secrets/git-state hooks, OQ-1 scope honesty, provenance sidecar) → **R2** 8 resolved + 3 real clarifications (#3 required-positive family table, #6 reject-path demoed via S4 eval-corpus replay to satisfy the DoD walkthrough, #12 git-state mechanism + current-state-only scoping) + consistency pass → **R3** 1 residual OQ-1 wording drift → **R4** clean **APPROVED**. Claude = final arbiter throughout; full critique + per-round responses in `PLAN-REVIEW-LOG.md`. **No code written during the gate (RULES — Act 1/Act 2 are plan-only).** 35/35 + eval 20/20|45/45 PASS reconfirmed live post-convergence; `out/` untouched. **Next = owner GO/NO-GO on building T-003.** Process note: an early Act-2 attempt ingested a *different project's* stale verdict from the skill's shared `/tmp/codex-verdict.txt` (discarded under project-isolation); the grill-me-codex skill was hardened (namespaced paths + no-`head`-pipe What-NOT-to-do bullets) so it can't recur.
+
+### Update (same session, earlier): context doctrine encoded; Act 2 attempted twice — VOID then seat-exhausted
+
+(1) **Context doctrine encoded** (owner GO on Claude's offer): minimal · durable · fresh — context auto-adjusts by task, like effort. Encoded in `CLAUDE.md` (Operating Doctrine — Context), decision-log row (source-validated vs Anthropic context-management guidance), `~/claude-os/docs/CONTINUITY.md` (new section) + flags broadcast, persistent memory (`context-minimal-durable-fresh`). (2) **Codex seat returned (owner action); Act 2 round 1 attempted twice:** attempt 1 **VOID** — the orchestration pipeline's `head -1` SIGPIPE-killed codex mid-review AND the skill's shared `/tmp/codex-verdict.txt` still held a **stale verdict from another project** (supply-chain-ai-resilix, 15:44 mtime vs our 15:59 thread) — all 12 contaminated findings discarded (project isolation); **harness + grill-me-codex skill fixed** (namespaced per-project paths; full-stream capture; two new What-NOT-to-do bullets in the skill). Attempt 2 launched clean (thread `019ebd71-b670`) → **seat exhausted mid-run**; raw error verbatim in `PLAN-REVIEW-LOG.md` ("...try again at 8:30 PM."). Stopped per owner order. **Act 2 still owed; build still blocked behind it.** (3) Effort-doctrine validation note added to the decision-log row (official guidance cross-check).
+
+### Update (same session, owner-directed): effort doctrine corrected — AUTO-ADJUST by task
+
+Owner: "i said auto adjust the claude and codex according to the task i meant" (confirmed: auto-adjust **replaces** blanket MAX). One rule for both Claude and Codex: model + effort routed by task demands (ship-gating/architecture/AI-behavior/security/public-claims → max / Codex `xhigh`; trivial/low-risk → proportionally lighter); the per-stage "Effort:" declaration stays (now: routed level + why). Applied to `CLAUDE.md` (Operating Doctrine — Effort), decision-log supersede row, `CURRENT_TASK.md`, plan draft 3 Mode section, the HANDOFF resume prompt, and persistent memory. Historical task-log entries keep their original "Effort: MAX" wording (records, not rewritten). T-003's gate/build still routes to MAX/xhigh (ship-gating + high-risk), so the active task's effort is unchanged in substance.
+
+### Next step
+
+Smoke-test the seat → Act 2 (read-only loop, MAX_ROUNDS=5, against `PLAN.md`) → apply findings (rejections logged) → owner GO → build S1→S5.
+
+## 2026-06-12 (T-003 plan revision + contradiction reconcile + constraints intake; Codex gate = dated obligation)
+
+### Professional Process Applied
+
+Task type: documentation reconcile + plan revision + cross-model review (attempted) + standing-constraints intake · Stage: post-T-002, pre-T-003 build · Risk: medium (AI-evaluation contract + data lane + public-claims surface; **no** product code/tests/CSV/`out`/`eval` touched) · Mode: FULL · **Effort: MAX** · Basis: ratified 2026-06-11 DoD + Codex jobs `bvympilb4`/`bm0i9bxpy` findings + live code reads · Validation: 35/35 tests + eval 20/20|45/45 PASS re-run live at session start; Codex review of the revised plan **deferred with written reason (RULES §9)** — quota-blocked, dated obligation · Human approval: build GO withheld until the gate runs.
+
+### What was done
+
+- **Step 1 — blueprint-review contradiction reconciled:** the ledger was right — job `bm0i9bxpy` ran 2026-06-09 (NO-SHIP, no P0, 10 findings; honesty fixes applied — the blueprint's `(Codex P1/P2)` annotations are the internal evidence). Blueprint status header updated (review completed; serves as architecture reference under the ratified DoD; L4 = ceiling). Decision-log rows flipped to **Accepted-via-DoD** with notation: T-003 re-scope + HYBRID data (both were stale-Proposed after the 2026-06-11 ratification).
+- **Step 2 — [docs/phase3-prep-slice-plan.md](phase3-prep-slice-plan.md) rewritten as REVISED draft 2:** add-alongside v1/v2 (frozen-lane table; "regenerate golden = create v2, never overwrite v1"; draft 1's rename-SOURCE_CSV revoked); ratified **HYBRID** wording; slices in ratified build order (S1 de-brand → S2 draft contract → S3 v2 hybrid lane → S4 adversarial corpus → S5 hooks); both Codex jobs' findings folded in as constraints. **New live-code finding:** `false_impact_claim` is regex-anchored on `doordash` ([scripts/guardrail.py:29](../scripts/guardrail.py:29)) → de-brand must parameterize the detector (PLATFORM_NAME + real marketplace names + comparative negatives), proven by v1 staying 45/45 with zero corpus edits. New OQ-1 surfaced (frozen v1 CSV's DoorDash filename: recommend label-don't-rename; Codex/owner to challenge).
+- **Step 3 — Codex review: ORPHANED (quota).** `codex exec` ran 1h36m with zero output and **no session rollout ever created**; root cause verified from the 09:45 smoke-test rollout (`has_credits: false, balance: "0"`; capped until **2026-06-14 ~09:56** per `~/claude-os` STATE). Killed; recorded as a **dated obligation** in the plan status. **Build does not start before the gate runs** (owner may re-decide).
+- **Fold-ins:** stale `README.md` fixed (two claims were two phases behind — status + built-today lines now name T-001/T-002 green evidence); **2026-06-09 doctrine/blueprint task-log entry backfilled** (marked as backfill, evidence-based); CASE-STUDY built-vs-designed overclaim corrected ("removed all real-company branding" → decided-not-yet-built).
+- **Owner constraints intake (claude-os, owner-directed):** standing `PROJECT-CONSTRAINTS.md` adopted → decision-log row (2026-06-12, Accepted) + `CLAUDE.md` doctrine addendum + roadmap Phase-7 **specific expansion & adoption path** deliverable + plan S3 standing-constraint note + open-questions **product target-market intake question** (proposed default US, owner confirms).
+- **Owner session-management rule encoded** (memory + `CLAUDE.md` Handoff doctrine): proactively prompt a fresh session when the conversation runs long; stage-boundary cuts preferred; always with the paste-ready resume prompt.
+
+### Compliance / scope
+
+Docs/governance only — **no** change to `scripts/`, `tests/`, source CSV, `out/`, `eval/`, integrations. **No commit** (owner decides — RULES §12). Validation evidence: live 35/35 + eval PASS at session start; outputs to temp dirs.
+
+### Update (same day, owner-directed): "June-14 law" removed — no cap-tracking
+
+Owner pointed at the claude-os update (`tasks/flags.md` 2026-06-12): the capped-until-06-14 advisory is **stripped by owner order** — don't gate work on a remembered date; **smoke-test the seat, run the gate when it works, surface raw errors verbatim**, never silently retry or switch (seat/credits = owner action; a backup account with credits exists). Codex policy = **latest model + auto-routed effort** (ship-gating reviews → xhigh; config default `gpt-5.5` @ `xhigh`). Live re-check at the owner's request: login valid ("Logged in using ChatGPT", primary), but the smoke test still errors verbatim: *"You've hit your usage limit … purchase more credits or try again at Jun 14th, 2026 9:56 AM."* All state docs + the plan status reframed from "dated obligation" to **"pending a working seat."** Gate remains a RULES §9 deferral with written reason; build still does not start before it runs.
+
+### Next step
+
+Smoke-test the Codex seat → when alive, run the review of plan draft 2 → apply findings → owner GO → build T-003 slice-by-slice. Owner to answer: target market (default US?) + OQ-1/OQ-2 (can also ride the gate review).
+
+## 2026-06-11 (/claude-os goal reassessment — analysis + cross-model verdict; owner decision pending)
+
+### Professional Process Applied (analysis-only; recommendation owner-gated)
+
+Task type: post-stage analysis + goal reassessment (owner-triggered) · Stage: post-T-002, pre-T-003 · Risk: low for the analysis (read-only; no product code/tests/CSV/`out`/`eval` change); what it recommends is consequential (project goal/DoD) → owner decides · Mode: lightweight analysis, FULL validation on the recommendation (Codex cross-check per the operating doctrine) · Basis: Mandatory Startup Contract reads + repo evidence ([docs/open-questions.md](open-questions.md) open DoD question; decision-log 2026-06-09 north-star row's "enterprise-grade, interview-defensible AI build" rationale; [docs/roadmap.md](roadmap.md) L0–L4) + one read-only Explore subagent (repo inventory: ~1,364 code + 510 test lines vs ~6,000 doc lines; 39 docs) · Validation: Codex gpt-5.5/xhigh read-only cross-check via background `codex exec` (2026-06-11) — **AGREE on all 4 recommendations**, refinements adopted · Codex review: done (this task) · Human approval: **REQUIRED** — goal/DoD ratification is the owner's call; nothing changed beyond this log entry + tooling-ledger rows.
+
+### What was done
+
+- Ran the startup contract; re-derived git state live (`HEAD = 9958ec0`; the 2026-06-09 docs/governance batch still uncommitted, matching the state docs).
+- **Analysis finding:** the use case (merchant/funnel activation engine) is sound; the **objective** is the unresolved part — the project-level Definition of Done/audience has been the repo's own open question since 2026-06-01 while the roadmap's completion line stretched to L4 agentic. The owner's recorded rationale for the agentic north-star is itself "an enterprise-grade, **interview-defensible** AI build" — i.e., the ladder is a means, not the goal.
+- **Verdict (Proposed — owner ratifies):** (1) keep the use case (de-brand stands); (2) ratify a portfolio Definition of Done = de-branded public repo + T-003 + Phase 3 bounded LLM drafting (L1) green against the v2 baseline + a demo visibly showing hold/reject/send paths + the case-study/interview docs; (3) L2–L4 and live integrations become optional roadmap, re-approved only after L1 evidence (L4 stays the designed **ceiling**, not the completion bar); (4) process freeze — next sessions build T-003 (its hooks are enforcement against named recurring blockers, not new governance).
+- **Codex cross-check (gpt-5.5/xhigh, read-only):** AGREE ×4. Refinements adopted: Phase 4 (HITL delivery) is the preferred *optional stretch proof* if the owner wants a stronger workflow-automation signal (more concrete than an offline L4 toy); stopping at L1 undersells "agentic" unless the demo shows the safety paths + the deliberate-deferral rationale.
+- **Repo contradictions found and verified** (to fix in the next doc-sync, owner-approved): `README.md` stale ("Planning is closing" — pre-T-001 wording, two shipped phases behind); `CURRENT_TASK.md` says the blueprint is "pending Codex review" while [docs/tooling-and-skills-usage.md](tooling-and-skills-usage.md) records blueprint completeness review job `bm0i9bxpy` as already run (NO-SHIP, fixes applied) — reconcile which is true; the 2026-06-09 task-log entry says "coverage-designed **synthetic**" while the ratified decision-log row says coverage-designed **HYBRID** (open base + synthetic edges); the 2026-06-09 doctrine/blueprint session has **no task-log entry** (RULES §9 gap — this entry records the gap, the owner decides whether to backfill).
+- **Owner-directed doctrine addition (same session): free-first runtime stack** — every product-runtime tool defaults to free / free-tier / self-hostable OSS; sole paid runtime exception = Gemini API (best current model, **$5 hard total budget**, freshness/price-checked at use). Encoded in `CLAUDE.md` (Operating Doctrine) + `docs/decision-log.md` (2026-06-11 row, Accepted owner-directed). Costs the recommended Portfolio DoD nothing ($0 + Gemini <$5); optional Phases 4–6 already have free routes named in the roadmap.
+- **Owner-directed identity clarification (same session): prototype run on demand, not an operated service** — episodic demo/eval/walkthrough runs; no 24/7 operation, hosting, uptime, or ops requirements as goals; production scale stays a documented Enterprise Expansion Path; any approved integration phase = transient flow demonstration, not standing infrastructure. Encoded in `CLAUDE.md` (Operating Doctrine — Project identity) + `docs/decision-log.md` (second 2026-06-11 row).
+- **Owner-directed additions (same session): company-agnostic ratified** — the 2026-06-09 de-brand decision-log row flipped **Proposed → Accepted** on the owner's words ("Keep it company agnostic"); `PLATFORM_NAME` final pick + trademark check remain open · **Effort policy = MAX for every stage**, declared per stage in the Professional Process Applied block, common across all owner projects (third 2026-06-11 decision-log row) · **Project isolation** — owner runs multiple concurrent projects; never mix contexts/rules/state across repos. Encoded in `CLAUDE.md` (Operating Doctrine — Effort & project isolation).
+- **GOAL RATIFIED (owner GO: "Your call. continue")** — owner kept the framing **specific** (delegating the choice): exercised as **merchant onboarding & activation for a local-commerce delivery marketplace** (company-agnostic; fictional platform name pending trademark check; the "any funnel" generalization stays a portability note in the case study, not the identity). Ratification + full state sync (Effort: max): new decision-log row (Portfolio DoD; Phases 4–6 optional; Phase 7 pulled forward; L4 = designed ceiling); `docs/open-questions.md` project-level items marked resolved (incl. the long-stale GO/NO-GO item); `docs/roadmap.md` DoD block + ladder/table/phase statuses synced; `CURRENT_TASK.md` rewritten to the T-003 path; `HANDOFF.md` refreshed with a new paste-ready resume prompt; `PROJECT_STATE.md` header/next-step/handoff-notes synced (bottom note no longer carries a SHA — anti-drift). **No product code/tests/CSV/`out`/`eval` change; no commit (owner decides).**
+
+### Compliance / scope
+
+Analysis + this log entry + tooling-ledger rows only. **No** change to `scripts/`, `tests/`, source CSV, `out/`, `eval/`, state docs, roadmap, or blueprint. **No commit** (owner decides — RULES §12).
+
+### Next step
+
+Owner decides the goal anchor (full options in the session verdict): **(A)** ratify the portfolio DoD (recommended), **(B)** DoD + Phase 4 as optional stretch, or **(C)** keep full L4 as the completion bar. Then: reconcile the blueprint-review status contradiction → revise the T-003 plan to add-alongside → build T-003.
+
+## 2026-06-09 (Doctrine + agentic-architecture-blueprint session — BACKFILLED 2026-06-12)
+
+> **Backfill note:** this session originally closed without a task-log entry (RULES §9 gap, recorded by the 2026-06-11 entry; backfill directed by the owner-approved 2026-06-11 handoff). Written 2026-06-12 from repo evidence: `docs/decision-log.md` 2026-06-09 rows, [docs/tooling-and-skills-usage.md](tooling-and-skills-usage.md), the blueprint's `(Codex P1/P2)` annotations, and the untracked-file set in `git status`.
+
+### Professional Process Applied (reconstructed)
+
+Task type: architecture + governance documentation · Stage: post-T-002, pre-T-003 · Risk: medium (target-architecture claims + public-portfolio artifacts; no product code/tests/CSV/`out`/`eval` changed) · Mode: FULL for the blueprint (architecture; broad source discovery), lightweight for doc syncs · Effort: MAX · Validation: 7-domain Tier-1 source sweep + Codex blueprint completeness review (job `bm0i9bxpy`) · Human approval: doctrine items owner-directed; blueprint left Proposed.
+
+### What was done
+
+- **Owner doctrine encoded** in `CLAUDE.md` (Operating Doctrine, 2026-06-09) + `docs/decision-log.md`: Codex pinned gpt-5.5/xhigh (review/rescue only, $20 plan); Gemini gated (<$5, freshness-checked); free/OSS alternative named per paid tool in public docs; paste-ready resume prompt every handoff; recommendation validation + Codex cross-check on consequential calls.
+- **North-star flipped (owner-directed):** full HITL *agentic* system as **target** (governed agency) — deterministic core/guardrails/approval gate become the agent's tools + rails; V1 claims unchanged (decision-log row).
+- **Authored** [docs/architecture/agentic-architecture-blueprint.md](architecture/agentic-architecture-blueprint.md) on a 7-domain discovery sweep (Anthropic agents, OpenAI guardrails, OWASP LLM/Agentic, NIST AI RMF/GenAI, 12-Factor-Agents, OTel GenAI, DeepEval/promptfoo/RAGAS — see ledger) + 5 new visuals (`agentic-workflow`, `autonomy-ladder`, `controls-map`, `data-lineage`, `eval-harness` .mmd) + visuals README/architecture/v1-thin-slice syncs.
+- **Codex blueprint completeness review** (job `bm0i9bxpy`): **NO-SHIP, no P0; 10 findings** (rename-SOURCE_CSV must be add-alongside; pipeline can't ingest v2; approval-gate overclaim; autonomy gates not auditable; visuals overstate eval; traceability/built-vs-target overclaims). **Honesty fixes applied to the blueprint same day** (the `(Codex P1/P2)` annotations); deeper acceptance-criteria deferred to T-003 build.
+- **Prompt Intake Protocol** created ([docs/prompt-intake-protocol.md](prompt-intake-protocol.md)) + `RULES.md` §16 + `CLAUDE.md`/`CODEX.md` wiring (owner non-negotiable).
+- **Source & Validation Depth standard** added to the playbook (two-source/triangulation/IFCN-grounded) + Expert & Industry-Practice validation step.
+- **Standing deliverables started** (owner-requested): [docs/CASE-STUDY.md](CASE-STUDY.md) + [docs/INTERVIEW-WALKTHROUGH.md](INTERVIEW-WALKTHROUGH.md) (living docs; owner polishes at completion). **Tooling/skills usage ledger** created ([docs/tooling-and-skills-usage.md](tooling-and-skills-usage.md), standing maintenance rule).
+
+### Compliance / scope
+
+Docs/governance only — **no** change to `scripts/`, `tests/`, source CSV, `out/`, `eval/`, integrations; **no commit** (owner decides, RULES §12). Gap acknowledged: the session itself skipped this log entry at close (process finding; the 2026-06-11 session caught it).
+
+## 2026-06-09 (Public-posting pivot — de-brand decision + live-API-vs-synthetic Codex review)
+
+### Professional Process Applied (full intake on a high-impact public-facing choice; decisions owner-gated)
+
+Task type: source/pattern intake + scope decision + cross-model review · Stage: pre-Phase-3 · Risk: low-medium (decisions touch public claims + data strategy; **no** product code/CSV/`out`/`eval` changed — planning only) · Basis: owner directive (go agnostic; consider live public-data APIs; check with Codex), RULES §4/§6/§7/§8/§11, advisor, and an independent `codex exec` adversarial review · Validation: cross-model convergence — Codex gpt-5.5 (xhigh, read-only) + Claude + advisor, each grounded in the repo files · Codex review: **done** (session `019eac95`, neutral fork, told to argue the other side) · Human approval: **required** to ratify the 3 Proposed decision-log rows + pick `PLATFORM_NAME`.
+
+### What was done / decided
+
+- Owner decided **company-agnostic** framing. Recommendation: keep **ActivationOps AI** (engine) + a fictional `PLATFORM_NAME`; real companies as comparisons only.
+- Owner proposed **live free public data APIs** to cover edge cases → put to a neutral cross-model adversarial review → **no-ship as a runtime/eval source** (Codex + Claude converged on the merits): live data can't supply the targeted business-state edge cases (opt-out / suppression / malformed email / guardrail-reject), breaks the golden-label eval (E7/E8), and puts real businesses in a fabricated risk narrative. **Decision (Proposed): coverage-designed synthetic dataset**; optional later non-gating fetch-once/scrub/freeze ingestion experiment.
+- Folded all of it into [docs/phase3-prep-slice-plan.md](phase3-prep-slice-plan.md) (now the combined pre-Phase-3 plan) + Codex's "what's missing" (explicit contact-safety data cases + a coverage matrix); added 2 Proposed `docs/decision-log.md` rows (de-brand; data-sourcing — supersedes the 2026-06-01 fixtures-only row).
+- Name check: "Forkful" rejected (real company); "MarketLane" candidate (not web-verified); "Acme Marketplace" zero-risk fallback.
+
+### Scope
+
+Planning/docs only. **No** change to `scripts/`, `tests/`, source CSV, `out/`, `eval/`, or integrations. Decisions are **Proposed** (owner ratifies). Codex job recorded (session `019eac95`).
+
+### Next step
+
+Owner: ratify the 3 Proposed rows + pick `PLATFORM_NAME` + answer the open question (optional ingestion experiment yes/no) → build T-003 (de-brand + synthetic dataset → eval coverage → hooks).
+
+## 2026-06-09 (/claude-os analysis + Phase-3-prep planning — re-scoped the pre-Phase-3 gate)
+
+### Professional Process Applied (analysis = lightweight; plans full work)
+
+Task type: post-stage analysis + source-intake + planning · Stage: post-T-002, pre-Phase-3 · Risk: low (read-only analysis + docs/planning; **no** product code/tests/CSV/`out`/`eval` touched) · Mode: lightweight (the plan doc); what it *plans* is Codex+owner-gated · Basis: `RULES.md`, enterprise-delivery-playbook, **live execution** + direct reads of `scripts/eval.py` + `eval/golden_merchants.v1.json` + `scripts/pipeline.py` · Validation: re-ran 35/35 tests + eval PASS (2026-06-09); read the eval scoring code to confirm coverage · Skills: `/claude-os` (entry ritual, used as a **lens** — the project's own OS is the system of record; did **not** scaffold competing claude-os ledgers) · Codex review: **required** on the new plan (`/codex:adversarial-review`) — not yet run · Human approval: **required** before building T-003 or starting Phase 3.
+
+### What was done
+
+- **Verified state by execution** (not trusting docs): `python3 -m unittest tests.test_t001 tests.test_t002` → 35/35 OK; `python3 scripts/eval.py` → MERCHANT 20/20 | GUARDRAIL 45/45 | PASS.
+- **Found the headline gap:** the T-002 baseline scores only deterministic fields ([scripts/eval.py:25](../scripts/eval.py:25)); Phase 3 replaces only `make_draft()` ([scripts/pipeline.py:112](../scripts/pipeline.py:112)), whose generated text no golden field observes → a green baseline does not measure what Phase 3 changes.
+- **Drafted** [docs/phase3-prep-slice-plan.md](phase3-prep-slice-plan.md) — **T-003** (generator-agnostic draft contract + adversarial guardrail corpus + secrets/git-state enforcement hooks), framed for Codex plan review + owner GO. Added a **Proposed** decision-log row (re-scope).
+- **Cleanups:** `.gitignore` now ignores `RULES_CONFIG_DUMP.txt` (regenerable dump generated 2026-06-06, was untracked + unrecorded); corrected the recurring git-state drift (docs read `HEAD = dc7d131`, actual `9958ec0` — the 4th occurrence) in `PROJECT_STATE.md` / `CURRENT_TASK.md` / `HANDOFF.md`.
+- Absorbed 3 generalizable lessons into the cross-project `~/claude-os/tasks/lessons.md` (control-not-enforced-at-gate drifts; a green eval can measure the wrong thing; `/claude-os` is a lens on a project that has its own OS).
+
+### Compliance / scope
+
+Docs + `.gitignore` only. **No** change to `scripts/`, `tests/`, source CSV, `out/`, `eval/`, or integrations. **No commit** (owner decides — RULES §12). The re-scope is **Proposed**, not Accepted.
+
+### Next step
+
+Owner: `/codex:adversarial-review` on the T-003 plan → apply findings → GO/NO-GO + ratify the decision-log row → build T-003 (one part at a time) → then the Phase-3 plan (FULL workflow).
+
 ## 2026-06-04 (Decision-log ratifications — guardrail hardening + baseline artifact policy)
 
 ### Professional Process Applied (lightweight)

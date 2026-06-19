@@ -1,39 +1,63 @@
 ---
-title: "ActivationOps AI — Target Architecture (ROADMAP — not yet built)"
+title: "ActivationOps AI — Layered Architecture (built vs. target)"
 ---
-%% STATUS: target architecture. As of 2026-06-01 only the source CSV exists.
-%% Dashed nodes are roadmap / not yet built. Do not present this as current state.
+%% STATUS as of 2026-06-09: solid = BUILT; dashed = target (roadmap). Simulation on dummy data.
+%% Supersedes the prior 2026-06-01 'nothing built yet' version.
+%% Detail: docs/architecture/agentic-architecture-blueprint.md
 flowchart TB
-  subgraph BUILT["Built today"]
-    CSV["Source CSV<br/>(20 dummy merchants)"]
+  subgraph DATA["Data & lineage"]
+    V1["v1 source CSV (FROZEN)<br/>20 dummy merchants - hash-pinned"]
+    V2["v2 'Curbside Commons' demo lane<br/>de-identified open base + synthetic edges"]
+  end
+  subgraph CORE["Deterministic core (trusted tools) - BUILT"]
+    RISK["Risk score + reason codes"]
+    BLOCK["Blocker + next-best-action"]
+    ELIG["Eligibility + review routing"]
+    GATE["Send-gate + idempotency"]
+  end
+  subgraph LLM["Agent / LLM layer"]
+    STUB["Stub drafter - BUILT"]
+    GEM["Bounded drafting (Gemini) - target"]
+    AGENT["Bounded planner / tool-use - target"]
+  end
+  subgraph CONTROL["Guardrail & control layer - BUILT (rules)"]
+    GRULES["Rules guardrails (5 categories)"]
+    GSTATE["State-consistency check"]
+    GSEM["Semantic / LLM-judge - target"]
+    GCB["Circuit breakers - target"]
+  end
+  subgraph HUMAN["Human-in-the-loop"]
+    REVIEW["Review queue - BUILT"]
+    APPROVE["Approval gate - BUILT (simulated)"]
+  end
+  subgraph EVAL["Eval & quality - BUILT (T-002)"]
+    GOLD["Golden labels + baseline"]
+    DRAFTC["Generator-agnostic draft contract - next"]
+    PROBE["Adversarial probes - next"]
+  end
+  subgraph OBS["Observability & audit"]
+    AUDIT["audit_log + model_runs - BUILT"]
+    OTEL["OpenTelemetry GenAI traces - target"]
+  end
+  subgraph INTEG["Integrations - target (gated)"]
+    STORE["Datastore (Postgres/Supabase)"]
+    SLACK["Approval (Slack)"]
+    SEND["Delivery (Resend)"]
+    ORCH["Orchestration (n8n)"]
   end
 
-  subgraph V1["V1 offline thin slice (target — not yet built)"]
-    NORM["Normalize to merchants_v1.csv"]
-    RISK["Deterministic risk + blocker"]
-    QUEUE["Human review queue"]
-    DRAFT["Structured draft (stubbed) + guardrails"]
-    SIM["Simulated send + audit / model_runs log"]
-  end
+  V1 --> CORE
+  V2 -. target .-> CORE
+  CORE --> LLM
+  STUB --> CONTROL
+  GEM -. replaces stub .-> CONTROL
+  AGENT -. target .-> CONTROL
+  CONTROL --> HUMAN
+  HUMAN --> AUDIT
+  EVAL -. measures .-> LLM
+  EVAL -. measures .-> CONTROL
+  HUMAN -. target .-> INTEG
+  OBS -. target .-> INTEG
 
-  subgraph ROADMAP["Roadmap runtime (not yet built)"]
-    SHEETS["Google Sheets<br/>(import / export, dashboard)"]
-    GEMINI["Gemini<br/>(structured drafts)"]
-    SUPA["Supabase Postgres<br/>(state, RLS)"]
-    N8N["n8n<br/>(orchestration)"]
-    SLACK["Slack<br/>(human approval)"]
-    RESEND["Resend<br/>(approved email + webhooks)"]
-    DASH["Dashboard / docs"]
-  end
-
-  CSV --> NORM --> RISK --> QUEUE --> DRAFT --> SIM
-  GEMINI -. replaces stub .-> DRAFT
-  SIM -. later .-> SUPA
-  SUPA -. later .-> N8N
-  N8N -. later .-> SLACK
-  SLACK -. later .-> RESEND
-  SHEETS -. visibility .-> CSV
-  SUPA -. feeds .-> DASH
-
-  classDef roadmap stroke-dasharray: 5 5,stroke:#888,color:#555;
-  class NORM,RISK,QUEUE,DRAFT,SIM,SHEETS,GEMINI,SUPA,N8N,SLACK,RESEND,DASH roadmap;
+  classDef target stroke-dasharray:5 5,stroke:#888,color:#555;
+  class V2,GEM,AGENT,GSEM,GCB,DRAFTC,PROBE,OTEL,STORE,SLACK,SEND,ORCH target;

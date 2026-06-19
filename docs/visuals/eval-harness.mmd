@@ -1,0 +1,26 @@
+---
+title: "ActivationOps AI — Evaluation & Regression Harness (built vs. next)"
+---
+%% Solid = BUILT (T-002); dashed = NEXT (T-003). 'Evaluation before claims' (RULES section 3).
+flowchart TB
+  subgraph INPUTS["Fixtures"]
+    GV1["golden_merchants.v1 (frozen)"]
+    GV2["golden_merchants.v2 - next"]
+    REG["Guardrail regression corpus (blocking, 100%)"]
+    PROBES["Adversarial probes - next (measured)"]
+    INDEP["Independent paraphrased drafts - next"]
+  end
+  PIPE["Run pipeline (deterministic)"] --> MERCH["Merchant field accuracy"]
+  GV1 --> MERCH
+  GV2 -. next .-> MERCH
+  REG --> GUARDE["Guardrail pass-rate (must be 100%)"]
+  PROBES -. next .-> CATCH["Adversarial catch-rate (measured; miss = finding)"]
+  INDEP -. next .-> DCON["Draft contract: state-consistency - structure - policy"]
+  MERCH --> BASE["Versioned baseline JSON"]
+  GUARDE --> BASE
+  CATCH -. next .-> BASE
+  DCON -. next .-> BASE
+  BASE --> TRIG["Phase-3 trigger:<br/>model meets/beats baseline behind guardrails"]
+
+  classDef target stroke-dasharray:5 5,stroke:#888,color:#555;
+  class GV2,PROBES,INDEP,CATCH,DCON,TRIG target;

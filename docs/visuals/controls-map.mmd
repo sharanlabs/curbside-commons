@@ -1,0 +1,30 @@
+---
+title: "ActivationOps AI — Controls Map (NIST functions x OWASP threats)"
+---
+%% How built/target controls satisfy NIST AI RMF functions and mitigate OWASP LLM/agentic risks.
+%% Sources: NIST AI RMF + GenAI Profile; OWASP LLM Top-10 (2025) + Agentic Top-10 (2026).
+flowchart TB
+  subgraph GOV["NIST GOVERN"]
+    RULESF["RULES + playbook + decision-log + dual-model review + doctrine"]
+  end
+  subgraph MAP["NIST MAP"]
+    CLASS["Data classification + threat model"]
+  end
+  subgraph MEAS["NIST MEASURE"]
+    EVALF["Eval harness + baseline<br/>(regression now; adversarial = T-003)"]
+  end
+  subgraph MAN["NIST MANAGE"]
+    GUARDF["Guardrails (layered)"]
+    HITLF["HITL approval gate"]
+    AUDITF["Audit trail + provenance"]
+    LADDER["Autonomy ladder (earned promotion)"]
+  end
+
+  GUARDF -->|mitigates| TOUT["OWASP: Improper Output Handling"]
+  EVALF -->|detects| TMIS["OWASP: Misinformation / hallucination"]
+  GSTATE2["state-consistency"] --> GUARDF
+  HITLF -->|mitigates| TAGENCY["OWASP: Excessive Agency"]
+  LADDER -->|mitigates| TAGENCY
+  GUARDF -->|mitigates| TPII["OWASP: Sensitive Info / PII-secret"]
+  HITLF -->|mitigates| TINJ["OWASP: Prompt Injection<br/>(model can't act directly)"]
+  AUDITF -->|supports| TDISC["NIST: incident disclosure / traceability"]
