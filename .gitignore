@@ -12,3 +12,26 @@ __pycache__/
 # snapshots (merchants_v1.csv, review_queue.csv); the other two are append-only logs
 # (model_runs.csv, audit_log.csv) that grow on re-runs — regenerate with
 # `python3 scripts/run.py --fresh` before committing so they reflect one clean run.
+
+# Generated convenience dumps — regenerable, not source of truth (artifact policy: ignored).
+# RULES_CONFIG_DUMP.txt is a verbatim concat of governance/config files produced ad hoc
+# (e.g. to paste the ruleset into another tool); keep it local, never commit it.
+RULES_CONFIG_DUMP.txt
+
+# --- Next.js / TypeScript app (the rebuild) ---
+# Secrets — never commit a real key (RULES §11). .env.example is the tracked template.
+.env
+.env*.local
+*.key
+
+# Dependencies + build output
+node_modules/
+.next/
+next-env.d.ts
+coverage/
+*.tsbuildinfo
+.vercel/
+
+# Playwright (Phase C)
+playwright-report/
+test-results/

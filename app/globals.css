@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Minimal base. The full "Quiet Instrument" design tokens land in Phase C. */
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: #ffffff;
+  color: #171717;
+  -webkit-font-smoothing: antialiased;
+}
