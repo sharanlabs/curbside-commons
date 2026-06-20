@@ -15,14 +15,14 @@ const input: MerchantInput = {
 };
 const merchant = normalizeRow(input, 1);
 
-/** A schema-valid generated draft, parameterized so tests can corrupt one field. */
+/** A schema-valid generated draft: addresses the merchant by {{MERCHANT}}, no raw name. */
 function validGenerated(overrides: Record<string, unknown> = {}) {
   return {
-    risk_explanation: `${merchant.merchant_name} has completed 2 of 5 steps.`,
+    risk_explanation: "{{MERCHANT}} has completed 2 of 5 steps.",
     blocker_summary: "Current blocker: photos_needed.",
     next_best_action: merchant.next_best_action,
-    draft_subject: "Your next onboarding step",
-    draft_body: "Hi, your next step is to add photos of your items.",
+    draft_subject: "Your next step, {{MERCHANT}}",
+    draft_body: "Hi {{MERCHANT}}, your next step is to add photos of your items.",
     claims: [{ field: "steps_completed", value: 2 }],
     ...overrides,
   };
@@ -113,6 +113,45 @@ describe("draftOutreach — mode taxonomy, cost, fail-closed budget", () => {
     const res = await draftOutreach(merchant, { generate, budget });
     expect(res.mode).toBe("FAILED_TO_FALLBACK");
     expect(res.errorClass).toContain("network down");
+  });
+
+  it("rejects a draft with NO placeholder (MISSING_PLACEHOLDER); billed cost accounted", async () => {
+    const generate = async () => ({
+      object: validGenerated({ draft_subject: "Your next step", draft_body: "Hi, please add photos." }),
+      usage,
+    });
+    const res = await draftOutreach(merchant, { generate, budget });
+    expect(res.mode).toBe("FAILED_TO_FALLBACK");
+    expect(res.errorClass).toBe("MISSING_PLACEHOLDER");
+    expect(res.costUsd).toBeGreaterThan(0);
+  });
+
+  it("rejects a draft where the real name leaks pre-substitution (NAME_LEAK)", async () => {
+    const generate = async () => ({
+      object: validGenerated({ draft_body: "Hi {{MERCHANT}}, this is Curry In A Hurry — add photos." }),
+      usage,
+    });
+    const res = await draftOutreach(merchant, { generate, budget });
+    expect(res.mode).toBe("FAILED_TO_FALLBACK");
+    expect(res.errorClass).toBe("NAME_LEAK");
+  });
+
+  it("rejects an unresolved/partial placeholder (UNRESOLVED_PLACEHOLDER)", async () => {
+    const generate = async () => ({
+      object: validGenerated({ draft_body: "Hi {{MERCHANT}}, visit {{LINK}} to add photos." }),
+      usage,
+    });
+    const res = await draftOutreach(merchant, { generate, budget });
+    expect(res.mode).toBe("FAILED_TO_FALLBACK");
+    expect(res.errorClass).toBe("UNRESOLVED_PLACEHOLDER");
+  });
+
+  it("fail-closed on a billed call with UNKNOWN usage (never records $0)", async () => {
+    const generate = async () => ({ object: validGenerated(), usage: {} });
+    const res = await draftOutreach(merchant, { generate, budget });
+    expect(res.mode).toBe("FAILED_TO_FALLBACK");
+    expect(res.errorClass).toBe("UNKNOWN_USAGE");
+    expect(res.costUsd).toBeCloseTo(budget.estimatedNextUsd, 10); // conservative estimate, not $0
   });
 
   it("budget hard-stop blocks the call BEFORE it can bill", async () => {

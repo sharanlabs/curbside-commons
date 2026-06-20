@@ -5,7 +5,7 @@ ActivationOps AI is built **adoption-grade**, not production-ready: the architec
 ## Implemented controls
 
 - **Deterministic-first decisions** — risk score, blocker diagnosis, contact/send eligibility, and hold/send are pure deterministic code, pinned **byte-for-byte to the Python v1 oracle** by a differential test (`evals/core-differential.test.ts`). The risky, audited decisions are replayable and regression-locked.
-- **Domain diagnosis layer** (`lib/domain/diagnosis.ts`) — engagement state + root-cause hypothesis + an engagement-routed reactivation play + `blocker_source` (merchant-side nudge vs platform-side ops-escalation). Add-alongside; never mutates the core.
+- **Domain diagnosis layer** (`lib/domain/diagnosis.ts`) — engagement state + root-cause hypothesis + an engagement-routed reactivation play. The `blocker_source` axis (merchant-side nudge vs platform-side ops-escalation) is modeled and the routing is ready, but the **current synthetic data emits merchant-side only** — platform-side is a documented target needing instrumentation, never fabricated. Add-alongside; never mutates the core.
 - **Schema-constrained drafting** — the LLM authors against a Zod contract (`GeneratedDraftSchema`); model output is non-authoritative for the gated decisions.
 - **Claims-gatekeeper** (`lib/agents/gatekeeper.ts`) — every *declared* claim must trace to merchant data; forbidden revenue/impact/urgency/PII patterns + state-consistency are hard blocks; `PASS / WARN / BLOCKED`; only a clean draft is `approvedForHumanReview`.
 - **Bounded LLM with honest fallback** — live Gemini is **off by default** (`lib/server/env-flags.ts`); the deterministic stub is the test path and the live-failure fallback (`FAILED_TO_FALLBACK`), so a failure degrades visibly, never silently.
@@ -48,4 +48,4 @@ ActivationOps AI is built **adoption-grade**, not production-ready: the architec
 
 ## The story to tell
 
-The claim is not that the AI is magic. It is **operational discipline**: deterministic code makes the risky decision · a bounded LLM drafts and explains · the gatekeeper proves every claim against data · a human approves the irreversible action · the audit trail records it · cost is hard-capped. That governance spine — transferable across verticals (see WHY.md) — is what a marketplace, a business analyst, and an engineering lead can actually trust and adopt.
+The claim is not that the AI is magic. It is **operational discipline**: deterministic code makes the risky decision · a bounded LLM drafts and explains · the gatekeeper checks every declared claim against data (+ forbidden-claim patterns) · a human approves the irreversible action · the audit trail records it · cost is hard-capped. That governance spine — transferable across verticals (see WHY.md) — is what a marketplace, a business analyst, and an engineering lead can actually trust and adopt.

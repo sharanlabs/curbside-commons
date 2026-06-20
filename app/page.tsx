@@ -32,7 +32,7 @@ const PIPELINE: Array<{ step: string; plain: string; tech: string }> = [
   { step: "Triage", plain: "Find who's stuck, and how badly.", tech: "Deterministic risk score + level (auditable formula)." },
   { step: "Diagnose", plain: "Pin the exact blocker.", tech: "Onboarding-step → blocker/next-action map." },
   { step: "Draft", plain: "Write the right next message.", tech: "Bounded, schema-constrained LLM (mock here; live = Phase B)." },
-  { step: "Gate", plain: "Check every claim is true.", tech: "Claims-gatekeeper: each claim traces to merchant data; guardrails." },
+  { step: "Gate", plain: "Check every declared claim is true.", tech: "Claims-gatekeeper: each declared claim traces to merchant data; forbidden-claim guardrails." },
   { step: "Score", plain: "Measure draft quality.", tech: "Eval graders: structure · state-consistency · policy." },
   { step: "Approve", plain: "A human decides: hold / reject / send.", tech: "Human-in-the-loop gate; simulated send; full audit trail." },
 ];
@@ -57,8 +57,8 @@ export default function Home() {
       </p>
       <p className="mt-2 max-w-3xl text-sm leading-relaxed text-neutral-500">
         <span className="font-medium text-neutral-600">Technically:</span> deterministic risk + blocker
-        triage → bounded, schema-constrained LLM drafting → a claims-gatekeeper that ties every claim to
-        the merchant&apos;s own data → an eval harness over the output → a human approval gate with an
+        triage → bounded, schema-constrained LLM drafting → a claims-gatekeeper that ties every declared
+        claim to the merchant&apos;s own data → an eval harness over the output → a human approval gate with an
         audit trail. Avoids the false-claim/churn failure the AI-outreach wave is hitting.
       </p>
 

@@ -32,15 +32,25 @@ const generate = async () => ({
 });
 
 describe("live-batch — cumulative ledger holds the $5 cap across the run", () => {
-  it("threads cumulative spend; processes all under a generous cap", async () => {
+  it("threads cumulative spend; processes all under a generous cap; gates+scores every row", async () => {
     const res = await draftBatchLive(merchants, { generate, capUsd: 5 });
     expect(res.processed).toBe(3);
     expect(res.stoppedEarly).toBe(false);
     expect(res.rows.every((r) => r.result.mode === "LIVE_AI")).toBe(true);
+    // no raw LIVE_AI passes through ungated: every row carries a gatekeeper verdict + eval score
+    expect(res.rows.every((r) => !!r.gatekeeper && !!r.evalScore)).toBe(true);
     expect(res.totalCostUsd).toBeGreaterThan(0);
     // total == sum of per-call costs (cumulative accounting)
     const sum = res.rows.reduce((a, r) => a + r.result.costUsd, 0);
     expect(res.totalCostUsd).toBeCloseTo(sum, 10);
+  });
+
+  it("stops the batch (fail-closed) when a live call's usage is unknowable", async () => {
+    const noUsage = async () => ({ object: {}, usage: {} }); // billed-but-no-usage -> UNKNOWN_USAGE
+    const res = await draftBatchLive(merchants, { generate: noUsage, capUsd: 5 });
+    expect(res.processed).toBe(1); // stopped after the first unverifiable row
+    expect(res.stoppedEarly).toBe(true);
+    expect(res.rows[0].result.errorClass).toContain("UNKNOWN_USAGE");
   });
 
   it("stops BEFORE a call that would breach the cumulative cap (fail-closed)", async () => {

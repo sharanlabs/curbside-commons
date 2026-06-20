@@ -20,11 +20,19 @@ function merchant(overrides: Partial<MerchantInput>) {
 }
 
 describe("engagementState — the no-new-fields discriminator", () => {
-  it("classifies new / ghosted / actively_stuck / progressing", () => {
+  it("classifies new / ghosted / dormant / actively_stuck / progressing", () => {
     expect(engagementState(merchant({ days_since_signup: 3 }))).toBe("new");
     expect(engagementState(merchant({ last_login_days_ago: 10, steps_completed: 1 }))).toBe("ghosted");
+    // inactive AFTER making progress = dormant (not "progressing") — Codex P2 fix
+    expect(engagementState(merchant({ last_login_days_ago: 10, steps_completed: 3 }))).toBe("dormant");
     expect(engagementState(merchant({ last_login_days_ago: 2, steps_completed: 1 }))).toBe("actively_stuck");
     expect(engagementState(merchant({ last_login_days_ago: 5, steps_completed: 3 }))).toBe("progressing");
+  });
+
+  it("routes a dormant (inactive-after-progress) merchant to re-engagement, not a bare step nudge", () => {
+    const d = diagnose(merchant({ last_login_days_ago: 10, steps_completed: 3 }));
+    expect(d.engagement_state).toBe("dormant");
+    expect(d.play.touch).toBe("re_engagement");
   });
 });
 

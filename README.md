@@ -10,7 +10,7 @@ A delivery marketplace's signed-up-but-never-live merchants are real lost GMV, a
 
 ## What it does
 
-Deterministic risk + blocker **triage** → a domain **diagnosis** (engagement state + root-cause hypothesis + a reactivation play that varies by *why* they're stuck, not just which step) → **bounded, schema-constrained LLM drafting** → a **claims-gatekeeper** that ties every claim to the merchant's own data → an **eval harness** that scores the draft → a **human-in-the-loop gate** (hold / reject / send) with a full **audit trail** and a **cost ledger**. The design is a direct antidote to the AI-outreach failure frontier (false claims, churn, *Moffatt v. Air Canada*, FTC Operation AI Comply).
+Deterministic risk + blocker **triage** → a domain **diagnosis** (engagement state + root-cause hypothesis + a reactivation play that varies by *why* they're stuck, not just which step) → **bounded, schema-constrained LLM drafting** → a **claims-gatekeeper** that ties every *declared* claim to the merchant's own data (+ forbidden-claim guardrails) → an **eval harness** that scores the draft → a **human-in-the-loop gate** (hold / reject / send) with a full **audit trail** and a **cost ledger**. The design is a direct antidote to the AI-outreach failure frontier (false claims, churn, *Moffatt v. Air Canada*, FTC Operation AI Comply).
 
 ## Today vs target (honest status)
 

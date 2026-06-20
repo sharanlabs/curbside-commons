@@ -17,8 +17,8 @@ export default function EvalPage() {
       <h1 className="text-2xl font-semibold tracking-tight">Eval / Quality</h1>
       <p className="mt-2 max-w-3xl text-[15px] text-neutral-700">
         <span className="font-medium">In plain terms:</span> every drafted message is scored before a
-        human ever sees it — is it well-formed, does it only say things that are true for this merchant,
-        and does it avoid forbidden promises?
+        human ever sees it — is it well-formed, do its declared claims all check out against this
+        merchant&apos;s data, and does it avoid forbidden promises?
       </p>
       <p className="mt-2 max-w-3xl text-sm text-neutral-500">
         <span className="font-medium text-neutral-600">Technically:</span> deterministic graders over the

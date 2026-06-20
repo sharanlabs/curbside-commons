@@ -11,11 +11,16 @@
 import type { Merchant } from "@/lib/core/types";
 import { DEFAULT_BUDGET_CAP_USD } from "@/lib/agents/budget";
 import { draftOutreach, type DraftResult } from "@/lib/agents/draft";
+import { runGatekeeper, type GatekeeperReport } from "@/lib/agents/gatekeeper";
+import { scoreDraft, type DraftScore } from "@/lib/evals/draft-quality";
 import { estimateLiveCallCostUsd, resolvedGeminiModel, type AgentRunUsage } from "@/lib/agents/gemini";
 
 export interface LiveBatchRow {
   merchant: Merchant;
   result: DraftResult;
+  /** Every produced draft is gated + scored before it can be consumed (no raw LIVE_AI passes through). */
+  gatekeeper: GatekeeperReport;
+  evalScore: DraftScore;
 }
 
 export interface LiveBatchResult {
@@ -59,7 +64,16 @@ export async function draftBatchLive(
       generate: opts.generate as never,
     });
     spentUsd += result.costUsd; // accumulate ACTUAL billed cost (incl. billed-but-fallback)
-    rows.push({ merchant, result });
+    // Gate + score EVERY produced draft before it can be consumed (no raw LIVE_AI passes through).
+    const gatekeeper = runGatekeeper(result.draft, merchant, opts.platformName);
+    const evalScore = scoreDraft(result.draft, merchant, opts.platformName);
+    rows.push({ merchant, result, gatekeeper, evalScore });
+    // If a live call billed but its usage was unknowable, the cumulative ledger can't be trusted —
+    // stop the batch (fail-closed) rather than continue spending on an unverifiable meter.
+    if (result.errorClass?.includes("UNKNOWN_USAGE")) {
+      stoppedEarly = true;
+      break;
+    }
   }
 
   return {

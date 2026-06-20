@@ -32,6 +32,7 @@ import {
   resolvedGeminiModel,
 } from "@/lib/agents/gemini";
 import { costUsd } from "@/lib/agents/pricing";
+import { BudgetExceededError } from "@/lib/agents/budget";
 import { sanitizeText, MAX_NAME_LEN } from "@/lib/ingest/sanitize";
 import { liveAiEnabled } from "@/lib/server/env-flags";
 
@@ -152,6 +153,31 @@ function fallback(
   };
 }
 
+/** Read provider usage off a thrown SDK error (e.g. the AI SDK's NoObjectGeneratedError carries usage). */
+function usageFromError(err: unknown): AgentRunUsage | undefined {
+  if (err && typeof err === "object" && "usage" in err) {
+    const u = (err as { usage?: unknown }).usage;
+    if (u && typeof u === "object") return u as AgentRunUsage;
+  }
+  return undefined;
+}
+
+/**
+ * Price a live call. If usage is KNOWN (reported tokens) -> real cost. If a live call happened but
+ * usage is UNKNOWN, we CANNOT record $0 (that would let spend escape the cap) — charge the
+ * conservative pre-call ESTIMATE instead, so the cumulative ledger only ever over-counts.
+ */
+function priceLive(
+  modelId: string,
+  usage: AgentRunUsage | undefined,
+  budget: BudgetContext,
+): { cost: number; known: boolean } {
+  const known = !!usage && (usage.inputTokens != null || usage.outputTokens != null);
+  return known
+    ? { cost: costUsd(modelId, usage.inputTokens, usage.outputTokens), known: true }
+    : { cost: budget.estimatedNextUsd, known: false };
+}
+
 /**
  * Produce an outreach draft. Default = the deterministic stub (no spend). The live path
  * runs only when `live` (default liveAiEnabled()) is true OR an injected `generate` is
@@ -202,30 +228,63 @@ export async function draftOutreach(
       budget,
       generate: opts.generate,
     });
-    // The call billed here (we got usage back) — account its cost on EVERY exit below,
-    // including the parse-failure fallback, so spend is never under-reported.
-    const liveCost = costUsd(modelId, usage.inputTokens, usage.outputTokens);
+    // Price the (billed) call; if usage is unknown after a real call, FAIL CLOSED (charge the
+    // estimate + flag) rather than silently recording $0 — the cap must never be escapable.
+    const priced = priceLive(modelId, usage, budget);
+    if (!priced.known) return fallback(merchant, platformName, "UNKNOWN_USAGE", priced.cost, usage);
+    const liveCost = priced.cost;
+
     const parsed = GeneratedDraftSchema.safeParse(object);
     if (!parsed.success) return fallback(merchant, platformName, "UNPARSEABLE_DRAFT", liveCost, usage);
 
-    // Substitute the sanitized REAL name into the model's output (it only ever saw the
-    // placeholder) — the untrusted name reaches the rendered draft, never the model prompt.
+    // INJECTION-CUT VALIDATION (the model only ever saw the {{MERCHANT}} placeholder). Each failure
+    // below still accounts the billed cost. (a) the placeholder must address the merchant in the
+    // subject/body greeting; (b) the real name must NOT appear in ANY model-authored field
+    // pre-substitution (a leak, or the model guessing it); (c) no unresolved/partial placeholder may
+    // survive substitution in any field.
     const safeName = sanitizeText(merchant.merchant_name, MAX_NAME_LEN);
+    const sub = (s: string) => s.replaceAll(MERCHANT_PLACEHOLDER, safeName);
+    const greeting = `${parsed.data.draft_subject}\n${parsed.data.draft_body}`;
+    const rawAll = [
+      parsed.data.draft_subject,
+      parsed.data.draft_body,
+      parsed.data.risk_explanation,
+      parsed.data.blocker_summary,
+    ].join("\n");
+    if (!greeting.includes(MERCHANT_PLACEHOLDER)) {
+      return fallback(merchant, platformName, "MISSING_PLACEHOLDER", liveCost, usage);
+    }
+    if (safeName.length >= 3 && rawAll.includes(safeName)) {
+      return fallback(merchant, platformName, "NAME_LEAK", liveCost, usage);
+    }
     const draft: OutreachDraft = {
       merchant_id: merchant.merchant_id,
-      risk_explanation: parsed.data.risk_explanation,
-      blocker_summary: parsed.data.blocker_summary,
+      risk_explanation: sub(parsed.data.risk_explanation),
+      blocker_summary: sub(parsed.data.blocker_summary),
       next_best_action: parsed.data.next_best_action,
-      draft_subject: parsed.data.draft_subject.replaceAll(MERCHANT_PLACEHOLDER, safeName),
-      draft_body: parsed.data.draft_body.replaceAll(MERCHANT_PLACEHOLDER, safeName),
+      draft_subject: sub(parsed.data.draft_subject),
+      draft_body: sub(parsed.data.draft_body),
       claims: parsed.data.claims,
       guardrail_flags: [],
       prompt_version: PROMPT_VERSION,
       model_version: modelId,
       schema_version: SCHEMA_VERSION,
     };
+    if (
+      [draft.draft_subject, draft.draft_body, draft.risk_explanation, draft.blocker_summary].some((s) =>
+        s.includes("{{"),
+      )
+    ) {
+      return fallback(merchant, platformName, "UNRESOLVED_PLACEHOLDER", liveCost, usage);
+    }
     return { draft, mode: "LIVE_AI", modelId, costUsd: liveCost, usage };
   } catch (err) {
-    return fallback(merchant, platformName, err instanceof Error ? err.message : "DRAFT_CALL_THREW");
+    // A pre-call budget breach never billed -> $0 is correct. Any OTHER throw may have billed
+    // (SDK errors can carry usage); price it, and if usage is unknown charge the estimate (fail-closed).
+    if (err instanceof BudgetExceededError) return fallback(merchant, platformName, err.message);
+    const usage = usageFromError(err);
+    const priced = priceLive(modelId, usage, budget);
+    const base = err instanceof Error ? err.message : "DRAFT_CALL_THREW";
+    return fallback(merchant, platformName, priced.known ? base : `${base} | UNKNOWN_USAGE`, priced.cost, usage);
   }
 }

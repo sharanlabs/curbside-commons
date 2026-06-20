@@ -25,7 +25,7 @@
  */
 import type { Merchant } from "@/lib/core/types";
 
-export type EngagementState = "new" | "actively_stuck" | "ghosted" | "progressing";
+export type EngagementState = "new" | "actively_stuck" | "ghosted" | "dormant" | "progressing";
 export type Touch = "self_serve_nudge" | "re_engagement" | "ops_escalation" | "high_touch" | "wait";
 export type BlockerSource = "merchant_side" | "platform_side";
 export type BlockerGroup = "A_step_aligned" | "B_cross_cutting";
@@ -61,11 +61,12 @@ interface BlockerMeta {
 }
 
 /**
- * The 6 onboarding blockers are all Group-A (step-aligned), merchant-side. The taxonomy is
- * intentionally broader than the data: platform-side (B6) blockers exist in reality
- * (duplicate location, virtual-brand/self-delivery detected, already-live, fraud hold) but
- * are NOT in the synthetic self-serve model — they are an instrumentation target, labeled
- * as such in classifyPlatformSide(), never fabricated into a merchant's record.
+ * The 6 onboarding blockers are all Group-A (step-aligned), merchant-side. HONEST SCOPE: the
+ * current synthetic model emits ONLY merchant_side — there is no platform-side classifier, and no
+ * merchant in this data is ever labeled platform_side. Platform-side (B6) blockers (duplicate
+ * location, virtual-brand/self-delivery detected, already-live, fraud hold) are real but require
+ * instrumentation (a `blocker_source` signal). The play() routing keeps a platform_side branch
+ * READY for that signal, but it never fires on the current data — a documented target, not faked.
  */
 const BLOCKER_META: Record<string, BlockerMeta> = {
   business_verification_needed: {
@@ -127,9 +128,10 @@ const FALLBACK_META: BlockerMeta = {
  */
 export function engagementState(m: Merchant): EngagementState {
   if (m.days_since_signup < 7) return "new";
-  if (m.last_login_days_ago >= 7 && m.steps_completed <= 1) return "ghosted";
+  if (m.last_login_days_ago >= 7 && m.steps_completed <= 1) return "ghosted"; // inactive + barely started
+  if (m.last_login_days_ago >= 7) return "dormant"; // inactive AFTER making progress (lost momentum)
   if (m.last_login_days_ago <= 3 && m.steps_completed < 5) return "actively_stuck";
-  return "progressing";
+  return "progressing"; // recently active, mid-progress
 }
 
 function play(meta: BlockerMeta, state: EngagementState): ReactivationPlay {
@@ -153,6 +155,12 @@ function play(meta: BlockerMeta, state: EngagementState): ReactivationPlay {
         action: `Re-engage first (value-prove + a time-limited reason to return), THEN: ${meta.nudge}`,
         rationale: "Inactive + barely started = a motivation/value gap; a step-only nudge to a disengaged merchant fails (research: generic-vs-matched outreach).",
       };
+    case "dormant":
+      return {
+        touch: "re_engagement",
+        action: `Re-engage acknowledging their earlier progress, THEN: ${meta.nudge}`,
+        rationale: "Advanced through onboarding, then went inactive — momentum lost; re-engage before the step nudge (a step-only nudge to a quiet merchant under-performs).",
+      };
     case "actively_stuck":
       return {
         touch: "self_serve_nudge",
@@ -171,6 +179,9 @@ function play(meta: BlockerMeta, state: EngagementState): ReactivationPlay {
 function rootCause(meta: BlockerMeta, state: EngagementState): string {
   if (state === "ghosted") {
     return `Stalled early and disengaged — likely a motivation/value gap, not a ${meta.label.toLowerCase()} problem per se.`;
+  }
+  if (state === "dormant") {
+    return `Made progress then went inactive — likely lost momentum/motivation; re-engage before the ${meta.label.toLowerCase()} nudge.`;
   }
   if (state === "new") {
     return `Recently signed up; sitting at ${meta.label.toLowerCase()} is expected this early, not yet a stall.`;
