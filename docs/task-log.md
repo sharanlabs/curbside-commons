@@ -1,5 +1,21 @@
 # Task Log
 
+## 2026-06-19 (build session 2 — THIN VERTICAL SLICE complete + GREEN; at the Codex gate, then owner commit+deploy gates)
+
+### Professional Process Applied
+Task type: execution (autonomous build via `/autopilot`) · Stage: execution (walking skeleton) · Risk: HIGH (architecture · AI behavior · data sourcing · public surface) · Mode: FULL · **Effort: MAX (auto-routed — ship-gating/architecture)** · Basis: canonical plan `~/.claude/plans/gentle-forging-starlight.md` + resilix house patterns + 3 advisor cross-checks · Validation: `npm run typecheck/lint/test/build` all GREEN (41 tests, differential byte-identical, 23 pages prerendered) + Codex changed-files review (running) · Docs: PROJECT_STATE/CURRENT_TASK/HANDOFF/decision-log/tooling-ledger synced · Codex review: via `~/claude-os/bin/codex-guarded` · Human approval: **commit + Vercel deploy owner-gated (PAUSE).**
+
+### What was done
+- Built the full **thin vertical slice** (one merchant → end-to-end), all add-alongside — **`lib/core/*` + the golden differential lane untouched**: (1) hybrid dataset (real DataSF SF entities + deterministic synthetic overlay; adapter/sanitizer/guards in `lib/ingest/`; frozen `lib/data/sf-entities.snapshot.json`, PII-scrubbed; **NAICS measured sector-level → Restaurant/Retail crosswalk**); (2) bounded Gemini draft (`lib/agents/{budget,pricing,gemini,draft}.ts` + `lib/server/env-flags.ts`; $5 fail-closed budget; mock/live/FAILED_TO_FALLBACK; **live OFF, $0 spend**); (3) claims-gatekeeper (`lib/agents/gatekeeper.ts`); (4) draft-quality eval (`lib/evals/draft-quality.ts`, corrupted-record teeth); (5) REPLAY orchestrator (`lib/replay/run.ts`); (6) Overview + Merchant Detail surfaces (`app/`, de-branded "Curbside Commons").
+- **Git-drift corrected** — session-1 scaffold+core+state-sync are committed (`4de4503`); the "surface commit gate first" handoff step was already resolved by the owner.
+- **Advisor caught + fixed:** the untracked-files-invisible-to-a-diff-review footgun (→ `git add -N` before Codex), an "independent oracle" comment overclaim (fixed), and banked the Phase-B prompt-injection item.
+
+### Compliance / scope
+Within the approved plan (no scope change). Slice **uncommitted**, intent-to-added for the Codex diff. **No commit/deploy** (owner-gated, RULES §12). Honesty: simulated/synthetic labels present; live AI off; $0 spend; no real-merchant claims.
+
+### Next step
+Finish the Codex review (`/tmp/codex-verdict-activationops.md`) → apply accepted findings → **surface to owner: commit (grouped) + Vercel deploy** → widen Phases A→D with the Phase-B binding items (HANDOFF).
+
 ## 2026-06-19 (MAJOR PIVOT — goal rebuilt to a deployed, industry-adoptable AI product; owner full-liberty GO; plan approved; /autopilot engaged; build deferred to a fresh session)
 
 ### Professional Process Applied
