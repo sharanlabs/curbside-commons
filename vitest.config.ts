@@ -12,10 +12,15 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text-summary", "json-summary"],
       // Cover the deterministic business logic + API routes. Demo/seed data and
-      // type decls carry no logic; tests cover themselves. Thresholds are added
-      // as a ratchet once real lib/ code lands (Phase A).
+      // type decls carry no logic; tests cover themselves.
       include: ["lib/**/*.ts", "app/api/**/*.ts"],
       exclude: ["lib/data/**", "**/*.d.ts"],
+      // Ratchet (Phase-A): a floor set just below the achieved coverage (statements
+      // ~85 / branches ~75 / functions ~88 / lines ~89). Guards regressions; enforced on
+      // `npm run coverage`. The inherently-network Gemini REST helpers (live ListModels /
+      // generateObject) are exercised only by the key-gated live test, so the floor leaves
+      // headroom for them. Raise as coverage rises.
+      thresholds: { statements: 80, branches: 70, functions: 80, lines: 80 },
     },
   },
   resolve: {
