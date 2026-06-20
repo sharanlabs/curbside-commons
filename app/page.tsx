@@ -43,16 +43,11 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-12">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-          ActivationOps AI · {PLATFORM_NAME}
-        </p>
-        <span className="rounded-full bg-neutral-900 px-2.5 py-1 text-[11px] font-medium text-white">
-          Prototype · REPLAY · $0.00 spend
-        </span>
-      </div>
+      <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+        {PLATFORM_NAME} · stalled-merchant activation
+      </p>
 
-      <h1 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight">
+      <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight">
         Activate stalled, long-tail merchants — responsibly.
       </h1>
       <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-neutral-700">
