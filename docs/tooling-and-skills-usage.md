@@ -49,4 +49,6 @@
 | **TaskCreate / TaskUpdate** (harness) | Used | 2026-06-19 | Tracked the 7 slice stages for visibility + resumability | Lightweight session-scoped tracking alongside the durable repo state docs. |
 | **node --experimental-strip-types** | Used | 2026-06-19 | Ran the zero-dep snapshot generator (`scripts-ts/build-hybrid-snapshot.mjs`) | Avoided adding a `tsx` dev dependency for a one-time generator. |
 
+| **research-specialist** (subagent) | Used | 2026-06-19 (goal mode) | Cited domain research (delivery-marketplace merchant-onboarding blocker taxonomy + reactivation plays + 2026 incumbents/failure frontier) for the Phase-B diagnosis layer | High value — structured, cited, honestly-flagged digest (the discrimination test; the actively-stuck/ghosted discriminator; platform-side blockers as the under-modeled category). Saved to `docs/research/merchant-activation-domain-2026-06-19.md`; drove `lib/domain/diagnosis.ts`. Read-only + quarantined. |
+
 *Rows are appended as work proceeds (e.g., during the rebuild: which skills/tools the build actually used).*

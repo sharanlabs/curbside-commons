@@ -1,5 +1,23 @@
 # Task Log
 
+## 2026-06-19 (build session 2, continued — goal mode: Phases B + C + D-docs done + committed + green; live path ready for the owner key)
+
+### Professional Process Applied
+Task type: execution (goal mode — owner: "have a goal mode complete it" + "continue building") · Stage: execution (Phases B→D) · Risk: HIGH (architecture · AI · public docs) · Mode: FULL · **Effort: MAX (auto-routed)** · Basis: canonical plan + a `research-specialist` cited digest + resilix patterns + advisor cross-checks · Validation: `typecheck/lint/test/build` GREEN (50 tests; all routes prerender) · Codex: original slice reviewed; the B/C/D + live-hardening batch to be Codex-reviewed before deploy / with the live run · Human approval: commits = standing goal-mode approval (local-only, reversible); live spend + deploy + platform-name = owner-gated.
+
+### What was done
+- **Phase B domain depth** (`3c1540b`) — `lib/domain/diagnosis.ts`: engagement state + engagement-routed reactivation play + blocker_source; cited (`docs/research/merchant-activation-domain-2026-06-19.md`); add-alongside (core/differential untouched); surfaced on Merchant Detail.
+- **Phase C console** (`3ca6986`) — nav + Eval/Quality · Metrics · Audit · Cost surfaces (a11y-minded).
+- **Live-path hardening** (`b0acef4`) — injection cut (placeholder substitution; untrusted name never reaches the model) + cumulative budget ledger (`lib/agents/live-batch.ts`, fail-closed across a run). These are the Codex-P1 pre-live items.
+- **Phase D docs** (`89c7a00`) — `docs/WHY.md` (full why-chain + cross-industry note) + honest today-vs-target README rewrite (de-branded).
+- Reached the **autonomous frontier**: everything not owner-gated is built + green + committed. Live Gemini run (the headline) is owner-gated on the key (offered; safe-`.env` instructions given).
+
+### Compliance / scope
+Within the approved plan. All committed locally (no push). lib/core + the golden differential lane untouched. Honesty: simulated/synthetic labels; live AI off ($0 spend); no real-merchant claims.
+
+### Next step
+**T12 live Gemini run** (owner key + <$5) per the HANDOFF "READY FOR THE LIVE RUN" checklist → then **T13 deploy** (owner) ; **T10 full Playwright** deferred (build render-smokes pages); **T11 doc polish** optional.
+
 ## 2026-06-19 (build session 2 — THIN VERTICAL SLICE complete + GREEN; at the Codex gate, then owner commit+deploy gates)
 
 ### Professional Process Applied
