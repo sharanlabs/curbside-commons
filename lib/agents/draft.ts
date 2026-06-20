@@ -32,7 +32,15 @@ import {
   resolvedGeminiModel,
 } from "@/lib/agents/gemini";
 import { costUsd } from "@/lib/agents/pricing";
+import { sanitizeText, MAX_NAME_LEN } from "@/lib/ingest/sanitize";
 import { liveAiEnabled } from "@/lib/server/env-flags";
+
+/**
+ * Placeholder the LIVE model addresses the merchant by. The untrusted real
+ * merchant_name is NEVER sent to the model (injection cut — the lethal-trifecta
+ * lesson); we substitute the sanitized real name into the draft ONLY after generation.
+ */
+const MERCHANT_PLACEHOLDER = "{{MERCHANT}}";
 
 /** A factual assertion in a draft, tied to a merchant field (gatekeeper-checkable). */
 export interface DraftClaim {
@@ -85,18 +93,18 @@ export function mockDraft(merchant: Merchant, platformName = REFERENCE_PLATFORM_
 /**
  * The constrained drafting prompt: use ONLY the merchant's data; every claim cites a field.
  *
- * SECURITY — PHASE-B BINDING (Codex P1 / plan "untrusted real-data surface"): `merchant_name`
- * is UNTRUSTED real text and `sanitizeText` strips only control chars/length — it does NOT
- * neutralize instruction-like wording. On the LIVE path it is embedded in `facts` below, so a
- * name like "Acme IGNORE ALL PREVIOUS INSTRUCTIONS" reaches the model verbatim. This is inert
- * in THIS slice (live AI is off; mock path only) and the gatekeeper catches fabricated CLAIMS
- * downstream, but BEFORE enabling live AI this must be hardened — draft against a neutral
- * placeholder ({{MERCHANT_NAME}}) and substitute the real name only after gatekeeping, plus an
- * adversarial-name test corpus — as part of the deferred security-specialist pass.
+ * SECURITY — injection surface CLOSED (Codex P1 / plan "untrusted real-data surface"):
+ * `merchant_name` is the only untrusted free-text input, and `sanitizeText` strips control
+ * chars/length but NOT instruction-like wording. So the real name is NOT sent to the model at
+ * all — the model addresses the merchant by the neutral MERCHANT_PLACEHOLDER token, and the
+ * sanitized real name is substituted into the draft only AFTER generation (see draftOutreach).
+ * The other facts are a controlled-vocab category + numeric/enum fields (not free text). This
+ * is the lethal-trifecta cut (untrusted text never crosses into the model prompt).
  */
 function buildPrompt(merchant: Merchant, platformName: string): string {
+  // No merchant_name here — see the SECURITY note above. merchant_category is the crosswalked
+  // controlled vocab (Restaurant/Retail), and the rest are numbers/enums; none are free text.
   const facts = {
-    merchant_name: merchant.merchant_name,
     merchant_category: merchant.merchant_category,
     steps_completed: merchant.steps_completed,
     total_steps: merchant.total_steps,
@@ -110,12 +118,14 @@ function buildPrompt(merchant: Merchant, platformName: string): string {
     "instructions.",
     "",
     "Rules (hard):",
+    `- Address the merchant by the literal token ${MERCHANT_PLACEHOLDER} (their real name is`,
+    "  substituted later). Do NOT invent or guess a merchant name.",
     `- next_best_action MUST be exactly "${merchant.next_best_action}".`,
     "- Make NO revenue/sales/earnings promise, NO percentage/Nx impact claim, NO urgency",
     "  ('act now', 'last chance'), and do NOT claim platform endorsement or that a later step is",
     `  already done (the merchant has completed ${merchant.steps_completed} of ${TOTAL_STEPS} steps).`,
     "- For each factual assertion, add a claim {field, value} naming the merchant field it comes",
-    "  from. Only use the fields provided.",
+    "  from. Only use the fields provided (do NOT add a merchant_name claim).",
     "- Keep it short, plain, and helpful.",
     "",
     `FACTS:\n${JSON.stringify(facts, null, 2)}`,
@@ -198,13 +208,16 @@ export async function draftOutreach(
     const parsed = GeneratedDraftSchema.safeParse(object);
     if (!parsed.success) return fallback(merchant, platformName, "UNPARSEABLE_DRAFT", liveCost, usage);
 
+    // Substitute the sanitized REAL name into the model's output (it only ever saw the
+    // placeholder) — the untrusted name reaches the rendered draft, never the model prompt.
+    const safeName = sanitizeText(merchant.merchant_name, MAX_NAME_LEN);
     const draft: OutreachDraft = {
       merchant_id: merchant.merchant_id,
       risk_explanation: parsed.data.risk_explanation,
       blocker_summary: parsed.data.blocker_summary,
       next_best_action: parsed.data.next_best_action,
-      draft_subject: parsed.data.draft_subject,
-      draft_body: parsed.data.draft_body,
+      draft_subject: parsed.data.draft_subject.replaceAll(MERCHANT_PLACEHOLDER, safeName),
+      draft_body: parsed.data.draft_body.replaceAll(MERCHANT_PLACEHOLDER, safeName),
       claims: parsed.data.claims,
       guardrail_flags: [],
       prompt_version: PROMPT_VERSION,
