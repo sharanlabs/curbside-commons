@@ -43,6 +43,7 @@ Single stack: **Next.js (App Router) · TypeScript · Tailwind v4 · React 19**,
 ## Key documents
 
 - **`docs/WHY.md`** — the decision rationale (every load-bearing "why", each naming the rejected alternative + its cost).
+- **`docs/ENTERPRISE-READINESS.md`** — controls inventory · demo boundaries · honest production gaps · the adapter-based **adoption contract** + expansion path.
 - `~/.claude/plans/gentle-forging-starlight.md` — the canonical goal, DoD, phases, and binding blindspots.
 - `docs/research/merchant-activation-domain-2026-06-19.md` — the cited domain research behind the diagnosis layer.
 - `lib/data/PROVENANCE.md` — the hybrid-data source/license/PII label.
