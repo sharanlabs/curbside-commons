@@ -35,3 +35,6 @@ coverage/
 # Playwright (Phase C)
 playwright-report/
 test-results/
+
+# UI-redesign exploration screenshots — regenerable (large PNGs); the source mockups/*.html are tracked.
+mockups/shots/

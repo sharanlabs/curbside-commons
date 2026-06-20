@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ActivationOps AI — Reactivate stalled merchants, safely</title>
+<meta name="description" content="ActivationOps AI finds stalled pre-live merchants, diagnoses why they're stuck, drafts a claim-checked next message, and keeps a human in control — built to be measured, audited, and adopted." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     ActivationOps AI — Premium Enterprise Trust landing
+     Design language: Stripe/Mercury/Arc-grade. Deep indigo accent
+     on near-white, soft realistic shadows, gently rounded surfaces,
+     a polished animated pipeline spine, refined console preview.
+     Self-contained: inline CSS + inline SVG + minimal vanilla JS.
+     ============================================================ */
+
+  :root {
+    /* Tonal indigo scale (deep, confident, desaturated — not "AI purple") */
+    --indigo-50:  #eef1fb;
+    --indigo-100: #dde3f7;
+    --indigo-200: #bcc7ef;
+    --indigo-300: #93a3e2;
+    --indigo-400: #6b7fd1;
+    --indigo-500: #4b5bbd;
+    --indigo-600: #3a45a0;
+    --indigo-700: #2f3781;
+    --indigo-800: #272e66;
+    --indigo-900: #1f244f;
+    --ink-950:    #14162b;
+
+    /* Neutrals — warm-cool slate, kept consistent throughout */
+    --paper:    #fbfbfd;
+    --surface:  #ffffff;
+    --line:     #e7e8ef;
+    --line-2:   #eef0f5;
+    --slate-900:#1a1c2b;
+    --slate-700:#3b3f54;
+    --slate-600:#54596f;
+    --slate-500:#6c7188;
+    --slate-400:#9499ac;
+
+    /* Status semantics carried from the product surface */
+    --emerald-700:#047857; --emerald-50:#ecfdf5; --emerald-line:#bbf7d0;
+    --amber-700: #b45309;  --amber-50: #fffbeb;  --amber-line: #fde68a;
+    --red-700:   #b91c1c;  --red-50:   #fef2f2;  --red-line:   #fecaca;
+
+    --accent: var(--indigo-600);
+    --accent-deep: var(--indigo-800);
+
+    /* Soft, realistic, layered shadows tinted to the page hue */
+    --shadow-sm:  0 1px 2px rgba(31,36,79,.06), 0 1px 1px rgba(31,36,79,.04);
+    --shadow-md:  0 4px 12px -2px rgba(31,36,79,.08), 0 2px 6px -2px rgba(31,36,79,.05);
+    --shadow-lg:  0 18px 40px -16px rgba(31,36,79,.18), 0 8px 18px -10px rgba(31,36,79,.10);
+    --shadow-xl:  0 40px 80px -28px rgba(31,36,79,.26), 0 16px 32px -16px rgba(31,36,79,.12);
+    --ring-focus: 0 0 0 3px rgba(58,69,160,.35);
+
+    --radius-sm: 10px;
+    --radius:    16px;
+    --radius-lg: 22px;
+    --radius-xl: 30px;
+
+    --maxw: 1180px;
+    --easing: cubic-bezier(.16,1,.3,1);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(75,91,189,.07), transparent 60%),
+      radial-gradient(900px 500px at -5% 8%, rgba(75,91,189,.05), transparent 55%),
+      var(--paper);
+    color: var(--slate-700);
+    font-family: "Spline Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3 { color: var(--slate-900); margin: 0; }
+  .display {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.04;
+  }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  .mono { font-family: "Spline Sans Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  ::selection { background: var(--indigo-100); color: var(--indigo-900); }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
+
+  /* keyboard focus — always visible */
+  a:focus-visible, button:focus-visible {
+    outline: none;
+    box-shadow: var(--ring-focus);
+    border-radius: 8px;
+  }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .eyebrow svg { width: 15px; height: 15px; }
+
+  .lede { font-size: 19px; color: var(--slate-600); line-height: 1.6; }
+
+  /* ---------- Nav ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 60;
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    background: rgba(251,251,253,.72);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s var(--easing), background .3s var(--easing);
+  }
+  header.nav.scrolled { border-bottom-color: var(--line); background: rgba(251,251,253,.85); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 70px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 600; color: var(--slate-900); font-size: 16px; letter-spacing: -.01em; }
+  .brand .logomark {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(155deg, var(--indigo-500), var(--indigo-800));
+    display: grid; place-items: center; box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.18);
+  }
+  .brand .logomark svg { width: 19px; height: 19px; }
+  .nav-links { display: flex; align-items: center; gap: 30px; }
+  .nav-links a.link { font-size: 14.5px; font-weight: 500; color: var(--slate-600); transition: color .2s var(--easing); }
+  .nav-links a.link:hover { color: var(--slate-900); }
+  @media (max-width: 860px) { .nav-links a.link { display: none; } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: inherit; font-size: 14.5px; font-weight: 600;
+    padding: 11px 18px; border-radius: 11px; cursor: pointer;
+    border: 1px solid transparent; transition: transform .18s var(--easing), box-shadow .25s var(--easing), background .2s var(--easing); white-space: nowrap;
+  }
+  .btn svg { width: 16px; height: 16px; }
+  .btn-primary {
+    background: linear-gradient(180deg, var(--indigo-600), var(--indigo-700));
+    color: #fff; box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.16);
+  }
+  .btn-primary:hover { box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.2); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost { background: var(--surface); color: var(--slate-900); border-color: var(--line); box-shadow: var(--shadow-sm); }
+  .btn-ghost:hover { border-color: var(--indigo-200); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+  /* ---------- Reveal animation ---------- */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .8s var(--easing), transform .8s var(--easing); }
+  .reveal.in { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay: .08s; } .reveal.d2 { transition-delay: .16s; }
+  .reveal.d3 { transition-delay: .24s; } .reveal.d4 { transition-delay: .32s; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .float-anim, .pulse-dot, .dash-flow { animation: none !important; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; padding: 64px 0 40px; overflow: hidden; }
+  .hero-grid { display: grid; grid-template-columns: 1.08fr .92fr; gap: 56px; align-items: center; }
+  @media (max-width: 980px) { .hero-grid { grid-template-columns: 1fr; gap: 44px; } }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 100px; padding: 7px 14px 7px 9px;
+    font-size: 13px; font-weight: 500; color: var(--slate-600);
+    box-shadow: var(--shadow-sm); margin-bottom: 26px;
+  }
+  .pill .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); background: var(--indigo-50); padding: 3px 9px; border-radius: 100px;
+  }
+  .hero h1 { font-size: clamp(40px, 5.4vw, 62px); margin-bottom: 22px; }
+  .hero h1 .accent { color: var(--accent-deep); }
+  .hero .lede { max-width: 540px; margin-bottom: 32px; }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .hero-note { margin-top: 22px; font-size: 13.5px; color: var(--slate-500); display: flex; align-items: center; gap: 9px; }
+  .hero-note svg { width: 16px; height: 16px; color: var(--emerald-700); flex: none; }
+
+  /* trust chips under hero */
+  .trust-row { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--line-2); }
+  .trust-chip { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--slate-600); }
+  .trust-chip svg { width: 16px; height: 16px; color: var(--accent); flex: none; }
+
+  /* ---------- Hero console preview ---------- */
+  .console {
+    position: relative; border-radius: var(--radius-lg);
+    background: var(--surface); border: 1px solid var(--line);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+  }
+  .console .float-anim { animation: floaty 7s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+  .console-bar { display: flex; align-items: center; gap: 8px; padding: 13px 16px; border-bottom: 1px solid var(--line-2); background: linear-gradient(180deg, #fff, #fcfcfe); }
+  .console-bar .dots { display: flex; gap: 6px; }
+  .console-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: block; }
+  .console-bar .title { margin-left: 6px; font-size: 12.5px; font-weight: 600; color: var(--slate-500); }
+  .console-bar .badge-live { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--amber-700); background: var(--amber-50); border: 1px solid var(--amber-line); padding: 3px 9px; border-radius: 100px; display: inline-flex; align-items: center; gap: 6px; }
+  .console-body { padding: 18px; }
+
+  .merch-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .merch-head .name { font-family: "Fraunces", serif; font-weight: 500; font-size: 21px; color: var(--slate-900); letter-spacing: -.01em; }
+  .merch-head .cat { font-size: 12.5px; color: var(--slate-500); margin-top: 2px; }
+  .chip { font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 100px; border: 1px solid; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .chip.high { color: var(--red-700); background: var(--red-50); border-color: var(--red-line); }
+  .chip.amber { color: var(--amber-700); background: var(--amber-50); border-color: var(--amber-line); }
+  .chip.green { color: var(--emerald-700); background: var(--emerald-50); border-color: var(--emerald-line); }
+
+  .kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line-2); border: 1px solid var(--line-2); border-radius: var(--radius-sm); overflow: hidden; margin-top: 16px; }
+  .kv { background: var(--surface); padding: 11px 13px; }
+  .kv .k { font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--slate-400); }
+  .kv .v { font-size: 14px; font-weight: 600; color: var(--slate-900); margin-top: 3px; }
+  .kv .v.mono { font-weight: 500; font-size: 13px; }
+
+  .draft-box { margin-top: 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+  .draft-box .dh { display: flex; align-items: center; gap: 8px; padding: 9px 13px; background: var(--indigo-50); border-bottom: 1px solid var(--line-2); font-size: 12px; font-weight: 600; color: var(--indigo-800); }
+  .draft-box .dh svg { width: 14px; height: 14px; }
+  .draft-box .db { padding: 13px; font-size: 13.5px; color: var(--slate-700); line-height: 1.55; }
+  .draft-box .db .hl { background: var(--indigo-50); color: var(--indigo-800); padding: 0 3px; border-radius: 4px; font-weight: 500; }
+
+  .gate-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 11px 13px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--paper); }
+  .gate-row .ico { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--emerald-50); color: var(--emerald-700); flex: none; }
+  .gate-row .ico svg { width: 16px; height: 16px; }
+  .gate-row .gt { font-size: 13px; font-weight: 600; color: var(--slate-900); }
+  .gate-row .gs { font-size: 12px; color: var(--slate-500); }
+  .gate-row .verdict { margin-left: auto; font-size: 11.5px; font-weight: 700; color: var(--amber-700); background: var(--amber-50); border: 1px solid var(--amber-line); padding: 4px 10px; border-radius: 100px; }
+
+  .pulse-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .pulse-dot::after { content:""; position: absolute; inset: -4px; border-radius: 50%; background: currentColor; opacity: .4; animation: pulse 2.4s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(.6); opacity:.5; } 100% { transform: scale(2.4); opacity: 0; } }
+
+  /* ---------- Section scaffolding ---------- */
+  section { padding: 96px 0; }
+  .sec-head { max-width: 680px; margin-bottom: 56px; }
+  .sec-head h2 { font-size: clamp(30px, 3.6vw, 44px); margin: 16px 0 18px; }
+  .sec-head .lede { font-size: 18px; }
+  .sec-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+  .sec-head.center .eyebrow { justify-content: center; width: 100%; }
+
+  /* ---------- Problem ---------- */
+  .problem { background: linear-gradient(180deg, transparent, rgba(255,255,255,.6) 30%, rgba(255,255,255,.6) 70%, transparent); }
+  .prob-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 52px; align-items: center; }
+  @media (max-width: 920px) { .prob-grid { grid-template-columns: 1fr; gap: 40px; } }
+  .prob-list { display: grid; gap: 14px; }
+  .prob-item { display: flex; gap: 15px; align-items: flex-start; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: box-shadow .3s var(--easing), transform .3s var(--easing), border-color .3s var(--easing); }
+  .prob-item:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--indigo-100); }
+  .prob-item .pn { width: 30px; height: 30px; border-radius: 9px; background: var(--indigo-50); color: var(--accent-deep); display: grid; place-items: center; flex: none; font-weight: 700; font-size: 13px; font-family: "Spline Sans Mono", monospace; }
+  .prob-item h3 { font-size: 15.5px; margin-bottom: 4px; }
+  .prob-item p { font-size: 14px; color: var(--slate-600); line-height: 1.55; }
+
+  /* funnel visual */
+  .funnel-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 30px; }
+  .funnel-card .ft { font-size: 13px; font-weight: 600; color: var(--slate-500); letter-spacing: .03em; margin-bottom: 4px; }
+  .funnel-card .fsub { font-size: 12.5px; color: var(--slate-400); margin-bottom: 22px; }
+  .funnel-step { display: flex; align-items: center; gap: 14px; margin-bottom: 11px; }
+  .funnel-step .label { font-size: 13px; font-weight: 500; color: var(--slate-700); width: 116px; flex: none; }
+  .funnel-step .bar-track { flex: 1; height: 30px; border-radius: 8px; background: var(--line-2); overflow: hidden; position: relative; }
+  .funnel-step .bar-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--indigo-400), var(--indigo-600)); width: 0; transition: width 1.1s var(--easing); box-shadow: inset 0 1px 0 rgba(255,255,255,.2); }
+  .funnel-step:last-of-type .bar-fill { background: linear-gradient(90deg, #d97b6b, var(--red-700)); }
+  .funnel-step .pct { font-size: 12.5px; font-weight: 600; color: var(--slate-500); width: 42px; text-align: right; flex: none; font-family: "Spline Sans Mono", monospace; }
+  .funnel-foot { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-2); font-size: 12.5px; color: var(--slate-500); display: flex; align-items: center; gap: 9px; }
+  .funnel-foot svg { width: 16px; height: 16px; color: var(--red-700); flex: none; }
+  .syn-note { font-size: 11px; color: var(--slate-400); margin-top: 8px; }
+
+  /* ---------- Pipeline (the spine) ---------- */
+  .pipeline { background: linear-gradient(180deg, var(--ink-950), var(--indigo-900) 60%, var(--indigo-800)); color: #c9cee6; position: relative; }
+  .pipeline::before { content:""; position:absolute; inset:0; background: radial-gradient(900px 400px at 15% 0%, rgba(107,127,209,.18), transparent 60%); pointer-events: none; }
+  .pipeline .eyebrow { color: var(--indigo-300); }
+  .pipeline h2 { color: #fff; }
+  .pipeline .lede { color: #aab1d0; }
+  .pipeline-layout { display: grid; grid-template-columns: 300px 1fr; gap: 48px; align-items: start; }
+  @media (max-width: 980px) { .pipeline-layout { grid-template-columns: 1fr; gap: 36px; } }
+
+  /* the SVG spine + step nav */
+  .spine-nav { position: sticky; top: 96px; }
+  @media (max-width: 980px) { .spine-nav { position: static; } }
+  .spine-svg { width: 100%; height: auto; display: block; }
+  .step-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; margin-top: 4px; }
+  .step-btn {
+    width: 100%; text-align: left; display: flex; align-items: center; gap: 14px;
+    background: transparent; border: 1px solid transparent; border-radius: 12px;
+    padding: 13px 14px; cursor: pointer; color: #aab1d0; font-family: inherit;
+    transition: background .25s var(--easing), border-color .25s var(--easing), color .25s var(--easing);
+  }
+  .step-btn:hover { background: rgba(255,255,255,.04); }
+  .step-btn.active { background: rgba(107,127,209,.16); border-color: rgba(147,163,226,.35); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+  .step-btn .num { width: 30px; height: 30px; border-radius: 9px; flex: none; display: grid; place-items: center; font-family: "Spline Sans Mono", monospace; font-size: 13px; font-weight: 500; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); color: var(--indigo-200); transition: all .25s var(--easing); }
+  .step-btn.active .num { background: linear-gradient(155deg, var(--indigo-400), var(--indigo-600)); color: #fff; border-color: transparent; }
+  .step-btn .st { font-size: 14.5px; font-weight: 600; }
+  .step-btn .ss { font-size: 11.5px; color: #8990b5; margin-top: 1px; }
+  .step-btn.active .ss { color: var(--indigo-200); }
+
+  .stage-panel { position: relative; min-height: 360px; }
+  .stage {
+    position: absolute; inset: 0; opacity: 0; transform: translateY(14px); pointer-events: none;
+    transition: opacity .55s var(--easing), transform .55s var(--easing);
+  }
+  .stage.show { opacity: 1; transform: none; pointer-events: auto; position: relative; }
+  @media (prefers-reduced-motion: reduce) { .stage { transition: none; } }
+  .stage-card {
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+    border-radius: var(--radius-lg); padding: 34px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05); backdrop-filter: blur(6px);
+  }
+  .stage-card .skicon { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: linear-gradient(155deg, rgba(147,163,226,.22), rgba(58,69,160,.4)); border: 1px solid rgba(147,163,226,.25); margin-bottom: 20px; }
+  .stage-card .skicon svg { width: 24px; height: 24px; color: #dfe4f8; }
+  .stage-card .stage-k { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--indigo-300); }
+  .stage-card h3 { color: #fff; font-size: 26px; margin: 8px 0 14px; font-family: "Fraunces", serif; font-weight: 500; letter-spacing: -.01em; }
+  .stage-card .plain { color: #d3d8ef; font-size: 16.5px; line-height: 1.6; }
+  .stage-card .tech { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.06); font-size: 13.5px; color: #aab1d0; display: flex; gap: 11px; align-items: flex-start; }
+  .stage-card .tech .lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--indigo-300); flex: none; margin-top: 2px; }
+  .stage-out { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 12.5px; font-weight: 600; color: #c9cee6; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); padding: 7px 13px; border-radius: 100px; }
+  .stage-out svg { width: 14px; height: 14px; color: var(--indigo-300); }
+
+  .auto-hint { margin-top: 18px; font-size: 12px; color: #8990b5; display: flex; align-items: center; gap: 8px; }
+  .auto-hint .pulse-dot { color: var(--indigo-300); }
+
+  /* ---------- Merchant example ---------- */
+  .example-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 52px; align-items: center; }
+  @media (max-width: 980px) { .example-grid { grid-template-columns: 1fr; gap: 40px; } }
+  .ex-narrative .step-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--indigo-50); padding: 5px 12px; border-radius: 100px; margin-bottom: 18px; }
+  .ex-flow { display: grid; gap: 0; margin-top: 8px; }
+  .ex-node { display: flex; gap: 16px; position: relative; padding-bottom: 26px; }
+  .ex-node:last-child { padding-bottom: 0; }
+  .ex-node .rail { display: flex; flex-direction: column; align-items: center; flex: none; }
+  .ex-node .rail .knob { width: 34px; height: 34px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); display: grid; place-items: center; color: var(--accent-deep); z-index: 2; }
+  .ex-node .rail .knob svg { width: 17px; height: 17px; }
+  .ex-node .rail .conn { width: 2px; flex: 1; background: linear-gradient(180deg, var(--indigo-200), var(--line)); margin-top: 4px; }
+  .ex-node:last-child .rail .conn { display: none; }
+  .ex-node .body h3 { font-size: 15.5px; margin-bottom: 4px; }
+  .ex-node .body p { font-size: 14px; color: var(--slate-600); }
+  .ex-node .body .tag-mini { font-size: 11px; font-weight: 600; color: var(--slate-500); font-family: "Spline Sans Mono", monospace; }
+
+  /* ---------- Trust ---------- */
+  .trust-sec { background: linear-gradient(180deg, rgba(255,255,255,.7), transparent); }
+  .trust-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 920px) { .trust-grid { grid-template-columns: 1fr; } }
+  .trust-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); transition: box-shadow .3s var(--easing), transform .3s var(--easing), border-color .3s var(--easing); }
+  .trust-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: var(--indigo-100); }
+  .trust-card .tc-ico { width: 48px; height: 48px; border-radius: 13px; display: grid; place-items: center; background: linear-gradient(155deg, var(--indigo-50), var(--indigo-100)); border: 1px solid var(--indigo-100); color: var(--accent-deep); margin-bottom: 20px; }
+  .trust-card .tc-ico svg { width: 24px; height: 24px; }
+  .trust-card h3 { font-size: 17px; margin-bottom: 9px; }
+  .trust-card p { font-size: 14px; color: var(--slate-600); line-height: 1.6; }
+  .trust-card .tc-foot { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line-2); font-size: 12px; font-weight: 600; color: var(--accent); display: inline-flex; align-items: center; gap: 7px; }
+  .trust-card .tc-foot svg { width: 14px; height: 14px; }
+
+  .ledger { margin-top: 30px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 26px; box-shadow: var(--shadow-sm); }
+  .ledger .li { display: inline-flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 500; color: var(--slate-600); }
+  .ledger .li svg { width: 17px; height: 17px; color: var(--emerald-700); flex: none; }
+  .ledger .li .mono { color: var(--slate-900); font-weight: 500; }
+  .ledger .sep { width: 1px; height: 18px; background: var(--line); }
+  @media (max-width: 720px) { .ledger .sep { display: none; } }
+
+  /* ---------- Generalizes ---------- */
+  .gen { background: linear-gradient(165deg, var(--indigo-50), transparent 70%); }
+  .gen-spine { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+  .gen-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 100px; padding: 9px 16px; font-size: 13.5px; font-weight: 600; color: var(--slate-700); box-shadow: var(--shadow-sm); }
+  .gen-chip svg { width: 15px; height: 15px; color: var(--accent); }
+  .gen-arrow { display: grid; place-items: center; color: var(--indigo-300); }
+  .gen-arrow svg { width: 18px; height: 18px; }
+  @media (max-width: 640px) { .gen-arrow { transform: rotate(90deg); } }
+  .gen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
+  @media (max-width: 920px) { .gen-grid { grid-template-columns: 1fr; } }
+  .gen-use { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow-sm); transition: transform .3s var(--easing), box-shadow .3s var(--easing); }
+  .gen-use:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .gen-use .gu-ico { color: var(--accent-deep); margin-bottom: 14px; }
+  .gen-use .gu-ico svg { width: 22px; height: 22px; }
+  .gen-use h3 { font-size: 15.5px; margin-bottom: 6px; }
+  .gen-use p { font-size: 13.5px; color: var(--slate-600); }
+
+  /* ---------- CTA ---------- */
+  .cta { padding: 88px 0; }
+  .cta-card {
+    position: relative; overflow: hidden;
+    background: linear-gradient(155deg, var(--indigo-700), var(--ink-950));
+    border-radius: var(--radius-xl); padding: 64px 56px; text-align: center;
+    box-shadow: var(--shadow-xl);
+  }
+  .cta-card::before { content:""; position:absolute; inset:0; background: radial-gradient(700px 320px at 50% -20%, rgba(147,163,226,.32), transparent 60%); pointer-events: none; }
+  .cta-card .eyebrow { color: var(--indigo-200); justify-content: center; width: 100%; }
+  .cta-card h2 { color: #fff; font-size: clamp(30px, 4vw, 46px); margin: 16px auto 18px; max-width: 640px; }
+  .cta-card p { color: #c0c6e3; font-size: 18px; max-width: 520px; margin: 0 auto 32px; }
+  .cta-card .hero-cta { justify-content: center; }
+  .cta-card .btn-ghost { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.18); box-shadow: none; backdrop-filter: blur(4px); }
+  .cta-card .btn-ghost:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
+  .cta-card .btn-primary { background: #fff; color: var(--indigo-800); }
+  .cta-card .btn-primary:hover { background: #fff; }
+  .cta-card .replay-note { margin-top: 22px; font-size: 13px; color: #9aa1c8; display: inline-flex; align-items: center; gap: 8px; }
+  .cta-card .replay-note svg { width: 15px; height: 15px; }
+
+  /* ---------- Footer ---------- */
+  footer { border-top: 1px solid var(--line); padding: 48px 0 56px; background: var(--paper); }
+  .foot-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; flex-wrap: wrap; margin-bottom: 32px; }
+  .foot-brand { max-width: 360px; }
+  .foot-brand .brand { margin-bottom: 12px; }
+  .foot-brand p { font-size: 13.5px; color: var(--slate-500); line-height: 1.6; }
+  .disclaimer {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 22px; box-shadow: var(--shadow-sm);
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .disclaimer .di { width: 30px; height: 30px; border-radius: 9px; background: var(--amber-50); color: var(--amber-700); display: grid; place-items: center; flex: none; border: 1px solid var(--amber-line); }
+  .disclaimer .di svg { width: 16px; height: 16px; }
+  .disclaimer p { font-size: 12.5px; color: var(--slate-500); line-height: 1.65; }
+  .disclaimer strong { color: var(--slate-700); font-weight: 600; }
+  .foot-base { margin-top: 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--slate-400); }
+
+  /* shared utility */
+  .grid-bg { position: absolute; inset: 0; pointer-events: none; opacity: .5; background-image: linear-gradient(var(--line-2) 1px, transparent 1px), linear-gradient(90deg, var(--line-2) 1px, transparent 1px); background-size: 56px 56px; mask-image: radial-gradient(500px 300px at 75% 30%, #000, transparent 80%); }
+</style>
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label="ActivationOps AI home">
+      <span class="logomark" aria-hidden="true">
+        <!-- spark / activation mark -->
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5 14.2 9.2 21 11.5 14.2 13.8 12 20.5 9.8 13.8 3 11.5 9.8 9.2 12 2.5Z" fill="#fff" opacity=".95"/></svg>
+      </span>
+      ActivationOps&nbsp;AI
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="link" href="#problem">The problem</a>
+      <a class="link" href="#pipeline">How it works</a>
+      <a class="link" href="#trust">Trust &amp; safety</a>
+      <a class="link" href="#generalizes">Generalizes</a>
+      <a class="btn btn-primary" href="#cta">
+        See the walkthrough
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="grid-bg" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy reveal in">
+      <span class="pill">
+        <span class="tag">Replay demo</span>
+        Human-led · AI-assisted · independently auditable
+      </span>
+      <h1 class="display">Reactivate stalled merchants — <span class="accent">without the false promises.</span></h1>
+      <p class="lede">ActivationOps AI finds signed-up-but-never-live merchants, diagnoses <em>why</em> each one is stuck, drafts a claim-checked next message, and keeps a human in control. Built to be measured, audited, and adopted.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#cta">
+          See the live walkthrough
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="#pipeline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>
+          Watch the pipeline
+        </a>
+      </div>
+      <div class="hero-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        Deterministic core makes the risky call. The AI is bounded and evaluated — never autonomous.
+      </div>
+
+      <div class="trust-row" aria-label="Core guarantees">
+        <span class="trust-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+          Every claim traces to data
+        </span>
+        <span class="trust-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          A human owns every send
+        </span>
+        <span class="trust-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Spend hard-capped at $5
+        </span>
+      </div>
+    </div>
+
+    <!-- Console preview -->
+    <div class="hero-console reveal d2 in">
+      <div class="console float-anim">
+        <div class="console-bar">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="title">ActivationOps · Activation Queue</span>
+          <span class="badge-live"><span class="pulse-dot" style="color:var(--amber-700)"></span> Held for review</span>
+        </div>
+        <div class="console-body">
+          <div class="merch-head">
+            <div>
+              <div class="name">Fog City Tacos</div>
+              <div class="cat">Restaurant · Curbside Commons</div>
+            </div>
+            <span class="chip high">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+              High risk · 92
+            </span>
+          </div>
+
+          <div class="kv-grid">
+            <div class="kv"><div class="k">Blocker</div><div class="v">Business verification</div></div>
+            <div class="kv"><div class="k">Onboarding step</div><div class="v">Verify business</div></div>
+            <div class="kv"><div class="k">Engagement</div><div class="v">Stalled · 24d idle</div></div>
+            <div class="kv"><div class="k">Reactivation play</div><div class="v mono">verify_unblock</div></div>
+          </div>
+
+          <div class="draft-box">
+            <div class="dh">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3V4Z"/></svg>
+              Drafted message · schema-constrained
+            </div>
+            <div class="db">Hi Fog City Tacos — you're one step from going live on <span class="hl">Curbside Commons</span>. Your <span class="hl">business verification</span> is still pending; finishing it unlocks orders. Here's the 2-minute link to complete it.</div>
+          </div>
+
+          <div class="gate-row">
+            <span class="ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+            <div>
+              <div class="gt">Claims gate · passed</div>
+              <div class="gs">1 declared claim → verified against merchant data</div>
+            </div>
+            <span class="verdict">Awaiting human</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PROBLEM ===================== -->
+<section class="problem" id="problem">
+  <div class="wrap prob-grid">
+    <div class="prob-copy reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        The lost revenue nobody works
+      </span>
+      <h2 class="display" style="font-size:clamp(30px,3.6vw,44px);margin:16px 0 18px;">A marketplace's signed-up-but-never-live merchants are real GMV, leaking quietly.</h2>
+      <p class="lede" style="margin-bottom:30px;">The long tail is too big to work by hand. Merchants stall somewhere between sign-up and first order — and the reason outreach fails is almost always the same.</p>
+
+      <div class="prob-list">
+        <div class="prob-item">
+          <span class="pn">01</span>
+          <div><h3>The long tail is too big to work by hand</h3><p>Thousands of pre-live merchants, a handful of activation reps. Most never get a tailored touch.</p></div>
+        </div>
+        <div class="prob-item">
+          <span class="pn">02</span>
+          <div><h3>Merchants stall mid-onboarding</h3><p>Verify business → menu → photos → hours → banking → final check. Each step is a place to quietly drop off.</p></div>
+        </div>
+        <div class="prob-item">
+          <span class="pn">03</span>
+          <div><h3>Generic outreach is the #1 failure</h3><p>A blast that ignores the <em>actual</em> blocker reads as spam. Matched-to-the-blocker is what converts.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="prob-visual reveal d2">
+      <div class="funnel-card" id="funnel">
+        <div class="ft">Onboarding drop-off</div>
+        <div class="fsub">Where pre-live merchants stall, step by step</div>
+        <div class="funnel-step"><span class="label">Verify business</span><span class="bar-track"><span class="bar-fill" data-w="100%"></span></span><span class="pct">100</span></div>
+        <div class="funnel-step"><span class="label">Add menu</span><span class="bar-track"><span class="bar-fill" data-w="78%"></span></span><span class="pct">78</span></div>
+        <div class="funnel-step"><span class="label">Upload photos</span><span class="bar-track"><span class="bar-fill" data-w="61%"></span></span><span class="pct">61</span></div>
+        <div class="funnel-step"><span class="label">Set hours</span><span class="bar-track"><span class="bar-fill" data-w="49%"></span></span><span class="pct">49</span></div>
+        <div class="funnel-step"><span class="label">Banking</span><span class="bar-track"><span class="bar-fill" data-w="34%"></span></span><span class="pct">34</span></div>
+        <div class="funnel-step"><span class="label">Final check → live</span><span class="bar-track"><span class="bar-fill" data-w="21%"></span></span><span class="pct">21</span></div>
+        <div class="funnel-foot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 1 21h22L12 2Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>
+          Each step that stalls is recoverable GMV — if you reach them with the right message.
+        </div>
+        <p class="syn-note">Illustrative shape — synthetic activation data, not a real marketplace's funnel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PIPELINE (the spine) ===================== -->
+<section class="pipeline" id="pipeline">
+  <div class="wrap">
+    <div class="sec-head reveal" style="margin-bottom:48px;">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><path d="M10 6.5h4a2 2 0 0 1 2 2V14"/></svg>
+        The pipeline
+      </span>
+      <h2 class="display">Six steps from stalled to safely sent.</h2>
+      <p class="lede">Risk is decided by replayable code. The model only writes — inside a bounded contract — and a human signs off before anything irreversible happens.</p>
+    </div>
+
+    <div class="pipeline-layout reveal d1">
+      <!-- the spine: SVG + step nav -->
+      <div class="spine-nav">
+        <svg class="spine-svg" viewBox="0 0 60 360" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="spineGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#93a3e2"/><stop offset="1" stop-color="#3a45a0"/>
+            </linearGradient>
+          </defs>
+          <line x1="30" y1="20" x2="30" y2="340" stroke="rgba(255,255,255,.1)" stroke-width="2"/>
+          <line id="spineProgress" x1="30" y1="20" x2="30" y2="20" stroke="url(#spineGrad)" stroke-width="3" stroke-linecap="round"/>
+          <!-- 6 nodes -->
+          <g id="spineNodes">
+            <circle class="spine-node" data-i="0" cx="30" cy="20"  r="6" fill="#1f244f" stroke="#93a3e2" stroke-width="2"/>
+            <circle class="spine-node" data-i="1" cx="30" cy="84"  r="6" fill="#1f244f" stroke="#5b66ab" stroke-width="2"/>
+            <circle class="spine-node" data-i="2" cx="30" cy="148" r="6" fill="#1f244f" stroke="#5b66ab" stroke-width="2"/>
+            <circle class="spine-node" data-i="3" cx="30" cy="212" r="6" fill="#1f244f" stroke="#5b66ab" stroke-width="2"/>
+            <circle class="spine-node" data-i="4" cx="30" cy="276" r="6" fill="#1f244f" stroke="#5b66ab" stroke-width="2"/>
+            <circle class="spine-node" data-i="5" cx="30" cy="340" r="6" fill="#1f244f" stroke="#5b66ab" stroke-width="2"/>
+          </g>
+        </svg>
+
+        <ul class="step-list" role="tablist" aria-label="Pipeline steps">
+          <li><button class="step-btn active" role="tab" aria-selected="true" data-step="0">
+            <span class="num">1</span><span><span class="st">Triage</span><span class="ss">Risk score + blocker</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="1">
+            <span class="num">2</span><span><span class="st">Diagnose</span><span class="ss">Root cause + play</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="2">
+            <span class="num">3</span><span><span class="st">Draft</span><span class="ss">Bounded LLM writes</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="3">
+            <span class="num">4</span><span><span class="st">Gate</span><span class="ss">Claims checked</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="4">
+            <span class="num">5</span><span><span class="st">Score</span><span class="ss">Eval graders</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="5">
+            <span class="num">6</span><span><span class="st">Approve</span><span class="ss">Human decides</span></span></button></li>
+        </ul>
+        <div class="auto-hint"><span class="pulse-dot"></span> Auto-advancing — click any step to explore.</div>
+      </div>
+
+      <!-- stage panels -->
+      <div class="stage-panel">
+        <!-- 1 TRIAGE -->
+        <div class="stage show" role="tabpanel" data-panel="0">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span>
+            <span class="stage-k">Step 01 · Deterministic</span>
+            <h3>Triage</h3>
+            <p class="plain">Find who's stuck — and exactly how badly. A transparent risk score and the single blocking step, every time.</p>
+            <div class="tech"><span class="lbl">How</span><span>A deterministic risk score plus the blocker, from an auditable formula. No model touches this call — it's replayable and identical on every run.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: risk level + blocker</span>
+          </div>
+        </div>
+        <!-- 2 DIAGNOSE -->
+        <div class="stage" role="tabpanel" data-panel="1">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v3l2 2"/></svg></span>
+            <span class="stage-k">Step 02 · Deterministic</span>
+            <h3>Diagnose</h3>
+            <p class="plain">Read the engagement state, name the root cause, and pick a reactivation play that varies by <em>why</em> they're stuck — not just by which step they're on.</p>
+            <div class="tech"><span class="lbl">How</span><span>Engagement state from recency × steps × tenure; merchant-vs-platform blocker source; a play matched to the cause, not a one-size message.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: root cause + play</span>
+          </div>
+        </div>
+        <!-- 3 DRAFT -->
+        <div class="stage" role="tabpanel" data-panel="2">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7-3-3-7 7v3h3Z"/><path d="m14 7 3 3"/><path d="M4 20h6"/></svg></span>
+            <span class="stage-k">Step 03 · Bounded LLM</span>
+            <h3>Draft</h3>
+            <p class="plain">Now — and only now — a model writes the message. It works inside a schema-constrained contract and declares every claim it makes.</p>
+            <div class="tech"><span class="lbl">How</span><span>A bounded LLM produces structured output with a typed claims array. The untrusted merchant name never enters the prompt — it's substituted after gating.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: draft + declared claims</span>
+          </div>
+        </div>
+        <!-- 4 GATE -->
+        <div class="stage" role="tabpanel" data-panel="3">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+            <span class="stage-k">Step 04 · Claims gatekeeper</span>
+            <h3>Gate</h3>
+            <p class="plain">Before a human ever sees it, every declared claim is checked against the merchant's own data — and against forbidden-claim guardrails.</p>
+            <div class="tech"><span class="lbl">How</span><span>Each declared claim must trace to merchant data; forbidden claims are blocked outright. Anything unverifiable is held, not sent.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: pass / hold / block</span>
+          </div>
+        </div>
+        <!-- 5 SCORE -->
+        <div class="stage" role="tabpanel" data-panel="4">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><rect x="7" y="11" width="3" height="8" rx="1"/><rect x="12" y="7" width="3" height="12" rx="1"/><rect x="17" y="14" width="3" height="5" rx="1"/></svg></span>
+            <span class="stage-k">Step 05 · Deterministic eval</span>
+            <h3>Score</h3>
+            <p class="plain">Measure the draft's quality with graders that run the same way every time — so quality is a number, not a vibe.</p>
+            <div class="tech"><span class="lbl">How</span><span>Deterministic graders for structure, state-consistency, and policy. Corrupted-record cases have teeth — a bad draft fails loudly.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: graded scores</span>
+          </div>
+        </div>
+        <!-- 6 APPROVE -->
+        <div class="stage" role="tabpanel" data-panel="5">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/><path d="m16 5 1.5 1.5L21 3"/></svg></span>
+            <span class="stage-k">Step 06 · Human-in-the-loop</span>
+            <h3>Approve</h3>
+            <p class="plain">A person makes the final call — hold, reject, or send. Every decision lands in a full audit trail, beside a fail-closed cost ledger.</p>
+            <div class="tech"><span class="lbl">How</span><span>The human owns the irreversible action. Sends are simulated in this demo; spend is hard-capped at $5 and recorded line by line.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: decision + audit record</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MERCHANT EXAMPLE ===================== -->
+<section class="example" id="example">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+        One merchant, end to end
+      </span>
+      <h2 class="display">How "Fog City Tacos" moves through the spine.</h2>
+      <p class="lede">A real moment from the replay: a high-risk, pre-live restaurant blocked on business verification — turned into a held, claim-checked draft awaiting a human.</p>
+    </div>
+
+    <div class="example-grid reveal d1">
+      <!-- the card moment -->
+      <div class="ex-card">
+        <div class="console" style="box-shadow:var(--shadow-lg)">
+          <div class="console-bar">
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="title">Merchant detail · Fog City Tacos</span>
+          </div>
+          <div class="console-body">
+            <div class="merch-head">
+              <div>
+                <div class="name">Fog City Tacos</div>
+                <div class="cat">Restaurant · stalled at verify business</div>
+              </div>
+              <span class="chip high">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                High risk
+              </span>
+            </div>
+            <div class="kv-grid">
+              <div class="kv"><div class="k">Risk decision</div><div class="v mono">deterministic · replayable</div></div>
+              <div class="kv"><div class="k">Blocker</div><div class="v">Business verification</div></div>
+              <div class="kv"><div class="k">Play</div><div class="v mono">verify_unblock</div></div>
+              <div class="kv"><div class="k">Declared claims</div><div class="v">1 · all verified</div></div>
+            </div>
+            <div class="gate-row">
+              <span class="ico" style="background:var(--amber-50);color:var(--amber-700)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+              </span>
+              <div>
+                <div class="gt">Held for human approval</div>
+                <div class="gs">Claims passed · awaiting hold / reject / send</div>
+              </div>
+              <span class="verdict">$0.00 spent</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- narrative flow -->
+      <div class="ex-narrative">
+        <span class="step-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          The trace
+        </span>
+        <div class="ex-flow">
+          <div class="ex-node">
+            <div class="rail"><span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span><span class="conn"></span></div>
+            <div class="body"><span class="tag-mini">TRIAGE</span><h3>Flagged High risk</h3><p>The deterministic score lands it in the queue with one named blocker: business verification.</p></div>
+          </div>
+          <div class="ex-node">
+            <div class="rail"><span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span class="conn"></span></div>
+            <div class="body"><span class="tag-mini">DIAGNOSE</span><h3>Stalled, not churned</h3><p>Engagement state says recoverable — the play becomes a focused "verify your business" nudge.</p></div>
+          </div>
+          <div class="ex-node">
+            <div class="rail"><span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7-3-3-7 7v3h3Z"/></svg></span><span class="conn"></span></div>
+            <div class="body"><span class="tag-mini">DRAFT</span><h3>One claim, declared</h3><p>The bounded model writes the message and declares exactly one claim: "verification is pending."</p></div>
+          </div>
+          <div class="ex-node">
+            <div class="rail"><span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="conn"></span></div>
+            <div class="body"><span class="tag-mini">GATE</span><h3>Claim checks out</h3><p>The gatekeeper matches the claim to the merchant's record. No forbidden claims present.</p></div>
+          </div>
+          <div class="ex-node">
+            <div class="rail"><span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span></div>
+            <div class="body"><span class="tag-mini">APPROVE</span><h3>Held for a human</h3><p>It waits. A person decides hold / reject / send — the system never sends on its own.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TRUST & SAFETY ===================== -->
+<section class="trust-sec" id="trust">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></svg>
+        Why a marketplace exec can trust it
+      </span>
+      <h2 class="display">A direct antidote to the AI-outreach failure frontier.</h2>
+      <p class="lede">False claims, churn from spammy blasts, regulatory liability — the known failure modes of "let AI message customers." This system is designed against each one.</p>
+    </div>
+
+    <div class="trust-grid reveal d1">
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span>
+        <h3>Deterministic where it counts</h3>
+        <p>The risky call — who's at risk and why — is made by code, not a model. Same inputs, same output, every replay.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Replayable by design</span>
+      </div>
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+        <h3>The AI is bounded, never autonomous</h3>
+        <p>The model only writes, inside a schema, with declared claims. It can't decide, can't act, and can't send.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg> Constrained output only</span>
+      </div>
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+        <h3>Every declared claim traces to data</h3>
+        <p>The gatekeeper checks each claim against the merchant's own record, and blocks forbidden claims outright.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> No unverifiable promises</span>
+      </div>
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span>
+        <h3>A human owns every irreversible send</h3>
+        <p>Nothing leaves the system without a person choosing to send it. The default is to hold, not to act.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Human-in-the-loop gate</span>
+      </div>
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+        <h3>Spend is hard-capped at $5</h3>
+        <p>A fail-closed cost ledger records every model call. Hit the cap and the system stops — it never overspends quietly.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Fail-closed budget</span>
+      </div>
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg></span>
+        <h3>The public demo is replay-only</h3>
+        <p>No live calls leave this walkthrough. What you see is a recorded run — auditable, repeatable, and safe to share.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Recorded fixture</span>
+      </div>
+    </div>
+
+    <div class="ledger reveal d2" aria-label="Live audit summary">
+      <span class="li"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Audit trail <span class="mono">on every decision</span></span>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="li"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Cost ledger <span class="mono">$0.00 in replay · cap $5.00</span></span>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="li"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></svg> Claims gate <span class="mono">100% of declared claims checked</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GENERALIZES ===================== -->
+<section class="gen" id="generalizes">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+        Why it generalizes
+      </span>
+      <h2 class="display">The same spine works far beyond merchant activation.</h2>
+      <p class="lede">Deterministic triage → bounded LLM → claims-gate → eval → human approval → audit. Any problem shaped like "use AI to act on people or accounts at scale, safely" can stand on it.</p>
+    </div>
+
+    <div class="gen-spine reveal d1">
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg> Deterministic triage</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7-3-3-7 7v3h3Z"/></svg> Bounded LLM</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></svg> Claims gate</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg> Eval</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/></svg> Human approval</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Audit</span>
+    </div>
+
+    <div class="gen-grid reveal d2">
+      <div class="gen-use">
+        <span class="gu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3z"/><path d="M3 7l3-4h12l3 4"/><path d="M8 11h8"/></svg></span>
+        <h3>Dormant-account winback</h3>
+        <p>Score churn risk in code, draft a matched re-engagement note, verify the offer, hold for a rep.</p>
+      </div>
+      <div class="gen-use">
+        <span class="gu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg></span>
+        <h3>Collections &amp; dunning</h3>
+        <p>Deterministic severity tiers, a bounded reminder, every amount and date checked before a human sends.</p>
+      </div>
+      <div class="gen-use">
+        <span class="gu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M17 11h5M19.5 8.5v5"/></svg></span>
+        <h3>Onboarding &amp; KYC nudges</h3>
+        <p>Pinpoint the stuck step, write the right prompt, gate the claims, keep a person on the irreversible action.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="cta" id="cta">
+  <div class="wrap">
+    <div class="cta-card reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>
+        Replay walkthrough
+      </span>
+      <h2 class="display">See a stalled merchant become a safely-sent message.</h2>
+      <p>Walk the full spine — triage to audit — on the recorded run. No live calls, no spend, every claim traceable.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#top">
+          See the live walkthrough
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="#pipeline">Review the pipeline</a>
+      </div>
+      <span class="replay-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></svg>
+        Replay-only · $0.00 spend · human-led, AI-assisted, professionally reviewed
+      </span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <span class="brand">
+          <span class="logomark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5 14.2 9.2 21 11.5 14.2 13.8 12 20.5 9.8 13.8 3 11.5 9.8 9.2 12 2.5Z" fill="#fff" opacity=".95"/></svg></span>
+          ActivationOps&nbsp;AI
+        </span>
+        <p>Finds stalled, pre-live merchants, diagnoses why they're stuck, drafts a claim-checked next message, and keeps a human in control — built to be measured, audited, and adopted.</p>
+      </div>
+
+      <div class="disclaimer" role="note" style="max-width:560px;flex:1;min-width:300px;">
+        <span class="di" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        </span>
+        <p><strong>Independent demo.</strong> ActivationOps AI is not affiliated with, endorsed by, or connected to DoorDash, Uber Eats, Grubhub, or DataSF. "Curbside Commons" is a fictional marketplace; all merchant names are fictional and activation data is synthetic. This is a replay-only walkthrough that makes <strong>no real-impact claims</strong>.</p>
+      </div>
+    </div>
+
+    <div class="foot-base">
+      <span>Human-led · AI-assisted · professionally reviewed.</span>
+      <span class="mono">Replay build · synthetic data · no live calls</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- sticky nav border ---- */
+  var nav = document.getElementById('nav');
+  function onScroll() { if (window.scrollY > 8) nav.classList.add('scrolled'); else nav.classList.remove('scrolled'); }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  /* ---- scroll reveal ---- */
+  var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  if (reduce || !('IntersectionObserver' in window)) {
+    reveals.forEach(function (el) { el.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+    reveals.forEach(function (el) { if (!el.classList.contains('in')) io.observe(el); });
+  }
+
+  /* ---- funnel bars animate when visible ---- */
+  var funnel = document.getElementById('funnel');
+  if (funnel) {
+    function fillBars() { funnel.querySelectorAll('.bar-fill').forEach(function (b) { b.style.width = b.getAttribute('data-w'); }); }
+    if (reduce || !('IntersectionObserver' in window)) { fillBars(); }
+    else {
+      var fio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { fillBars(); fio.disconnect(); } });
+      }, { threshold: 0.3 });
+      fio.observe(funnel);
+    }
+  }
+
+  /* ---- pipeline stepper ---- */
+  var btns = Array.prototype.slice.call(document.querySelectorAll('.step-btn'));
+  var stages = Array.prototype.slice.call(document.querySelectorAll('.stage'));
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('.spine-node'));
+  var progress = document.getElementById('spineProgress');
+  var nodeY = [20, 84, 148, 212, 276, 340];
+  var current = 0, timer = null, AUTO_MS = 4200;
+
+  function setStep(i, fromUser) {
+    current = i;
+    btns.forEach(function (b, k) {
+      var on = k === i;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    stages.forEach(function (s, k) { s.classList.toggle('show', k === i); });
+    nodes.forEach(function (n, k) {
+      n.setAttribute('r', k <= i ? '7' : '6');
+      n.setAttribute('stroke', k <= i ? '#93a3e2' : '#5b66ab');
+      n.setAttribute('fill', k === i ? '#3a45a0' : '#1f244f');
+    });
+    if (progress && !reduce) { progress.setAttribute('y2', String(nodeY[i])); }
+    else if (progress) { progress.setAttribute('y2', String(nodeY[i])); }
+    if (fromUser) { restartAuto(); }
+  }
+
+  function nextStep() { setStep((current + 1) % btns.length, false); }
+  function startAuto() { if (reduce) return; timer = setInterval(nextStep, AUTO_MS); }
+  function restartAuto() { if (timer) { clearInterval(timer); } startAuto(); }
+
+  btns.forEach(function (b, i) {
+    b.addEventListener('click', function () { setStep(i, true); });
+    b.addEventListener('keydown', function (e) {
+      var idx = i;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { idx = (i + 1) % btns.length; btns[idx].focus(); setStep(idx, true); e.preventDefault(); }
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { idx = (i - 1 + btns.length) % btns.length; btns[idx].focus(); setStep(idx, true); e.preventDefault(); }
+    });
+  });
+
+  /* only auto-advance while the pipeline is on screen */
+  var pipeline = document.getElementById('pipeline');
+  if (pipeline && 'IntersectionObserver' in window) {
+    var pio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { startAuto(); }
+        else if (timer) { clearInterval(timer); timer = null; }
+      });
+    }, { threshold: 0.25 });
+    pio.observe(pipeline);
+  } else { startAuto(); }
+
+  setStep(0, false);
+})();
+</script>
+</body>
+</html>
