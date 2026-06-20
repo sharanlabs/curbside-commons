@@ -52,8 +52,9 @@ export default function Home() {
       </h1>
       <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-neutral-700">
         <span className="font-medium">In plain terms:</span> it spots which delivery-marketplace
-        merchants are stuck getting set up and why, writes a truthful next message, and keeps a human
-        in charge — built to be measured, audited, and adopted.
+        merchants are stuck getting set up and why, drafts a next message whose claims are checked
+        against the merchant&apos;s own data, and keeps a human in charge — built to be measured,
+        audited, and adopted.
       </p>
       <p className="mt-2 max-w-3xl text-sm leading-relaxed text-neutral-500">
         <span className="font-medium text-neutral-600">Technically:</span> deterministic risk + blocker
@@ -72,7 +73,7 @@ export default function Home() {
         <Stat label="Held for review" value={String(s.held)} sub="human gate" />
         <Stat label="Eval passing" value={`${s.evalPassed}/${s.evalTotal}`} sub="quality dims" />
         <Stat label="Gemini spend" value="$0.00" sub={`≤ $5 cap · ${snap.costLedger.liveCalls} live calls`} />
-        <Stat label="Mode" value="REPLAY" sub="no live AI yet" />
+        <Stat label="Mode" value="REPLAY" sub="demo makes no live calls" />
       </section>
 
       <section className="mt-10">

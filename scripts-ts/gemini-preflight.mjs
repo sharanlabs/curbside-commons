@@ -11,10 +11,10 @@ if (!key) {
 }
 console.log("GEMINI_API_KEY: present (non-empty) — value not displayed.");
 
-const res = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`,
-  { headers: { Accept: "application/json" } },
-);
+// Key as a header, never a URL query param (query strings leak into proxy/server logs).
+const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+  headers: { Accept: "application/json", "x-goog-api-key": key },
+});
 console.log("ListModels HTTP:", res.status, res.statusText);
 if (!res.ok) {
   const body = await res.text();

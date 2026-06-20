@@ -49,10 +49,16 @@ export function assertWithinBudget(
 ): void {
   const spent = Number(spentUsd);
   const next = Number(nextEstimatedUsd);
-  if (!Number.isFinite(spent) || !Number.isFinite(next)) {
+  const cap = Number(capUsd);
+  // Fail CLOSED on any non-sensible input: a non-finite/negative spend or estimate, or a
+  // non-finite/non-positive cap. A guard that accepts garbage (negative spend, cap <= 0) is not a guard.
+  if (!Number.isFinite(spent) || !Number.isFinite(next) || spent < 0 || next < 0) {
     throw new BudgetExceededError(spentUsd, nextEstimatedUsd, capUsd);
   }
-  if (spent + next > capUsd) {
+  if (!Number.isFinite(cap) || cap <= 0) {
     throw new BudgetExceededError(spent, next, capUsd);
+  }
+  if (spent + next > cap) {
+    throw new BudgetExceededError(spent, next, cap);
   }
 }

@@ -28,7 +28,7 @@ export default function MetricsPage() {
       <h1 className="text-2xl font-semibold tracking-tight">Metrics / Impact</h1>
       <p className="mt-2 max-w-3xl text-[15px] text-neutral-700">
         <span className="font-medium">In plain terms:</span> what this would move for an activation team —
-        how many stalled merchants get a truthful nudge, how many are held for a human, and what&apos;s
+        how many stalled merchants get a claim-checked nudge, how many are held for a human, and what&apos;s
         actually blocking them.
       </p>
       <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-[13px] text-amber-800">

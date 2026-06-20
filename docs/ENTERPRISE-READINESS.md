@@ -30,7 +30,7 @@ ActivationOps AI is built **adoption-grade**, not production-ready: the architec
 - **Auth / identity:** SSO, RBAC, user identity, and tenant boundaries (none today — single-user prototype).
 - **Real integrations:** Slack / email / CRM via explicit adapters with permission, data-classification, and redaction controls (sends are simulated today).
 - **Persistence & observability at scale:** REPLAY is computed in-memory; a real deployment needs durable state + audit + metrics (latency, model-failure/fallback rate, gatekeeper-block rate, approval latency).
-- **Live-LLM assurance:** the eval over the *real* model output + an authentic caught-failure + a calibrated LLM-judge are key-gated (Phase B) and not yet exercised.
+- **Live-LLM assurance:** the eval over the *real* model output + an authentic caught-failure are **done** — a recorded live run (`lib/data/live-samples.snapshot.json`, $0.0036). A **calibrated LLM-judge** for *semantic* unsupported-claim detection remains not-yet-built (the deterministic graders + claims-gatekeeper are forward-only — a documented boundary).
 - **Diagnosis depth:** the deeper blocker root-causes need the instrumentation signals named in `lib/domain/diagnosis.ts` (`blocker_source`, `verification_status`, `menu_status`, …) — built to consume, not yet populated.
 - **Any live endpoint:** add rate limiting + the budget hard-stop + a managed secret store; run a security-specialist pass on the deployed app before enabling live AI.
 - **CI / e2e:** full Playwright e2e + a11y audit on settled DOM + a CI quality gate (typecheck/lint/test/build/secret-scan) — local `verify` exists; CI is a gap.

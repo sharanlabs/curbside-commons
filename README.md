@@ -1,6 +1,6 @@
 # ActivationOps AI
 
-A **human-led, AI-assisted** prototype for activating **stalled / pre-live, long-tail merchants** on a local-commerce **delivery marketplace** (DoorDash / Uber Eats / Grubhub-style). It spots which signed-up merchants are stuck getting set up, diagnoses **why**, drafts a **truthful** next message, holds it for human approval, scores it for quality, and logs every step — built to be **measured, audited, and adopted**.
+A **human-led, AI-assisted** prototype for activating **stalled / pre-live, long-tail merchants** on a local-commerce **delivery marketplace** (DoorDash / Uber Eats / Grubhub-style). It spots which signed-up merchants are stuck getting set up, diagnoses **why**, drafts a next message whose **every claim is checked against the merchant's own data** (and forbidden-claim patterns), holds it for human approval, scores it for quality, and logs every step — built to be **measured, audited, and adopted**.
 
 > **Not** an official system of any marketplace. It runs on **hybrid demo data** — real public-domain business names (DataSF) + a **synthetic** activation overlay — with **no real merchant relationship, account, or PII**, and makes **no real business-impact claims**. All metrics are simulated. Company-agnostic; real companies appear only as comparisons. Working platform name: **"Curbside Commons"** (pending an owner trademark check).
 
@@ -14,17 +14,17 @@ Deterministic risk + blocker **triage** → a domain **diagnosis** (engagement s
 
 ## Today vs target (honest status)
 
-**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 50 tests):**
+**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 94 tests + 3 Playwright e2e):**
 - Single-stack **Next.js + TypeScript + Tailwind + React** app; a desktop **console**: Overview/queue · Merchant Detail (full why-chain) · Eval/Quality · Metrics/Impact · Audit · Cost.
 - The **deterministic core ported to TS** and pinned **byte-for-byte to the Python v1 oracle** by a differential test.
 - **Hybrid dataset** (real SF entities, PII-scrubbed + license-clean; deterministic synthetic overlay) via a **source-swappable adapter** + trust-boundary sanitizer.
-- **Bounded Gemini drafting** wired (mock path by default; `FAILED_TO_FALLBACK`), with the **claims-gatekeeper**, a **draft-quality eval** (corrupted-record teeth), a **$5 fail-closed budget** (per-call + cumulative), model preflight, and a **prompt-injection cut** (untrusted name never reaches the model).
-- A **REPLAY** snapshot the console renders with **zero live spend**.
+- **Bounded Gemini drafting**, with the **claims-gatekeeper**, a **draft-quality eval** (corrupted-record teeth), a **$5 fail-closed budget** (per-call + cumulative), model preflight, and a **prompt-injection cut** (untrusted name never reaches the model).
+- A **recorded real Gemini run** (one merchant per blocker, $0.0036) that the eval scored — the live path is proven end-to-end (and surfaced + fixed a real guardrail-precision issue). The public **demo stays REPLAY-only** (no live calls, zero spend).
 
 **Designed but gated / target:**
-- **Live Gemini run** (eval over the *real* output + an authentic caught failure) — owner-gated on `GEMINI_API_KEY` + a <$5 spend; live AI is off by default and off in any public deploy.
-- **Vercel deploy** (REPLAY-only, key gated off) — owner-gated.
+- **Vercel deploy** (REPLAY-only public demo, key gated off) — owner-gated.
 - **Deeper blocker root-causes** — need instrumentation signals (named in `lib/domain/diagnosis.ts`, not faked).
+- A **calibrated LLM-judge** for semantic unsupported-claim detection (the deterministic graders + the claims-gatekeeper are forward-only today — an honest, documented boundary).
 
 ## Run it
 
@@ -55,6 +55,6 @@ Built under human direction with **Claude Code** (planning + implementation) and
 
 ## Adoption boundary
 
-Adoption-**grade** means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough for a marketplace to inherit — **not** "production-ready." Honest gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, the live-LLM eval + caught-failure (key-gated), and deeper blocker instrumentation. A marketplace adopts it by swapping the hybrid dataset's real layer for its own export against the adapter's documented contract.
+Adoption-**grade** means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough for a marketplace to inherit — **not** "production-ready." Honest gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, a calibrated LLM-judge for semantic claims (the live-LLM eval + caught-failure are done — recorded), and deeper blocker instrumentation. A marketplace adopts it by swapping the hybrid dataset's real layer for its own export against the adapter's documented contract.
 
 Human-led, AI-assisted, professionally reviewed.

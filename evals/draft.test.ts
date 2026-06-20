@@ -154,6 +154,22 @@ describe("draftOutreach — mode taxonomy, cost, fail-closed budget", () => {
     expect(res.costUsd).toBeCloseTo(budget.estimatedNextUsd, 10); // conservative estimate, not $0
   });
 
+  it("treats PARTIAL usage (one token count missing) as UNKNOWN_USAGE (no $0 undercount)", async () => {
+    const generate = async () => ({ object: validGenerated(), usage: { inputTokens: 1000 } }); // no outputTokens
+    const res = await draftOutreach(merchant, { generate, budget });
+    expect(res.mode).toBe("FAILED_TO_FALLBACK");
+    expect(res.errorClass).toBe("UNKNOWN_USAGE");
+    expect(res.costUsd).toBeCloseTo(budget.estimatedNextUsd, 10);
+  });
+
+  it("fail-closed: live:true without ENABLE_LIVE_AI+key never hits the provider (LIVE_AI_DISABLED)", async () => {
+    // Unit-test env: liveAiEnabled() is false (no .env loaded), so a real (non-injected) live call is refused.
+    const res = await draftOutreach(merchant, { live: true, budget }); // no generate, no key
+    expect(res.mode).toBe("FAILED_TO_FALLBACK");
+    expect(res.errorClass).toBe("LIVE_AI_DISABLED");
+    expect(res.costUsd).toBe(0);
+  });
+
   it("budget hard-stop blocks the call BEFORE it can bill", async () => {
     let called = false;
     const generate = async () => {

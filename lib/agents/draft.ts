@@ -172,10 +172,13 @@ function priceLive(
   usage: AgentRunUsage | undefined,
   budget: BudgetContext,
 ): { cost: number; known: boolean } {
-  const known = !!usage && (usage.inputTokens != null || usage.outputTokens != null);
-  return known
-    ? { cost: costUsd(modelId, usage.inputTokens, usage.outputTokens), known: true }
-    : { cost: budget.estimatedNextUsd, known: false };
+  // BOTH token counts must be finite + non-negative to price from usage. Partial usage (only one
+  // count) is NOT "known" — pricing the missing leg at $0 would undercount real spend (Codex P1).
+  const ok = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n) && n >= 0;
+  if (usage && ok(usage.inputTokens) && ok(usage.outputTokens)) {
+    return { cost: costUsd(modelId, usage.inputTokens, usage.outputTokens), known: true };
+  }
+  return { cost: budget.estimatedNextUsd, known: false };
 }
 
 /**
@@ -208,6 +211,13 @@ export async function draftOutreach(
       modelId: "deterministic-rules",
       costUsd: 0,
     };
+  }
+
+  // Provider boundary (Codex P1, defense-in-depth): a REAL (non-injected) live call REQUIRES
+  // liveAiEnabled() (ENABLE_LIVE_AI + key). A caller passing live:true cannot bypass the flag at
+  // the provider boundary. An injected `generate` is a test/DI path that never bills -> allowed.
+  if (!opts.generate && !liveAiEnabled()) {
+    return fallback(merchant, platformName, "LIVE_AI_DISABLED");
   }
 
   const modelId = resolvedGeminiModel();

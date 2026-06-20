@@ -28,9 +28,10 @@ export default function EvalPage() {
         fail is theater).
       </p>
       <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-[13px] text-amber-800">
-        These scores grade the <span className="font-semibold">deterministic stub</span> output. Scoring the{" "}
-        <span className="font-semibold">real Gemini</span> output + capturing an authentic caught failure is
-        the Phase-B step (key-gated, &lt; $5) — not staged here.
+        These corpus scores grade the <span className="font-semibold">deterministic stub</span> output. The
+        same graders also scored a <span className="font-semibold">recorded real Gemini run</span> — shown
+        below (key-gated, $0.0036 spent) — so this stays honest about real output. The public{" "}
+        <span className="font-semibold">demo itself makes no live calls</span>.
       </div>
 
       <section className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-4">

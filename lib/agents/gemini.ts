@@ -58,9 +58,10 @@ function geminiModel(modelId: string) {
 export async function listGeminiModels(): Promise<string[]> {
   const key = process.env.GEMINI_API_KEY?.trim();
   if (!key) throw new Error("listGeminiModels: GEMINI_API_KEY is not set; cannot preflight models.");
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`,
-  );
+  // Send the key as a header, never a URL query param — query strings leak into proxy/server logs.
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+    headers: { "x-goog-api-key": key },
+  });
   if (!res.ok) {
     throw new Error(
       `listGeminiModels: request failed (${res.status} ${res.statusText}). ` +

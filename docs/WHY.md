@@ -46,7 +46,7 @@ This product is built to **answer every load-bearing "why" to first principles**
 
 **Why desktop-only.** A deliberate, stated scope cut for an internal ops console. *Rejected:* responsive/mobile. *Cost:* time spent on breakpoints that an ops reviewer doesn't need, at the expense of depth. Stated, not hidden.
 
-**Why REPLAY (a recorded/deterministic demo).** The public demo renders recorded results, never a live call. *Rejected:* live AI in the public demo. *Cost:* a public live endpoint can be abused to burn the budget and leak a key. REPLAY = zero spend, reproducible, safe to deploy. (When live Gemini runs, the recording is frozen from a real run — a live call isn't recomputable.)
+**Why REPLAY (a recorded/deterministic demo).** The public demo renders recorded results, never a live call. *Rejected:* live AI in the public demo. *Cost:* a public live endpoint can be abused to burn the budget and leak a key. REPLAY = zero spend, reproducible, safe to deploy. (Done: a real run is frozen in `lib/data/live-samples.snapshot.json` — a live call isn't recomputable, so the demo replays the recording.)
 
 ---
 
@@ -54,7 +54,7 @@ This product is built to **answer every load-bearing "why" to first principles**
 
 **Why we label everything "simulated / synthetic" and never claim real impact.** Credibility with a real evaluator depends on it; one overclaim discredits the whole artifact. *Rejected:* presenting the demo as a live product. *Cost:* it would be false and self-defeating. Human-led, AI-assisted, professionally reviewed.
 
-**Honest production gaps (the adoption boundary).** Adoption-*grade* means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough to inherit — **not** "production-ready." Known gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, the live-LLM eval + an authentic caught-failure (key-gated), and the deeper blocker root-causes that need instrumentation (named in `lib/domain/diagnosis.ts`, not faked). A marketplace inherits it by swapping the real layer of the hybrid dataset for its own export against the adapter's documented contract.
+**Honest production gaps (the adoption boundary).** Adoption-*grade* means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough to inherit — **not** "production-ready." Known gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, a **calibrated LLM-judge** for semantic unsupported-claims (the live-LLM eval + an authentic caught-failure are now **done** — a recorded run), and the deeper blocker root-causes that need instrumentation (named in `lib/domain/diagnosis.ts`, not faked). A marketplace inherits it by swapping the real layer of the hybrid dataset for its own export against the adapter's documented contract.
 
 ---
 
