@@ -1,16 +1,11 @@
 {
   "_provenance": {
-    "source": "DataSF — Registered Business Locations (San Francisco)",
-    "dataset_id": "g8m3-pdis",
-    "endpoint": "https://data.sfgov.org/resource/g8m3-pdis.json",
-    "license": "PDDL 1.0 (Public Domain Dedication and License)",
+    "source": "FICTIONAL demo names — invented for the public demo; NOT real businesses. (The real-data CAPABILITY is intact: lib/ingest/sf-adapter.ts ingests real DataSF 'Registered Business Locations'.)",
+    "dataset_id": "g8m3-pdis (the real adapter source; this displayed fixture is fictional)",
+    "endpoint": "https://data.sfgov.org/resource/g8m3-pdis.json (real adapter source; not used to build this fictional fixture)",
+    "license": "PDDL 1.0 (the real DataSF adapter source is public-domain; the fictional names in THIS fixture carry no license constraint)",
     "fetched_at": "2026-06-20",
-    "fields_used": [
-      "dba_name",
-      "naic_code_description",
-      "city",
-      "state"
-    ],
+    "fields_used": ["dba_name", "naic_code_description", "city", "state"],
     "pii_excluded": [
       "ownership_name",
       "full_business_address",
@@ -19,89 +14,29 @@
       "ttxid",
       "location (coordinates)"
     ],
-    "selection": "active SF locations; NAICS in {Food Services->Restaurant, Retail Trade->Retail}; sanitized; deduped by name; name length >= 3 and starts with a letter (drops address-as-name rows); 10 per category, stride-sampled across the alphabetical set for variety",
-    "synthetic_note": "These are REAL business names + crosswalked categories only. The activation state (onboarding progress, blockers, risk inputs) is SYNTHETIC, applied deterministically at load by lib/ingest/overlay.ts — no public dataset exists for it."
+    "selection": "PUBLIC DEMO uses 20 obviously-FICTIONAL names (10 Restaurant + 10 Retail) so the SYNTHETIC 'high-risk / stalled' activation states are never attached to real businesses or people (a privacy/optics risk on a public surface). The real-data path — real DataSF names, sanitized, PII-scrubbed, NAICS-crosswalked (Food Services->Restaurant, Retail Trade->Retail) — is implemented + tested in lib/ingest/sf-adapter.ts + evals/hybrid-dataset.test.ts; swap this fixture for a real export via the adapter's documented contract.",
+    "synthetic_note": "Names are fictional; the activation state (onboarding progress, blockers, risk inputs) is SYNTHETIC, applied deterministically at load by lib/ingest/overlay.ts — no public dataset exists for it."
   },
   "entities": [
-    {
-      "merchant_name": "Aaron Jevon Burrus",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "Brewvino SF",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "Curry In A Hurry",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "Flying Figs LLC",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "Iris Dullaart",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "Local Folks",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "New Mangia Tutti Ristorante",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "Pure Love Food",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "Spangler's Market",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "The Tamale Fiesta",
-      "merchant_category": "Restaurant"
-    },
-    {
-      "merchant_name": "Abc Supply LLC",
-      "merchant_category": "Retail"
-    },
-    {
-      "merchant_name": "Blue Moon Spinnery",
-      "merchant_category": "Retail"
-    },
-    {
-      "merchant_name": "Danah Accessories, Inc",
-      "merchant_category": "Retail"
-    },
-    {
-      "merchant_name": "Folklore",
-      "merchant_category": "Retail"
-    },
-    {
-      "merchant_name": "Hybrid Organic Design",
-      "merchant_category": "Retail"
-    },
-    {
-      "merchant_name": "Locali Gift Shop",
-      "merchant_category": "Retail"
-    },
-    {
-      "merchant_name": "Needles And Pens, Inc.",
-      "merchant_category": "Retail"
-    },
-    {
-      "merchant_name": "Radiance Glow",
-      "merchant_category": "Retail"
-    },
-    {
-      "merchant_name": "Silver Sprocket LLC",
-      "merchant_category": "Retail"
-    },
-    {
-      "merchant_name": "The Tea Garden",
-      "merchant_category": "Retail"
-    }
+    { "merchant_name": "Fog City Tacos", "merchant_category": "Restaurant" },
+    { "merchant_name": "Bayview Bistro", "merchant_category": "Restaurant" },
+    { "merchant_name": "Marina Morsels", "merchant_category": "Restaurant" },
+    { "merchant_name": "Sunset Noodle House", "merchant_category": "Restaurant" },
+    { "merchant_name": "Mission Masa", "merchant_category": "Restaurant" },
+    { "merchant_name": "Embarcadero Eats", "merchant_category": "Restaurant" },
+    { "merchant_name": "Nob Hill Nibbles", "merchant_category": "Restaurant" },
+    { "merchant_name": "Presidio Pizzeria", "merchant_category": "Restaurant" },
+    { "merchant_name": "Castro Curry Co", "merchant_category": "Restaurant" },
+    { "merchant_name": "Dogpatch Diner", "merchant_category": "Restaurant" },
+    { "merchant_name": "Cable Car Goods", "merchant_category": "Retail" },
+    { "merchant_name": "Twin Peaks Threads", "merchant_category": "Retail" },
+    { "merchant_name": "Haight Street Hardware", "merchant_category": "Retail" },
+    { "merchant_name": "Richmond Records", "merchant_category": "Retail" },
+    { "merchant_name": "Soma Supply Co", "merchant_category": "Retail" },
+    { "merchant_name": "Pacific Heights Provisions", "merchant_category": "Retail" },
+    { "merchant_name": "Glen Park Goods", "merchant_category": "Retail" },
+    { "merchant_name": "Outer Avenue Outfitters", "merchant_category": "Retail" },
+    { "merchant_name": "Bernal Books", "merchant_category": "Retail" },
+    { "merchant_name": "Hayes Valley Home", "merchant_category": "Retail" }
   ]
 }

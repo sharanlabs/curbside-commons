@@ -15,15 +15,15 @@ ActivationOps AI is built **adoption-grade**, not production-ready: the architec
 - **Human-in-the-loop gate** — hold / reject / send (simulated), with a per-merchant **audit trail**, a **cost ledger**, and an honest **mode taxonomy** (REPLAY / LIVE_AI / DETERMINISTIC_RULES / FAILED_TO_FALLBACK).
 - **Secrets** — the Gemini key is server-side only and never client-exposed; `.env` is gitignored; no secret is committed (RULES §11).
 - **Quality gate** — `npm run verify` (typecheck · lint · test · build); 153 tests + 3 Playwright e2e including the differential + the guardrail-corpus + draft-text differentials; `next build` prerenders every route (also the console render-smoke).
-- **Data hygiene** — the real layer is license-clean (DataSF, PDDL 1.0 public domain) and PII-scrubbed to name + category; activation state is synthetic and labeled (`lib/data/PROVENANCE.md`).
+- **Data hygiene** — the public demo DISPLAYS fictional names (no real businesses); the real-data adapter is license-clean (DataSF, PDDL 1.0 public domain) and PII-scrubbed to name + category; activation state is synthetic and labeled (`lib/data/PROVENANCE.md`).
 
 ## Demo boundaries
 
-- Activation state is **synthetic** and disclosed; the real layer is **public-domain business names + category only**.
+- Activation state is **synthetic** and disclosed; the public demo **displays fictional names** (the adapter's real layer is public-domain names + category only).
 - **No** real merchant relationship, account, or PII; **no** real marketplace access or business-impact claim. Metrics are simulated.
 - The public demo is **REPLAY-only** — no live AI, no spend.
 - Model output is non-authoritative for the gated decisions (deterministic code owns them).
-- Company-agnostic; real companies appear only as comparisons. "Curbside Commons" is a working name pending a trademark check.
+- Company-agnostic; real companies appear only as comparisons. "Curbside Commons" is the working demo name (no obvious trademark collision found; formal clearance only before commercial use).
 
 ## Production gaps (honest)
 

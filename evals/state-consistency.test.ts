@@ -41,6 +41,10 @@ const MUST_NOT_FLAG: string[] = [
   "Set your hours so customers can find you.",
   "Next, verify your bank information to get paid.",
   "Complete your final verification to finish onboarding.",
+  // live-run-surfaced false positives (2026-06-20): infinitive/passive phrasing, NOT "done"
+  "Your account requires your menu to be uploaded to continue.",
+  "Add Photos to Complete Onboarding.",
+  "Set your business hours to complete setup.",
 ];
 
 describe("proseClaimsUnreachedStep — completion claims flag; imperative phrasing does not", () => {

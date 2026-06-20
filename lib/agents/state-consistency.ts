@@ -29,16 +29,16 @@ const COMPLETED_CLAIMS: Array<[RegExp, number]> = [
   [/\b(?:completed|finished|approved|passed)\b.{0,20}\bbusiness\b.{0,12}\bverification\b/i, 1],
   [/\bbusiness\b.{0,20}\bverified\b/i, 1],
   [/\bverified\b.{0,15}\bbusiness\b/i, 1],
-  // menu DONE (past-tense done-words only — imperative "upload your menu" does not match)
-  [/\bmenu\b.{0,15}\b(uploaded|live|complete|added)\b/i, 2],
-  [/\b(uploaded|added)\b.{0,15}\bmenu\b/i, 2],
-  // photos DONE
-  [/\bphotos?\b.{0,15}\b(added|uploaded|live|complete|done)\b/i, 3],
-  [/\b(added|uploaded)\b.{0,15}\bphotos?\b/i, 3],
-  // hours DONE — "hours are/were/have been set", "hours configured/complete/done", "we've set ... hours".
-  // Imperative "set your hours" (set BEFORE hours, no done-auxiliary) is NOT matched.
-  [/\bhours\b\s+(?:are|were|have\s+been|is|already|now)\s+set\b/i, 4],
-  [/\bhours\b.{0,15}\b(configured|complete|done)\b/i, 4],
+  // menu DONE — the done-word must DIRECTLY follow "menu" (via an optional done-auxiliary), so
+  // imperative/infinitive phrasing ("upload your menu", "menu to be uploaded") does NOT match.
+  [/\bmenu\b\s+(?:is\s+|was\s+|has\s+been\s+|have\s+been\s+|already\s+|now\s+)?(?:uploaded|live|complete|completed|added)\b/i, 2],
+  [/\b(?:uploaded|added)\b.{0,15}\bmenu\b/i, 2],
+  // photos DONE — same shape ("add photos", "photos to complete onboarding" do NOT match)
+  [/\bphotos?\b\s+(?:are\s+|were\s+|have\s+been\s+|is\s+|already\s+|now\s+)?(?:uploaded|added|live|complete|completed|done)\b/i, 3],
+  [/\b(?:added|uploaded)\b.{0,15}\bphotos?\b/i, 3],
+  // hours DONE — "hours (are/were/has been) set/configured/complete". "set your hours" and "hours
+  // to complete setup" do NOT match. ("we've set ... hours" reverse form kept.)
+  [/\bhours\b\s+(?:are\s+|were\s+|have\s+been\s+|is\s+|already\s+|now\s+)?(?:set|configured|complete|completed|done)\b/i, 4],
   [/\b(we'?ve|we have|have|already)\b.{0,20}\bset\b.{0,15}\bhours\b/i, 4],
   // bank verification DONE (same shape as business verification)
   [/\bbank\b.{0,25}\bverification\b\s+(?:is\s+|was\s+|has\s+been\s+|have\s+been\s+|already\s+|now\s+)?(?:complete|completed|done|approved|passed|finished)\b/i, 5],

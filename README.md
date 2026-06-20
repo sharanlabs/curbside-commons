@@ -2,7 +2,7 @@
 
 A **human-led, AI-assisted** prototype for activating **stalled / pre-live, long-tail merchants** on a local-commerce **delivery marketplace** (DoorDash / Uber Eats / Grubhub-style). It spots which signed-up merchants are stuck getting set up, diagnoses **why**, drafts a next message whose **every declared claim is checked against the merchant's own data** (and forbidden-claim patterns), holds it for human approval, scores it for quality, and logs every step — built to be **measured, audited, and adopted**.
 
-> **Not affiliated with, endorsed by, or connected to** DoorDash, Uber Eats, Grubhub, DataSF, or any named business — an independent, company-agnostic prototype (those names appear only as style comparisons). It runs on **hybrid demo data** — real public-domain business *names* (DataSF) + a **synthetic** activation overlay — with **no real merchant relationship, account, or PII**, and makes **no real business-impact claims**. All metrics are simulated. Working platform name: **"Curbside Commons"** (pending an owner trademark check).
+> **Not affiliated with, endorsed by, or connected to** DoorDash, Uber Eats, Grubhub, DataSF, or any named business — an independent, company-agnostic prototype (those names appear only as style comparisons). It runs on **hybrid demo data** — **fictional** merchant names for display (the adapter ingests real public-domain DataSF names; the demo shows invented ones so synthetic risk states aren't pinned on real businesses) + a **synthetic** activation overlay — with **no real merchant relationship, account, or PII**, and makes **no real business-impact claims**. All metrics are simulated. Working platform name: **"Curbside Commons"** (pending an owner trademark check).
 
 ## The problem
 
@@ -17,7 +17,7 @@ Deterministic risk + blocker **triage** → a domain **diagnosis** (engagement s
 **Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 153 tests + 3 Playwright e2e):**
 - Single-stack **Next.js + TypeScript + Tailwind + React** app; a desktop **console**: Overview/queue · Merchant Detail (full why-chain) · Eval/Quality · Metrics · Audit · Cost.
 - The **deterministic core ported to TS** and pinned **byte-for-byte to the Python v1 oracle** by a differential test.
-- **Hybrid dataset** (real SF entities, PII-scrubbed + license-clean; deterministic synthetic overlay) via a **source-swappable adapter** + trust-boundary sanitizer.
+- **Hybrid dataset** — the public demo shows **fictional** merchant names (so synthetic risk states are never pinned on real businesses); the **source-swappable adapter** ingests real DataSF entities (PII-scrubbed, license-clean) + a trust-boundary sanitizer + a deterministic synthetic overlay. Real-data *capability*, fictional *display*.
 - **Bounded Gemini drafting**, with the **claims-gatekeeper**, a **draft-quality eval** (corrupted-record teeth), a **$5 fail-closed budget** (per-call + cumulative), model preflight, and a **prompt-injection cut** (untrusted name never reaches the model).
 - A **recorded real Gemini run** (one merchant per blocker, $0.0036 — 4 parsed live drafts, 2 billed parse-failures that fell back safely) that the eval scored. This **exercised the plumbing, fallback, and cost-accounting end-to-end** (and surfaced + fixed a real guardrail-precision issue) — it is **not** evidence of broad model quality at scale. The public **demo stays REPLAY-only** (no live calls, zero spend); reproduce the run locally with your own key.
 
