@@ -94,15 +94,17 @@ export default function EvalPage() {
 
       <section className="mt-10">
         <h2 className="text-sm font-semibold text-neutral-900">
-          Real Gemini output — recorded live run{" "}
+          Recorded Gemini run — static fixture{" "}
           <span className="font-normal text-neutral-400">
             ({liveSamples.provenance.model}, {liveSamples.provenance.recorded_at})
           </span>
         </h2>
         <p className="mt-1 max-w-3xl text-[13px] text-neutral-600">
-          A frozen recording of an actual Gemini run (one merchant per blocker) — so this stays
-          honest about the <span className="font-medium">real</span> model output, not just the stub,
-          with zero re-spend. Total cost: <span className="tabular-nums">${liveSamples.provenance.total_cost_usd.toFixed(4)}</span>{" "}
+          A <span className="font-medium">frozen recording</span> of a local Gemini API run (one merchant per
+          blocker). The public demo does <span className="font-medium">not</span> re-run or independently
+          verify it (REPLAY-only, zero spend) — reproduce it yourself with your own key:{" "}
+          <code className="rounded bg-neutral-100 px-1 text-[11px]">node --env-file=.env node_modules/.bin/vitest run evals/live-smoke.test.ts</code>.
+          Total cost: <span className="tabular-nums">${liveSamples.provenance.total_cost_usd.toFixed(4)}</span>{" "}
           (cap $5). Modes: {Object.entries(liveSamples.provenance.modes).map(([k, v]) => `${v} ${k}`).join(" · ")}.
           Gate: {Object.entries(liveSamples.provenance.gate).map(([k, v]) => `${v} ${k}`).join(" · ")}.
         </p>

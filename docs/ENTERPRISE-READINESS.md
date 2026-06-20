@@ -1,6 +1,6 @@
 # Enterprise readiness & adoption path
 
-ActivationOps AI is built **adoption-grade**, not production-ready: the architecture, controls, evals, the real-data adapter, and the path below are credible enough for a marketplace to **inherit and run** — while the demo stays honestly bounded. The *rationale* for each control is in [`docs/WHY.md`](WHY.md); this doc is the structured inventory + the inheritance contract. Mirrors the resilix `enterprise_readiness` standard (controls · boundaries · gaps · story), adapted to what is actually built.
+ActivationOps AI is built **adoption-grade**, not production-ready: the architecture, controls, evals, the real-data adapter, and the path below are credible enough for a marketplace to **review, adapt, and revalidate as a reference prototype** (not drop in and run as-is) — while the demo stays honestly bounded. The *rationale* for each control is in [`docs/WHY.md`](WHY.md); this doc is the structured inventory + the inheritance contract. Mirrors the resilix `enterprise_readiness` standard (controls · boundaries · gaps · story), adapted to what is actually built.
 
 ## Implemented controls
 
@@ -14,7 +14,7 @@ ActivationOps AI is built **adoption-grade**, not production-ready: the architec
 - **Eval harness** (`lib/evals/draft-quality.ts`) — deterministic graders (structure · state-consistency · policy), each paired with a corrupted record it must catch (teeth, not theater).
 - **Human-in-the-loop gate** — hold / reject / send (simulated), with a per-merchant **audit trail**, a **cost ledger**, and an honest **mode taxonomy** (REPLAY / LIVE_AI / DETERMINISTIC_RULES / FAILED_TO_FALLBACK).
 - **Secrets** — the Gemini key is server-side only and never client-exposed; `.env` is gitignored; no secret is committed (RULES §11).
-- **Quality gate** — `npm run verify` (typecheck · lint · test · build); 50 tests including the differential; `next build` prerenders every route (also the console render-smoke).
+- **Quality gate** — `npm run verify` (typecheck · lint · test · build); 153 tests + 3 Playwright e2e including the differential + the guardrail-corpus + draft-text differentials; `next build` prerenders every route (also the console render-smoke).
 - **Data hygiene** — the real layer is license-clean (DataSF, PDDL 1.0 public domain) and PII-scrubbed to name + category; activation state is synthetic and labeled (`lib/data/PROVENANCE.md`).
 
 ## Demo boundaries
@@ -48,4 +48,4 @@ ActivationOps AI is built **adoption-grade**, not production-ready: the architec
 
 ## The story to tell
 
-The claim is not that the AI is magic. It is **operational discipline**: deterministic code makes the risky decision · a bounded LLM drafts and explains · the gatekeeper checks every declared claim against data (+ forbidden-claim patterns) · a human approves the irreversible action · the audit trail records it · cost is hard-capped. That governance spine — transferable across verticals (see WHY.md) — is what a marketplace, a business analyst, and an engineering lead can actually trust and adopt.
+The claim is not that the AI is magic. It is **operational discipline**: deterministic code makes the risky decision · a bounded LLM drafts and explains · the gatekeeper checks every declared claim against data (+ forbidden-claim patterns) · a human approves the irreversible action · the audit trail records it · cost is hard-capped. That governance spine — transferable across verticals (see WHY.md) — is what a marketplace, a business analyst, and an engineering lead can review, adapt, and revalidate as a credible reference.

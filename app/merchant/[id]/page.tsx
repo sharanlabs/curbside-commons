@@ -109,7 +109,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
 
         <Section
           title="2 · Drafted outreach"
-          plain="A bounded, schema-constrained draft. Here it's the deterministic stub (live Gemini is the Phase-B step) — the safety machinery around it is identical either way."
+          plain="A bounded, schema-constrained draft. Here it's the deterministic stub (REPLAY); a recorded real-Gemini run is on the Eval page — the safety machinery around it is identical either way."
         >
           <div className="rounded-md border border-neutral-200">
             <div className="border-b border-neutral-100 px-3 py-2 text-sm font-medium">

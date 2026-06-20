@@ -13,4 +13,4 @@ export const PLATFORM_NAME = "Curbside Commons";
 
 /** One-line honest data label, reused across surfaces. */
 export const HONEST_DATA_LABEL =
-  "Real open business data (DataSF, public domain — public-record business/trade names, some registered under a sole proprietor's name; not private PII). Activation state is synthetic and illustrative. No real merchant relationship or account.";
+  "Real open business data (DataSF, public domain — public-record business/trade names, some of which are sole-proprietor personal-name DBAs). No private contact details, addresses, coordinates, account data, or marketplace records. Activation state is synthetic and illustrative. No real merchant relationship or account.";

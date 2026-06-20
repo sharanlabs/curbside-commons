@@ -25,15 +25,16 @@ export default function MetricsPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
-      <h1 className="text-2xl font-semibold tracking-tight">Metrics / Impact</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Workflow metrics (simulated)</h1>
       <p className="mt-2 max-w-3xl text-[15px] text-neutral-700">
-        <span className="font-medium">In plain terms:</span> what this would move for an activation team —
-        how many stalled merchants get a claim-checked nudge, how many are held for a human, and what&apos;s
-        actually blocking them.
+        <span className="font-medium">In plain terms:</span> what the demo routes and tracks for an
+        activation team — how many stalled merchants get a claim-checked nudge, how many are held for a
+        human, and what&apos;s blocking them.
       </p>
       <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-[13px] text-amber-800">
         Figures are <span className="font-semibold">simulated</span> over the hybrid demo set (real
-        business names, synthetic activation state) — illustrative of the workflow, not a real-impact claim.
+        business names, synthetic activation state) — illustrative of the workflow, <span className="font-semibold">not
+        activation, revenue, or reactivation outcomes</span>.
       </div>
 
       <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -72,7 +73,7 @@ export default function MetricsPage() {
             ))}
           </div>
           <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-1 text-[13px]">
-            <dt className="text-neutral-500">Send rate (of total)</dt>
+            <dt className="text-neutral-500">Simulated send rate (of total)</dt>
             <dd className="tabular-nums">{Math.round((s.sent / s.merchants) * 100)}%</dd>
             <dt className="text-neutral-500">Held-for-review rate</dt>
             <dd className="tabular-nums">{Math.round((s.held / s.merchants) * 100)}%</dd>

@@ -15,6 +15,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <Nav />
         {children}
+        <footer className="mx-auto mt-16 max-w-6xl border-t border-neutral-200 px-6 py-6 text-[12px] leading-relaxed text-neutral-500">
+          <span className="font-medium text-neutral-600">Demo / portfolio prototype.</span> REPLAY over
+          public business-record <span className="font-medium">names</span> + <span className="font-medium">synthetic
+          activation state</span> — not production logs, real sends, real marketplace access, or real-impact
+          data. The &ldquo;real Gemini&rdquo; output shown is a <span className="font-medium">recorded static
+          fixture</span> (reproduce it locally with your own key). Human-led, AI-assisted, professionally
+          reviewed. <span className="font-medium">Not affiliated with, endorsed by, or connected to</span>{" "}
+          DoorDash, Uber Eats, Grubhub, DataSF, or any named business.
+        </footer>
       </body>
     </html>
   );

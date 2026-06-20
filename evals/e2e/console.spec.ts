@@ -33,7 +33,7 @@ test("console nav reaches every surface; active link carries aria-current", asyn
   await page.goto("/");
   const surfaces: Array<[string, string]> = [
     ["Eval / Quality", "Eval / Quality"],
-    ["Metrics", "Metrics / Impact"],
+    ["Metrics", "Workflow metrics (simulated)"],
     ["Audit", "Audit Trail"],
     ["Cost", "Cost ledger"],
   ];

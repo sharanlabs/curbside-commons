@@ -86,7 +86,7 @@ function buildAudit(
       at: RUN_TIMESTAMP,
       actor: "draft",
       action: "DETERMINISTIC_RULES",
-      detail: "Outreach drafted by the deterministic stub (live Gemini = Phase-B step).",
+      detail: "Outreach drafted by the deterministic stub (REPLAY; a recorded real-Gemini run is on the Eval page).",
     },
     {
       at: RUN_TIMESTAMP,
@@ -165,7 +165,7 @@ export function buildReplaySnapshot(platformName = REFERENCE_PLATFORM_NAME): Rep
       totalUsd: 0,
       pricingVersion: PRICING_VERSION,
       liveCalls: 0,
-      note: "Deterministic stub drafting — no live Gemini calls, $0.00 spend. Live drafting is the Phase-B key-gated step.",
+      note: "Deterministic stub drafting — no live Gemini calls, $0.00 spend. A real Gemini run is recorded (see Eval); the public demo stays REPLAY-only.",
     },
     merchants: replayMerchants,
   };

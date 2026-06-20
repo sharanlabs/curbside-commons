@@ -11,9 +11,9 @@ export default function CostPage() {
     <main className="mx-auto max-w-4xl px-6 py-10">
       <h1 className="text-2xl font-semibold tracking-tight">Cost ledger</h1>
       <p className="mt-2 max-w-3xl text-[15px] text-neutral-700">
-        <span className="font-medium">In plain terms:</span> the AI can never quietly run up a bill. Spend
-        is computed from real reported tokens against a pinned price list, and a hard stop blocks any call
-        that would cross the cap.
+        <span className="font-medium">In plain terms:</span> the implemented live-drafting path is
+        budget-guarded so a run can&apos;t quietly exceed the cap. Spend is computed from real reported
+        tokens against a pinned price list, and a fail-closed hard stop blocks any call that would cross it.
       </p>
 
       <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -46,7 +46,7 @@ export default function CostPage() {
           <li>Before every live call, a fail-closed guard blocks it if spent + next-estimate would exceed the cap.</li>
           <li>A batch threads cumulative spend, so the cap holds across the whole run — not just per call.</li>
           <li>An unknown model id fails loud (never silently prices at $0); a billed-then-failed call still records its cost.</li>
-          <li>Re-verified against current official Gemini pricing at use-time (never trusted from memory).</li>
+          <li>The price table was pinned + verified against official Gemini pricing for the recorded run; it must be re-checked before any future live run (never trusted from memory).</li>
         </ul>
       </section>
 
