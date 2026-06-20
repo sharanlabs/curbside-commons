@@ -24,6 +24,9 @@
 const COMPLETED_CLAIMS: Array<[RegExp, number]> = [
   // business/identity verification DONE — incl. "verification is/was/has been complete[d]/approved/passed"
   [/\bbusiness\b.{0,25}\bverification\b\s+(?:is\s+|was\s+|has\s+been\s+|have\s+been\s+|already\s+|now\s+)?(?:complete|completed|done|approved|passed|finished)\b/i, 1],
+  // verb-BEFORE-noun completion ("we've completed your business verification") — PAST-TENSE only,
+  // so imperative "complete business verification" (present tense) still does NOT match.
+  [/\b(?:completed|finished|approved|passed)\b.{0,20}\bbusiness\b.{0,12}\bverification\b/i, 1],
   [/\bbusiness\b.{0,20}\bverified\b/i, 1],
   [/\bverified\b.{0,15}\bbusiness\b/i, 1],
   // menu DONE (past-tense done-words only — imperative "upload your menu" does not match)
@@ -39,6 +42,7 @@ const COMPLETED_CLAIMS: Array<[RegExp, number]> = [
   [/\b(we'?ve|we have|have|already)\b.{0,20}\bset\b.{0,15}\bhours\b/i, 4],
   // bank verification DONE (same shape as business verification)
   [/\bbank\b.{0,25}\bverification\b\s+(?:is\s+|was\s+|has\s+been\s+|have\s+been\s+|already\s+|now\s+)?(?:complete|completed|done|approved|passed|finished)\b/i, 5],
+  [/\b(?:completed|finished|approved|passed)\b.{0,20}\bbank\b.{0,12}\bverification\b/i, 5],
   [/\bbank\b.{0,20}\bverified\b/i, 5],
   [/\bverified\b.{0,15}\bbank\b/i, 5],
   // global "you're live / onboarding complete" (straight + curly apostrophe)

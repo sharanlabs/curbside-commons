@@ -1,0 +1,17 @@
+# Keep secrets + non-runtime artifacts out of ANY Vercel upload (defense-in-depth, esp. for a
+# CLI / local-dir deploy where untracked files could otherwise ride along). `next build` only
+# bundles what app/ + lib/ import, so none of these are needed at runtime.
+# SECRETS — never upload:
+.env
+.env*.local
+# Python v1 prototype + its generated artifacts (carry legacy "DoorDash" strings; the differential
+# oracle reads them at TEST time only, never at build/runtime):
+out/
+scripts/
+*.csv
+RULES_CONFIG_DUMP.txt
+# Dev-only tooling / generators / docs not needed by the deployed app:
+scripts-ts/
+reference/
+.agents/
+# NOTE: lib/ (incl. lib/data/*.snapshot.json) + app/ + components/ are REQUIRED by the build — not ignored.

@@ -16,7 +16,7 @@
     "honest_findings": [
       "Claims-gatekeeper passed every DECLARED claim against merchant data on all real drafts (its core function held on live output).",
       "AUTHENTIC caught failures on real output: schema-constrained generation occasionally returns unparseable output -> the validation catches it and degrades to FAILED_TO_FALLBACK (the deterministic stub), with billed cost still recorded so the cumulative cap stays honest. The gate also holds High-risk drafts for human approval (WARN).",
-      "The first live run surfaced a fail-safe OVER-match: the pinned core guardrail flagged the phrase \"business verification\" regardless of tense, false-blocking a truthful imperative draft. FIXED in the agent tier (lib/agents/state-consistency.ts, tense-aware) WITHOUT touching the pinned core/differential. Confirmed here: 0 false blocks; all real drafts score 3/3 on the eval."
+      "The first live run surfaced a fail-safe OVER-match: the pinned core guardrail flagged the phrase \"business verification\" regardless of tense, false-blocking a truthful imperative draft. FIXED in the agent tier (lib/agents/state-consistency.ts, tense-aware) WITHOUT touching the pinned core/differential. Confirmed here: 0 false blocks; all 4 LIVE_AI drafts score 3/3 on the eval (the 2 schema parse-failures fell back to the clean deterministic stub, also 3/3)."
     ]
   },
   "rows": [

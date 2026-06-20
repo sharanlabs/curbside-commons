@@ -1,0 +1,166 @@
+{
+  "_oracle": "Python v1 STUB draft text, extracted from out/model_runs.csv (generator=stub). Locks the TS makeDraft text port byte-for-byte. Regenerate: python3 the extractor in evals/draft-oracle.test.ts header.",
+  "platform": "DoorDash",
+  "rows": {
+    "M001": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Maria's Tacos, thanks for getting started on your DoorDash onboarding. Your next step is to add photos of your items. Reply to this message if you would like a hand.",
+      "risk_explanation": "Maria's Tacos has completed 2 of 5 onboarding steps; the current blocker is photos_needed.",
+      "blocker_summary": "Current blocker: photos_needed.",
+      "next_best_action": "add_photos",
+      "guardrail_flags": []
+    },
+    "M002": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Golden Dragon, thanks for getting started on your DoorDash onboarding. Your next step is to upload your menu. Reply to this message if you would like a hand.",
+      "risk_explanation": "Golden Dragon has completed 1 of 5 onboarding steps; the current blocker is menu_upload_needed.",
+      "blocker_summary": "Current blocker: menu_upload_needed.",
+      "next_best_action": "upload_menu",
+      "guardrail_flags": []
+    },
+    "M003": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Fresh Market Co, thanks for getting started on your DoorDash onboarding. Your next step is to complete your final verification. Reply to this message if you would like a hand.",
+      "risk_explanation": "Fresh Market Co has completed 5 of 5 onboarding steps; the current blocker is final_verification_needed.",
+      "blocker_summary": "Current blocker: final_verification_needed.",
+      "next_best_action": "complete_final_verification",
+      "guardrail_flags": []
+    },
+    "M004": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Pizza Palace, thanks for getting started on your DoorDash onboarding. Your next step is to set your business hours. Reply to this message if you would like a hand.",
+      "risk_explanation": "Pizza Palace has completed 3 of 5 onboarding steps; the current blocker is business_hours_needed.",
+      "blocker_summary": "Current blocker: business_hours_needed.",
+      "next_best_action": "set_business_hours",
+      "guardrail_flags": []
+    },
+    "M005": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Corner Store 24/7, thanks for getting started on your DoorDash onboarding. Your next step is to verify your bank information. Reply to this message if you would like a hand.",
+      "risk_explanation": "Corner Store 24/7 has completed 4 of 5 onboarding steps; the current blocker is bank_verification_needed.",
+      "blocker_summary": "Current blocker: bank_verification_needed.",
+      "next_best_action": "verify_bank",
+      "guardrail_flags": []
+    },
+    "M006": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Bella Italia, thanks for getting started on your DoorDash onboarding. Your next step is to add photos of your items. Reply to this message if you would like a hand.",
+      "risk_explanation": "Bella Italia has completed 2 of 5 onboarding steps; the current blocker is photos_needed.",
+      "blocker_summary": "Current blocker: photos_needed.",
+      "next_best_action": "add_photos",
+      "guardrail_flags": []
+    },
+    "M007": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Green Leaf Cafe, thanks for getting started on your DoorDash onboarding. Your next step is to set your business hours. Reply to this message if you would like a hand.",
+      "risk_explanation": "Green Leaf Cafe has completed 3 of 5 onboarding steps; the current blocker is business_hours_needed.",
+      "blocker_summary": "Current blocker: business_hours_needed.",
+      "next_best_action": "set_business_hours",
+      "guardrail_flags": []
+    },
+    "M008": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Tech Gadgets Plus, thanks for getting started on your DoorDash onboarding. Your next step is to verify your business information. Reply to this message if you would like a hand.",
+      "risk_explanation": "Tech Gadgets Plus has completed 0 of 5 onboarding steps; the current blocker is business_verification_needed.",
+      "blocker_summary": "Current blocker: business_verification_needed.",
+      "next_best_action": "verify_business",
+      "guardrail_flags": []
+    },
+    "M009": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Sunrise Bakery, thanks for getting started on your DoorDash onboarding. Your next step is to verify your bank information. Reply to this message if you would like a hand.",
+      "risk_explanation": "Sunrise Bakery has completed 4 of 5 onboarding steps; the current blocker is bank_verification_needed.",
+      "blocker_summary": "Current blocker: bank_verification_needed.",
+      "next_best_action": "verify_bank",
+      "guardrail_flags": []
+    },
+    "M010": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Metro Pharmacy, thanks for getting started on your DoorDash onboarding. Your next step is to upload your menu. Reply to this message if you would like a hand.",
+      "risk_explanation": "Metro Pharmacy has completed 1 of 5 onboarding steps; the current blocker is menu_upload_needed.",
+      "blocker_summary": "Current blocker: menu_upload_needed.",
+      "next_best_action": "upload_menu",
+      "guardrail_flags": []
+    },
+    "M011": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Taco Express, thanks for getting started on your DoorDash onboarding. Your next step is to complete your final verification. Reply to this message if you would like a hand.",
+      "risk_explanation": "Taco Express has completed 5 of 5 onboarding steps; the current blocker is final_verification_needed.",
+      "blocker_summary": "Current blocker: final_verification_needed.",
+      "next_best_action": "complete_final_verification",
+      "guardrail_flags": []
+    },
+    "M012": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Organic Foods Hub, thanks for getting started on your DoorDash onboarding. Your next step is to add photos of your items. Reply to this message if you would like a hand.",
+      "risk_explanation": "Organic Foods Hub has completed 2 of 5 onboarding steps; the current blocker is photos_needed.",
+      "blocker_summary": "Current blocker: photos_needed.",
+      "next_best_action": "add_photos",
+      "guardrail_flags": []
+    },
+    "M013": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Burger Kingdom, thanks for getting started on your DoorDash onboarding. Your next step is to set your business hours. Reply to this message if you would like a hand.",
+      "risk_explanation": "Burger Kingdom has completed 3 of 5 onboarding steps; the current blocker is business_hours_needed.",
+      "blocker_summary": "Current blocker: business_hours_needed.",
+      "next_best_action": "set_business_hours",
+      "guardrail_flags": []
+    },
+    "M014": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Fashion Forward, thanks for getting started on your DoorDash onboarding. Your next step is to upload your menu. Reply to this message if you would like a hand.",
+      "risk_explanation": "Fashion Forward has completed 1 of 5 onboarding steps; the current blocker is menu_upload_needed.",
+      "blocker_summary": "Current blocker: menu_upload_needed.",
+      "next_best_action": "upload_menu",
+      "guardrail_flags": []
+    },
+    "M015": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Healthy Bites, thanks for getting started on your DoorDash onboarding. Your next step is to complete your final verification. Reply to this message if you would like a hand.",
+      "risk_explanation": "Healthy Bites has completed 5 of 5 onboarding steps; the current blocker is final_verification_needed.",
+      "blocker_summary": "Current blocker: final_verification_needed.",
+      "next_best_action": "complete_final_verification",
+      "guardrail_flags": []
+    },
+    "M016": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Downtown Deli, thanks for getting started on your DoorDash onboarding. Your next step is to add photos of your items. Reply to this message if you would like a hand.",
+      "risk_explanation": "Downtown Deli has completed 2 of 5 onboarding steps; the current blocker is photos_needed.",
+      "blocker_summary": "Current blocker: photos_needed.",
+      "next_best_action": "add_photos",
+      "guardrail_flags": []
+    },
+    "M017": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Sports Gear Pro, thanks for getting started on your DoorDash onboarding. Your next step is to verify your business information. Reply to this message if you would like a hand.",
+      "risk_explanation": "Sports Gear Pro has completed 0 of 5 onboarding steps; the current blocker is business_verification_needed.",
+      "blocker_summary": "Current blocker: business_verification_needed.",
+      "next_best_action": "verify_business",
+      "guardrail_flags": []
+    },
+    "M018": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Spice Garden, thanks for getting started on your DoorDash onboarding. Your next step is to verify your bank information. Reply to this message if you would like a hand.",
+      "risk_explanation": "Spice Garden has completed 4 of 5 onboarding steps; the current blocker is bank_verification_needed.",
+      "blocker_summary": "Current blocker: bank_verification_needed.",
+      "next_best_action": "verify_bank",
+      "guardrail_flags": []
+    },
+    "M019": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Quick Mart, thanks for getting started on your DoorDash onboarding. Your next step is to set your business hours. Reply to this message if you would like a hand.",
+      "risk_explanation": "Quick Mart has completed 3 of 5 onboarding steps; the current blocker is business_hours_needed.",
+      "blocker_summary": "Current blocker: business_hours_needed.",
+      "next_best_action": "set_business_hours",
+      "guardrail_flags": []
+    },
+    "M020": {
+      "draft_subject": "Your next onboarding step with DoorDash",
+      "draft_body": "Hi Urban Grocery, thanks for getting started on your DoorDash onboarding. Your next step is to upload your menu. Reply to this message if you would like a hand.",
+      "risk_explanation": "Urban Grocery has completed 1 of 5 onboarding steps; the current blocker is menu_upload_needed.",
+      "blocker_summary": "Current blocker: menu_upload_needed.",
+      "next_best_action": "upload_menu",
+      "guardrail_flags": []
+    }
+  }
+}

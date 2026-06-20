@@ -5,11 +5,15 @@ import { proseClaimsUnreachedStep } from "@/lib/agents/state-consistency";
 // imperative / "to-do" phrasing MUST NOT flag. Locks the precision fix (Codex P1) broadly.
 
 const MUST_FLAG: string[] = [
-  // business verification — incl. the forms the first refactor missed
+  // business verification — incl. the forms the first refactor missed + verb-before-noun
   "Great — your business is verified and you're all set.",
   "Your business verification is complete.",
   "Your business verification has been completed.",
   "We've verified your business already.",
+  "We've completed your business verification.",
+  // bank verification verb-before-noun (Codex/evals P1 escape)
+  "We have finished your bank verification.",
+  "We completed your bank verification.",
   // menu
   "Your menu is uploaded and live.",
   "We added your menu.",
