@@ -80,3 +80,23 @@ describe("gatekeeper — corrupted drafts each BLOCK (teeth, not theater)", () =
     expect(r.failures.join(" ")).toContain("guardrail:state_mismatch");
   });
 });
+
+describe("gatekeeper — live-phrasing precision (the 2026-06-20 live-run fix)", () => {
+  const step0 = merchantWith({ steps_completed: 0, source_risk_level: "Low" }, 7); // business_verification
+
+  it("does NOT block a truthful imperative ('complete business verification')", () => {
+    const d = mockDraft(step0); // action = verify_business (matches)
+    d.draft_body = "Hi, to get live, please complete business verification. You have completed 0 of 5 steps.";
+    const r = runGatekeeper(d, step0);
+    expect(r.status).toBe("PASS");
+    expect(r.failures.join(" ")).not.toContain("state_mismatch");
+  });
+
+  it("STILL blocks a real completion claim ('your business is verified') the merchant hasn't reached", () => {
+    const d = mockDraft(step0);
+    d.draft_body = "Great — your business is verified and you're all set. Thanks!";
+    const r = runGatekeeper(d, step0);
+    expect(r.status).toBe("BLOCKED");
+    expect(r.failures.join(" ")).toContain("guardrail:state_mismatch");
+  });
+});

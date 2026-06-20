@@ -19,10 +19,11 @@
  * real model miss; an authentic LLM-caught failure is the separate key-gated live step.)
  */
 import { REFERENCE_PLATFORM_NAME } from "@/lib/core/constants";
-import { runGuardrail, scanText } from "@/lib/core/guardrail";
+import { scanText } from "@/lib/core/guardrail";
 import { validateDraft } from "@/lib/core/pipeline";
 import type { Merchant } from "@/lib/core/types";
 import type { OutreachDraft } from "@/lib/agents/draft";
+import { proseClaimsUnreachedStep } from "@/lib/agents/state-consistency";
 
 export type GraderId = "structure" | "state-consistency" | "policy";
 
@@ -50,11 +51,7 @@ function gradeStructure(draft: OutreachDraft): GraderResult {
   return { grader: "structure", pass: failures.length === 0, failures };
 }
 
-function gradeStateConsistency(
-  draft: OutreachDraft,
-  merchant: Merchant,
-  platformName: string,
-): GraderResult {
+function gradeStateConsistency(draft: OutreachDraft, merchant: Merchant): GraderResult {
   const failures: string[] = [];
   const m = merchant as unknown as Record<string, unknown>;
   for (const c of draft.claims) {
@@ -67,9 +64,14 @@ function gradeStateConsistency(
       failures.push(`claim ${c.field}=${JSON.stringify(c.value)} != merchant ${JSON.stringify(actual)}`);
     }
   }
-  // The guardrail's state_mismatch covers BOTH the structural action check and the
-  // prose "claims a step not yet reached" check; policy flags are scored separately.
-  if (runGuardrail(draft, merchant, platformName).includes("state_mismatch")) {
+  // Structural action check + a TENSE-AWARE prose check (the same product-tier
+  // lib/agents/state-consistency the gatekeeper uses — NOT the core's bundled state_mismatch,
+  // which over-matches "business verification" on live phrasing). Policy flags scored separately.
+  const prose = `${draft.draft_subject} ${draft.draft_body}`;
+  if (
+    draft.next_best_action !== merchant.next_best_action ||
+    proseClaimsUnreachedStep(prose, Number(merchant.steps_completed ?? 0))
+  ) {
     failures.push("state_mismatch: action or prose asserts a step the merchant has not reached");
   }
   return { grader: "state-consistency", pass: failures.length === 0, failures };
@@ -91,7 +93,7 @@ export function scoreDraft(
 ): DraftScore {
   const results = [
     gradeStructure(draft),
-    gradeStateConsistency(draft, merchant, platformName),
+    gradeStateConsistency(draft, merchant),
     gradePolicy(draft, platformName),
   ];
   const passed = results.filter((r) => r.pass).length;

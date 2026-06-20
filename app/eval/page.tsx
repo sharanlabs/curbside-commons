@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getReplaySnapshot } from "@/lib/replay/run";
+import { liveSamples } from "@/lib/replay/live-samples";
 import { PLATFORM_NAME } from "@/lib/product";
 
 const DIMS = ["structure", "state-consistency", "policy"] as const;
@@ -88,6 +89,58 @@ export default function EvalPage() {
             ))}
           </tbody>
         </table>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold text-neutral-900">
+          Real Gemini output — recorded live run{" "}
+          <span className="font-normal text-neutral-400">
+            ({liveSamples.provenance.model}, {liveSamples.provenance.recorded_at})
+          </span>
+        </h2>
+        <p className="mt-1 max-w-3xl text-[13px] text-neutral-600">
+          A frozen recording of an actual Gemini run (one merchant per blocker) — so this stays
+          honest about the <span className="font-medium">real</span> model output, not just the stub,
+          with zero re-spend. Total cost: <span className="tabular-nums">${liveSamples.provenance.total_cost_usd.toFixed(4)}</span>{" "}
+          (cap $5). Modes: {Object.entries(liveSamples.provenance.modes).map(([k, v]) => `${v} ${k}`).join(" · ")}.
+          Gate: {Object.entries(liveSamples.provenance.gate).map(([k, v]) => `${v} ${k}`).join(" · ")}.
+        </p>
+
+        <div className="mt-3 rounded-lg border border-neutral-200 bg-neutral-50/60 p-4">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
+            What the live run showed (honest)
+          </div>
+          <ul className="mt-1.5 list-inside list-disc space-y-1 text-[12px] text-neutral-700">
+            {liveSamples.provenance.honest_findings.map((f, i) => (
+              <li key={i}>{f}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-3 overflow-hidden rounded-lg border border-neutral-200">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-neutral-50 text-[11px] uppercase tracking-wide text-neutral-500">
+              <tr>
+                <th scope="col" className="px-4 py-2.5 font-medium">Blocker</th>
+                <th scope="col" className="px-4 py-2.5 font-medium">Mode</th>
+                <th scope="col" className="px-4 py-2.5 font-medium">Gate</th>
+                <th scope="col" className="px-4 py-2.5 font-medium">Eval</th>
+                <th scope="col" className="px-4 py-2.5 font-medium">Cost</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-100">
+              {liveSamples.rows.map((r, i) => (
+                <tr key={i}>
+                  <td className="px-4 py-2.5 text-[13px] text-neutral-700">{r.blocker}</td>
+                  <td className="px-4 py-2.5 text-[12px] font-mono text-neutral-600">{r.mode}</td>
+                  <td className="px-4 py-2.5 text-[13px] text-neutral-600">{r.gatekeeper}</td>
+                  <td className="px-4 py-2.5 tabular-nums text-neutral-600">{r.eval}</td>
+                  <td className="px-4 py-2.5 tabular-nums text-neutral-500">${r.costUsd.toFixed(6)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   );

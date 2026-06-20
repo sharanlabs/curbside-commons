@@ -22,10 +22,11 @@
  * (no wall-clock) so the REPLAY snapshot stays reproducible.
  */
 import { REFERENCE_PLATFORM_NAME, RUN_TIMESTAMP } from "@/lib/core/constants";
-import { runGuardrail } from "@/lib/core/guardrail";
+import { scanText } from "@/lib/core/guardrail";
 import { validateDraft } from "@/lib/core/pipeline";
 import type { Merchant } from "@/lib/core/types";
 import type { OutreachDraft } from "@/lib/agents/draft";
+import { proseClaimsUnreachedStep } from "@/lib/agents/state-consistency";
 
 /** Merchant fields a claim is allowed to cite (a claim outside this set is unverifiable). */
 const CLAIMABLE_FIELDS = new Set<string>([
@@ -78,8 +79,24 @@ export function runGatekeeper(
   // 2. Schema validity (core contract).
   for (const err of validateDraft(draft)) failures.push(`schema:${err}`);
 
-  // 3. Guardrail: forbidden claims / state_mismatch / PII — each flag blocks.
-  const guardrailFlags = runGuardrail(draft, merchant, platformName);
+  // 3. Guardrail (product tier): the pinned-core forbidden-claim scan (scanText) + a structural
+  //    action check + a TENSE-AWARE prose state-consistency check (lib/agents/state-consistency).
+  //    The precise prose check replaces the core's bundled state_mismatch so a truthful imperative
+  //    ("complete business verification") no longer false-blocks — without touching the pinned core
+  //    (which stays a faithful Python port for the differential). Forbidden-claim detection is the
+  //    core's, unchanged.
+  const fullText = [draft.draft_subject, draft.draft_body, draft.risk_explanation, draft.blocker_summary]
+    .map((s) => String(s ?? ""))
+    .join(" ");
+  const flagSet = new Set<string>(scanText(fullText, platformName));
+  const prose = `${draft.draft_subject} ${draft.draft_body}`;
+  if (
+    draft.next_best_action !== merchant.next_best_action ||
+    proseClaimsUnreachedStep(prose, Number(merchant.steps_completed ?? 0))
+  ) {
+    flagSet.add("state_mismatch");
+  }
+  const guardrailFlags = [...flagSet].sort();
   for (const flag of guardrailFlags) failures.push(`guardrail:${flag}`);
 
   // 4. Held for human review (not a block — a clean draft still needs approval).
