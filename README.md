@@ -1,53 +1,59 @@
 # ActivationOps AI
 
-ActivationOps AI is a **human-led, AI-assisted workflow automation** project for a DoorDash-style merchant onboarding simulation. It helps onboarding and account managers spot stalled merchants, diagnose what is blocking activation, recommend the next best action, route risky cases to a human, draft approved outreach, and track outcomes.
+A **human-led, AI-assisted** prototype for activating **stalled / pre-live, long-tail merchants** on a local-commerce **delivery marketplace** (DoorDash / Uber Eats / Grubhub-style). It spots which signed-up merchants are stuck getting set up, diagnoses **why**, drafts a **truthful** next message, holds it for human approval, scores it for quality, and logs every step — built to be **measured, audited, and adopted**.
 
-This is **not** an official DoorDash system. It runs on dummy data, uses no real merchant data, and makes no real business-impact claims. All metrics are simulated.
+> **Not** an official system of any marketplace. It runs on **hybrid demo data** — real public-domain business names (DataSF) + a **synthetic** activation overlay — with **no real merchant relationship, account, or PII**, and makes **no real business-impact claims**. All metrics are simulated. Company-agnostic; real companies appear only as comparisons. Working platform name: **"Curbside Commons"** (pending an owner trademark check).
 
 ## The problem
 
-New merchants must finish a sequence of onboarding steps before they can take a single order — verify the business, upload a menu, add photos, set hours, verify banking, pass a final check. Many stall partway and churn before going live. The people responsible for unsticking them work in a spreadsheet with no easy way to see who is at risk, why, what to do next, or who was already contacted.
+A delivery marketplace's signed-up-but-never-live merchants are real lost GMV, and the long tail is too large to work by hand. Merchants stall partway through onboarding (verify business → menu → photos → hours → banking → final check) and the people who unstick them work in a spreadsheet with no easy way to see who's at risk, **why**, what to do next, or who was already contacted. The #1 reason reactivation outreach fails is being **generic instead of matched to the actual blocker**.
 
-## The solution (V1)
+## What it does
 
-V1 is a single, fully offline slice on the dummy data — no external services, no credentials:
+Deterministic risk + blocker **triage** → a domain **diagnosis** (engagement state + root-cause hypothesis + a reactivation play that varies by *why* they're stuck, not just which step) → **bounded, schema-constrained LLM drafting** → a **claims-gatekeeper** that ties every claim to the merchant's own data → an **eval harness** that scores the draft → a **human-in-the-loop gate** (hold / reject / send) with a full **audit trail** and a **cost ledger**. The design is a direct antidote to the AI-outreach failure frontier (false claims, churn, *Moffatt v. Air Canada*, FTC Operation AI Comply).
 
-- normalize the merchant data into a clean schema;
-- score activation risk with a transparent, deterministic formula;
-- diagnose the current blocker and the next best action;
-- build a human review queue for high-risk or ineligible merchants;
-- generate one structured outreach draft behind guardrails;
-- simulate the send and log every action.
+## Today vs target (honest status)
 
-V1 is **AI-assisted workflow automation**, not an autonomous agent. The model drafts and explains; humans decide and approve.
+**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 50 tests):**
+- Single-stack **Next.js + TypeScript + Tailwind + React** app; a desktop **console**: Overview/queue · Merchant Detail (full why-chain) · Eval/Quality · Metrics/Impact · Audit · Cost.
+- The **deterministic core ported to TS** and pinned **byte-for-byte to the Python v1 oracle** by a differential test.
+- **Hybrid dataset** (real SF entities, PII-scrubbed + license-clean; deterministic synthetic overlay) via a **source-swappable adapter** + trust-boundary sanitizer.
+- **Bounded Gemini drafting** wired (mock path by default; `FAILED_TO_FALLBACK`), with the **claims-gatekeeper**, a **draft-quality eval** (corrupted-record teeth), a **$5 fail-closed budget** (per-call + cumulative), model preflight, and a **prompt-injection cut** (untrusted name never reaches the model).
+- A **REPLAY** snapshot the console renders with **zero live spend**.
 
-## Product runtime stack
+**Designed but gated / target:**
+- **Live Gemini run** (eval over the *real* output + an authentic caught failure) — owner-gated on `GEMINI_API_KEY` + a <$5 spend; live AI is off by default and off in any public deploy.
+- **Vercel deploy** (REPLAY-only, key gated off) — owner-gated.
+- **Deeper blocker root-causes** — need instrumentation signals (named in `lib/domain/diagnosis.ts`, not faked).
 
-CSV / Google Sheets · Python or Apps Script · Gemini (structured drafts) · Supabase Postgres (state) · n8n (orchestration) · Slack (human approval) · Resend (approved email + webhooks) · dashboard / docs.
+## Run it
 
-Most of this is roadmap. Built today: the offline deterministic pipeline (`scripts/`), its tests (`tests/`, 35/35), and the offline evaluation harness (`scripts/eval.py` + `eval/`) — no external services, no credentials. See `docs/visuals/architecture.mmd` for what is built versus target.
+```bash
+npm install
+npm run dev        # http://localhost:3000  (REPLAY demo, no live AI, no spend)
+npm run verify     # typecheck + lint + test + build
+```
 
-## Roadmap / target architecture
+Live AI stays off unless you set `GEMINI_API_KEY` + `ENABLE_LIVE_AI=true` in a (gitignored) `.env` — see `.env.example`.
 
-The target is an auditable, human-in-the-loop **agentic workflow**: bounded model tool-use under policy controls, durable state, orchestrated multi-step flows, live approval and delivery, and outcome learning. Each external system is added only when the offline slice has earned it. "Agentic" describes this target — not V1.
+## Stack
 
-## Development Workflow
-
-> Internal build method, not part of the product runtime.
-
-Built under human direction with **Claude Code** (planning and implementation support) and **Codex** (adversarial plan review, changed-file review, rescue debugging, pre-ship audits), using Git for version control and Mermaid for diagrams. This is how the work is built and reviewed; it is not the product. Details: `docs/dual-model-workflow.md`.
+Single stack: **Next.js (App Router) · TypeScript · Tailwind v4 · React 19**, deploy target **Vercel (free tier)**, tests **Vitest** (+ Playwright e2e, target). **Free-first**; the only paid runtime is the **Gemini API**, hard-capped at **$5 total** and ledgered. Gemini key is **server-side only**.
 
 ## Key documents
 
-- `docs/project-narrative.md` — the full product story and methodology.
-- `docs/product-brief.md` — product summary and intended workflow.
-- `docs/plan-reconciliation.md` — the pre-build decision and V1 scope.
-- `docs/data-audit.md` — the dummy-data audit.
-- `PROJECT_STATE.md` — current status and next step.
-- `docs/visuals/` — architecture and flow diagrams.
+- **`docs/WHY.md`** — the decision rationale (every load-bearing "why", each naming the rejected alternative + its cost).
+- `~/.claude/plans/gentle-forging-starlight.md` — the canonical goal, DoD, phases, and binding blindspots.
+- `docs/research/merchant-activation-domain-2026-06-19.md` — the cited domain research behind the diagnosis layer.
+- `lib/data/PROVENANCE.md` — the hybrid-data source/license/PII label.
+- `docs/decision-log.md` · `PROJECT_STATE.md` · `HANDOFF.md` — decisions, status, next step.
 
-## Status and limitations
+## Development workflow (internal — not the product)
 
-The V1 offline slice (T-001) and the offline evaluation/regression harness (T-002) are built and green: `python3 scripts/run.py` runs the pipeline, `python3 -m unittest tests.test_t001 tests.test_t002` passes 35/35, and `python3 scripts/eval.py` reports MERCHANT 20/20 | GUARDRAIL 45/45 | PASS. The next step is T-003 (pre-Phase-3 hardening: company-agnostic de-brand, generated-draft evaluation coverage, a v2 demo/eval dataset, and enforcement hooks), then bounded LLM drafting (Phase 3). The data is simulated; "learning from outcomes" is simulated until real outcome events exist; the risk score is a transparent synthetic formula, not a trained model; and V1 sends nothing — it simulates sends.
+Built under human direction with **Claude Code** (planning + implementation) and **Codex** (adversarial + changed-file review), Git, and a cross-model ship gate. This is how it's built and reviewed; it is not the product runtime. See `docs/dual-model-workflow.md`.
+
+## Adoption boundary
+
+Adoption-**grade** means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough for a marketplace to inherit — **not** "production-ready." Honest gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, the live-LLM eval + caught-failure (key-gated), and deeper blocker instrumentation. A marketplace adopts it by swapping the hybrid dataset's real layer for its own export against the adapter's documented contract.
 
 Human-led, AI-assisted, professionally reviewed.
