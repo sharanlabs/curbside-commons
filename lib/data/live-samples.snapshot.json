@@ -1,0 +1,99 @@
+{
+  "_provenance": {
+    "recorded_at": "2026-06-20",
+    "model": "gemini-2.5-flash",
+    "pricing_version": "2026-06-18",
+    "note": "A RECORDED LIVE Gemini run over one merchant per blocker (real model output, not the deterministic stub). Frozen because a live call is not recomputable; lets the demo + eval showcase real output with zero re-spend. Real public-domain business names; activation state synthetic. Total spend recorded below.",
+    "total_cost_usd": 0.00369,
+    "modes": {
+      "LIVE_AI": 5,
+      "FAILED_TO_FALLBACK": 1
+    },
+    "gate": {
+      "BLOCKED": 1,
+      "PASS": 3,
+      "WARN": 2
+    },
+    "honest_findings": [
+      "The claims-gatekeeper passed every declared claim against merchant data on all real drafts (its core function held on live output).",
+      "The business_verification draft was BLOCKED on state_mismatch — a fail-safe over-match: the pinned core guardrail pattern flags the phrase \"business verification\" regardless of tense, so a truthful imperative (\"complete business verification\") trips it. Not a model hallucination. Tuning this for live phrasing (in the agent tier, preserving the pinned core + differential) is a documented next step.",
+      "The bank_verification live response could not be parsed -> FAILED_TO_FALLBACK to the deterministic stub (honest degradation), and its billed cost was still recorded ($0.000255, not $0) — the cumulative budget cap stays honest."
+    ]
+  },
+  "rows": [
+    {
+      "merchant": "Aaron Jevon Burrus",
+      "blocker": "business_verification_needed",
+      "mode": "LIVE_AI",
+      "costUsd": 0.000588,
+      "errorClass": null,
+      "gatekeeper": "BLOCKED",
+      "gateFailures": [
+        "guardrail:state_mismatch"
+      ],
+      "eval": "2/3",
+      "subject": "Action Required: Complete Business Verification for Curbside Commons",
+      "body": "Hello Aaron Jevon Burrus, Your account currently has a high risk level. To proceed with getting your Restaurant live on Curbside Commons, you need to complete business verification. This is step 1 of 5. Completing this next best action will unlock further steps for your profile setup. Thank you, The Curbside Commons Team"
+    },
+    {
+      "merchant": "Brewvino SF",
+      "blocker": "menu_upload_needed",
+      "mode": "LIVE_AI",
+      "costUsd": 0.000775,
+      "errorClass": null,
+      "gatekeeper": "PASS",
+      "gateFailures": [],
+      "eval": "3/3",
+      "subject": "Next step for Brewvino SF: Upload your menu",
+      "body": "Hello Brewvino SF, You have completed 1 of 5 onboarding steps for your business on Curbside Commons. Your merchant category is Restaurant. To continue, please upload your menu. This is the next step needed to get your business ready. Thank you,"
+    },
+    {
+      "merchant": "Curry In A Hurry",
+      "blocker": "photos_needed",
+      "mode": "LIVE_AI",
+      "costUsd": 0.000792,
+      "errorClass": null,
+      "gatekeeper": "WARN",
+      "gateFailures": [],
+      "eval": "3/3",
+      "subject": "Action needed: Add photos for Curry In A Hurry",
+      "body": "Hi Curry In A Hurry, your Curbside Commons Restaurant profile needs photos. You have completed 2 of 5 onboarding steps. Adding photos is the next step to get your profile ready."
+    },
+    {
+      "merchant": "Flying Figs LLC",
+      "blocker": "business_hours_needed",
+      "mode": "LIVE_AI",
+      "costUsd": 0.000629,
+      "errorClass": null,
+      "gatekeeper": "PASS",
+      "gateFailures": [],
+      "eval": "3/3",
+      "subject": "Action Required: Set Your Business Hours for Curbside Commons",
+      "body": "Hello Flying Figs LLC,You've completed 3 of 5 steps to get your Restaurant ready on Curbside Commons.The next step is to set your business hours. This is needed before your business can go live.Please log in to your dashboard to set your business hours.Thank you,The Curbside Commons Team"
+    },
+    {
+      "merchant": "Iris Dullaart",
+      "blocker": "bank_verification_needed",
+      "mode": "FAILED_TO_FALLBACK",
+      "costUsd": 0.000255,
+      "errorClass": "No object generated: could not parse the response.",
+      "gatekeeper": "WARN",
+      "gateFailures": [],
+      "eval": "3/3",
+      "subject": "Your next onboarding step with Curbside Commons",
+      "body": "Hi Iris Dullaart, thanks for getting started on your Curbside Commons onboarding. Your next step is to verify your bank information. Reply to this message if you would like a hand."
+    },
+    {
+      "merchant": "Local Folks",
+      "blocker": "final_verification_needed",
+      "mode": "LIVE_AI",
+      "costUsd": 0.000651,
+      "errorClass": null,
+      "gatekeeper": "PASS",
+      "gateFailures": [],
+      "eval": "3/3",
+      "subject": "Action Needed: Complete Final Verification for Curbside Commons",
+      "body": "Hi Local Folks,This message is about your Curbside Commons account for your Restaurant.You have completed 5 of 5 steps in the onboarding process. The final step needed is completing your final verification.To complete your onboarding, please complete the final verification."
+    }
+  ]
+}
