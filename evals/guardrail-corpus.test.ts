@@ -16,9 +16,9 @@ interface Case {
   case_id: string;
   kind: string;
   category: string;
-  text?: string;
+  text?: string | null;
   expect_flags: string[];
-  merchant_context?: { steps_completed?: number } | null;
+  merchant_context?: { steps_completed?: number; merchant_name?: string } | null;
   draft_overrides?: { next_best_action?: string };
 }
 
@@ -30,7 +30,7 @@ const textCases = cases.filter((c) => c.kind !== "structural_positive" && typeof
 // assembled from fragments the same way (scripts/eval.py REGRESSION_TEXT_SENTINELS).
 const SENTINELS: Record<string, string> = {
   ["__" + "REGRESSION_PII_API_KEY_ASSIGNMENT" + "__"]:
-    "Use " + "api" + "_" + "key" + "=" + "sk" + "_" + "live" + "_" + "abcdefghijklmnop",
+    "Use " + "api" + "_" + "key" + "=" + "sk" + "_" + "live" + "_" + "abcdefghijklmnop" + " to connect.",
 };
 const resolveText = (c: Case): string => SENTINELS[c.text as string] ?? (c.text as string);
 
@@ -54,6 +54,33 @@ describe("guardrail regression corpus (45) — TS core matches the Python oracle
       }
     },
   );
+
+  // stub_clean cases (text=null): reconstruct the merchant, build the DETERMINISTIC stub draft, and
+  // assert it is guardrail-clean — exactly as scripts/eval.py does (so all 45 cases actually run).
+  const stubCleanCases = cases.filter((c) => c.kind === "stub_clean");
+  it.each(stubCleanCases.map((c) => [c.case_id, c] as const))(
+    "%s: the deterministic stub draft is guardrail-clean",
+    (_id, c) => {
+      const ctx = c.merchant_context ?? {};
+      const merchant = normalizeRow(
+        {
+          merchant_name: ctx.merchant_name ?? "Stub Co",
+          merchant_category: "Restaurant",
+          days_since_signup: 10,
+          last_login_days_ago: 3,
+          steps_completed: ctx.steps_completed ?? 0,
+          source_risk_level: "Low",
+        },
+        1,
+      );
+      const draft = makeDraft(merchant, REFERENCE_PLATFORM_NAME);
+      expect(runGuardrail(draft, merchant, REFERENCE_PLATFORM_NAME)).toEqual(c.expect_flags);
+    },
+  );
+
+  it("every case is exercised (text/stub/structural), not just counted", () => {
+    expect(textCases.length + stubCleanCases.length + 1).toBe(45);
+  });
 
   it("structural state_mismatch case (action override) flags state_mismatch", () => {
     const c = cases.find((x) => x.kind === "structural_positive");

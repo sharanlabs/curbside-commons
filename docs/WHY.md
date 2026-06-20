@@ -2,7 +2,7 @@
 
 This product is built to **answer every load-bearing "why" to first principles**, and the test for each is concrete: **name the alternative it rejected and the cost of that choice.** A confident rationale that doesn't name what it gave up is just rationalization. Plain-English first, the technical reason alongside.
 
-> Status note: this describes the prototype as built. Where a capability is designed-but-gated (live Gemini, deploy), it says so. Honesty is itself a why (last section).
+> Status note: this describes the prototype as built. The live Gemini run is **done and recorded** (a frozen fixture; the public demo stays REPLAY-only — no live calls); the public **deploy** is the remaining owner-gated step. Honesty is itself a why (last section).
 
 ---
 
@@ -60,4 +60,4 @@ This product is built to **answer every load-bearing "why" to first principles**
 
 ## Why this generalizes (the pattern, beyond delivery merchants)
 
-The shape — **deterministic triage + a typed diagnosis layer → bounded, schema-constrained LLM drafting → a claims-gatekeeper that ties every claim to source data → an eval harness → a human-approval gate → audit + cost ledger** — is the reusable answer to *any* "use AI to act on people/accounts at scale, safely" problem where a wrong or fabricated claim is costly. Swap the entity and the blocker taxonomy and the same skeleton serves: SaaS trial-to-paid activation (blocker = setup step not done), patient/member onboarding, lender/KYC document chase, B2B renewal/churn outreach, support-ticket deflection. What stays constant is the *governance spine*: the risky decision is deterministic and replayable, the LLM is bounded and evaluated, every claim traces to data, and a human owns the irreversible action. That spine — not the merchant specifics — is the transferable asset, and it's exactly what the documented AI-outreach failure frontier (false claims, churn, regulatory liability) demands.
+The shape — **deterministic triage + a typed diagnosis layer → bounded, schema-constrained LLM drafting → a claims-gatekeeper that ties every declared claim to source data → an eval harness → a human-approval gate → audit + cost ledger** — is the reusable answer to *any* "use AI to act on people/accounts at scale, safely" problem where a wrong or fabricated claim is costly. Swap the entity and the blocker taxonomy and the same skeleton serves: SaaS trial-to-paid activation (blocker = setup step not done), patient/member onboarding, lender/KYC document chase, B2B renewal/churn outreach, support-ticket deflection. What stays constant is the *governance spine*: the risky decision is deterministic and replayable, the LLM is bounded and evaluated, every declared claim traces to data, and a human owns the irreversible action. That spine — not the merchant specifics — is the transferable asset, and it's exactly what the documented AI-outreach failure frontier (false claims, churn, regulatory liability) demands.

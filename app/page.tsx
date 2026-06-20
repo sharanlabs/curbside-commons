@@ -31,7 +31,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 const PIPELINE: Array<{ step: string; plain: string; tech: string }> = [
   { step: "Triage", plain: "Find who's stuck, and how badly.", tech: "Deterministic risk score + level (auditable formula)." },
   { step: "Diagnose", plain: "Pin the exact blocker.", tech: "Onboarding-step → blocker/next-action map." },
-  { step: "Draft", plain: "Write the right next message.", tech: "Bounded, schema-constrained LLM (mock here; live = Phase B)." },
+  { step: "Draft", plain: "Write the right next message.", tech: "Bounded, schema-constrained LLM (REPLAY here; a real Gemini run is recorded — see Eval)." },
   { step: "Gate", plain: "Check every declared claim is true.", tech: "Claims-gatekeeper: each declared claim traces to merchant data; forbidden-claim guardrails." },
   { step: "Score", plain: "Measure draft quality.", tech: "Eval graders: structure · state-consistency · policy." },
   { step: "Approve", plain: "A human decides: hold / reject / send.", tech: "Human-in-the-loop gate; simulated send; full audit trail." },

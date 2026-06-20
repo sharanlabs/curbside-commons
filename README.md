@@ -1,6 +1,6 @@
 # ActivationOps AI
 
-A **human-led, AI-assisted** prototype for activating **stalled / pre-live, long-tail merchants** on a local-commerce **delivery marketplace** (DoorDash / Uber Eats / Grubhub-style). It spots which signed-up merchants are stuck getting set up, diagnoses **why**, drafts a next message whose **every claim is checked against the merchant's own data** (and forbidden-claim patterns), holds it for human approval, scores it for quality, and logs every step — built to be **measured, audited, and adopted**.
+A **human-led, AI-assisted** prototype for activating **stalled / pre-live, long-tail merchants** on a local-commerce **delivery marketplace** (DoorDash / Uber Eats / Grubhub-style). It spots which signed-up merchants are stuck getting set up, diagnoses **why**, drafts a next message whose **every declared claim is checked against the merchant's own data** (and forbidden-claim patterns), holds it for human approval, scores it for quality, and logs every step — built to be **measured, audited, and adopted**.
 
 > **Not** an official system of any marketplace. It runs on **hybrid demo data** — real public-domain business names (DataSF) + a **synthetic** activation overlay — with **no real merchant relationship, account, or PII**, and makes **no real business-impact claims**. All metrics are simulated. Company-agnostic; real companies appear only as comparisons. Working platform name: **"Curbside Commons"** (pending an owner trademark check).
 

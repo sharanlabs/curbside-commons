@@ -1,6 +1,6 @@
 // Gemini key + model preflight. Run: node --env-file=.env scripts-ts/gemini-preflight.mjs
-// Free, read-only ListModels — verifies the key works WITHOUT ever printing it (the key
-// only ever appears inside the request URL, which is never logged). No billing.
+// Free, read-only ListModels — verifies the key works WITHOUT ever printing it (the key is sent
+// as the x-goog-api-key request header, never in the URL and never logged). No billing.
 
 const key = process.env.GEMINI_API_KEY?.trim();
 const enable = process.env.ENABLE_LIVE_AI;
