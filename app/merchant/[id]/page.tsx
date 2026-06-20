@@ -35,7 +35,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
   const rm = getReplayMerchant(id, PLATFORM_NAME);
   if (!rm) notFound();
 
-  const { merchant: m, draft, gatekeeper: gate, evalScore } = rm;
+  const { merchant: m, draft, gatekeeper: gate, evalScore, diagnosis } = rm;
   const mRec = m as unknown as Record<string, unknown>;
   const stepsRemaining = TOTAL_STEPS - m.steps_completed;
 
@@ -79,6 +79,32 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
               # {stepsRemaining} step{stepsRemaining === 1 ? "" : "s"} remaining
             </span>
           </p>
+
+          <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50/60 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
+                Why they&apos;re stuck
+              </span>
+              <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-[11px] font-medium text-neutral-700">
+                {diagnosis.engagement_state.replace(/_/g, " ")}
+              </span>
+              <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-[11px] font-medium text-neutral-700">
+                {diagnosis.blocker_source.replace(/_/g, " ")}
+              </span>
+            </div>
+            <p className="mt-2 text-[13px] text-neutral-700">{diagnosis.root_cause_hypothesis}</p>
+            <div className="mt-2 rounded border border-neutral-200 bg-white px-3 py-2">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
+                Recommended play ·{" "}
+              </span>
+              <span className="text-[12px] font-medium text-neutral-800">
+                {diagnosis.play.touch.replace(/_/g, " ")}
+              </span>
+              <p className="mt-1 text-[13px] text-neutral-700">{diagnosis.play.action}</p>
+              <p className="mt-1 text-[12px] text-neutral-500">{diagnosis.play.rationale}</p>
+            </div>
+            <p className="mt-2 text-[11px] text-neutral-400">{diagnosis.caveat}</p>
+          </div>
         </Section>
 
         <Section

@@ -17,6 +17,7 @@ import { mockDraft, type OutreachDraft } from "@/lib/agents/draft";
 import type { AgentMode } from "@/lib/agents/gemini";
 import { runGatekeeper, type GatekeeperReport } from "@/lib/agents/gatekeeper";
 import { scoreDraft, type DraftScore } from "@/lib/evals/draft-quality";
+import { diagnose, type Diagnosis } from "@/lib/domain/diagnosis";
 import { getHybridMerchants, hybridProvenance, type HybridProvenance } from "@/lib/ingest/hybrid";
 
 export interface AuditEntry {
@@ -32,6 +33,8 @@ export interface ReplayMerchant {
   draftMode: AgentMode;
   gatekeeper: GatekeeperReport;
   evalScore: DraftScore;
+  /** Domain-depth diagnosis: engagement state + root-cause hypothesis + routed reactivation play. */
+  diagnosis: Diagnosis;
   costUsd: number;
   /** Final human-in-the-loop state: held / simulated_sent / draft_rejected / none. */
   outreachStatus: Merchant["outreach_status"];
@@ -66,13 +69,18 @@ export interface ReplaySnapshot {
   merchants: ReplayMerchant[];
 }
 
-function buildAudit(m: Merchant, gate: GatekeeperReport, evalScore: DraftScore): AuditEntry[] {
+function buildAudit(
+  m: Merchant,
+  gate: GatekeeperReport,
+  evalScore: DraftScore,
+  diagnosis: Diagnosis,
+): AuditEntry[] {
   return [
     {
       at: RUN_TIMESTAMP,
       actor: "system",
       action: "TRIAGE",
-      detail: `risk_score=${m.risk_score} (${m.risk_level}); blocker=${m.current_blocker_code}; next=${m.next_best_action}`,
+      detail: `risk=${m.risk_score} (${m.risk_level}); blocker=${m.current_blocker_code}; engagement=${diagnosis.engagement_state}; play=${diagnosis.play.touch}`,
     },
     {
       at: RUN_TIMESTAMP,
@@ -115,15 +123,17 @@ export function buildReplaySnapshot(platformName = REFERENCE_PLATFORM_NAME): Rep
     const gatekeeper = runGatekeeper(draft, m, platformName);
     draft.guardrail_flags = gatekeeper.guardrailFlags; // stamp the record accurately
     const evalScore = scoreDraft(draft, m, platformName);
+    const diagnosis = diagnose(m);
     return {
       merchant: m,
       draft,
       draftMode: "DETERMINISTIC_RULES",
       gatekeeper,
       evalScore,
+      diagnosis,
       costUsd: 0,
       outreachStatus: m.outreach_status,
-      audit: buildAudit(m, gatekeeper, evalScore),
+      audit: buildAudit(m, gatekeeper, evalScore, diagnosis),
     };
   });
 
