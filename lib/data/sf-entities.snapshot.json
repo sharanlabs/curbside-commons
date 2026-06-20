@@ -1,0 +1,107 @@
+{
+  "_provenance": {
+    "source": "DataSF — Registered Business Locations (San Francisco)",
+    "dataset_id": "g8m3-pdis",
+    "endpoint": "https://data.sfgov.org/resource/g8m3-pdis.json",
+    "license": "PDDL 1.0 (Public Domain Dedication and License)",
+    "fetched_at": "2026-06-20",
+    "fields_used": [
+      "dba_name",
+      "naic_code_description",
+      "city",
+      "state"
+    ],
+    "pii_excluded": [
+      "ownership_name",
+      "full_business_address",
+      "business_zip",
+      "certificate_number",
+      "ttxid",
+      "location (coordinates)"
+    ],
+    "selection": "active SF locations; NAICS in {Food Services->Restaurant, Retail Trade->Retail}; sanitized; deduped by name; name length >= 3 and starts with a letter (drops address-as-name rows); 10 per category, stride-sampled across the alphabetical set for variety",
+    "synthetic_note": "These are REAL business names + crosswalked categories only. The activation state (onboarding progress, blockers, risk inputs) is SYNTHETIC, applied deterministically at load by lib/ingest/overlay.ts — no public dataset exists for it."
+  },
+  "entities": [
+    {
+      "merchant_name": "Aaron Jevon Burrus",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "Brewvino SF",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "Curry In A Hurry",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "Flying Figs LLC",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "Iris Dullaart",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "Local Folks",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "New Mangia Tutti Ristorante",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "Pure Love Food",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "Spangler's Market",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "The Tamale Fiesta",
+      "merchant_category": "Restaurant"
+    },
+    {
+      "merchant_name": "Abc Supply LLC",
+      "merchant_category": "Retail"
+    },
+    {
+      "merchant_name": "Blue Moon Spinnery",
+      "merchant_category": "Retail"
+    },
+    {
+      "merchant_name": "Danah Accessories, Inc",
+      "merchant_category": "Retail"
+    },
+    {
+      "merchant_name": "Folklore",
+      "merchant_category": "Retail"
+    },
+    {
+      "merchant_name": "Hybrid Organic Design",
+      "merchant_category": "Retail"
+    },
+    {
+      "merchant_name": "Locali Gift Shop",
+      "merchant_category": "Retail"
+    },
+    {
+      "merchant_name": "Needles And Pens, Inc.",
+      "merchant_category": "Retail"
+    },
+    {
+      "merchant_name": "Radiance Glow",
+      "merchant_category": "Retail"
+    },
+    {
+      "merchant_name": "Silver Sprocket LLC",
+      "merchant_category": "Retail"
+    },
+    {
+      "merchant_name": "The Tea Garden",
+      "merchant_category": "Retail"
+    }
+  ]
+}
