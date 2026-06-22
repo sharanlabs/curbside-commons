@@ -52,7 +52,7 @@ export default function CostPage() {
 
       <section className="mt-8">
         <h2 className="text-sm font-semibold text-neutral-900">
-          Pinned price table <span className="font-normal text-neutral-400">({PRICING_VERSION})</span>
+          Pinned price table <span className="font-normal text-neutral-500">({PRICING_VERSION})</span>
         </h2>
         <div className="mt-2 overflow-hidden rounded-lg border border-neutral-200">
           <table className="w-full text-left text-sm">

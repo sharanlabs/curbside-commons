@@ -96,7 +96,7 @@ export default function EvalPage() {
       <section className="mt-10">
         <h2 className="text-sm font-semibold text-neutral-900">
           Recorded Gemini run — static fixture{" "}
-          <span className="font-normal text-neutral-400">
+          <span className="font-normal text-neutral-500">
             ({liveSamples.provenance.model}, {liveSamples.provenance.recorded_at})
           </span>
         </h2>
@@ -111,7 +111,7 @@ export default function EvalPage() {
         </p>
 
         <div className="mt-3 rounded-lg border border-neutral-200 bg-neutral-50/60 p-4">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
             What the live run showed (honest)
           </div>
           <ul className="mt-1.5 list-inside list-disc space-y-1 text-[12px] text-neutral-700">

@@ -23,7 +23,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
     <div className="rounded-lg border border-neutral-200 px-4 py-3">
       <div className="text-2xl font-semibold tabular-nums">{value}</div>
       <div className="mt-0.5 text-xs font-medium text-neutral-500">{label}</div>
-      {sub ? <div className="mt-0.5 text-[11px] text-neutral-400">{sub}</div> : null}
+      {sub ? <div className="mt-0.5 text-[11px] text-neutral-500">{sub}</div> : null}
     </div>
   );
 }

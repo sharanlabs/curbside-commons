@@ -13,8 +13,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-neutral-900 focus:px-3 focus:py-2 focus:text-sm focus:text-white"
+        >
+          Skip to main content
+        </a>
         <Nav />
-        {children}
+        <div id="main-content" tabIndex={-1}>
+          {children}
+        </div>
         <footer className="mx-auto mt-16 max-w-6xl border-t border-neutral-200 px-6 py-6 text-[12px] leading-relaxed text-neutral-500">
           <span className="font-medium text-neutral-600">Demo / portfolio prototype.</span> REPLAY over
           public business-record <span className="font-medium">names</span> + <span className="font-medium">synthetic

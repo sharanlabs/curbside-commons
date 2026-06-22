@@ -75,14 +75,14 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
           <p className="mt-3 rounded bg-neutral-50 px-3 py-2 font-mono text-[12px] text-neutral-600">
             risk = 2×{m.days_since_signup} + 3×{m.last_login_days_ago} + 10×({TOTAL_STEPS}−{m.steps_completed}) ={" "}
             {m.risk_score}
-            <span className="ml-2 text-neutral-400">
+            <span className="ml-2 text-neutral-500">
               # {stepsRemaining} step{stepsRemaining === 1 ? "" : "s"} remaining
             </span>
           </p>
 
           <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50/60 p-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
                 Why they&apos;re stuck
               </span>
               <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-[11px] font-medium text-neutral-700">
@@ -94,7 +94,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
             </div>
             <p className="mt-2 text-[13px] text-neutral-700">{diagnosis.root_cause_hypothesis}</p>
             <div className="mt-2 rounded border border-neutral-200 bg-white px-3 py-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
                 Recommended play ·{" "}
               </span>
               <span className="text-[12px] font-medium text-neutral-800">
@@ -103,7 +103,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
               <p className="mt-1 text-[13px] text-neutral-700">{diagnosis.play.action}</p>
               <p className="mt-1 text-[12px] text-neutral-500">{diagnosis.play.rationale}</p>
             </div>
-            <p className="mt-2 text-[11px] text-neutral-400">{diagnosis.caveat}</p>
+            <p className="mt-2 text-[11px] text-neutral-500">{diagnosis.caveat}</p>
           </div>
         </Section>
 
@@ -127,11 +127,11 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
                 <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-[12px]">
                   {c.field} = {String(c.value)}
                 </code>
-                <span className="text-neutral-400">→ merchant.{c.field} = {String(mRec[c.field])}</span>
+                <span className="text-neutral-500">→ merchant.{c.field} = {String(mRec[c.field])}</span>
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-[11px] text-neutral-400">
+          <p className="mt-2 text-[11px] text-neutral-500">
             mode: {rm.draftMode} · cost: ${rm.costUsd.toFixed(2)} · model: {draft.model_version}
           </p>
         </Section>
@@ -195,7 +195,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
                 <GateButton label="Reject" tone="danger" />
                 <GateButton label="Hold" tone="neutral" />
               </div>
-              <p className="mt-1.5 text-[11px] text-neutral-400">
+              <p className="mt-1.5 text-[11px] text-neutral-500">
                 Display of the gate state. Interactive approval (writing the decision back) lands in Phase C.
               </p>
             </div>
@@ -236,7 +236,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-400">{label}</dt>
+      <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">{label}</dt>
       <dd className="text-[13px] text-neutral-800">{value}</dd>
     </div>
   );
@@ -257,7 +257,7 @@ function FlagList({
     <div className="mt-2">
       <span className="text-[12px] font-medium text-neutral-500">{label}: </span>
       {items.length === 0 ? (
-        <span className="text-[12px] text-neutral-400">{emptyText}</span>
+        <span className="text-[12px] text-neutral-500">{emptyText}</span>
       ) : (
         <ul className={`mt-1 list-inside list-disc text-[12px] ${tone === "warn" ? "text-amber-700" : "text-red-600"}`}>
           {items.map((it, i) => (
