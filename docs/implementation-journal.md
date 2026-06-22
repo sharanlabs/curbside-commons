@@ -30,6 +30,21 @@ Newest entries on top.
 
 ---
 
+## 2026-06-22 REBUILD/JUDGE — P2: calibration gold set + metrics harness (offline, $0)
+
+- What changed: Added the calibration core for the semantic judge — a pure metrics module (`lib/evals/judge-metrics.ts`), a stratified gold set as typed TS literals (`evals/gold/semantic-judge-gold.ts`), a reusable harness (`evals/gold/harness.ts`), and a 16-test calibration suite (`evals/judge-calibration.test.ts`). 192 tests + 1 skipped green; typecheck/lint/build green. No `lib/core` / differential touch; no runtime/UI change (the app does not import any of these), so the Phase-C e2e is unaffected.
+- Why it changed: P2 of the approved plan (`docs/spec-semantic-judge.md`) — "calibrated" requires a labeled gold set + a metrics harness before any live run. P3's live cross-family judge needs this scaffolding to produce real numbers.
+- Challenge / tradeoff: The dangerous ambiguity in "validate the pipeline on the mock judge." The mock is a keyword stub explicitly NOT a real detector; making it score well would corrupt both the gold set (too easy → the lab-vs-prod gap) and the deliverable (a stub masquerading as a detector).
+- How it was diagnosed: An `advisor` (stronger-model) review before writing a line flagged exactly this and three follow-ons (κ/flip-rate degenerate under the mock; stratify the held-out split now; headline must be recall-on-the-gatekeeper-passing-subset, not vacuum recall).
+- Options considered: (a) pre-baked JSON gold with R-CAL-1 assumed in comments; (b) typed TS literals with R-CAL-1 ENFORCED by running the real gatekeeper at test time. Chose (b) — the live-enforced artifact is strictly stronger.
+- Final fix: Metric math is tested against hand-computed confusion matrices (independent of any judge). The mock judge is run only as a recorded "stub baseline (NOT calibration)," never gated on a threshold. Every gold item is run through the REAL `runGatekeeper` and its approval must equal the item's declared `expectGatekeeperApproves`.
+- How it was verified: That live enforcement immediately caught a defective planted positive (`G-state-1`: "photos are already uploaded" did not trip the tense-aware state check — the auxiliary slot allows one token, not "are already"); reworded to a form that genuinely trips the gate. Proof the enforcement has teeth.
+- Honesty (R-CAL-4 / R-HON-1): The 6 recorded live drafts are well-grounded (organic fabrications ≈ 0), so every gold positive is SYNTHETIC and labeled `source:"planted"`; no "built + calibrated, F1=X" claim ships until P3/P4 metrics clear the bar on held-out data.
+- Files changed: `lib/evals/judge-metrics.ts`, `evals/gold/semantic-judge-gold.ts`, `evals/gold/harness.ts`, `evals/judge-calibration.test.ts` (+ state docs).
+- Reviewer notes (Codex / human): Codex changed-files pass deferred to the P4 ship gate (offline eval rigor, $0). Human: P3 live key (`GROQ_API_KEY`) remains owner-gated.
+
+---
+
 ## 2026-06-22 REBUILD/JUDGE — P1: semantic faithfulness judge (mock + DI-live + Faithfulness panel)
 
 - What changed: built the judge's offline core. New `lib/agents/claimable-fields.ts` (the shared `CLAIMABLE_FIELDS` + `merchantFacts`, now imported by BOTH the gatekeeper and the judge — one source of truth, spec R-ARCH-2). New `lib/agents/semantic-judge.ts`: the Zod per-claim verdict schema, the grounded entailment prompt, a deterministic `mockJudge` (sentence-level, $0 test/REPLAY path), and `judgeDraft` (mock + DI-live + `FAILED_TO_FALLBACK`) behind a provider-agnostic boundary, budget-ledgered. `judgeLiveEnabled()` added to env-flags. Wired as a SECONDARY control after the gatekeeper in `lib/replay/run.ts` (new `judge` field + a `judge` audit actor; runs only when `approvedForHumanReview`, R-ARCH-4). New Merchant-Detail "Faithfulness check" panel (§4, renumbering Eval/Human/Audit → 5/6/7), rendering per-claim ✓/✗ verdicts.

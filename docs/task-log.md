@@ -1,5 +1,25 @@
 # Task Log
 
+## 2026-06-22 (semantic judge — P2: gold set + metrics harness; offline/$0; goal mode)
+
+### Professional Process Applied
+Task type: eval-rigor build (calibration gold set + metrics harness) · Stage: execution, P2 of P0–P4 · Risk: medium (offline, $0; no `lib/core` touch) · Mode: FULL (calibration core; ship-gating) · Effort: high, auto-routed · Basis: committed spec `docs/spec-semantic-judge.md` (R-CAL-1…7, R-HON) + advisor review · Validation: typecheck + lint + 192 tests (+1 skipped) + build green; R-CAL-1 enforced LIVE against the real `runGatekeeper` · Codex: P4 gate covers it (changed-files pass optional at close) · Human approval: not needed (offline/$0, inside the approved plan); P3 live key stays owner-gated.
+
+### Skills / tooling used
+- `advisor` (stronger-model review) before writing the harness — surfaced the load-bearing constraint: test the metric MATH against hand-computed matrices (independent of any judge), run the mock judge only as a labeled "stub baseline," and enforce R-CAL-1 live (gold as typed TS literals, not pre-baked JSON). All adopted.
+
+### What was done
+- `lib/evals/judge-metrics.ts` — pure, independently-tested metrics: confusion matrix, precision/recall/F1, TPR/TNR, Wilson recall CI, Cohen's κ, test-retest flip-rate; `headlineReport` = recall on the gatekeeper-PASSING subset (R-CAL-1).
+- `evals/gold/semantic-judge-gold.ts` — stratified gold set as typed TS literals (~24 items): 10 planted judge-territory positives across 4 failure modes (timeline/entity/capability/specific) that survive the guardrail, 2 gate-caught positives (revenue%, state-mismatch) to exercise R-CAL-1 exclusion, 7 mock-clean negatives, 2 real-supply (live-snapshot) clean negatives; objective field-entailment labels + critiques (R-CAL-5); tune/test split (R-CAL-6/7). All positives SYNTHETIC + labeled (R-CAL-4: the 6 recorded live drafts are well-grounded).
+- `evals/gold/harness.ts` — reusable wiring (gold → real gatekeeper + JudgeFn → labeled predictions); `mockJudgeFn` is the P2 stub; the same harness feeds the live cross-family judge at P3.
+- `evals/judge-calibration.test.ts` (16 tests) — metric math vs hand-computed matrices; κ/flip-rate vs known inputs; **R-CAL-1 enforced LIVE** (every item's real-gatekeeper approval == its declared expectation); R-CAL-4 probe; mock judge recorded as STUB BASELINE (not gated on a threshold).
+
+### Finding caught by the live enforcement
+R-CAL-1's live gatekeeper run caught a bad planted positive (`G-state-1`: "photos are already uploaded" — the state-consistency auxiliary slot allows one token, not "are already", so it didn't trip). Reworded to "photos have been uploaded and are live" → gate blocks it correctly. This is the value of enforcing, not asserting.
+
+### Next
+P3 (OWNER-GATED): free `GROQ_API_KEY` → run the live cross-family judge (Groq gpt-oss-120b) through this harness → real metrics + frozen calibration fixture. `lib/core` + differential untouched.
+
 ## 2026-06-22 (doctrine alignment-audit — reconciled + committed; owner: "do all the fixes and commit, go till the end")
 
 ### Professional Process Applied
