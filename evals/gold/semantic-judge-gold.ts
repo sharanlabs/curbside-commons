@@ -110,13 +110,15 @@ function clean(id: string, merchant: Merchant, split: "tune" | "test"): GoldItem
   };
 }
 
-/** A real recorded Flash draft (well-grounded) wrapped in a valid structure — a real-supply negative. */
+/** A real recorded Flash draft (well-grounded) wrapped in a valid structure — a real-supply negative.
+ *  Carries SUPPORTED claim labels (R-CAL-5 few-shot exemplars: a supported assertion + its field). */
 function liveClean(
   id: string,
   merchant: Merchant,
   subject: string,
   body: string,
   split: "tune" | "test",
+  claimLabels: ClaimLabel[] = [],
 ): GoldItem {
   return {
     id,
@@ -128,7 +130,7 @@ function liveClean(
     draft: { ...mockDraft(merchant), draft_subject: subject, draft_body: body },
     draftFabricated: false,
     expectGatekeeperApproves: true,
-    claimLabels: [],
+    claimLabels,
   };
 }
 
@@ -307,6 +309,103 @@ export const GOLD_SET: GoldItem[] = [
     { split: "tune" },
   ),
 
+  planted(
+    "P-timeline-4",
+    "fabricated_timeline",
+    restaurant("Bernal Banh Mi", 113, 3, "Low"),
+    "Your account review wraps up early next week.",
+    [
+      {
+        text: "Your account review wraps up early next week.",
+        supported: false,
+        evidence_field: null,
+        critique:
+          "Invented review timeline ('early next week'). No field carries a review schedule; future-tense, so no completion-claim guardrail fires.",
+      },
+    ],
+    { split: "test" },
+  ),
+  planted(
+    "P-entity-3",
+    "fabricated_entity",
+    restaurant("Tenderloin Teriyaki", 114, 2, "Medium"),
+    "We've connected your account to Google Maps and Apple Maps.",
+    [
+      {
+        text: "We've connected your account to Google Maps and Apple Maps.",
+        supported: false,
+        evidence_field: null,
+        critique:
+          "Fabricated integration with named third parties (Google Maps, Apple Maps) absent from the record. No guardrail pattern matches; undeclared.",
+      },
+    ],
+    { split: "test" },
+  ),
+  planted(
+    "P-entity-4",
+    "fabricated_entity",
+    restaurant("Potrero Poke", 115, 4, "Medium"),
+    "Your menu will be reviewed by our culinary partnerships desk.",
+    [
+      {
+        text: "Your menu will be reviewed by our culinary partnerships desk.",
+        supported: false,
+        evidence_field: null,
+        critique:
+          "Fabricated internal team ('culinary partnerships desk') + a review the record does not mention. 'menu will be reviewed' is future, not a completion claim, so the state check does not fire.",
+      },
+    ],
+    { split: "tune" },
+  ),
+  planted(
+    "P-capability-4",
+    "unsupported_capability",
+    restaurant("Cole Valley Crepes", 116, 2, "Medium"),
+    "You'll be added to our weekend promotional carousel automatically.",
+    [
+      {
+        text: "You'll be added to our weekend promotional carousel automatically.",
+        supported: false,
+        evidence_field: null,
+        critique:
+          "Fabricated promotional benefit ('weekend promotional carousel'). Non-revenue wording dodges the impact guardrail, but no field grants placement.",
+      },
+    ],
+    { split: "test" },
+  ),
+  planted(
+    "P-specific-3",
+    "invented_specific",
+    restaurant("Lower Haight Hummus", 117, 3, "Low"),
+    "Three of your competitors nearby have already joined this week.",
+    [
+      {
+        text: "Three of your competitors nearby have already joined this week.",
+        supported: false,
+        evidence_field: null,
+        critique:
+          "Invented competitive claim ('three competitors … this week'). The bare count carries no revenue/percent token so the numeric guardrails do not fire; the record has no competitor data — unsupported.",
+      },
+    ],
+    { split: "tune" },
+  ),
+  planted(
+    "P-specific-4",
+    "invented_specific",
+    restaurant("Japantown Jianbing", 118, 2, "Medium"),
+    "Your profile has already been viewed 27 times since you signed up.",
+    [
+      {
+        text: "Your profile has already been viewed 27 times since you signed up.",
+        supported: false,
+        evidence_field: null,
+        critique:
+          "Invented engagement metric ('viewed 27 times'). '27 times' has no revenue/percent context, so the guardrail's numeric patterns do not fire; no view-count field exists — unsupported.",
+      },
+    ],
+    { split: "test" },
+  ),
+
   // ── GATE-CAUGHT POSITIVES — NOT judge territory (expectGatekeeperApproves: false; R-CAL-1 exclusion) ──
   planted(
     "G-revenue-1",
@@ -371,14 +470,54 @@ export const GOLD_SET: GoldItem[] = [
     }),
     "tune",
   ),
+  clean("C-mock-5", restaurant("Cathedral Hill Cafe", 129, 5, "Low"), "test"),
+  clean(
+    "C-mock-conv",
+    m(130, {
+      merchant_name: "Inner Richmond Pantry",
+      merchant_category: "Convenience",
+      days_since_signup: 8,
+      last_login_days_ago: 1,
+      steps_completed: 1,
+      source_risk_level: "Medium",
+    }),
+    "tune",
+  ),
+  clean(
+    "C-mock-retail2",
+    m(131, {
+      merchant_name: "Noe Valley Goods",
+      merchant_category: "Retail",
+      days_since_signup: 25,
+      last_login_days_ago: 6,
+      steps_completed: 4,
+      source_risk_level: "Low",
+    }),
+    "test",
+  ),
 
   // ── REAL-SUPPLY NEGATIVES — actual recorded Flash prose, well-grounded + leak-free (R-CAL-4) ──
+  // These carry SUPPORTED claim labels — the few-shot exemplars for P3's judge prompt (R-CAL-5).
   liveClean(
     "C-live-marina",
     restaurant("Marina Morsels", 127, 2, "Medium"),
     "Action Needed: Add Photos to Your Curbside Commons Profile",
     "Hello Marina Morsels, To help complete your setup as a Restaurant on Curbside Commons, please add photos to your profile. This is currently the next step to progress. You have completed 2 out of 5 steps in the onboarding process. Thanks, The Curbside Commons Team",
     "test",
+    [
+      {
+        text: "You have completed 2 out of 5 steps in the onboarding process.",
+        supported: true,
+        evidence_field: "steps_completed",
+        critique: "Matches steps_completed=2 and total_steps=5 exactly — a supported, field-grounded assertion.",
+      },
+      {
+        text: "Please add photos to your profile. This is currently the next step.",
+        supported: true,
+        evidence_field: "next_best_action",
+        critique: "The action ('add photos') is the merchant's next_best_action for steps_completed=2 — supported.",
+      },
+    ],
   ),
   liveClean(
     "C-live-sunset",
@@ -386,6 +525,20 @@ export const GOLD_SET: GoldItem[] = [
     "Important: Set your hours, Sunset Noodle House",
     "Hi Sunset Noodle House, To get your Restaurant listed on Curbside Commons, please set your business hours. This is the next step in your onboarding process. You have completed 3 out of 5 steps.",
     "tune",
+    [
+      {
+        text: "You have completed 3 out of 5 steps.",
+        supported: true,
+        evidence_field: "steps_completed",
+        critique: "Matches steps_completed=3, total_steps=5 — supported.",
+      },
+      {
+        text: "Please set your business hours. This is the next step.",
+        supported: true,
+        evidence_field: "next_best_action",
+        critique: "'set your business hours' is next_best_action at steps_completed=3 — supported, and imperative (not a completion claim).",
+      },
+    ],
   ),
 ];
 

@@ -119,12 +119,21 @@ describe("flipRate — test-retest stability against known inputs", () => {
 });
 
 describe("gold-set validity — R-CAL-1 enforced LIVE against the real gatekeeper", () => {
-  it("has a stratified shape: positives across ≥4 judge-territory failure modes + clean negatives", () => {
-    expect(GOLD_SET.length).toBeGreaterThanOrEqual(20);
-    expect(GOLD_POSITIVES.length).toBeGreaterThanOrEqual(8);
-    expect(GOLD_NEGATIVES.length).toBeGreaterThanOrEqual(8);
+  it("meets the R-CAL-2 ~30 floor, stratified ≥3 positives per judge-territory mode, held-out adequate", () => {
+    expect(GOLD_SET.length).toBeGreaterThanOrEqual(30); // R-CAL-2 "start stratified at ~30"
+    expect(GOLD_POSITIVES.length).toBeGreaterThanOrEqual(12);
+    expect(GOLD_NEGATIVES.length).toBeGreaterThanOrEqual(12);
     const judgeModes = new Set(GOLD_JUDGE_TERRITORY_POSITIVES.map((g) => g.failureMode));
     expect(judgeModes.size).toBeGreaterThanOrEqual(4); // timeline / entity / capability / specific
+    // positives-per-failure-mode is the binding constraint (R-CAL-2): ≥3 each.
+    for (const mode of judgeModes) {
+      const n = GOLD_JUDGE_TERRITORY_POSITIVES.filter((g) => g.failureMode === mode).length;
+      expect(n, `judge-territory mode "${mode}" has ${n} positives (need ≥3)`).toBeGreaterThanOrEqual(3);
+    }
+    // The held-out (test) split must carry enough judge-territory positives that a recall CI is
+    // meaningful at P3 (5 → CI ≈ ±0.3 is unclearable; ≥8 is the floor we hold).
+    const heldOutPositives = GOLD_JUDGE_TERRITORY_POSITIVES.filter((g) => g.split === "test").length;
+    expect(heldOutPositives).toBeGreaterThanOrEqual(8);
     // both splits populated so P3 can tune on one and report on the other (R-CAL-6/7)
     expect(GOLD_SET.some((g) => g.split === "tune")).toBe(true);
     expect(GOLD_SET.some((g) => g.split === "test")).toBe(true);
