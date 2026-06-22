@@ -30,6 +30,38 @@ Newest entries on top.
 
 ---
 
+## 2026-06-22 REBUILD — Doctrine alignment-audit reconciliation (honesty · eval coverage · a11y · traceability)
+
+- What changed: ran a read-only 3-agent alignment audit (project-advisor → HYBRID-CORRECT/SOUND-WITH-GAPS; guidelines-monitor → 12 followed/2 partial/0 violated; acceptance-gate → BLOCK), then fixed every gate-blocking and important finding across 5 committed slices.
+- Why it changed: pre-deploy hardening; an honesty-first artifact had drifted false claims onto public surfaces.
+- Challenge that appeared: the acceptance-gate ranked a real-format `GEMINI_API_KEY` in `.env` as the HIGHEST blocker (possible committed-secret compromise).
+- How it was diagnosed: verified with git plumbing — `.env` is gitignored, untracked, and absent from all history; `.vercelignore` also excludes it. So it is a local-only dev key, **not** a RULES §11 breach. The gate over-ranked it because it lacked Bash; verification broke the tie.
+- Final fixes (per slice): (1) honesty/accuracy copy — false "Real San Francisco businesses" / "real business names" on `app/page.tsx` + `app/metrics` → fictional-display wording; stale live-run stats `$0.0036/4-2` → `$0.0042/5-1` (README, app/eval, ENTERPRISE-READINESS) synced to the locked fixture; test count → 157; "authentic caught-failure are done" overclaim softened. (2) NEW `no-leakage` eval grader (4th dimension) that catches the recorded Mission Masa raw-enum + risk-level leak the other graders missed — proven by a planted test AND a real-output test over the frozen drafts; live prompt tightened; snapshot re-scored deterministically (3/4 leaky, 4/4 clean). (3) recovered the rebuild-era Codex verdicts from `/tmp` into `docs/reviews/` (this gap). (4) a11y — dim 11px `text-neutral-400`→`500` (WCAG 1.4.3) + skip-link (2.4.1).
+- How it was verified: `npm run verify` (typecheck/lint/build) green at every slice; 157 tests + 1 skipped; the 2 new teeth tests pass.
+- Prevention step: derive the live-run figures from the fixture so the README/Eval copy can't drift again (logged as a follow-up); keep cross-model verdicts in `docs/reviews/`, never only `/tmp`.
+- Files changed: `app/{page,metrics/page,eval/page,cost/page,layout,merchant/[id]/page}.tsx`, `README.md`, `docs/{WHY,ENTERPRISE-READINESS}.md`, `lib/evals/draft-quality.ts`, `lib/agents/draft.ts`, `evals/{draft-quality,live-samples}.test.ts`, `lib/data/live-samples.snapshot.json`, `docs/reviews/codex-*`.
+- Reviewer notes: a fresh pre-deploy Codex pass on these slices is recommended before T13.
+- Human decision: owner directed "do all the fixes and commit, go till the end"; deploy + any live spend remain owner-gated.
+
+## 2026-06-20 REBUILD — Cross-model gate + live Gemini run + 3-audit sweep (backfilled 2026-06-22)
+
+- What changed: ran the recorded live Gemini run (6 merchants, `gemini-2.5-flash`, ~$0.0042, fixture `lib/data/live-samples.snapshot.json`) and a comprehensive review sweep — Codex (initial + batch-2 + two confirming passes, all BLOCK→reconciled), security-specialist (no P0/P1), evals-specialist (4 P1 rigor gaps closed).
+- Why it changed: prove the bounded-LLM path on real output; gate the artifact before any deploy.
+- Final fixes: cumulative fail-closed budget on missing/partial usage (`UNKNOWN_USAGE`); `live:true` cannot bypass `ENABLE_LIVE_AI`; `{{MERCHANT}}` placeholder validation hardened; 45-case guardrail corpus ported; draft-text differential vs `out/model_runs.csv`; live-snapshot regression lock; honesty copy ("declared claims", not "every claim").
+- How it was verified: 155 tests + 3 e2e green; coverage ≥88/79/90/91; `lib/core` + the differential oracle untouched (surgical state-consistency lives in the agent tier).
+- Reviewer notes: the four Codex verdicts are in `docs/reviews/codex-2026-06-*` (recovered 2026-06-22) and indexed in `docs/reviews/codex-rebuild-INDEX.md`.
+- Files changed: `lib/agents/*`, `evals/*`, `lib/data/live-samples.snapshot.json`, honesty copy across docs/surfaces. See decision-log 2026-06-20 rows.
+
+## 2026-06-19 REBUILD — Rebuild execution: scaffold → thin vertical slice → Phases A–D (backfilled 2026-06-22)
+
+- What changed: executed the approved pivot (`~/.claude/plans/gentle-forging-starlight.md`) — Next.js 16/React 19/TS/Tailwind scaffold; deterministic core ported to TS and pinned byte-for-byte to the Python oracle (`evals/core-differential.test.ts`); thin vertical slice (hybrid DataSF+synthetic dataset, bounded Gemini draft, claims-gatekeeper, draft-quality eval, REPLAY orchestrator, Overview + Merchant Detail); Phase B domain depth (`lib/domain/diagnosis.ts`); Phase C console (Eval/Metrics/Audit/Cost); live-path hardening (injection cut + cumulative budget ledger); Phase D docs (`docs/WHY.md`, README).
+- Why it changed: the 2026-06-19 owner-approved pivot from a Python CLI to a deployed, adoption-grade product.
+- How it was verified: typecheck/lint/test/build green at each slice; differential stays byte-identical; `next build` prerenders every route.
+- Reviewer notes: Codex BLOCK→reconciled at the slice gate (see `docs/reviews/codex-2026-06-19-rebuild-comprehensive.md`).
+- Files changed: `lib/**`, `app/**`, `evals/**`, `docs/**` (the rebuild). See decision-log 2026-06-19 rows + `PROJECT_STATE.md`.
+
+---
+
 ## 2026-06-02 T-001 — Audit finding: recurring git-state doc staleness (process)
 
 - What changed: process note only (no code). The ground-rules audit found the state docs had again drifted from git.
