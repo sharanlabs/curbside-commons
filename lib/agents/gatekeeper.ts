@@ -27,20 +27,8 @@ import { validateDraft } from "@/lib/core/pipeline";
 import type { Merchant } from "@/lib/core/types";
 import type { OutreachDraft } from "@/lib/agents/draft";
 import { proseClaimsUnreachedStep, registerLeakFailures } from "@/lib/agents/state-consistency";
-
-/** Merchant fields a claim is allowed to cite (a claim outside this set is unverifiable). */
-const CLAIMABLE_FIELDS = new Set<string>([
-  "merchant_name",
-  "merchant_category",
-  "steps_completed",
-  "total_steps",
-  "current_blocker_code",
-  "next_best_action",
-  "risk_level",
-  "risk_score",
-  "days_since_signup",
-  "last_login_days_ago",
-]);
+// CLAIMABLE_FIELDS is shared with the semantic judge (one source of truth — spec R-ARCH-2).
+import { CLAIMABLE_FIELDS } from "@/lib/agents/claimable-fields";
 
 export interface GatekeeperReport {
   status: "PASS" | "WARN" | "BLOCKED";

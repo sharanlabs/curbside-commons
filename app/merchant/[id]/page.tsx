@@ -35,7 +35,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
   const rm = getReplayMerchant(id, PLATFORM_NAME);
   if (!rm) notFound();
 
-  const { merchant: m, draft, gatekeeper: gate, evalScore, diagnosis } = rm;
+  const { merchant: m, draft, gatekeeper: gate, judge, evalScore, diagnosis } = rm;
   const mRec = m as unknown as Record<string, unknown>;
   const stepsRemaining = TOTAL_STEPS - m.steps_completed;
 
@@ -156,7 +156,56 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
         </Section>
 
         <Section
-          title="4 · Eval / quality"
+          title="4 · Faithfulness check (semantic judge)"
+          plain="A second, independent check: an LLM from a DIFFERENT model family reads the finished message and verifies each factual sentence against the merchant's data row — catching an invented number, capability, or timeline the deterministic gatekeeper structurally can't see. Here it's the deterministic stub verdict (REPLAY, $0); the live cross-family judge (Groq gpt-oss-120b) is key-gated."
+        >
+          {judge ? (
+            <>
+              <div className="flex items-center gap-3">
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[12px] font-medium ring-1 ring-inset ${
+                    judge.verdict.any_unsupported ? STATUS_STYLE.WARN : STATUS_STYLE.PASS
+                  }`}
+                >
+                  {judge.verdict.any_unsupported ? "UNSUPPORTED CLAIM" : "ALL SUPPORTED"}
+                </span>
+                <span className="text-[13px] text-neutral-600">
+                  {judge.verdict.claims.filter((c) => c.supported).length}/{judge.verdict.claims.length} prose
+                  assertions backed by the data row
+                </span>
+              </div>
+              <ul className="mt-3 space-y-1.5">
+                {judge.verdict.claims.map((c, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[13px]">
+                    <span className={c.supported ? "text-emerald-600" : "text-red-600"}>{c.supported ? "✓" : "✗"}</span>
+                    <span className="text-neutral-700">
+                      {c.text}
+                      {c.supported && c.evidence_field ? (
+                        <span className="text-neutral-500">
+                          {" "}
+                          → <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-[12px]">{c.evidence_field}</code>
+                        </span>
+                      ) : (
+                        <span className="text-red-500"> → no supporting field (unsupported)</span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-[11px] text-neutral-500">
+                mode: {judge.mode} · model: {judge.modelId} · cost: ${judge.costUsd.toFixed(2)}
+                {judge.errorClass ? ` · ${judge.errorClass}` : ""}
+              </p>
+            </>
+          ) : (
+            <p className="text-[13px] text-neutral-600">
+              Skipped — the gatekeeper blocked this draft, so it never reaches the semantic judge.
+            </p>
+          )}
+        </Section>
+
+        <Section
+          title="5 · Eval / quality"
           plain="An independent measurement of draft quality across four dimensions — the deep-AI showcase, in human terms."
         >
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -182,7 +231,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
         </Section>
 
         <Section
-          title="5 · Human-in-the-loop gate"
+          title="6 · Human-in-the-loop gate"
           plain="A person decides — hold, reject, or send. Low-risk, clean drafts are eligible to send (simulated); high-risk ones are held for approval."
         >
           {m.review_required ? (
@@ -213,7 +262,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
           )}
         </Section>
 
-        <Section title="6 · Audit trail" plain="Every step of the decision, recorded.">
+        <Section title="7 · Audit trail" plain="Every step of the decision, recorded.">
           <ol className="space-y-1.5">
             {rm.audit.map((a, i) => (
               <li key={i} className="flex gap-3 text-[12px]">

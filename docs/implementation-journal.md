@@ -30,6 +30,17 @@ Newest entries on top.
 
 ---
 
+## 2026-06-22 REBUILD/JUDGE — P1: semantic faithfulness judge (mock + DI-live + Faithfulness panel)
+
+- What changed: built the judge's offline core. New `lib/agents/claimable-fields.ts` (the shared `CLAIMABLE_FIELDS` + `merchantFacts`, now imported by BOTH the gatekeeper and the judge — one source of truth, spec R-ARCH-2). New `lib/agents/semantic-judge.ts`: the Zod per-claim verdict schema, the grounded entailment prompt, a deterministic `mockJudge` (sentence-level, $0 test/REPLAY path), and `judgeDraft` (mock + DI-live + `FAILED_TO_FALLBACK`) behind a provider-agnostic boundary, budget-ledgered. `judgeLiveEnabled()` added to env-flags. Wired as a SECONDARY control after the gatekeeper in `lib/replay/run.ts` (new `judge` field + a `judge` audit actor; runs only when `approvedForHumanReview`, R-ARCH-4). New Merchant-Detail "Faithfulness check" panel (§4, renumbering Eval/Human/Audit → 5/6/7), rendering per-claim ✓/✗ verdicts.
+- Why it changed: P1 of the approved plan — make the judge real + SHOWABLE offline before any spend; close the documented Phase-B gap (`gatekeeper.ts:9-12`) the forward-checker can't cover.
+- Decisions baked in: default judge = CROSS-FAMILY Groq `openai/gpt-oss-120b` strict-JSON (owner raised Groq; freshness-verified current/non-deprecated as of 2026-06-22, the Llama line was deprecated 06-17 → migrate to gpt-oss); `any_unsupported` ALWAYS recomputed from the per-claim booleans (never trust the model's aggregate); the free Groq judge still threads the budget ledger so switching to the paid Gemini alt can't silently escape the cap; mock judge is a stub for plumbing/panel, NOT a real detector (the live cross-family judge is, at P3).
+- Challenge: keep P1 truly offline + dependency-free while encoding a not-yet-installed provider. Fix: the live path runs via an injected `generate` (DI) in tests; the default Groq call throws `JUDGE_PROVIDER_NOT_WIRED` (caught → fallback) until P3 installs `@ai-sdk/groq`; the Gemini alt is wired now via the installed `@ai-sdk/google`. No static groq import → typecheck stays clean.
+- How it was verified: `npm run verify` green — typecheck + lint + **176 tests (+1 skipped)** (15 new judge tests: mock determinism + both heuristic directions, DI LIVE_JUDGE, recomputed aggregate, UNPARSEABLE/throw/NO_BUDGET/hard-stop/JUDGE_LIVE_DISABLED rails, free-$0 vs Gemini-priced alt, REPLAY wiring) + `next build` (27 routes incl. all 20 merchant pages with the panel) + **3/3 Playwright e2e** (the heading-substring selectors survived the renumber).
+- Files changed: `lib/agents/{claimable-fields,semantic-judge,gatekeeper}.ts`, `lib/server/env-flags.ts`, `lib/replay/run.ts`, `app/merchant/[id]/page.tsx`, `evals/semantic-judge.test.ts`, `docs/spec-semantic-judge.md` (freshness).
+- Reviewer notes: Codex cross-model gate is P4 (pre-ship). The live cross-family path is unproven until P3 (key + the `@ai-sdk/groq` install).
+- Human decision: owner chose Groq cross-family ("which is best for quality/structured/enterprise") + "explore current free models, use the best" → gpt-oss-120b. P3 live calibration (free Groq key) remains owner-gated.
+
 ## 2026-06-22 REBUILD — Doctrine alignment-audit reconciliation (honesty · eval coverage · a11y · traceability)
 
 - What changed: ran a read-only 3-agent alignment audit (project-advisor → HYBRID-CORRECT/SOUND-WITH-GAPS; guidelines-monitor → 12 followed/2 partial/0 violated; acceptance-gate → BLOCK), then fixed every gate-blocking and important finding across 5 committed slices.

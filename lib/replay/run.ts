@@ -16,13 +16,14 @@ import type { Merchant } from "@/lib/core/types";
 import { mockDraft, type OutreachDraft } from "@/lib/agents/draft";
 import type { AgentMode } from "@/lib/agents/gemini";
 import { runGatekeeper, type GatekeeperReport } from "@/lib/agents/gatekeeper";
+import { mockJudgeResult, type JudgeResult } from "@/lib/agents/semantic-judge";
 import { scoreDraft, type DraftScore } from "@/lib/evals/draft-quality";
 import { diagnose, type Diagnosis } from "@/lib/domain/diagnosis";
 import { getHybridMerchants, hybridProvenance, type HybridProvenance } from "@/lib/ingest/hybrid";
 
 export interface AuditEntry {
   at: string;
-  actor: "system" | "draft" | "gatekeeper" | "eval";
+  actor: "system" | "draft" | "gatekeeper" | "judge" | "eval";
   action: string;
   detail: string;
 }
@@ -32,6 +33,10 @@ export interface ReplayMerchant {
   draft: OutreachDraft;
   draftMode: AgentMode;
   gatekeeper: GatekeeperReport;
+  /** Secondary control: the semantic faithfulness judge (per-claim entailment vs the data row).
+   *  Runs only when the gatekeeper approved the draft (R-ARCH-4); null = gatekeeper-blocked (skipped).
+   *  REPLAY renders the deterministic mock verdict ($0); a recorded cross-family judge fixture lands P4. */
+  judge: JudgeResult | null;
   evalScore: DraftScore;
   /** Domain-depth diagnosis: engagement state + root-cause hypothesis + routed reactivation play. */
   diagnosis: Diagnosis;
@@ -72,6 +77,7 @@ export interface ReplaySnapshot {
 function buildAudit(
   m: Merchant,
   gate: GatekeeperReport,
+  judge: JudgeResult | null,
   evalScore: DraftScore,
   diagnosis: Diagnosis,
 ): AuditEntry[] {
@@ -93,6 +99,15 @@ function buildAudit(
       actor: "gatekeeper",
       action: gate.status,
       detail: `${gate.failures.length} failure(s), ${gate.warnings.length} warning(s).`,
+    },
+    {
+      at: RUN_TIMESTAMP,
+      actor: "judge",
+      action: judge ? judge.mode : "SKIPPED",
+      detail: judge
+        ? `${judge.verdict.claims.filter((c) => c.supported).length}/${judge.verdict.claims.length} prose assertions supported by merchant data` +
+          (judge.verdict.any_unsupported ? "; UNSUPPORTED claim(s) → held for human review." : "; all supported.")
+        : "Skipped — the gatekeeper blocked the draft (it never reaches the semantic judge).",
     },
     {
       at: RUN_TIMESTAMP,
@@ -122,6 +137,9 @@ export function buildReplaySnapshot(platformName = REFERENCE_PLATFORM_NAME): Rep
     const draft = mockDraft(m, platformName);
     const gatekeeper = runGatekeeper(draft, m, platformName);
     draft.guardrail_flags = gatekeeper.guardrailFlags; // stamp the record accurately
+    // Secondary control: judge only a draft the gatekeeper approved (R-ARCH-4). REPLAY uses the
+    // deterministic mock verdict ($0); P4 swaps in a recorded cross-family judge fixture here.
+    const judge = gatekeeper.approvedForHumanReview ? mockJudgeResult(draft, m) : null;
     const evalScore = scoreDraft(draft, m, platformName);
     const diagnosis = diagnose(m);
     return {
@@ -129,11 +147,12 @@ export function buildReplaySnapshot(platformName = REFERENCE_PLATFORM_NAME): Rep
       draft,
       draftMode: "DETERMINISTIC_RULES",
       gatekeeper,
+      judge,
       evalScore,
       diagnosis,
       costUsd: 0,
       outreachStatus: m.outreach_status,
-      audit: buildAudit(m, gatekeeper, evalScore, diagnosis),
+      audit: buildAudit(m, gatekeeper, judge, evalScore, diagnosis),
     };
   });
 
