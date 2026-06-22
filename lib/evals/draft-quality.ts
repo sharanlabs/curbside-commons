@@ -27,7 +27,7 @@ import { scanText } from "@/lib/core/guardrail";
 import { validateDraft } from "@/lib/core/pipeline";
 import type { Merchant } from "@/lib/core/types";
 import type { OutreachDraft } from "@/lib/agents/draft";
-import { proseClaimsUnreachedStep } from "@/lib/agents/state-consistency";
+import { proseClaimsUnreachedStep, registerLeakFailures } from "@/lib/agents/state-consistency";
 
 export type GraderId = "structure" | "state-consistency" | "policy" | "no-leakage";
 
@@ -42,28 +42,6 @@ export interface DraftScore {
   pass: boolean;
   passed: number;
   total: number;
-}
-
-/**
- * Register / no-leakage check over MERCHANT-FACING prose (subject + body ONLY — the internal
- * risk_explanation/blocker_summary legitimately carry the blocker enum + risk level and are never
- * sent to the merchant). Catches what makes an LLM draft read as machine-generated or discloses
- * internals to the recipient:
- *   - a raw internal field identifier (snake_case token, e.g. "bank_verification_needed"), and
- *   - an internal risk level/score disclosure (e.g. "High Risk", "medium-risk", "risk level").
- * Prose-only (takes a string) so the same teeth run over the frozen recorded live drafts — real
- * model output, not just a planted corruption.
- */
-export function registerLeakFailures(prose: string): string[] {
-  const failures: string[] = [];
-  const idents = prose.match(/\b[a-z]+(?:_[a-z]+)+\b/g);
-  if (idents && idents.length > 0) {
-    failures.push(`leaked internal identifier(s): ${[...new Set(idents)].join(", ")}`);
-  }
-  if (/\b(high|medium|low)[\s-]?risk\b|\brisk[\s-]?(level|score|rating|tier)\b/i.test(prose)) {
-    failures.push("disclosed an internal risk level/score in merchant-facing prose");
-  }
-  return failures;
 }
 
 function gradeNoLeakage(draft: OutreachDraft): GraderResult {

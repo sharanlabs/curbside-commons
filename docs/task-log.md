@@ -3,17 +3,18 @@
 ## 2026-06-22 (doctrine alignment-audit — reconciled + committed; owner: "do all the fixes and commit, go till the end")
 
 ### Professional Process Applied
-Task type: pre-deploy alignment audit + corrective fixes · Stage: pre-deploy hardening · Risk: low per slice (text/docs) except the eval-grader slice (logic — verified) · Mode: FULL (public-claim surface) · Effort: high, auto-routed (honesty invariant + AI behavior) · Basis: 3 read-only agents (project-advisor · guidelines-monitor · acceptance-gate) + claude-os doctrine + every finding independently re-verified against repo evidence · Validation: `npm run verify` green per slice (157 tests + 1 skipped) · Codex: the rebuild verdicts recovered into `docs/reviews/`; a fresh pre-deploy pass on the new slices recommended · Human approval: owner authorized the fixes + commits; deploy + live spend stay owner-gated.
+Task type: pre-deploy alignment audit + corrective fixes · Stage: pre-deploy hardening · Risk: low per slice (text/docs) except the eval-grader slice (logic — verified) · Mode: FULL (public-claim surface) · Effort: high, auto-routed (honesty invariant + AI behavior) · Basis: 3 read-only agents (project-advisor · guidelines-monitor · acceptance-gate) + claude-os doctrine + every finding independently re-verified against repo evidence · Validation: `npm run verify` green per slice (159 tests + 1 skipped) · Codex: the rebuild verdicts recovered into `docs/reviews/`; a fresh pre-deploy pass on the new slices recommended · Human approval: owner authorized the fixes + commits; deploy + live spend stay owner-gated.
 
 ### What was done (5 committed slices)
 - `8b8a896` — honesty/accuracy: false "real businesses" copy → fictional-display; stale run-stats `$0.0036/4-2` → fixture `$0.0042/5-1`; test count → 157; softened the "authentic caught-failure" overclaim.
 - `c100f41` — NEW `no-leakage` eval grader (4th dim) catching the recorded raw-enum + risk-level leak; planted + real-output teeth; live prompt tightened; snapshot re-scored 3/4 leaky / 4/4 clean.
 - `93848de` — a11y: dim 11px text contrast → WCAG-AA (`text-neutral-500`) + skip-link.
 - `e675df0` — recovered the rebuild-era Codex verdicts from `/tmp` → `docs/reviews/` + INDEX; backfilled `docs/implementation-journal.md`.
-- (this) state-doc sync to canonical facts + final verify + Codex-gate attempt.
+- `d799240` — state-doc sync to canonical facts + final verify (verify:full incl. 3 e2e green).
+- (slice 6) reconciled a fresh Codex BLOCK (gpt-5.5 xhigh, `docs/reviews/codex-2026-06-22-alignfix.md`, 11 findings): the runtime **gatekeeper now ENFORCES no-leakage** via a shared precise-denylist detector (`lib/agents/state-consistency.ts`) — closes the eval-scored-but-not-gated gap + removes the false-positive; footer + "caught-nothing" overclaim corrected; grader-list surfaces + eval-value lock added; review-doc whitespace stripped. **159 tests** + 1 skipped green. Confirming Codex pass recommended before T13.
 
 ### Verification / honesty
-Every finding re-verified before acting. The acceptance-gate's HIGHEST-ranked "secret in `.env`" was checked with git and found a FALSE ALARM (gitignored/untracked/never-committed/deploy-excluded). Canonical facts: 157 tests (+1 skipped); live fixture 5 LIVE_AI / 1 fallback / $0.004203. `lib/core` + differential oracle untouched.
+Every finding re-verified before acting. The acceptance-gate's HIGHEST-ranked "secret in `.env`" was checked with git and found a FALSE ALARM (gitignored/untracked/never-committed/deploy-excluded). Canonical facts: 159 tests (+1 skipped); live fixture 5 LIVE_AI / 1 fallback / $0.004203. `lib/core` + differential oracle untouched.
 
 ### Next step
 Owner-gated **deploy (T13)** only; a fresh pre-deploy Codex pass on the 4 fix slices recommended. The UI-redesign exploration remains separate + in-flight.

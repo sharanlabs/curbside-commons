@@ -14,6 +14,8 @@
  * menu/photos/hours patterns already required past-tense done-words and are carried as-is.
  */
 
+import { STEP_MAP } from "@/lib/core/constants";
+
 /**
  * [pattern, minimum steps_completed for the claim to be TRUE]. A completion claim asserts a step
  * is DONE. The completion word must follow the step noun (optionally via a done-auxiliary like
@@ -58,4 +60,55 @@ export function proseClaimsUnreachedStep(prose: string, stepsCompleted: number):
     if (requiredSteps > stepsCompleted && pattern.test(prose)) return true;
   }
   return false;
+}
+
+/**
+ * Internal identifiers that must NEVER appear in merchant-facing prose (subject + body): the
+ * snake_case blocker codes + the next-best-action enum + the internal field names. Matched as a
+ * PRECISE denylist (not a generic snake_case catch-all) so a legitimate name like "Tacos_To_Go" is
+ * never false-flagged, while snake_case / camelCase / UPPER_CASE forms of a KNOWN token are caught.
+ * (The internal risk_explanation/blocker_summary legitimately carry these and are never sent.)
+ */
+const INTERNAL_IDENTIFIERS: string[] = [
+  ...Object.values(STEP_MAP).flatMap((v) => [v.blocker, v.action]),
+  "current_blocker_code", "next_best_action", "risk_level", "risk_score", "source_risk_level",
+  "steps_completed", "total_steps", "merchant_category", "merchant_id",
+  "days_since_signup", "last_login_days_ago",
+];
+const normalizeIdentifier = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+const INTERNAL_BY_NORM = new Map<string, string>(
+  INTERNAL_IDENTIFIERS.map((t) => [normalizeIdentifier(t), t]),
+);
+
+/**
+ * Register / no-leakage check over MERCHANT-FACING prose (subject + body). Flags two things the
+ * recipient must never see: (a) a leaked internal identifier — any KNOWN internal token in
+ * identifier form (snake_case / camelCase / UPPER), detected by normalizing identifier-shaped
+ * word-tokens so a natural phrase ("your bank verification") is NOT flagged, only the joined token
+ * ("bank_verification_needed"); and (b) an internal risk level/score disclosure. Pure-string so the
+ * same teeth run over the frozen recorded live drafts. SHARED by the eval grader AND the runtime
+ * gatekeeper — one rule, one source of truth.
+ */
+export function registerLeakFailures(prose: string): string[] {
+  const failures: string[] = [];
+  const tokens = prose.match(/[A-Za-z][A-Za-z0-9_]*/g) ?? [];
+  const leaked = [
+    ...new Set(
+      tokens
+        .filter((t) => t.includes("_") || /[a-z][A-Z]/.test(t))
+        .map((t) => INTERNAL_BY_NORM.get(normalizeIdentifier(t)))
+        .filter((t): t is string => Boolean(t)),
+    ),
+  ];
+  if (leaked.length > 0) {
+    failures.push(`leaked internal identifier(s): ${leaked.join(", ")}`);
+  }
+  if (
+    /\b(?:high|medium|low)[\s-]?risk\b|\brisk[\s:_-]*(?:high|medium|low|level|score|rating|tier)\b|\bflagged\b[^.]{0,24}\brisk\b/i.test(
+      prose,
+    )
+  ) {
+    failures.push("disclosed an internal risk level/score in merchant-facing prose");
+  }
+  return failures;
 }

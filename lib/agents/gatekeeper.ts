@@ -26,7 +26,7 @@ import { scanText } from "@/lib/core/guardrail";
 import { validateDraft } from "@/lib/core/pipeline";
 import type { Merchant } from "@/lib/core/types";
 import type { OutreachDraft } from "@/lib/agents/draft";
-import { proseClaimsUnreachedStep } from "@/lib/agents/state-consistency";
+import { proseClaimsUnreachedStep, registerLeakFailures } from "@/lib/agents/state-consistency";
 
 /** Merchant fields a claim is allowed to cite (a claim outside this set is unverifiable). */
 const CLAIMABLE_FIELDS = new Set<string>([
@@ -98,6 +98,12 @@ export function runGatekeeper(
   }
   const guardrailFlags = [...flagSet].sort();
   for (const flag of guardrailFlags) failures.push(`guardrail:${flag}`);
+
+  // 3b. Register / no-leakage: the customer-facing prose (subject + body) must not leak an internal
+  //     identifier or disclose an internal risk level/score (shared rule with the eval's no-leakage
+  //     grader — one source of truth). A leak is a hard failure -> BLOCKED, so a leaky draft never
+  //     reaches the human gate (closes the eval-scored-but-not-enforced gap, Codex 2026-06-22).
+  for (const f of registerLeakFailures(prose)) failures.push(`register-leak:${f}`);
 
   // 4. Held for human review (not a block — a clean draft still needs approval).
   if (merchant.review_required) {

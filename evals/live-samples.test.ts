@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { liveSamples } from "@/lib/replay/live-samples";
-import { registerLeakFailures } from "@/lib/evals/draft-quality";
+import { registerLeakFailures } from "@/lib/agents/state-consistency";
 
 /**
  * Regression-lock the RECORDED live-Gemini run (the frozen fixture). The live model is
@@ -55,6 +55,13 @@ describe("live-samples fixture — recorded real-Gemini run, regression-locked",
     // Mission Masa leaked a raw "bank_verification_needed" enum + a "Medium risk" disclosure;
     // Fog City Tacos and Bayview Bistro disclosed an internal risk level. The clean drafts pass.
     expect(leaky).toEqual(["Bayview Bistro", "Fog City Tacos", "Mission Masa"]);
+  });
+
+  it("each recorded row's eval value matches its leak status (leaky 3/4, clean 4/4)", () => {
+    for (const r of liveSamples.rows) {
+      const leaky = registerLeakFailures(`${r.subject} ${r.body}`).length > 0;
+      expect(r.eval).toBe(leaky ? "3/4" : "4/4");
+    }
   });
 
   it("provenance mode + gate counts match the rows (no summary↔data drift)", () => {

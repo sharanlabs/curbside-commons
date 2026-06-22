@@ -79,6 +79,15 @@ describe("gatekeeper — corrupted drafts each BLOCK (teeth, not theater)", () =
     expect(r.status).toBe("BLOCKED");
     expect(r.failures.join(" ")).toContain("guardrail:state_mismatch");
   });
+
+  it("blocks a draft leaking an internal identifier / risk level into merchant-facing prose", () => {
+    const d = mockDraft(clean);
+    d.draft_body = "Hi — the current blocker is bank_verification_needed; this is a High Risk item.";
+    const r = runGatekeeper(d, clean);
+    expect(r.status).toBe("BLOCKED");
+    expect(r.approvedForHumanReview).toBe(false);
+    expect(r.failures.join(" ")).toContain("register-leak");
+  });
 });
 
 describe("gatekeeper — live-phrasing precision (the 2026-06-20 live-run fix)", () => {
