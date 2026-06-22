@@ -14,7 +14,7 @@ ActivationOps AI is built **adoption-grade**, not production-ready: the architec
 - **Eval harness** (`lib/evals/draft-quality.ts`) — deterministic graders (structure · state-consistency · policy), each paired with a corrupted record it must catch (teeth, not theater).
 - **Human-in-the-loop gate** — hold / reject / send (simulated), with a per-merchant **audit trail**, a **cost ledger**, and an honest **mode taxonomy** (REPLAY / LIVE_AI / DETERMINISTIC_RULES / FAILED_TO_FALLBACK).
 - **Secrets** — the Gemini key is server-side only and never client-exposed; `.env` is gitignored; no secret is committed (RULES §11).
-- **Quality gate** — `npm run verify` (typecheck · lint · test · build); 155 tests + 3 Playwright e2e including the differential + the guardrail-corpus + draft-text differentials; `next build` prerenders every route (also the console render-smoke).
+- **Quality gate** — `npm run verify` (typecheck · lint · test · build); 157 tests + 3 Playwright e2e including the differential + the guardrail-corpus + draft-text differentials; `next build` prerenders every route (also the console render-smoke).
 - **Data hygiene** — the public demo DISPLAYS fictional names (no real businesses); the real-data adapter is license-clean (DataSF, PDDL 1.0 public domain) and PII-scrubbed to name + category; activation state is synthetic and labeled (`lib/data/PROVENANCE.md`).
 
 ## Demo boundaries

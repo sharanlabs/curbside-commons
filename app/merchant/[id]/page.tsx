@@ -157,9 +157,9 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
 
         <Section
           title="4 · Eval / quality"
-          plain="An independent measurement of draft quality across three dimensions — the deep-AI showcase, in human terms."
+          plain="An independent measurement of draft quality across four dimensions — the deep-AI showcase, in human terms."
         >
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {evalScore.results.map((r) => (
               <div key={r.grader} className="rounded-md border border-neutral-200 p-3">
                 <div className="flex items-center justify-between">

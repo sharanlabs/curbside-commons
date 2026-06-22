@@ -14,7 +14,7 @@ Deterministic risk + blocker **triage** → a domain **diagnosis** (engagement s
 
 ## Today vs target (honest status)
 
-**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 155 tests + 3 Playwright e2e):**
+**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 157 tests + 3 Playwright e2e):**
 - Single-stack **Next.js + TypeScript + Tailwind + React** app; a desktop **console**: Overview/queue · Merchant Detail (full why-chain) · Eval/Quality · Metrics · Audit · Cost.
 - The **deterministic core ported to TS** and pinned **byte-for-byte to the Python v1 oracle** by a differential test.
 - **Hybrid dataset** — the public demo shows **fictional** merchant names (so synthetic risk states are never pinned on real businesses); the **source-swappable adapter** ingests real DataSF entities (PII-scrubbed, license-clean) + a trust-boundary sanitizer + a deterministic synthetic overlay. Real-data *capability*, fictional *display*.

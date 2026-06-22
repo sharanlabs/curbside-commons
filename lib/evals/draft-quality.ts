@@ -8,11 +8,15 @@
  * source of truth, no divergence; the teeth are proven by the paired corrupted-record
  * tests, not by code independence.
  *
- * Three deterministic dimensions (plan's draft-quality contract):
+ * Four deterministic dimensions (plan's draft-quality contract):
  *   - structure          schema-valid + well-formed claims.
  *   - state-consistency  every claim matches merchant data; the action + prose never
  *                        assert a step the merchant has not reached.
  *   - policy             no forbidden revenue/impact/urgency claim, no PII.
+ *   - no-leakage         the MERCHANT-FACING prose (subject + body) never leaks an internal
+ *                        field identifier (snake_case enum token) or discloses an internal
+ *                        risk level/score. (The internal risk_explanation/blocker_summary
+ *                        legitimately carry those and are never sent to the merchant.)
  *
  * Each grader is paired in the test suite with a deliberately-corrupted draft it must
  * catch — a grader that cannot fail is theater. (These are PLANTED corruptions, not a
@@ -25,7 +29,7 @@ import type { Merchant } from "@/lib/core/types";
 import type { OutreachDraft } from "@/lib/agents/draft";
 import { proseClaimsUnreachedStep } from "@/lib/agents/state-consistency";
 
-export type GraderId = "structure" | "state-consistency" | "policy";
+export type GraderId = "structure" | "state-consistency" | "policy" | "no-leakage";
 
 export interface GraderResult {
   grader: GraderId;
@@ -38,6 +42,34 @@ export interface DraftScore {
   pass: boolean;
   passed: number;
   total: number;
+}
+
+/**
+ * Register / no-leakage check over MERCHANT-FACING prose (subject + body ONLY — the internal
+ * risk_explanation/blocker_summary legitimately carry the blocker enum + risk level and are never
+ * sent to the merchant). Catches what makes an LLM draft read as machine-generated or discloses
+ * internals to the recipient:
+ *   - a raw internal field identifier (snake_case token, e.g. "bank_verification_needed"), and
+ *   - an internal risk level/score disclosure (e.g. "High Risk", "medium-risk", "risk level").
+ * Prose-only (takes a string) so the same teeth run over the frozen recorded live drafts — real
+ * model output, not just a planted corruption.
+ */
+export function registerLeakFailures(prose: string): string[] {
+  const failures: string[] = [];
+  const idents = prose.match(/\b[a-z]+(?:_[a-z]+)+\b/g);
+  if (idents && idents.length > 0) {
+    failures.push(`leaked internal identifier(s): ${[...new Set(idents)].join(", ")}`);
+  }
+  if (/\b(high|medium|low)[\s-]?risk\b|\brisk[\s-]?(level|score|rating|tier)\b/i.test(prose)) {
+    failures.push("disclosed an internal risk level/score in merchant-facing prose");
+  }
+  return failures;
+}
+
+function gradeNoLeakage(draft: OutreachDraft): GraderResult {
+  const prose = `${draft.draft_subject} ${draft.draft_body}`;
+  const failures = registerLeakFailures(prose).map((f) => `no-leakage:${f}`);
+  return { grader: "no-leakage", pass: failures.length === 0, failures };
 }
 
 function gradeStructure(draft: OutreachDraft): GraderResult {
@@ -95,6 +127,7 @@ export function scoreDraft(
     gradeStructure(draft),
     gradeStateConsistency(draft, merchant),
     gradePolicy(draft, platformName),
+    gradeNoLeakage(draft),
   ];
   const passed = results.filter((r) => r.pass).length;
   return { results, pass: passed === results.length, passed, total: results.length };

@@ -18,11 +18,12 @@ const merchant = normalizeRow(
 );
 
 describe("draft-quality eval — clean drafts score full marks", () => {
-  it("a clean mock draft passes all three dimensions", () => {
+  it("a clean mock draft passes all four dimensions", () => {
     const s = scoreDraft(mockDraft(merchant), merchant);
     expect(s.pass).toBe(true);
-    expect(s.passed).toBe(3);
+    expect(s.passed).toBe(4);
     expect(s.results.map((r) => r.grader).sort()).toEqual([
+      "no-leakage",
       "policy",
       "state-consistency",
       "structure",
@@ -67,5 +68,14 @@ describe("draft-quality eval — each dimension's teeth bite a planted corruptio
     const policy = s.results.find((r) => r.grader === "policy");
     expect(policy?.pass).toBe(false);
     expect(policy?.failures.join(" ")).toContain("policy:");
+  });
+
+  it("no-leakage: a leaked internal enum or risk level in the body fails that grader", () => {
+    const d = mockDraft(merchant);
+    d.draft_body = "Hi there — the current blocker is bank_verification_needed; this is a High Risk item.";
+    const s = scoreDraft(d, merchant);
+    const leak = s.results.find((r) => r.grader === "no-leakage");
+    expect(leak?.pass).toBe(false);
+    expect(leak?.failures.join(" ")).toContain("no-leakage:");
   });
 });

@@ -3,7 +3,7 @@ import { getReplaySnapshot } from "@/lib/replay/run";
 import { liveSamples } from "@/lib/replay/live-samples";
 import { PLATFORM_NAME } from "@/lib/product";
 
-const DIMS = ["structure", "state-consistency", "policy"] as const;
+const DIMS = ["structure", "state-consistency", "policy", "no-leakage"] as const;
 
 export default function EvalPage() {
   const snap = getReplaySnapshot(PLATFORM_NAME);
@@ -23,9 +23,10 @@ export default function EvalPage() {
       </p>
       <p className="mt-2 max-w-3xl text-sm text-neutral-500">
         <span className="font-medium text-neutral-600">Technically:</span> deterministic graders over the
-        draft contract (structure · state-consistency · policy). They share the gate&apos;s rule
+        draft contract (structure · state-consistency · policy · no-leakage). They share the gate&apos;s rule
         definitions; their teeth are proven by paired corrupted-record tests (a grader that can&apos;t
-        fail is theater).
+        fail is theater) — including on the recorded real-Gemini drafts, where no-leakage catches a raw
+        enum / risk-level leak the other dimensions missed.
       </p>
       <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-[13px] text-amber-800">
         These corpus scores grade the <span className="font-semibold">deterministic stub</span> output. The
@@ -34,7 +35,7 @@ export default function EvalPage() {
         <span className="font-semibold">demo itself makes no live calls</span>.
       </div>
 
-      <section className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-4">
+      <section className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <div className="rounded-lg border border-neutral-200 px-4 py-3">
           <div className="text-2xl font-semibold tabular-nums">
             {snap.summary.evalPassed}/{snap.summary.evalTotal}

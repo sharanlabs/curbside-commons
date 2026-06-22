@@ -16,7 +16,8 @@
     "honest_findings": [
       "Claims-gatekeeper passed every DECLARED claim against merchant data on every produced draft (its core function held on live output).",
       "AUTHENTIC failure handling on real output: schema-constrained generation occasionally returns unparseable output -> FAILED_TO_FALLBACK to the deterministic stub, with billed cost still recorded so the cumulative cap stays honest. High-risk drafts are held for human approval (WARN).",
-      "Live runs surfaced a guardrail OVER-match: the pinned core flagged phrases like \"business verification\", \"menu to be uploaded\", \"photos to complete\" regardless of tense, false-blocking truthful drafts. FIXED in the agent tier (lib/agents/state-consistency.ts — a completion word must follow the step noun via a done-auxiliary), pinned core/differential UNTOUCHED. Confirmed here: 0 false blocks; all LIVE_AI drafts 3/3."
+      "Live runs surfaced a guardrail OVER-match: the pinned core flagged phrases like \"business verification\", \"menu to be uploaded\", \"photos to complete\" regardless of tense, false-blocking truthful drafts. FIXED in the agent tier (lib/agents/state-consistency.ts — a completion word must follow the step noun via a done-auxiliary), pinned core/differential UNTOUCHED. Confirmed here: 0 false blocks.",
+      "A no-leakage / register grader (added after this recording; lib/evals/draft-quality.ts) re-scores the recorded MERCHANT-FACING prose and CATCHES a real register leak in 3 of the 6 drafts: Mission Masa surfaced the raw \"bank_verification_needed\" enum + a \"Medium risk\" disclosure; Fog City Tacos and Bayview Bistro disclosed an internal risk level. Those now score 3/4, the clean drafts 4/4 — an authentic eval catch on real model output, reproducible from the frozen bodies (evals/live-samples.test.ts). The live prompt was also tightened to forbid such leaks going forward."
     ]
   },
   "rows": [
@@ -28,7 +29,7 @@
       "errorClass": null,
       "gatekeeper": "WARN",
       "gateFailures": [],
-      "eval": "3/3",
+      "eval": "3/4",
       "subject": "Action Required: Verify Your Business for Curbside Commons",
       "body": "Hello Fog City Tacos,Your account is currently flagged as High Risk. To proceed with Curbside Commons, your business information needs verification.You have completed 0 of 5 steps in the onboarding process. Please complete the business verification step to continue.Thank you,The Curbside Commons Team"
     },
@@ -40,7 +41,7 @@
       "errorClass": null,
       "gatekeeper": "WARN",
       "gateFailures": [],
-      "eval": "3/3",
+      "eval": "3/4",
       "subject": "Next step for Bayview Bistro: Upload your menu",
       "body": "Hello Bayview Bistro,Welcome to Curbside Commons!You've completed 1 of your 5 setup steps. Your Restaurant is currently blocked from going live because the menu needs to be uploaded. We've noted this as a high-risk item for account completion.The next best action for you is to upload your menu.The Curbside Commons Team"
     },
@@ -52,7 +53,7 @@
       "errorClass": null,
       "gatekeeper": "PASS",
       "gateFailures": [],
-      "eval": "3/3",
+      "eval": "4/4",
       "subject": "Action Needed: Add Photos to Your Curbside Commons Profile",
       "body": "Hello Marina Morsels,To help complete your setup as a Restaurant on Curbside Commons, please add photos to your profile. This is currently the next step to progress.You have completed 2 out of 5 steps in the onboarding process.Thanks,The Curbside Commons Team"
     },
@@ -64,7 +65,7 @@
       "errorClass": null,
       "gatekeeper": "WARN",
       "gateFailures": [],
-      "eval": "3/3",
+      "eval": "4/4",
       "subject": "Important: Set your hours, Sunset Noodle House",
       "body": "Hi Sunset Noodle House,To get your Restaurant listed on Curbside Commons, please set your business hours. This is the next step in your onboarding process. You have completed 3 out of 5 steps."
     },
@@ -76,7 +77,7 @@
       "errorClass": null,
       "gatekeeper": "PASS",
       "gateFailures": [],
-      "eval": "3/3",
+      "eval": "3/4",
       "subject": "Action needed for your Curbside Commons account",
       "body": "Hi Mission Masa,This is a quick update regarding your Curbside Commons account.To fully activate your account and process transactions, your bank account needs verification. This is a crucial step for a Restaurant like yours.You have completed 4 out of 5 onboarding steps. The current blocker is bank_verification_needed. Completing this will help mitigate the Medium risk associated with unverified information.Your next best action is to verify your bank.Thank you,The Curbside Commons Team"
     },
@@ -88,7 +89,7 @@
       "errorClass": "No object generated: could not parse the response.",
       "gatekeeper": "WARN",
       "gateFailures": [],
-      "eval": "3/3",
+      "eval": "4/4",
       "subject": "Your next onboarding step with Curbside Commons",
       "body": "Hi Embarcadero Eats, thanks for getting started on your Curbside Commons onboarding. Your next step is to complete your final verification. Reply to this message if you would like a hand."
     }
