@@ -4,6 +4,7 @@ import type { MerchantInput } from "@/lib/core/types";
 import { mockDraft } from "@/lib/agents/draft";
 import { getHybridMerchants } from "@/lib/ingest/hybrid";
 import { scoreDraft, scoreDraftCorpus } from "@/lib/evals/draft-quality";
+import { registerLeakFailures } from "@/lib/agents/state-consistency";
 
 const merchant = normalizeRow(
   {
@@ -77,5 +78,39 @@ describe("draft-quality eval — each dimension's teeth bite a planted corruptio
     const leak = s.results.find((r) => r.grader === "no-leakage");
     expect(leak?.pass).toBe(false);
     expect(leak?.failures.join(" ")).toContain("no-leakage:");
+  });
+});
+
+describe("registerLeakFailures — allow/deny coverage (the no-leakage detector's teeth)", () => {
+  it("DENIES a known internal identifier in any form (snake / UPPER / camel / kebab) + risk disclosures", () => {
+    const deny = [
+      "the current blocker is bank_verification_needed.",
+      "BANK_VERIFICATION_NEEDED is set",
+      "status: bankVerificationNeeded",
+      "blocker bank-verification-needed pending",
+      "internal current_blocker_code reads ...",
+      "your account is flagged as High Risk",
+      "this is a medium-risk item",
+      "risk: High",
+      "the risk is high here",
+      "risk=high",
+    ];
+    for (const s of deny) {
+      expect(registerLeakFailures(s).length, s).toBeGreaterThan(0);
+    }
+  });
+
+  it("ALLOWS benign prose: separator words not in the denylist + natural phrasings of the same words", () => {
+    const allow = [
+      "Welcome to Tacos_To_Go!", // underscore name, not an internal token
+      "We're a family-owned shop.", // hyphenated word
+      "Finish your sign-up to continue.", // hyphenated word
+      "Your bank verification is needed to go live.", // natural words, NOT the joined identifier
+      "Please add photos and set your business hours.", // humanized actions
+      "There is no risk to getting started.", // "risk" without a level disclosure
+    ];
+    for (const s of allow) {
+      expect(registerLeakFailures(s), s).toEqual([]);
+    }
   });
 });

@@ -91,11 +91,14 @@ const INTERNAL_BY_NORM = new Map<string, string>(
  */
 export function registerLeakFailures(prose: string): string[] {
   const failures: string[] = [];
-  const tokens = prose.match(/[A-Za-z][A-Za-z0-9_]*/g) ?? [];
+  // Identifier-shaped tokens (snake_case / kebab-case / camelCase) — hyphens are included so a
+  // kebab form of a known token ("bank-verification-needed") is matched; the precise denylist
+  // means a benign hyphenated/underscored word ("sign-up", "Tacos_To_Go") is never flagged.
+  const tokens = prose.match(/[A-Za-z][A-Za-z0-9_-]*/g) ?? [];
   const leaked = [
     ...new Set(
       tokens
-        .filter((t) => t.includes("_") || /[a-z][A-Z]/.test(t))
+        .filter((t) => t.includes("_") || t.includes("-") || /[a-z][A-Z]/.test(t))
         .map((t) => INTERNAL_BY_NORM.get(normalizeIdentifier(t)))
         .filter((t): t is string => Boolean(t)),
     ),
@@ -103,8 +106,10 @@ export function registerLeakFailures(prose: string): string[] {
   if (leaked.length > 0) {
     failures.push(`leaked internal identifier(s): ${leaked.join(", ")}`);
   }
+  // Risk-level / score disclosure in any direct form: "High Risk", "high-risk", "risk: High",
+  // "risk is high", "risk=high", "risk level/score", "flagged as ... risk".
   if (
-    /\b(?:high|medium|low)[\s-]?risk\b|\brisk[\s:_-]*(?:high|medium|low|level|score|rating|tier)\b|\bflagged\b[^.]{0,24}\brisk\b/i.test(
+    /\b(?:high|medium|low)[\s-]?risk\b|\brisk\b[\s:=_-]*(?:is\s+|was\s+)?(?:high|medium|low|level|score|rating|tier)\b|\bflagged\b[^.]{0,24}\brisk\b/i.test(
       prose,
     )
   ) {

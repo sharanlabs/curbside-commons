@@ -26,4 +26,4 @@ All 11 findings reconciled:
 - **Copy (P1):** footer → fictional display; README/WHY/ENTERPRISE → "caught register leaks in 3 parseable drafts; semantic judge unbuilt."
 - **Locks (P2):** live-samples test asserts eval==leak status; the 3 grader-list surfaces add no-leakage; recovered review docs stripped of trailing whitespace.
 
-Verified: `npm run verify` green; **159 tests + 1 skipped** (the +2 = gate teeth + eval-match lock). A confirming Codex pass on this reconciliation is the last recommended step before T13.
+Verified: `npm run verify` green; **161 tests + 1 skipped** (the +2 = gate teeth + eval-match lock). A confirming Codex pass on this reconciliation is the last recommended step before T13.

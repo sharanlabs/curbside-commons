@@ -14,7 +14,7 @@ Deterministic risk + blocker **triage** → a domain **diagnosis** (engagement s
 
 ## Today vs target (honest status)
 
-**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 159 tests + 3 Playwright e2e):**
+**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 161 tests + 3 Playwright e2e):**
 - Single-stack **Next.js + TypeScript + Tailwind + React** app; a desktop **console**: Overview/queue · Merchant Detail (full why-chain) · Eval/Quality · Metrics · Audit · Cost.
 - The **deterministic core ported to TS** and pinned **byte-for-byte to the Python v1 oracle** by a differential test.
 - **Hybrid dataset** — the public demo shows **fictional** merchant names (so synthetic risk states are never pinned on real businesses); the **source-swappable adapter** ingests real DataSF entities (PII-scrubbed, license-clean) + a trust-boundary sanitizer + a deterministic synthetic overlay. Real-data *capability*, fictional *display*.
@@ -55,6 +55,6 @@ Built under human direction with **Claude Code** (planning + implementation) and
 
 ## Adoption boundary
 
-Adoption-**grade** means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough for a marketplace to inherit — **not** "production-ready." Honest gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, a calibrated LLM-judge for semantic claims (the deterministic eval — including the no-leakage grader — caught register/disclosure leaks in 3 of the 6 parseable real drafts, and the gatekeeper now blocks them; a calibrated *semantic* unsupported-claim judge remains unbuilt), and deeper blocker instrumentation. A marketplace adopts it by swapping the hybrid dataset's real layer for its own export against the adapter's documented contract.
+Adoption-**grade** means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough for a marketplace to inherit — **not** "production-ready." Honest gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, a calibrated LLM-judge for semantic claims (the deterministic eval — including the no-leakage grader — caught register/disclosure leaks in 3 of the 5 parsed live drafts, and the gatekeeper now blocks them; a calibrated *semantic* unsupported-claim judge remains unbuilt), and deeper blocker instrumentation. A marketplace adopts it by swapping the hybrid dataset's real layer for its own export against the adapter's documented contract.
 
 Human-led, AI-assisted, professionally reviewed.
