@@ -32,8 +32,8 @@ export default function MetricsPage() {
         human, and what&apos;s blocking them.
       </p>
       <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-[13px] text-amber-800">
-        Figures are <span className="font-semibold">simulated</span> over the hybrid demo set (real
-        business names, synthetic activation state) — illustrative of the workflow, <span className="font-semibold">not
+        Figures are <span className="font-semibold">simulated</span> over the hybrid demo set (fictional
+        names, synthetic activation state) — illustrative of the workflow, <span className="font-semibold">not
         activation, revenue, or reactivation outcomes</span>.
       </div>
 

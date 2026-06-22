@@ -97,8 +97,9 @@ export default function Home() {
       <section className="mt-10">
         <h2 className="text-sm font-semibold text-neutral-900">Activation queue</h2>
         <p className="mt-1 text-[13px] text-neutral-500">
-          Real San Francisco businesses (public-domain) with synthetic activation state. Open one to see
-          the full why-chain end to end.
+          Fictional businesses with synthetic activation state — the adapter ingests real DataSF
+          public records (fictional display, real-data capability). Open one to see the full why-chain
+          end to end.
         </p>
         <div className="mt-3 overflow-hidden rounded-lg border border-neutral-200">
           <table className="w-full text-left text-sm">

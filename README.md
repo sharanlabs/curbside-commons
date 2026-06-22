@@ -14,12 +14,12 @@ Deterministic risk + blocker **triage** → a domain **diagnosis** (engagement s
 
 ## Today vs target (honest status)
 
-**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 153 tests + 3 Playwright e2e):**
+**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 155 tests + 3 Playwright e2e):**
 - Single-stack **Next.js + TypeScript + Tailwind + React** app; a desktop **console**: Overview/queue · Merchant Detail (full why-chain) · Eval/Quality · Metrics · Audit · Cost.
 - The **deterministic core ported to TS** and pinned **byte-for-byte to the Python v1 oracle** by a differential test.
 - **Hybrid dataset** — the public demo shows **fictional** merchant names (so synthetic risk states are never pinned on real businesses); the **source-swappable adapter** ingests real DataSF entities (PII-scrubbed, license-clean) + a trust-boundary sanitizer + a deterministic synthetic overlay. Real-data *capability*, fictional *display*.
 - **Bounded Gemini drafting**, with the **claims-gatekeeper**, a **draft-quality eval** (corrupted-record teeth), a **$5 fail-closed budget** (per-call + cumulative), model preflight, and a **prompt-injection cut** (untrusted name never reaches the model).
-- A **recorded real Gemini run** (one merchant per blocker, $0.0036 — 4 parsed live drafts, 2 billed parse-failures that fell back safely) that the eval scored. This **exercised the plumbing, fallback, and cost-accounting end-to-end** (and surfaced + fixed a real guardrail-precision issue) — it is **not** evidence of broad model quality at scale. The public **demo stays REPLAY-only** (no live calls, zero spend); reproduce the run locally with your own key.
+- A **recorded real Gemini run** (one merchant per blocker, $0.0042 — 5 parsed live drafts, 1 billed parse-failure that fell back safely) that the eval scored. This **exercised the plumbing, fallback, and cost-accounting end-to-end** (and surfaced + fixed a real guardrail-precision issue) — it is **not** evidence of broad model quality at scale. The public **demo stays REPLAY-only** (no live calls, zero spend); reproduce the run locally with your own key.
 
 **Designed but gated / target:**
 - **Vercel deploy** (REPLAY-only public demo, key gated off) — owner-gated.
@@ -55,6 +55,6 @@ Built under human direction with **Claude Code** (planning + implementation) and
 
 ## Adoption boundary
 
-Adoption-**grade** means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough for a marketplace to inherit — **not** "production-ready." Honest gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, a calibrated LLM-judge for semantic claims (the live-LLM eval + caught-failure are done — recorded), and deeper blocker instrumentation. A marketplace adopts it by swapping the hybrid dataset's real layer for its own export against the adapter's documented contract.
+Adoption-**grade** means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough for a marketplace to inherit — **not** "production-ready." Honest gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, a calibrated LLM-judge for semantic claims (the live-LLM eval is exercised on a recorded run — it caught no bad-but-parseable draft that run, though it surfaced + fixed a real guardrail-precision bug), and deeper blocker instrumentation. A marketplace adopts it by swapping the hybrid dataset's real layer for its own export against the adapter's documented contract.
 
 Human-led, AI-assisted, professionally reviewed.
