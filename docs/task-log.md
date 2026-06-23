@@ -1,5 +1,23 @@
 # Task Log
 
+## 2026-06-22 (semantic judge — P3 infrastructure + live judge wired + calibration run; owner provided GROQ_API_KEY)
+
+### Professional Process Applied
+Task type: live-AI integration + calibration (P3) · Stage: execution, P3 of P0–P4 · Risk: medium (live model calls, but FREE tier $0; key owner-provided; no `lib/core` touch) · Mode: FULL · Effort: high, auto-routed (AI behavior + live integration) · Basis: spec `docs/spec-semantic-judge.md` R-ARCH-3/R-CAL/R-HON + 2 advisor reviews · Validation: offline suite green (192 + 2 skipped, both live tests auto-skip); key + strict-mode + reasoning-effort verified by live probes (raw errors read, not inferred) · Codex: P4 ship gate · Human approval: key was the owner-gated stop (provided); deploy + public posting still gated.
+
+### What was done
+- **Verified the owner's `GROQ_API_KEY`** without printing it: present/well-formed (gsk_, 56 chars), `.env` gitignored + untracked, HTTP 200, `openai/gpt-oss-120b` available + non-deprecated (RULES §6).
+- **Installed `@ai-sdk/groq@2.0.42`** (AI SDK v5 compatible — the approved P0 Source-Intake decision) and **wired the live Groq judge** in `lib/agents/semantic-judge.ts` `defaultJudgeGenerate` (strict `structuredOutputs: true` + `reasoningEffort: "low"`). Build-time strict-mode smoke: schema-valid JSON + correctly flagged a planted fabrication.
+- **Calibration runner** `evals/judge-calibration.live.test.ts` (key-gated, auto-skips offline): live judge over the 30-item gold set, K=3 reps, R-CAL-1 partition, writes the report; quality thresholds eval-locked at P4 (not here).
+- **Calibrated the judge prompt** (`buildJudgePrompt`, threaded `platformName`): a live run showed strong recall but precision dragged by the judge flagging the platform's own name + greeting framing as "unsupported" — root-caused + fixed (the email is sent BY the platform; skip its name + greetings). Raw probe confirmed the fix discriminates at low reasoning effort.
+- **Lowered `MAX_JUDGE_OUTPUT_TOKENS` 2000→1024** (Groq reserves max_tokens against the rate window).
+
+### The real limit (read verbatim, not inferred — advisor catch)
+The Groq 429 body names it: **tokens-per-day (TPD) = 200,000**, and 5 debugging/calibration runs this session used 199,981. NOT a code bug, NOT "free tier can't do it." With `reasoningEffort: "low"` a full run needs ~30K of 200K → feasible on a fresh daily window. Full honest status: `docs/judge-calibration-status.md`.
+
+### Next
+One clean calibration run on a fresh Groq daily window → held-out metrics → P4 (eval-lock + demo surfaces + Codex gate + flip docs ONLY if metrics clear the bar, R-HON-3). The garbage all-fallback snapshot was deleted (not committed); run-2 numbers deliberately NOT enshrined (no durable artifact).
+
 ## 2026-06-22 (semantic judge — P2: gold set + metrics harness; offline/$0; goal mode)
 
 ### Professional Process Applied

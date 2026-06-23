@@ -30,6 +30,21 @@ Newest entries on top.
 
 ---
 
+## 2026-06-22 REBUILD/JUDGE — P3: live Groq judge wired + calibration run (owner key; free tier)
+
+- What changed: Wired the live cross-family Groq `openai/gpt-oss-120b` judge (`@ai-sdk/groq`, strict structured outputs + `reasoningEffort: "low"`) in `lib/agents/semantic-judge.ts`; built the key-gated calibration runner `evals/judge-calibration.live.test.ts`; calibrated the judge prompt (platform-name grounding); lowered `MAX_JUDGE_OUTPUT_TOKENS` to 1024. Offline suite green (192 + 2 skipped). Honest status doc `docs/judge-calibration-status.md`.
+- Why it changed: P3 of the approved plan — the owner provided a free `GROQ_API_KEY` (the owner-gated stop), so the live calibration could run.
+- Challenge / failure: The live calibration kept degrading to fallback. I twice inferred the cause from rate-limit HEADERS (TPM 8000) and "fixed" pacing/concurrency — and was WRONG both times. An advisor review forced me to read the actual 429 BODY, which named the real limit: tokens-per-day = 200,000, used 199,981 — I'd exhausted today's budget across 5 debugging runs.
+- Why it happened: I read headers off 200-responses and pattern-matched to TPM; the binding bucket (TPD) only appears in the 429 body, which I hadn't printed. Classic "inferred a finding instead of reading it."
+- How it was diagnosed: A raw `fetch` printing status + `.text()` together on a throttled call surfaced the verbatim TPD error; a second probe proved `reasoningEffort: "low"` still catches every planted fabrication at ~half the tokens.
+- Options considered: (a) declare "free tier can't sustain it" and checkpoint on a guess; (b) read the 429 body + try the reasoning-effort lever before concluding. Chose (b) — it changed the conclusion from "can't" to "today's budget spent; ~30K of 200K needed on a fresh window."
+- Final fix: `reasoningEffort: "low"` (validated to discriminate) + `MAX_JUDGE_OUTPUT_TOKENS` 1024 + sequential pacing make a full run cheap; the one clean run just needs a fresh daily window. Precision finding (platform-name false-positives) root-caused + fixed in the prompt.
+- Honesty (R-HON): No "calibrated, metrics = X" claim shipped — the pre-fix run's numbers are NOT enshrined (the snapshot had true-negative inflation + is superseded; backing artifact deleted). Status doc documents the finding qualitatively + quotes the real limit verbatim.
+- Files changed: `lib/agents/semantic-judge.ts`, `evals/judge-calibration.live.test.ts`, `evals/semantic-judge.test.ts` (prompt-assert sync), `package.json`/`package-lock.json` (@ai-sdk/groq), `docs/judge-calibration-status.md` (+ state docs).
+- Reviewer notes: Two advisor reviews shaped this — (1) before P2, the math-vs-judge-quality separation; (2) here, "read the 429 body, don't enshrine run-2 numbers." Codex gate at P4.
+
+---
+
 ## 2026-06-22 REBUILD/JUDGE — P2: calibration gold set + metrics harness (offline, $0)
 
 - What changed: Added the calibration core for the semantic judge — a pure metrics module (`lib/evals/judge-metrics.ts`), a stratified gold set as typed TS literals (`evals/gold/semantic-judge-gold.ts`), a reusable harness (`evals/gold/harness.ts`), and a 16-test calibration suite (`evals/judge-calibration.test.ts`). 192 tests + 1 skipped green; typecheck/lint/build green. No `lib/core` / differential touch; no runtime/UI change (the app does not import any of these), so the Phase-C e2e is unaffected.
