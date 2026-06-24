@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ActivationOps AI — Story × Flow: watch a claim get verified</title>
+<meta name="description" content="A scroll-driven walkthrough of ActivationOps AI: stalled merchants, an AI-written draft, the fabrication it slips in, and the verification pipeline that catches it — forward claims-gate plus a reverse semantic faithfulness judge — before a human ever approves. An independent, simulated demo." />
+
+<!-- no-JS guard: only hide reveal states when JS can clear them -->
+<script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Spline+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  /* =========================================================
+     ActivationOps AI — "Story × Flow"
+     A storytelling arc (Fraunces optical serif display +
+     Spline Sans body) over a TRUE-WHITE stage, with one
+     animated verification pipeline at its heart. One brand
+     accent — oxblood. Functional pass/fail only where a
+     verdict must be read. IBM Plex Mono for data/labels.
+     ========================================================= */
+
+  :root {
+    /* stage + ink */
+    --white:       #ffffff;   /* the mandatory true-white stage */
+    --paper:       #f7f5f2;   /* faint warm inset, used sparingly */
+    --paper-2:     #f1eee9;
+    --ink:         #16130f;   /* near-black ink */
+    --ink-soft:    #423b34;
+    --ink-faint:   #8a8077;
+    --rule:        #e7e2da;   /* hairline rules */
+    --rule-soft:   #efebe4;
+
+    /* the single brand accent — oxblood */
+    --accent:      #7a1f2b;
+    --accent-deep: #5d1320;
+    --accent-wash: #f4e7e7;
+    --accent-line: #e0c4c6;
+
+    /* functional verdict tones — read as status, not brand */
+    --pass:        #2f6b4f;   /* muted forest — supported */
+    --pass-wash:   #e9f1ec;
+    --pass-line:   #cfe1d6;
+    --fail:        #a23423;   /* warm rust — unsupported / caught */
+    --fail-wash:   #f8e9e4;
+    --fail-line:   #ecccc2;
+
+    --serif: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --sans:  "Spline Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --measure: 62ch;
+    --gutter: clamp(1.25rem, 5vw, 5.5rem);
+    --maxw: 1160px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--white);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    line-height: 1.72;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; }
+  ::selection { background: var(--accent-wash); color: var(--accent-deep); }
+
+  /* ---- layout primitives ---- */
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gutter); position: relative; }
+  .measure { max-width: var(--measure); }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+    display: inline-flex; align-items: center; gap: 0.6rem;
+  }
+  .kicker .tick { width: 16px; height: 1px; background: var(--accent); display: inline-block; }
+
+  h1, h2, h3 { font-family: var(--serif); font-weight: 500; letter-spacing: -0.012em; }
+
+  .rule { height: 1px; background: var(--rule); border: 0; margin: 0; }
+
+  /* skip link */
+  .skip {
+    position: absolute; left: -999px; top: 0; z-index: 80;
+    background: var(--ink); color: var(--white); padding: 0.6rem 1rem; border-radius: 3px;
+    font-family: var(--mono); font-size: 0.8rem;
+  }
+  .skip:focus { left: 1rem; top: 1rem; }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2.5px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  /* =================== MASTHEAD =================== */
+  .masthead {
+    position: sticky; top: 0; z-index: 40;
+    background: color-mix(in srgb, var(--white) 84%, transparent);
+    backdrop-filter: saturate(150%) blur(9px);
+    -webkit-backdrop-filter: saturate(150%) blur(9px);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .masthead__row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; padding-block: 0.82rem;
+  }
+  .brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+  .brand__name {
+    font-family: var(--serif); font-weight: 600; font-size: 1.16rem;
+    letter-spacing: -0.012em; line-height: 1;
+  }
+  .brand__name em { font-style: italic; color: var(--accent); }
+  .masthead__meta {
+    font-family: var(--mono);
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-faint); display: none;
+  }
+  @media (min-width: 800px) { .masthead__meta { display: block; } }
+  .masthead__cta {
+    font-family: var(--sans); font-size: 0.84rem; font-weight: 600;
+    text-decoration: none; color: var(--ink);
+    border-bottom: 1.5px solid var(--accent);
+    padding-bottom: 1px; white-space: nowrap;
+    transition: color 0.25s var(--ease);
+  }
+  .masthead__cta:hover { color: var(--accent); }
+
+  /* =================== HERO / OPENER =================== */
+  .hero { padding-top: clamp(3rem, 8vw, 6rem); padding-bottom: clamp(2.5rem, 6vw, 4.5rem); }
+  .hero__dateline {
+    display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: baseline;
+    font-family: var(--mono);
+    font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 1.5rem;
+  }
+  .hero__dateline .dot { color: var(--accent); }
+
+  .hero__title {
+    font-size: clamp(2.5rem, 6.6vw, 5rem);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    margin: 0;
+    max-width: 17ch;
+    font-weight: 500;
+  }
+  .hero__title em { font-style: italic; color: var(--accent); }
+
+  .hero__split {
+    display: grid; gap: clamp(1.5rem, 4vw, 3rem);
+    grid-template-columns: 1fr;
+    margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  }
+  @media (min-width: 900px) {
+    .hero__split { grid-template-columns: 1.3fr 1fr; align-items: start; }
+  }
+  .hero__dek {
+    font-size: clamp(1.08rem, 1.6vw, 1.28rem);
+    line-height: 1.62; color: var(--ink-soft); margin: 0;
+    max-width: 46ch;
+  }
+  .hero__dek strong { color: var(--ink); font-weight: 600; }
+
+  .hero__aside { border-top: 2px solid var(--ink); padding-top: 0.9rem; }
+  .hero__aside dl { margin: 0; }
+  .hero__aside .pair { display: flex; justify-content: space-between; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid var(--rule-soft); }
+  .hero__aside dt { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.02em; color: var(--ink-faint); }
+  .hero__aside dd { margin: 0; font-family: var(--serif); font-size: 0.96rem; font-weight: 500; text-align: right; }
+  .hero__aside dd .num { font-variant-numeric: tabular-nums; }
+
+  .hero__cta-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: center; margin-top: 2.2rem; }
+  .btn {
+    font-family: var(--sans); font-size: 0.92rem; font-weight: 600;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 0.55rem;
+    padding: 0.78rem 1.4rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 0.18s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
+  }
+  .btn--primary { background: var(--accent); color: #fdf6f0; }
+  .btn--primary:hover { background: var(--accent-deep); }
+  .btn--primary:active { transform: translateY(1px); }
+  .btn svg { transition: transform 0.25s var(--ease); }
+  .btn--primary:hover svg { transform: translateX(3px); }
+  .btn--ghost { color: var(--ink); border-color: var(--rule); border-radius: 3px; background: var(--white); }
+  .btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn--ghost:active { transform: translateY(1px); }
+
+  /* =================== ARTICLE STRUCTURE =================== */
+  section[data-beat] { padding-block: clamp(3.25rem, 7.5vw, 6rem); }
+  .beat-head { display: grid; gap: 0.85rem; margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+  .beat-title {
+    font-size: clamp(1.85rem, 4vw, 3rem); line-height: 1.08; margin: 0;
+    letter-spacing: -0.02em; max-width: 19ch;
+  }
+  .beat-title em { font-style: italic; color: var(--accent); }
+  .lede {
+    font-size: clamp(1.04rem, 1.5vw, 1.18rem); line-height: 1.68; color: var(--ink-soft);
+    margin: 0.4rem 0 0;
+  }
+
+  /* drop cap — the editorial opener move */
+  .dropcap::first-letter {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 4.4em;
+    line-height: 0.82;
+    float: left;
+    padding: 0.06em 0.12em 0 0;
+    color: var(--accent);
+  }
+
+  /* problem columns */
+  .prob-grid {
+    display: grid; gap: clamp(1.4rem, 3vw, 2.4rem);
+    grid-template-columns: 1fr;
+    margin-top: 2.4rem;
+  }
+  @media (min-width: 760px) { .prob-grid { grid-template-columns: repeat(2, 1fr); } }
+  .prob { border-top: 1px solid var(--rule); padding-top: 1.05rem; }
+  .prob__icon { color: var(--accent); margin-bottom: 0.7rem; display: block; }
+  .prob h3 { font-size: 1.16rem; margin: 0 0 0.4rem; font-weight: 600; }
+  .prob p { margin: 0; font-size: 0.97rem; color: var(--ink-soft); line-height: 1.6; }
+
+  /* pull quote */
+  .pullquote {
+    margin: clamp(2.5rem, 6vw, 3.75rem) 0 0;
+    border-left: 2px solid var(--accent);
+    padding: 0.4rem 0 0.4rem clamp(1.25rem, 3vw, 2.1rem);
+    max-width: 32ch;
+  }
+  .pullquote p {
+    font-family: var(--serif); font-style: italic; font-weight: 400;
+    font-size: clamp(1.45rem, 3.2vw, 2.2rem); line-height: 1.22; margin: 0;
+    letter-spacing: -0.01em; color: var(--ink);
+  }
+  .pullquote cite { display: block; margin-top: 0.9rem; font-style: normal; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
+
+  /* =================== THE VERIFICATION HERO (centerpiece) =================== */
+  .verify { background: var(--paper); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .verify .lede { max-width: 56ch; }
+
+  .stage {
+    margin-top: clamp(1.75rem, 4vw, 2.75rem);
+    border: 1px solid var(--rule);
+    background: var(--white);
+    border-radius: 6px;
+    box-shadow: 0 30px 70px -48px rgba(22,19,15,0.4);
+    overflow: hidden;
+  }
+  .stage__bar {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem;
+    padding: 0.85rem clamp(1rem, 3vw, 1.6rem);
+    border-bottom: 1px solid var(--rule-soft);
+    background: var(--white);
+  }
+  .stage__bar .id { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ink-faint); text-transform: uppercase; }
+  .stage__bar .id b { color: var(--ink); font-weight: 500; }
+  .stage__bar .ctl { display: inline-flex; align-items: center; gap: 0.6rem; }
+  .replay-btn {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--white); color: var(--ink-soft); border: 1px solid var(--rule);
+    border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer;
+    transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .replay-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .replay-btn svg { width: 13px; height: 13px; }
+  .stage__progress { display: inline-flex; gap: 5px; }
+  .stage__progress i { width: 7px; height: 7px; border-radius: 50%; background: var(--rule); transition: background 0.3s var(--ease); }
+  .stage__progress i.on { background: var(--accent); }
+
+  /* the diagram canvas */
+  .diagram { padding: clamp(0.75rem, 2vw, 1.25rem); }
+  .diagram svg { display: block; width: 100%; height: auto; }
+
+  /* the live readout strip below the diagram */
+  .readout {
+    display: grid; grid-template-columns: 1fr; gap: 0;
+    border-top: 1px solid var(--rule-soft);
+  }
+  @media (min-width: 880px) { .readout { grid-template-columns: 1.02fr 1fr; } }
+
+  /* left: source-of-truth data row */
+  .srcrow { padding: clamp(1.1rem, 3vw, 1.6rem); border-bottom: 1px solid var(--rule-soft); }
+  @media (min-width: 880px) { .srcrow { border-bottom: 0; border-right: 1px solid var(--rule-soft); } }
+  .srcrow__label, .draftcol__label, .verdict__label {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink-faint); margin: 0 0 0.9rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .srcrow__label .chip { font-size: 0.62rem; color: var(--accent); border: 1px solid var(--accent-line); border-radius: 999px; padding: 1px 7px; letter-spacing: 0.06em; }
+  .field { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.55rem 0; border-bottom: 1px solid var(--rule-soft); }
+  .field:last-child { border-bottom: 0; }
+  .field .fk { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-faint); }
+  .field .fv { font-family: var(--mono); font-size: 0.82rem; color: var(--ink); font-weight: 500; text-align: right; }
+  .field.is-lit { background: var(--accent-wash); margin-inline: -0.5rem; padding-inline: 0.5rem; border-radius: 4px; transition: background 0.4s var(--ease); }
+  .field .absent { color: var(--ink-faint); font-style: italic; }
+  .srcrow__note { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-faint); margin: 1rem 0 0; line-height: 1.6; }
+  .srcrow__note b { color: var(--fail); font-weight: 500; }
+
+  /* right: the draft, sentence-by-sentence */
+  .draftcol { padding: clamp(1.1rem, 3vw, 1.6rem); background: linear-gradient(180deg, var(--white) 0%, var(--paper) 130%); }
+  .draftcol__subject { font-family: var(--serif); font-size: 1.04rem; font-weight: 600; margin: 0 0 0.85rem; line-height: 1.3; }
+  .claimline {
+    display: grid; grid-template-columns: 24px 1fr auto; gap: 0.65rem; align-items: start;
+    padding: 0.7rem 0; border-bottom: 1px solid var(--rule-soft);
+  }
+  .claimline:last-of-type { border-bottom: 0; }
+  .claimline__mark {
+    width: 22px; height: 22px; border-radius: 50%; flex: none; margin-top: 1px;
+    display: grid; place-items: center;
+    border: 1.5px solid var(--rule); color: var(--ink-faint);
+    background: var(--white);
+    transition: border-color 0.35s var(--ease), color 0.35s var(--ease), background 0.35s var(--ease), transform 0.35s var(--ease);
+  }
+  .claimline__mark svg { width: 13px; height: 13px; opacity: 0; transition: opacity 0.3s var(--ease); }
+  .claimline__txt { font-size: 0.95rem; line-height: 1.5; color: var(--ink-soft); margin: 0; }
+  .claimline__txt b { color: var(--ink); font-weight: 600; }
+  .claimline__tag {
+    font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.04em;
+    color: var(--ink-faint); white-space: nowrap; opacity: 0;
+    transition: opacity 0.35s var(--ease); text-align: right; line-height: 1.4;
+  }
+  /* resolved states (added by JS, or by reduced-motion fallback) */
+  .claimline.is-pass .claimline__mark { border-color: var(--pass); color: var(--pass); background: var(--pass-wash); transform: scale(1.04); }
+  .claimline.is-pass .claimline__mark svg { opacity: 1; }
+  .claimline.is-pass .claimline__tag { opacity: 1; color: var(--pass); }
+  .claimline.is-fail .claimline__mark { border-color: var(--fail); color: var(--fail); background: var(--fail-wash); transform: scale(1.04); }
+  .claimline.is-fail .claimline__mark svg { opacity: 1; }
+  .claimline.is-fail .claimline__tag { opacity: 1; color: var(--fail); }
+  .claimline.is-active { background: var(--paper-2); margin-inline: -0.6rem; padding-inline: 0.6rem; border-radius: 5px; }
+
+  /* the catch verdict */
+  .verdict {
+    margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+    border: 1px solid var(--fail-line);
+    background: var(--fail-wash);
+    border-radius: 6px;
+    padding: clamp(1.1rem, 3vw, 1.5rem) clamp(1.1rem, 3vw, 1.6rem);
+    display: grid; grid-template-columns: auto 1fr; gap: 0.9rem 1rem; align-items: start;
+  }
+  .verdict__icon { color: var(--fail); margin-top: 2px; }
+  .verdict h3 { font-size: 1.18rem; margin: 0 0 0.3rem; font-weight: 600; font-family: var(--serif); color: var(--ink); }
+  .verdict p { margin: 0; font-size: 0.97rem; color: var(--ink-soft); line-height: 1.6; }
+  .verdict p b { color: var(--fail); font-weight: 600; }
+  .verdict .held {
+    grid-column: 1 / -1; margin-top: 0.6rem; padding-top: 0.85rem; border-top: 1px dashed var(--fail-line);
+    font-family: var(--mono); font-size: 0.76rem; color: var(--ink-soft); display: flex; align-items: center; gap: 0.5rem;
+  }
+  .verdict .held b { color: var(--ink); font-weight: 500; }
+
+  /* =================== METHOD: forward + reverse =================== */
+  .duo { display: grid; gap: clamp(1.4rem, 3vw, 2.25rem); grid-template-columns: 1fr; margin-top: clamp(1.5rem, 4vw, 2.5rem); }
+  @media (min-width: 820px) { .duo { grid-template-columns: 1fr 1fr; } }
+  .gate {
+    border-top: 2px solid var(--ink); padding-top: 1.1rem;
+  }
+  .gate__dir { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin: 0 0 0.5rem; display: flex; align-items: center; gap: 0.45rem; }
+  .gate h3 { font-size: 1.32rem; margin: 0 0 0.55rem; font-weight: 500; }
+  .gate p { margin: 0 0 0.85rem; font-size: 0.98rem; color: var(--ink-soft); line-height: 1.6; }
+  .gate__how { font-family: var(--mono); font-size: 0.76rem; color: var(--ink-faint); line-height: 1.65; margin: 0; }
+  .gate__how span { color: var(--ink-soft); }
+
+  /* =================== TRUST LEDGER =================== */
+  .ledger { display: grid; gap: 0; grid-template-columns: 1fr; margin-top: clamp(1.5rem, 4vw, 2.5rem); }
+  @media (min-width: 720px) { .ledger { grid-template-columns: repeat(2, 1fr); column-gap: clamp(2rem, 4vw, 3.25rem); } }
+  .ledger__item {
+    display: grid; grid-template-columns: auto 1fr; gap: 0.45rem 1rem;
+    padding: 1.2rem 0; border-top: 1px solid var(--rule);
+    align-items: start;
+  }
+  .ledger__icon { color: var(--accent); grid-row: 1 / span 2; }
+  .ledger__item h3 { margin: 0; font-size: 1.08rem; font-weight: 600; font-family: var(--serif); }
+  .ledger__item p { margin: 0; font-size: 0.94rem; color: var(--ink-soft); line-height: 1.56; }
+
+  /* =================== GENERALIZE (dark inset) =================== */
+  .general { background: var(--ink); color: var(--white); border-radius: 8px; overflow: hidden; }
+  .general .inner { padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 5vw, 4rem); }
+  .general .kicker { color: #e7b9bd; }
+  .general .kicker .tick { background: #e7b9bd; }
+  .general .beat-title { color: var(--white); }
+  .general .lede { color: color-mix(in srgb, var(--white) 76%, transparent); }
+  .general__spine {
+    display: flex; flex-wrap: wrap; gap: 0.55rem 0.4rem; align-items: center;
+    margin-top: 1.9rem; font-family: var(--serif); font-style: italic;
+    font-size: clamp(1rem, 2vw, 1.32rem); color: var(--white);
+  }
+  .general__spine .arr { color: #e08e96; font-style: normal; }
+  .general__close { margin-top: 1.7rem; max-width: 58ch; font-size: 1.02rem; line-height: 1.68; color: color-mix(in srgb, var(--white) 80%, transparent); }
+  .general__close strong { color: var(--white); font-weight: 600; }
+
+  /* =================== CTA =================== */
+  .cta__title { font-size: clamp(2rem, 5vw, 3.3rem); line-height: 1.05; margin: 0; letter-spacing: -0.02em; max-width: 17ch; }
+  .cta__title em { font-style: italic; color: var(--accent); }
+  .cta__row { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; margin-top: 1.9rem; }
+  .cta__note { font-family: var(--mono); font-size: 0.74rem; color: var(--ink-faint); margin-top: 1.4rem; display: inline-flex; align-items: center; gap: 0.5rem; }
+
+  /* =================== FOOTER (honest) =================== */
+  .colophon { border-top: 1px solid var(--rule); padding-block: clamp(2.5rem, 5vw, 3.5rem); margin-top: clamp(2rem, 5vw, 3rem); }
+  .colophon__grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .colophon__grid { grid-template-columns: 1.35fr 1fr; align-items: start; gap: clamp(2rem,5vw,4rem); } }
+  .colophon__brand { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; }
+  .colophon__name { font-family: var(--serif); font-weight: 600; font-size: 1.04rem; }
+  .colophon__name em { font-style: italic; color: var(--accent); }
+  .disclaimer { font-size: 0.81rem; line-height: 1.62; color: var(--ink-faint); margin: 0; }
+  .disclaimer strong { color: var(--ink-soft); font-weight: 600; }
+  .colophon__meta { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-faint); line-height: 1.85; }
+  .colophon__meta a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--rule); }
+  .colophon__meta a:hover { color: var(--accent); border-color: var(--accent); }
+  .colophon__tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
+  .colophon__tags span { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.04em; color: var(--ink-faint); border: 1px solid var(--rule); border-radius: 999px; padding: 0.2rem 0.6rem; }
+
+  /* =================== SCROLL REVEAL =================== */
+  .js .reveal {
+    opacity: 0; transform: translateY(18px);
+    transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    will-change: transform, opacity;
+  }
+  .js .reveal.is-visible { opacity: 1; transform: none; }
+  .js .reveal[data-delay="1"] { transition-delay: 0.08s; }
+  .js .reveal[data-delay="2"] { transition-delay: 0.16s; }
+  .js .reveal[data-delay="3"] { transition-delay: 0.24s; }
+  .js .reveal[data-delay="4"] { transition-delay: 0.32s; }
+
+  /* SVG pipeline draw-in (decorative; JS animates the sequence) */
+  .vp-conn { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .js .vp-conn { transition: stroke-dashoffset 0.7s var(--ease); }
+  .vp-node-g { opacity: 0; }
+  .js .vp-node-g { transition: opacity 0.45s var(--ease); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js .reveal, .js .reveal[data-delay] { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .vp-conn { stroke-dashoffset: 0 !important; transition: none !important; }
+    .vp-node-g { opacity: 1 !important; transition: none !important; }
+    .btn, .btn svg, .masthead__cta, .claimline__mark, .field { transition: none !important; }
+  }
+</style>
+</head>
+
+<body>
+<a class="skip" href="#problem">Skip to the story</a>
+
+<!-- ===================== MASTHEAD ===================== -->
+<header class="masthead">
+  <div class="wrap masthead__row">
+    <a class="brand" href="#top" aria-label="ActivationOps AI — home">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <circle cx="13" cy="13" r="12" stroke="#7a1f2b" stroke-width="1.4"/>
+        <path d="M6 16.5 L11 7.5 L15.5 16.5 M8 13 H14" stroke="#16130f" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="18.5" cy="9" r="2" fill="#7a1f2b"/>
+      </svg>
+      <span class="brand__name">ActivationOps <em>AI</em></span>
+    </a>
+    <p class="masthead__meta">Story × Flow — verification, watched</p>
+    <a class="masthead__cta" href="#verify">Watch a claim get verified</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ===================== HERO / OPENER ===================== -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <p class="hero__dateline reveal">
+        <span>Story × Flow</span>
+        <span class="dot">·</span>
+        <span>Applied AI &amp; operations</span>
+        <span class="dot">·</span>
+        <span>A simulated, independent demo</span>
+      </p>
+
+      <h1 class="hero__title reveal" id="hero-title" data-delay="1">
+        AI wrote the message. Then it slipped in a date that <em>wasn't true.</em>
+      </h1>
+
+      <div class="hero__split">
+        <div>
+          <p class="hero__dek reveal" data-delay="2">
+            <strong>ActivationOps AI</strong> re-activates stalled merchants on a delivery marketplace — but its
+            edge isn't the writing. It's <em>verification rigor</em>: every claim in an AI draft is checked, line by line,
+            against the merchant's own data row, so a fabrication never reaches a person's send button.
+          </p>
+          <div class="hero__cta-row reveal" data-delay="3">
+            <a class="btn btn--primary" href="#verify">
+              Watch a claim get verified
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h9m0 0L8.5 4.5M12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="btn btn--ghost" href="#problem">Read the story</a>
+          </div>
+        </div>
+
+        <aside class="hero__aside reveal" data-delay="2" aria-label="At a glance">
+          <dl>
+            <div class="pair"><dt>marketplace</dt><dd>Curbside Commons</dd></div>
+            <div class="pair"><dt>the differentiator</dt><dd>Faithfulness, verified</dd></div>
+            <div class="pair"><dt>forward check</dt><dd>claim → data</dd></div>
+            <div class="pair"><dt>reverse check</dt><dd>sentence → entailment</dd></div>
+            <div class="pair"><dt>every send</dt><dd>Human-approved</dd></div>
+          </dl>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ===================== 01 · THE STALL ===================== -->
+  <section data-beat id="problem" aria-labelledby="problem-title">
+    <div class="wrap">
+      <div class="beat-head reveal">
+        <p class="kicker"><span class="tick"></span>01 — The stall</p>
+        <h2 class="beat-title" id="problem-title">A merchant signed up, got halfway, and went quiet.</h2>
+      </div>
+
+      <p class="lede measure dropcap reveal">
+        Every marketplace has a long tail of them — businesses that opened an account, started onboarding,
+        and then stopped. They are not rejections; they are <em>unfinished revenue</em>, GMV that was almost
+        won and then left on the table. The tail is far too long to work by hand, and a one-size message
+        ignores the very thing that matters: <em>why</em> each one is stuck.
+      </p>
+
+      <div class="prob-grid">
+        <article class="prob reveal" data-delay="1">
+          <svg class="prob__icon" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <path d="M3 21 L9 13 L13 17 L23 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M23 11 V5 H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h3>Lost revenue, not lost leads</h3>
+          <p>Signed-up-but-never-live merchants are real GMV the marketplace already paid to acquire — and then never collected.</p>
+        </article>
+
+        <article class="prob reveal" data-delay="2">
+          <svg class="prob__icon" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <rect x="4" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 9 H18 M8 13 H18 M8 17 H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <h3>They stall mid-setup</h3>
+          <p>Verify business → menu → photos → hours → banking → final check. Most drop somewhere in that chain, each for a different reason.</p>
+        </article>
+
+        <article class="prob reveal" data-delay="3">
+          <svg class="prob__icon" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <path d="M5 6 H21 V16 H11 L6 20 V16 H5 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M9 11 H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <h3>Generic outreach fails</h3>
+          <p>The number-one reason reactivation flops: a message that ignores the merchant's actual blocker.</p>
+        </article>
+
+        <article class="prob reveal" data-delay="4">
+          <svg class="prob__icon" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <path d="M13 3 L21 6.5 V12 C21 17 17.5 20.5 13 22 C8.5 20.5 5 17 5 12 V6.5 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M13 9 V13 M13 16 V16.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+          <h3>And AI can make it worse</h3>
+          <p>Hand the writing to a model and it will help — until it confidently states something the data never supported. That is the risk this system is built against.</p>
+        </article>
+      </div>
+
+      <blockquote class="pullquote reveal">
+        <p>The danger isn't that AI won't write. It's that it will write something true-sounding that the data can't back.</p>
+        <cite>The thesis of this walkthrough</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ===================== 02 · THE VERIFICATION HERO ===================== -->
+  <section data-beat id="verify" class="verify" aria-labelledby="verify-title">
+    <div class="wrap">
+      <div class="beat-head reveal">
+        <p class="kicker"><span class="tick"></span>02 — Watch a claim get verified</p>
+        <h2 class="beat-title" id="verify-title">A draft enters. Every sentence is checked against the source of truth before a person ever sees it.</h2>
+        <p class="lede">This is one recorded run for <strong>Fog City Tacos</strong>. The model writes the prose; the pipeline proves the prose. Watch the draft move through a forward claims-gatekeeper and a reverse semantic faithfulness judge — and watch one sentence get caught.</p>
+      </div>
+
+      <div class="stage reveal" id="vstage">
+        <div class="stage__bar">
+          <span class="id">merchant <b>m-0417</b> · Curbside&nbsp;Commons · <b>replay</b></span>
+          <span class="ctl">
+            <span class="stage__progress" id="vprogress" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+            <button class="replay-btn" id="vreplay" type="button" aria-label="Replay the verification sequence">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              replay
+            </button>
+          </span>
+        </div>
+
+        <!-- THE ANIMATED PIPELINE -->
+        <div class="diagram">
+          <svg viewBox="0 0 1080 220" role="img" aria-labelledby="vp-title vp-desc" id="vp-svg" preserveAspectRatio="xMidYMid meet">
+            <title id="vp-title">The ActivationOps verification pipeline</title>
+            <desc id="vp-desc">Five connected stages, left to right: the merchant data row (source of truth), a bounded LLM draft, a deterministic claims-gatekeeper checking each claim forward to the data, a semantic faithfulness judge checking each prose sentence in reverse for data entailment with a cross-family model, and a human approval gate. A draft sentence is shown being checked claim by claim — "you've completed 2 of 5 steps" is supported, while a fabricated "you'll be live by Friday" is unsupported and held for a human.</desc>
+
+            <!-- baseline -->
+            <line x1="40" y1="86" x2="1040" y2="86" stroke="var(--rule-soft)" stroke-width="1"/>
+
+            <!-- connectors -->
+            <g fill="none" stroke="#7a1f2b" stroke-width="2.2" stroke-linecap="round">
+              <path class="vp-conn" d="M196 86 H236" pathLength="1"/>
+              <path class="vp-conn" d="M396 86 H436" pathLength="1"/>
+              <path class="vp-conn" d="M636 86 H676" pathLength="1"/>
+              <path class="vp-conn" d="M876 86 H916" pathLength="1"/>
+            </g>
+
+            <!-- reverse-direction arc under the gate + judge (the "reverse" check) -->
+            <path class="vp-conn" id="vp-reverse" d="M716 122 C716 168 556 168 556 122" pathLength="1"
+                  fill="none" stroke="#a23423" stroke-width="1.8" stroke-dasharray="4 4" stroke-linecap="round"/>
+            <text x="636" y="186" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#a23423">reverse · sentence → entailment</text>
+
+            <!-- traveling verification token -->
+            <g id="vp-token" opacity="0">
+              <circle r="6" fill="#7a1f2b"/>
+              <circle r="12" fill="#7a1f2b" opacity="0.16"/>
+            </g>
+
+            <!-- NODE 1 — data row -->
+            <g class="vp-node-g" data-node="0" transform="translate(40,50)">
+              <rect width="156" height="72" rx="11" fill="#fff" stroke="var(--rule)" stroke-width="1.4"/>
+              <rect class="vp-node-active" width="156" height="72" rx="11" fill="none" stroke="#7a1f2b" stroke-width="1.6" opacity="0"/>
+              <text x="16" y="27" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#8a8077">source of truth</text>
+              <text x="16" y="48" font-family="Fraunces, Georgia, serif" font-size="15" font-weight="500" fill="#16130f">merchant data row</text>
+              <text x="16" y="63" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#8a8077">m-0417 · structured</text>
+            </g>
+
+            <!-- NODE 2 — bounded LLM draft -->
+            <g class="vp-node-g" data-node="1" transform="translate(240,50)">
+              <rect width="156" height="72" rx="11" fill="#f4e7e7" stroke="#e0c4c6" stroke-width="1.4"/>
+              <rect class="vp-node-active" width="156" height="72" rx="11" fill="none" stroke="#7a1f2b" stroke-width="1.6" opacity="0"/>
+              <text x="16" y="27" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7a1f2b">bounded llm</text>
+              <text x="16" y="48" font-family="Fraunces, Georgia, serif" font-size="15" font-weight="500" fill="#5d1320">writes the draft</text>
+              <text x="16" y="63" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#7a1f2b">schema-constrained</text>
+            </g>
+
+            <!-- NODE 3 — forward claims-gatekeeper -->
+            <g class="vp-node-g" data-node="2" transform="translate(440,50)">
+              <rect width="196" height="72" rx="11" fill="#fff" stroke="var(--rule)" stroke-width="1.4"/>
+              <rect class="vp-node-active" width="196" height="72" rx="11" fill="none" stroke="#7a1f2b" stroke-width="1.6" opacity="0"/>
+              <text x="16" y="27" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#8a8077">deterministic · forward</text>
+              <text x="16" y="48" font-family="Fraunces, Georgia, serif" font-size="15" font-weight="500" fill="#16130f">claims-gatekeeper</text>
+              <text x="16" y="63" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#8a8077">every claim → a data field</text>
+            </g>
+
+            <!-- NODE 4 — reverse semantic judge -->
+            <g class="vp-node-g" data-node="3" transform="translate(680,50)">
+              <rect width="196" height="72" rx="11" fill="#fff" stroke="var(--rule)" stroke-width="1.4"/>
+              <rect class="vp-node-active" width="196" height="72" rx="11" fill="none" stroke="#7a1f2b" stroke-width="1.6" opacity="0"/>
+              <text x="16" y="27" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#a23423">semantic · reverse</text>
+              <text x="16" y="48" font-family="Fraunces, Georgia, serif" font-size="15" font-weight="500" fill="#16130f">faithfulness judge</text>
+              <text x="16" y="63" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#8a8077">cross-family · entailment</text>
+            </g>
+
+            <!-- NODE 5 — human gate -->
+            <g class="vp-node-g" data-node="4" transform="translate(920,50)">
+              <rect width="120" height="72" rx="11" fill="#fff" stroke="var(--rule)" stroke-width="1.4"/>
+              <rect class="vp-node-active" width="120" height="72" rx="11" fill="none" stroke="#7a1f2b" stroke-width="1.6" opacity="0"/>
+              <text x="16" y="27" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#8a8077">human gate</text>
+              <text x="16" y="48" font-family="Fraunces, Georgia, serif" font-size="15" font-weight="500" fill="#16130f">approval</text>
+              <text x="16" y="63" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#8a8077">hold · send</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- LIVE READOUT -->
+        <div class="readout">
+          <!-- the source-of-truth data row -->
+          <div class="srcrow" aria-label="Merchant data row — the source of truth">
+            <p class="srcrow__label">source of truth <span class="chip">merchant.row</span></p>
+            <div class="field" data-field="merchant_name"><span class="fk">merchant_name</span><span class="fv">Fog City Tacos</span></div>
+            <div class="field" data-field="risk_score"><span class="fk">risk_score</span><span class="fv">HIGH</span></div>
+            <div class="field" data-field="blocker"><span class="fk">blocker</span><span class="fv">business_verification</span></div>
+            <div class="field" data-field="steps_completed"><span class="fk">steps_completed</span><span class="fv">2 of 5</span></div>
+            <div class="field" data-field="go_live_date"><span class="fk">go_live_date</span><span class="fv"><span class="absent">— not set —</span></span></div>
+            <p class="srcrow__note">There is a value for <code>steps_completed</code>. There is <b>no go-live date anywhere in the row</b> — so any sentence that promises one has nothing to stand on.</p>
+          </div>
+
+          <!-- the draft, checked sentence by sentence -->
+          <div class="draftcol" aria-label="The drafted outreach, checked sentence by sentence">
+            <p class="draftcol__label">the draft — checked, not sent</p>
+            <p class="draftcol__subject">A quick step to finish your Curbside&nbsp;Commons setup</p>
+
+            <div class="claimline" data-claim="0">
+              <span class="claimline__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <p class="claimline__txt">"You've <b>completed 2 of 5 steps</b> in your onboarding."</p>
+              <span class="claimline__tag">→ steps_completed<br>supported</span>
+            </div>
+
+            <div class="claimline" data-claim="1">
+              <span class="claimline__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <p class="claimline__txt">"The next step is <b>verifying your business.</b>"</p>
+              <span class="claimline__tag">→ blocker<br>supported</span>
+            </div>
+
+            <div class="claimline" data-claim="2">
+              <span class="claimline__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+              <p class="claimline__txt">"And you'll <b>be live by Friday.</b>"</p>
+              <span class="claimline__tag">→ no field<br>unsupported</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- THE CATCH -->
+      <div class="verdict reveal" role="status" aria-live="polite">
+        <svg class="verdict__icon" width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+          <path d="M15 3 L25 7.5 V14 C25 20 21 24.5 15 27 C9 24.5 5 20 5 14 V7.5 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M11 11 L19 19 M19 11 L11 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h3>Caught: a promise the data can't keep.</h3>
+          <p>The forward gatekeeper passed "2 of 5 steps" — it traces straight to <code>steps_completed</code>. But the reverse faithfulness judge read the prose for entailment and flagged <b>"live by Friday"</b>: no field in the row supports a go-live date, so the sentence is <b>unsupported</b>. The draft does not advance.</p>
+        </div>
+        <p class="held"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 9.5v5M14.5 9.5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Held for human approval — <b>nothing is sent automatically.</b> A person decides hold, edit, or send.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 03 · TWO DIRECTIONS ===================== -->
+  <section data-beat id="method" aria-labelledby="method-title">
+    <div class="wrap">
+      <div class="beat-head reveal">
+        <p class="kicker"><span class="tick"></span>03 — Why two checks, not one</p>
+        <h2 class="beat-title" id="method-title">One check proves what's <em>declared.</em> The other reads what's <em>written.</em></h2>
+        <p class="lede measure">Generic AI guardrails check tone and policy. They rarely check whether a sentence is <em>true to the data</em>. ActivationOps runs both directions — and it's the second that catches the Friday line.</p>
+      </div>
+
+      <div class="duo">
+        <article class="gate reveal">
+          <p class="gate__dir">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h10m0 0L9 5m3 3l-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            forward
+          </p>
+          <h3>The claims-gatekeeper</h3>
+          <p>Deterministic, and first in line. Each claim the draft <em>declares</em> is traced forward to a specific field in the merchant's record — and forbidden-claim guardrails are enforced. If a declared claim has no field behind it, the gate blocks it.</p>
+          <p class="gate__how">claim <span>"2 of 5 steps"</span> → <span>steps_completed</span> · ✓ supported<br>same inputs, same verdict, every replay — auditable by design.</p>
+        </article>
+
+        <article class="gate reveal" data-delay="1">
+          <p class="gate__dir">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M14 8H4m0 0l3-3m-3 3l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            reverse
+          </p>
+          <h3>The semantic faithfulness judge</h3>
+          <p>It works backward from the prose. Each written <em>sentence</em> is tested for entailment against the data row by a <em>cross-family</em> model — a different model lineage than the one that wrote the draft, so a writer's blind spot isn't also the checker's. A sentence the data can't entail is flagged, even when no claim was formally declared.</p>
+          <p class="gate__how">sentence <span>"live by Friday"</span> → entailment <span>fails</span> · ✗ unsupported<br>this is the check generic guardrails miss.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ===================== 04 · WHY IT'S SAFE ===================== -->
+  <section data-beat id="trust" aria-labelledby="trust-title">
+    <div class="wrap">
+      <div class="beat-head reveal">
+        <p class="kicker"><span class="tick"></span>04 — Why it's safe</p>
+        <h2 class="beat-title" id="trust-title">The model is the writer, never the decider.</h2>
+        <p class="lede measure">We don't claim no one else automates outreach. We claim something narrower and provable: <strong>we verify the AI's claims against the source of truth</strong>, in both directions, before a human approves a single send.</p>
+      </div>
+
+      <div class="ledger">
+        <div class="ledger__item reveal">
+          <svg class="ledger__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 18 V8 M9 18 V5 M14 18 V10 M19 18 V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <h3>Deterministic where it counts</h3>
+          <p>The risk score and the blocker come from code, not a model. Same inputs, same output, every time — replayable, and defensible.</p>
+        </div>
+        <div class="ledger__item reveal" data-delay="1">
+          <svg class="ledger__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 12 L11 15 L16 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>Every claim traces to a field</h3>
+          <p>The forward gatekeeper ties each declared claim to the merchant's own record. If the data doesn't back it, the claim doesn't ship.</p>
+        </div>
+        <div class="ledger__item reveal">
+          <svg class="ledger__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 4 H6 V20 H18 V8 Z M14 4 V8 H18" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12.5l2 2 4-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>Every sentence read for entailment</h3>
+          <p>The reverse semantic judge, on a cross-family model, catches true-sounding prose the data can't support — the fabrications generic guardrails miss.</p>
+        </div>
+        <div class="ledger__item reveal" data-delay="1">
+          <svg class="ledger__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 19 C3.5 15.5 6 13.8 9 13.8 C12 13.8 14.5 15.5 14.5 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M16 12 L18.5 14.5 L22 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>A human owns the send</h3>
+          <p>The one irreversible action always belongs to a person. The system holds; it never sends on its own. Hold, edit, or send.</p>
+        </div>
+        <div class="ledger__item reveal">
+          <svg class="ledger__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M12 7 V12 L15 13.5 M9.5 12 H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>Spend is hard-capped</h3>
+          <p>A $5 cost ledger fails closed — it halts the run before it can overspend. The public demo is replay-only: no live calls.</p>
+        </div>
+        <div class="ledger__item reveal" data-delay="1">
+          <svg class="ledger__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 8 H16 M8 12 H16 M8 16 H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <h3>A full audit trail</h3>
+          <p>Every step, every verdict, every decision is recorded. The run can be reconstructed end to end — by an auditor, not just an engineer.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 05 · GENERALIZES ===================== -->
+  <section data-beat id="generalizes" aria-labelledby="gen-title">
+    <div class="wrap">
+      <div class="general reveal">
+        <div class="inner">
+          <p class="kicker"><span class="tick"></span>05 — Why it generalizes</p>
+          <h2 class="beat-title" id="gen-title">The verification spine outlives the use case.</h2>
+          <p class="lede">Stalled-merchant activation is the worked example. The shape underneath it — prove every claim forward, read every sentence backward, keep a human on the trigger — is a pattern for any time you let AI write to people at scale.</p>
+
+          <div class="general__spine" aria-label="The reusable pattern">
+            <span>data row</span><span class="arr">→</span>
+            <span>bounded draft</span><span class="arr">→</span>
+            <span>claims-gate</span><span class="arr">→</span>
+            <span>faithfulness judge</span><span class="arr">→</span>
+            <span>human approval</span>
+          </div>
+
+          <p class="general__close">
+            Swap the merchants for patients, borrowers, students, or subscribers and the discipline holds:
+            <strong>let code make the risky call, let the model write within bounds, prove every claim against the source of truth in both directions, and put a person on the send.</strong>
+            That is the transferable part — and the reason this is built to be adopted, not just demoed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CTA ===================== -->
+  <section data-beat id="cta" aria-labelledby="cta-title">
+    <div class="wrap">
+      <p class="kicker reveal"><span class="tick"></span>The walkthrough</p>
+      <h2 class="cta__title reveal" id="cta-title" data-delay="1">See a stalled merchant become a <em>verified</em> message.</h2>
+      <div class="cta__row reveal" data-delay="2">
+        <a class="btn btn--primary" href="#verify">
+          Replay the verification
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h9m0 0L8.5 4.5M12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn btn--ghost" href="#method">Revisit the two checks</a>
+      </div>
+      <p class="cta__note reveal" data-delay="2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        recorded run · $0.00 spent in this demo · no live calls
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== COLOPHON / HONEST FOOTER ===================== -->
+<footer class="colophon" aria-labelledby="colophon-title">
+  <div class="wrap colophon__grid">
+    <div>
+      <div class="colophon__brand">
+        <svg width="22" height="22" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <circle cx="13" cy="13" r="12" stroke="#7a1f2b" stroke-width="1.4"/>
+          <path d="M6 16.5 L11 7.5 L15.5 16.5 M8 13 H14" stroke="#16130f" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="18.5" cy="9" r="2" fill="#7a1f2b"/>
+        </svg>
+        <span class="colophon__name" id="colophon-title">ActivationOps <em>AI</em></span>
+      </div>
+      <p class="disclaimer">
+        <strong>An independent, simulated demo.</strong> ActivationOps AI is <strong>not affiliated with, endorsed by, or connected to</strong>
+        DoorDash, Uber&nbsp;Eats, Grubhub, DataSF, or any real business or marketplace. "Curbside&nbsp;Commons" is a <strong>fictional</strong>,
+        DoorDash/Uber&nbsp;Eats/Grubhub-style marketplace used for illustration only. All merchant names shown — including
+        "Fog&nbsp;City&nbsp;Tacos" — are <strong>fictional</strong>, and the activation data is <strong>synthetic</strong>, built on de-identified open data.
+        The drafted message and verification shown are a recorded fixture, not a live send. <strong>No real-world results,
+        business impact, or platform access are claimed.</strong>
+      </p>
+      <div class="colophon__tags" aria-hidden="true">
+        <span>synthetic data</span>
+        <span>fictional names</span>
+        <span>not affiliated</span>
+        <span>replay demo</span>
+      </div>
+    </div>
+    <div class="colophon__meta">
+      <p>Human-led, AI-assisted, professionally reviewed.</p>
+      <p>The honest framing: <a href="#trust">we verify AI claims against the source of truth</a> — in both directions.</p>
+      <p>The public demo runs in <a href="#verify">replay</a> only — it makes no live AI calls.</p>
+      <p>Story × Flow · a walkthrough of verification rigor</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== MOTION ===================== -->
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hasIO = "IntersectionObserver" in window;
+
+  /* ---------- scroll-reveal ---------- */
+  var revealEls = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  if (reduce || !hasIO) {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  } else {
+    var rio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("is-visible"); rio.unobserve(e.target); }
+      });
+    }, { threshold: 0.14, rootMargin: "0px 0px -8% 0px" });
+    revealEls.forEach(function (el) { rio.observe(el); });
+  }
+
+  /* ---------- the verification stage ---------- */
+  var stage     = document.getElementById("vstage");
+  var svg       = document.getElementById("vp-svg");
+  if (!stage || !svg) return;
+
+  var conns     = Array.prototype.slice.call(svg.querySelectorAll(".vp-conn"));
+  var revConn   = document.getElementById("vp-reverse");
+  var nodes     = Array.prototype.slice.call(svg.querySelectorAll(".vp-node-g"));
+  var actives   = Array.prototype.slice.call(svg.querySelectorAll(".vp-node-active"));
+  var token     = document.getElementById("vp-token");
+  var progress  = Array.prototype.slice.call(document.querySelectorAll("#vprogress i"));
+  var claims    = Array.prototype.slice.call(stage.querySelectorAll(".claimline"));
+  var fields    = {};
+  Array.prototype.slice.call(stage.querySelectorAll(".field")).forEach(function (f) { fields[f.getAttribute("data-field")] = f; });
+  var replayBtn = document.getElementById("vreplay");
+
+  // node centre x-coordinates (in SVG viewBox units), y baseline = 86
+  var nodeX = [118, 318, 538, 778, 980];
+  var timers = [];
+  var rafId = null, raf0 = null, packetActive = false;
+
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+  function resetVisual() {
+    clearTimers();
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; raf0 = null; }
+    packetActive = false;
+    conns.forEach(function (p) { p.style.transition = "none"; p.style.strokeDashoffset = 1; });
+    if (revConn) { revConn.style.transition = "none"; revConn.style.strokeDashoffset = 1; }
+    nodes.forEach(function (n) { n.style.opacity = 0; });
+    actives.forEach(function (a) { a.setAttribute("opacity", 0); });
+    if (token) token.setAttribute("opacity", 0);
+    progress.forEach(function (i) { i.classList.remove("on"); });
+    claims.forEach(function (c) { c.classList.remove("is-pass", "is-fail", "is-active"); });
+    Object.keys(fields).forEach(function (k) { fields[k].classList.remove("is-lit"); });
+    // force reflow so the "none" transition resets cleanly
+    void svg.getBoundingClientRect();
+  }
+
+  // resolved end-state (used for reduced-motion and as the final frame)
+  function showEndState() {
+    conns.forEach(function (p) { p.style.transition = "none"; p.style.strokeDashoffset = 0; });
+    if (revConn) { revConn.style.transition = "none"; revConn.style.strokeDashoffset = 0; }
+    nodes.forEach(function (n) { n.style.opacity = 1; });
+    progress.forEach(function (i) { i.classList.add("on"); });
+    claims[0].classList.add("is-pass");
+    claims[1].classList.add("is-pass");
+    claims[2].classList.add("is-fail");
+    fields["steps_completed"].classList.add("is-lit");
+    fields["blocker"].classList.add("is-lit");
+    fields["go_live_date"].classList.add("is-lit");
+    if (token) token.setAttribute("opacity", 0);
+  }
+
+  // move the token between two node centres over ms, then callback
+  function moveToken(fromX, toX, ms, cb) {
+    if (!token) { if (cb) cb(); return; }
+    token.setAttribute("opacity", 1);
+    var start = null;
+    function frame(ts) {
+      if (start === null) start = ts;
+      var t = Math.min((ts - start) / ms, 1);
+      var e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // easeInOutQuad
+      var x = fromX + (toX - fromX) * e;
+      token.setAttribute("transform", "translate(" + x + ",86)");
+      if (t < 1) { rafId = requestAnimationFrame(frame); }
+      else { rafId = null; if (cb) cb(); }
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function pulseNode(idx) {
+    var a = actives[idx];
+    if (!a) return;
+    a.setAttribute("opacity", 1);
+    later(function () { a.setAttribute("opacity", 0); }, 900);
+  }
+
+  function drawConn(p, ms) {
+    p.style.transition = "stroke-dashoffset " + ms + "ms cubic-bezier(0.16,1,0.3,1)";
+    requestAnimationFrame(function () { p.style.strokeDashoffset = 0; });
+  }
+
+  // the choreographed sequence
+  function play() {
+    resetVisual();
+    if (reduce) { showEndState(); return; }
+    packetActive = true;
+
+    // 1) reveal node 1 (data row), light progress 1
+    later(function () { nodes[0].style.opacity = 1; progress[0].classList.add("on"); pulseNode(0); }, 120);
+
+    // 2) draw to node 2 (bounded llm), token travels, reveal node 2
+    later(function () { drawConn(conns[0], 600); }, 520);
+    later(function () { moveToken(nodeX[0], nodeX[1], 700, function () { nodes[1].style.opacity = 1; progress[1].classList.add("on"); pulseNode(1); }); }, 560);
+
+    // 3) draw to node 3 (forward gatekeeper)
+    later(function () { drawConn(conns[1], 600); }, 1380);
+    later(function () { moveToken(nodeX[1], nodeX[2], 700, function () { nodes[2].style.opacity = 1; progress[2].classList.add("on"); pulseNode(2); }); }, 1420);
+
+    // 4) FORWARD checks: claim 0 → steps_completed ✓, claim 1 → blocker ✓
+    later(function () {
+      claims[0].classList.add("is-active");
+      fields["steps_completed"].classList.add("is-lit");
+    }, 2250);
+    later(function () { claims[0].classList.remove("is-active"); claims[0].classList.add("is-pass"); }, 2900);
+    later(function () {
+      claims[1].classList.add("is-active");
+      fields["blocker"].classList.add("is-lit");
+    }, 3050);
+    later(function () { claims[1].classList.remove("is-active"); claims[1].classList.add("is-pass"); }, 3650);
+
+    // 5) draw to node 4 (reverse semantic judge), reveal reverse arc
+    later(function () { drawConn(conns[2], 600); }, 3850);
+    later(function () { moveToken(nodeX[2], nodeX[3], 700, function () { nodes[3].style.opacity = 1; progress[3].classList.add("on"); pulseNode(3); }); }, 3890);
+    later(function () { if (revConn) drawConn(revConn, 700); }, 4650);
+
+    // 6) REVERSE check: sentence 2 "live by Friday" → no field → ✗ FAIL (the catch)
+    later(function () {
+      claims[2].classList.add("is-active");
+      fields["go_live_date"].classList.add("is-lit");
+    }, 4900);
+    later(function () { claims[2].classList.remove("is-active"); claims[2].classList.add("is-fail"); }, 5650);
+
+    // 7) hand to human gate — held, not sent. token does NOT cross into approval as "send".
+    later(function () { drawConn(conns[3], 600); }, 5900);
+    later(function () { moveToken(nodeX[3], nodeX[4], 700, function () { nodes[4].style.opacity = 1; progress[4].classList.add("on"); pulseNode(4); }); }, 5940);
+    later(function () { if (token) token.setAttribute("opacity", 0); }, 6800);
+  }
+
+  // play on first scroll-in; allow replay via button
+  if (reduce || !hasIO) {
+    showEndState();
+  } else {
+    var played = false;
+    var vio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && !played) { played = true; play(); vio.unobserve(e.target); }
+      });
+    }, { threshold: 0.35 });
+    vio.observe(stage);
+
+    // pause the token rAF when the stage scrolls fully out of view
+    var pauseObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting && rafId) { cancelAnimationFrame(rafId); rafId = null; raf0 = null; }
+      });
+    }, { threshold: 0 });
+    pauseObs.observe(stage);
+  }
+
+  if (replayBtn) {
+    replayBtn.addEventListener("click", function () {
+      if (reduce) { resetVisual(); showEndState(); return; }
+      play();
+    });
+  }
+})();
+</script>
+</body>
+</html>

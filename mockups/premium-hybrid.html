@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ActivationOps AI — verify every AI claim against the source of truth</title>
+<meta name="description" content="ActivationOps AI reactivates stalled merchants on a delivery marketplace and verifies every AI-written claim against the merchant's own data — a deterministic claims-gate plus a cross-family semantic faithfulness judge, with a human on the send." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     ActivationOps AI — "Polished Hybrid"
+     The most polished, credible, enterprise-grade sample.
+     Stripe / Mercury / Linear-tier craft on a WHITE page.
+     Storytelling arc + an animated verification-pipeline hero
+     where you WATCH a draft sentence get verified claim-by-claim.
+     Self-contained: inline CSS + inline SVG + vanilla JS only.
+     No fetch/XHR (file:// safe). prefers-reduced-motion honored.
+     ============================================================ */
+
+  :root {
+    /* Deep, desaturated indigo — confident, not "AI purple" */
+    --indigo-50:  #eef1fb;
+    --indigo-100: #dde3f7;
+    --indigo-200: #bcc7ef;
+    --indigo-300: #93a3e2;
+    --indigo-400: #6b7fd1;
+    --indigo-500: #4b5bbd;
+    --indigo-600: #3a45a0;
+    --indigo-700: #2f3781;
+    --indigo-800: #272e66;
+    --indigo-900: #1f244f;
+    --ink-950:    #14162b;
+
+    /* Warm-cool slate neutrals, consistent throughout */
+    --paper:    #fbfbfd;
+    --surface:  #ffffff;
+    --line:     #e7e8ef;
+    --line-2:   #eef0f5;
+    --slate-900:#1a1c2b;
+    --slate-700:#3b3f54;
+    --slate-600:#54596f;
+    --slate-500:#6c7188;
+    --slate-400:#6a6f86; /* AA-compliant on white/paper (~4.9:1); carries real microlabel text */
+
+    /* Status semantics from the product surface */
+    --emerald-700:#047857; --emerald-600:#059669; --emerald-50:#ecfdf5; --emerald-line:#bbf7d0;
+    --amber-700: #b45309;  --amber-50: #fffbeb;  --amber-line: #fde68a;
+    --red-700:   #b91c1c;  --red-600: #dc2626;   --red-50:   #fef2f2;  --red-line:   #fecaca;
+    --teal-700:  #0f766e;  --teal-50: #f0fdfa;   --teal-line: #99f6e4; /* the reverse/judge family */
+
+    --accent: var(--indigo-600);
+    --accent-deep: var(--indigo-800);
+
+    /* Soft, realistic, layered shadows tinted to the page hue */
+    --shadow-xs:  0 1px 1.5px rgba(31,36,79,.05);
+    --shadow-sm:  0 1px 2px rgba(31,36,79,.06), 0 1px 1px rgba(31,36,79,.04);
+    --shadow-md:  0 4px 12px -2px rgba(31,36,79,.08), 0 2px 6px -2px rgba(31,36,79,.05);
+    --shadow-lg:  0 18px 40px -16px rgba(31,36,79,.18), 0 8px 18px -10px rgba(31,36,79,.10);
+    --shadow-xl:  0 40px 80px -28px rgba(31,36,79,.26), 0 16px 32px -16px rgba(31,36,79,.12);
+    --ring-focus: 0 0 0 3px rgba(58,69,160,.38);
+
+    --radius-sm: 10px;
+    --radius:    16px;
+    --radius-lg: 22px;
+    --radius-xl: 30px;
+
+    --maxw: 1200px;
+    --easing: cubic-bezier(.16,1,.3,1);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 620px at 82% -8%, rgba(75,91,189,.07), transparent 60%),
+      radial-gradient(900px 520px at -6% 6%, rgba(15,118,110,.045), transparent 55%),
+      var(--paper);
+    color: var(--slate-700);
+    font-family: "Spline Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3 { color: var(--slate-900); margin: 0; }
+  .display {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.04;
+  }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  em { font-style: italic; }
+  .mono { font-family: "Spline Sans Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  ::selection { background: var(--indigo-100); color: var(--indigo-900); }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
+  @media (max-width: 560px) { .wrap { padding: 0 20px; } }
+
+  /* skip link */
+  .skip { position: absolute; left: -999px; top: 8px; z-index: 200; background: var(--slate-900); color: #fff; padding: 10px 16px; border-radius: 9px; font-size: 13px; font-weight: 600; }
+  .skip:focus { left: 16px; }
+
+  a:focus-visible, button:focus-visible { outline: none; box-shadow: var(--ring-focus); border-radius: 9px; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .eyebrow svg { width: 15px; height: 15px; }
+
+  .lede { font-size: 19px; color: var(--slate-600); line-height: 1.6; }
+
+  /* ---------- Nav ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 60;
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    background: rgba(251,251,253,.72);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s var(--easing), background .3s var(--easing);
+  }
+  header.nav.scrolled { border-bottom-color: var(--line); background: rgba(251,251,253,.86); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 70px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 600; color: var(--slate-900); font-size: 16px; letter-spacing: -.01em; }
+  .brand .logomark {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(155deg, var(--indigo-500), var(--indigo-800));
+    display: grid; place-items: center; box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.18);
+  }
+  .brand .logomark svg { width: 19px; height: 19px; }
+  .nav-links { display: flex; align-items: center; gap: 30px; }
+  .nav-links a.link { font-size: 14.5px; font-weight: 500; color: var(--slate-600); transition: color .2s var(--easing); }
+  .nav-links a.link:hover { color: var(--slate-900); }
+  @media (max-width: 900px) { .nav-links a.link { display: none; } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: inherit; font-size: 14.5px; font-weight: 600;
+    padding: 11px 18px; border-radius: 11px; cursor: pointer;
+    border: 1px solid transparent; transition: transform .18s var(--easing), box-shadow .25s var(--easing), background .2s var(--easing); white-space: nowrap;
+  }
+  .btn svg { width: 16px; height: 16px; }
+  .btn-primary {
+    background: linear-gradient(180deg, var(--indigo-600), var(--indigo-700));
+    color: #fff; box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.16);
+  }
+  .btn-primary:hover { box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.2); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost { background: var(--surface); color: var(--slate-900); border-color: var(--line); box-shadow: var(--shadow-sm); }
+  .btn-ghost:hover { border-color: var(--indigo-200); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+  /* ---------- Reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .8s var(--easing), transform .8s var(--easing); }
+  .reveal.in { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay: .08s; } .reveal.d2 { transition-delay: .16s; }
+  .reveal.d3 { transition-delay: .24s; } .reveal.d4 { transition-delay: .32s; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .float-anim, .pulse-dot, .scan-line, .beam, .verify-claim { animation: none !important; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; padding: 60px 0 36px; overflow: hidden; }
+  .grid-bg { position: absolute; inset: 0; pointer-events: none; opacity: .55; background-image: linear-gradient(var(--line-2) 1px, transparent 1px), linear-gradient(90deg, var(--line-2) 1px, transparent 1px); background-size: 58px 58px; mask-image: radial-gradient(560px 360px at 72% 22%, #000, transparent 82%); -webkit-mask-image: radial-gradient(560px 360px at 72% 22%, #000, transparent 82%); }
+  .hero-grid { display: grid; grid-template-columns: 1.02fr 1.18fr; gap: 50px; align-items: center; }
+  @media (max-width: 1040px) { .hero-grid { grid-template-columns: 1fr; gap: 44px; } }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 100px; padding: 7px 14px 7px 9px;
+    font-size: 13px; font-weight: 500; color: var(--slate-600);
+    box-shadow: var(--shadow-sm); margin-bottom: 26px;
+  }
+  .pill .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); background: var(--indigo-50); padding: 3px 9px; border-radius: 100px;
+  }
+  .hero h1 { font-size: clamp(38px, 5vw, 58px); margin-bottom: 22px; }
+  .hero h1 .accent { color: var(--accent-deep); }
+  .hero .lede { max-width: 520px; margin-bottom: 30px; }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .hero-note { margin-top: 22px; font-size: 13.5px; color: var(--slate-500); display: flex; align-items: center; gap: 9px; }
+  .hero-note svg { width: 16px; height: 16px; color: var(--emerald-700); flex: none; }
+
+  .trust-row { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line-2); }
+  .trust-chip { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--slate-600); }
+  .trust-chip svg { width: 16px; height: 16px; color: var(--accent); flex: none; }
+
+  /* ============================================================
+     HERO CENTERPIECE — the live verification panel.
+     A draft is checked sentence-by-sentence: a forward claims-gate
+     (declared claim -> data field) and a reverse faithfulness judge
+     (prose sentence -> entailment vs the row, cross-family model).
+     You watch one claim pass and one fabrication get caught.
+     ============================================================ */
+  .verifier {
+    position: relative; border-radius: var(--radius-lg);
+    background: var(--surface); border: 1px solid var(--line);
+    box-shadow: var(--shadow-xl); overflow: hidden;
+  }
+  .verifier .float-anim { animation: floaty 8s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  .vf-bar { display: flex; align-items: center; gap: 8px; padding: 13px 16px; border-bottom: 1px solid var(--line-2); background: linear-gradient(180deg, #fff, #fcfcfe); }
+  .vf-bar .dots { display: flex; gap: 6px; }
+  .vf-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: block; }
+  .vf-bar .title { margin-left: 6px; font-size: 12.5px; font-weight: 600; color: var(--slate-500); }
+  .vf-bar .badge { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--amber-700); background: var(--amber-50); border: 1px solid var(--amber-line); padding: 4px 10px; border-radius: 100px; display: inline-flex; align-items: center; gap: 6px; }
+
+  .vf-body { padding: 18px; display: grid; gap: 16px; }
+
+  /* the source-of-truth data row (forward target) */
+  .truth {
+    border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; background: var(--paper);
+  }
+  .truth .th { display: flex; align-items: center; gap: 8px; padding: 9px 13px; background: var(--surface); border-bottom: 1px solid var(--line-2); }
+  .truth .th svg { width: 14px; height: 14px; color: var(--accent-deep); }
+  .truth .th .lbl { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--slate-500); }
+  .truth .th .mname { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--slate-700); }
+  .truth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line-2); }
+  .tcell { background: var(--paper); padding: 9px 13px; transition: background .35s var(--easing), box-shadow .35s var(--easing); }
+  .tcell .k { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--slate-400); }
+  .tcell .v { font-size: 13px; font-weight: 600; color: var(--slate-900); margin-top: 2px; }
+  .tcell.is-hit { background: var(--indigo-50); box-shadow: inset 0 0 0 1.5px var(--indigo-200); }
+  .tcell.absent { opacity: .85; }
+  .tcell.absent .v { color: var(--red-700); font-weight: 500; font-style: italic; }
+  .tcell.is-miss { background: var(--red-50); box-shadow: inset 0 0 0 1.5px var(--red-line); }
+
+  /* the draft, sentence by sentence */
+  .draft {
+    border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; background: var(--surface);
+  }
+  .draft .dh { display: flex; align-items: center; gap: 8px; padding: 9px 13px; background: var(--indigo-50); border-bottom: 1px solid var(--line-2); }
+  .draft .dh svg { width: 14px; height: 14px; color: var(--indigo-800); }
+  .draft .dh .lbl { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--indigo-800); }
+  .draft .dh .src { margin-left: auto; font-size: 10.5px; font-weight: 600; color: var(--indigo-700); background: var(--surface); border: 1px solid var(--indigo-100); padding: 3px 8px; border-radius: 100px; }
+  .draft .db { padding: 14px 15px; font-size: 14px; color: var(--slate-700); line-height: 1.7; }
+
+  .verify-claim {
+    position: relative; border-radius: 5px; padding: 1px 4px; margin: 0 -1px;
+    transition: background .4s var(--easing), color .4s var(--easing), box-shadow .4s var(--easing);
+    cursor: default;
+  }
+  /* state: under review (scanning) */
+  .verify-claim.scanning { background: linear-gradient(90deg, var(--indigo-50), var(--teal-50)); box-shadow: inset 0 -2px 0 var(--indigo-300); }
+  .verify-claim.scanning::after {
+    content: ""; position: absolute; left: 0; bottom: -1px; height: 2px; width: 22%;
+    background: linear-gradient(90deg, transparent, var(--indigo-500), transparent);
+    animation: scan-line 1.1s var(--easing) infinite;
+  }
+  @keyframes scan-line { 0% { left: 0; } 100% { left: 78%; } }
+  /* state: supported */
+  .verify-claim.ok { background: var(--emerald-50); color: var(--emerald-700); box-shadow: inset 0 -2px 0 var(--emerald-600); font-weight: 500; }
+  /* state: unsupported / held */
+  .verify-claim.bad { background: var(--red-50); color: var(--red-700); box-shadow: inset 0 -2px 0 var(--red-600); font-weight: 500; }
+
+  /* the two-pass verdict rail */
+  .passes { display: grid; gap: 9px; }
+  .pass-row {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px;
+    padding: 11px 13px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface);
+    transition: border-color .35s var(--easing), box-shadow .35s var(--easing), background .35s var(--easing);
+  }
+  .pass-row.active { box-shadow: var(--shadow-md); }
+  .pass-row .pico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+  .pass-row .pico svg { width: 17px; height: 17px; }
+  .pass-row.forward .pico { background: var(--indigo-50); color: var(--accent-deep); }
+  .pass-row.reverse .pico { background: var(--teal-50); color: var(--teal-700); }
+  .pass-row .ptitle { font-size: 13px; font-weight: 600; color: var(--slate-900); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pass-row .pdir { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 100px; }
+  .pass-row.forward .pdir { color: var(--accent-deep); background: var(--indigo-50); }
+  .pass-row.reverse .pdir { color: var(--teal-700); background: var(--teal-50); }
+  .pass-row .psub { font-size: 11.5px; color: var(--slate-500); margin-top: 1px; }
+  .pass-row .pverdict { font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: 4px 10px; border-radius: 100px; white-space: nowrap; transition: all .35s var(--easing); }
+  .pverdict.wait { color: var(--slate-500); background: var(--line-2); border: 1px solid var(--line); }
+  .pverdict.run  { color: var(--accent-deep); background: var(--indigo-50); border: 1px solid var(--indigo-200); }
+  .pverdict.pass { color: var(--emerald-700); background: var(--emerald-50); border: 1px solid var(--emerald-line); }
+  .pverdict.flag { color: var(--red-700); background: var(--red-50); border: 1px solid var(--red-line); }
+
+  /* the human gate outcome */
+  .gate {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    background: var(--paper); border: 1px solid var(--line);
+    transition: background .4s var(--easing), border-color .4s var(--easing);
+  }
+  .gate .gico { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex: none; background: var(--amber-50); color: var(--amber-700); }
+  .gate .gico svg { width: 18px; height: 18px; }
+  .gate .gt { font-size: 13.5px; font-weight: 600; color: var(--slate-900); }
+  .gate .gs { font-size: 12px; color: var(--slate-500); }
+  .gate .gverdict { margin-left: auto; font-size: 11.5px; font-weight: 700; color: var(--amber-700); background: var(--surface); border: 1px solid var(--amber-line); padding: 5px 11px; border-radius: 100px; }
+  .gate.is-held { background: var(--amber-50); border-color: var(--amber-line); }
+
+  .vf-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 18px; border-top: 1px solid var(--line-2); background: var(--paper); font-size: 11.5px; color: var(--slate-500); flex-wrap: wrap; }
+  .vf-foot .l { display: inline-flex; align-items: center; gap: 7px; }
+  .vf-foot .l svg { width: 14px; height: 14px; color: var(--emerald-700); }
+  .vf-foot .reset { font-family: inherit; font-size: 11.5px; font-weight: 600; color: var(--accent); background: transparent; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 7px; }
+  .vf-foot .reset svg { width: 13px; height: 13px; }
+  .vf-foot .reset:hover { background: var(--indigo-50); }
+
+  .pulse-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: inline-block; }
+  .pulse-dot::after { content:""; position: absolute; inset: -4px; border-radius: 50%; background: currentColor; opacity: .4; animation: pulse 2.4s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(.6); opacity:.5; } 100% { transform: scale(2.4); opacity: 0; } }
+
+  /* ---------- Section scaffolding ---------- */
+  section { padding: 96px 0; }
+  @media (max-width: 640px) { section { padding: 72px 0; } }
+  .sec-head { max-width: 700px; margin-bottom: 52px; }
+  .sec-head h2 { font-size: clamp(30px, 3.6vw, 44px); margin: 16px 0 18px; }
+  .sec-head .lede { font-size: 18px; }
+  .sec-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+  .sec-head.center .eyebrow { justify-content: center; width: 100%; }
+
+  /* ---------- Arc / problem ---------- */
+  .arc-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 52px; align-items: center; }
+  @media (max-width: 960px) { .arc-grid { grid-template-columns: 1fr; gap: 40px; } }
+  .arc-list { display: grid; gap: 14px; }
+  .arc-item { display: flex; gap: 15px; align-items: flex-start; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: box-shadow .3s var(--easing), transform .3s var(--easing), border-color .3s var(--easing); }
+  .arc-item:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--indigo-100); }
+  .arc-item .pn { width: 30px; height: 30px; border-radius: 9px; background: var(--indigo-50); color: var(--accent-deep); display: grid; place-items: center; flex: none; font-weight: 700; font-size: 13px; font-family: "Spline Sans Mono", monospace; }
+  .arc-item h3 { font-size: 15.5px; margin-bottom: 4px; }
+  .arc-item p { font-size: 14px; color: var(--slate-600); line-height: 1.55; }
+
+  /* funnel */
+  .funnel-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 30px; }
+  .funnel-card .ft { font-size: 13px; font-weight: 600; color: var(--slate-500); letter-spacing: .03em; margin-bottom: 4px; }
+  .funnel-card .fsub { font-size: 12.5px; color: var(--slate-400); margin-bottom: 22px; }
+  .funnel-step { display: flex; align-items: center; gap: 14px; margin-bottom: 11px; }
+  .funnel-step .label { font-size: 13px; font-weight: 500; color: var(--slate-700); width: 124px; flex: none; }
+  .funnel-step .bar-track { flex: 1; height: 30px; border-radius: 8px; background: var(--line-2); overflow: hidden; position: relative; }
+  .funnel-step .bar-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--indigo-400), var(--indigo-600)); width: 0; transition: width 1.1s var(--easing); box-shadow: inset 0 1px 0 rgba(255,255,255,.2); }
+  .funnel-step:last-of-type .bar-fill { background: linear-gradient(90deg, #d97b6b, var(--red-700)); }
+  .funnel-step .pct { font-size: 12.5px; font-weight: 600; color: var(--slate-500); width: 42px; text-align: right; flex: none; font-family: "Spline Sans Mono", monospace; }
+  .funnel-foot { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-2); font-size: 12.5px; color: var(--slate-500); display: flex; align-items: center; gap: 9px; }
+  .funnel-foot svg { width: 16px; height: 16px; color: var(--red-700); flex: none; }
+  .syn-note { font-size: 11px; color: var(--slate-400); margin-top: 8px; }
+
+  /* ---------- Pipeline spine ---------- */
+  .pipeline { background: linear-gradient(180deg, var(--ink-950), var(--indigo-900) 60%, var(--indigo-800)); color: #c9cee6; position: relative; }
+  .pipeline::before { content:""; position:absolute; inset:0; background: radial-gradient(900px 400px at 15% 0%, rgba(107,127,209,.18), transparent 60%); pointer-events: none; }
+  .pipeline .eyebrow { color: var(--indigo-300); }
+  .pipeline h2 { color: #fff; }
+  .pipeline .lede { color: #aab1d0; }
+  .pipeline-layout { display: grid; grid-template-columns: 304px 1fr; gap: 48px; align-items: start; }
+  @media (max-width: 1000px) { .pipeline-layout { grid-template-columns: 1fr; gap: 36px; } }
+
+  .spine-nav { position: sticky; top: 96px; }
+  @media (max-width: 1000px) { .spine-nav { position: static; } }
+  .step-list { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 2px; }
+  .step-btn {
+    width: 100%; text-align: left; display: flex; align-items: center; gap: 14px;
+    background: transparent; border: 1px solid transparent; border-radius: 12px;
+    padding: 12px 14px; cursor: pointer; color: #aab1d0; font-family: inherit;
+    transition: background .25s var(--easing), border-color .25s var(--easing), color .25s var(--easing);
+  }
+  .step-btn:hover { background: rgba(255,255,255,.04); }
+  .step-btn.active { background: rgba(107,127,209,.16); border-color: rgba(147,163,226,.35); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+  .step-btn .num { width: 30px; height: 30px; border-radius: 9px; flex: none; display: grid; place-items: center; font-family: "Spline Sans Mono", monospace; font-size: 13px; font-weight: 500; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); color: var(--indigo-200); transition: all .25s var(--easing); }
+  .step-btn.active .num { background: linear-gradient(155deg, var(--indigo-400), var(--indigo-600)); color: #fff; border-color: transparent; }
+  .step-btn .st { font-size: 14.5px; font-weight: 600; }
+  .step-btn .ss { font-size: 11.5px; color: #8990b5; margin-top: 1px; }
+  .step-btn.active .ss { color: var(--indigo-200); }
+
+  .stage-panel { position: relative; min-height: 364px; }
+  .stage { position: absolute; inset: 0; opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity .55s var(--easing), transform .55s var(--easing); }
+  .stage.show { opacity: 1; transform: none; pointer-events: auto; position: relative; }
+  @media (prefers-reduced-motion: reduce) { .stage { transition: none; } }
+  .stage-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: var(--radius-lg); padding: 34px; box-shadow: inset 0 1px 0 rgba(255,255,255,.05); backdrop-filter: blur(6px); }
+  .stage-card .skicon { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: linear-gradient(155deg, rgba(147,163,226,.22), rgba(58,69,160,.4)); border: 1px solid rgba(147,163,226,.25); margin-bottom: 20px; }
+  .stage-card .skicon svg { width: 24px; height: 24px; color: #dfe4f8; }
+  .stage-card .stage-k { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--indigo-300); }
+  .stage-card h3 { color: #fff; font-size: 26px; margin: 8px 0 14px; font-family: "Fraunces", serif; font-weight: 500; letter-spacing: -.01em; }
+  .stage-card .plain { color: #d3d8ef; font-size: 16.5px; line-height: 1.6; }
+  .stage-card .tech { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.06); font-size: 13.5px; color: #aab1d0; display: flex; gap: 11px; align-items: flex-start; }
+  .stage-card .tech .lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--indigo-300); flex: none; margin-top: 2px; }
+  .stage-out { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 12.5px; font-weight: 600; color: #c9cee6; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); padding: 7px 13px; border-radius: 100px; }
+  .stage-out svg { width: 14px; height: 14px; color: var(--indigo-300); }
+  .auto-hint { margin-top: 18px; font-size: 12px; color: #8990b5; display: flex; align-items: center; gap: 8px; }
+  .auto-hint .pulse-dot { color: var(--indigo-300); }
+
+  /* ---------- The "catch" example ---------- */
+  .example-grid { display: grid; grid-template-columns: 1.04fr .96fr; gap: 52px; align-items: center; }
+  @media (max-width: 1000px) { .example-grid { grid-template-columns: 1fr; gap: 40px; } }
+  .ex-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; }
+  .ex-card .ech { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line-2); }
+  .ex-card .ech .av { width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(155deg, var(--indigo-500), var(--indigo-800)); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; box-shadow: inset 0 1px 0 rgba(255,255,255,.18); }
+  .ex-card .ech .nm { font-weight: 600; font-size: 15px; color: var(--slate-900); }
+  .ex-card .ech .sub { font-size: 12px; color: var(--slate-500); }
+  .ex-card .ech .chip { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--red-700); background: var(--red-50); border: 1px solid var(--red-line); padding: 4px 10px; border-radius: 100px; }
+  .ex-body { padding: 18px; display: grid; gap: 14px; }
+  .ex-quote { padding: 14px 15px; border-radius: var(--radius-sm); border: 1px solid var(--red-line); background: var(--red-50); }
+  .ex-quote .ql { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--red-700); margin-bottom: 7px; }
+  .ex-quote .qt { font-size: 14.5px; color: var(--slate-900); line-height: 1.55; }
+  .ex-quote .qt .strike { text-decoration: line-through; text-decoration-color: var(--red-600); color: var(--red-700); }
+  .ex-reason { display: flex; gap: 11px; align-items: flex-start; padding: 13px 14px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--paper); }
+  .ex-reason svg { width: 18px; height: 18px; color: var(--teal-700); flex: none; margin-top: 1px; }
+  .ex-reason .rt { font-size: 13px; color: var(--slate-700); line-height: 1.55; }
+  .ex-reason .rt b { color: var(--slate-900); font-weight: 600; }
+  .ex-outcome { display: flex; align-items: center; gap: 11px; padding: 13px 14px; border-radius: var(--radius-sm); background: var(--amber-50); border: 1px solid var(--amber-line); }
+  .ex-outcome svg { width: 18px; height: 18px; color: var(--amber-700); flex: none; }
+  .ex-outcome .ot { font-size: 13px; color: #7a4a08; line-height: 1.5; }
+  .ex-outcome .ot b { color: var(--amber-700); }
+
+  .ex-narrative .step-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--indigo-50); padding: 5px 12px; border-radius: 100px; margin-bottom: 18px; }
+  .ex-flow { display: grid; gap: 0; margin-top: 8px; }
+  .ex-node { display: flex; gap: 16px; position: relative; padding-bottom: 24px; }
+  .ex-node:last-child { padding-bottom: 0; }
+  .ex-node .rail { display: flex; flex-direction: column; align-items: center; flex: none; }
+  .ex-node .rail .knob { width: 34px; height: 34px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); display: grid; place-items: center; color: var(--accent-deep); z-index: 2; }
+  .ex-node .rail .knob.rev { color: var(--teal-700); }
+  .ex-node .rail .knob.human { color: var(--amber-700); }
+  .ex-node .rail .knob svg { width: 17px; height: 17px; }
+  .ex-node .rail .conn { width: 2px; flex: 1; background: linear-gradient(180deg, var(--indigo-200), var(--line)); margin-top: 4px; }
+  .ex-node:last-child .rail .conn { display: none; }
+  .ex-node .body h3 { font-size: 15.5px; margin-bottom: 4px; }
+  .ex-node .body p { font-size: 14px; color: var(--slate-600); }
+  .ex-node .body .tag-mini { font-size: 11px; font-weight: 600; color: var(--slate-500); font-family: "Spline Sans Mono", monospace; }
+
+  /* ---------- Trust ---------- */
+  .trust-sec { background: linear-gradient(180deg, rgba(255,255,255,.7), transparent); }
+  .trust-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 960px) { .trust-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 620px) { .trust-grid { grid-template-columns: 1fr; } }
+  .trust-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 26px; box-shadow: var(--shadow-sm); transition: box-shadow .3s var(--easing), transform .3s var(--easing), border-color .3s var(--easing); }
+  .trust-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: var(--indigo-100); }
+  .trust-card .tc-ico { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: linear-gradient(155deg, var(--indigo-50), var(--indigo-100)); border: 1px solid var(--indigo-100); color: var(--accent-deep); margin-bottom: 18px; }
+  .trust-card.rev .tc-ico { background: linear-gradient(155deg, var(--teal-50), #d3f3ee); border-color: var(--teal-line); color: var(--teal-700); }
+  .trust-card .tc-ico svg { width: 23px; height: 23px; }
+  .trust-card h3 { font-size: 16.5px; margin-bottom: 9px; }
+  .trust-card p { font-size: 14px; color: var(--slate-600); line-height: 1.6; }
+  .trust-card .tc-foot { margin-top: 15px; padding-top: 13px; border-top: 1px solid var(--line-2); font-size: 12px; font-weight: 600; color: var(--accent); display: inline-flex; align-items: center; gap: 7px; }
+  .trust-card.rev .tc-foot { color: var(--teal-700); }
+  .trust-card .tc-foot svg { width: 14px; height: 14px; }
+
+  .ledger { margin-top: 30px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 26px; box-shadow: var(--shadow-sm); }
+  .ledger .li { display: inline-flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 500; color: var(--slate-600); }
+  .ledger .li svg { width: 17px; height: 17px; color: var(--emerald-700); flex: none; }
+  .ledger .li .mono { color: var(--slate-900); font-weight: 500; }
+  .ledger .sep { width: 1px; height: 18px; background: var(--line); }
+  @media (max-width: 760px) { .ledger .sep { display: none; } }
+
+  /* ---------- Generalizes ---------- */
+  .gen { background: linear-gradient(165deg, var(--indigo-50), transparent 70%); }
+  .gen-spine { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+  .gen-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 100px; padding: 9px 16px; font-size: 13.5px; font-weight: 600; color: var(--slate-700); box-shadow: var(--shadow-sm); }
+  .gen-chip svg { width: 15px; height: 15px; color: var(--accent); }
+  .gen-chip.rev svg { color: var(--teal-700); }
+  .gen-arrow { display: grid; place-items: center; color: var(--indigo-300); }
+  .gen-arrow svg { width: 18px; height: 18px; }
+  @media (max-width: 680px) { .gen-arrow { transform: rotate(90deg); } }
+  .gen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
+  @media (max-width: 960px) { .gen-grid { grid-template-columns: 1fr; } }
+  .gen-use { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow-sm); transition: transform .3s var(--easing), box-shadow .3s var(--easing); }
+  .gen-use:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .gen-use .gu-ico { color: var(--accent-deep); margin-bottom: 14px; }
+  .gen-use .gu-ico svg { width: 22px; height: 22px; }
+  .gen-use h3 { font-size: 15.5px; margin-bottom: 6px; }
+  .gen-use p { font-size: 13.5px; color: var(--slate-600); }
+
+  /* ---------- CTA ---------- */
+  .cta { padding: 88px 0; }
+  .cta-card { position: relative; overflow: hidden; background: linear-gradient(155deg, var(--indigo-700), var(--ink-950)); border-radius: var(--radius-xl); padding: 64px 56px; text-align: center; box-shadow: var(--shadow-xl); }
+  @media (max-width: 600px) { .cta-card { padding: 44px 28px; } }
+  .cta-card::before { content:""; position:absolute; inset:0; background: radial-gradient(700px 320px at 50% -20%, rgba(147,163,226,.32), transparent 60%); pointer-events: none; }
+  .cta-card .eyebrow { color: var(--indigo-200); justify-content: center; width: 100%; }
+  .cta-card h2 { color: #fff; font-size: clamp(30px, 4vw, 46px); margin: 16px auto 18px; max-width: 660px; }
+  .cta-card p { color: #c0c6e3; font-size: 18px; max-width: 540px; margin: 0 auto 32px; }
+  .cta-card .hero-cta { justify-content: center; }
+  .cta-card .btn-ghost { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.18); box-shadow: none; backdrop-filter: blur(4px); }
+  .cta-card .btn-ghost:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
+  .cta-card .btn-primary { background: #fff; color: var(--indigo-800); }
+  .cta-card .btn-primary:hover { background: #fff; }
+  .cta-card .replay-note { margin-top: 22px; font-size: 13px; color: #9aa1c8; display: inline-flex; align-items: center; gap: 8px; }
+  .cta-card .replay-note svg { width: 15px; height: 15px; }
+
+  /* ---------- Footer ---------- */
+  footer { border-top: 1px solid var(--line); padding: 48px 0 56px; background: var(--paper); }
+  .foot-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; flex-wrap: wrap; margin-bottom: 32px; }
+  .foot-brand { max-width: 380px; }
+  .foot-brand .brand { margin-bottom: 12px; }
+  .foot-brand p { font-size: 13.5px; color: var(--slate-500); line-height: 1.6; }
+  .disclaimer { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 22px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; align-items: flex-start; max-width: 560px; flex: 1; min-width: 300px; }
+  .disclaimer .di { width: 30px; height: 30px; border-radius: 9px; background: var(--amber-50); color: var(--amber-700); display: grid; place-items: center; flex: none; border: 1px solid var(--amber-line); }
+  .disclaimer .di svg { width: 16px; height: 16px; }
+  .disclaimer p { font-size: 12.5px; color: var(--slate-500); line-height: 1.65; }
+  .disclaimer strong { color: var(--slate-700); font-weight: 600; }
+  .foot-base { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--slate-400); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label="ActivationOps AI home">
+      <span class="logomark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5 14.2 9.2 21 11.5 14.2 13.8 12 20.5 9.8 13.8 3 11.5 9.8 9.2 12 2.5Z" fill="#fff" opacity=".95"/></svg>
+      </span>
+      ActivationOps&nbsp;AI
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="link" href="#problem">The problem</a>
+      <a class="link" href="#pipeline">How it works</a>
+      <a class="link" href="#catch">The catch</a>
+      <a class="link" href="#trust">Trust &amp; safety</a>
+      <a class="btn btn-primary" href="#cta">
+        See the walkthrough
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="main">
+  <div class="grid-bg" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy reveal in">
+      <span class="pill">
+        <span class="tag">Replay demo</span>
+        Human-led · AI-assisted · independently auditable
+      </span>
+      <h1 class="display">Reactivate stalled merchants — and <span class="accent">verify every claim against the source of truth.</span></h1>
+      <p class="lede">ActivationOps AI finds signed-up-but-never-live merchants, drafts a next message with a bounded model, then checks each claim against the merchant's own data row — catching fabrications generic AI guardrails wave through.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#cta">
+          See the live walkthrough
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="#pipeline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>
+          Watch a claim get verified
+        </a>
+      </div>
+      <div class="hero-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        Two passes: a deterministic claims-gate, then a cross-family faithfulness judge. A human still owns the send.
+      </div>
+
+      <div class="trust-row" aria-label="Core guarantees">
+        <span class="trust-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+          Every claim traces to data
+        </span>
+        <span class="trust-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 5v4h4"/><path d="M12 8v4l3 2"/></svg>
+          Reverse-checked for faithfulness
+        </span>
+        <span class="trust-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          A human owns every send
+        </span>
+      </div>
+    </div>
+
+    <!-- ============= HERO CENTERPIECE: live verifier ============= -->
+    <div class="hero-verifier reveal d2 in">
+      <div class="verifier float-anim" id="verifier" role="img"
+           aria-label="A verification panel. A drafted outreach message is checked sentence by sentence against a merchant data row for Marisol's Empanadas. The claim 'you've completed 2 of 5 steps' is supported by the steps_completed field. The fabricated claim 'you'll be live by Friday' is unsupported — the data row has no go-live date — so the message is held for a human.">
+        <div class="vf-bar">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="title">ActivationOps · Faithfulness check</span>
+          <span class="badge"><span class="pulse-dot" style="color:var(--amber-700)"></span> <span id="vf-badge">Verifying…</span></span>
+        </div>
+
+        <div class="vf-body">
+          <!-- source of truth -->
+          <div class="truth">
+            <div class="th">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+              <span class="lbl">Source of truth · merchant row</span>
+              <span class="mname">Marisol's Empanadas · m-0231</span>
+            </div>
+            <div class="truth-grid">
+              <div class="tcell" id="cell-steps"><div class="k">steps_completed</div><div class="v">2 of 5</div></div>
+              <div class="tcell"><div class="k">blocker</div><div class="v">menu_upload</div></div>
+              <div class="tcell"><div class="k">engagement</div><div class="v">stalled · 12d idle</div></div>
+              <div class="tcell absent" id="cell-golive"><div class="k">go_live_date</div><div class="v">— not set —</div></div>
+            </div>
+          </div>
+
+          <!-- the draft, checked sentence by sentence -->
+          <div class="draft">
+            <div class="dh">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3V4Z"/></svg>
+              <span class="lbl">Bounded LLM draft</span>
+              <span class="src">drafter · family A</span>
+            </div>
+            <div class="db">
+              Hi Marisol's Empanadas — <span class="verify-claim" id="claim-ok" data-cell="cell-steps">you've completed 2 of 5 setup steps</span>, so you're close to going live on Curbside&nbsp;Commons. <span class="verify-claim" id="claim-bad" data-cell="cell-golive">You'll be live by Friday</span> — here's the link to finish.
+            </div>
+          </div>
+
+          <!-- the two verification passes -->
+          <div class="passes">
+            <div class="pass-row forward" id="pass-fwd">
+              <span class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+              <div>
+                <div class="ptitle">Claims gatekeeper <span class="pdir">forward · claim → data</span></div>
+                <div class="psub">Deterministic — every declared claim must map to a field</div>
+              </div>
+              <span class="pverdict wait" id="verdict-fwd">Queued</span>
+            </div>
+            <div class="pass-row reverse" id="pass-rev">
+              <span class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg></span>
+              <div>
+                <div class="ptitle">Faithfulness judge <span class="pdir">reverse · sentence → data</span></div>
+                <div class="psub">Each prose sentence must be entailed by the row · cross-family model</div>
+              </div>
+              <span class="pverdict wait" id="verdict-rev">Queued</span>
+            </div>
+          </div>
+
+          <!-- human gate -->
+          <div class="gate" id="gate">
+            <span class="gico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span>
+            <div>
+              <div class="gt" id="gate-title">Awaiting verification</div>
+              <div class="gs" id="gate-sub">Nothing is sent until both passes clear and a human approves.</div>
+            </div>
+            <span class="gverdict" id="gate-verdict">Pending</span>
+          </div>
+        </div>
+
+        <div class="vf-foot">
+          <span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Replay · $0.00 spent · cap $5.00</span>
+          <button class="reset" id="vf-reset" type="button" aria-label="Replay the verification">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+            Replay
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PROBLEM ===================== -->
+<section class="problem" id="problem">
+  <div class="wrap arc-grid">
+    <div class="arc-copy reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        The lost revenue nobody works
+      </span>
+      <h2 class="display" style="font-size:clamp(30px,3.6vw,44px);margin:16px 0 18px;">A marketplace's signed-up-but-never-live merchants are real GMV, leaking quietly.</h2>
+      <p class="lede" style="margin-bottom:30px;">The long tail is too big to work by hand. Merchants stall somewhere between sign-up and first order — and the outreach that reaches them has to be both <em>matched to the blocker</em> and <em>true to the record</em>.</p>
+
+      <div class="arc-list">
+        <div class="arc-item">
+          <span class="pn">01</span>
+          <div><h3>The long tail is too big to work by hand</h3><p>Thousands of pre-live merchants, a handful of activation reps. Most never get a tailored touch.</p></div>
+        </div>
+        <div class="arc-item">
+          <span class="pn">02</span>
+          <div><h3>Generic outreach is the #1 failure</h3><p>A blast that ignores the <em>actual</em> blocker reads as spam. Matched-to-the-blocker is what converts.</p></div>
+        </div>
+        <div class="arc-item">
+          <span class="pn">03</span>
+          <div><h3>And AI will confidently make things up</h3><p>Let a model write at scale and it invents dates, offers, and statuses. Generic guardrails miss claims that are merely <em>unsupported</em> — not toxic.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arc-visual reveal d2">
+      <div class="funnel-card" id="funnel">
+        <div class="ft">Onboarding drop-off</div>
+        <div class="fsub">Where pre-live merchants stall, step by step</div>
+        <div class="funnel-step"><span class="label">Verify business</span><span class="bar-track"><span class="bar-fill" data-w="100%"></span></span><span class="pct">100</span></div>
+        <div class="funnel-step"><span class="label">Add menu</span><span class="bar-track"><span class="bar-fill" data-w="78%"></span></span><span class="pct">78</span></div>
+        <div class="funnel-step"><span class="label">Upload photos</span><span class="bar-track"><span class="bar-fill" data-w="61%"></span></span><span class="pct">61</span></div>
+        <div class="funnel-step"><span class="label">Set hours</span><span class="bar-track"><span class="bar-fill" data-w="49%"></span></span><span class="pct">49</span></div>
+        <div class="funnel-step"><span class="label">Banking</span><span class="bar-track"><span class="bar-fill" data-w="34%"></span></span><span class="pct">34</span></div>
+        <div class="funnel-step"><span class="label">Final check → live</span><span class="bar-track"><span class="bar-fill" data-w="21%"></span></span><span class="pct">21</span></div>
+        <div class="funnel-foot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 1 21h22L12 2Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>
+          Each step that stalls is recoverable GMV — if the message that reaches them is true.
+        </div>
+        <p class="syn-note">Illustrative shape — synthetic activation data, not a real marketplace's funnel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PIPELINE (the spine) ===================== -->
+<section class="pipeline" id="pipeline">
+  <div class="wrap">
+    <div class="sec-head reveal" style="margin-bottom:48px;">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><path d="M10 6.5h4a2 2 0 0 1 2 2V14"/></svg>
+        The pipeline
+      </span>
+      <h2 class="display">From stalled merchant to a verified, human-approved message.</h2>
+      <p class="lede">Risk is decided by replayable code. The model writes inside a bounded contract. Then <em>two</em> verification passes — forward and reverse — run before a human ever sees the draft.</p>
+    </div>
+
+    <div class="pipeline-layout reveal d1">
+      <div class="spine-nav">
+        <ul class="step-list" role="tablist" aria-label="Pipeline steps">
+          <li><button class="step-btn active" role="tab" aria-selected="true" data-step="0">
+            <span class="num">1</span><span><span class="st">Triage</span><span class="ss">Risk score + blocker</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="1">
+            <span class="num">2</span><span><span class="st">Diagnose</span><span class="ss">Root cause + play</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="2">
+            <span class="num">3</span><span><span class="st">Draft</span><span class="ss">Bounded LLM writes</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="3">
+            <span class="num">4</span><span><span class="st">Gate</span><span class="ss">Claim → data (forward)</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="4">
+            <span class="num">5</span><span><span class="st">Judge</span><span class="ss">Sentence → data (reverse)</span></span></button></li>
+          <li><button class="step-btn" role="tab" aria-selected="false" data-step="5">
+            <span class="num">6</span><span><span class="st">Approve</span><span class="ss">Human decides</span></span></button></li>
+        </ul>
+        <div class="auto-hint"><span class="pulse-dot"></span> Auto-advancing — click any step to explore.</div>
+      </div>
+
+      <div class="stage-panel">
+        <!-- 1 TRIAGE -->
+        <div class="stage show" role="tabpanel" data-panel="0">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span>
+            <span class="stage-k">Step 01 · Deterministic</span>
+            <h3>Triage</h3>
+            <p class="plain">Find who's stuck — and exactly how badly. A transparent risk score and the single blocking step, every time.</p>
+            <div class="tech"><span class="lbl">How</span><span>A deterministic risk score plus the blocker, from an auditable formula. No model touches this call — it's replayable and identical on every run.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: risk level + blocker</span>
+          </div>
+        </div>
+        <!-- 2 DIAGNOSE -->
+        <div class="stage" role="tabpanel" data-panel="1">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v3l2 2"/></svg></span>
+            <span class="stage-k">Step 02 · Deterministic</span>
+            <h3>Diagnose</h3>
+            <p class="plain">Read the engagement state, name the root cause, and pick a reactivation play that varies by <em>why</em> they're stuck — not just by which step they're on.</p>
+            <div class="tech"><span class="lbl">How</span><span>Engagement state from recency × steps × tenure; merchant-vs-platform blocker source; a play matched to the cause, not a one-size message.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: root cause + play</span>
+          </div>
+        </div>
+        <!-- 3 DRAFT -->
+        <div class="stage" role="tabpanel" data-panel="2">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7-3-3-7 7v3h3Z"/><path d="m14 7 3 3"/><path d="M4 20h6"/></svg></span>
+            <span class="stage-k">Step 03 · Bounded LLM</span>
+            <h3>Draft</h3>
+            <p class="plain">Now — and only now — a model writes the message. It works inside a schema-constrained contract and declares every claim it makes.</p>
+            <div class="tech"><span class="lbl">How</span><span>A bounded LLM produces structured output with a typed claims array. The untrusted merchant name never enters the prompt — it's substituted after gating.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: draft + declared claims</span>
+          </div>
+        </div>
+        <!-- 4 GATE (forward) -->
+        <div class="stage" role="tabpanel" data-panel="3">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+            <span class="stage-k">Step 04 · Claims gatekeeper · forward</span>
+            <h3>Gate</h3>
+            <p class="plain">Every <em>declared</em> claim is checked against the merchant's own data — claim&nbsp;→&nbsp;data — and against forbidden-claim guardrails. Deterministic, so it runs the same way every time.</p>
+            <div class="tech"><span class="lbl">How</span><span>Each declared claim must trace to a field on the merchant row; forbidden claims are blocked outright. Anything unverifiable is held, not sent.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: pass / hold / block</span>
+          </div>
+        </div>
+        <!-- 5 JUDGE (reverse) -->
+        <div class="stage" role="tabpanel" data-panel="4">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/><path d="M19 6v12"/></svg></span>
+            <span class="stage-k">Step 05 · Faithfulness judge · reverse</span>
+            <h3>Judge</h3>
+            <p class="plain">The gate checks what the model <em>declared</em>. The judge checks what it actually <em>wrote</em>: every prose sentence must be entailed by the data row — so an undeclared fabrication can't slip through.</p>
+            <div class="tech"><span class="lbl">How</span><span>A calibrated semantic judge runs sentence&nbsp;→&nbsp;data entailment with a <strong>cross-family model</strong> (a different family than the drafter). Maker isn't judge — an independent reader scores faithfulness.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: per-sentence faithfulness</span>
+          </div>
+        </div>
+        <!-- 6 APPROVE -->
+        <div class="stage" role="tabpanel" data-panel="5">
+          <div class="stage-card">
+            <span class="skicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/><path d="m16 5 1.5 1.5L21 3"/></svg></span>
+            <span class="stage-k">Step 06 · Human-in-the-loop</span>
+            <h3>Approve</h3>
+            <p class="plain">A person makes the final call — hold, reject, or send. Every decision lands in a full audit trail, beside a fail-closed cost ledger.</p>
+            <div class="tech"><span class="lbl">How</span><span>The human owns the irreversible action. Sends are simulated in this demo; spend is hard-capped at $5 and recorded line by line.</span></div>
+            <span class="stage-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> Output: decision + audit record</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== THE CATCH (fabrication flagged) ===================== -->
+<section class="catch-sec" id="catch">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M9 11h4M11 9v4"/></svg>
+        The catch in action
+      </span>
+      <h2 class="display">When the model invents a promise, the judge holds it.</h2>
+      <p class="lede">A second, recorded run — a different merchant, a different stall. The draft reads fine. One sentence makes a promise the data can't back. Watch where it stops.</p>
+    </div>
+
+    <div class="example-grid reveal d1">
+      <!-- the catch card -->
+      <div class="ex-card">
+        <div class="ech">
+          <span class="av" aria-hidden="true">FC</span>
+          <div>
+            <span class="nm">Fog City Tacos</span><br>
+            <span class="sub">Restaurant · stalled at verify business · 0 of 5 steps</span>
+          </div>
+          <span class="chip">High risk</span>
+        </div>
+        <div class="ex-body">
+          <div class="ex-quote">
+            <div class="ql">Flagged sentence · unsupported</div>
+            <div class="qt">"Once you verify, <span class="strike">we'll waive your first month of commission</span> and you'll be live the same day."</div>
+          </div>
+          <div class="ex-reason">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg>
+            <div class="rt"><b>Reverse pass, cross-family judge.</b> The sentence asserts a commission waiver and a same-day timeline. Neither maps to any field on Fog City Tacos' row — there is no <span class="mono">offer</span> and no <span class="mono">go_live_date</span>. Not toxic, not policy-banned — just <em>unsupported</em>, which is exactly the failure generic guardrails wave through.</div>
+          </div>
+          <div class="ex-outcome">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>
+            <div class="ot"><b>Held for human approval.</b> The draft never reaches the merchant. A person sees the flag and the missing fields, then chooses hold, reject, or rewrite.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- narrative -->
+      <div class="ex-narrative">
+        <span class="step-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          The trace
+        </span>
+        <div class="ex-flow">
+          <div class="ex-node">
+            <div class="rail"><span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span><span class="conn"></span></div>
+            <div class="body"><span class="tag-mini">TRIAGE · DIAGNOSE</span><h3>High risk, blocked at verification</h3><p>Deterministic score and blocker land it in the queue — recoverable, not churned.</p></div>
+          </div>
+          <div class="ex-node">
+            <div class="rail"><span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7-3-3-7 7v3h3Z"/></svg></span><span class="conn"></span></div>
+            <div class="body"><span class="tag-mini">DRAFT</span><h3>The model over-promises</h3><p>The bounded draft is fluent — but slips in a commission waiver and a same-day go-live that were never in the data.</p></div>
+          </div>
+          <div class="ex-node">
+            <div class="rail"><span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="conn"></span></div>
+            <div class="body"><span class="tag-mini">GATE · FORWARD</span><h3>Declared claims pass</h3><p>What the model <em>declared</em> traces cleanly to data — which is exactly why the forward gate alone isn't enough.</p></div>
+          </div>
+          <div class="ex-node">
+            <div class="rail"><span class="knob rev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg></span><span class="conn"></span></div>
+            <div class="body"><span class="tag-mini">JUDGE · REVERSE</span><h3>The prose betrays it</h3><p>Reading the sentences back against the row, the cross-family judge finds an entailment it can't support. Faithfulness fails.</p></div>
+          </div>
+          <div class="ex-node">
+            <div class="rail"><span class="knob human"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span></div>
+            <div class="body"><span class="tag-mini">APPROVE</span><h3>Held for a human</h3><p>It waits. The system never sends an unsupported promise on its own.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TRUST & SAFETY ===================== -->
+<section class="trust-sec" id="trust">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></svg>
+        Why a marketplace exec can trust it
+      </span>
+      <h2 class="display">A direct antidote to the AI-outreach failure frontier.</h2>
+      <p class="lede">False claims, churn from spammy blasts, regulatory liability — the known failure modes of "let AI message customers." This system is designed against each one, in two directions.</p>
+    </div>
+
+    <div class="trust-grid reveal d1">
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span>
+        <h3>Deterministic where it counts</h3>
+        <p>The risky call — who's at risk and why — is made by code, not a model. Same inputs, same output, every replay.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Replayable by design</span>
+      </div>
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+        <h3>Forward gate: every declared claim → data</h3>
+        <p>The gatekeeper checks each claim against the merchant's own record, and blocks forbidden claims outright. Deterministic and replayable.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> No unverifiable promises</span>
+      </div>
+      <div class="trust-card rev">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/><path d="M19 6v12"/></svg></span>
+        <h3>Reverse judge: every sentence → entailment</h3>
+        <p>A calibrated faithfulness judge reads the prose back against the row, sentence by sentence — catching the undeclared fabrications a forward check can't see.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Semantic faithfulness, scored</span>
+      </div>
+      <div class="trust-card rev">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3"/><circle cx="17" cy="15" r="3"/><path d="M5 18a4 4 0 0 1 6-3.5M19 6a4 4 0 0 0-6 3.5"/></svg></span>
+        <h3>Maker isn't judge — cross-family</h3>
+        <p>The model that wrote the draft does not grade it. A different model family reads it independently, so a writer's blind spots aren't its own reviewer.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Independent reviewer</span>
+      </div>
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span>
+        <h3>A human owns every irreversible send</h3>
+        <p>Nothing leaves the system without a person choosing to send it. The default is to hold, not to act.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Human-in-the-loop gate</span>
+      </div>
+      <div class="trust-card">
+        <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+        <h3>Spend hard-capped, demo replay-only</h3>
+        <p>A fail-closed $5 cost ledger records every model call and halts before it overspends. The public demo makes no live calls — it replays a recorded run.</p>
+        <span class="tc-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Fail-closed · recorded fixture</span>
+      </div>
+    </div>
+
+    <div class="ledger reveal d2" aria-label="Live audit summary">
+      <span class="li"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Audit trail <span class="mono">on every decision</span></span>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="li"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Cost ledger <span class="mono">$0.00 in replay · cap $5.00</span></span>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="li"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></svg> Verification <span class="mono">forward + reverse on every draft</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GENERALIZES ===================== -->
+<section class="gen" id="generalizes">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+        Why it generalizes
+      </span>
+      <h2 class="display">The same spine works far beyond merchant activation.</h2>
+      <p class="lede">Deterministic triage → bounded LLM → forward claims-gate → reverse faithfulness judge → human approval → audit. Any problem shaped like "use AI to act on people or accounts at scale, safely" can stand on it.</p>
+    </div>
+
+    <div class="gen-spine reveal d1">
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg> Deterministic triage</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7-3-3-7 7v3h3Z"/></svg> Bounded LLM</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></svg> Forward gate</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip rev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg> Reverse judge</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/></svg> Human approval</span>
+      <span class="gen-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      <span class="gen-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Audit</span>
+    </div>
+
+    <div class="gen-grid reveal d2">
+      <div class="gen-use">
+        <span class="gu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3z"/><path d="M3 7l3-4h12l3 4"/><path d="M8 11h8"/></svg></span>
+        <h3>Dormant-account winback</h3>
+        <p>Score churn risk in code, draft a matched re-engagement note, verify every offer against the account, hold for a rep.</p>
+      </div>
+      <div class="gen-use">
+        <span class="gu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg></span>
+        <h3>Collections &amp; dunning</h3>
+        <p>Deterministic severity tiers, a bounded reminder, every amount and date entailed by the ledger before a human sends.</p>
+      </div>
+      <div class="gen-use">
+        <span class="gu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M17 11h5M19.5 8.5v5"/></svg></span>
+        <h3>Onboarding &amp; KYC nudges</h3>
+        <p>Pinpoint the stuck step, write the right prompt, verify both directions, keep a person on the irreversible action.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="cta" id="cta">
+  <div class="wrap">
+    <div class="cta-card reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>
+        Replay walkthrough
+      </span>
+      <h2 class="display">See a stalled merchant become a verified, human-approved message.</h2>
+      <p>Walk the full spine — triage to audit — on the recorded run. No live calls, no spend, every claim checked in both directions.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#top">
+          See the live walkthrough
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="#pipeline">Review the pipeline</a>
+      </div>
+      <span class="replay-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></svg>
+        Replay-only · $0.00 spend · human-led, AI-assisted, professionally reviewed
+      </span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== FOOTER (honest) ===================== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <span class="brand">
+          <span class="logomark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5 14.2 9.2 21 11.5 14.2 13.8 12 20.5 9.8 13.8 3 11.5 9.8 9.2 12 2.5Z" fill="#fff" opacity=".95"/></svg></span>
+          ActivationOps&nbsp;AI
+        </span>
+        <p>Finds stalled, pre-live merchants, drafts a claim-checked next message, verifies it forward and reverse against the source of truth, and keeps a human in control — built to be measured, audited, and adopted.</p>
+      </div>
+
+      <div class="disclaimer" role="note">
+        <span class="di" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        </span>
+        <p><strong>Independent demo.</strong> ActivationOps AI is not affiliated with, endorsed by, or connected to DoorDash, Uber&nbsp;Eats, Grubhub, DataSF, or any real business. "Curbside&nbsp;Commons" is a fictional marketplace; all merchant names — including "Marisol's&nbsp;Empanadas" and "Fog&nbsp;City&nbsp;Tacos" — are <strong>fictional</strong>, and the activation data shown is <strong>synthetic</strong>. The drafts and verifications shown are recorded fixtures, not live sends. This is a replay-only walkthrough that makes <strong>no real-impact claims</strong>.</p>
+      </div>
+    </div>
+
+    <div class="foot-base">
+      <span>Human-led · AI-assisted · professionally reviewed.</span>
+      <span class="mono">Replay build · synthetic data · no live calls</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hasIO = "IntersectionObserver" in window;
+
+  /* ---------- sticky nav border ---------- */
+  var nav = document.getElementById("nav");
+  function onScroll() { if (window.scrollY > 8) nav.classList.add("scrolled"); else nav.classList.remove("scrolled"); }
+  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+  /* ---------- scroll reveal ---------- */
+  var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  if (reduce || !hasIO) {
+    reveals.forEach(function (el) { el.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { threshold: 0.14, rootMargin: "0px 0px -8% 0px" });
+    reveals.forEach(function (el) { if (!el.classList.contains("in")) io.observe(el); });
+  }
+
+  /* ---------- funnel bars ---------- */
+  var funnel = document.getElementById("funnel");
+  if (funnel) {
+    function fillBars() { funnel.querySelectorAll(".bar-fill").forEach(function (b) { b.style.width = b.getAttribute("data-w"); }); }
+    if (reduce || !hasIO) { fillBars(); }
+    else {
+      var fio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { fillBars(); fio.disconnect(); } });
+      }, { threshold: 0.3 });
+      fio.observe(funnel);
+    }
+  }
+
+  /* ============================================================
+     HERO VERIFIER — the choreographed claim-by-claim check.
+     Forward gate verifies the supported claim; reverse judge
+     catches the fabrication; the human gate holds the draft.
+     ============================================================ */
+  var verifier = document.getElementById("verifier");
+  if (verifier) {
+    var elClaimOk   = document.getElementById("claim-ok");
+    var elClaimBad  = document.getElementById("claim-bad");
+    var elCellSteps = document.getElementById("cell-steps");
+    var elCellGolive= document.getElementById("cell-golive");
+    var vBadge      = document.getElementById("vf-badge");
+    var passFwd     = document.getElementById("pass-fwd");
+    var passRev     = document.getElementById("pass-rev");
+    var vFwd        = document.getElementById("verdict-fwd");
+    var vRev        = document.getElementById("verdict-rev");
+    var gate        = document.getElementById("gate");
+    var gTitle      = document.getElementById("gate-title");
+    var gSub        = document.getElementById("gate-sub");
+    var gVerdict    = document.getElementById("gate-verdict");
+    var resetBtn    = document.getElementById("vf-reset");
+
+    var timers = [];
+    function after(ms, fn) { timers.push(setTimeout(fn, ms)); }
+    function clearAll() { timers.forEach(clearTimeout); timers = []; }
+
+    function setVerdict(el, cls, txt) {
+      el.className = "pverdict " + cls; el.textContent = txt;
+    }
+
+    function resetState() {
+      clearAll();
+      elClaimOk.className = "verify-claim"; elClaimBad.className = "verify-claim";
+      elCellSteps.className = "tcell"; elCellGolive.className = "tcell absent";
+      passFwd.classList.remove("active"); passRev.classList.remove("active");
+      setVerdict(vFwd, "wait", "Queued"); setVerdict(vRev, "wait", "Queued");
+      gate.classList.remove("is-held");
+      gTitle.textContent = "Awaiting verification";
+      gSub.textContent = "Nothing is sent until both passes clear and a human approves.";
+      gVerdict.textContent = "Pending"; gVerdict.style.color = ""; gVerdict.style.background = ""; gVerdict.style.borderColor = "";
+      vBadge.textContent = "Verifying…";
+    }
+
+    /* the END state — also what reduced-motion renders immediately */
+    function finalState() {
+      clearAll();
+      // forward pass: supported claim verified
+      elClaimOk.className = "verify-claim ok";
+      elCellSteps.className = "tcell is-hit";
+      passFwd.classList.add("active");
+      setVerdict(vFwd, "pass", "1 / 1 supported");
+      // reverse pass: fabrication caught
+      elClaimBad.className = "verify-claim bad";
+      elCellGolive.className = "tcell absent is-miss";
+      passRev.classList.add("active");
+      setVerdict(vRev, "flag", "1 unsupported");
+      // human gate holds
+      gate.classList.add("is-held");
+      gTitle.textContent = "Held for human approval";
+      gSub.textContent = "“live by Friday” has no go_live_date to support it — a person decides hold, reject, or rewrite.";
+      gVerdict.textContent = "Held";
+      vBadge.textContent = "1 fabrication held";
+    }
+
+    /* the animated sequence */
+    function play() {
+      resetState();
+      vBadge.textContent = "Verifying…";
+
+      // FORWARD GATE: scan the supported claim, map it to steps_completed
+      after(700, function () {
+        passFwd.classList.add("active");
+        setVerdict(vFwd, "run", "Checking…");
+        elClaimOk.className = "verify-claim scanning";
+      });
+      after(1500, function () { elCellSteps.className = "tcell is-hit"; });
+      after(2100, function () {
+        elClaimOk.className = "verify-claim ok";
+        setVerdict(vFwd, "pass", "1 / 1 supported");
+      });
+
+      // REVERSE JUDGE: scan the fabricated sentence, find no field to entail it
+      after(2700, function () {
+        passRev.classList.add("active");
+        setVerdict(vRev, "run", "Reading prose…");
+        elClaimBad.className = "verify-claim scanning";
+        vBadge.textContent = "Reverse check…";
+      });
+      after(3700, function () { elCellGolive.className = "tcell absent is-miss"; });
+      after(4300, function () {
+        elClaimBad.className = "verify-claim bad";
+        setVerdict(vRev, "flag", "1 unsupported");
+      });
+
+      // HUMAN GATE: hold
+      after(4900, function () { finalState(); });
+
+      // loop
+      after(8200, play);
+    }
+
+    if (reduce) {
+      // reduced-motion: render the resolved end state, no animation
+      finalState();
+    } else if (hasIO) {
+      // play when on screen, pause (and reset timers) when off screen
+      var vis = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { play(); } else { clearAll(); }
+        });
+      }, { threshold: 0.35 });
+      vis.observe(verifier);
+    } else {
+      play();
+    }
+
+    resetBtn.addEventListener("click", function () { play(); });
+  }
+
+  /* ============================================================
+     PIPELINE STEPPER — six tabs, auto-advancing while on screen.
+     ============================================================ */
+  var btns = Array.prototype.slice.call(document.querySelectorAll(".step-btn"));
+  var stages = Array.prototype.slice.call(document.querySelectorAll(".stage"));
+  var current = 0, timer = null, AUTO_MS = 4400;
+
+  function setStep(i, fromUser) {
+    current = i;
+    btns.forEach(function (b, k) {
+      var on = k === i;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    stages.forEach(function (s, k) { s.classList.toggle("show", k === i); });
+    if (fromUser) { restartAuto(); }
+  }
+  function nextStep() { setStep((current + 1) % btns.length, false); }
+  function startAuto() { if (reduce || timer) return; timer = setInterval(nextStep, AUTO_MS); }
+  function stopAuto() { if (timer) { clearInterval(timer); timer = null; } }
+  function restartAuto() { stopAuto(); startAuto(); }
+
+  btns.forEach(function (b, i) {
+    b.addEventListener("click", function () { setStep(i, true); });
+    b.addEventListener("keydown", function (e) {
+      var idx = i;
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") { idx = (i + 1) % btns.length; btns[idx].focus(); setStep(idx, true); e.preventDefault(); }
+      else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { idx = (i - 1 + btns.length) % btns.length; btns[idx].focus(); setStep(idx, true); e.preventDefault(); }
+    });
+  });
+
+  var pipeline = document.getElementById("pipeline");
+  if (pipeline && hasIO) {
+    var pio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { startAuto(); } else { stopAuto(); } });
+    }, { threshold: 0.25 });
+    pio.observe(pipeline);
+  } else if (!reduce) { startAuto(); }
+
+  setStep(0, false);
+})();
+</script>
+</body>
+</html>
