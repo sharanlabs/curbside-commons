@@ -14,5 +14,6 @@ export default defineConfig([
     ".agents/**",
     ".claude/**",
     "reference/**",
+    "screenshots/**",
   ]),
 ]);

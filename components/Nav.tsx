@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
-  { href: "/", label: "Overview" },
+  { href: "/console", label: "Console" },
   { href: "/eval", label: "Eval / Quality" },
   { href: "/metrics", label: "Metrics" },
   { href: "/audit", label: "Audit" },
@@ -18,12 +18,13 @@ export function Nav() {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-6 py-2.5 text-sm">
         <Link
           href="/"
+          aria-current={pathname === "/" ? "page" : undefined}
           className="mr-3 font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           ActivationOps AI
         </Link>
         {LINKS.map((l) => {
-          const active = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+          const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
           return (
             <Link
               key={l.href}

@@ -1,12 +1,1090 @@
 @import "tailwindcss";
 
-/* Minimal base. The full "Quiet Instrument" design tokens land in Phase C. */
+/* ============================================================================
+   ActivationOps — "Ledger Enterprise" design system (Stage 1 foundation)
+   Ported from mockups/v3-ledger-enterprise.html. Premium white ground, a single
+   vermilion accent (two lightnesses of one hue), cool-neutral ink/graphite, and
+   one signature primitive: the hairline-ruled ledger row (field · value · verdict).
+   Fonts are self-hosted via next/font/google (see app/layout.tsx) and reach this
+   file as CSS variables (--font-sans / --font-mono / --font-geist-mono).
+   ========================================================================== */
+
 :root {
   color-scheme: light;
+
+  /* ground — true premium white, no warmth */
+  --bg: #ffffff;
+  --bg-2: #fcfcfd;
+  --bg-3: #f7f7f9;
+
+  /* ink + graphite structure (cool neutrals, AA+ on white) */
+  --ink: #0a0a0c;
+  --ink-2: #16161a;
+  --body: #34343c; /* 11.6:1 — body text */
+  --graphite: #52525c; /* 7.72:1 — labels, values */
+  --muted: #5d5d68; /* 6.50:1 — secondary mono */
+  --faint: #6c6c78; /* 5.16:1 — non-essential ≥13px */
+
+  /* hairlines */
+  --rule: #ececef;
+  --rule-2: #e0e0e4;
+  --rule-3: #d2d2d8;
+
+  /* THE single accent — vermilion, two lightnesses of one hue */
+  --signal: #e2402a; /* fills, dots, rules, marks */
+  --signal-text: #c0301b; /* 5.71:1 on white — small labels / verdicts */
+  --signal-tint: #fbedea; /* faint held-row ground */
+  --signal-rule: #f0d6cf; /* hairline at signal hue */
+
+  /* spacing — 4px base */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+  --s9: 88px;
+  --s10: 120px;
+  --maxw: 1180px;
+
+  /* type — font stacks resolve to the next/font CSS vars, with safe fallbacks */
+  --ff-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+  --ff-mono: var(--font-mono), var(--font-geist-mono), ui-monospace, monospace;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background-color: #ffffff;
-  color: #171717;
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--body);
+  font-family: var(--ff-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ----- type primitives ------------------------------------------------------ */
+
+.ds-mono {
+  font-family: var(--ff-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.ds-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.ds-h1,
+.ds-h2,
+.ds-h3,
+.ds-h4 {
+  color: var(--ink);
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.ds-h2 {
+  letter-spacing: -0.028em;
+}
+.ds-h3 {
+  font-weight: 600;
+  letter-spacing: -0.018em;
+}
+.ds-h4 {
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+
+.ds-h2big {
+  font-size: clamp(28px, 4vw, 42px);
+  margin-top: 18px;
+}
+
+.ds-lede {
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--body);
+  max-width: 62ch;
+  letter-spacing: -0.01em;
+}
+.ds-lede em {
+  font-style: normal;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* sentence-case mono eyebrow — NOT all-caps (anti-slop) */
+.ds-eyebrow {
+  font-family: var(--ff-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--graphite);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.ds-eyebrow .idx {
+  color: var(--signal-text);
+  font-weight: 600;
+}
+
+/* ----- layout rhythm -------------------------------------------------------- */
+
+.ds-wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+@media (max-width: 560px) {
+  .ds-wrap {
+    padding: 0 20px;
+  }
+}
+
+.ds-section {
+  padding: var(--s9) 0;
+  border-top: 1px solid var(--rule);
+}
+@media (max-width: 720px) {
+  .ds-section {
+    padding: 64px 0;
+  }
+}
+
+/* ----- THE SIGNATURE PRIMITIVE: hairline-ruled ledger row ------------------- */
+/* field · value · verdict — one container, three roles. Re-used across surfaces. */
+.ds-lrow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: 16px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--rule);
+  transition: background 0.4s ease;
+}
+.ds-lrow:first-of-type {
+  border-top: none;
+}
+.ds-lrow .lk {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--graphite);
+  letter-spacing: -0.002em;
+  grid-column: 1;
+  min-width: 0;
+}
+.ds-lrow .lv {
+  font-family: var(--ff-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 500;
+  grid-column: 2;
+  text-align: right;
+  white-space: nowrap;
+}
+/* absent field — the only red on the record: the data that ISN'T there */
+.ds-lrow.absent .lv {
+  color: var(--signal-text);
+  font-weight: 500;
+}
+/* the cited field gets a gutter mark + tint — NOT a colored left-stripe */
+.ds-lrow.cited {
+  background: var(--bg-2);
+  grid-template-columns: auto 1fr auto;
+  column-gap: 12px;
+}
+.ds-lrow.cited .gut {
+  display: block;
+  grid-column: 1;
+  align-self: center;
+  width: 9px;
+  height: 9px;
+  position: relative;
+}
+.ds-lrow.cited .gut::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1.5px solid var(--ink);
+}
+.ds-lrow.cited .lk {
+  grid-column: 2;
+  color: var(--ink);
+}
+.ds-lrow.cited .lv {
+  grid-column: 3;
+}
+.ds-lrow .gut {
+  display: none;
+}
+
+/* ----- elevation: tinted, restrained (no glow) ------------------------------ */
+.ds-panel {
+  border: 1px solid var(--rule-3);
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(16, 16, 22, 0.03),
+    0 12px 28px -18px rgba(16, 16, 22, 0.1);
+}
+.ds-panel-strong {
+  box-shadow:
+    0 1px 2px rgba(16, 16, 22, 0.03),
+    0 16px 36px -22px rgba(16, 16, 22, 0.1);
+}
+
+/* ----- buttons -------------------------------------------------------------- */
+.ds-btn {
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.008em;
+  cursor: pointer;
+  padding: 9px 15px;
+  border-radius: 7px;
+  border: 1px solid var(--rule-3);
+  background: #fff;
+  color: var(--ink-2);
+  min-height: 36px;
+  transition:
+    transform 0.12s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.ds-btn:hover {
+  border-color: var(--graphite);
+}
+.ds-btn:active {
+  transform: translateY(1px);
+}
+.ds-btn[disabled] {
+  cursor: default;
+  opacity: 0.85;
+}
+.ds-btn.primary {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.ds-btn.primary:hover {
+  background: #000;
+}
+.ds-btn.hold {
+  color: var(--signal-text);
+  border-color: var(--signal-rule);
+  background: var(--signal-tint);
+}
+.ds-btn.hold:hover {
+  border-color: var(--signal);
+}
+
+/* primary CTA link — solid ink pill */
+.ds-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 13px 20px;
+  border-radius: 7px;
+  min-height: 44px;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+.ds-cta:hover {
+  transform: translateY(-1px);
+  background: #000;
+}
+.ds-cta:active {
+  transform: translateY(0);
+}
+.ds-cta svg {
+  transition: transform 0.2s ease;
+}
+.ds-cta:hover svg {
+  transform: translateX(3px);
+}
+
+/* ----- focus + skip link + reduced motion ----------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.ds-skip {
+  position: absolute;
+  left: -9999px;
+}
+.ds-skip:focus {
+  left: 16px;
+  top: 12px;
+  z-index: 50;
+  background: #fff;
+  border: 1px solid var(--signal);
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* Scroll-reveal helpers — resolved to settled state under reduced motion. */
+.ds-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+.ds-reveal.in {
+  opacity: 1;
+  transform: none;
+}
+.ds-stagger > * {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+.ds-stagger.in > * {
+  opacity: 1;
+  transform: none;
+}
+.ds-stagger.in > *:nth-child(1) {
+  transition-delay: 0.04s;
+}
+.ds-stagger.in > *:nth-child(2) {
+  transition-delay: 0.12s;
+}
+.ds-stagger.in > *:nth-child(3) {
+  transition-delay: 0.2s;
+}
+.ds-stagger.in > *:nth-child(4) {
+  transition-delay: 0.28s;
+}
+.ds-stagger.in > *:nth-child(5) {
+  transition-delay: 0.36s;
+}
+.ds-stagger.in > *:nth-child(6) {
+  transition-delay: 0.44s;
+}
+
+/* ----- the CatchPanel centerpiece (cp-*) ------------------------------------ */
+/* SSR renders settled (.cp-settled or .cp-on). Animation only via .cp class
+   without .cp-on (un-resolved), resolved by .cp-on or .cp-settled. */
+.cp-cap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--rule-2);
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.005em;
+  color: var(--graphite);
+  background: var(--bg-2);
+}
+.cp-cap-right {
+  color: var(--signal-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.cp-tick {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--signal);
+  flex: none;
+}
+
+.cp-record {
+  padding: 13px 16px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  align-items: baseline;
+}
+.cp-rlbl {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  color: var(--graphite);
+  letter-spacing: 0.005em;
+  width: 100%;
+  margin-bottom: 2px;
+}
+.cp-rf {
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.cp-rf .cp-rk {
+  color: var(--graphite);
+}
+.cp-rf.absent .cp-rv {
+  color: var(--signal-text);
+}
+.cp-rf .cp-rv {
+  font-variant-numeric: tabular-nums;
+}
+
+.cp-draft {
+  padding: 0;
+}
+.cp-claim {
+  padding: 16px 16px;
+  border-top: 1px solid var(--rule);
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease,
+    background 0.45s ease;
+}
+.cp-claim:first-child {
+  border-top: none;
+}
+.cp-claim.fail {
+  background: var(--signal-tint);
+}
+.cp-ctext {
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.cp-verdict {
+  margin-top: 11px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.005em;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+.cp-vcell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  padding: 3px 0;
+}
+.cp-vcell.pass {
+  color: var(--ink);
+}
+.cp-vcell.fail {
+  color: var(--signal-text);
+}
+.cp-glyph {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  transform: scale(1);
+  opacity: 1;
+  transition:
+    transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.3s ease;
+}
+.cp-cite {
+  color: var(--muted);
+}
+
+.cp-held {
+  padding: 16px 16px;
+  border-top: 1px solid var(--signal-rule);
+  background: var(--signal-tint);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+.cp-held-lbl {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--signal-text);
+  letter-spacing: -0.01em;
+}
+.cp-held .ds-mono {
+  font-size: 11.5px;
+  color: var(--signal-text);
+}
+
+.cp-decide {
+  padding: 14px 16px;
+  border-top: 1px solid var(--rule-2);
+  background: var(--bg-2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+.cp-dnote {
+  font-size: 11px;
+  color: var(--muted);
+  margin-right: auto;
+}
+
+/* Animated (motion-on) state: start un-resolved, resolve in a stagger when .cp-on lands.
+   .cp-settled is the SSR/reduced-motion path and never enters this branch. */
+.cp:not(.cp-settled):not(.cp-on) .cp-claim {
+  opacity: 0;
+  transform: translateY(7px);
+}
+.cp:not(.cp-settled):not(.cp-on) .cp-claim .cp-verdict {
+  opacity: 0;
+}
+.cp:not(.cp-settled):not(.cp-on) .cp-glyph {
+  transform: scale(0.4);
+  opacity: 0;
+}
+.cp:not(.cp-settled):not(.cp-on) .cp-held,
+.cp:not(.cp-settled):not(.cp-on) .cp-decide {
+  opacity: 0;
+}
+.cp:not(.cp-settled):not(.cp-on) .cp-held {
+  transform: translateY(6px);
+}
+
+.cp.cp-on .cp-claim:nth-of-type(1) {
+  transition-delay: 0.05s;
+}
+.cp.cp-on .cp-claim:nth-of-type(2) {
+  transition-delay: 0.55s;
+}
+.cp.cp-on .cp-claim:nth-of-type(3) {
+  transition-delay: 1.1s;
+}
+.cp.cp-on .cp-claim:nth-of-type(1) .cp-verdict {
+  transition-delay: 0.48s;
+}
+.cp.cp-on .cp-claim:nth-of-type(2) .cp-verdict {
+  transition-delay: 1s;
+}
+.cp.cp-on .cp-claim:nth-of-type(3) .cp-verdict {
+  transition-delay: 1.7s;
+}
+.cp.cp-on .cp-held {
+  transition-delay: 2.2s;
+}
+.cp.cp-on .cp-decide {
+  transition-delay: 2.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .ds-reveal,
+  .ds-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .cp .cp-claim,
+  .cp .cp-verdict,
+  .cp .cp-held,
+  .cp .cp-decide,
+  .cp .cp-glyph {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ============================================================================
+   Landing-page section primitives (Layer 1 surfaces) — ported from the v3 mockup
+   ========================================================================== */
+
+/* ----- HERO ----------------------------------------------------------------- */
+.lp-hero {
+  padding: 78px 0 70px;
+}
+@media (max-width: 720px) {
+  .lp-hero {
+    padding: 48px 0 44px;
+  }
+}
+.lp-hero-grid {
+  display: grid;
+  grid-template-columns: 1.04fr 0.96fr;
+  gap: 56px;
+  align-items: center;
+}
+@media (max-width: 960px) {
+  .lp-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+}
+.lp-hero h1 {
+  font-size: clamp(36px, 5.2vw, 56px);
+  max-width: 16ch;
+  letter-spacing: -0.034em;
+  margin: 22px 0 0;
+  font-weight: 800;
+  line-height: 1.04;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.lp-hero h1 .mark-word {
+  color: var(--signal-text);
+  white-space: nowrap;
+}
+.lp-hero .sub {
+  margin-top: 22px;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--body);
+  max-width: 50ch;
+  letter-spacing: -0.01em;
+}
+.lp-hero .sub em {
+  font-style: normal;
+  color: var(--ink);
+  font-weight: 600;
+}
+.lp-hero-cta {
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.lp-howlink {
+  font-family: var(--ff-mono);
+  font-size: 12.5px;
+  color: var(--graphite);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 2px;
+  min-height: 24px;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.lp-howlink:hover {
+  color: var(--ink);
+  border-color: var(--rule-3);
+}
+.lp-howlink svg {
+  color: var(--signal-text);
+}
+.lp-hero-aside {
+  position: relative;
+}
+@media (max-width: 960px) {
+  .lp-hero-aside {
+    max-width: 520px;
+  }
+}
+
+/* ----- TRUST ANCHOR — three honest steps as a ruled strip ------------------- */
+.lp-anchor {
+  margin-top: var(--s7);
+  border-top: 1px solid var(--rule-3);
+  border-bottom: 1px solid var(--rule-3);
+}
+.lp-anchor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 760px) {
+  .lp-anchor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.lp-astep {
+  padding: 26px 28px 26px 24px;
+  border-left: 1px solid var(--rule);
+}
+.lp-astep:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+@media (max-width: 760px) {
+  .lp-astep {
+    border-left: none;
+    border-top: 1px solid var(--rule);
+    padding: 22px 0;
+  }
+  .lp-astep:first-child {
+    border-top: none;
+  }
+}
+.lp-astep .an {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--graphite);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.lp-astep .an .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--ink);
+  flex: none;
+}
+.lp-astep .an.signal .dot {
+  background: var(--signal);
+}
+.lp-astep h3 {
+  font-size: 16px;
+  margin-top: 12px;
+}
+.lp-astep p {
+  margin: 8px 0 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--body);
+}
+.lp-anchor-foot {
+  margin: 16px 0 0;
+  font-size: 14.5px;
+  color: var(--body);
+  line-height: 1.55;
+  max-width: 70ch;
+}
+.lp-anchor-foot em {
+  font-style: normal;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ----- HOW IT WORKS — pipeline ledger rows (not a 1-2-3 band) --------------- */
+.lp-pipe {
+  margin-top: var(--s6);
+  border-top: 1px solid var(--rule-3);
+}
+.lp-prow {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--rule);
+  transition: background 0.15s ease;
+}
+.lp-prow:hover {
+  background: var(--bg-2);
+}
+.lp-prow .pn {
+  grid-column: 1;
+  padding: 22px 0 22px 2px;
+  font-family: var(--ff-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--graphite);
+  font-weight: 500;
+}
+.lp-prow.gate .pn {
+  color: var(--signal-text);
+}
+.lp-prow .pmain {
+  grid-column: 2;
+  padding: 20px 0 20px 24px;
+  border-left: 1px solid var(--rule);
+}
+.lp-prow .ptop {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.lp-prow h3 {
+  font-size: 17px;
+}
+.lp-prow .check-tag {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--signal-text);
+  border: 1px solid var(--signal-rule);
+  border-radius: 4px;
+  padding: 2px 7px;
+  background: var(--signal-tint);
+}
+.lp-prow .pl {
+  margin: 9px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--body);
+  max-width: 64ch;
+}
+@media (max-width: 560px) {
+  .lp-prow {
+    grid-template-columns: 40px 1fr;
+  }
+  .lp-prow .pmain {
+    padding-left: 16px;
+  }
+}
+
+/* ----- DIFFERENTIATION — two ledger columns --------------------------------- */
+.lp-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-top: var(--s6);
+  border: 1px solid var(--rule-2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+@media (max-width: 760px) {
+  .lp-compare {
+    grid-template-columns: 1fr;
+  }
+}
+.lp-ccol {
+  padding: 28px;
+  background: #fff;
+}
+.lp-ccol.them {
+  border-right: 1px solid var(--rule-2);
+}
+@media (max-width: 760px) {
+  .lp-ccol.them {
+    border-right: none;
+    border-bottom: 1px solid var(--rule-2);
+  }
+}
+.lp-ccol .crole {
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.005em;
+  color: var(--graphite);
+  margin-bottom: 8px;
+}
+.lp-ccol.ours .crole {
+  color: var(--signal-text);
+}
+.lp-ccol h3 {
+  font-size: 19px;
+  letter-spacing: -0.022em;
+}
+.lp-ccol ul {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.lp-ccol li {
+  display: flex;
+  gap: 13px;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: var(--body);
+  padding: 13px 0;
+  border-top: 1px solid var(--rule);
+}
+.lp-ccol li:first-child {
+  border-top: none;
+}
+.lp-ccol li .gl {
+  flex: none;
+  margin-top: 1px;
+}
+.lp-ccol .cq {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule-2);
+  font-size: 14.5px;
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.lp-ccol .cq em {
+  font-style: normal;
+  color: var(--signal-text);
+}
+
+/* ----- OBJECTION — method only, no figures ---------------------------------- */
+.lp-qa {
+  margin-top: var(--s6);
+  border-top: 1px solid var(--rule-3);
+}
+.lp-qrow {
+  display: grid;
+  grid-template-columns: 0.42fr 1fr;
+  gap: 32px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--rule);
+}
+@media (max-width: 760px) {
+  .lp-qrow {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+.lp-qrow .qh {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: -0.018em;
+}
+.lp-qrow .qb {
+  color: var(--body);
+  font-size: 15.5px;
+  line-height: 1.55;
+  max-width: 62ch;
+}
+.lp-qrow .qb em {
+  font-style: normal;
+  color: var(--ink);
+  font-weight: 600;
+}
+.lp-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 11px;
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  color: var(--signal-text);
+  border: 1px solid var(--signal-rule);
+  background: var(--signal-tint);
+  border-radius: 5px;
+  padding: 4px 9px;
+}
+.lp-pending .ring {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  border: 1.5px solid var(--signal);
+  flex: none;
+}
+
+/* ----- CTA close ------------------------------------------------------------ */
+.lp-cta-wrap {
+  margin-top: var(--s7);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.lp-cta-note {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ----- LAYER 2 = opt-in technical reveal (the only home for deep ML jargon) -- */
+.ds-tech {
+  margin-top: var(--s5);
+  border-top: 1px solid var(--rule-2);
+  border-bottom: 1px solid var(--rule-2);
+}
+.ds-tech > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 15px 2px;
+  min-height: 24px;
+  font-family: var(--ff-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.005em;
+  color: var(--graphite);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+.ds-tech > summary:hover {
+  color: var(--ink);
+}
+.ds-tech > summary::-webkit-details-marker {
+  display: none;
+}
+.ds-tech > summary .chev {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  color: var(--signal-text);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ds-tech[open] > summary .chev {
+  transform: rotate(90deg);
+}
+.ds-tech .tech-body {
+  padding: 2px 2px 22px 24px;
+}
+.ds-tech .tech-body p {
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--body);
+  max-width: 72ch;
+  margin: 0;
+}
+.ds-tech .tech-body p + p {
+  margin-top: 12px;
+}
+.ds-tech .tech-body em {
+  font-style: normal;
+  color: var(--ink);
+  font-weight: 600;
+}
+.ds-tech .tech-body .mono-line {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-top: 12px;
+  letter-spacing: -0.002em;
+}
+.ds-tech .tech-body .mono-line .k {
+  color: var(--graphite);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-tech > summary .chev {
+    transition: none;
+  }
 }
