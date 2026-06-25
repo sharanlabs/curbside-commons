@@ -65,7 +65,7 @@ One canonical glossary so the spec, the build, and the agents use the **same wor
 
 **Constraints HELD (non-negotiable — every phase verifies against these):**
 
-1. **Free-first runtime** — Groq `gpt-oss-120b` (free) carries the loop + critics; **Gemini Flash is the sole paid runtime model, <$5 hard total** (the `assertWithinBudget` rail). No other paid/metered runtime tool.
+1. **Best-fit, cost-aware — near-term all-free** (refined 2026-06-25, decision-log; was "free-first, no other paid tool") — Groq `gpt-oss-120b` (free) carries the loop + critics; **Gemini Flash stays the cost-tracked LLM, <$5 hard total** (the `assertWithinBudget` rail). **Near-term (P3-calibration + A1 + A2) runs entirely free.** Free / free-tier / self-hostable is the **default bias**, no longer a hard gate: an additional **paid / enterprise-grade** tool is allowed **at A3+ only where it materially serves the goal** — named justification + live freshness/price check (`RULES.md` §6) + owner sign-off + Codex cross-check (consequential pick). Does **not** reopen the AM-6 scope cap.
 2. **Gemini reserved for A3** — A2's loop runs entirely on **free Groq**; **A2 SHALL NOT call Gemini** (asserted to $0).
 3. **Human-approval-before-send** — no send without explicit human approval; A2 ends at the human gate / simulated send only.
 4. **Prototype-run-on-demand** — integrations (Slack/email/n8n, A5) are a **transient demo + a recorded walkthrough**, never standing infra; no uptime/ops goals.
