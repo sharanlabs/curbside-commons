@@ -1,5 +1,26 @@
 # Task Log
 
+## 2026-06-25 (MULTI-AGENT PIVOT — Phase 0: Codex gate → BLOCK → reconciled; ADR-002 + reversals + spec amendments)
+
+### Professional Process Applied
+Task type: governance — pivot-checkpoint + mandatory cross-model gate (no product code) · Stage: Phase 0 (Decide & gate) · Risk: HIGH (scope · architecture · AI behavior · public claims; reverses 3 logged decisions) · Mode: FULL · Effort: MAX, auto-routed (ship-gating governance on a major architectural pivot) · Basis: owner-approved brief `~/.claude/plans/read-last-handoff-and-snappy-ripple.md` + execution spec `docs/plan-multi-agent-execution.md` §4 (EARS R-P0-1..5); RULES §3/§6/§12/§14; playbook Decision-Reversal Rule + ADR format · Validation: Codex adversarial cross-check (primary-model-final) + a confirming pass + the §4.2 acceptance checklist · Codex: this step IS the gate (BLOCK→reconciled; confirming pass running) · Human approval: owner `/autopilot`+`/goal` toggle + commit (pending).
+
+### What was done
+- **Smoke-tested the Codex seat** (`codex-guarded`, owner doctrine — surface raw, no retry/downgrade/switch) → alive; ran the **adversarial cross-check** on the pivot → **BLOCK (9 findings)**, captured + reconciled all 9 under primary-model-final in `docs/reviews/codex-2026-06-25-multiagent-pivot.md` (none refuted — all honesty/scope/deterministic-first conditions; #6 + #7 caught real gaps the primary had under-specified).
+- **Authored ADR-002** (`docs/decisions/ADR-002-multi-agent-architecture.md`): the agent/tool line, named agents+tools, two-axis ship bar, Groq-loop/Gemini-final split, REPLAY-only posture, A1→A2→A3 with A2 as the early go/no-go; **Validation Needed makes P3 calibration a hard A2 prerequisite + the recommend-not-decide test-lock**.
+- **Recorded 4 decision-log rows** (2026-06-25): the pivot + the 3 reversals (drop-agentic→agentic deliverable · implicit single-agent→bounded multi-agent · integrations-deferred→transient demo — the last framed as a *satisfied* RULES §3 precondition, not a rule reversal, per Codex #8).
+- **Amended the execution spec** (`docs/plan-multi-agent-execution.md` §0): binding **AM-1..AM-8** + new **R-LOOP-1b** (recommend-not-decide invariant) + **R-LOOP-8b** (test-lock) + the inline R-LOOP-1 fix; the §0 block supersedes conflicting requirement text below it.
+- **Synced state docs:** PROJECT_STATE · CURRENT_TASK · HANDOFF (resume) · roadmap · this log · journal. Prior active task (UI Stage 2 + judge P3 calibration) re-labeled **subsumed** (calibration still completes — it IS the Faithfulness-reverse tool).
+- **Launched a confirming Codex pass** on the reconciled artifacts (running).
+- **No product code touched** (Phase 0 = governance only); `lib/core` + the differential oracle UNTOUCHED.
+
+### Skills / tools used
+- **Codex** via `~/claude-os/bin/codex-guarded` (shared-seat wrapper) — the mandatory cross-model gate (BLOCK → reconcile → confirm loop).
+- **advisor** (pre-substantive-work) — armed the Codex framing with current state + decision-log rows, flagged the unproven-catcher dependency, the reversal-(c) mis-framing, and commit hygiene.
+
+### Next
+Reconcile the confirming pass → owner commit (explicit paths) → owner toggles `/autopilot`+`/goal "<ship condition>"` → A1 (tool-ify the deterministic core).
+
 ## 2026-06-22 (semantic judge — P3 infrastructure + live judge wired + calibration run; owner provided GROQ_API_KEY)
 
 ### Professional Process Applied

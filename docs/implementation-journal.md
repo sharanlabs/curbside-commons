@@ -30,6 +30,23 @@ Newest entries on top.
 
 ---
 
+## 2026-06-25 MULTI-AGENT PIVOT — Phase 0: Codex gate → BLOCK → reconciled (governance only)
+
+- What changed: Executed Phase 0 of the owner-approved multi-agent pivot (no product code). Ran the mandatory Codex adversarial cross-check (BLOCK, 9 findings) + reconciled all 9; authored ADR-002; recorded the pivot + 3 decision-log reversals; amended the execution spec (§0 binding AM-1..AM-8 + new R-LOOP-1b/8b); synced state docs; launched a confirming Codex pass.
+- Why it changed: the owner re-judged the near-ship product as "a pipeline with an LLM call" and approved elevating it into a bounded, HITL, eval-gated multi-agent verify-and-self-correct system; Phase 0 is the gated checkpoint before any build.
+- Challenge or failure that appeared: Codex BLOCKed — the load-bearing finding (#1) is that the pivot's whole "catches its own mistakes" identity rides the semantic judge, whose calibration is PAUSED (no held-out metrics yet). Two findings (#6 recommend-not-decide, #7 Groq availability rail) caught real gaps I'd under-specified.
+- Why it happened: the plan implied a working detector and used "decides" routing language; the Gemini budget rail had no Groq analogue. The pivot's ambition outran what is yet proven.
+- How it was diagnosed: advisor (pre-work) flagged the unproven catcher + the reversal-(c) mis-framing + commit hygiene; the Codex adversarial pass (armed with current state + the decision-log rows) confirmed + sharpened; the primary model formed an independent APPROVE-WITH-CONDITIONS (C1–C6) read first, then reconciled.
+- Options considered: (a) rubber-stamp the owner-approved pivot; (b) primary-model-final — independent read + run the gate + reconcile each finding with evidence. Chose (b).
+- Final fix: all 9 reconciled as binding CONDITIONS, not direction changes — P3 calibration a hard A2 prerequisite (AM-1); agent recommends-only + test-locked eligibility/send (AM-4 / R-LOOP-1b/8b); A2 = single-agent convergence-only spike (AM-2/3); scope sequenced to P3+A1+A2 (AM-6); honesty language (AM-7); reversal-(c) reframed as a satisfied §3 precondition (AM-8); a Groq availability rail (AM-5).
+- Why this fix: it tightens the plan toward the project's own constraints (honesty, deterministic-first, portfolio scope) without abandoning the owner's approved direction — the governed-agency version.
+- How it was implemented: `docs/reviews/codex-2026-06-25-multiagent-pivot.md` (verdict + reconciliation table), `ADR-002`, `docs/decision-log.md` (4 rows), `docs/plan-multi-agent-execution.md` §0 amendments, + the PROJECT_STATE/CURRENT_TASK/HANDOFF/roadmap/task-log sync.
+- How it was verified: a confirming Codex pass on the reconciled artifacts (running); the §4.2 acceptance checklist; `git status` confirms docs/governance-only (no `lib/`/`app/`/`evals/`).
+- Prevention step for the future: the binding build preconditions live in the spec + ADR, so A1/A2 cannot silently re-introduce the unproven-catcher or recommend-vs-decide issues.
+- Files changed: `docs/reviews/codex-2026-06-25-multiagent-pivot.md` (new), `docs/decisions/ADR-002-multi-agent-architecture.md` (new), `docs/decision-log.md`, `docs/plan-multi-agent-execution.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/roadmap.md`, `docs/task-log.md`, this journal.
+- Reviewer notes (Codex / human): Codex `gpt-5.5`@`xhigh` BLOCK → reconciled; confirming pass running. advisor shaped the approach pre-work.
+- Human decision: owner toggles `/autopilot` + `/goal` + approves the commit (pending).
+
 ## 2026-06-22 REBUILD/JUDGE — P3: live Groq judge wired + calibration run (owner key; free tier)
 
 - What changed: Wired the live cross-family Groq `openai/gpt-oss-120b` judge (`@ai-sdk/groq`, strict structured outputs + `reasoningEffort: "low"`) in `lib/agents/semantic-judge.ts`; built the key-gated calibration runner `evals/judge-calibration.live.test.ts`; calibrated the judge prompt (platform-name grounding); lowered `MAX_JUDGE_OUTPUT_TOKENS` to 1024. Offline suite green (192 + 2 skipped). Honest status doc `docs/judge-calibration-status.md`.
