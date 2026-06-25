@@ -40,8 +40,11 @@ import { liveAiEnabled } from "@/lib/server/env-flags";
  * Placeholder the LIVE model addresses the merchant by. The untrusted real
  * merchant_name is NEVER sent to the model (injection cut — the lethal-trifecta
  * lesson); we substitute the sanitized real name into the draft ONLY after generation.
+ *
+ * Exported so the A2 Groq drafting path (lib/agents/groq-draft.ts) and its tests reuse the
+ * SAME placeholder token — the injection posture is SHARED, never forked (R-LOOP-7).
  */
-const MERCHANT_PLACEHOLDER = "{{MERCHANT}}";
+export const MERCHANT_PLACEHOLDER = "{{MERCHANT}}";
 
 /** A factual assertion in a draft, tied to a merchant field (gatekeeper-checkable). */
 export interface DraftClaim {
@@ -101,8 +104,11 @@ export function mockDraft(merchant: Merchant, platformName = REFERENCE_PLATFORM_
  * sanitized real name is substituted into the draft only AFTER generation (see draftOutreach).
  * The other facts are a controlled-vocab category + numeric/enum fields (not free text). This
  * is the lethal-trifecta cut (untrusted text never crosses into the model prompt).
+ *
+ * Exported so the A2 Groq drafting path reuses the SAME constrained prompt (only the provider
+ * differs); the security framing lives in ONE place (R-LOOP-7).
  */
-function buildPrompt(merchant: Merchant, platformName: string): string {
+export function buildPrompt(merchant: Merchant, platformName: string): string {
   // No merchant_name here — see the SECURITY note above. merchant_category is the crosswalked
   // controlled vocab (Restaurant/Retail), and the rest are numbers/enums; none are free text.
   const facts = {
@@ -184,6 +190,72 @@ function priceLive(
   return { cost: budget.estimatedNextUsd, known: false };
 }
 
+/** The injection-cut error classes (returned, then mapped to FAILED_TO_FALLBACK by the caller). */
+export type InjectionCutError =
+  | "UNPARSEABLE_DRAFT"
+  | "MISSING_PLACEHOLDER"
+  | "NAME_LEAK"
+  | "UNRESOLVED_PLACEHOLDER";
+
+export type InjectionCutResult =
+  | { ok: true; draft: OutreachDraft }
+  | { ok: false; errorClass: InjectionCutError };
+
+/**
+ * THE SHARED INJECTION-CUT (R-LOOP-7). Validate a model-authored draft object and substitute the
+ * sanitized real merchant_name into the {{MERCHANT}} placeholder — the SAME post-generation
+ * security pass for BOTH the Gemini path (draftOutreach) and the A2 Groq path (draftOutreachGroq),
+ * so the lethal-trifecta posture cannot silently regress in one and not the other.
+ *
+ * The model only ever saw the {{MERCHANT}} placeholder (the untrusted real name never entered the
+ * prompt — see buildPrompt). Here we: (a) parse to the schema; (b) require the placeholder addresses
+ * the merchant in the subject/body; (c) reject if the real name appears in ANY model-authored field
+ * pre-substitution (a leak, or the model guessing it); (d) substitute; (e) reject any unresolved
+ * placeholder. Branch ORDER is load-bearing (the draft tests pin the exact errorClass per case):
+ * UNPARSEABLE -> MISSING_PLACEHOLDER -> NAME_LEAK -> UNRESOLVED_PLACEHOLDER.
+ *
+ * PURE (no cost/usage here): the caller owns cost accounting, so a billed-then-rejected live call
+ * still records its spend. `modelId` is stamped as model_version.
+ */
+export function applyInjectionCut(object: unknown, merchant: Merchant, modelId: string): InjectionCutResult {
+  const parsed = GeneratedDraftSchema.safeParse(object);
+  if (!parsed.success) return { ok: false, errorClass: "UNPARSEABLE_DRAFT" };
+
+  const safeName = sanitizeText(merchant.merchant_name, MAX_NAME_LEN);
+  const sub = (s: string) => s.replaceAll(MERCHANT_PLACEHOLDER, safeName);
+  const greeting = `${parsed.data.draft_subject}\n${parsed.data.draft_body}`;
+  const rawAll = [
+    parsed.data.draft_subject,
+    parsed.data.draft_body,
+    parsed.data.risk_explanation,
+    parsed.data.blocker_summary,
+  ].join("\n");
+  if (!greeting.includes(MERCHANT_PLACEHOLDER)) return { ok: false, errorClass: "MISSING_PLACEHOLDER" };
+  if (safeName.length >= 3 && rawAll.includes(safeName)) return { ok: false, errorClass: "NAME_LEAK" };
+
+  const draft: OutreachDraft = {
+    merchant_id: merchant.merchant_id,
+    risk_explanation: sub(parsed.data.risk_explanation),
+    blocker_summary: sub(parsed.data.blocker_summary),
+    next_best_action: parsed.data.next_best_action,
+    draft_subject: sub(parsed.data.draft_subject),
+    draft_body: sub(parsed.data.draft_body),
+    claims: parsed.data.claims,
+    guardrail_flags: [],
+    prompt_version: PROMPT_VERSION,
+    model_version: modelId,
+    schema_version: SCHEMA_VERSION,
+  };
+  if (
+    [draft.draft_subject, draft.draft_body, draft.risk_explanation, draft.blocker_summary].some((s) =>
+      s.includes("{{"),
+    )
+  ) {
+    return { ok: false, errorClass: "UNRESOLVED_PLACEHOLDER" };
+  }
+  return { ok: true, draft };
+}
+
 /**
  * Produce an outreach draft. Default = the deterministic stub (no spend). The live path
  * runs only when `live` (default liveAiEnabled()) is true OR an injected `generate` is
@@ -247,50 +319,11 @@ export async function draftOutreach(
     if (!priced.known) return fallback(merchant, platformName, "UNKNOWN_USAGE", priced.cost, usage);
     const liveCost = priced.cost;
 
-    const parsed = GeneratedDraftSchema.safeParse(object);
-    if (!parsed.success) return fallback(merchant, platformName, "UNPARSEABLE_DRAFT", liveCost, usage);
-
-    // INJECTION-CUT VALIDATION (the model only ever saw the {{MERCHANT}} placeholder). Each failure
-    // below still accounts the billed cost. (a) the placeholder must address the merchant in the
-    // subject/body greeting; (b) the real name must NOT appear in ANY model-authored field
-    // pre-substitution (a leak, or the model guessing it); (c) no unresolved/partial placeholder may
-    // survive substitution in any field.
-    const safeName = sanitizeText(merchant.merchant_name, MAX_NAME_LEN);
-    const sub = (s: string) => s.replaceAll(MERCHANT_PLACEHOLDER, safeName);
-    const greeting = `${parsed.data.draft_subject}\n${parsed.data.draft_body}`;
-    const rawAll = [
-      parsed.data.draft_subject,
-      parsed.data.draft_body,
-      parsed.data.risk_explanation,
-      parsed.data.blocker_summary,
-    ].join("\n");
-    if (!greeting.includes(MERCHANT_PLACEHOLDER)) {
-      return fallback(merchant, platformName, "MISSING_PLACEHOLDER", liveCost, usage);
-    }
-    if (safeName.length >= 3 && rawAll.includes(safeName)) {
-      return fallback(merchant, platformName, "NAME_LEAK", liveCost, usage);
-    }
-    const draft: OutreachDraft = {
-      merchant_id: merchant.merchant_id,
-      risk_explanation: sub(parsed.data.risk_explanation),
-      blocker_summary: sub(parsed.data.blocker_summary),
-      next_best_action: parsed.data.next_best_action,
-      draft_subject: sub(parsed.data.draft_subject),
-      draft_body: sub(parsed.data.draft_body),
-      claims: parsed.data.claims,
-      guardrail_flags: [],
-      prompt_version: PROMPT_VERSION,
-      model_version: modelId,
-      schema_version: SCHEMA_VERSION,
-    };
-    if (
-      [draft.draft_subject, draft.draft_body, draft.risk_explanation, draft.blocker_summary].some((s) =>
-        s.includes("{{"),
-      )
-    ) {
-      return fallback(merchant, platformName, "UNRESOLVED_PLACEHOLDER", liveCost, usage);
-    }
-    return { draft, mode: "LIVE_AI", modelId, costUsd: liveCost, usage };
+    // INJECTION-CUT VALIDATION (shared with the Groq path — R-LOOP-7). Each failure below still
+    // accounts the billed cost (the live call already spent before the cut ran).
+    const cut = applyInjectionCut(object, merchant, modelId);
+    if (!cut.ok) return fallback(merchant, platformName, cut.errorClass, liveCost, usage);
+    return { draft: cut.draft, mode: "LIVE_AI", modelId, costUsd: liveCost, usage };
   } catch (err) {
     // A pre-call budget breach never billed -> $0 is correct. Any OTHER throw may have billed
     // (SDK errors can carry usage); price it, and if usage is unknown charge the estimate (fail-closed).
