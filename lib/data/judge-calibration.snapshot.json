@@ -1,0 +1,733 @@
+{
+  "_provenance": {
+    "recorded_at": "2026-06-25",
+    "recorded_at_note": "live P3 calibration run; date stamped at commit time (no wall-clock in tests)",
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "temperature": 0,
+    "reps_per_item": 3,
+    "gold_total": 30,
+    "fallbacks_excluded": 0,
+    "cost_usd": 0,
+    "note": "LIVE cross-family Groq gpt-oss-120b judge over the gold set. Metrics on the gatekeeper-PASSING subset (R-CAL-1). All gold positives are SYNTHETIC/planted (R-CAL-4). Held-out = the 'test' split (R-CAL-7). Directional until the ~100+ floor (R-HON-1)."
+  },
+  "metrics": {
+    "overall_passing_subset": {
+      "matrix": {
+        "tp": 14,
+        "fp": 1,
+        "tn": 11,
+        "fn": 2
+      },
+      "precision": 0.9333333333333333,
+      "recall": 0.875,
+      "f1": 0.9032258064516129,
+      "tpr": 0.875,
+      "tnr": 0.9166666666666666,
+      "recallCi95": [
+        0.6397666856325173,
+        0.9650232506629428
+      ],
+      "n": 28
+    },
+    "tune_passing_subset": {
+      "matrix": {
+        "tp": 5,
+        "fp": 1,
+        "tn": 5,
+        "fn": 2
+      },
+      "precision": 0.8333333333333334,
+      "recall": 0.7142857142857143,
+      "f1": 0.7692307692307692,
+      "tpr": 0.7142857142857143,
+      "tnr": 0.8333333333333334,
+      "recallCi95": [
+        0.35892909014821267,
+        0.9177828342909844
+      ],
+      "n": 13
+    },
+    "held_out_passing_subset": {
+      "matrix": {
+        "tp": 9,
+        "fp": 0,
+        "tn": 6,
+        "fn": 0
+      },
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "tpr": 1,
+      "tnr": 1,
+      "recallCi95": [
+        0.7008472464490407,
+        1
+      ],
+      "n": 15
+    },
+    "cohen_kappa_judge_vs_gold": 0.7835051546391754,
+    "test_retest_flip_rate": 0.07142857142857142
+  },
+  "items": [
+    {
+      "id": "P-timeline-1",
+      "split": "tune",
+      "failureMode": "fabricated_timeline",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "We expect your account to be fully approved by Friday.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-timeline-2",
+      "split": "test",
+      "failureMode": "fabricated_timeline",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Your listing will go live within 24 hours of this email.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-entity-1",
+      "split": "tune",
+      "failureMode": "fabricated_entity",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Your account now syncs automatically with Toast and Square.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-entity-2",
+      "split": "test",
+      "failureMode": "fabricated_entity",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "A dedicated onboarding specialist named Alex will call you tomorrow.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-capability-1",
+      "split": "tune",
+      "failureMode": "unsupported_capability",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Our partnerships team has personally reviewed your profile",
+          "supported": false,
+          "evidence_field": null
+        },
+        {
+          "text": "reserved a featured homepage spot for you",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-capability-2",
+      "split": "test",
+      "failureMode": "unsupported_capability",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "You also get priority placement in search results during your first month.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-specific-1",
+      "split": "tune",
+      "failureMode": "invented_specific",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "You already have 4 customers waiting to order from you.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-specific-2",
+      "split": "test",
+      "failureMode": "invented_specific",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "You're currently the top-rated new spot in your neighborhood.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-capability-3",
+      "split": "test",
+      "failureMode": "unsupported_capability",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "We've waived your first three months of commission fees.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-timeline-3",
+      "split": "tune",
+      "failureMode": "fabricated_timeline",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        true,
+        true
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": []
+    },
+    {
+      "id": "P-timeline-4",
+      "split": "test",
+      "failureMode": "fabricated_timeline",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Your account review wraps up early next week.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-entity-3",
+      "split": "test",
+      "failureMode": "fabricated_entity",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "We've connected your account to Google Maps and Apple Maps.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-entity-4",
+      "split": "tune",
+      "failureMode": "fabricated_entity",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Your menu will be reviewed by our culinary partnerships desk.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-capability-4",
+      "split": "test",
+      "failureMode": "unsupported_capability",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Reply to this message if you would like a hand.",
+          "supported": false,
+          "evidence_field": null
+        },
+        {
+          "text": "You'll be added to our weekend promotional carousel automatically.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "P-specific-3",
+      "split": "tune",
+      "failureMode": "invented_specific",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        true
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": []
+    },
+    {
+      "id": "P-specific-4",
+      "split": "test",
+      "failureMode": "invented_specific",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Your profile has already been viewed 27 times since you signed up.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    },
+    {
+      "id": "G-revenue-1",
+      "split": "tune",
+      "failureMode": "revenue_or_percent",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": false,
+      "reps": [],
+      "predicted": false,
+      "mode": "SKIPPED_GATE_BLOCKED",
+      "claims": []
+    },
+    {
+      "id": "G-state-1",
+      "split": "test",
+      "failureMode": "state_mismatch",
+      "source": "planted",
+      "actualFabricated": true,
+      "gatekeeperApproved": false,
+      "reps": [],
+      "predicted": false,
+      "mode": "SKIPPED_GATE_BLOCKED",
+      "claims": []
+    },
+    {
+      "id": "C-mock-0",
+      "split": "tune",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Glen Park Grill",
+          "supported": true,
+          "evidence_field": "merchant_name"
+        },
+        {
+          "text": "Your next step is to verify your business information.",
+          "supported": true,
+          "evidence_field": "next_best_action"
+        }
+      ]
+    },
+    {
+      "id": "C-mock-1",
+      "split": "tune",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "The merchant's name is Bernal Bites.",
+          "supported": true,
+          "evidence_field": "merchant_name"
+        },
+        {
+          "text": "The next onboarding step is to upload the menu.",
+          "supported": true,
+          "evidence_field": "next_best_action"
+        }
+      ]
+    },
+    {
+      "id": "C-mock-2",
+      "split": "test",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": []
+    },
+    {
+      "id": "C-mock-3",
+      "split": "test",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": []
+    },
+    {
+      "id": "C-mock-4",
+      "split": "tune",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "SoMa Smoothies",
+          "supported": true,
+          "evidence_field": "merchant_name"
+        },
+        {
+          "text": "Your next step is to verify your bank information.",
+          "supported": true,
+          "evidence_field": "next_best_action"
+        }
+      ]
+    },
+    {
+      "id": "C-mock-retail",
+      "split": "test",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Your next step is to add photos of your items.",
+          "supported": true,
+          "evidence_field": "next_best_action"
+        }
+      ]
+    },
+    {
+      "id": "C-mock-grocery",
+      "split": "tune",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": []
+    },
+    {
+      "id": "C-mock-5",
+      "split": "test",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Cathedral Hill Cafe",
+          "supported": true,
+          "evidence_field": "merchant_name"
+        },
+        {
+          "text": "Your next step is to complete your final verification.",
+          "supported": true,
+          "evidence_field": "next_best_action"
+        }
+      ]
+    },
+    {
+      "id": "C-mock-conv",
+      "split": "tune",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": []
+    },
+    {
+      "id": "C-mock-retail2",
+      "split": "test",
+      "failureMode": "clean",
+      "source": "mock-clean",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "The merchant name is Noe Valley Goods.",
+          "supported": true,
+          "evidence_field": "merchant_name"
+        },
+        {
+          "text": "The next onboarding step is to verify the bank information.",
+          "supported": true,
+          "evidence_field": "next_best_action"
+        }
+      ]
+    },
+    {
+      "id": "C-live-marina",
+      "split": "test",
+      "failureMode": "clean",
+      "source": "live-snapshot",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "Restaurant",
+          "supported": true,
+          "evidence_field": "merchant_category"
+        },
+        {
+          "text": "add photos to your profile",
+          "supported": true,
+          "evidence_field": "next_best_action"
+        },
+        {
+          "text": "completed 2 out of 5 steps in the onboarding process",
+          "supported": true,
+          "evidence_field": "steps_completed"
+        }
+      ]
+    },
+    {
+      "id": "C-live-sunset",
+      "split": "tune",
+      "failureMode": "clean",
+      "source": "live-snapshot",
+      "actualFabricated": false,
+      "gatekeeperApproved": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "mode": "LIVE_JUDGE",
+      "claims": [
+        {
+          "text": "You have completed 3 steps.",
+          "supported": true,
+          "evidence_field": "steps_completed"
+        },
+        {
+          "text": "There are 5 total steps.",
+          "supported": true,
+          "evidence_field": "total_steps"
+        },
+        {
+          "text": "Your Restaurant is listed on Curbside Commons.",
+          "supported": false,
+          "evidence_field": null
+        }
+      ]
+    }
+  ]
+}

@@ -165,7 +165,13 @@ describe.skipIf(!live)("LIVE judge calibration — Groq gpt-oss-120b cross-famil
       const territory = perItem.filter((p) => p.gatekeeperApproved);
       const liveTerritory = territory.filter((p) => p.mode === "LIVE_JUDGE");
       expect(liveTerritory.length / territory.length).toBeGreaterThanOrEqual(0.85);
-      for (const p of liveTerritory) expect(p.claims.length).toBeGreaterThan(0);
+      // PLUMBING, not quality: a draft the judge FLAGS (predicted fabricated) must carry its
+      // claim-level breakdown. CLEAN drafts legitimately return 0 unsupported claims, and a flippy
+      // temp-0 rep-0 may come back clean — so we do NOT demand claims on every item (that is a
+      // QUALITY threshold, eval-locked at P4 on the FROZEN report per R-HON-2/3, not a plumbing check).
+      const flagged = liveTerritory.filter((p) => p.predicted);
+      expect(flagged.length).toBeGreaterThan(0); // non-vacuous: the judge did flag fabrications
+      for (const p of flagged) expect(p.claims.length).toBeGreaterThan(0);
       expect(budget.spentUsd).toBe(0); // free tier — the whole run is $0
       expect(heldOut.n).toBeGreaterThan(0); // the held-out passing subset is non-empty
 
