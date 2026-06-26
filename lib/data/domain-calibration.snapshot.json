@@ -1,0 +1,1631 @@
+{
+  "_provenance": {
+    "recorded_at_note": "2026-06-26 — live Groq gpt-oss-120b domain-judge calibration (B1d); frozen fixture, eval-locked by evals/domain-calibration.lock.test.ts",
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "temperature": 0,
+    "reps_per_item": 3,
+    "gold_total": 36,
+    "fallbacks_excluded": 0,
+    "cost_usd": 0,
+    "note": "LIVE cross-family Groq gpt-oss-120b DOMAIN judge over the gold set. Metrics on the territory (gate-passing + faithful) subset (R-DCAL-1); per-dimension reported (R-DCAL-2). All gold positives are SYNTHETIC/planted (R-DCAL-4). Held-out = the 'test' split (R-DCAL-7). Directional until the ~100 floor (R-DHON-1); over-promise (§4.2) marginal-value vs the LIVE faithfulness judge is partial — see docs/domain-calibration-status.md."
+  },
+  "metrics": {
+    "aggregate": {
+      "overall_territory": {
+        "matrix": {
+          "tp": 24,
+          "fp": 0,
+          "tn": 12,
+          "fn": 0
+        },
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "tpr": 1,
+        "tnr": 1,
+        "recallCi95": [
+          0.8620194241710247,
+          1
+        ],
+        "n": 36
+      },
+      "tune_territory": {
+        "matrix": {
+          "tp": 12,
+          "fp": 0,
+          "tn": 6,
+          "fn": 0
+        },
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "tpr": 1,
+        "tnr": 1,
+        "recallCi95": [
+          0.7574992425007574,
+          1
+        ],
+        "n": 18
+      },
+      "held_out_territory": {
+        "matrix": {
+          "tp": 12,
+          "fp": 0,
+          "tn": 6,
+          "fn": 0
+        },
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "tpr": 1,
+        "tnr": 1,
+        "recallCi95": [
+          0.7574992425007574,
+          1
+        ],
+        "n": 18
+      },
+      "cohen_kappa_judge_vs_gold": 1,
+      "test_retest_flip_rate": 0
+    },
+    "per_dimension": {
+      "matched_to_blocker": {
+        "held_out": {
+          "matrix": {
+            "tp": 4,
+            "fp": 0,
+            "tn": 14,
+            "fn": 0
+          },
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "tpr": 1,
+          "tnr": 1,
+          "recallCi95": [
+            0.5100999795960008,
+            1
+          ],
+          "n": 18
+        },
+        "tune": {
+          "matrix": {
+            "tp": 4,
+            "fp": 0,
+            "tn": 14,
+            "fn": 0
+          },
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "tpr": 1,
+          "tnr": 1,
+          "recallCi95": [
+            0.5100999795960008,
+            1
+          ],
+          "n": 18
+        }
+      },
+      "engagement_appropriate": {
+        "held_out": {
+          "matrix": {
+            "tp": 4,
+            "fp": 4,
+            "tn": 10,
+            "fn": 0
+          },
+          "precision": 0.5,
+          "recall": 1,
+          "f1": 0.6666666666666666,
+          "tpr": 1,
+          "tnr": 0.7142857142857143,
+          "recallCi95": [
+            0.5100999795960008,
+            1
+          ],
+          "n": 18
+        },
+        "tune": {
+          "matrix": {
+            "tp": 4,
+            "fp": 4,
+            "tn": 10,
+            "fn": 0
+          },
+          "precision": 0.5,
+          "recall": 1,
+          "f1": 0.6666666666666666,
+          "tpr": 1,
+          "tnr": 0.7142857142857143,
+          "recallCi95": [
+            0.5100999795960008,
+            1
+          ],
+          "n": 18
+        }
+      },
+      "no_over_promise": {
+        "held_out": {
+          "matrix": {
+            "tp": 4,
+            "fp": 0,
+            "tn": 14,
+            "fn": 0
+          },
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "tpr": 1,
+          "tnr": 1,
+          "recallCi95": [
+            0.5100999795960008,
+            1
+          ],
+          "n": 18
+        },
+        "tune": {
+          "matrix": {
+            "tp": 4,
+            "fp": 0,
+            "tn": 14,
+            "fn": 0
+          },
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "tpr": 1,
+          "tnr": 1,
+          "recallCi95": [
+            0.5100999795960008,
+            1
+          ],
+          "n": 18
+        }
+      }
+    }
+  },
+  "items": [
+    {
+      "id": "D1-verif-1",
+      "split": "tune",
+      "failureMode": "generic_not_matched",
+      "dimension": "matched_to_blocker",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": true,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": false,
+          "rationale": "The draft never mentions the specific blocker (business/identity verification) and instead gives a generic \"complete your setup\" prompt."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "For an actively‑stuck merchant, the outreach should nudge the exact blocked step, but the message is generic and does not target the verification step."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The text contains no outcome guarantees, typicality claims, or fabricated urgency."
+        }
+      ]
+    },
+    {
+      "id": "D1-menu-1",
+      "split": "tune",
+      "failureMode": "generic_not_matched",
+      "dimension": "matched_to_blocker",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": true,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": false,
+          "rationale": "The draft never mentions the specific blocker (menu upload needed) and instead gives a generic 'finish your onboarding' message."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "For an actively_stuck merchant, the outreach should nudge the exact pending step, but the draft provides only a vague encouragement."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome or earnings claims, only a generic prompt, so it does not over‑promise."
+        }
+      ]
+    },
+    {
+      "id": "D1-photos-1",
+      "split": "tune",
+      "failureMode": "generic_not_matched",
+      "dimension": "matched_to_blocker",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": true,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": false,
+          "rationale": "The draft only says the account setup is incomplete and does not mention the specific 'Menu photos' blocker, violating the requirement to name the concrete blocker and fix."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "For an actively_stuck merchant, the outreach should give a precise, targeted nudge for the known step, but the draft provides a generic reminder without addressing the specific stuck step."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome or earnings claims, urgency, or typicality statements, thus it does not over‑promise."
+        }
+      ]
+    },
+    {
+      "id": "D1-hours-1",
+      "split": "tune",
+      "failureMode": "generic_not_matched",
+      "dimension": "matched_to_blocker",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": true,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": false,
+          "rationale": "The draft never mentions the specific blocker (missing business hours) or the required fix, so it is not matched to the merchant's actual blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "For an actively_stuck merchant, the outreach should give a precise, blocker‑specific nudge, but the draft offers only a generic reminder, which is not appropriate for this engagement state."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome guarantees, typicality claims, or fabricated urgency, thus it does not over‑promise."
+        }
+      ]
+    },
+    {
+      "id": "D1-bank-1",
+      "split": "test",
+      "failureMode": "generic_not_matched",
+      "dimension": "matched_to_blocker",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": true,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": false,
+          "rationale": "The draft mentions completing the profile, but the merchant's blocker is bank verification, which is not referenced."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "For an actively_stuck merchant, the outreach should target the specific blocked step; the generic prompt to complete the profile does not fit the engagement state."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no claims about outcomes, earnings, or typical results, so it does not over‑promise."
+        }
+      ]
+    },
+    {
+      "id": "D1-verif-2",
+      "split": "test",
+      "failureMode": "generic_not_matched",
+      "dimension": "matched_to_blocker",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": true,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": false,
+          "rationale": "The draft does not mention the specific blocker (business/identity verification) or the concrete fix, providing only a generic reminder."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "For an actively_stuck merchant, the outreach should nudge the exact verification step, but the draft offers a vague, non‑specific prompt."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no claims about outcomes, earnings, or typical results, so it does not over‑promise."
+        }
+      ]
+    },
+    {
+      "id": "D1-photos-2",
+      "split": "test",
+      "failureMode": "generic_not_matched",
+      "dimension": "matched_to_blocker",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": true,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": false,
+          "rationale": "The draft never mentions the specific 'Menu photos' blocker or the required action to add photos, violating the requirement to match the merchant's actual blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "For an actively_stuck merchant, the outreach should provide a precise, blocker‑specific nudge; the generic reminder to \"finish setting up your account\" does not meet this criterion."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome claims, guarantees, or implied typicality, so it complies with the no‑over‑promise rule."
+        }
+      ]
+    },
+    {
+      "id": "D1-hours-2",
+      "split": "test",
+      "failureMode": "generic_not_matched",
+      "dimension": "matched_to_blocker",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": true,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": false,
+          "rationale": "The draft does not name the specific blocker (missing business hours) or the concrete fix, offering only a generic reminder of \"a few items left\"."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "For an actively_stuck merchant, the outreach should provide a precise nudge about the exact step (setting business hours), but the draft remains vague and non‑targeted."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome claims, guarantees, or implied typicality statements."
+        }
+      ]
+    },
+    {
+      "id": "D2-ghost-menu-1",
+      "split": "tune",
+      "failureMode": "wrong_play_for_state",
+      "dimension": "engagement_appropriate",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references uploading the menu, which directly addresses the merchant's known blocker 'menu_upload_needed'."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "The merchant is in a ghosted state, but the draft only nudges the next step without first re‑establishing value, which is required for disengaged merchants."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome guarantees, typicality claims, or unsubstantiated promises."
+        }
+      ]
+    },
+    {
+      "id": "D2-ghost-verif-1",
+      "split": "tune",
+      "failureMode": "wrong_play_for_state",
+      "dimension": "engagement_appropriate",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly asks the merchant to verify business details, which directly addresses the known blocker 'business_verification_needed'."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "The merchant is in a ghosted state, but the draft only nudges the verification step without first re‑establishing value, which is required for disengaged merchants."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome claims, guarantees, or typicality statements, so it does not over‑promise."
+        }
+      ]
+    },
+    {
+      "id": "D2-dorm-photos-1",
+      "split": "tune",
+      "failureMode": "wrong_play_for_state",
+      "dimension": "engagement_appropriate",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references adding photos, which directly addresses the merchant's 'photos_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "The merchant is dormant, yet the message only nudges the step without first re‑establishing value, violating the rule for dormant engagement."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The text makes no outcome or earnings claims, merely instructs the merchant to add photos."
+        }
+      ]
+    },
+    {
+      "id": "D2-dorm-hours-1",
+      "split": "tune",
+      "failureMode": "wrong_play_for_state",
+      "dimension": "engagement_appropriate",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references setting business hours, which is the exact blocker identified for the merchant."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "The merchant is dormant, yet the message only nudges the next step without first re‑establishing value, violating the rule for dormant engagement."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message makes no outcome or earnings claims and simply instructs the merchant to set hours."
+        }
+      ]
+    },
+    {
+      "id": "D2-dorm-bank-1",
+      "split": "test",
+      "failureMode": "wrong_play_for_state",
+      "dimension": "engagement_appropriate",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references bank verification, which is the merchant's identified blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "The merchant is dormant, yet the message only nudges the step without re‑establishing value, violating the requirement to first re‑prove value for disengaged merchants."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome guarantees or typicality claims, only a factual instruction."
+        }
+      ]
+    },
+    {
+      "id": "D2-ghost-menu-2",
+      "split": "test",
+      "failureMode": "wrong_play_for_state",
+      "dimension": "engagement_appropriate",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references the menu upload blocker and asks the merchant to add the menu, directly addressing the known issue."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "The merchant is in a ghosted state, which requires re‑proving value before a step nudge; the draft only gives a bare step reminder without any value proposition."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome guarantees, typicality claims, or unsubstantiated promises."
+        }
+      ]
+    },
+    {
+      "id": "D2-ghost-verif-2",
+      "split": "test",
+      "failureMode": "wrong_play_for_state",
+      "dimension": "engagement_appropriate",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly asks the merchant to confirm business information, directly addressing the 'business verification needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "The merchant is in a ghosted state, but the message only nudges the verification step without first re‑establishing value, which is required for disengaged merchants."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The email contains no outcome or earnings claims, urgency, or typicality statements, thus it does not over‑promise."
+        }
+      ]
+    },
+    {
+      "id": "D2-dorm-photos-2",
+      "split": "test",
+      "failureMode": "wrong_play_for_state",
+      "dimension": "engagement_appropriate",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": true,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references adding menu photos, which directly addresses the merchant's 'photos_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": false,
+          "rationale": "The merchant is dormant, yet the message only nudges the step without first re‑proving value, which is required for a dormant engagement state."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The draft contains no outcome or earnings claims, only a factual instruction to add photos."
+        }
+      ]
+    },
+    {
+      "id": "D3-photos-1",
+      "split": "tune",
+      "failureMode": "implied_over_promise",
+      "dimension": "no_over_promise",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": true
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references adding photos, which directly addresses the merchant's 'photos_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a direct step‑nudge to add photos is the correct engagement play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": false,
+          "rationale": "The phrase 'Stores like yours quickly become neighborhood favorites' makes an unsubstantiated typicality claim, violating the no‑over‑promise rule."
+        }
+      ]
+    },
+    {
+      "id": "D3-menu-1",
+      "split": "tune",
+      "failureMode": "implied_over_promise",
+      "dimension": "no_over_promise",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": true
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references uploading the menu, which directly addresses the merchant's 'menu_upload_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a direct nudge to complete the specific step is the correct engagement play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": false,
+          "rationale": "The phrase \"Restaurants like you really thrive once they're listed\" makes an unsubstantiated typicality claim, violating the no over‑promise rule."
+        }
+      ]
+    },
+    {
+      "id": "D3-bank-1",
+      "split": "tune",
+      "failureMode": "implied_over_promise",
+      "dimension": "no_over_promise",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": true
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references bank verification, which directly addresses the merchant's 'bank_verification_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to verify the bank is the correct play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": false,
+          "rationale": "The phrase \"watch your orders roll in\" implies a guaranteed outcome without evidence, constituting an over‑promise."
+        }
+      ]
+    },
+    {
+      "id": "D3-hours-1",
+      "split": "tune",
+      "failureMode": "implied_over_promise",
+      "dimension": "no_over_promise",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": true
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references setting business hours, which is the merchant's identified blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a direct nudge to complete the specific step is the correct engagement play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": false,
+          "rationale": "The phrase \"places like yours take off fast\" implies a typical, guaranteed success outcome without evidence, violating the no‑over‑promise rule."
+        }
+      ]
+    },
+    {
+      "id": "D3-verif-1",
+      "split": "test",
+      "failureMode": "implied_over_promise",
+      "dimension": "no_over_promise",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": true
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references verifying business details, which directly addresses the 'business_verification_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to verify the business is appropriate."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": false,
+          "rationale": "The phrase \"Businesses like yours become local favorites here\" makes an unsubstantiated typicality claim, violating the no‑over‑promise rule."
+        }
+      ]
+    },
+    {
+      "id": "D3-photos-2",
+      "split": "test",
+      "failureMode": "implied_over_promise",
+      "dimension": "no_over_promise",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": true
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references adding photos, which directly addresses the merchant's 'photos_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to add photos is the correct play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": false,
+          "rationale": "The phrase \"you'll become a neighborhood favorite in no time\" makes an unsubstantiated guarantee about outcomes, violating the no‑over‑promise rule."
+        }
+      ]
+    },
+    {
+      "id": "D3-menu-2",
+      "split": "test",
+      "failureMode": "implied_over_promise",
+      "dimension": "no_over_promise",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": true
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references uploading the menu, which directly addresses the merchant's 'menu_upload_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to upload the menu is the correct engagement play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": false,
+          "rationale": "The claim that \"stores like yours double their visibility\" is an unsubstantiated typicality statement, violating the no‑over‑promise rule."
+        }
+      ]
+    },
+    {
+      "id": "D3-hours-2",
+      "split": "test",
+      "failureMode": "implied_over_promise",
+      "dimension": "no_over_promise",
+      "source": "planted",
+      "actualDefective": true,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        true,
+        true,
+        true
+      ],
+      "predicted": true,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": true
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references setting business hours, which directly addresses the merchant's known blocker of 'business_hours_needed'."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a focused nudge to complete the specific pending step (setting hours) is the correct engagement play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": false,
+          "rationale": "The phrase \"thrive in your neighborhood from day one\" promises a successful outcome without evidence, constituting an over‑promise."
+        }
+      ]
+    },
+    {
+      "id": "C-at-photos",
+      "split": "tune",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references adding photos, which directly addresses the merchant's 'photos_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to add photos is the correct play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome guarantees or typicality claims, only a factual request for photos and an offer of help."
+        }
+      ]
+    },
+    {
+      "id": "C-at-menu",
+      "split": "tune",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references uploading the menu, which directly addresses the merchant's 'menu_upload_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to upload the menu is the correct play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message makes no outcome or earnings claims, only requests the next step and offers assistance."
+        }
+      ]
+    },
+    {
+      "id": "C-at-verif",
+      "split": "test",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references the known blocker—business verification—by telling the merchant their next step is to verify business information."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a direct nudge to complete the specific verification step is the correct play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome guarantees, typicality claims, or unsubstantiated promises."
+        }
+      ]
+    },
+    {
+      "id": "C-at-bank",
+      "split": "test",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references verifying bank information, which directly addresses the merchant's known blocker of 'bank_verification_needed'."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to verify the bank details is the correct play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome guarantees, typicality claims, or fabricated urgency; it simply requests the required action."
+        }
+      ]
+    },
+    {
+      "id": "C-reengage-ghost-menu",
+      "split": "tune",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references uploading the menu, which directly addresses the merchant's 'menu_upload_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For a ghosted merchant, the message first re‑states the value of being listed before nudging the next step, matching the required re‑prove‑value approach."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The text makes no unsubstantiated outcome or typicality claims; it only suggests a benefit without guaranteeing results."
+        }
+      ]
+    },
+    {
+      "id": "C-reengage-dorm-hours",
+      "split": "test",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references the needed action—setting business hours—which directly addresses the merchant's 'business_hours_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For a dormant merchant, the message first re‑states the value of going live before mentioning the step, aligning with the required re‑prove‑value approach."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The text makes no unsubstantiated earnings, performance, or typicality claims; it only notes that going live is worthwhile."
+        }
+      ]
+    },
+    {
+      "id": "C-reengage-ghost-verif",
+      "split": "tune",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references verifying business details, which directly addresses the 'business_verification_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For a ghosted merchant, the message first re‑states the value of completing setup before prompting the verification step, matching the required re‑engagement approach."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The text does not make any guaranteed or typicality claims about outcomes; it only mentions that finishing setup is \"worth it\" without overstating results."
+        }
+      ]
+    },
+    {
+      "id": "C-reengage-dorm-photos",
+      "split": "test",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references adding photos, which directly addresses the merchant's 'photos_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For a dormant merchant, the message first reminds them of the value of going live before nudging the next step, matching the required re‑prove‑value approach."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The language is factual and does not make any guaranteed or typicality claims about outcomes."
+        }
+      ]
+    },
+    {
+      "id": "C-at-retail",
+      "split": "tune",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references adding photos, which directly addresses the merchant's 'photos_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to add photos is the correct play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome guarantees or typicality claims, only a factual request for photos and an offer of help."
+        }
+      ]
+    },
+    {
+      "id": "C-at-grocery",
+      "split": "test",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "mock-clean",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references setting business hours, which is the merchant's identified blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a direct nudge to complete the specific pending step is the correct engagement play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome guarantees, typicality claims, or unsubstantiated promises."
+        }
+      ]
+    },
+    {
+      "id": "C-live-marina",
+      "split": "tune",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "live-snapshot",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references adding photos, directly addressing the merchant's 'photos_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to add photos is the correct play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome or earnings claims, only a factual request to add photos."
+        }
+      ]
+    },
+    {
+      "id": "C-live-sunset",
+      "split": "test",
+      "failureMode": "clean",
+      "dimension": null,
+      "source": "live-snapshot",
+      "actualDefective": false,
+      "gatekeeperApproved": true,
+      "faithful": true,
+      "territory": true,
+      "reps": [
+        false,
+        false,
+        false
+      ],
+      "predicted": false,
+      "dimFail": {
+        "matched_to_blocker": false,
+        "engagement_appropriate": false,
+        "no_over_promise": false
+      },
+      "mode": "LIVE_JUDGE",
+      "dimensions": [
+        {
+          "dimension": "matched_to_blocker",
+          "pass": true,
+          "rationale": "The draft explicitly references setting business hours, which directly addresses the 'business_hours_needed' blocker."
+        },
+        {
+          "dimension": "engagement_appropriate",
+          "pass": true,
+          "rationale": "For an actively_stuck merchant, a precise step‑nudge to set hours is the correct play."
+        },
+        {
+          "dimension": "no_over_promise",
+          "pass": true,
+          "rationale": "The message contains no outcome or earnings claims, only a factual request to complete the next step."
+        }
+      ]
+    }
+  ]
+}
