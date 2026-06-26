@@ -1,6 +1,6 @@
 # Domain Judge — B1 Calibration Status
 
-**Status (2026-06-26): the OFFLINE machinery is DONE + green; the LIVE calibration run has NOT been run yet.** It is **owner-gated** on a free `GROQ_API_KEY` + a fresh Groq daily token window ($0). The pass/fail **bar is PRE-REGISTERED below, BEFORE any live number is read** (R-DCAL-7 / R-DHON-1) — so clearing it later is honest pre-registration, not goalpost-moving.
+**Status (2026-06-26): the LIVE calibration run RAN ($0, cross-family Groq `openai/gpt-oss-120b`) and the HELD-OUT (test) split CLEARED all seven pre-registered thresholds.** The result is **DIRECTIONAL** (held-out n=18; 36-item *synthetic* gold set) and the **"built + calibrated, metrics = X"** label still waits for **two** things (R-DHON-1/3): the **Codex cross-model gate** (seat-blocked → **dated obligation ≈3:27 PM 2026-06-26**, NOT waived) and the **~100 validation floor**. Until both clear, this is **"RAN + CLEARED (directional)", NOT "calibrated."** The pass/fail **bar was PRE-REGISTERED below BEFORE any live number was read** (R-DCAL-7), and the held-out split was committed in the gold set before the run — so clearing it is honest pre-registration, not goalpost-moving. The result is **eval-locked** (`evals/domain-calibration.lock.test.ts` asserts the frozen `lib/data/domain-calibration.snapshot.json` clears the bar; it makes NO live call — R-DHON-4).
 
 This is the **Effective**-axis analogue of the faithfulness judge's `docs/judge-calibration-status.md`.
 
@@ -28,6 +28,32 @@ Recall-favoring (a false flag just sends a fine draft to a human; a missed bad-p
 
 **Decision rule.** IF the held-out split clears ALL of the above → eval-lock (freeze `lib/data/domain-calibration.snapshot.json`; add an offline regression test asserting the FROZEN fixture, never a live re-run — R-DHON-4) + flip the docs from "designed rubric" → "built + calibrated, metrics = X" (R-DHON-3) + the Codex gate. ELSE → tune the prompt/threshold on the **tune** split + re-run; **never tune on the test split.**
 
+## The run + results (2026-06-26) — held-out CLEARED all seven (directional)
+
+Live cross-family judge: Groq `openai/gpt-oss-120b`, strict structured outputs, `reasoningEffort:"low"`, temp 0, **K=3 reps/item over the 36-item gold set**. **$0** (free tier). **36/36 real `LIVE_JUDGE` verdicts, 0 fallbacks.** Snapshot: `lib/data/domain-calibration.snapshot.json` (frozen; eval-locked by `evals/domain-calibration.lock.test.ts`).
+
+**Aggregate (territory subset, R-DCAL-1):**
+
+| Split | n | Recall | Precision | F1 | Matrix (tp/fp/tn/fn) |
+|---|---|---|---|---|---|
+| **Held-out (test) — THE bar** | 18 | **1.000** (CI95 0.76–1.0) | **1.000** | 1.000 | 12 / 0 / 6 / 0 |
+| Tune | 18 | 1.000 | 1.000 | 1.000 | 12 / 0 / 6 / 0 |
+| Overall | 36 | 1.000 | 1.000 | 1.000 | 24 / 0 / 12 / 0 |
+
+- Cohen's κ (judge vs gold, territory subset): **1.000**. Test-retest flip-rate (K=3): **0.000**.
+
+**Per-dimension held-out (test) recall (R-DCAL-2):**
+
+| Dimension | Recall | Precision | Note |
+|---|---|---|---|
+| matched_to_blocker | **1.000** (4/4) | 1.000 | clean |
+| engagement_appropriate | **1.000** (4/4) | **0.500** | precision dragged by cross-dim bleed — caveat 7 |
+| no_over_promise (§4.2) | **1.000** (4/4) | 1.000 | clean |
+
+**Verdict: the held-out split CLEARS all seven pre-registered thresholds** — recall 1.0 ≥ 0.80; precision 1.0 ≥ 0.70; per-dim recall 1.0 ≥ {0.75, 0.75, 0.50}; κ 1.0 ≥ 0.60; flip 0.0 ≤ 0.15.
+
+**No-answer-leakage verified (R-DARCH-2 — the make-or-break property).** The perfect-but-stable κ=1.0 / flip=0.0 signature was scrutinised (it is also what a tautology/wrapper would show): `domainSituation()` withholds `diagnose().play` / `.root_cause_hypothesis` (the answer); the live runner never passes the gold `dimension`/`failureMode`/label into the prompt; and the recorded rationales reason situation→draft *cold* (quoting the offending phrase) and **isolate the correct dimension** — e.g. on an engagement-defective ghosted draft the judge PASSES matched + over-promise and FAILS only engagement, which a label-fed wrapper could not do selectively. The engagement cross-dim bleed (caveat 7) is itself the fingerprint of independent reasoning, not leakage.
+
 ## Honest caveats (NOT buried)
 
 1. **All gold positives are SYNTHETIC/planted** (R-DCAL-4): the recorded live Flash drafts are matched + well-grounded, so organic domain-defects ≈ 0. Metrics are measured on synthetic domain-defects; docs say so. Directional until the ~100 validation floor (R-DHON-1).
@@ -36,8 +62,11 @@ Recall-favoring (a false flag just sends a fine draft to a human; a missed bad-p
 4. **Researched, not credentialed** (R-DHON-2 / AM-7): the rubric is researched + source-cited (the B0 KB) + owner judgment, never a marketplace-insider's expertise.
 5. **Small held-out N** (4 test positives/dimension): per-dimension recall is granular (0/.25/.5/.75/1.0). The ~100 floor is the later validation; B1's numbers are directional.
 6. **Difficulty / realism gap — where the directional number is WEAKEST.** The positives are hand-authored to be *cleanly* defective ("Complete your setup!"); a real Gemini drafter rarely emits something that obvious, so live recall on these synthetic positives may **overstate** recall on subtle real-world defects. And in production most drafts are *good*, so the judge's **precision on realistic clean drafts is the production-critical number** — yet the gold set has only **2 real-supply clean negatives** (the rest are deterministic mock-clean). Growing real-supply negatives + subtler positives is a priority for the ~100 floor.
+7. **engagement_appropriate per-dim PRECISION = 0.5 (a measured result, not a flaw hidden).** The judge flags the generic `matched_to_blocker` (D1) drafts as ALSO engagement-inappropriate (a generic draft fits no engagement state well — a reasoned, debatable stance, NOT answer-leakage). This drags engagement per-dim precision to 0.5 but does NOT dent aggregate precision (those drafts are true positives at the draft level). The pre-registered bar carries no per-dim precision floor; the question of whether `engagement_appropriate` should fire on generic drafts is carried explicitly to the **B2 §4.2 / dimension-redundancy decision** (Forward-decision section below). The eval-lock asserts this precision is `< 1` so the nuance stays visible, never silently blessed.
 
-## How to run (owner-gated — fresh Groq daily window only)
+## How it was run (2026-06-26) — re-run command (fresh Groq daily window only)
+
+It was run once cleanly on 2026-06-26 (a one-call smoke first, to protect the daily budget against a strict-output/fallback failure, then the full ~100K-token run). To reproduce on a fresh window:
 
 ```
 # 1) put a free GROQ_API_KEY in the gitignored .env (editor, never chat)
@@ -51,8 +80,11 @@ Do not run a heavy Groq job on another project concurrently (the 200K/day window
 
 ## Remaining B1 work after the run
 
-- IF the bar clears → eval-lock + the Codex cross-model gate on the calibration honesty → flip the docs. THEN **B2** (wire the KB into the agents + the domain judge into the ship gate).
-- IF not → tune on the tune split + re-run.
+The bar cleared, so:
+- **DONE:** eval-lock (`evals/domain-calibration.lock.test.ts`, committed `1fcb492`); `verify` green (243 + 4 skipped); `acceptance-gate` engineering = SHIP (leak/non-vacuity/eval-lock/metric-math all cleared independently) with a doc-coherence BLOCK that this reconciliation closes.
+- **PENDING (the only open gate):** the **Codex cross-model gate** on the calibration honesty — **seat-blocked (dated obligation ≈3:27 PM 2026-06-26), NOT waived** (R-DHON-3). Re-run `~/claude-os/bin/codex-guarded review --base 07e9a55` on a fresh seat; record the verdict in `docs/reviews/`; reconcile primary-model-final.
+- **AFTER Codex APPROVEs:** flip "RAN + CLEARED (directional)" → "built + calibrated, metrics = X" (R-DHON-3), then **B2** (wire the KB into the agents + the domain judge into the ship gate; settle the §4.2 dimension-redundancy decision below).
+- The ~100 validation floor (R-DHON-1) keeps the number **directional** regardless.
 
 ## Forward decision for B2 (carry explicitly — do not silently drop)
 

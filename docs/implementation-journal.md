@@ -30,6 +30,24 @@ Newest entries on top.
 
 ---
 
+## 2026-06-26 Track B1d — LIVE domain-judge calibration: RAN + CLEARED (directional); acceptance-gate BLOCK→reconciled
+
+- What changed: Ran the live cross-family Groq `gpt-oss-120b` domain judge over the 36-item synthetic gold set (K=3, temp 0, $0, 36/36 LIVE_JUDGE, 0 fallbacks). Held-out recall/precision/F1 1.00 (CI95 [0.76,1.00], n=18), per-dim recall 1.00 each, κ 1.00, flip 0.00 — clears all seven pre-registered thresholds. Eval-locked (`evals/domain-calibration.lock.test.ts`, R-DHON-4) + date-stamped the frozen snapshot. Commit `1fcb492`.
+- Why it changed: B1d is the live half of the calibration; the bar was pre-registered offline (B1c). Owner: "Run B1d now."
+- Challenge or failure that appeared: (1) one-shot/day budget — Groq free tier ~200K tok/day, the run needs ~100K, and the strict-output→fallback failure mode BILLS while failing (P3 burned a day's budget this way). (2) The result was PERFECT (κ=1.0, flip=0.0) — also the exact signature of an R-DARCH-2 tautology/leak. (3) The acceptance-gate BLOCKed: the eval-lock result was committed before the claiming docs were flipped → the repo momentarily told two contradictory stories (RULES §1).
+- Why it happened: (1) Groq daily budget is hard + shared; (2) perfect scores on a small synthetic set are inherently suspect and must be RULED leak-free, not trusted; (3) I sliced the commit (eval-lock first, docs next) and the gate ran between slices.
+- How it was diagnosed: (1) advisor recommended a 1-call smoke before the full run; (2) advisor flagged κ=1.0+flip=0.0 as the leak signature → read `effective-rubric.ts` (`domainSituation()` withholds `.play`) + the recorded rationales (they isolate the right dimension; the engagement cross-dim bleed is the fingerprint of real reasoning) → leak ruled out; (3) the acceptance-gate read the committed repo and caught the status-doc contradiction.
+- Options considered: (1) run blind [rejected — budget risk] vs smoke-first [chosen]; (3) prepend-new-block vs flip-claims-in-place [flipped the contradictory claims in place + prepended PROJECT_STATE per its convention].
+- Final fix: the smoke protected the budget (the full run then ran clean); leak ruled out by reading source + rationales BEFORE eval-locking; the doc contradiction reconciled across status + state docs to one story (template: `docs/judge-calibration-status.md`).
+- How it was verified: `npm run verify` green (243 + 4 skipped); the eval-lock test passes against the frozen snapshot; acceptance-gate re-gate requested on the reconciled docs.
+- Prevention step for the future: flip the claiming docs in the SAME commit as a ship-gating result (don't slice result-then-docs); for any perfect calibration, run the leak-check (read the situation payload + the rationales) before eval-locking; smoke ONE live call before any metered batch.
+- Other decisions: engagement per-dim precision 0.5 (cross-dim bleed on generic drafts) carried to the B2 §4.2 / dimension-redundancy decision; "RAN + CLEARED (directional)", NOT "calibrated" until Codex + the ~100 floor (R-DHON-3).
+- Files changed: `lib/data/domain-calibration.snapshot.json`, `evals/domain-calibration.lock.test.ts` (`1fcb492`); `docs/domain-calibration-status.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/task-log.md`, `docs/reviews/gate-2026-06-26-b1d-live.md` (this commit).
+- Reviewer notes (Codex / human): acceptance-gate = engineering SHIP + doc-coherence BLOCK→reconciled. Codex cross-model gate SEAT-BLOCKED (usage limit, ~3:27 PM) → dated obligation (`--base 07e9a55` covers the full B1 diff).
+- Human decision: pending — surface results + the Codex dated obligation; flip "directional"→"calibrated" only after Codex APPROVEs.
+
+---
+
 ## 2026-06-26 Track B1 — domain-quality "Effective"-axis judge (OFFLINE MACHINERY)
 
 - What changed: Built the Effective-axis analogue of the P3 faithfulness judge — a KB-cited rubric (`lib/domain/effective-rubric.ts`), a per-dimension mock+live Groq judge (`lib/agents/domain-judge.ts`), a 24-positive/12-negative gold set (`evals/gold/domain-gold.ts`), a harness (`evals/gold/domain-harness.ts`), an offline calibration test (`evals/domain-calibration.test.ts`), a key-gated live runner (`evals/domain-calibration.live.test.ts`), the spec (`docs/spec-domain-judge.md`), and the pre-registered bar (`docs/domain-calibration-status.md`). 5 committed slices `db72461`→`e201eee`.

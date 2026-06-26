@@ -10,7 +10,8 @@ import { DOMAIN_DIMENSIONS, type DomainDimension } from "@/lib/domain/effective-
  * It makes NO live call — the live runner is evals/domain-calibration.live.test.ts (owner-gated). This
  * is the guard that stops the domain judge's quality from silently drifting below the shipped bar.
  *
- * FROZEN SHIPPED RESULT (2026-06-26 · Groq gpt-oss-120b · K=3 · temp 0 · $0 · 36/36 LIVE_JUDGE · 0 fallbacks):
+ * FROZEN CALIBRATION RESULT — cleared the pre-registered bar; "calibrated" label pending the Codex gate
+ * (2026-06-26 · Groq gpt-oss-120b · K=3 · temp 0 · $0 · 36/36 LIVE_JUDGE · 0 fallbacks):
  *   held-out (test, n=18: 12 pos / 6 neg): recall 1.00 · precision 1.00 · F1 1.00 · CI95 [0.76, 1.00]
  *   per-dim held-out recall: matched 1.00 · engagement 1.00 · over_promise 1.00 ; κ 1.00 ; flip 0.00
  *   draft-level confusion: TP 24 / FP 0 / TN 12 / FN 0

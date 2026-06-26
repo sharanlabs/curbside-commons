@@ -1,5 +1,19 @@
 # Task Log
 
+## 2026-06-26 (Track B1d — LIVE domain-judge calibration: RAN + CLEARED the pre-registered bar; eval-locked; acceptance-gate engineering-SHIP)
+
+**Process:** FULL · high-risk (AI behavior, ship-gating calibration honesty) · Effort MAX (auto-routed). Advisor before the run (budget protection + decision-rule reading) and after (the κ=1.0 leak scrutiny). Owner: "Run B1d now."
+
+**Ran:** the live cross-family Groq `openai/gpt-oss-120b` domain judge over the 36-item synthetic gold set (K=3, temp 0, **$0**, 36/36 LIVE_JUDGE, 0 fallbacks; ~27 min). A **1-call smoke FIRST** (advisor) ruled out the strict-output→fallback-while-billing failure before the ~100K-token run — the one-shot/day budget was protected. **Held-out (test) recall/precision/F1 1.00 (CI95 [0.76,1.00], n=18), per-dim recall 1.00 each, κ 1.00, flip 0.00 → CLEARS all seven pre-registered thresholds** (`docs/domain-calibration-status.md`). No-leakage VERIFIED (R-DARCH-2) by reading the situation extractor + the recorded rationales (they isolate the right dimension; the engagement cross-dim precision 0.5 is a real-reasoning fingerprint, carried to B2).
+
+**Eval-lock (`1fcb492`):** `evals/domain-calibration.lock.test.ts` (R-DHON-4 frozen-fixture — asserts the committed snapshot clears the bar + real-run provenance; makes NO live call) + date-stamped `lib/data/domain-calibration.snapshot.json`.
+
+**Validation:** `npm run verify` green = **243 + 4 skipped** (the 4 live tests auto-skip offline → $0); `lib/core` + the differential oracle + the faithfulness gold UNTOUCHED.
+
+**Gates:** `acceptance-gate` = engineering **SHIP** (leak / non-vacuity / eval-lock / metric-math all independently cleared) with a doc-coherence **BLOCK** (the result was committed before the claiming docs were flipped → transient repo contradiction) → **RECONCILED** this commit (status + state docs flipped to one story; lesson: flip the claiming docs in the SAME commit as the result). Codex cross-model gate = **SEAT-BLOCKED** (usage limit, raw-surfaced, ~3:27 PM reset) → **dated obligation** (`--base 07e9a55` covers the full B1 diff, also discharging the B1-offline obligation). Record: `docs/reviews/gate-2026-06-26-b1d-live.md`.
+
+**Honesty held (R-DHON-1/3):** "RAN + CLEARED (DIRECTIONAL)", NOT "calibrated" — the calibrated label waits for the Codex gate + the ~100 floor; all gold positives SYNTHETIC (R-DCAL-4). Skills/tools: advisor (×3), acceptance-gate, codex-guarded (attempted). Commit per green slice (owner mode). No push (owner-gated).
+
 ## 2026-06-26 (Track B1 — domain-quality "Effective"-axis judge: OFFLINE MACHINERY; acceptance-gate SHIP)
 
 **Process:** FULL · high-risk (AI behavior, calibration) · Effort MAX (auto-routed). Advisor-shaped before authoring (5 constraints folded into the spec). Owner: "continue building as per our plan."
