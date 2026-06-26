@@ -30,6 +30,24 @@ Newest entries on top.
 
 ---
 
+## 2026-06-26 Track B1 — domain-quality "Effective"-axis judge (OFFLINE MACHINERY)
+
+- What changed: Built the Effective-axis analogue of the P3 faithfulness judge — a KB-cited rubric (`lib/domain/effective-rubric.ts`), a per-dimension mock+live Groq judge (`lib/agents/domain-judge.ts`), a 24-positive/12-negative gold set (`evals/gold/domain-gold.ts`), a harness (`evals/gold/domain-harness.ts`), an offline calibration test (`evals/domain-calibration.test.ts`), a key-gated live runner (`evals/domain-calibration.live.test.ts`), the spec (`docs/spec-domain-judge.md`), and the pre-registered bar (`docs/domain-calibration-status.md`). 5 committed slices `db72461`→`e201eee`.
+- Why it changed: B0 gave Faithful (claims true to data); the ship bar needs Effective (good domain practice — SC-2). Owner: "continue building as per our plan."
+- Challenge or failure that appeared: (1) the calibration-TAUTOLOGY trap — if the judge is fed `diagnose().play` (the correct play), calibration measures a string-compare, not a judge. (2) The R-DCAL-1 enforcement caught a mis-constructed gold item: a clean re-engagement negative said "once you're live", which the tense-aware state check read as a near-completion claim (state_mismatch) → gate-caught.
+- Why it happened: (1) the obvious-but-wrong design is to give the judge the answer; (2) hand-authored gold prose can trip deterministic guardrails in ways only a live run surfaces.
+- How it was diagnosed: the advisor (before authoring) named the tautology trap as make-or-break + the marginal-value enforcement as essential; the offline test's LIVE R-DCAL-1 partition (`domainTerritoryViolations()`) surfaced the bad gold item exactly as P2's R-CAL-1 did.
+- Options considered: (1a) feed the play and string-compare [rejected — wrapper, not a judge]; (1b) situation-in (engagement_state + blocker + facts) + the rubric standard, judge infers fit cold [chosen, R-DARCH-2]. (2) reword the negative to "going live" [chosen] vs drop it.
+- Final fix: `domainSituation()` surfaces facts only and deliberately omits `.play`/`.root_cause_hypothesis`; an R-DARCH-2 lock test asserts the prompt never leaks the tactic vocabulary. The gold item reworded; the harness enforces gate-pass + faithful per item, so any future bad item fails the build.
+- How it was verified: `npm run verify` green (236 + 4 skipped); the R-DCAL-1 enforcement + the situation-in lock are committed tests.
+- Prevention step for the future: the marginal-value enforcement (gate-pass + faithful, live per item) is now a standing pattern for any reverse-of-an-axis judge — it makes "is this a pure residual?" a build-time assertion, not a claim.
+- Other decisions: §4.2 (over-promise) isolated to implied/typicality phrasing that dodges the regex + reported per-dimension (its production redundancy vs the faithfulness judge is carried as an explicit B2 decision); platform-side escalation DEFERRED not faked (diagnosis.ts emits only merchant_side). All positives synthetic + labeled; the pre-registered bar pinned before any number.
+- Files changed: see the 5 commits + `docs/reviews/gate-2026-06-26-b1-offline.md`.
+- Reviewer notes (Codex / human): acceptance-gate = SHIP (offline machinery). Codex changed-files review SEAT-BLOCKED (usage limit) → dated obligation folded into the B1d Codex gate.
+- Human decision: live calibration + eval-lock + Codex gate are owner-gated (B1d); no "calibrated" claim ships before the bar clears (R-DHON-3).
+
+---
+
 ## 2026-06-25 MULTI-AGENT PIVOT — Phase 0: Codex gate → BLOCK → reconciled (governance only)
 
 - What changed: Executed Phase 0 of the owner-approved multi-agent pivot (no product code). Ran the mandatory Codex adversarial cross-check (BLOCK, 9 findings) + reconciled all 9; authored ADR-002; recorded the pivot + 3 decision-log reversals; amended the execution spec (§0 binding AM-1..AM-8 + new R-LOOP-1b/8b); synced state docs; launched a confirming Codex pass.

@@ -6,7 +6,7 @@ This is the **Effective**-axis analogue of the faithfulness judge's `docs/judge-
 
 ## What is built (offline, $0, committed)
 
-- **Rubric** (`lib/domain/effective-rubric.ts`) — the 3 calibrated dimensions (matched-to-blocker · engagement-appropriate · no-over-promise) as a KB-cited STANDARD; `domainSituation()` surfaces the situation WITHOUT leaking the answer (R-DARCH-2). `docs/spec-domain-judge.md` = the spec.
+- **Rubric** (`lib/domain/effective-rubric.ts`) — the 3 dimensions under calibration (matched-to-blocker · engagement-appropriate · no-over-promise) as a KB-cited STANDARD; `domainSituation()` surfaces the situation WITHOUT leaking the answer (R-DARCH-2). `docs/spec-domain-judge.md` = the spec.
 - **Judge** (`lib/agents/domain-judge.ts`) — per-dimension Zod verdict; deterministic mock (stub baseline, $0); live cross-family Groq `gpt-oss-120b` via DI, budget-guarded + fail-closed.
 - **Gold set** (`evals/gold/domain-gold.ts`) — 24 single-dimension synthetic positives (8 per dimension) + 12 clean negatives; every positive is a matched draft with only its body swapped, so it is gate-passing + faithful by construction (the labels are objective).
 - **Harness + offline test** (`evals/gold/domain-harness.ts`, `evals/domain-calibration.test.ts`) — reuses `lib/evals/judge-metrics.ts`; **R-DCAL-1 enforced LIVE** (every item run through the real `runGatekeeper` + the faithfulness mock — this already caught + fixed one mis-constructed gold item where "once you're live" tripped `state_mismatch`); per-dimension reporting; the mock is run ONLY as a labeled stub baseline, never gated.

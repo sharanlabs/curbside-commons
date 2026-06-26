@@ -19,7 +19,8 @@
 import type { Merchant } from "@/lib/core/types";
 import { diagnose, type EngagementState } from "@/lib/domain/diagnosis";
 
-/** The three CALIBRATED dimensions (B1). Platform-side escalation is documented + DEFERRED below. */
+/** The three dimensions UNDER calibration (B1) — calibration is owner-gated + not yet run. Platform-side
+ *  escalation is documented + DEFERRED below. */
 export type DomainDimension = "matched_to_blocker" | "engagement_appropriate" | "no_over_promise";
 
 export const DOMAIN_DIMENSIONS: readonly DomainDimension[] = [

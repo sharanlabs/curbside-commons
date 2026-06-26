@@ -1,5 +1,17 @@
 # Task Log
 
+## 2026-06-26 (Track B1 — domain-quality "Effective"-axis judge: OFFLINE MACHINERY; acceptance-gate SHIP)
+
+**Process:** FULL · high-risk (AI behavior, calibration) · Effort MAX (auto-routed). Advisor-shaped before authoring (5 constraints folded into the spec). Owner: "continue building as per our plan."
+
+**Built (5 committed slices, each `verify`-green):** `db72461` B1a (spec `docs/spec-domain-judge.md` + rubric `lib/domain/effective-rubric.ts`) · `4096ebe` B1b (`lib/agents/domain-judge.ts` + 11 tests) · `f71c5c9` B1c (gold `evals/gold/domain-gold.ts` + harness `evals/gold/domain-harness.ts` + offline cal `evals/domain-calibration.test.ts`, 8 tests) · `2fc1f08` B1d (live runner `evals/domain-calibration.live.test.ts` + status `docs/domain-calibration-status.md` with the pre-registered bar) · `e201eee` honesty refinements (advisor). The Effective analogue of the P3 faithfulness judge: KB-cited rubric (matched/engagement/over-promise from `knowledge/domain/merchant-activation-kb.md`), **situation-in not answer-in** judge (R-DARCH-2 — withholds `diagnose().play`), gold positives gate-passing + faithful by construction, **R-DCAL-1 enforced LIVE** in the harness (caught + fixed one mis-constructed gold item), per-dimension metrics, the bar pinned before any number.
+
+**Validation:** `npm run verify` green = 236 + 4 skipped (the live cal test auto-skips offline); `lib/core` + the differential oracle + the faithfulness gold UNTOUCHED.
+
+**Gates:** `acceptance-gate` = **SHIP** (offline machinery, framed as method-not-calibrated-judge). Codex changed-files review = **SEAT-BLOCKED** (usage limit, raw-surfaced, ~3:27 PM reset) → dated obligation folded into the B1d Codex gate. Durable record: `docs/reviews/gate-2026-06-26-b1-offline.md`.
+
+**Honesty held:** NO "calibrated" claim anywhere; the live Groq calibration run + eval-lock + Codex gate are owner-gated (B1d, R-DHON-3). State docs synced to "B1 offline machinery done", never "B1 done". Skills used: advisor (review), acceptance-gate. Commit per green slice (owner mode). No push (owner-gated).
+
 ## 2026-06-26 (Remove the auto-resume launcher — owner request; docs-only)
 
 **Process:** lightweight · low-risk · docs-only. Owner asked to "remove auto resume launcher."
