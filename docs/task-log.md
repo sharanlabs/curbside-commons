@@ -1,5 +1,13 @@
 # Task Log
 
+## 2026-06-26 (Remove the auto-resume launcher — owner request; docs-only)
+
+**Process:** lightweight · low-risk · docs-only. Owner asked to "remove auto resume launcher."
+
+**Finding (surfaced, do-no-harm inspection before removal):** the "owner-installable launchd auto-resume" described in the state docs (`~/claude-os/bin/activationops-autoresume.sh` + a launchd job + `.claude/AUTORESUME_PAUSE`) **was never actually installed.** Verified: `launchctl list` has no matching job; no plist in `~/Library/LaunchAgents` (or `/Library/Launch*`); no `activationops-autoresume*` script anywhere under `~`; no `AUTORESUME_PAUSE` file; claude-os records no such install. It existed only as "owner-installable" text in 3 docs.
+
+**Action:** scrubbed the auto-resume references from `HANDOFF.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md` (replaced with "build continuation is manual / owner-driven" + a removal note). No code, no launchd/system change (nothing was installed to unload). No decision-log entry (the mechanism was never load-bearing — never installed). Commit owner-gated (RULES §12).
+
 ## 2026-06-25 (MULTI-AGENT PIVOT — Phase 0: Codex gate → BLOCK → reconciled; ADR-002 + reversals + spec amendments)
 
 ### Professional Process Applied
