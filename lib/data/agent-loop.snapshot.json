@@ -1,0 +1,99 @@
+{
+  "_provenance": {
+    "recorded_at_note": "stamp the date at commit time (no wall-clock in tests)",
+    "drafter_provider": "groq",
+    "drafter_model": "openai/gpt-oss-120b",
+    "judge_provider": "groq",
+    "judge_model": "openai/gpt-oss-120b",
+    "held_out_n": 9,
+    "max_iterations": 3,
+    "cost_usd": 0,
+    "note": "LIVE A2 single-agent loop over the 9 held-out planted positives. Drafter AND judge are BOTH Groq gpt-oss-120b (same-family, R-LOOP-5): convergence + same-family detection, NOT a calibrated cross-family faithfulness metric. K is a recall-style floor recorded at the GO/NO-GO."
+  },
+  "self_corrected": 8,
+  "held_out_n": 9,
+  "K_floor": 7,
+  "items": [
+    {
+      "id": "P-timeline-2",
+      "failureMode": "fabricated_timeline",
+      "selfCorrected": true,
+      "iterations": 2,
+      "stopReason": "verified",
+      "finalAnyUnsupported": false,
+      "outreachStatus": "simulated_sent"
+    },
+    {
+      "id": "P-entity-2",
+      "failureMode": "fabricated_entity",
+      "selfCorrected": true,
+      "iterations": 2,
+      "stopReason": "verified",
+      "finalAnyUnsupported": false,
+      "outreachStatus": "simulated_sent"
+    },
+    {
+      "id": "P-capability-2",
+      "failureMode": "unsupported_capability",
+      "selfCorrected": true,
+      "iterations": 3,
+      "stopReason": "verified",
+      "finalAnyUnsupported": false,
+      "outreachStatus": "simulated_sent"
+    },
+    {
+      "id": "P-specific-2",
+      "failureMode": "invented_specific",
+      "selfCorrected": true,
+      "iterations": 2,
+      "stopReason": "verified",
+      "finalAnyUnsupported": false,
+      "outreachStatus": "simulated_sent"
+    },
+    {
+      "id": "P-capability-3",
+      "failureMode": "unsupported_capability",
+      "selfCorrected": true,
+      "iterations": 3,
+      "stopReason": "verified",
+      "finalAnyUnsupported": false,
+      "outreachStatus": "drafted"
+    },
+    {
+      "id": "P-timeline-4",
+      "failureMode": "fabricated_timeline",
+      "selfCorrected": true,
+      "iterations": 3,
+      "stopReason": "verified",
+      "finalAnyUnsupported": false,
+      "outreachStatus": "simulated_sent"
+    },
+    {
+      "id": "P-entity-3",
+      "failureMode": "fabricated_entity",
+      "selfCorrected": true,
+      "iterations": 2,
+      "stopReason": "verified",
+      "finalAnyUnsupported": false,
+      "outreachStatus": "simulated_sent"
+    },
+    {
+      "id": "P-capability-4",
+      "failureMode": "unsupported_capability",
+      "selfCorrected": true,
+      "iterations": 2,
+      "stopReason": "verified",
+      "finalAnyUnsupported": false,
+      "outreachStatus": "simulated_sent"
+    },
+    {
+      "id": "P-specific-4",
+      "failureMode": "invented_specific",
+      "selfCorrected": false,
+      "iterations": 3,
+      "stopReason": "max_iterations",
+      "finalAnyUnsupported": true,
+      "outreachStatus": "drafted"
+    }
+  ]
+}
