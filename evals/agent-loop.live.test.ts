@@ -51,6 +51,8 @@ describe.skipIf(!live)("LIVE R-LOOP-10 — A2 loop self-corrects the held-out pl
         id: string;
         failureMode: string;
         selfCorrected: boolean;
+        seedCatchLive: boolean;
+        finalVerifyMode: string | null;
         iterations: number;
         stopReason: string;
         finalAnyUnsupported: boolean | null;
@@ -69,22 +71,30 @@ describe.skipIf(!live)("LIVE R-LOOP-10 — A2 loop self-corrects the held-out pl
           },
         );
         // Self-correction: the loop CAUGHT the seed (it did not pass on iteration 0) AND converged.
-        // Self-correction requires a GENUINE LIVE loop (Codex A2 P2): (1) the seed was CAUGHT on
-        // iteration 0; (2) a real LIVE redraft ran (a redraft step with modelMode LIVE_AI — not a
-        // FAILED_TO_FALLBACK deterministic stub); and (3) the loop converged with the FINAL verifier
-        // being a real LIVE_JUDGE. A deterministic fallback stub must NOT count as self-correction.
-        const caughtSeed = result.trajectory.some(
-          (s) => s.phase === "verify" && s.iteration === 0 && s.verdictSummary.includes("verify=FAIL"),
+        // Self-correction requires a GENUINE LIVE loop on the RIGHT iterations (Codex A2 P2 + the
+        // confirming pass): (1) the seed caught by a REAL LIVE_JUDGE on iteration 0 — a
+        // FAILED_TO_FALLBACK "verify=FAIL" is the judge NOT running, not a catch; (2) EVERY verify a
+        // genuine LIVE_JUDGE (no fallback verify counted anywhere); (3) a real LIVE_AI redraft authored
+        // the fix; (4) a real LIVE_JUDGE final; and converged. No fallback work can count.
+        const liveSeedCatch = result.trajectory.some(
+          (s) =>
+            s.phase === "verify" &&
+            s.iteration === 0 &&
+            s.modelMode === "LIVE_JUDGE" &&
+            s.verdictSummary.includes("verify=FAIL"),
         );
-        const liveRedraft = result.trajectory.some(
-          (s) => s.phase === "redraft" && s.modelMode === "LIVE_AI",
-        );
+        const allVerifiesLive = result.trajectory
+          .filter((s) => s.phase === "verify")
+          .every((s) => s.modelMode === "LIVE_JUDGE");
+        const liveRedraft = result.trajectory.some((s) => s.phase === "redraft" && s.modelMode === "LIVE_AI");
         const liveFinalVerify = result.finalVerify.judge?.mode === "LIVE_JUDGE";
-        const selfCorrected = caughtSeed && result.converged && liveRedraft && liveFinalVerify;
+        const selfCorrected = liveSeedCatch && allVerifiesLive && liveRedraft && liveFinalVerify && result.converged;
         perItem.push({
           id: item.id,
           failureMode: item.failureMode,
           selfCorrected,
+          seedCatchLive: liveSeedCatch, // auditable: was iteration-0 a genuine live catch (not a fallback)?
+          finalVerifyMode: result.finalVerify.judge?.mode ?? null, // auditable: the final verifier's mode
           iterations: result.iterations,
           stopReason: result.stopReason,
           finalAnyUnsupported: result.finalVerify.judge?.verdict.any_unsupported ?? null,
