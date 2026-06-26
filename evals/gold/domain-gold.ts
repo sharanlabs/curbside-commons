@@ -18,6 +18,12 @@
  * recorded live drafts are matched + well-grounded → organic domain-defects ≈ 0; mined here only as
  * clean negatives). Metrics derived from this set are measured on SYNTHETIC domain-defects; docs say so.
  *
+ * PLATFORM NAME: the mock-constructed drafts address the merchant under `REFERENCE_PLATFORM_NAME`
+ * ("DoorDash", the differential-oracle reference name) while the 2 real-supply drafts say "Curbside
+ * Commons" (the product display name) — consistent with the faithfulness gold set, and irrelevant to
+ * the domain dimensions (the judge scores strategy-fit against the situation + rubric, not the platform
+ * name; `domainSituation` does not even include the merchant name).
+ *
  * OVER-PROMISE residual (R-DCAL-3): the §4.2 positives use IMPLIED / typicality / hype phrasing that
  * DODGES the deterministic guardrail (verified against `lib/core/guardrail.ts`: revenue claims need a
  * verb {increase|boost|double|triple|grow} NEAR a money word {sales|revenue|orders|income}; these dodge

@@ -35,6 +35,7 @@ Recall-favoring (a false flag just sends a fine draft to a human; a missed bad-p
 3. **Platform-side escalation is DEFERRED, not faked** (R-DCAL-3): `lib/domain/diagnosis.ts` emits only `merchant_side`; calibrating platform-side would require fabricating data the synthetic model does not carry. Documented rubric rule; revisit at B2 with a real `blocker_source` signal.
 4. **Researched, not credentialed** (R-DHON-2 / AM-7): the rubric is researched + source-cited (the B0 KB) + owner judgment, never a marketplace-insider's expertise.
 5. **Small held-out N** (4 test positives/dimension): per-dimension recall is granular (0/.25/.5/.75/1.0). The ~100 floor is the later validation; B1's numbers are directional.
+6. **Difficulty / realism gap — where the directional number is WEAKEST.** The positives are hand-authored to be *cleanly* defective ("Complete your setup!"); a real Gemini drafter rarely emits something that obvious, so live recall on these synthetic positives may **overstate** recall on subtle real-world defects. And in production most drafts are *good*, so the judge's **precision on realistic clean drafts is the production-critical number** — yet the gold set has only **2 real-supply clean negatives** (the rest are deterministic mock-clean). Growing real-supply negatives + subtler positives is a priority for the ~100 floor.
 
 ## How to run (owner-gated — fresh Groq daily window only)
 
@@ -52,3 +53,7 @@ Do not run a heavy Groq job on another project concurrently (the 200K/day window
 
 - IF the bar clears → eval-lock + the Codex cross-model gate on the calibration honesty → flip the docs. THEN **B2** (wire the KB into the agents + the domain judge into the ship gate).
 - IF not → tune on the tune split + re-run.
+
+## Forward decision for B2 (carry explicitly — do not silently drop)
+
+**§4.2 ordering / redundancy.** At runtime the faithfulness judge runs BEFORE the domain judge (R-DARCH-4 ordering: gatekeeper → faithfulness → domain). If the faithfulness judge already flags the implied-typicality drafts, the `no_over_promise` dimension is partly **redundant in production**. **B2 must DECIDE:** does `no_over_promise` stay a domain ship-gate dimension, or become documentation / a drafter-prompt rule (KB §4.2 fed into the A3 Drafter), given the ordering? The `matched_to_blocker` + `engagement_appropriate` dimensions are **unaffected** — they are invisible to both the gate and faithfulness, so they are the domain judge's load-bearing, non-redundant value regardless.
