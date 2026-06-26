@@ -6,8 +6,9 @@
  * and the R-DARCH-2 lock — the judge's runtime input (situation + prompt) must NOT leak the
  * pre-computed correct play (`diagnose().play`), or calibration is a string-compare wrapper.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { normalizeRow } from "@/lib/core/pipeline";
+import { domainJudgeLiveEnabled } from "@/lib/server/env-flags";
 import type { Merchant, MerchantInput } from "@/lib/core/types";
 import { mockDraft, type OutreachDraft } from "@/lib/agents/draft";
 import { engagementState } from "@/lib/domain/diagnosis";
@@ -131,6 +132,60 @@ describe("judgeDomain — live path (DI), recompute + fail-closed", () => {
     // The fallback still returns a usable (mock) verdict — never goes dark.
     expect(res.verdict.dimensions.length).toBe(3);
   });
+
+  // [Codex B1 P2-1] A schema-valid but PARTIAL verdict must NOT let an omitted failed dimension read as
+  // passing. The judge must fail closed to the mock (all three), never accept the subset.
+  it("falls back (INCOMPLETE_VERDICT) when the model OMITS a rubric dimension", async () => {
+    const generate = async () => ({
+      object: {
+        // engagement_appropriate omitted — for a ghosted merchant that is exactly the dimension at risk.
+        dimensions: [
+          { dimension: "matched_to_blocker", pass: true, rationale: "addresses the blocker" },
+          { dimension: "no_over_promise", pass: true, rationale: "no hype" },
+        ],
+        any_dimension_failed: false,
+      },
+      usage: { inputTokens: 100, outputTokens: 30 },
+    });
+    const res = await judgeDomain(mockDraft(ghosted), ghosted, { live: true, budget, generate });
+    expect(res.mode).toBe("FAILED_TO_FALLBACK");
+    expect(res.errorClass).toBe("INCOMPLETE_VERDICT");
+    expect(res.verdict.dimensions.length).toBe(3); // mock assesses all three
+  });
+
+  it("falls back (INCOMPLETE_VERDICT) when duplicate dimensions normalize down to < 3", async () => {
+    const generate = async () => ({
+      object: {
+        dimensions: [
+          { dimension: "matched_to_blocker", pass: true, rationale: "ok" },
+          { dimension: "matched_to_blocker", pass: false, rationale: "dup — first wins on normalize" },
+          { dimension: "no_over_promise", pass: true, rationale: "ok" },
+        ],
+        any_dimension_failed: false,
+      },
+      usage: { inputTokens: 100, outputTokens: 30 },
+    });
+    const res = await judgeDomain(mockDraft(activelyStuck), activelyStuck, { live: true, budget, generate });
+    expect(res.mode).toBe("FAILED_TO_FALLBACK");
+    expect(res.errorClass).toBe("INCOMPLETE_VERDICT");
+  });
+
+  it("accepts a complete 3-dimension verdict (the guard does not over-reject)", async () => {
+    const generate = async () => ({
+      object: {
+        dimensions: [
+          { dimension: "matched_to_blocker", pass: true, rationale: "ok" },
+          { dimension: "engagement_appropriate", pass: true, rationale: "ok" },
+          { dimension: "no_over_promise", pass: true, rationale: "ok" },
+        ],
+        any_dimension_failed: false,
+      },
+      usage: { inputTokens: 100, outputTokens: 30 },
+    });
+    const res = await judgeDomain(mockDraft(activelyStuck), activelyStuck, { live: true, budget, generate });
+    expect(res.mode).toBe("LIVE_JUDGE");
+    expect(res.verdict.domain_defective).toBe(false);
+  });
 });
 
 describe("R-DARCH-2 lock — situation-in, NOT answer-in", () => {
@@ -156,5 +211,54 @@ describe("R-DARCH-2 lock — situation-in, NOT answer-in", () => {
     for (const tactic of ["re_engagement", "ops_escalation", "self_serve_nudge", "high_touch"]) {
       expect(prompt).not.toContain(tactic);
     }
+  });
+});
+
+describe("domainJudgeLiveEnabled — reads the DOMAIN_JUDGE_* namespace, not the faithfulness JUDGE_* [Codex B1 P2-2]", () => {
+  const KEYS = ["ENABLE_LIVE_AI", "GROQ_API_KEY", "GEMINI_API_KEY", "JUDGE_PROVIDER", "DOMAIN_JUDGE_PROVIDER"] as const;
+  let saved: Record<string, string | undefined>;
+  beforeEach(() => {
+    saved = {};
+    for (const k of KEYS) saved[k] = process.env[k];
+  });
+  afterEach(() => {
+    for (const k of KEYS) {
+      if (saved[k] === undefined) delete process.env[k];
+      else process.env[k] = saved[k];
+    }
+  });
+
+  it("is off unless ENABLE_LIVE_AI is set (even with a provider + key)", () => {
+    delete process.env.ENABLE_LIVE_AI;
+    process.env.DOMAIN_JUDGE_PROVIDER = "groq";
+    process.env.GROQ_API_KEY = "x";
+    expect(domainJudgeLiveEnabled()).toBe(false);
+  });
+
+  it("the Gemini domain override is enabled by DOMAIN_JUDGE_PROVIDER + GEMINI_API_KEY (no Groq key) — the bug", () => {
+    process.env.ENABLE_LIVE_AI = "true";
+    delete process.env.GROQ_API_KEY;
+    delete process.env.JUDGE_PROVIDER;
+    process.env.DOMAIN_JUDGE_PROVIDER = "gemini";
+    process.env.GEMINI_API_KEY = "x";
+    // Before the fix this read JUDGE_PROVIDER (→ groq) and reported the domain override disabled.
+    expect(domainJudgeLiveEnabled()).toBe(true);
+  });
+
+  it("the faithfulness JUDGE_PROVIDER does NOT leak into the domain judge's gate", () => {
+    process.env.ENABLE_LIVE_AI = "true";
+    delete process.env.GROQ_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+    process.env.JUDGE_PROVIDER = "gemini"; // faithfulness namespace only
+    delete process.env.DOMAIN_JUDGE_PROVIDER; // defaults to groq → needs GROQ_API_KEY (absent)
+    expect(domainJudgeLiveEnabled()).toBe(false);
+  });
+
+  it("default provider (groq) is enabled by GROQ_API_KEY", () => {
+    process.env.ENABLE_LIVE_AI = "true";
+    delete process.env.DOMAIN_JUDGE_PROVIDER;
+    delete process.env.GEMINI_API_KEY;
+    process.env.GROQ_API_KEY = "x";
+    expect(domainJudgeLiveEnabled()).toBe(true);
   });
 });

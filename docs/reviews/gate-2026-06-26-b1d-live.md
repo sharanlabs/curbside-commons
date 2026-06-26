@@ -2,6 +2,8 @@
 
 **Date:** 2026-06-26 · **Scope:** the LIVE Groq `openai/gpt-oss-120b` domain-judge calibration run + eval-lock (commit `1fcb492`) · **Artifact framing:** a calibration result that **RAN + CLEARED the pre-registered bar (DIRECTIONAL)** — NOT yet "calibrated" (that label waits for the Codex gate, R-DHON-3, + the ~100 floor, R-DHON-1).
 
+> **UPDATE 2026-06-26 (later) — SUPERSEDED re: the Codex gate.** The "sole open gate / pending Codex / only then flip to calibrated" framing throughout this record (header + §3 + §4) is now historical: the Codex cross-model gate has RUN + reconciled (`docs/reviews/codex-2026-06-26-b1-domain-judge.md`) and the label is now **"calibrated — directional, pending the ~100 floor."** Below is the point-in-time pre-Codex record.
+
 ## 1. The run
 
 - Live cross-family judge: Groq `openai/gpt-oss-120b`, strict structured outputs, `reasoningEffort:"low"`, temp 0, **K=3 reps/item over the 36-item synthetic gold set**, **$0** (free tier), **36/36 real `LIVE_JUDGE`, 0 fallbacks**. ~27 min at 14s pacing. Budget-protected by a 1-call smoke first (advisor) — the strict-output→fallback-while-billing failure mode was ruled out before the ~100K-token run.
@@ -28,6 +30,8 @@ The five-gate panel ran on the B1d calibration. **Engineering cleared adversaria
 **Out-of-scope advisory (NOT a B1d item, surfaced for the owner):** the re-gate noticed the public landing (`app/page.tsx:458`) + several `mockups/*.html` say "The judge is calibrated …" — this is the **faithfulness** (semantic) judge, a *different* track, not the domain judge (which isn't wired into the app until B2). On full reading it is **defensible + conservative**: line 458 describes the *method* inside a "for technical reviewers" block, and the surrounding copy repeatedly states figures are "pending, not assumed" (lines 430/470/506). It is in fact slightly stale in the SAFE direction (that judge's P3 cleared its bar directionally, yet the copy still says "pending"). No honesty violation; an optional freshness pass for the owner once the faithfulness judge's P4 (eval-lock + Codex) is also closed.
 
 ## 4. Codex cross-model gate → SEAT-BLOCKED (dated obligation, NOT waived)
+
+> **UPDATE 2026-06-26 (later) — DISCHARGED.** The gate has since RUN on a fresh seat (gpt-5.5 @ xhigh, `--base 07e9a55`, full B1 diff) → **2 P2 code findings, 0 P0/P1, both fixed + reconciled primary-model-final + test-locked** (`docs/reviews/codex-2026-06-26-b1-domain-judge.md`). The "directional" → **"calibrated — directional, pending the ~100 floor"** flip followed. The seat-blocked text below is the point-in-time history.
 
 Attempted `~/claude-os/bin/codex-guarded review --base 07e9a55` (gpt-5.5 @ xhigh, the whole B1 diff) at ~18:33 UTC. Raw error, surfaced verbatim (owner doctrine: no retry/downgrade/switch — the seat is an owner action):
 

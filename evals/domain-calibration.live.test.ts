@@ -1,6 +1,6 @@
 import { writeFileSync } from "node:fs";
 import { describe, it, expect } from "vitest";
-import { judgeLiveEnabled } from "@/lib/server/env-flags";
+import { domainJudgeLiveEnabled } from "@/lib/server/env-flags";
 import {
   judgeDomain,
   dimensionPassMap,
@@ -21,7 +21,7 @@ import {
 /**
  * LIVE B1d CALIBRATION RUNNER — the cross-family Groq gpt-oss-120b DOMAIN judge over the gold set.
  *
- * Free tier ($0), GATED on judgeLiveEnabled() so a normal `npm test` auto-skips (vitest does NOT load
+ * Free tier ($0), GATED on domainJudgeLiveEnabled() so a normal `npm test` auto-skips (vitest does NOT load
  * .env, so the committed suite stays offline + spend-free). Run deliberately on a FRESH Groq daily
  * token window (~36 items × K reps; ~100K tokens at reasoningEffort:low — fits the 200K/day budget):
  *   node --env-file=.env node_modules/.bin/vitest run evals/domain-calibration.live.test.ts
@@ -33,7 +33,7 @@ import {
  *
  * The positive class is DOMAIN-DEFECTIVE. The R-DCAL-1 partition = gate-passing AND faithful (territory).
  */
-const live = judgeLiveEnabled();
+const live = domainJudgeLiveEnabled();
 const K = 3; // reps per item for the test-retest flip-rate (temp-0 is not bit-deterministic)
 const CALL_PACING_MS = 14_000; // pace under the Groq free-tier per-minute window; no retry (avoids the 429 cascade)
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));

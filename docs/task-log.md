@@ -1,5 +1,19 @@
 # Task Log
 
+## 2026-06-26 (Track B1 — Codex cross-model gate RAN + reconciled → domain judge "calibrated — directional"; 2 P2 fixes)
+
+**Process:** FULL · high-risk (ship-gating cross-model gate on a calibration-honesty claim; AI behavior) · Effort xhigh (auto-routed; Codex gpt-5.5 @ xhigh). Advisor before the gate (approach + the flip-label nuance) and before the flip (tie-break + record-softening + coherence). Owner: "run the Codex cross-model review … reconcile primary-model-final … then flip."
+
+**Ran:** the mandatory Codex cross-model gate — `~/claude-os/bin/codex-guarded review --base 07e9a55` (gpt-5.5 @ xhigh, CLI 0.136.0, session `019f0571`) over the full B1 diff `07e9a55..HEAD` (18 files, +3686/−1; `07e9a55` verified = parent of the first B1 commit `db72461`, so one base covers B1a→B1d + discharges the B1-offline obligation). Independently re-confirmed the pre-gate tree green (243+4) first.
+
+**Verdict → reconciliation (primary-model-final):** 2 P2 *code* findings, 0 P0/P1, no honesty/overclaim finding (a code-scoped review). Both ACCEPT→FIX + test-locked: (B1-1) live partial-verdict acceptance — a schema-valid verdict with <3 dimensions computed `domain_defective` from the subset, so an omitted failed dimension read as passing → now requires all 3, else fails closed to the mock (`INCOMPLETE_VERDICT`); (B1-2) liveness read the faithfulness `JUDGE_PROVIDER` not `DOMAIN_JUDGE_PROVIDER` → new `domainJudgeLiveEnabled()` in the env single-source-of-truth. Calibration result provably unchanged (ran via explicit `live:true` / default-groq). Record: `docs/reviews/codex-2026-06-26-b1-domain-judge.md`.
+
+**Flip (R-DHON-3 + R-DHON-1):** docs flipped coherently in ONE pass — "directional / pending Codex" → **"calibrated — directional, pending the ~100 floor"** across `docs/domain-calibration-status.md` (line-3 logic rewritten, not find/replaced), `evals/domain-calibration.lock.test.ts` (header), PROJECT_STATE / CURRENT_TASK / HANDOFF, + forward-pointers on the two prior gate records. The "calibrated" word is carried by the cleared bar + eval-lock + acceptance-gate + the R-DARCH-2 leak-check, NOT by Codex's silence (it audits code, not prose).
+
+**Validation:** `npm run verify` green = **250 + 4 skipped** (+7 lock tests: 3 partial-verdict, 4 env-routing). `lib/core` + the differential oracle + the gold labels + the frozen calibration snapshot UNTOUCHED.
+
+**Honesty / owner gate:** committed 2026-06-26 (owner GO via "continue"); introducing "calibrated" into the honesty-sensitive docs is a public-claim change — owner-approved. **Push remains owner-gated** (RULES §12); not pushed. Skills/tools: advisor (×3 this session), codex-guarded (the gate), acceptance-gate (prior, referenced). NEXT = B2 + A3.
+
 ## 2026-06-26 (Track B1d — LIVE domain-judge calibration: RAN + CLEARED the pre-registered bar; eval-locked; acceptance-gate engineering-SHIP)
 
 **Process:** FULL · high-risk (AI behavior, ship-gating calibration honesty) · Effort MAX (auto-routed). Advisor before the run (budget protection + decision-rule reading) and after (the κ=1.0 leak scrutiny). Owner: "Run B1d now."

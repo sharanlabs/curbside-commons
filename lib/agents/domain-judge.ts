@@ -22,7 +22,7 @@ import type { OutreachDraft } from "@/lib/agents/draft";
 import type { AgentRunUsage, BudgetContext } from "@/lib/agents/gemini";
 import { assertWithinBudget, BudgetExceededError, DEFAULT_BUDGET_CAP_USD } from "@/lib/agents/budget";
 import { costUsd } from "@/lib/agents/pricing";
-import { judgeLiveEnabled } from "@/lib/server/env-flags";
+import { domainJudgeLiveEnabled } from "@/lib/server/env-flags";
 import { diagnose } from "@/lib/domain/diagnosis";
 import {
   DOMAIN_DIMENSIONS,
@@ -342,7 +342,7 @@ function normalizeDimensions(raw: { dimension: string; pass: boolean; rationale:
 
 /**
  * Judge a draft's domain quality. Default = the deterministic mock ($0). The live path runs only when
- * `live` (default judgeLiveEnabled()) OR an injected `generate` is supplied (test/DI, no billing). A
+ * `live` (default domainJudgeLiveEnabled()) OR an injected `generate` is supplied (test/DI, no billing). A
  * live failure → FAILED_TO_FALLBACK with the mock verdict, honestly labeled. The cumulative budget
  * ledger is REQUIRED on the live path (fail closed) — even the free Groq judge threads it, so a switch
  * to the paid Gemini alt can never silently escape the $5 cap.
@@ -361,13 +361,14 @@ export async function judgeDomain(
 ): Promise<DomainJudgeResult> {
   const provider = resolvedDomainJudgeProvider();
   const modelId = resolvedDomainJudgeModel();
-  const live = opts.live ?? judgeLiveEnabled();
+  const live = opts.live ?? domainJudgeLiveEnabled();
 
   // Deterministic path (live disabled, no injected generate): the mock judge, $0.
   if (!live && !opts.generate) return mockDomainJudgeResult(draft, merchant);
 
-  // Provider boundary (defense-in-depth): a REAL (non-injected) live call REQUIRES judgeLiveEnabled().
-  if (!opts.generate && !judgeLiveEnabled()) return fallback(draft, merchant, "DOMAIN_JUDGE_LIVE_DISABLED");
+  // Provider boundary (defense-in-depth): a REAL (non-injected) live call REQUIRES the DOMAIN judge's
+  // own gate (domainJudgeLiveEnabled reads DOMAIN_JUDGE_PROVIDER, not the faithfulness JUDGE_PROVIDER).
+  if (!opts.generate && !domainJudgeLiveEnabled()) return fallback(draft, merchant, "DOMAIN_JUDGE_LIVE_DISABLED");
 
   // The cumulative ledger is required on the live path — no ledger ⇒ fail closed (no call).
   if (!opts.budget) return fallback(draft, merchant, "NO_BUDGET_LEDGER");
@@ -392,7 +393,14 @@ export async function judgeDomain(
     if (!parsed.success) return fallback(draft, merchant, "UNPARSEABLE_VERDICT", priced.cost, usage, provider, modelId);
 
     const dims = normalizeDimensions(parsed.data.dimensions);
-    if (dims.length === 0) return fallback(draft, merchant, "NO_DIMENSIONS", priced.cost, usage, provider, modelId);
+    // Require ALL rubric dimensions (recall-favoring fail-closed): a schema-valid but PARTIAL verdict —
+    // a missing dimension, or duplicates that normalize to < 3 — would compute domain_defective from only
+    // the returned subset, so an OMITTED failed dimension reads as "passing" and a domain-defective draft
+    // could clear the judge. Fall back to the deterministic mock (which always assesses all three) rather
+    // than accept an incomplete verdict. [Codex B1 cross-model review P2-1, 2026-06-26]
+    if (dims.length !== DOMAIN_DIMENSIONS.length) {
+      return fallback(draft, merchant, "INCOMPLETE_VERDICT", priced.cost, usage, provider, modelId);
+    }
     // Recompute the aggregate from the per-dimension booleans — never trust the model's own flag.
     const verdict: DomainVerdict = { dimensions: dims, domain_defective: recomputeDefective(dims) };
     return { verdict, mode: "LIVE_JUDGE", modelId, provider, costUsd: priced.cost, usage };

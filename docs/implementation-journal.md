@@ -30,6 +30,25 @@ Newest entries on top.
 
 ---
 
+## 2026-06-26 Track B1 — Codex cross-model gate RAN + reconciled → "calibrated — directional"; 2 P2 live-path fixes
+
+- What changed: Ran the mandatory Codex cross-model gate over the full B1 diff (`--base 07e9a55`, gpt-5.5 @ xhigh, session `019f0571`); reconciled its 2 P2 code findings (both fixed + test-locked); flipped the docs "directional / pending Codex" → "calibrated — directional, pending the ~100 floor."
+- Why it changed: B1d cleared the bar + eval-locked, but the mandatory Codex gate was the one open item (had been seat-blocked → dated obligation). The seat reset; R-DHON-3 binds the "calibrated" claim to the gate.
+- Challenge or failure that appeared: (1) Codex came back PURELY mechanical — 2 P2 code bugs, zero engagement with the n=18/synthetic honesty claim. (2) B1-1: the live judge accepted a schema-valid PARTIAL verdict (`DomainVerdictSchema` is `.min(1)`), computing `domain_defective` from the subset — an omitted FAILED dimension read as passing (a recall hole in a recall-favoring control). (3) B1-2: liveness read the faithfulness `JUDGE_PROVIDER`, not the domain judge's own `DOMAIN_JUDGE_PROVIDER` — the documented override was misrouted.
+- Why it happened: (1) `codex review` audits code, not prose — so it neither corroborates nor refutes the honesty framing (I initially over-read its silence as "corroborating"; advisor corrected it); (2) the dims guard only checked the zero-length case; (3) the domain judge reused the faithfulness env predicate instead of its own namespace.
+- How it was diagnosed: read the judge + env-flags + the live runner against each finding; confirmed both real on the merits; confirmed the calibration ran via explicit `live:true` / default-groq, so neither fix alters the frozen snapshot.
+- Options considered: (a) flip on the current evidence vs (b) a focused honesty-only Codex follow-up — advisor tie-break: SKIP (b) (a code-scoped pass on perfect-1.0 synthetic gold only re-surfaces documented caveats and lands on "directional"); keep the label hedged instead.
+- Final fix: B1-1 → require all 3 rubric dimensions after normalize, else fail closed to the deterministic mock (`INCOMPLETE_VERDICT`). B1-2 → new `domainJudgeLiveEnabled()` (reads `DOMAIN_JUDGE_PROVIDER`) in the env single-source-of-truth, used by the liveness default + the real-call boundary; the live runner's skip-gate aligned to it.
+- Why this fix: matches the file's existing fail-closed/fallback pattern + the env single-source-of-truth; minimal blast radius (the domain judge isn't app-wired until B2).
+- How it was implemented: `lib/server/env-flags.ts` (+`domainJudgeLiveEnabled`), `lib/agents/domain-judge.ts` (import + 2 liveness checks + the completeness guard + a stale comment), `evals/domain-calibration.live.test.ts` (skip-gate), `evals/domain-judge.test.ts` (+7 lock tests).
+- How it was verified: `npm run verify` green = **250 + 4 skipped** (was 243); the eval-lock + all calibration tests still green; `lib/core` / oracle / gold / frozen-snapshot UNTOUCHED.
+- Prevention step for the future: when reusing a sibling control's env predicate, give the new control its OWN namespaced predicate; when accepting a structured multi-part verdict, require completeness (fail closed), never compute from a partial subset. Carry the same fail-closed rule into B2 when the domain judge is wired into the agent loop (mirrors the A2-1 "FAILED_TO_FALLBACK excluded from verifyPassed" fix).
+- Files changed: `lib/agents/domain-judge.ts`, `lib/server/env-flags.ts`, `evals/domain-judge.test.ts`, `evals/domain-calibration.live.test.ts`, `evals/domain-calibration.lock.test.ts`, `docs/domain-calibration-status.md`, `docs/reviews/codex-2026-06-26-b1-domain-judge.md` (new), `docs/reviews/gate-2026-06-26-b1d-live.md`, `docs/reviews/gate-2026-06-26-b1-offline.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/task-log.md`, this journal.
+- Reviewer notes (Codex / human): Codex gpt-5.5 @ xhigh; `docs/reviews/codex-2026-06-26-b1-domain-judge.md`. Advisor ×3 (gate approach · flip tie-break + record-softening · coherence).
+- Human decision: owner GO via "continue" (2026-06-26) → committed; the public-claim change ("calibrated" entering the honesty-sensitive docs) is owner-approved. Push remains owner-gated (not pushed).
+
+---
+
 ## 2026-06-26 Track B1d — LIVE domain-judge calibration: RAN + CLEARED (directional); acceptance-gate BLOCK→reconciled
 
 - What changed: Ran the live cross-family Groq `gpt-oss-120b` domain judge over the 36-item synthetic gold set (K=3, temp 0, $0, 36/36 LIVE_JUDGE, 0 fallbacks). Held-out recall/precision/F1 1.00 (CI95 [0.76,1.00], n=18), per-dim recall 1.00 each, κ 1.00, flip 0.00 — clears all seven pre-registered thresholds. Eval-locked (`evals/domain-calibration.lock.test.ts`, R-DHON-4) + date-stamped the frozen snapshot. Commit `1fcb492`.

@@ -2,6 +2,8 @@
 
 **Date:** 2026-06-26 · **Scope:** B1 offline machinery (commits `db72461` B1a · `4096ebe` B1b · `f71c5c9` B1c · `2fc1f08` B1d · `e201eee` honesty-refinements) · **Artifact framing:** offline calibration machinery + method + a PRE-REGISTERED bar — **NOT** a proven calibrated judge (no live run yet; owner-gated).
 
+> **UPDATE 2026-06-26 (later) — SUPERSEDED.** This is the OFFLINE-machinery stage record (pre-live-run). The live calibration has since RAN + CLEARED the pre-registered bar AND the Codex cross-model gate has RUN + reconciled (`docs/reviews/codex-2026-06-26-b1-domain-judge.md`); the domain judge is now **"calibrated — directional, pending the ~100 floor."** The "no live run yet / not a proven calibrated judge" framing below is historical-as-of-this-stage.
+
 ## 1. `acceptance-gate` (independent, read-only) → **SHIP**
 
 Ran the five-gate panel on the offline machinery (framed correctly: judge honesty + construction rigor + pre-registration, NOT "is the judge calibrated").
@@ -17,6 +19,8 @@ Ran the five-gate panel on the offline machinery (framed correctly: judge honest
 **Verdict: SHIP (the offline machinery).** Non-blocking follow-ups: (1) state-doc sync (was "NEXT = B1" — UNDER-claimed, no honesty breach; synced this commit); (2) the wording nit (fixed). `npm run verify` green = 236 + 4 skipped (the +4 includes the live calibration test auto-skipping offline — correct; no live judge ran, no numbers exist).
 
 ## 2. Codex cross-model changed-files review → **SEAT-BLOCKED (dated obligation)**
+
+> **UPDATE 2026-06-26 (later) — DISCHARGED.** This obligation has been met: the Codex gate RAN on a fresh seat over the full B1 diff (`--base 07e9a55`, gpt-5.5 @ xhigh) → 2 P2 code findings, 0 P0/P1, both fixed + reconciled + test-locked — **`docs/reviews/codex-2026-06-26-b1-domain-judge.md`**. One base covered B1a→B1d, so this offline obligation and the B1d gate were discharged together.
 
 Attempted `~/claude-os/bin/codex-guarded review --base 07e9a55` (the whole B1 diff) at ~16:05 UTC. Raw error, surfaced verbatim (owner doctrine: no retry/downgrade/switch — the seat is an owner action):
 
