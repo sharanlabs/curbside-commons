@@ -149,6 +149,35 @@ describe("A1 Class A — tool-composed chain ≡ the Python oracle (out/merchant
   });
 });
 
+// --------------------- simulate_send idempotency on re-call (Codex A1 P2) ---------------------
+
+describe("A1 simulate_send — idempotency key preserved on an already-sent merchant (Codex A1 P2)", () => {
+  const eligible = triageMerchant.run({
+    index: 1,
+    row: {
+      merchant_name: "Idempo Diner",
+      merchant_category: "Restaurant",
+      days_since_signup: 20,
+      last_login_days_ago: 10,
+      steps_completed: 2,
+      source_risk_level: "Medium",
+    },
+  });
+
+  it("first send mints a key; a SECOND call on the already-sent record preserves it (no dedup-guard wipe)", () => {
+    expect(eligible.send_eligible).toBe(true); // precondition: Medium + eligible contact
+    const drafted: Merchant = { ...eligible, outreach_status: "drafted", last_outreach_at: AS_OF_DATE };
+    const first = simulateSend.run(drafted);
+    expect(first.outreach_status).toBe("simulated_sent");
+    expect(first.idempotency_key.length).toBeGreaterThan(0);
+    // Re-call on the already-sent record — the key must NOT be cleared to "" (the dedup guard holds).
+    const sent: Merchant = { ...drafted, outreach_status: "simulated_sent", idempotency_key: first.idempotency_key };
+    const second = simulateSend.run(sent);
+    expect(second.outreach_status).toBe("simulated_sent");
+    expect(second.idempotency_key).toBe(first.idempotency_key);
+  });
+});
+
 // ----------------------------- Class B — wrapper-identity (R-TOOL-6) -----------------------------
 
 const hybridMerchants = runCore(getHybridMerchants(), {}, REFERENCE_PLATFORM_NAME).merchants;

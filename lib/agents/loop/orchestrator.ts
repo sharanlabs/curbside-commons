@@ -332,7 +332,14 @@ export async function runAgentLoop(
     const supported = judge.verdict.claims.filter((c) => c.supported).length;
     // R-LOOP-3(a) is the authoritative pass condition: gatekeeper PASS/WARN (no failures =
     // approvedForHumanReview) AND the judge reports all-supported.
-    verifyPassed = gate.approvedForHumanReview && !judge.verdict.any_unsupported;
+    // FAIL CLOSED (Codex A2 P1): a judge that FELL BACK to the deterministic mock (the live call
+    // failed / was rate-limited) never actually ran the reverse-faithfulness check — its clean verdict
+    // must NOT count as verification. Treat FAILED_TO_FALLBACK as not-passed, so the draft is re-drafted
+    // or held for a human, NEVER sent on the keyword-mock's say-so.
+    verifyPassed =
+      gate.approvedForHumanReview &&
+      judge.mode !== "FAILED_TO_FALLBACK" &&
+      !judge.verdict.any_unsupported;
     recorder.record({
       phase: "verify",
       iteration: i,

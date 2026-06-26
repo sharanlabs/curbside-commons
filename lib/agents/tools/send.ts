@@ -40,9 +40,17 @@ export const simulateSend: Tool<Merchant, SimulateSendOutput> = {
         outreach_status: "simulated_sent",
       }) as SimulateSendOutput;
     }
+    // Already-sent (a retry/resume or a second call): PRESERVE the idempotency key — clearing it would
+    // erase the duplicate-send guard a caller relies on when applying a "simulated_sent" transition
+    // (Codex A1 P2). Recompute deterministically if somehow absent. Otherwise (drafted/rejected/none)
+    // no key exists yet -> "".
+    const idempotency_key =
+      m.outreach_status === "simulated_sent"
+        ? m.idempotency_key || idempotencyKey(m.merchant_id, m.current_blocker_code)
+        : "";
     return SimulateSendOutputSchema.parse({
       send_eligible: eligible,
-      idempotency_key: "",
+      idempotency_key,
       outreach_status: m.outreach_status,
     }) as SimulateSendOutput;
   },

@@ -69,10 +69,18 @@ describe.skipIf(!live)("LIVE R-LOOP-10 — A2 loop self-corrects the held-out pl
           },
         );
         // Self-correction: the loop CAUGHT the seed (it did not pass on iteration 0) AND converged.
+        // Self-correction requires a GENUINE LIVE loop (Codex A2 P2): (1) the seed was CAUGHT on
+        // iteration 0; (2) a real LIVE redraft ran (a redraft step with modelMode LIVE_AI — not a
+        // FAILED_TO_FALLBACK deterministic stub); and (3) the loop converged with the FINAL verifier
+        // being a real LIVE_JUDGE. A deterministic fallback stub must NOT count as self-correction.
         const caughtSeed = result.trajectory.some(
           (s) => s.phase === "verify" && s.iteration === 0 && s.verdictSummary.includes("verify=FAIL"),
         );
-        const selfCorrected = caughtSeed && result.converged;
+        const liveRedraft = result.trajectory.some(
+          (s) => s.phase === "redraft" && s.modelMode === "LIVE_AI",
+        );
+        const liveFinalVerify = result.finalVerify.judge?.mode === "LIVE_JUDGE";
+        const selfCorrected = caughtSeed && result.converged && liveRedraft && liveFinalVerify;
         perItem.push({
           id: item.id,
           failureMode: item.failureMode,

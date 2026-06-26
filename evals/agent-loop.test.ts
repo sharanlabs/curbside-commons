@@ -205,6 +205,30 @@ describe("R-LOOP-8 — the loop self-corrects a planted fabrication (injected ve
   });
 });
 
+// ───────────────────── R-LOOP-8 fail-closed — a fallback judge never passes (Codex A2 P1) ─────────────────────
+
+describe("R-LOOP-8 fail-closed — a FAILED_TO_FALLBACK judge is held, never sent (Codex A2 P1)", () => {
+  it("a clean draft whose LIVE judge call fails (fallback) does NOT pass — held for a human, never sent", async () => {
+    const merchant = normalizeRow(mediumInput("Failsafe Falafel", 1, 2), 1);
+    const result = await runAgentLoop(
+      { input: mediumInput("Failsafe Falafel", 1, 2), index: 1 },
+      {
+        // a clean draft (would clear the gatekeeper) ...
+        draftGenerate: async () => ({ object: generatedFrom(merchant) }),
+        // ... but the LIVE judge call THROWS -> judgeDraft falls back to the mock (FAILED_TO_FALLBACK).
+        // Without fail-closed, a clean mock verdict would PASS -> simulate_send. It must NOT.
+        judgeGenerate: async () => {
+          throw new Error("simulated Groq 429 / live judge failure");
+        },
+      },
+    );
+    expect(result.finalVerify.judge?.mode).toBe("FAILED_TO_FALLBACK"); // the judge fell back
+    expect(result.converged).toBe(false); // fail-closed: a fallback verdict is NOT verification
+    expect(result.outreachStatus).not.toBe("simulated_sent"); // never sent on the keyword-mock's say-so
+    expect(result.sent).toBe(false);
+  });
+});
+
 // ───────────────────── R-LOOP-8b — recommend-not-decide (TEST-LOCKED, AM-4) ─────────────────────
 
 describe("R-LOOP-8b — the agent cannot override deterministic eligibility", () => {
