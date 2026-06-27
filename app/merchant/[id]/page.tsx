@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getReplaySnapshot, getReplayMerchant } from "@/lib/replay/run";
 import { PLATFORM_NAME, HONEST_DATA_LABEL } from "@/lib/product";
 import { TOTAL_STEPS } from "@/lib/core/constants";
+import { DIMENSION_SPECS } from "@/lib/domain/effective-rubric";
 
 export function generateStaticParams() {
   return getReplaySnapshot(PLATFORM_NAME).merchants.map((rm) => ({ id: rm.merchant.merchant_id }));
@@ -35,7 +36,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
   const rm = getReplayMerchant(id, PLATFORM_NAME);
   if (!rm) notFound();
 
-  const { merchant: m, draft, gatekeeper: gate, judge, evalScore, diagnosis } = rm;
+  const { merchant: m, draft, gatekeeper: gate, judge, domainJudge, evalScore, diagnosis } = rm;
   const mRec = m as unknown as Record<string, unknown>;
   const stepsRemaining = TOTAL_STEPS - m.steps_completed;
 
@@ -205,7 +206,51 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
         </Section>
 
         <Section
-          title="5 · Eval / quality"
+          title="5 · Domain quality check (domain judge)"
+          plain="A third, independent check — on a different question than faithfulness. Not 'is every fact true?' but 'is this a GOOD activation message?' — scored against a cited rubric: matched to the merchant's real blocker · the right play for their engagement state · no over-promising. It's advisory and recall-favoring: the verdict is surfaced for the reviewer and recorded in the audit trail, but it never changes the send — eligibility and the human approval gate stay deterministic (a low-risk draft can still be simulated-sent even when flagged). Here BOTH the draft and this verdict are deterministic $0 stubs (REPLAY) — a minimal stub nudge often trips the engagement-fit check, which is the tertiary control doing its job, not the product grading its real output down; the live cross-family judge (Groq gpt-oss-120b) and the real drafter are separate and key-gated."
+        >
+          {domainJudge ? (
+            <>
+              <div className="flex items-center gap-3">
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[12px] font-medium ring-1 ring-inset ${
+                    domainJudge.verdict.domain_defective ? STATUS_STYLE.WARN : STATUS_STYLE.PASS
+                  }`}
+                >
+                  {domainJudge.verdict.domain_defective ? "FLAGGED FOR REVIEW" : "GOOD PRACTICE"}
+                </span>
+                <span className="text-[13px] text-neutral-600">
+                  {domainJudge.verdict.dimensions.filter((d) => d.pass).length}/
+                  {domainJudge.verdict.dimensions.length} domain-quality dimensions passed
+                </span>
+              </div>
+              <ul className="mt-3 space-y-1.5">
+                {domainJudge.verdict.dimensions.map((d, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[13px]">
+                    <span className={d.pass ? "text-emerald-600" : "text-amber-600"}>{d.pass ? "✓" : "!"}</span>
+                    <span className="text-neutral-700">
+                      <span className="font-medium">{DIMENSION_SPECS[d.dimension].title}</span>
+                      <span className="text-neutral-500"> — {d.rationale}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-[11px] text-neutral-500">
+                mode: {domainJudge.mode} · model: {domainJudge.modelId} · cost: $
+                {domainJudge.costUsd.toFixed(2)}
+                {domainJudge.errorClass ? ` · ${domainJudge.errorClass}` : ""} · advisory — does not change the
+                send decision
+              </p>
+            </>
+          ) : (
+            <p className="text-[13px] text-neutral-600">
+              Skipped — the gatekeeper blocked this draft, so it never reaches the domain judge.
+            </p>
+          )}
+        </Section>
+
+        <Section
+          title="6 · Eval / quality"
           plain="An independent measurement of draft quality across four dimensions — the deep-AI showcase, in human terms."
         >
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -231,7 +276,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
         </Section>
 
         <Section
-          title="6 · Human-in-the-loop gate"
+          title="7 · Human-in-the-loop gate"
           plain="A person decides — hold, reject, or send. Low-risk, clean drafts are eligible to send (simulated); high-risk ones are held for approval."
         >
           {m.review_required ? (
@@ -262,7 +307,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
           )}
         </Section>
 
-        <Section title="7 · Audit trail" plain="Every step of the decision, recorded.">
+        <Section title="8 · Audit trail" plain="Every step of the decision, recorded.">
           <ol className="space-y-1.5">
             {rm.audit.map((a, i) => (
               <li key={i} className="flex gap-3 text-[12px]">

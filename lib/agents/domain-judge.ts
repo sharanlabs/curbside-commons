@@ -1,6 +1,7 @@
 /**
- * The DOMAIN-QUALITY ("Effective"-axis) JUDGE — the SECONDARY control that scores whether a
- * gate-passing, faithful draft is GOOD merchant-activation practice. The Effective analogue of the
+ * The DOMAIN-QUALITY ("Effective"-axis) JUDGE — the TERTIARY control in the REPLAY ship-gate
+ * (order R-DARCH-4: gatekeeper → faithfulness → domain) that scores whether a gate-passing draft is
+ * GOOD merchant-activation practice. The Effective analogue of the
  * faithfulness judge (`semantic-judge.ts`): faithfulness asks "is every claim true to the data?";
  * this asks "is this draft good domain practice?" across three rubric dimensions (matched-to-blocker,
  * engagement-appropriate, no-over-promise) defined in `effective-rubric.ts` from the cited B0 KB.

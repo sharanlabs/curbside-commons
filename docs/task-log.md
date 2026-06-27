@@ -1,5 +1,15 @@
 # Task Log
 
+## 2026-06-26 (Track B2 — domain judge WIRED into the REPLAY ship-gate as the tertiary ADVISORY control; test-verified + acceptance-gate-reconciled; Codex review OPEN)
+
+**Process:** FULL · high-risk (ship-gate wiring + AI behavior on a public surface) · Effort HIGH (auto-routed; mirrors a proven pattern, not novel architecture). Advisor before writing (advisory-invariant + non-vacuous test shape) and at the completion checkpoint (caught the §4.2 0/20-inert gap + the open-gate framing). Owner: "resume b2".
+
+**Built (6 files, uncommitted):** `lib/replay/run.ts` — `ReplayMerchant.domainJudge: DomainJudgeResult | null` (mock, `$0`, gated on `gatekeeper.approvedForHumanReview`, parallel to faithfulness) + `"domain"` `AuditEntry` actor (after `judge`, before `eval`) + widened the actor union; `lib/agents/tools/schemas.ts` — mirror-fix (`"domain"` into `AuditEntrySchema`, restoring lockstep with the canonical type — the A1 `append_audit` tool derives from it, so the widening broke typecheck until fixed); `lib/agents/domain-judge.ts` — comment-only "secondary"→"tertiary" reconcile; `app/merchant/[id]/page.tsx` — "5 · Domain quality check" panel (Eval→6/Human→7/Audit→8); `evals/replay.test.ts` — 5 new tests; `evals/e2e/console.spec.ts` — section assertion.
+
+**Verified:** `npm run verify` green = **255 + 4 skipped** (was 250), exit 0; differential **20/20** (`lib/core`+oracle+gold+frozen snapshot UNTOUCHED, confirmed via `git diff --name-only`); e2e 4/4. **Red-green** for the ADVISORY invariant (mutation → `replay.test.ts:79` RED; restore → GREEN). **§4.2 non-redundancy demonstrated** (gatekeeper APPROVES + faithfulness PASSES + only `no_over_promise` FAILS on implied-typicality hype).
+
+**Gates:** `acceptance-gate` = BLOCK (procedural — no hard P0/P1; all 5 invariants honored on its read + advisor agreed) → gate-3 (verify) CLEARED with raw + red-green; 3 non-blocking items addressed. **Codex changed-files review OPEN** — seat ALIVE, review ran + surfaced 1 real finding (false "never auto-sent" copy → fixed primary-model-final) then hit the usage limit mid-review (raw surfaced; no retry). Complete review + §4.2 cross-check = DATED OBLIGATION (seat ~8:31 PM). Record: `docs/reviews/gate-2026-06-26-b2-domain-shipgate.md`. Commit + the Codex re-run are owner-gated.
+
 ## 2026-06-26 (Track B1 — Codex cross-model gate RAN + reconciled → domain judge "calibrated — directional"; 2 P2 fixes)
 
 **Process:** FULL · high-risk (ship-gating cross-model gate on a calibration-honesty claim; AI behavior) · Effort xhigh (auto-routed; Codex gpt-5.5 @ xhigh). Advisor before the gate (approach + the flip-label nuance) and before the flip (tie-break + record-softening + coherence). Owner: "run the Codex cross-model review … reconcile primary-model-final … then flip."

@@ -36,6 +36,7 @@ test("a merchant opens its full why-chain end to end", async ({ page }) => {
     "Triage & diagnosis",
     "Drafted outreach",
     "Claims-gatekeeper",
+    "Domain quality check",
     "Eval / quality",
     "Human-in-the-loop gate",
     "Audit trail",

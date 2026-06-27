@@ -17,13 +17,14 @@ import { mockDraft, type OutreachDraft } from "@/lib/agents/draft";
 import type { AgentMode } from "@/lib/agents/gemini";
 import { runGatekeeper, type GatekeeperReport } from "@/lib/agents/gatekeeper";
 import { mockJudgeResult, type JudgeResult } from "@/lib/agents/semantic-judge";
+import { mockDomainJudgeResult, type DomainJudgeResult } from "@/lib/agents/domain-judge";
 import { scoreDraft, type DraftScore } from "@/lib/evals/draft-quality";
 import { diagnose, type Diagnosis } from "@/lib/domain/diagnosis";
 import { getHybridMerchants, hybridProvenance, type HybridProvenance } from "@/lib/ingest/hybrid";
 
 export interface AuditEntry {
   at: string;
-  actor: "system" | "draft" | "gatekeeper" | "judge" | "eval";
+  actor: "system" | "draft" | "gatekeeper" | "judge" | "domain" | "eval";
   action: string;
   detail: string;
 }
@@ -37,6 +38,15 @@ export interface ReplayMerchant {
    *  Runs only when the gatekeeper approved the draft (R-ARCH-4); null = gatekeeper-blocked (skipped).
    *  REPLAY renders the deterministic mock verdict ($0); a recorded cross-family judge fixture lands P4. */
   judge: JudgeResult | null;
+  /** TERTIARY control (R-DARCH-4: gatekeeper → faithfulness → domain): the domain-quality
+   *  ("Effective"-axis) judge — not "is every fact true?" but "is this GOOD activation practice?",
+   *  scored against the cited rubric (matched-to-blocker · engagement-appropriate · no-over-promise;
+   *  §4.2 keeps `no_over_promise` one of the three gating dimensions feeding `domain_defective`).
+   *  Parallel-gated to `judge`: runs only on a gatekeeper-approved draft; null = blocked (skipped).
+   *  ADVISORY + recall-favoring — it flags a weak draft for the human but NEVER changes eligibility or
+   *  the send (those stay deterministic). REPLAY renders the deterministic mock verdict ($0); a recorded
+   *  cross-family calibrated judge fixture swaps in here later, like `judge`. */
+  domainJudge: DomainJudgeResult | null;
   evalScore: DraftScore;
   /** Domain-depth diagnosis: engagement state + root-cause hypothesis + routed reactivation play. */
   diagnosis: Diagnosis;
@@ -78,6 +88,7 @@ function buildAudit(
   m: Merchant,
   gate: GatekeeperReport,
   judge: JudgeResult | null,
+  domainJudge: DomainJudgeResult | null,
   evalScore: DraftScore,
   diagnosis: Diagnosis,
 ): AuditEntry[] {
@@ -111,6 +122,17 @@ function buildAudit(
     },
     {
       at: RUN_TIMESTAMP,
+      actor: "domain",
+      action: domainJudge ? domainJudge.mode : "SKIPPED",
+      detail: domainJudge
+        ? `${domainJudge.verdict.dimensions.filter((d) => d.pass).length}/${domainJudge.verdict.dimensions.length} domain-quality dimensions passed` +
+          (domainJudge.verdict.domain_defective
+            ? " → domain quality flagged (advisory — surfaced for review; does not change the send or eligibility)."
+            : " → good activation practice.")
+        : "Skipped — the gatekeeper blocked the draft (it never reaches the domain judge).",
+    },
+    {
+      at: RUN_TIMESTAMP,
       actor: "eval",
       action: evalScore.pass ? "PASS" : "FAIL",
       detail: `${evalScore.passed}/${evalScore.total} quality dimensions passed.`,
@@ -140,6 +162,10 @@ export function buildReplaySnapshot(platformName = REFERENCE_PLATFORM_NAME): Rep
     // Secondary control: judge only a draft the gatekeeper approved (R-ARCH-4). REPLAY uses the
     // deterministic mock verdict ($0); P4 swaps in a recorded cross-family judge fixture here.
     const judge = gatekeeper.approvedForHumanReview ? mockJudgeResult(draft, m) : null;
+    // Tertiary control (R-DARCH-4): the domain-quality judge, parallel-gated to the faithfulness
+    // judge (only a gatekeeper-approved draft reaches it). ADVISORY — its verdict is surfaced + audited
+    // but NEVER changes outreachStatus/eligibility (those are the deterministic core's, computed above).
+    const domainJudge = gatekeeper.approvedForHumanReview ? mockDomainJudgeResult(draft, m) : null;
     const evalScore = scoreDraft(draft, m, platformName);
     const diagnosis = diagnose(m);
     return {
@@ -148,11 +174,12 @@ export function buildReplaySnapshot(platformName = REFERENCE_PLATFORM_NAME): Rep
       draftMode: "DETERMINISTIC_RULES",
       gatekeeper,
       judge,
+      domainJudge,
       evalScore,
       diagnosis,
       costUsd: 0,
       outreachStatus: m.outreach_status,
-      audit: buildAudit(m, gatekeeper, judge, evalScore, diagnosis),
+      audit: buildAudit(m, gatekeeper, judge, domainJudge, evalScore, diagnosis),
     };
   });
 

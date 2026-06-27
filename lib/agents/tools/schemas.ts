@@ -167,10 +167,10 @@ export const SimulateSendOutputSchema = z.object({
   outreach_status: z.enum(OUTREACH_STATES),
 });
 
-/** Mirrors AuditEntry (lib/replay/run.ts). */
+/** Mirrors AuditEntry (lib/replay/run.ts) — keep the actor vocab in lockstep with it (incl. "domain"). */
 export const AuditEntrySchema = z.object({
   at: z.string(),
-  actor: z.enum(["system", "draft", "gatekeeper", "judge", "eval"]),
+  actor: z.enum(["system", "draft", "gatekeeper", "judge", "domain", "eval"]),
   action: z.string(),
   detail: z.string(),
 });
