@@ -1,6 +1,8 @@
 # Gate record — Track B2 (wire the domain-quality judge into the REPLAY ship-gate, tertiary advisory control)
 
-**Date:** 2026-06-26 · **Scope:** B2 — wire the already-calibrated domain judge into the REPLAY ship-gate as the **tertiary, ADVISORY** control (order R-DARCH-4: gatekeeper → faithfulness → domain), `$0` deterministic mock in REPLAY, surfaced + audited like the faithfulness `judge` field. **6 modified tracked files, UNCOMMITTED** (commit owner-gated). **`lib/core` + the differential oracle + the gold set + the frozen calibration snapshot UNTOUCHED.**
+**Date:** 2026-06-26 · **Scope:** B2 — wire the already-calibrated domain judge into the REPLAY ship-gate as the **tertiary, ADVISORY** control (order R-DARCH-4: gatekeeper → faithfulness → domain), `$0` deterministic mock in REPLAY, surfaced + audited like the faithfulness `judge` field. **COMMITTED as `6ea0549`** (owner GO 2026-06-26, on the test-verified basis below; push owner-gated). **`lib/core` + the differential oracle + the gold set + the frozen calibration snapshot UNTOUCHED.**
+
+> **UPDATE 2026-06-26 — B2 COMMITTED `6ea0549`.** The owner approved the commit on the test-verified basis (gate-3 cleared + red-green; acceptance-gate non-blocking items addressed). The **Codex changed-files review + §4.2 cross-check (gate 2 below) remain the OPEN dated obligation** — to run on a fresh seat (~8:31 PM) before push, with the 4 targets in §2.
 
 Files: `lib/replay/run.ts` · `lib/agents/tools/schemas.ts` · `lib/agents/domain-judge.ts` (comment-only consistency fix) · `app/merchant/[id]/page.tsx` · `evals/replay.test.ts` · `evals/e2e/console.spec.ts`.
 
