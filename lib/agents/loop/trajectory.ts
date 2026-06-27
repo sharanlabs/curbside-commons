@@ -19,6 +19,22 @@ import type { AuditEntry } from "@/lib/replay/run";
 /** The loop phases (R-LOOP-6). iter-0 drafting is "draft"; a re-draft after reflection is "redraft". */
 export type LoopPhase = "plan" | "draft" | "verify" | "reflect" | "redraft" | "route";
 
+/**
+ * WHICH specialist produced a step (R-A3-6 — the A4 "watch the four agents reason" attribution).
+ * The four named agents are strategist | drafter | domain_critic | router; "tool" is every
+ * deterministic/control step that is NOT one of them (triage/diagnose, the faithfulness control,
+ * the deterministic conductor).
+ *
+ * HONESTY RULE — tool-until-earned (AM-2 "no agent costumes on pipeline stages" + R-A3-1): a step
+ * carries an agent role ONLY in the slice that BOTH wires that agent's LLM AND clears its
+ * anti-theater seam-eval. Until then it is "tool". `agent` is a positive claim ("this IS the
+ * strategist"); `modelMode` does not soften it. So in A2/A3-1 the plan/reflect/route steps are
+ * deterministic stand-ins ⇒ "tool"; they flip to "strategist"/"router" in A3-2/A3-5 IFF R-A3-1
+ * passes (a demoted candidate stays "tool" automatically). Only the genuinely-generative drafter is
+ * an agent today (§11.1 — "already agentic"). This makes the agent column a live anti-theater ledger.
+ */
+export type TrajectoryAgent = "strategist" | "drafter" | "domain_critic" | "router" | "tool";
+
 /** One tool/action invocation within a step, summarized for the trajectory view. */
 export interface TrajectoryToolCall {
   /** The A1 tool name (triage_merchant, ...) or the Groq drafting action / live judge. */
@@ -33,6 +49,9 @@ export interface TrajectoryToolCall {
  */
 export interface TrajectoryStep {
   phase: LoopPhase;
+  /** WHICH specialist produced the step (R-A3-6). Required so tsc flags any un-attributed record()
+   *  site. "tool" until an agent earns its role per the tool-until-earned rule on TrajectoryAgent. */
+  agent: TrajectoryAgent;
   /** 0-based loop iteration. plan uses 0; route uses the final iteration. */
   iteration: number;
   /** The tools/actions invoked in this step. */

@@ -306,6 +306,77 @@ describe("R-LOOP-6 — the trajectory freezes to a $0 fixture and renders the se
     expect(snap.sent).toBe(true);
     expect(snap.outreachStatus).toBe("simulated_sent");
     expect(snap.trajectory.map((s) => s.phase)).toEqual(["plan", "draft", "verify", "reflect", "redraft", "verify", "route"]);
+    // R-A3-6 on the DEPLOYED payoff surface (acceptance-gate advisory): the SERVED snapshot carries
+    // valid `agent` attribution and shows no un-earned agent (tool-until-earned holds on the fixture).
+    const allowedAgents = new Set(["strategist", "drafter", "domain_critic", "router", "tool"]);
+    expect(snap.trajectory.every((s) => allowedAgents.has(s.agent))).toBe(true);
+    expect(snap.trajectory.map((s) => s.agent)).toEqual(["tool", "drafter", "tool", "tool", "drafter", "tool", "tool"]);
     expect(snap.note).toContain("SCRIPTED"); // honest labeling (AM-7) — not a live "catches its own mistakes" claim
+  });
+});
+
+// ───────────────────── R-A3-6 — trajectory `agent` attribution + tool-until-earned ─────────────────────
+
+describe("R-A3-6 — every step carries an `agent` attribution, honest under tool-until-earned (AM-2)", () => {
+  it("attributes the scripted self-correction trajectory and labels NO un-earned agent", async () => {
+    const merchant = normalizeRow(mediumInput("Curry In A Hurry", 1, 2), 1);
+    const result = await runAgentLoop(
+      { input: mediumInput("Curry In A Hurry", 1, 2), index: 1 },
+      { draftGenerate: scriptedDraftGenerate(merchant, FABRICATION), judgeGenerate: scriptedJudgeGenerate(FABRICATION) },
+    );
+
+    // Every step is attributed (the field is required; tsc + this guard both enforce presence).
+    const allowed = new Set(["strategist", "drafter", "domain_critic", "router", "tool"]);
+    for (const s of result.trajectory) expect(allowed.has(s.agent)).toBe(true);
+
+    // The mapping is locked against the known phase sequence (plan,draft,verify,reflect,redraft,verify,route).
+    expect(result.trajectory.map((s) => s.phase)).toEqual(["plan", "draft", "verify", "reflect", "redraft", "verify", "route"]);
+    expect(result.trajectory.map((s) => s.agent)).toEqual(["tool", "drafter", "tool", "tool", "drafter", "tool", "tool"]);
+
+    // tool-until-earned (AM-2 / R-A3-1): in A3-1 the ONLY agent that has earned its label is the
+    // drafter (the genuinely-generative slot). strategist/router/domain_critic appear ONLY in the
+    // slice that wires their LLM and clears the anti-theater eval — they must NOT appear yet.
+    const agents = new Set(result.trajectory.map((s) => s.agent));
+    expect(agents.has("drafter")).toBe(true);
+    expect(agents.has("strategist")).toBe(false); // → A3-2 iff R-A3-1 passes
+    expect(agents.has("router")).toBe(false); // → A3-5 iff R-A3-1 passes
+    expect(agents.has("domain_critic")).toBe(false); // → A3-4 (2nd verify-phase critic)
+
+    // A deterministic stand-in step is honestly "tool" + DETERMINISTIC_RULES (no agent costume).
+    const plan = result.trajectory.find((s) => s.phase === "plan")!;
+    expect(plan.agent).toBe("tool");
+    expect(plan.modelMode).toBe("DETERMINISTIC_RULES");
+  });
+
+  it("the seedDraft branch is a fixture, not the Drafter: seed_draft → tool, the generated redraft → drafter [Codex A3-1 F2]", async () => {
+    const merchant = normalizeRow(mediumInput("Seeded Soba", 5, 2), 1);
+    // iteration-0 is a FED-IN draft (a fixture) carrying a planted fabrication; the injected judge flags
+    // it, so the loop re-drafts on iteration-1 via the GENERATED Groq path (clean) and converges.
+    const base = mockDraft(merchant);
+    const seed = { ...base, draft_body: `${base.draft_body} ${FABRICATION}` };
+    const result = await runAgentLoop(
+      { input: mediumInput("Seeded Soba", 5, 2), index: 1 },
+      {
+        seedDraft: seed,
+        draftGenerate: async () => ({ object: generatedFrom(merchant) }), // the clean redraft
+        judgeGenerate: scriptedJudgeGenerate(FABRICATION), // flag the seed, clear the redraft
+      },
+    );
+
+    // The iteration-0 draft went through the seedDraft branch (a fixture), NOT the Drafter.
+    const seedStep = result.trajectory.find((s) => s.phase === "draft")!;
+    expect(seedStep.toolCalls[0]?.tool).toBe("seed_draft"); // confirm it IS the seed branch
+    expect(seedStep.modelMode).toBe("REPLAY"); // no generative call
+    expect(seedStep.agent).toBe("tool"); // a fed-in fixture is NOT the drafter (F1)
+
+    // The actual re-draft IS the Drafter — a genuine generative call earns the label.
+    const redraft = result.trajectory.find((s) => s.phase === "redraft")!;
+    expect(redraft.agent).toBe("drafter");
+
+    // tool-until-earned still holds across the seeded branch: no un-earned agent appears.
+    const agents = new Set(result.trajectory.map((s) => s.agent));
+    expect(agents.has("strategist")).toBe(false);
+    expect(agents.has("router")).toBe(false);
+    expect(agents.has("domain_critic")).toBe(false);
   });
 });

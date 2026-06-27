@@ -253,6 +253,9 @@ export async function runAgentLoop(
   const recommendation = recommend(merchant, diagnosis);
   recorder.record({
     phase: "plan",
+    // tool-until-earned (R-A3-6): the recommend seam is a deterministic stand-in in A2; it flips to
+    // "strategist" in A3-2 IFF the Strategist clears its R-A3-1 anti-theater eval. Until then, "tool".
+    agent: "tool",
     iteration: 0,
     toolCalls: planToolCalls,
     modelMode: "DETERMINISTIC_RULES",
@@ -280,6 +283,10 @@ export async function runAgentLoop(
       draftMode = "REPLAY"; // a fed-in starting draft (R-LOOP-10 seeding); no model call here
       recorder.record({
         phase: "draft",
+        // a FED-IN fixture (modelMode "REPLAY", no generative call) — NOT a Drafter-produced step, so
+        // "tool", not "drafter" (tool-until-earned / AM-2: only a genuinely-GENERATED draft/redraft
+        // earns "drafter"; labeling a seeded fixture "drafter" would be a costume). [Codex A3-1 F1]
+        agent: "tool",
         iteration: i,
         toolCalls: [{ tool: "seed_draft", summary: "iteration-0 starting draft fed in (R-LOOP-10)" }],
         modelMode: draftMode,
@@ -300,6 +307,7 @@ export async function runAgentLoop(
       draftErrorClass = draftResult.errorClass;
       recorder.record({
         phase: i === 0 ? "draft" : "redraft",
+        agent: "drafter", // generative composition is the drafter's real seam (Groq today, Gemini at A3-3)
         iteration: i,
         toolCalls: [{ tool: "draft_outreach_groq", summary: `mode=${draftResult.mode}` }],
         modelMode: draftMode,
@@ -342,6 +350,9 @@ export async function runAgentLoop(
       !judge.verdict.any_unsupported;
     recorder.record({
       phase: "verify",
+      // the faithfulness check is a CONTROL, not one of the four product agents (it stays "tool");
+      // the domain_critic enters VERIFY as a SECOND verify-phase step in A3-4.
+      agent: "tool",
       iteration: i,
       toolCalls: [
         { tool: "check_faithfulness_forward", summary: `${gate.status} (${gate.failures.length} fail)` },
@@ -363,6 +374,9 @@ export async function runAgentLoop(
     instruction = buildReflection(gate, judge);
     recorder.record({
       phase: "reflect",
+      // buildReflection is the Router/Conductor's revision-synthesis seam, deterministic in A2; it
+      // flips to "router" in A3-5 IFF the Router clears its R-A3-1 eval vs buildReflection. Until then "tool".
+      agent: "tool",
       iteration: i,
       toolCalls: [],
       modelMode: "DETERMINISTIC_RULES",
@@ -473,6 +487,9 @@ export async function runAgentLoop(
 
   recorder.record({
     phase: "route",
+    // the deterministic conductor in A2 (route recommendation + rationale); flips to "router" in A3-5
+    // with reflect, IFF R-A3-1 passes. Recommend-only either way (R-A3-3).
+    agent: "tool",
     iteration: attempts - 1,
     toolCalls: [...routeToolCalls, { tool: "append_audit", summary: `${audit.length} entries` }],
     modelMode: "DETERMINISTIC_RULES",

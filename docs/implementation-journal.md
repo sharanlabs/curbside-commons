@@ -30,6 +30,25 @@ Newest entries on top.
 
 ---
 
+## 2026-06-27 A3-1 — trajectory `agent` attribution (R-A3-6): a Codex-caught honesty bug, reconciled + red-green-locked
+
+- What changed: Added a `TrajectoryAgent` type + a **required** `agent` field on `TrajectoryStep` (`lib/agents/loop/trajectory.ts`), attributed every `record()` site (`lib/agents/loop/orchestrator.ts`), and added 2 R-A3-6 tests + a served-snapshot agent-lock (`evals/agent-loop.test.ts`). Offline, $0, no behavior change.
+- Why it changed: A3-1 is the enabling first slice of the A3 multi-agent split — the `agent` field lets the future "watch the four agents reason" view (A4) show which specialist produced each step.
+- Challenge or failure that appeared: (1) Design: is it honest to label A2's *deterministic* plan/reflect/route steps with agent roles now? (2) Codex BLOCK (P1): I labeled the `seedDraft` branch `agent:"drafter"`, but it's a fed-in test fixture (`modelMode:"REPLAY"`, no generative call) — not a Drafter-produced step. (P2) my test only exercised the generated path, so it couldn't have caught P1.
+- Why it happened: I over-read R-A3-6 ("show the four specialists") as "label the slots now"; the advisor corrected the design to tool-until-earned, but I still missed the `seedDraft` sub-branch when attributing sites — and tested only the path I was looking at.
+- How it was diagnosed: advisor cross-check BEFORE writing (caught the design framing); Codex changed-files review AFTER (caught the seed sub-branch + the test gap); a red-green revert pinned the exact failing assertion.
+- Options considered: (a) label role+modelMode now (rejected — `agent` is a positive claim a costume can't wear, AM-2/R-A3-1); (b) tool-until-earned (adopted — a step earns its role label only in the slice that wires its LLM AND clears its anti-theater seam-eval; demoted candidates stay `tool` automatically, making `agent` a live anti-theater ledger).
+- Final fix: seed branch → `agent:"tool"` (only genuinely-GENERATED draft/redraft = `drafter`); added a seeded test driving the `seedDraft` branch (asserts seed→tool, generated redraft→drafter, the 3 unearned agents absent); added a served-snapshot agent-sequence lock.
+- Why this fix: it makes the honesty rule complete across ALL branches and compiler-enforced (required field) + test-locked (red-green).
+- How it was implemented: Edit on the 3 files; tool-until-earned mapping = plan/verify/reflect/route + seed fixture → `tool`; generated draft/redraft → `drafter`.
+- How it was verified: `npm run verify` exit 0 (257 passed + 4 skipped, tsc/eslint/build clean); red-green — revert seed `tool`→`drafter` ⇒ seeded test FAILS at `agent-loop.test.ts:365` `expected 'drafter' to be 'tool'`; restore ⇒ 12/12; diff scope = 3 code files, `lib/core`+oracle+gold+snapshots UNTOUCHED (differential 20/20).
+- Prevention step for the future: when adding an attribution/label field, enumerate EVERY branch that produces the labeled object (not just the common path) and test each branch — a per-branch red-green. Also: `codex exec` blocks reading stdin unless `< /dev/null`.
+- Files changed: `lib/agents/loop/trajectory.ts`, `lib/agents/loop/orchestrator.ts`, `evals/agent-loop.test.ts` (+ state docs + `docs/reviews/{codex,gate}-2026-06-27-a3-1*.md`).
+- Reviewer notes (Codex / human): Codex BLOCK → 2 findings (P1+P2) both ACCEPTED + fixed + red-green-locked primary-model-final; confirming re-pass = recommended dated obligation. acceptance-gate 1/2/4/5 PASS + gate-3 SHIP on its flip condition.
+- Human decision: commit owner-gated (pending); A3-1 proceeds test-verified + gated.
+
+---
+
 ## 2026-06-26 Track B2 — Codex cross-model gate completed (SHIP) + reconciled; the open dated obligation discharged
 
 - What changed: Completed the B2 ship-gate's one open gate — the mandatory Codex changed-files review + the §4.2 cross-check — on the reset seat. Codex returned **SHIP** (all 4 targets CONFIRMED); 3 findings (1 P2 + 2 P3) reconciled primary-model-final and fixed: (F1) the Human-in-the-loop gate copy "Eligible and clean" → "Eligible by the deterministic core" with an advisory note appended when `domain_defective`; (F2) the audit-wording test bans all send-gating verbs (`reject|block|gate|hold|prevent`) on flagged entries; (F3) the §4.2 demo test now calls the wired `mockDomainJudgeResult(...).verdict`.
