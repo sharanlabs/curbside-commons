@@ -1,5 +1,15 @@
 # Task Log
 
+## 2026-06-26 (Track B2 — Codex cross-model gate COMPLETED on the reset seat → SHIP; 3 findings fixed; B2 ship-gate FULLY DISCHARGED)
+
+**Process:** FULL · high-risk (ship-gating cross-model review on a public-surface AI-behavior slice; the §4.2 consequential-recommendation cross-check) · Effort xhigh (auto-routed; Codex gpt-5.5 @ xhigh). Advisor before spending the seat (pre-registered per-finding accept/refute discriminators + the "don't break AM-4" trap). Owner: "complete the OPEN Codex gate … reconcile primary-model-final … commit the reconciliation."
+
+**Ran:** the COMPLETE read-only Codex changed-files review — `~/claude-os/bin/codex-guarded exec -s read-only` over commit `6ea0549` (the 6 code/test files), `gpt-5.5` @ `xhigh`, CLI 0.136.0, session `019f069f`, full run ~212.5k tokens (seat reset — NOT limited this time). Smoke-tested the seat ALIVE (`SEAT_OK`) first; gave the 4 concrete gate-record targets + rejected the "mirrors faithfulness" discharge up front.
+
+**Verdict → reconciliation (primary-model-final):** VERDICT **SHIP**; all 4 targets CONFIRMED (advisory invariant = leaf field that protects the future live judge too · 75% mock-flag surface honest · audit honest · **§4.2 non-redundancy confirmed against the REAL gatekeeper + faithfulness code**). 3 findings, 0 P0/P1, ALL accept→fix: (F1, P2 `page.tsx`) Human-gate "Eligible and clean" → "Eligible by the deterministic core" + an advisory note when `domain_defective`; (F2, P3 `replay.test.ts`) the audit-wording test now bans `reject|block|gate|hold|prevent` on flagged entries; (F3, P3 `replay.test.ts`) the §4.2 demo test exercises the wired `mockDomainJudgeResult().verdict`. Codex independently confirmed `AuditEntrySchema` is enforced (not cosmetic) + the 5→8 renumber is correct, and did NOT push the trap (gate-the-send would break AM-4). Record: `docs/reviews/codex-2026-06-26-b2-domain-shipgate.md`; gate record flipped to gate-2 CLEARED.
+
+**Verified:** `npm run verify` green = **255 + 4 skipped**, exit 0 (count unchanged — assertions hardened + one call swapped, no tests added/removed); `npm run test:e2e` 4/4 (one first-navigation Playwright flake on the first run, clean on re-run — reported, not a regression); differential 20/20 (`lib/core`+oracle+gold+frozen snapshot UNTOUCHED). **B2 ship-gate FULLY DISCHARGED.** Reconciliation committed on top of `6ea0549`; push owner-gated. **NEXT = A3.**
+
 ## 2026-06-26 (Track B2 — domain judge WIRED into the REPLAY ship-gate as the tertiary ADVISORY control; test-verified + acceptance-gate-reconciled; Codex review OPEN)
 
 **Process:** FULL · high-risk (ship-gate wiring + AI behavior on a public surface) · Effort HIGH (auto-routed; mirrors a proven pattern, not novel architecture). Advisor before writing (advisory-invariant + non-vacuous test shape) and at the completion checkpoint (caught the §4.2 0/20-inert gap + the open-gate framing). Owner: "resume b2".

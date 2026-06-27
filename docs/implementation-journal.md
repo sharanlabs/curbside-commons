@@ -30,6 +30,25 @@ Newest entries on top.
 
 ---
 
+## 2026-06-26 Track B2 — Codex cross-model gate completed (SHIP) + reconciled; the open dated obligation discharged
+
+- What changed: Completed the B2 ship-gate's one open gate — the mandatory Codex changed-files review + the §4.2 cross-check — on the reset seat. Codex returned **SHIP** (all 4 targets CONFIRMED); 3 findings (1 P2 + 2 P3) reconciled primary-model-final and fixed: (F1) the Human-in-the-loop gate copy "Eligible and clean" → "Eligible by the deterministic core" with an advisory note appended when `domain_defective`; (F2) the audit-wording test bans all send-gating verbs (`reject|block|gate|hold|prevent`) on flagged entries; (F3) the §4.2 demo test now calls the wired `mockDomainJudgeResult(...).verdict`.
+- Why it changed: the prior B2 Codex run was seat-limited mid-review (~8:31 PM) after surfacing 1 finding; the COMPLETE review + the §4.2 consequential-recommendation cross-check were a dated obligation. The acceptance-gate's verdict stays BLOCK by design until the Codex gate closes — this is the gate that turns B2 from test-verified into ship-gate-discharged.
+- Challenge or failure that appeared: the first `npm run test:e2e` run failed 1/4 — the "why-chain end to end" test, at its `/console`→`/merchant` navigation step (`12 × unexpected value "…/console"`).
+- Why it happened: a Playwright first-navigation hydration race — the click fired before the client router attached. My edits touch neither `/console` nor routing; the merchant pages prerender fine in the build; the 3 other tests (which also load merchant pages) passed.
+- How it was diagnosed: reasoned about the causal path (no edit reaches `/console` or routing) → re-ran the suite to distinguish flake from regression → clean 4/4 in 13.6s. Confirmed flake.
+- Options considered: (a) treat the e2e fail as a regression + investigate the merchant page, vs (b) re-run to test the flake hypothesis. Chose (b) because there was no causal path from the diff to the failing navigation step; had the re-run failed again, (a) would have followed.
+- Final fix: no code change for the flake (a test-harness timing artifact — reported honestly, not hidden). The 3 Codex findings are the real fixes (above).
+- Why this fix: each finding is the honest, advisory-consistent option — F1 surfaces the flag to the human WITHOUT making the judge gate the send (the trap; gating the send would break AM-4); F2/F3 are invariant/fidelity test-hardening at ~zero risk.
+- How it was implemented: read the diff myself first (primary-model-final needs an independent ground-truth read to weigh Codex's findings); pre-registered the per-finding accept/refute discriminators with the advisor before spending the seat; applied the 3 edits; ran the real verify + e2e.
+- How it was verified: `npm run verify` green **255 + 4 skipped**, exit 0; `npm run test:e2e` **4/4** (after the flake re-run); differential **20/20** (`lib/core`+oracle+gold+frozen snapshot UNTOUCHED).
+- Prevention step for the future: the audit-wording test now structurally bans send-gating verbs on flagged domain entries, so a future regression that describes the advisory judge as gating the send fails the suite.
+- Files changed: `app/merchant/[id]/page.tsx`, `evals/replay.test.ts`, `docs/reviews/codex-2026-06-26-b2-domain-shipgate.md` (new), `docs/reviews/gate-2026-06-26-b2-domain-shipgate.md` (gate-2 CLEARED), + state-doc sync (`PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/task-log.md`).
+- Reviewer notes (Codex / human): Codex `gpt-5.5` @ `xhigh`, read-only, full run ~212.5k tokens, session `019f069f`; SHIP; independently confirmed `AuditEntrySchema` enforced + the renumber correct; did not push the gate-the-send trap.
+- Human decision: owner pre-authorized "commit the reconciliation" in the resume prompt; push owner-gated.
+
+---
+
 ## 2026-06-26 Track B2 — wire the domain judge into the REPLAY ship-gate as the tertiary ADVISORY control
 
 - What changed: Wired the calibrated domain judge into the REPLAY snapshot as the tertiary control (R-DARCH-4: gatekeeper → faithfulness → domain), `$0` deterministic mock, surfaced + audited like the faithfulness `judge` field. `ReplayMerchant.domainJudge` (gated on `gatekeeper.approvedForHumanReview`, parallel to faithfulness — NOT chained on faithfulness-pass), a `"domain"` `AuditEntry` actor (after `judge`, before `eval`), and a Merchant-Detail "5 · Domain quality check" panel (Eval→6/Human→7/Audit→8).

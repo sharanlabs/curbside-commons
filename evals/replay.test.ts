@@ -5,7 +5,7 @@ import { normalizeRow } from "@/lib/core/pipeline";
 import { mockDraft } from "@/lib/agents/draft";
 import { runGatekeeper } from "@/lib/agents/gatekeeper";
 import { mockJudgeResult } from "@/lib/agents/semantic-judge";
-import { mockDomainJudge, dimensionPassMap } from "@/lib/agents/domain-judge";
+import { mockDomainJudgeResult, dimensionPassMap } from "@/lib/agents/domain-judge";
 
 const snap = buildReplaySnapshot();
 
@@ -103,6 +103,12 @@ describe("REPLAY — domain-quality judge wired as the advisory tertiary control
       expect(entry.detail.toLowerCase()).not.toContain("reject");
       if (rm.domainJudge?.verdict.domain_defective) {
         expect(entry.detail.toLowerCase()).toContain("advisory");
+        // Advisory means advisory: a FLAGGED domain verdict must never be described with send-gating
+        // language. (The skipped-branch "the gatekeeper blocked the draft" is a different, honest case —
+        // that entry is never domain_defective, so it is out of this scope.)
+        for (const gatingVerb of ["reject", "block", "gate", "hold", "prevent"]) {
+          expect(entry.detail.toLowerCase()).not.toContain(gatingVerb);
+        }
       }
     }
   });
@@ -132,7 +138,7 @@ describe("§4.2 non-redundancy — no_over_promise catches implied-typicality hy
     // there is no data field to entail it against — per-claim entailment structurally cannot see it.
     expect(mockJudgeResult(hype, m).verdict.any_unsupported).toBe(false);
     // Tertiary control — ONLY no_over_promise fails; matched + engagement still pass. The §4.2 seam, closed.
-    const dom = mockDomainJudge(hype, m); // returns a DomainVerdict directly (not wrapped in .verdict)
+    const dom = mockDomainJudgeResult(hype, m).verdict; // exercise the EXACT fn REPLAY wires (run.ts), unwrapped
     expect(dimensionPassMap(dom)).toEqual({
       matched_to_blocker: true,
       engagement_appropriate: true,

@@ -296,8 +296,14 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
           ) : (
             <div>
               <p className="text-[13px] text-emerald-700">
-                Eligible and clean → <span className="font-medium">simulated send</span> recorded.
+                Eligible by the deterministic core → <span className="font-medium">simulated send</span> recorded.
               </p>
+              {domainJudge?.verdict.domain_defective ? (
+                <p className="mt-1 text-[11px] text-amber-700">
+                  The domain quality check above flagged this draft — advisory only; it does not change
+                  eligibility or the send.
+                </p>
+              ) : null}
               {m.idempotency_key ? (
                 <p className="mt-1 font-mono text-[11px] text-neutral-500">
                   idempotency_key: {m.idempotency_key}
