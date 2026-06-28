@@ -28,5 +28,15 @@
 ## Post-fix state
 `npm run verify` green: **277 passed + 4 skipped** (+7 regression tests: 4 env-routing, 2 prompt-wiring, 1 mutating-recommender). Each finding is test-locked. Differential lane still UNTOUCHED.
 
-## Verdict (round 2 — confirming re-pass on the FIXED diff)
-**PENDING** — running read-only via `codex-guarded` (the seat is shared cross-project; the first foreground attempt exceeded the 10-min limit, re-running in background). Result + reconciliation appended here on completion. Per the A1/A2/A3-1 precedent, the reconciliation is **test-verified** (each finding has a regression lock) and the confirming SHIP discharges the BLOCK.
+## Verdict (round 2 — confirming re-pass on the FIXED diff): **SHIP** — no blocking residuals
+
+Read-only re-pass via `codex-guarded` (background; the first foreground attempt exceeded the 10-min limit). Verbatim confirmations:
+- **F1 resolved:** `groqLiveEnabled()` is `ENABLE_LIVE_AI && GROQ_API_KEY` with no provider switch (`lib/server/env-flags.ts`); the Strategist uses it (`strategist.ts:211/:218`); the Groq drafter uses it (`groq-draft.ts:84/:92`). The `JUDGE_PROVIDER=gemini` misroute is closed.
+- **F2 resolved:** `Recommendation.mode/errorClass` exist (`orchestrator.ts`); the plan step records `recommendation.mode ?? "DETERMINISTIC_RULES"` + the fallback detail; `agent` stays `"tool"`.
+- **F3 resolved:** `buildStrategistPrompt` carries the discriminating fact lines; tests assert risk, review flag, tenure, engagement, blocker label/code, root cause + merchant-name absence (`strategist.test.ts`).
+- **F4 resolved:** `recommend({ ...merchant }, diagnosis)` isolates the eligibility fields; the async mutating-recommender regression is non-vacuous (`agent-loop.test.ts`).
+- **Prior probes hold:** advisory route does not feed `simulate_send`; the anti-theater eval is non-vacuous; no send gap; tool-until-earned intact (no `strategist`/`router`/`domain_critic` labels in the loop). Differential lane untouched (no changes under `lib/core`, `evals/gold`, `eval/`, `lib/data/*snapshot*`).
+
+Codex did not re-run `npm run verify` (read-only sandbox); it reviewed the fixed diff statically against the maker-side green result (277+4).
+
+**A3-2a Codex gate = FULLY DISCHARGED** (BLOCK → 4 reconciled primary-model-final + test-locked → confirming **SHIP**). Reconciliation files (`groqLiveEnabled` in env-flags.ts + groq-draft.ts) covered by the confirming pass. Raw verdicts: `/tmp/codex-verdict-activationops-a3-2a.txt` (round 1) + `/tmp/codex-verdict-activationops-a3-2a-confirm.txt` (round 2).
