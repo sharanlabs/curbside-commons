@@ -1,5 +1,17 @@
 # Task Log
 
+## 2026-06-28 (A3-4 — Domain Critic wired into the loop VERIFY as the 2nd critic; advisory + independent; anti-theater eval → label DEFERS; COMMITTED TEST-VERIFIED, gate-2 Codex named-open)
+
+**Process:** per-slice A3 gate · FULL · high-risk (AI behavior · cross-family architecture) · Effort auto-routed to MAX. Advisor consulted BEFORE writing (it set the decisive discipline: the Domain Critic needs its OWN anti-theater eval vs `mockDomainJudge` — B1/B2 don't discharge it — and the eval DECIDES the label; flagged the cross-family P1 would recur on the new judge's separate env). Owner said "keep going here" → continued autonomously per the RESUME DIRECTIVE.
+
+**Did:** Wired the existing `judgeDomain` (B1/B2, unchanged) into the loop's VERIFY phase as the 2nd critic — ADVISORY (never gates `verifyPassed`/eligibility/send), INDEPENDENT (no faithfulness input; withholds `diagnose().play`), gatekeeper-gated, with `finalVerify.domain` + a `"domain"` audit actor + a 2nd verify-phase trajectory step. Extended the `live` gate to `crossFamilyReady` (+`resolvedDomainJudgeProvider()==="groq"`) + a fail-closed throw on a forced non-fully-DI'd `live:true`. Built the R-A3-1 anti-theater eval (`evals/domain-critic-antitheater.test.ts`).
+
+**The material finding (anti-theater):** the live Groq domain judge (B1-frozen held-out) **TIES** its deterministic counterpart `mockDomainJudge` on the held-out gold (both aggregate F1 = 1.00) → the eval is a FLOOR-not-ceiling → the **`domain_critic` label DEFERS** (step stays "tool", like the Strategist). Honest earned-agent ledger after A3-4: **Drafter EARNED · Strategist DEFERRED · Domain Critic DEFERRED · Router pending A3-5.** Took the eval at face value (advisor: "if it ties, defer — don't rescue the label").
+
+**Gate:** `npm run verify` **exit 0 — 285 passed + 5 skipped**; differential 20/20 UNTOUCHED. Two red-greens (advisory: domain gating the send → RED; cross-family: `||`→partial-DI attempts a real Gemini call, `&&`→throws). **Codex round-1 BLOCK (6: 1 P1 forced-live cross-family bypass + 2 P2 [stale `lastDomain` · plan claimed DONE] + 3 P3) → ALL reconciled primary-model-final; round-2 confirming → 1 RESIDUAL P1 (the `||` partial-DI hole) → patched to `&&` fully-injected-DI + a 3-case regression; round-3 re-confirm SEAT-BLOCKED (Codex usage limit ~7:25 PM, raw error surfaced, NO retry) = DATED OBLIGATION** → proceeding test-verified. **acceptance-gate = BLOCK (gates 1/3/4/5 PASS; gate-2 NAMED-OPEN — the load-bearing partial-DI fix is unreviewed by Codex + round-1 missed the P1 round-2 caught; flips SHIP 5/5 when round-3 returns).** Records: `docs/reviews/{codex,gate}-2026-06-28-a3-4*.md`.
+
+**Skills used:** advisor (pre-build design + 2 reconciles), acceptance-gate (5-gate ship judge), codex-guarded (cross-model review, 3 rounds — round 3 seat-blocked). Committed test-verified via the RESUME DIRECTIVE; **push HELD** (no remote). NEXT = A3-5, after the A3-4 Codex round-3 re-confirm.
+
 ## 2026-06-28 (A3-3 — Drafter→Gemini cross-family OFFLINE machinery + §4.2 prevention; FULLY GATED, commit owner-authorized via the RESUME DIRECTIVE, push HELD)
 
 **Process:** per-slice A3 gate · FULL · high-risk (AI behavior · cross-family architecture · cost/budget) · Effort auto-routed to MAX (ship-gating). Advisor consulted BEFORE writing (settled: hardcode Gemini not a `draftFn` seam — a seam would be a hole in R-A3-2; don't make `usage:{0,0}` universal — add a real cost-integrity test; honest live-gate). Owner said "resume" → continued autonomously per the RESUME DIRECTIVE.

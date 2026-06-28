@@ -156,14 +156,21 @@ describe("R-LOOP-8 — the loop self-corrects a planted fabrication (injected ve
     expect(result.finalVerify.judge?.mode).toBe("LIVE_JUDGE");
 
     // ── the trajectory records the correction, and proves the LIVE paths ran (not the mock fallback) ──
+    // A3-4: each VERIFY now has TWO steps — the faithfulness control THEN the advisory domain critic
+    // (both "tool"; the domain_critic label DEFERS per the anti-theater eval). Domain runs because the
+    // gatekeeper approved each draft (the fabrication survives the gate; only the judge catches it).
     const phases = result.trajectory.map((s) => s.phase);
-    expect(phases).toEqual(["plan", "draft", "verify", "reflect", "redraft", "verify", "route"]);
+    expect(phases).toEqual(["plan", "draft", "verify", "verify", "reflect", "redraft", "verify", "verify", "route"]);
 
     const draft0 = result.trajectory.find((s) => s.phase === "draft")!;
-    const verify0 = result.trajectory.filter((s) => s.phase === "verify")[0];
+    // index the FAITHFULNESS verify steps explicitly (the domain critic shares the "verify" phase).
+    const faithVerifies = result.trajectory.filter(
+      (s) => s.phase === "verify" && s.toolCalls.some((t) => t.tool === "check_faithfulness_reverse"),
+    );
+    const verify0 = faithVerifies[0];
     const reflect0 = result.trajectory.find((s) => s.phase === "reflect")!;
     const redraft1 = result.trajectory.find((s) => s.phase === "redraft")!;
-    const verify1 = result.trajectory.filter((s) => s.phase === "verify")[1];
+    const verify1 = faithVerifies[1];
 
     expect(draft0.modelMode).toBe("LIVE_AI"); // NOT mockDraft fallback
     expect(verify0.modelMode).toBe("LIVE_JUDGE"); // NOT mockJudge
@@ -174,8 +181,18 @@ describe("R-LOOP-8 — the loop self-corrects a planted fabrication (injected ve
     expect(verify1.modelMode).toBe("LIVE_JUDGE");
     expect(verify1.verdictSummary).toContain("verify=PASS");
 
-    // audit is distinct from the trajectory (R-LOOP-6) and order-preserving.
-    expect(result.audit.map((a) => a.actor)).toEqual(["system", "draft", "gatekeeper", "judge", "system"]);
+    // A3-4: the advisory domain critic ran each verify (gatekeeper-approved) — a "tool" step (label
+    // DEFERS) carrying the domain verdict, surfaced but never gating. domain_critic stays ABSENT.
+    const domainVerifies = result.trajectory.filter(
+      (s) => s.phase === "verify" && s.toolCalls.some((t) => t.tool === "check_domain_quality"),
+    );
+    expect(domainVerifies.length).toBe(2); // one per gatekeeper-approved iteration
+    expect(domainVerifies.every((s) => s.agent === "tool")).toBe(true); // label deferred, not "domain_critic"
+    expect(domainVerifies[0].verdictSummary).toContain("ADVISORY");
+    expect(result.finalVerify.domain).not.toBeNull(); // the verdict is surfaced for the human gate
+
+    // audit is distinct from the trajectory (R-LOOP-6) and order-preserving — now incl. the "domain" actor.
+    expect(result.audit.map((a) => a.actor)).toEqual(["system", "draft", "gatekeeper", "judge", "domain", "system"]);
   });
 
   it("100% convergence across the seeded cases", async () => {
@@ -212,6 +229,129 @@ describe("R-LOOP-8 — the loop self-corrects a planted fabrication (injected ve
     expect(result.stopReason).toBe("max_iterations");
     expect(result.outreachStatus).not.toBe("simulated_sent"); // held, never sent on an unverified draft
     expect(result.sent).toBe(false);
+  });
+});
+
+// ───────────────────── A3-4 — the domain critic is ADVISORY + INDEPENDENT (R-A3-4) ─────────────────────
+
+describe("A3-4 — the domain critic is ADVISORY + INDEPENDENT of faithfulness (R-A3-4)", () => {
+  /** A domain verdict the model would author: one dimension fails ⇒ domain_defective. */
+  const domainDefectiveVerdict = () => ({
+    dimensions: [
+      { dimension: "matched_to_blocker", pass: true, rationale: "addresses the blocker" },
+      { dimension: "engagement_appropriate", pass: true, rationale: "fits the engagement state" },
+      { dimension: "no_over_promise", pass: false, rationale: "implied-typicality hype (a §4.2 residual)" },
+    ],
+    any_dimension_failed: true,
+  });
+
+  it("a domain-DEFECTIVE draft that PASSES faithfulness still converges + sends — domain never gates", async () => {
+    const merchant = normalizeRow(mediumInput("Advisory Arepas", 1, 2), 1);
+    const result = await runAgentLoop(
+      { input: mediumInput("Advisory Arepas", 1, 2), index: 1 },
+      {
+        live: false,
+        draftGenerate: async () => ({ object: generatedFrom(merchant), usage: ZERO_USAGE }),
+        judgeGenerate: async () => ({ object: cleanVerdict() }), // faithfulness PASSES (all-supported)
+        domainGenerate: async () => ({ object: domainDefectiveVerdict() }), // domain FLAGS (defective)
+      },
+    );
+
+    // INDEPENDENT (R-A3-4) — STRUCTURAL: judgeDomain receives ONLY (draft, merchant), never the
+    // faithfulness verdict (and domainSituation withholds diagnose().play), so its verdict cannot be a
+    // function of faithfulness. This test exercises the loop SURFACING both verdicts side by side via DI
+    // (faithfulness PASS + domain FLAG on the same draft); the independence itself is from that signature.
+    expect(result.finalVerify.judge?.verdict.any_unsupported).toBe(false); // faithfulness: all-supported
+    expect(result.finalVerify.domain?.verdict.domain_defective).toBe(true); // domain: flagged the SAME draft
+    expect(result.finalVerify.domain?.mode).toBe("LIVE_JUDGE"); // genuine judgment ran (via DI), not the mock
+
+    // ADVISORY (R-A3-4): the domain flag did NOT block — eligibility/send stayed the deterministic core's.
+    // RED-GREEN: making verifyPassed (or the send) depend on domain_defective turns this RED.
+    expect(result.converged).toBe(true);
+    expect(result.outreachStatus).toBe("simulated_sent");
+    expect(result.sent).toBe(true);
+
+    // tool-until-earned: the domain step is "tool" (the label DEFERS per the anti-theater eval), NOT
+    // "domain_critic" — even though a genuine LIVE_JUDGE produced the verdict.
+    const domainStep = result.trajectory.find((s) => s.toolCalls.some((t) => t.tool === "check_domain_quality"))!;
+    expect(domainStep.agent).toBe("tool");
+    expect(new Set(result.trajectory.map((s) => s.agent)).has("domain_critic")).toBe(false);
+  });
+
+  it("a gatekeeper-BLOCKED final draft surfaces NO stale domain verdict (Codex A3-4 P2 — lastDomain reset)", async () => {
+    const merchant = normalizeRow(mediumInput("Stale Strudel", 6, 2), 1);
+    let call = 0;
+    const result = await runAgentLoop(
+      { input: mediumInput("Stale Strudel", 6, 2), index: 1 },
+      {
+        maxIterations: 2,
+        // iter 0: a clean draft (gatekeeper PASS → domain RUNS) but faithfulness flags it → re-draft.
+        // iter 1: a register-leak draft (internal snake_case token) → gatekeeper BLOCKS → domain SKIPPED.
+        draftGenerate: async () => ({
+          object:
+            call++ === 0
+              ? generatedFrom(merchant)
+              : {
+                  ...generatedFrom(merchant),
+                  draft_body: "Hi {{MERCHANT}}, your business_verification_needed step is next.",
+                },
+          usage: ZERO_USAGE,
+        }),
+        judgeGenerate: scriptedJudgeGenerate(FABRICATION), // flag iter 0 → forces the re-draft
+      },
+    );
+
+    // the FINAL draft was gate-BLOCKED; lastDomain reset per iteration ⇒ no STALE iteration-0 verdict.
+    expect(result.finalVerify.gatekeeper?.approvedForHumanReview).toBe(false);
+    expect(result.finalVerify.domain).toBeNull(); // not the earlier approved draft's verdict
+    expect(result.audit.some((a) => a.actor === "domain")).toBe(false); // and no stale domain audit entry
+    // sanity: the domain critic DID run on iteration 0 — proving the null is a RESET, not "never ran".
+    expect(result.trajectory.some((s) => s.toolCalls.some((t) => t.tool === "check_domain_quality"))).toBe(true);
+  });
+
+  it("a forced live:true that is NOT cross-family-ready (DOMAIN_JUDGE_PROVIDER=gemini) FAILS CLOSED — throws (Codex A3-4 P1)", async () => {
+    const keys = ["ENABLE_LIVE_AI", "GEMINI_API_KEY", "GROQ_API_KEY", "JUDGE_PROVIDER", "DOMAIN_JUDGE_PROVIDER"] as const;
+    const saved = Object.fromEntries(keys.map((k) => [k, process.env[k]]));
+    try {
+      process.env.ENABLE_LIVE_AI = "true";
+      process.env.GEMINI_API_KEY = "test-gemini-key";
+      process.env.GROQ_API_KEY = "test-groq-key";
+      process.env.JUDGE_PROVIDER = "groq";
+      process.env.DOMAIN_JUDGE_PROVIDER = "gemini"; // ← the same-family hole: the Domain Critic would be Gemini
+      const R_A3_2 = /R-A3-2: live:true requested but cross-family is not ready/;
+      const input = { input: mediumInput("Crossfam Crepes", 1, 2), index: 1 };
+      const gen = async () => ({ object: generatedFrom(normalizeRow(mediumInput("Crossfam Crepes", 1, 2), 1)), usage: ZERO_USAGE });
+
+      // (a) NO DI — a real forced-live run while the Domain Critic is NOT Groq → THROW before any call.
+      await expect(runAgentLoop(input, { live: true })).rejects.toThrow(R_A3_2);
+
+      // (b) PARTIAL DI (draftGenerate only) STILL throws (Codex A3-4 P1 round 2): the non-injected Domain
+      // Critic would make a REAL Gemini call. The exemption requires FULLY-injected DI, not just any.
+      await expect(runAgentLoop(input, { live: true, draftGenerate: gen })).rejects.toThrow(R_A3_2);
+
+      // (c) FULLY-injected DI is exempt (no real provider call anywhere) → runs, does NOT throw.
+      const di = {
+        live: true as const,
+        draftGenerate: gen,
+        judgeGenerate: async () => ({ object: cleanVerdict() }),
+        domainGenerate: async () => ({
+          object: {
+            dimensions: [
+              { dimension: "matched_to_blocker", pass: true, rationale: "ok" },
+              { dimension: "engagement_appropriate", pass: true, rationale: "ok" },
+              { dimension: "no_over_promise", pass: true, rationale: "ok" },
+            ],
+            any_dimension_failed: false,
+          },
+        }),
+      };
+      await expect(runAgentLoop(input, di)).resolves.toBeDefined();
+    } finally {
+      for (const k of keys) {
+        if (saved[k] === undefined) delete process.env[k];
+        else process.env[k] = saved[k];
+      }
+    }
   });
 });
 
@@ -352,12 +492,12 @@ describe("R-LOOP-6 — the trajectory freezes to a $0 fixture and renders the se
     expect(snap.converged).toBe(true);
     expect(snap.sent).toBe(true);
     expect(snap.outreachStatus).toBe("simulated_sent");
-    expect(snap.trajectory.map((s) => s.phase)).toEqual(["plan", "draft", "verify", "reflect", "redraft", "verify", "route"]);
+    expect(snap.trajectory.map((s) => s.phase)).toEqual(["plan", "draft", "verify", "verify", "reflect", "redraft", "verify", "verify", "route"]);
     // R-A3-6 on the DEPLOYED payoff surface (acceptance-gate advisory): the SERVED snapshot carries
     // valid `agent` attribution and shows no un-earned agent (tool-until-earned holds on the fixture).
     const allowedAgents = new Set(["strategist", "drafter", "domain_critic", "router", "tool"]);
     expect(snap.trajectory.every((s) => allowedAgents.has(s.agent))).toBe(true);
-    expect(snap.trajectory.map((s) => s.agent)).toEqual(["tool", "drafter", "tool", "tool", "drafter", "tool", "tool"]);
+    expect(snap.trajectory.map((s) => s.agent)).toEqual(["tool", "drafter", "tool", "tool", "tool", "drafter", "tool", "tool", "tool"]);
     expect(snap.note).toContain("SCRIPTED"); // honest labeling (AM-7) — not a live "catches its own mistakes" claim
   });
 });
@@ -376,9 +516,10 @@ describe("R-A3-6 — every step carries an `agent` attribution, honest under too
     const allowed = new Set(["strategist", "drafter", "domain_critic", "router", "tool"]);
     for (const s of result.trajectory) expect(allowed.has(s.agent)).toBe(true);
 
-    // The mapping is locked against the known phase sequence (plan,draft,verify,reflect,redraft,verify,route).
-    expect(result.trajectory.map((s) => s.phase)).toEqual(["plan", "draft", "verify", "reflect", "redraft", "verify", "route"]);
-    expect(result.trajectory.map((s) => s.agent)).toEqual(["tool", "drafter", "tool", "tool", "drafter", "tool", "tool"]);
+    // The mapping is locked against the known phase sequence (A3-4: each verify is TWO steps — faithfulness
+    // then the advisory domain critic): plan,draft,verify,verify,reflect,redraft,verify,verify,route.
+    expect(result.trajectory.map((s) => s.phase)).toEqual(["plan", "draft", "verify", "verify", "reflect", "redraft", "verify", "verify", "route"]);
+    expect(result.trajectory.map((s) => s.agent)).toEqual(["tool", "drafter", "tool", "tool", "tool", "drafter", "tool", "tool", "tool"]);
 
     // tool-until-earned (AM-2 / R-A3-1): in A3-1 the ONLY agent that has earned its label is the
     // drafter (the genuinely-generative slot). strategist/router/domain_critic appear ONLY in the

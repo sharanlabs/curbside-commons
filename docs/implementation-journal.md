@@ -30,6 +30,22 @@ Newest entries on top.
 
 ---
 
+## 2026-06-28 A3-4 — the Domain Critic defers its label too: the anti-theater discipline working as designed
+
+**Goal:** wire the existing calibrated domain-quality judge (`judgeDomain`, from B1/B2) into the agent loop's VERIFY phase as the 2nd critic — Groq, cross-family vs the Gemini drafter, ADVISORY, INDEPENDENT of the faithfulness judge (R-A3-4). Offline only; the live run is A3-7.
+
+**The decisive call the advisor forced (before any code): the Domain Critic needs its OWN anti-theater eval — and B1/B2 don't discharge it.** My first instinct was "B1 calibrated it, B2 demonstrated §4.2 non-redundancy, so it earns `domain_critic`." Wrong. R-A3-1's counterpart is the agent's *deterministic baseline*, which here is `mockDomainJudge` (a real keyword/hint heuristic in the same file) — NOT the gold labels (B1 = live-vs-gold accuracy) and NOT the gatekeeper/faithfulness controls (B2 = a different axis). Neither measured live-vs-mock. So I built that eval: ran `mockDomainJudge` through the existing `domain-harness` on the same held-out split and compared to the live judge's B1-frozen metrics.
+
+**The result, taken at face value: a TIE.** The live judge scored held-out F1 = 1.00; the mock *also* scores held-out F1 = 1.00 (identical confusion matrix). The gold positives are single-dimension body-swaps that the tuned heuristic catches as well as the live judge reasons. So the eval is a NECESSARY anti-theater FLOOR (it fails a critic *worse* than the baseline — the inverse-costume failure) but NOT a label-earning ceiling. The advisor was explicit: "if it ties, defer — don't go looking for a close-reading that rescues the label." So the **`domain_critic` label DEFERS**, the loop's domain step stays `"tool"`, and the count stays conservative — exactly the Strategist's A3-2 outcome.
+
+**The honest ledger this produces:** Drafter EARNED · Strategist DEFERRED · Domain Critic DEFERRED · Router pending. Two of three non-Drafter agents now defer. That is a real signal, not a failure of the slice: the anti-theater discipline is refusing to dress deterministic tools in agent costumes on gold sets that don't discriminate. The discriminating evidence — does the live judge catch defects on *diverse live prose* that the keyword mock misses — needs live Gemini drafts (A3-7) or harder adversarial cases. The wiring still ships (the advisory Effective-axis signal flows to the human gate); only the *claim* is conservative.
+
+**The cross-family bug recurred (as the advisor predicted), and Codex caught a residual I'd left.** The A3-3 P1 (a same-family judge under a cross-family banner) came back because the domain judge reads a *separate* `DOMAIN_JUDGE_PROVIDER` env. I extended the gate to require `resolvedDomainJudgeProvider()==="groq"` — but Codex round-1 found that a *forced* `live:true` bypasses the default gate, and round-2 found my first fix was still wrong: the DI exemption used `||` (any injected generate), so *partial* DI (`draftGenerate` only + `DOMAIN_JUDGE_PROVIDER=gemini`) skipped the throw and would run a real Gemini domain critic. The fix is `&&` (fully-injected DI). The red-green is sharp: with `||`, the partial-DI case resolves and the domain critic hits `FAILED_TO_FALLBACK` — i.e. it *attempted* the real Gemini call; with `&&`, it throws first.
+
+**Where it landed:** verify green 285+5, differential 20/20 untouched, committed test-verified. The round-3 Codex re-confirm on that `&&` fix is seat-blocked (usage limit ~7:25 PM) — a dated obligation. The acceptance-gate BLOCK'd on exactly that: gate-2 won't stamp SHIP until Codex sees the round-2 fix, and it noted (correctly) that round-1 Codex *missed* the P1 round-2 caught — so the cross-model judge has earned the right to see the patch. A maker-written regression encodes Codex's case but isn't a substitute for the cross-model pass. Committed test-verified, gate-2 named-open; push HELD. Records: `docs/reviews/{codex,gate}-2026-06-28-a3-4*.md`.
+
+---
+
 ## 2026-06-28 A3-3 — Drafter→Gemini cross-family: the metered-drafter cost trap + a configurable-judge hole, both caught by the gate
 
 **Goal:** swap the loop's Drafter from same-family Groq to **cross-family Gemini** (restoring R-A3-2/R-ARCH-3: Gemini drafts ⊥ the Groq judge), wire KB §4.2 over-promise-prevention into the Drafter prompt, offline machinery only ($0; the live run is A3-7, owner-gated).

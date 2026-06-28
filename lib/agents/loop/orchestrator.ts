@@ -39,6 +39,7 @@ import { DEFAULT_BUDGET_CAP_USD } from "@/lib/agents/budget";
 import { estimateLiveCallCostUsd, resolvedGeminiModel, type BudgetContext } from "@/lib/agents/gemini";
 import { draftOutreach, type OutreachDraft } from "@/lib/agents/draft";
 import { judgeDraft, resolvedJudgeProvider, type JudgeResult } from "@/lib/agents/semantic-judge";
+import { judgeDomain, resolvedDomainJudgeProvider, type DomainJudgeResult } from "@/lib/agents/domain-judge";
 import type { GatekeeperReport } from "@/lib/agents/gatekeeper";
 import {
   appendAudit,
@@ -97,9 +98,11 @@ export interface AgentLoopOptions {
   maxIterations?: number;
   /** Cumulative budget ledger for the metered Gemini Drafter ($5 cap; $0 offline). Default { spentUsd:0, estimatedNextUsd:0, capUsd:5 }. */
   budget?: BudgetContext;
-  /** Whether the draft + judge run live. Default = liveAiEnabled() && groqLiveEnabled() &&
-   *  resolvedJudgeProvider()==="groq" — a real cross-family run needs the Gemini-drafter key, the
-   *  Groq-judge key, AND a genuinely Groq judge (R-A3-2; Codex A3-3 P1). */
+  /** Whether the draft + the two critics run live. Default = `crossFamilyReady` = liveAiEnabled() &&
+   *  groqLiveEnabled() && resolvedJudgeProvider()==="groq" && resolvedDomainJudgeProvider()==="groq" — a
+   *  real cross-family run needs the Gemini-drafter key AND BOTH critics genuinely Groq (the faithfulness
+   *  judge AND the Domain Critic, separate envs; R-A3-2). Forcing live:true that is not cross-family-ready
+   *  (and not a DI path) THROWS rather than silently going same-family (Codex A3-4 P1). */
   live?: boolean;
   /** Inter-call pacing (ms) against the provider windows (Gemini drafter + Groq judge) — LIVE path only (R-LOOP-4). */
   pacingMs?: number;
@@ -111,6 +114,8 @@ export interface AgentLoopOptions {
   draftGenerate?: GenerateObjectFn;
   /** DI: the reverse-faithfulness judge generate (offline machinery — inject the failing verdict). */
   judgeGenerate?: GenerateObjectFn;
+  /** DI: the DOMAIN critic's object-generate (offline machinery — inject a per-dimension domain verdict). */
+  domainGenerate?: GenerateObjectFn;
 }
 
 export interface AgentLoopResult {
@@ -122,7 +127,14 @@ export interface AgentLoopResult {
   /** Verify passed within the cap (gatekeeper approved AND judge all-supported). */
   converged: boolean;
   stopReason: StopReason;
-  finalVerify: { gatekeeper: GatekeeperReport | null; judge: JudgeResult | null; passed: boolean };
+  /** `domain` is the ADVISORY Effective-axis verdict (A3-4) — surfaced for the human gate, NEVER an input
+   *  to `passed`/eligibility/the send. `null` when the gatekeeper blocked the draft (the critic is moot). */
+  finalVerify: {
+    gatekeeper: GatekeeperReport | null;
+    judge: JudgeResult | null;
+    domain: DomainJudgeResult | null;
+    passed: boolean;
+  };
   outreachStatus: OutreachStatus;
   sent: boolean;
   /** Total LLM spend across the run. $0 offline (no real call) AND $0 on the public REPLAY demo;
@@ -230,13 +242,32 @@ export async function runAgentLoop(
   // CLONE the budget so the cumulative ledger we accrue across re-drafts (the Gemini Drafter bills
   // every iteration) never mutates the caller's object; default is a fresh $5-capped ledger.
   const budget: BudgetContext = { ...(opts.budget ?? { spentUsd: 0, estimatedNextUsd: 0, capUsd: DEFAULT_BUDGET_CAP_USD }) };
-  // CROSS-FAMILY GATE (R-A3-2; Codex A3-3 P1). A live run needs the Gemini Drafter key (liveAiEnabled)
-  // AND a genuinely Groq judge — the Groq key (groqLiveEnabled) AND the judge provider actually
-  // resolving to "groq". `judgeLiveEnabled()` alone is NOT enough: under JUDGE_PROVIDER=gemini it is
-  // satisfied by a Gemini key, which would run Gemini-drafts-Gemini-judges (SAME family) while the code
-  // claims cross-family. Gating on resolvedJudgeProvider()==="groq" makes the cross-family claim true by
-  // construction — a non-Groq judge config (the spec's Gemini-judge alt) opts the live loop out, not in.
-  const live = opts.live ?? (liveAiEnabled() && groqLiveEnabled() && resolvedJudgeProvider() === "groq");
+  // CROSS-FAMILY READINESS (R-A3-2; Codex A3-3 P1 + A3-4). A real cross-family live run needs the Gemini
+  // Drafter key (liveAiEnabled) AND BOTH Groq critics — the Groq key (groqLiveEnabled) AND BOTH judge
+  // providers actually resolving to "groq": the faithfulness judge (resolvedJudgeProvider) AND the Domain
+  // Critic (resolvedDomainJudgeProvider, a SEPARATE DOMAIN_JUDGE_PROVIDER env). Either flipped to gemini
+  // would run a SAME-family critic while the code claims cross-family.
+  const crossFamilyReady =
+    liveAiEnabled() &&
+    groqLiveEnabled() &&
+    resolvedJudgeProvider() === "groq" &&
+    resolvedDomainJudgeProvider() === "groq";
+  // FAIL CLOSED on a FORCED live:true that bypasses the default gate (Codex A3-4 P1, round 2): a caller
+  // that forces live:true with a non-Groq critic config (e.g. DOMAIN_JUDGE_PROVIDER=gemini) would run
+  // same-family critics under a cross-family banner. The exemption requires FULLY-injected DI — ALL of
+  // draft + judge + domain generates — because PARTIAL DI still leaves the non-injected critic making a
+  // REAL provider call (e.g. live:true + draftGenerate only + DOMAIN_JUDGE_PROVIDER=gemini would run a
+  // real Gemini Domain Critic). A REAL forced-live run that is not cross-family-ready THROWS rather than
+  // silently going same-family. (The A3-7 harness forces live:true only behind its crossFamilyReady skip-gate.)
+  const fullyInjectedDI = Boolean(opts.draftGenerate && opts.judgeGenerate && opts.domainGenerate);
+  if (opts.live === true && !crossFamilyReady && !fullyInjectedDI) {
+    throw new Error(
+      "R-A3-2: live:true requested but cross-family is not ready — need the Gemini Drafter key AND BOTH " +
+        "the faithfulness judge and the Domain Critic resolving to Groq (check ENABLE_LIVE_AI, GEMINI_API_KEY, " +
+        "GROQ_API_KEY, JUDGE_PROVIDER=groq, DOMAIN_JUDGE_PROVIDER=groq).",
+    );
+  }
+  const live = opts.live ?? crossFamilyReady;
   const recommend = opts.recommend ?? defaultRecommend;
   const recorder = new TrajectoryRecorder();
 
@@ -299,6 +330,7 @@ export async function runAgentLoop(
   let draft: OutreachDraft | null = null;
   let lastGate: GatekeeperReport | null = null;
   let lastJudge: JudgeResult | null = null;
+  let lastDomain: DomainJudgeResult | null = null; // ADVISORY Effective-axis verdict (A3-4); never gates.
   let attempts = 0;
   let verifyPassed = false;
   let stopReason: StopReason = "max_iterations";
@@ -406,6 +438,47 @@ export async function runAgentLoop(
       verdictSummary: `gatekeeper=${gate.status}; judge any_unsupported=${judge.verdict.any_unsupported}; verify=${verifyPassed ? "PASS" : "FAIL"}`,
     });
 
+    // ── DOMAIN CRITIC (A3-4): the 2nd VERIFY-phase critic — the calibrated Effective-axis judge ──
+    // ADVISORY + INDEPENDENT (R-A3-4): it gets ONLY the draft + the merchant (judgeDomain withholds
+    // diagnose().play via domainSituation, R-DARCH-2) and is NOT passed the faithfulness verdict, so it
+    // is formed without it. Its verdict NEVER feeds verifyPassed/eligibility/the send (verifyPassed was
+    // ALREADY finalized above; nothing below reads lastDomain into a gate). It runs ONLY on a gatekeeper-
+    // APPROVED draft (R-DARCH-4 ordering: gatekeeper → faithfulness → domain; a blocked draft is moot).
+    //
+    // LABEL DEFERS — the step is "tool", NOT "domain_critic" (A3-4 anti-theater eval, floor-not-ceiling):
+    // on the held-out gold the deterministic mockDomainJudge TIES the live judge (both F1 1.00), so the
+    // eval is a NECESSARY FLOOR (it fails a critic WORSE than the baseline), NOT a label-earning ceiling.
+    // The label flips to "domain_critic" IFF a future discriminating eval shows the live judge materially
+    // beats the mock (evals/domain-critic-antitheater.test.ts locks the defer). Tool-until-earned (AM-2).
+    //
+    // RESET per iteration (Codex A3-4 P2): lastDomain holds ONLY the current draft's verdict, so if the
+    // FINAL iteration's gatekeeper BLOCKS (skipping the domain critic), finalVerify.domain + the audit are
+    // null — never a stale verdict from an earlier approved draft.
+    lastDomain = null;
+    if (gate.approvedForHumanReview) {
+      if (live && opts.pacingMs) await sleep(opts.pacingMs);
+      const domain = await judgeDomain(draft, merchant, { live, budget, generate: opts.domainGenerate });
+      totalCostUsd += domain.costUsd;
+      budget.spentUsd += domain.costUsd; // accrue ALL metered spend (Groq domain critic => $0 no-op).
+      lastDomain = domain;
+      const dimsPassed = domain.verdict.dimensions.filter((d) => d.pass).length;
+      recorder.record({
+        phase: "verify",
+        agent: "tool", // label DEFERS (see above) — flips to "domain_critic" only when the eval earns it
+        iteration: i,
+        toolCalls: [
+          {
+            tool: "check_domain_quality",
+            summary: `${domain.mode} ${dimsPassed}/${domain.verdict.dimensions.length} dims passed; domain_defective=${domain.verdict.domain_defective}`,
+          },
+        ],
+        modelMode: domain.mode,
+        // ADVISORY — surfaced for the human gate; "directional" calibration label held (R-A3-8: the judge
+        // was calibrated on the synthetic gold, NOT on live Gemini prose). Never changes the send.
+        verdictSummary: `domain_defective=${domain.verdict.domain_defective} (ADVISORY — directional; does not gate the send)`,
+      });
+    }
+
     if (verifyPassed) {
       stopReason = "verified";
       break;
@@ -512,6 +585,22 @@ export async function runAgentLoop(
       },
     });
   }
+  if (lastDomain) {
+    const dimsPassed = lastDomain.verdict.dimensions.filter((d) => d.pass).length;
+    audit = appendAudit.run({
+      log: audit,
+      entry: {
+        at: RUN_TIMESTAMP,
+        actor: "domain", // the ADVISORY Effective-axis critic (A3-4); ordered after `judge`, before the final system entry
+        action: lastDomain.mode,
+        detail:
+          `${dimsPassed}/${lastDomain.verdict.dimensions.length} domain-quality dimensions passed` +
+          (lastDomain.verdict.domain_defective
+            ? " → domain quality flagged (ADVISORY — surfaced for review; does not change the send or eligibility)."
+            : "."),
+      },
+    });
+  }
   audit = appendAudit.run({
     log: audit,
     entry: {
@@ -544,7 +633,7 @@ export async function runAgentLoop(
     iterations: attempts,
     converged: verifyPassed,
     stopReason,
-    finalVerify: { gatekeeper: lastGate, judge: lastJudge, passed: verifyPassed },
+    finalVerify: { gatekeeper: lastGate, judge: lastJudge, domain: lastDomain, passed: verifyPassed },
     outreachStatus,
     sent,
     costUsd: totalCostUsd,

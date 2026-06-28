@@ -26,15 +26,21 @@ import { writeFileSync } from "node:fs";
 import { describe, it, expect } from "vitest";
 import { groqLiveEnabled, liveAiEnabled } from "@/lib/server/env-flags";
 import { resolvedJudgeModel, resolvedJudgeProvider } from "@/lib/agents/semantic-judge";
+import { resolvedDomainJudgeProvider } from "@/lib/agents/domain-judge";
 import { resolvedGeminiModel } from "@/lib/agents/gemini";
 import { runAgentLoop, type AgentLoopResult } from "@/lib/agents/loop/orchestrator";
 import { GOLD_JUDGE_TERRITORY_POSITIVES } from "@/evals/gold/semantic-judge-gold";
 
-// CROSS-FAMILY GATE (R-A3-2; Codex A3-3 P1): a real cross-family run needs the Gemini Drafter key
-// (liveAiEnabled), the Groq judge key (groqLiveEnabled), AND the judge provider actually resolving to
-// "groq". Gating on resolvedJudgeProvider()==="groq" prevents a JUDGE_PROVIDER=gemini config from
-// running Gemini-drafts-Gemini-judges (same-family) under a "cross-family" banner — it skips instead.
-const live = liveAiEnabled() && groqLiveEnabled() && resolvedJudgeProvider() === "groq";
+// CROSS-FAMILY GATE (R-A3-2; Codex A3-3 P1 + A3-4): a real cross-family run needs the Gemini Drafter key
+// (liveAiEnabled), the Groq key (groqLiveEnabled), AND BOTH critics resolving to "groq" — the
+// faithfulness judge (resolvedJudgeProvider) AND the Domain Critic (resolvedDomainJudgeProvider, a
+// SEPARATE env). Either flipped to gemini would run a same-family critic under a "cross-family" banner;
+// gating on both === "groq" skips instead.
+const live =
+  liveAiEnabled() &&
+  groqLiveEnabled() &&
+  resolvedJudgeProvider() === "groq" &&
+  resolvedDomainJudgeProvider() === "groq";
 
 /**
  * PLACEHOLDER split (Codex A3-3 P2): the EXISTING P3 held-out planted positives (R-CAL-7 test split).
@@ -124,8 +130,10 @@ describe.skipIf(!live)("LIVE R-A3-7 — cross-family loop self-corrects the held
           finalAnyUnsupported: result.finalVerify.judge?.verdict.any_unsupported ?? null,
           outreachStatus: result.outreachStatus,
         });
-        // Cross-family judge ENFORCED per item (R-A3-2; Codex A3-3 P1): the catcher is the Groq judge, never Gemini.
+        // Cross-family critics ENFORCED per item (R-A3-2): BOTH the faithfulness judge AND the advisory
+        // Domain Critic are the Groq family, never Gemini (the catcher + the domain critic vs a Gemini drafter).
         expect(result.finalVerify.judge?.provider).toBe("groq");
+        expect(result.finalVerify.domain?.provider).toBe("groq");
         // The Gemini Drafter bills; the REAL cumulative ledger (accrued above) must never exceed the $5 cap (R-A3-7).
         expect(budget.spentUsd).toBeLessThanOrEqual(budget.capUsd);
         expect(result.costUsd).toBeGreaterThanOrEqual(0);
