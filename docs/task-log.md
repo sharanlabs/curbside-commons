@@ -1,5 +1,15 @@
 # Task Log
 
+## 2026-06-28 (A3-3 — Drafter→Gemini cross-family OFFLINE machinery + §4.2 prevention; FULLY GATED, commit owner-authorized via the RESUME DIRECTIVE, push HELD)
+
+**Process:** per-slice A3 gate · FULL · high-risk (AI behavior · cross-family architecture · cost/budget) · Effort auto-routed to MAX (ship-gating). Advisor consulted BEFORE writing (settled: hardcode Gemini not a `draftFn` seam — a seam would be a hole in R-A3-2; don't make `usage:{0,0}` universal — add a real cost-integrity test; honest live-gate). Owner said "resume" → continued autonomously per the RESUME DIRECTIVE.
+
+**Did:** Swapped the loop's Drafter `draftOutreachGroq`→`draftOutreach` (Gemini, cross-family R-A3-2/R-ARCH-3); moved shared `withRevision` into `draft.ts` + added `instruction` to `draftOutreach`; wired KB §4.2 `DOMAIN_HONESTY_RULES` (static, merchant-independent, off the per-merchant `facts`) into the shared `buildPrompt` (R-A3-5); threaded a cloned cumulative $5 ledger (accrues drafter + judge spend; `UNKNOWN_USAGE` fail-closed); honest live-gate default; reframed the honesty notes cross-family; offline DI fixtures → usage `{0,0}` ($0 known); added 2 cost-integrity tests; repurposed the A2 live Groq test into the A3-7 cross-family harness skeleton; R-A3-8 note in `docs/{judge,domain}-calibration-status.md`. 9 files (`git diff --stat` 284+/111-).
+
+**Gate:** `npm run verify` **exit 0 — 279 passed + 5 skipped**, typecheck/lint/build green; differential **20/20** (`lib/core`+oracle+gold+snapshots UNTOUCHED). **Codex changed-files review → BLOCK (6: 2 P1+2 P2+2 P3) → ALL reconciled primary-model-final + re-verified → confirming re-pass SHIP** — F1 cross-family gate not Groq-specific (`resolvedJudgeProvider()==="groq"` fix) + F2 vacuous live-harness ledger (the budget clone) were integrity bugs a green CI can't catch. **acceptance-gate → BLOCK (substance SOUND; caught a record-honesty defect I'd introduced — an overclaimed unreceived "SHIP" header) → 3 conditions discharged (raw verify + red-green + git-diff; confirming Codex SHIP + header fix; grill-basis) → re-stamp SHIP 5/5**. **Red-green:** disabling the loop's estimate-reservation turns the UNKNOWN_USAGE test RED (`expected +0 to be close to 0.0056` — the $0 spend-escape); restore → GREEN. Records: `docs/reviews/{codex,gate}-2026-06-28-a3-3*.md`.
+
+**Skills used:** advisor (pre-build design + reconcile), acceptance-gate (5-gate ship judge), codex-guarded (cross-model review). Commit owner-authorized via the RESUME DIRECTIVE; **push HELD** (no remote). NEXT = A3-4.
+
 ## 2026-06-28 (A3-2b — Strategist live $0 Groq confirmatory eval; CLEARED the pre-registered anti-theater floor; label defers to A3-3)
 
 **Process:** per-slice A3 gate · low-risk (evidence/eval only — no product/core/behavior change; $0 free Groq; internal artifact) · Effort auto-routed. Pre-registered the floor bar BEFORE the run (R-DCAL-7 honesty discipline). Owner said "resume" → continued autonomously per the RESUME DIRECTIVE.

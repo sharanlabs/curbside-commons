@@ -37,7 +37,7 @@ export type TrajectoryAgent = "strategist" | "drafter" | "domain_critic" | "rout
 
 /** One tool/action invocation within a step, summarized for the trajectory view. */
 export interface TrajectoryToolCall {
-  /** The A1 tool name (triage_merchant, ...) or the Groq drafting action / live judge. */
+  /** The A1 tool name (triage_merchant, ...) or the Drafter action / live judge. */
   tool: string;
   /** A one-line summary of what it returned (not the full payload — that lives in the audit/record). */
   summary: string;
@@ -80,7 +80,7 @@ export class TrajectoryRecorder {
 export interface AgentLoopSnapshot {
   servedMode: "REPLAY";
   generatedAt: string;
-  /** Honesty note (AM-7 / R-LOOP-5): same-family verify, convergence not calibrated faithfulness. */
+  /** Honesty note (AM-7 / R-ARCH-3): cross-family verify (A3-3), convergence not calibrated faithfulness. */
   note: string;
   merchantId: string;
   converged: boolean;
@@ -92,11 +92,17 @@ export interface AgentLoopSnapshot {
   audit: AuditEntry[];
 }
 
-/** The default honesty note stamped on a frozen trajectory (AM-7 + R-LOOP-5). */
+/**
+ * The default honesty note stamped on a frozen trajectory (AM-7 + R-ARCH-3). Named A2_* for its
+ * origin (the grill record cites this constant as where the caveat lives); the CONTENT tracks the
+ * live architecture, updated at A3-3 when the Drafter became Gemini (cross-family restored).
+ */
 export const A2_HONESTY_NOTE =
-  "A2 single-agent verify-and-self-correct loop. Drafter AND reverse-faithfulness judge are BOTH " +
-  "Groq gpt-oss-120b (same-family): this proves loop CONVERGENCE/machinery, NOT calibrated " +
-  "faithfulness. Cross-family maker!=judge (R-ARCH-3) is restored at A3. $0, no Gemini.";
+  "Single-agent verify-and-self-correct loop. CROSS-FAMILY maker!=judge (R-ARCH-3, restored at A3-3): " +
+  "the Drafter is Gemini Flash and the reverse-faithfulness judge is Groq gpt-oss-120b (different " +
+  "families). The loop proves CONVERGENCE/machinery; the faithfulness judge's calibration label stays " +
+  "'directional' and was NOT re-calibrated on live Gemini prose (R-A3-8). No real spend offline; a live " +
+  "Gemini Drafter bills every re-draft, ledger-tracked under the $5 cap (live run owner-gated, A3-7).";
 
 /**
  * Freeze a completed loop run into the serializable REPLAY snapshot. PURE — the orchestrator hands in

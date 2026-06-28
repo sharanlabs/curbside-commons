@@ -107,6 +107,16 @@ export function mockDraft(merchant: Merchant, platformName = REFERENCE_PLATFORM_
  *
  * Exported so the A2 Groq drafting path reuses the SAME constrained prompt (only the provider
  * differs); the security framing lives in ONE place (R-LOOP-7).
+ *
+ * DOMAIN HONESTY — §4.2 PREVENTION WIRING (R-A3-5, A3-3): the over-promise-prevention rules from
+ * knowledge/domain/merchant-activation-kb.md §4.2 ("Safe vs. unsafe claims in merchant outreach")
+ * are wired in below as a STATIC, MERCHANT-INDEPENDENT block (DOMAIN_HONESTY_RULES). This is the
+ * PREVENTION half of the owner's 2026-06-26 defense-in-depth decision (the DETECTION half — the
+ * `no_over_promise` domain dimension — ships in B2's domain judge). GUARDRAIL (R-A3-5): the KB
+ * informs tactics / tone / what-NOT-to-claim ONLY — it never enters the per-merchant factual path
+ * (`facts` below stays exactly the structured fields; RAG stays OFF the facts), so it cannot
+ * smuggle an un-grounded fact into a claim. Shared with the Groq path too (R-LOOP-7) = defense
+ * in depth on both providers.
  */
 export function buildPrompt(merchant: Merchant, platformName: string): string {
   // No merchant_name here — see the SECURITY note above. merchant_category is the crosswalked
@@ -138,7 +148,48 @@ export function buildPrompt(merchant: Merchant, platformName: string): string {
     "  risk level ('High Risk', 'Medium risk'); state the situation in plain merchant-facing words.",
     "- Keep it short, plain, and helpful.",
     "",
+    DOMAIN_HONESTY_RULES,
+    "",
     `FACTS:\n${JSON.stringify(facts, null, 2)}`,
+  ].join("\n");
+}
+
+/**
+ * The KB §4.2 over-promise-prevention rules, encoded for the Drafter prompt (R-A3-5). STATIC +
+ * MERCHANT-INDEPENDENT — these are domain tactics ("what kind of claim is unsafe"), never
+ * per-merchant facts, so they carry no RAG / no factual-path risk. Sourced verbatim-in-spirit from
+ * knowledge/domain/merchant-activation-kb.md §4.2 "Rules for a critic to enforce" (1–5).
+ */
+export const DOMAIN_HONESTY_RULES = [
+  "Domain honesty (KB §4.2 — merchant-outreach over-promise prevention):",
+  "- Implied claims count: a 'stores like yours' / testimonial framing that IMPLIES a typical",
+  "  result is a performance/earnings claim — do not use it.",
+  "- Default to PROCESS / CONDITIONAL framing ('complete your menu to start receiving orders'),",
+  "  never an outcome framing ('watch the orders roll in'); anything touching revenue/earnings/",
+  "  'grow' is for human review, not for you to assert.",
+  "- No guarantee about an outcome the merchant or platform controls (live-by-a-date, sales uplift).",
+  "- No fabricated urgency or scarcity ('activate now or lose your spot'); state only the true state.",
+  "- The honest, matched message is also the higher-retention one — over-promising a stalled",
+  "  merchant who then has a bad experience accelerates churn.",
+].join("\n");
+
+/**
+ * Append the reflect->redraft revision instruction to the constrained prompt (R-LOOP-2). The
+ * appendix is OUR text, but it is framed as "remove the flagged content, add NO new fact" so a
+ * future LLM-authored reflection cannot smuggle a fabrication back in.
+ *
+ * SHARED, NOT FORKED (R-LOOP-7): exported so the Groq path (groq-draft.ts) reuses the SAME revision
+ * framing as the Gemini path — moved here from groq-draft.ts in A3-3 when the loop's drafter became
+ * Gemini, so the redraft contract lives in ONE place across both providers.
+ */
+export function withRevision(prompt: string, instruction: string): string {
+  return [
+    prompt,
+    "",
+    "REVISION REQUIRED — a faithfulness check flagged the previous draft. Rewrite so the flagged",
+    "content is REMOVED. Do NOT introduce any fact that is not in FACTS above (no timelines, named",
+    "entities, capabilities, benefits, or counts the record does not contain). Flagged issue:",
+    instruction,
   ].join("\n");
 }
 
@@ -266,6 +317,9 @@ export async function draftOutreach(
   merchant: Merchant,
   opts: {
     platformName?: string;
+    /** The reflect-step revision instruction (R-LOOP-2); when present the prompt asks the model to
+     *  remove the flagged content without adding new facts. Used by the A3-3 loop's re-draft. */
+    instruction?: string;
     live?: boolean;
     budget?: BudgetContext;
     generate?: (a: {
@@ -305,11 +359,14 @@ export async function draftOutreach(
   if (!opts.budget) return fallback(merchant, platformName, "NO_BUDGET_LEDGER");
   const budget: BudgetContext = opts.budget;
 
+  const basePrompt = buildPrompt(merchant, platformName);
+  const prompt = opts.instruction ? withRevision(basePrompt, opts.instruction) : basePrompt;
+
   try {
     const { object, usage } = await liveGenerateObject({
       model: modelId,
       schema: GeneratedDraftSchema,
-      prompt: buildPrompt(merchant, platformName),
+      prompt,
       budget,
       generate: opts.generate,
     });

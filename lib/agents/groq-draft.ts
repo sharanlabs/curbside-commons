@@ -1,29 +1,38 @@
 /**
- * The A2 Groq drafting ACTION — the LLM action the single-agent loop takes (Constraint #2: A2's loop
- * is FREE Groq gpt-oss-120b; ZERO Gemini). It mirrors lib/agents/draft.ts's draftOutreach contract
- * (mode taxonomy, fail-closed boundary, injectable `generate`), but on the Groq provider and at $0.
+ * The A2 Groq drafting ACTION — the same-family drafter from the A2 loop, RETAINED as the historical
+ * A2 reference (its direct unit tests in evals/agent-loop.test.ts still pin the shared injection-cut +
+ * the free-tier cost model). A3-3 swapped the LOOP's Drafter to cross-family Gemini (lib/agents/draft.ts
+ * `draftOutreach`), so this function is **no longer wired into the orchestrator** — it is kept for those
+ * tests and as the A2 same-family reference, NOT called by the live loop. It mirrors draftOutreach's
+ * contract (mode taxonomy, fail-closed boundary, injectable `generate`), on the Groq provider, at $0.
  *
- * SHARED, NOT FORKED (R-LOOP-7): it reuses buildPrompt + GeneratedDraftSchema + applyInjectionCut from
- * draft.ts verbatim, so the constrained prompt and the lethal-trifecta injection cut are identical to
- * the Gemini path. The ONLY differences are the provider (Groq) and the cost model.
+ * SHARED, NOT FORKED (R-LOOP-7): it reuses buildPrompt + GeneratedDraftSchema + applyInjectionCut +
+ * withRevision from draft.ts verbatim, so the constrained prompt, the §4.2 rules, and the
+ * lethal-trifecta injection cut are identical to the Gemini path. The ONLY differences are the provider
+ * (Groq) and the cost model.
  *
  * COST MODEL (the mock-fallback trap, closed): Groq's free tier is $0 and KNOWN regardless of reported
- * usage — exactly priceJudge()'s groq short-circuit in semantic-judge.ts. We deliberately do NOT reuse
- * draft.ts's priceLive (which fail-closes to UNKNOWN_USAGE -> mockDraft when usage is absent). An
- * injected `generate` returns no usage; on the free tier that is $0, not unknown — so the loop stays on
- * the LIVE_AI path and never silently degrades to the mock (which would make R-LOOP-8 pass for the
- * wrong reason).
+ * usage — exactly priceJudge()'s groq short-circuit in semantic-judge.ts. It deliberately does NOT reuse
+ * draft.ts's priceLive (which fail-closes to UNKNOWN_USAGE -> mockDraft when usage is absent); on the
+ * free tier absent usage is $0, not unknown, so a Groq draft stays LIVE_AI and never silently mocks.
  *
- * SAME-FAMILY (R-LOOP-5): the drafter here AND the reverse-faithfulness judge are both Groq
- * gpt-oss-120b. A2 asserts loop convergence/machinery, NOT calibrated faithfulness. Documented, not
- * overclaimed.
+ * SAME-FAMILY (R-LOOP-5): this drafter AND the reverse-faithfulness judge are both Groq gpt-oss-120b —
+ * the A2 same-family configuration (convergence, NOT calibrated faithfulness). The loop's CURRENT
+ * cross-family maker!=judge (Gemini drafts, Groq judges) lives in the orchestrator (A3-3, R-A3-2).
  */
 import type { z } from "zod";
 import { REFERENCE_PLATFORM_NAME } from "@/lib/core/constants";
 import type { Merchant } from "@/lib/core/types";
 import type { AgentRunUsage, BudgetContext } from "@/lib/agents/gemini";
 import { BudgetExceededError } from "@/lib/agents/budget";
-import { applyInjectionCut, buildPrompt, GeneratedDraftSchema, mockDraft, type DraftResult } from "@/lib/agents/draft";
+import {
+  applyInjectionCut,
+  buildPrompt,
+  GeneratedDraftSchema,
+  mockDraft,
+  withRevision,
+  type DraftResult,
+} from "@/lib/agents/draft";
 import { liveGroqGenerateObject, resolvedGroqModel } from "@/lib/agents/groq";
 import { groqLiveEnabled } from "@/lib/server/env-flags";
 
@@ -43,22 +52,6 @@ function fallback(merchant: Merchant, platformName: string, errorClass: string):
     costUsd: 0, // free tier — a Groq failure never billed
     errorClass,
   };
-}
-
-/**
- * Append the reflect->redraft revision instruction to the constrained prompt, keeping the untrusted-
- * data framing (the instruction is OUR text, but we frame the whole appendix as "do not add new facts"
- * so a future LLM-authored reflection can't smuggle a fabrication back in).
- */
-function withRevision(prompt: string, instruction: string): string {
-  return [
-    prompt,
-    "",
-    "REVISION REQUIRED — a faithfulness check flagged the previous draft. Rewrite so the flagged",
-    "content is REMOVED. Do NOT introduce any fact that is not in FACTS above (no timelines, named",
-    "entities, capabilities, benefits, or counts the record does not contain). Flagged issue:",
-    instruction,
-  ].join("\n");
 }
 
 /**

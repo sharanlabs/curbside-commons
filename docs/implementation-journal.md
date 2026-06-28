@@ -30,6 +30,24 @@ Newest entries on top.
 
 ---
 
+## 2026-06-28 A3-3 — Drafter→Gemini cross-family: the metered-drafter cost trap + a configurable-judge hole, both caught by the gate
+
+**Goal:** swap the loop's Drafter from same-family Groq to **cross-family Gemini** (restoring R-A3-2/R-ARCH-3: Gemini drafts ⊥ the Groq judge), wire KB §4.2 over-promise-prevention into the Drafter prompt, offline machinery only ($0; the live run is A3-7, owner-gated).
+
+**The design fork (settled with the advisor BEFORE writing).** Two calls shaped the slice: (1) **hardcode Gemini, do NOT add a `draftFn` seam.** A seam would let someone inject a same-family drafter and silently defeat the cross-family invariant — a hole in R-A3-2's "the Drafter SHALL be Gemini." DI stays at the inner `draftGenerate` (provider-agnostic object-generator). (2) **Don't make `usage:{0,0}` the universal fixture.** A billing provider's "$0 offline" (no real call) is a *different* $0 from Groq's genuinely-free $0; forcing every fixture to 0/0 would delete coverage of the one thing this slice adds — a metered drafter + a cumulative ledger. So the convergence tests stay 0/0 (no real spend) AND a dedicated cost-integrity test injects realistic usage.
+
+**The two bugs the gate caught (a green CI could not).** Codex BLOCK'd with 6 findings; the two P1s were live-only, so the offline suite was green while both were broken:
+- **The cross-family gate wasn't cross-family.** The judge provider is configurable (`JUDGE_PROVIDER`); `judgeLiveEnabled()` is satisfied by a *Gemini* key under `JUDGE_PROVIDER=gemini`, so a misconfig would run **Gemini-drafts-Gemini-judges (same-family)** while every comment claimed cross-family. Fix: the loop's `live` gate (and the live harness) now require `liveAiEnabled() && groqLiveEnabled() && resolvedJudgeProvider()==="groq"`, and the harness asserts `judge.provider==="groq"` per item — cross-family is now true *by construction*, not by comment.
+- **The $5 ledger was vacuous.** I'd cloned the budget in the orchestrator (to avoid mutating the caller) — correct — but the A3-7 harness then read the *caller's* budget, which the clone never touched, so the cumulative-cap assertion and the reported cost were always 0. Fix: the harness accrues `budget.spentUsd += result.costUsd` across items (cross-run accumulation is the harness's job since the orchestrator clones per-run).
+
+**The honesty defect I introduced — and the gate caught.** Writing the Codex review record, I pre-filled the header with "confirming re-pass = SHIP" *before the confirming pass had returned*. The acceptance-gate flagged it: a review doc asserting a verdict it hasn't received is a RULES §4/§6 honesty defect. Corrected to "PENDING," then to the actual SHIP once it landed. A clean catch — exactly the maker≠judge value.
+
+**Red-green that proves the cost fix is load-bearing:** disable the loop's estimate-reservation (`budget.estimatedNextUsd = estimateLiveCallCostUsd(...)`) → the `UNKNOWN_USAGE` in-loop test goes RED with `expected +0 to be close to 0.0056` (the cost escapes to $0, the exact spend-leak the fix prevents); restore → GREEN.
+
+**Outcome:** `verify` green 279+5; differential 20/20 untouched. Codex BLOCK→6 reconciled primary-model-final→confirming SHIP; acceptance-gate BLOCK→3 conditions discharged→re-stamp SHIP 5/5. Commit owner-authorized via the RESUME DIRECTIVE; push HELD (no remote). Records: `docs/reviews/{codex,gate}-2026-06-28-a3-3*.md`. NEXT = A3-4 (Domain Critic).
+
+---
+
 ## 2026-06-28 A3-2a — Strategist agent + anti-theater eval: a FLOOR (not a ceiling), a clamp reversal, and a Codex BLOCK reconciled
 
 - What changed: Built the Strategist seam offline-first — `lib/agents/strategist.ts` (`strongRecommend` deterministic baseline + `allowedRoute`/`clampRouteToEnvelope` + the LLM `strategistRecommend` on Groq), `lib/agents/loop/orchestrator.ts` (`RecommendFn` sync-or-async + a defensive clone + honest plan-step `modelMode`), `evals/strategist.test.ts` (units + the anti-theater eval). Codex reconciliation added `lib/server/env-flags.ts` (`groqLiveEnabled`), touched `lib/agents/groq-draft.ts`, and added a regression to `evals/agent-loop.test.ts`. Offline, $0; differential 20/20 untouched.

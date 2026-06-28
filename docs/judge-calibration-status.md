@@ -2,6 +2,8 @@
 
 **Status (2026-06-25): the clean calibration run RAN ($0, cross-family Groq `gpt-oss-120b`). The HELD-OUT (test) split CLEARED the pre-registered bar.** The result is **DIRECTIONAL** (held-out n=15, ~30-item gold set) — the "built + calibrated, metrics = X" claim still waits for **P4** (eval-lock + Codex gate) and the **~100+ validation floor** (R-HON-1/3).
 
+> **A3-3 note (R-A3-8, 2026-06-28) — the directional label is NOT upgraded by the multi-agent loop.** A3-3 swapped the loop's Drafter to **Gemini Flash** (cross-family — Gemini drafts, this Groq judge checks). The metrics above were calibrated over the **synthetic gold set**, NOT over **live Gemini prose** (a new draft distribution). Running this judge inside the A3 loop adds **no** evidence about its faithfulness calibration; the label stays **"directional, pending the ~100 floor."** Re-calibration / K re-pinning on the live Gemini distribution is **owner-gated at A3-7** (R-A3-9).
+
 ## The run (2026-06-25)
 
 - Live cross-family judge: Groq `openai/gpt-oss-120b`, strict structured outputs, `reasoningEffort:"low"`, temp 0, **K=3 reps/item over the 30-item gold set**. **$0** (free tier). Snapshot: `lib/data/judge-calibration.snapshot.json`.

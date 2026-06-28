@@ -25,6 +25,8 @@ import { normalizeRow } from "@/lib/core/pipeline";
 import type { Merchant, MerchantInput } from "@/lib/core/types";
 import { MERCHANT_PLACEHOLDER, mockDraft } from "@/lib/agents/draft";
 import { draftOutreachGroq } from "@/lib/agents/groq-draft";
+import { costUsd } from "@/lib/agents/pricing";
+import { estimateLiveCallCostUsd, resolvedGeminiModel } from "@/lib/agents/gemini";
 import { runAgentLoop, type Recommendation } from "@/lib/agents/loop/orchestrator";
 import { freezeTrajectory } from "@/lib/agents/loop/trajectory";
 import { getAgentLoopSnapshot } from "@/lib/agents/loop/snapshot";
@@ -65,10 +67,18 @@ const cleanVerdict = () => ({
   any_unsupported: false,
 });
 
-/** Scripted draft generate: planted fabrication on call 0, clean on every later call. */
+/**
+ * Offline DI usage: a (mocked) call that reported ZERO tokens. On the METERED Gemini Drafter (A3-3)
+ * this prices as KNOWN $0, so the loop stays on the LIVE_AI path WITHOUT recording real spend — the
+ * honest "no real call offline" $0, distinct from Groq's genuinely-free $0. Absent usage would fail
+ * closed to UNKNOWN_USAGE -> mockDraft (Codex P1 cost guard), which is exercised separately below.
+ */
+const ZERO_USAGE = { inputTokens: 0, outputTokens: 0 } as const;
+
+/** Scripted draft generate: planted fabrication on call 0, clean on every later call (ZERO_USAGE => known $0). */
 function scriptedDraftGenerate(merchant: Merchant, fab: string) {
   let call = 0;
-  return async () => ({ object: call++ === 0 ? generatedFrom(merchant, fab) : generatedFrom(merchant) });
+  return async () => ({ object: call++ === 0 ? generatedFrom(merchant, fab) : generatedFrom(merchant), usage: ZERO_USAGE });
 }
 /** Scripted judge generate: flag (any_unsupported) on call 0, all-supported on every later call. */
 function scriptedJudgeGenerate(fab: string) {
@@ -137,7 +147,7 @@ describe("R-LOOP-8 — the loop self-corrects a planted fabrication (injected ve
     expect(result.converged).toBe(true);
     expect(result.iterations).toBe(2);
     expect(result.stopReason).toBe("verified");
-    expect(result.costUsd).toBe(0); // R-LOOP-4 / no Gemini
+    expect(result.costUsd).toBe(0); // offline DI: a (mocked) 0-token call => known $0 (no real spend)
     expect(result.outreachStatus).toBe("simulated_sent");
     expect(result.sent).toBe(true);
     // the FINAL draft is the clean redraft — the fabrication is gone.
@@ -193,7 +203,7 @@ describe("R-LOOP-8 — the loop self-corrects a planted fabrication (injected ve
       { input: mediumInput("Stubborn Soup", 4, 2), index: 1 },
       {
         maxIterations: 3,
-        draftGenerate: async () => ({ object: generatedFrom(merchant, FABRICATION) }),
+        draftGenerate: async () => ({ object: generatedFrom(merchant, FABRICATION), usage: ZERO_USAGE }),
         judgeGenerate: alwaysFlag,
       },
     );
@@ -214,7 +224,7 @@ describe("R-LOOP-8 fail-closed — a FAILED_TO_FALLBACK judge is held, never sen
       { input: mediumInput("Failsafe Falafel", 1, 2), index: 1 },
       {
         // a clean draft (would clear the gatekeeper) ...
-        draftGenerate: async () => ({ object: generatedFrom(merchant) }),
+        draftGenerate: async () => ({ object: generatedFrom(merchant), usage: ZERO_USAGE }),
         // ... but the LIVE judge call THROWS -> judgeDraft falls back to the mock (FAILED_TO_FALLBACK).
         // Without fail-closed, a clean mock verdict would PASS -> simulate_send. It must NOT.
         judgeGenerate: async () => {
@@ -256,7 +266,7 @@ describe("R-LOOP-8b — the agent cannot override deterministic eligibility", ()
       { input: highRisk, index: 1 },
       {
         recommend: sendAnyway,
-        draftGenerate: async () => ({ object: generatedFrom(merchant) }), // clean draft
+        draftGenerate: async () => ({ object: generatedFrom(merchant), usage: ZERO_USAGE }), // clean draft
         judgeGenerate: async () => ({ object: cleanVerdict() }), // all-supported -> verify passes
       },
     );
@@ -294,7 +304,7 @@ describe("R-LOOP-8b — the agent cannot override deterministic eligibility", ()
       { input: highRisk, index: 1 },
       {
         recommend: mutating,
-        draftGenerate: async () => ({ object: generatedFrom(merchant) }),
+        draftGenerate: async () => ({ object: generatedFrom(merchant), usage: ZERO_USAGE }),
         judgeGenerate: async () => ({ object: cleanVerdict() }),
       },
     );
@@ -388,14 +398,14 @@ describe("R-A3-6 — every step carries an `agent` attribution, honest under too
   it("the seedDraft branch is a fixture, not the Drafter: seed_draft → tool, the generated redraft → drafter [Codex A3-1 F2]", async () => {
     const merchant = normalizeRow(mediumInput("Seeded Soba", 5, 2), 1);
     // iteration-0 is a FED-IN draft (a fixture) carrying a planted fabrication; the injected judge flags
-    // it, so the loop re-drafts on iteration-1 via the GENERATED Groq path (clean) and converges.
+    // it, so the loop re-drafts on iteration-1 via the GENERATED Drafter (Gemini) path (clean) and converges.
     const base = mockDraft(merchant);
     const seed = { ...base, draft_body: `${base.draft_body} ${FABRICATION}` };
     const result = await runAgentLoop(
       { input: mediumInput("Seeded Soba", 5, 2), index: 1 },
       {
         seedDraft: seed,
-        draftGenerate: async () => ({ object: generatedFrom(merchant) }), // the clean redraft
+        draftGenerate: async () => ({ object: generatedFrom(merchant), usage: ZERO_USAGE }), // the clean redraft
         judgeGenerate: scriptedJudgeGenerate(FABRICATION), // flag the seed, clear the redraft
       },
     );
@@ -415,5 +425,54 @@ describe("R-A3-6 — every step carries an `agent` attribution, honest under too
     expect(agents.has("strategist")).toBe(false);
     expect(agents.has("router")).toBe(false);
     expect(agents.has("domain_critic")).toBe(false);
+  });
+});
+
+// ───────────────── A3-3 — cost integrity: the metered Gemini Drafter inside the loop ─────────────────
+// The A3-3 swap (Groq -> Gemini) makes the Drafter a BILLING agent that runs EVERY re-draft. The
+// convergence tests above hold cost at $0 with 0-token DI (no real spend offline) — but $0 fixtures
+// alone would DELETE coverage of the one thing this slice introduces: a metered drafter + a cumulative
+// ledger. These two tests inject REALISTIC usage and lock that behavior (advisor A3-3). Still $0 of
+// REAL spend (DI, no network); the asserted dollars are computed from the pinned Gemini price table.
+describe("A3-3 cost integrity — the metered Gemini Drafter accrues into the loop's $5 ledger", () => {
+  it("a 2-iteration run accrues BOTH Gemini draft calls — costUsd is the cumulative bill, not a per-call $0", async () => {
+    const merchant = normalizeRow(mediumInput("Costly Curry", 1, 2), 1);
+    const USAGE = { inputTokens: 1200, outputTokens: 300 };
+    let call = 0;
+    // planted (caught) -> clean redraft: exactly 2 metered Gemini draft calls.
+    const draftGenerate = async () => ({
+      object: call++ === 0 ? generatedFrom(merchant, FABRICATION) : generatedFrom(merchant),
+      usage: USAGE,
+    });
+    const result = await runAgentLoop(
+      { input: mediumInput("Costly Curry", 1, 2), index: 1 },
+      { live: false, draftGenerate, judgeGenerate: scriptedJudgeGenerate(FABRICATION) },
+    );
+
+    expect(result.converged).toBe(true);
+    expect(result.iterations).toBe(2); // two draft calls (initial + one redraft)
+    const perCall = costUsd(resolvedGeminiModel(), USAGE.inputTokens, USAGE.outputTokens);
+    expect(perCall).toBeGreaterThan(0); // guards a silently-$0 price table (the test would be vacuous otherwise)
+    // The ledger ACCUMULATES across re-drafts (the Groq judge is free) — the cumulative cap is real.
+    expect(result.costUsd).toBeCloseTo(2 * perCall, 10);
+  });
+
+  it("a billed draft with UNKNOWN usage fails closed INSIDE the loop — records the estimate, never $0 (Codex P1)", async () => {
+    const merchant = normalizeRow(mediumInput("Unknown Udon", 2, 2), 1);
+    // A parseable object but NO usage reported: on the metered Gemini path a real call that can't be
+    // priced MUST NOT record $0 (that is the exact blind spot that lets spend escape the cap). It fails
+    // closed to the conservative estimate the loop reserved (budget.estimatedNextUsd) — proven IN-LOOP.
+    const draftGenerate = async () => ({ object: generatedFrom(merchant) }); // no usage
+    const result = await runAgentLoop(
+      { input: mediumInput("Unknown Udon", 2, 2), index: 1 },
+      { live: false, draftGenerate, judgeGenerate: async () => ({ object: cleanVerdict() }) },
+    );
+
+    const estimate = estimateLiveCallCostUsd(resolvedGeminiModel());
+    expect(estimate).toBeGreaterThan(0);
+    const draftStep = result.trajectory.find((s) => s.phase === "draft")!;
+    expect(draftStep.modelMode).toBe("FAILED_TO_FALLBACK"); // the in-loop draft fell back honestly
+    expect(draftStep.verdictSummary).toContain("UNKNOWN_USAGE");
+    expect(result.costUsd).toBeCloseTo(estimate, 10); // charged the estimate, NOT $0
   });
 });

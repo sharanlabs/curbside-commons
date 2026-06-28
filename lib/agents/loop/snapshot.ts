@@ -7,9 +7,9 @@
  * SCRIPTED deterministic DI — a planted-fabrication draft on iteration-0 then a clean draft on
  * iteration-1, and an injected judge verdict that flags iteration-0 then clears iteration-1. No network,
  * no model call, no spend. This is a SCRIPTED MACHINERY DEMONSTRATION of the loop's control flow; the
- * LIVE Groq self-correction trajectory (real drafter + real cross-... same-family judge) is frozen at
- * the A2 GO/NO-GO (§6.5) and swapped in behind this same accessor. Labeled as such (AM-7 honesty) — it
- * is NOT a live "catches its own mistakes" claim.
+ * LIVE CROSS-FAMILY self-correction trajectory (real Gemini drafter + real Groq judge, A3-3) is frozen
+ * at the owner-gated A3-7 live run and swapped in behind this same accessor. Labeled as such (AM-7
+ * honesty) — it is NOT a live "catches its own mistakes" claim.
  *
  * The injected objects are derived from the grounded deterministic stub (mockDraft) with the real name
  * placeholderized back to {{MERCHANT}}, so after the shared injection-cut they reproduce a gate-passing
@@ -76,8 +76,12 @@ export async function buildAgentLoopSnapshot(): Promise<AgentLoopSnapshot> {
     { input: DEMO_INPUT, index: 1 },
     {
       // `live:false` + injected generate => the injected (LIVE_AI / LIVE_JUDGE) paths run, deterministic + $0.
+      // The Gemini Drafter (A3-3) needs reported usage to price; ZERO tokens => known $0, no real spend.
       live: false,
-      draftGenerate: async () => ({ object: draftCall++ === 0 ? plantedGenerated : cleanGenerated }),
+      draftGenerate: async () => ({
+        object: draftCall++ === 0 ? plantedGenerated : cleanGenerated,
+        usage: { inputTokens: 0, outputTokens: 0 },
+      }),
       judgeGenerate: async () => ({ object: judgeCall++ === 0 ? flagVerdict : cleanVerdict }),
     },
   );
@@ -92,7 +96,8 @@ export async function buildAgentLoopSnapshot(): Promise<AgentLoopSnapshot> {
     audit: result.audit,
     note:
       `${A2_HONESTY_NOTE} | SCRIPTED deterministic machinery demonstration (planted->clean draft, ` +
-      "flag->clean verdict); the LIVE Groq self-correction trajectory is frozen at the A2 GO/NO-GO.",
+      "flag->clean verdict); the live cross-family self-correction trajectory (Gemini drafter, Groq judge) " +
+      "is frozen at the owner-gated A3-7 live run.",
   });
 }
 

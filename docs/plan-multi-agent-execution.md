@@ -335,8 +335,8 @@ KB §4.2 prevention rules → the **Drafter prompt** (prevention half: avoid ove
 ```
 A3-0  [DESIGN/PLAN] this §11 + decision-log row + advisor cross-check + OWNER GO "full 4"   ← (B2 done)   ✅
 A3-1  Trajectory `agent` attribution (R-A3-6) — small, enabling, offline ($0)                ← A3-0   ✅ DONE 2026-06-27 (verify 257+4; Codex BLOCK→2 reconciled+red-green-locked; gate 1/2/4/5 PASS + gate-3 SHIP; uncommitted/owner-gated)
-A3-2  Strategist agent (Groq; DI/mock offline) + component eval vs diagnose().play (R-A3-1)   ← A3-1
-A3-3  Drafter→Gemini cross-family OFFLINE machinery (mock/DI) + §4.2 prevention wiring (R-A3-5,2) ← A3-1
+A3-2  Strategist agent (Groq; DI/mock offline) + component eval vs diagnose().play (R-A3-1)   ← A3-1   ✅ DONE 2026-06-28 (a: machinery + Codex BLOCK→4 reconciled→SHIP, committed 32da7b1; b: live $0 confirmatory eval cleared the anti-theater FLOOR, committed ded2205/c56c4c0; floor-not-ceiling → `strategist` label DEFERS to A3-3, count = "3 + a candidate")
+A3-3  Drafter→Gemini cross-family OFFLINE machinery (mock/DI) + §4.2 prevention wiring (R-A3-5,2) ← A3-1   ✅ DONE 2026-06-28 (verify 279+5; cross-family enforced — Gemini drafts ⊥ Groq judge gated on resolvedJudgeProvider==="groq"; metered drafter $5 ledger + UNKNOWN_USAGE fail-closed [red-green]; §4.2 DOMAIN_HONESTY_RULES off the facts path; Codex BLOCK→6 reconciled primary-model-final→confirming SHIP; acceptance-gate 5/5 SHIP; uncommitted→commit owner-authorized via RESUME DIRECTIVE, push HELD)
 A3-4  Domain Critic as 2nd critic in VERIFY (Groq, advisory, independent; R-A3-4)             ← A3-3
 A3-5  Router/Conductor agent (Groq) — LLM reflection/route synthesis + eval vs buildReflection (R-A3-1) + R-LOOP-8b red-green ← A3-2, A3-4
 A3-6  Multi-agent orchestrator wired + $0 agent-attributed trajectory fixture + verify:full   ← A3-5

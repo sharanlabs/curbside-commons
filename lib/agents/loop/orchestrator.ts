@@ -1,12 +1,12 @@
 /**
- * THE A2 SINGLE-AGENT VERIFY-AND-SELF-CORRECT LOOP (the Router/Conductor in embryo).
+ * THE SINGLE-AGENT VERIFY-AND-SELF-CORRECT LOOP (the Router/Conductor in embryo).
  *
  * Given a stalled merchant, ONE orchestrator agent runs:
  *   plan -> draft -> verify -> reflect -> re-draft -> route
  * using ONLY the A1 tools (triage_merchant, diagnose_blocker, check_faithfulness_forward,
- * simulate_send, append_audit) + a Groq drafting action + the LIVE reverse-faithfulness judge.
- * Bounded, free on Groq, observable (a dedicated TrajectoryStep[]). This is the EARLY GO/NO-GO
- * milestone — a true agent on its own (R-LOOP-1..6).
+ * simulate_send, append_audit) + the LLM Drafter + the LIVE reverse-faithfulness judge.
+ * Bounded, observable (a dedicated TrajectoryStep[]). A2 cleared this as the EARLY GO/NO-GO
+ * milestone (R-LOOP-1..6); A3-3 swapped the Drafter to Gemini (cross-family, below).
  *
  * Framework decision (R-LOOP-D0): the loop is orchestrated by HAND with a bounded while-loop over the
  * already-installed Vercel `ai` SDK (used in gemini.ts / semantic-judge.ts / groq.ts) — NO LangGraph
@@ -14,11 +14,12 @@
  * tool binding + the $0-REPLAY trajectory are all expressible directly; a graph runtime would be new
  * surface for no gain at this scale.
  *
- * SAME-FAMILY VERIFY — DOCUMENTED LIMITATION (R-LOOP-5): the drafter AND the reverse-faithfulness
- * judge are both Groq gpt-oss-120b. A2 asserts loop CONVERGENCE/machinery, NOT calibrated
- * faithfulness. Maker!=judge still holds at the PROCESS layer (verify is a distinct control from
- * draft); model-layer independence (R-ARCH-3) is restored at A3 (Gemini drafter, Groq judges
- * cross-family). Not overclaimed.
+ * CROSS-FAMILY MAKER!=JUDGE — RESTORED AT A3-3 (R-A3-2 / R-ARCH-3): the Drafter is Gemini Flash
+ * (`draftOutreach`) and BOTH the reverse-faithfulness judge and (A3-4) the Domain Critic are Groq
+ * gpt-oss-120b — model-layer independence, the gap A2 deferred under R-LOOP-5's same-family caveat.
+ * Maker!=judge now holds at BOTH the process layer (verify is a distinct control from draft) AND the
+ * model layer (different families). The Drafter is the only metered agent and runs every re-draft;
+ * its spend is ledger-tracked under the $5 cap (cost notes below). The live run is owner-gated (A3-7).
  *
  * RECOMMEND-NOT-DECIDE — BINDING INVARIANT (AM-4 / R-LOOP-1b): the agent RECOMMENDS strategy/tone/
  * route only. The deterministic eligibility fields (contact_eligible, review_required, approval_state,
@@ -35,10 +36,9 @@ import type { OutreachStatus } from "@/lib/core/constants";
 import type { Merchant, MerchantInput } from "@/lib/core/types";
 import type { Diagnosis } from "@/lib/domain/diagnosis";
 import { DEFAULT_BUDGET_CAP_USD } from "@/lib/agents/budget";
-import type { BudgetContext } from "@/lib/agents/gemini";
-import type { OutreachDraft } from "@/lib/agents/draft";
-import { draftOutreachGroq } from "@/lib/agents/groq-draft";
-import { judgeDraft, type JudgeResult } from "@/lib/agents/semantic-judge";
+import { estimateLiveCallCostUsd, resolvedGeminiModel, type BudgetContext } from "@/lib/agents/gemini";
+import { draftOutreach, type OutreachDraft } from "@/lib/agents/draft";
+import { judgeDraft, resolvedJudgeProvider, type JudgeResult } from "@/lib/agents/semantic-judge";
 import type { GatekeeperReport } from "@/lib/agents/gatekeeper";
 import {
   appendAudit,
@@ -48,7 +48,7 @@ import {
   triageMerchant,
 } from "@/lib/agents/tools/registry";
 import type { AuditEntry } from "@/lib/replay/run";
-import { judgeLiveEnabled } from "@/lib/server/env-flags";
+import { groqLiveEnabled, liveAiEnabled } from "@/lib/server/env-flags";
 import {
   TrajectoryRecorder,
   type TrajectoryStep,
@@ -95,17 +95,19 @@ export interface AgentLoopOptions {
   platformName?: string;
   /** Hard iteration cap (R-LOOP-3, bounded). Default 3. Floored at 1. */
   maxIterations?: number;
-  /** Cumulative budget ledger (free Groq => $0). Default { spentUsd:0, estimatedNextUsd:0, capUsd:5 }. */
+  /** Cumulative budget ledger for the metered Gemini Drafter ($5 cap; $0 offline). Default { spentUsd:0, estimatedNextUsd:0, capUsd:5 }. */
   budget?: BudgetContext;
-  /** Whether the draft/judge run live. Default judgeLiveEnabled() (the A2 Groq gate). */
+  /** Whether the draft + judge run live. Default = liveAiEnabled() && groqLiveEnabled() &&
+   *  resolvedJudgeProvider()==="groq" — a real cross-family run needs the Gemini-drafter key, the
+   *  Groq-judge key, AND a genuinely Groq judge (R-A3-2; Codex A3-3 P1). */
   live?: boolean;
-  /** Inter-call pacing (ms) against the Groq day-window — used by the LIVE path only (R-LOOP-4). */
+  /** Inter-call pacing (ms) against the provider windows (Gemini drafter + Groq judge) — LIVE path only (R-LOOP-4). */
   pacingMs?: number;
-  /** Iteration-0 starting draft fed in (R-LOOP-10 seeding); else iteration-0 is generated on Groq. */
+  /** Iteration-0 starting draft fed in (R-LOOP-10 seeding); else iteration-0 is generated by the Gemini Drafter. */
   seedDraft?: OutreachDraft;
   /** The agent's plan-judgment seam (default = a deterministic A2 stand-in). */
   recommend?: RecommendFn;
-  /** DI: the Groq drafting generate (offline machinery). */
+  /** DI: the Drafter's object-generate (offline machinery — provider-agnostic; feeds the Gemini Drafter). */
   draftGenerate?: GenerateObjectFn;
   /** DI: the reverse-faithfulness judge generate (offline machinery — inject the failing verdict). */
   judgeGenerate?: GenerateObjectFn;
@@ -123,7 +125,8 @@ export interface AgentLoopResult {
   finalVerify: { gatekeeper: GatekeeperReport | null; judge: JudgeResult | null; passed: boolean };
   outreachStatus: OutreachStatus;
   sent: boolean;
-  /** Total LLM spend across the run. ALWAYS 0 on A2 (free Groq, zero Gemini) — R-LOOP-4. */
+  /** Total LLM spend across the run. $0 offline (no real call) AND $0 on the public REPLAY demo;
+   *  a live Gemini Drafter bills every re-draft — accrued here + ledger-tracked under the $5 cap. */
   costUsd: number;
   audit: AuditEntry[];
   /** The agent's reasoning path (dedicated type — R-LOOP-6). */
@@ -215,7 +218,8 @@ function buildReflection(gate: GatekeeperReport, judge: JudgeResult): string {
 
 /**
  * Run the A2 single-agent verify-and-self-correct loop over one stalled merchant.
- * Offline-provable via injected draftGenerate/judgeGenerate; live on free Groq when keyed.
+ * Offline-provable via injected draftGenerate/judgeGenerate; live cross-family (Gemini drafter +
+ * Groq judge) when BOTH keys are present (owner-gated, A3-7).
  */
 export async function runAgentLoop(
   input: AgentLoopInput,
@@ -223,8 +227,16 @@ export async function runAgentLoop(
 ): Promise<AgentLoopResult> {
   const platformName = opts.platformName ?? REFERENCE_PLATFORM_NAME;
   const maxIterations = Math.max(1, opts.maxIterations ?? 3);
-  const budget: BudgetContext = opts.budget ?? { spentUsd: 0, estimatedNextUsd: 0, capUsd: DEFAULT_BUDGET_CAP_USD };
-  const live = opts.live ?? judgeLiveEnabled();
+  // CLONE the budget so the cumulative ledger we accrue across re-drafts (the Gemini Drafter bills
+  // every iteration) never mutates the caller's object; default is a fresh $5-capped ledger.
+  const budget: BudgetContext = { ...(opts.budget ?? { spentUsd: 0, estimatedNextUsd: 0, capUsd: DEFAULT_BUDGET_CAP_USD }) };
+  // CROSS-FAMILY GATE (R-A3-2; Codex A3-3 P1). A live run needs the Gemini Drafter key (liveAiEnabled)
+  // AND a genuinely Groq judge — the Groq key (groqLiveEnabled) AND the judge provider actually
+  // resolving to "groq". `judgeLiveEnabled()` alone is NOT enough: under JUDGE_PROVIDER=gemini it is
+  // satisfied by a Gemini key, which would run Gemini-drafts-Gemini-judges (SAME family) while the code
+  // claims cross-family. Gating on resolvedJudgeProvider()==="groq" makes the cross-family claim true by
+  // construction — a non-Groq judge config (the spec's Gemini-judge alt) opts the live loop out, not in.
+  const live = opts.live ?? (liveAiEnabled() && groqLiveEnabled() && resolvedJudgeProvider() === "groq");
   const recommend = opts.recommend ?? defaultRecommend;
   const recorder = new TrajectoryRecorder();
 
@@ -315,7 +327,11 @@ export async function runAgentLoop(
       });
     } else {
       if (live && opts.pacingMs) await sleep(opts.pacingMs);
-      const draftResult = await draftOutreachGroq(merchant, {
+      // CUMULATIVE LEDGER (the cap is across the WHOLE run, not per call): reserve a conservative
+      // Gemini estimate before the metered call, then accrue the actual cost into budget.spentUsd so
+      // the NEXT re-draft's assertWithinBudget sees the running total. Offline DI => $0, no-op.
+      budget.estimatedNextUsd = estimateLiveCallCostUsd(resolvedGeminiModel());
+      const draftResult = await draftOutreach(merchant, {
         platformName,
         instruction,
         live,
@@ -323,20 +339,22 @@ export async function runAgentLoop(
         generate: opts.draftGenerate,
       });
       totalCostUsd += draftResult.costUsd;
+      budget.spentUsd += draftResult.costUsd;
       draft = draftResult.draft;
       draftMode = draftResult.mode;
       draftErrorClass = draftResult.errorClass;
       recorder.record({
         phase: i === 0 ? "draft" : "redraft",
-        agent: "drafter", // generative composition is the drafter's real seam (Groq today, Gemini at A3-3)
+        agent: "drafter", // generative prose composition is the Drafter's real seam (Gemini at A3-3 — cross-family)
         iteration: i,
-        toolCalls: [{ tool: "draft_outreach_groq", summary: `mode=${draftResult.mode}` }],
+        toolCalls: [{ tool: "draft_outreach", summary: `mode=${draftResult.mode}` }],
         modelMode: draftMode,
         verdictSummary:
           `subject="${draft.draft_subject}"; claims=${draft.claims.length}` +
           (draftErrorClass ? `; errorClass=${draftErrorClass}` : ""),
       });
-      // Budget-guard trip (defense-in-depth; never fires on free Groq). Stop bounded -> held.
+      // Budget-guard trip: a Gemini cap breach surfaces as "Budget hard-stop" -> stop bounded, held
+      // (the metered Drafter CAN trip this now; offline DI never does). NOT the agent touching eligibility.
       if (draftErrorClass?.includes("Budget hard-stop")) {
         stopReason = "budget_guard";
         break;
@@ -356,6 +374,8 @@ export async function runAgentLoop(
       generate: opts.judgeGenerate,
     });
     totalCostUsd += judge.costUsd;
+    budget.spentUsd += judge.costUsd; // accrue ALL metered spend into the ledger (Groq judge => $0 no-op;
+    // a configured Gemini judge would accrue, so a later draft's assertWithinBudget can't undercount). [Codex A3-3 P2]
     lastGate = gate;
     lastJudge = judge;
     const supported = judge.verdict.claims.filter((c) => c.supported).length;
@@ -465,7 +485,7 @@ export async function runAgentLoop(
     entry: {
       at: RUN_TIMESTAMP,
       actor: "draft",
-      action: live ? "LIVE_AI_GROQ" : "MACHINERY",
+      action: live ? "LIVE_AI_GEMINI" : "MACHINERY",
       detail: `${attempts} draft attempt(s); converged=${verifyPassed} (${stopReason})`,
     },
   });
