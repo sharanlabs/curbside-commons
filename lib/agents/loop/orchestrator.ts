@@ -40,6 +40,8 @@ import { estimateLiveCallCostUsd, resolvedGeminiModel, type BudgetContext } from
 import { draftOutreach, type OutreachDraft } from "@/lib/agents/draft";
 import { judgeDraft, resolvedJudgeProvider, type JudgeResult } from "@/lib/agents/semantic-judge";
 import { judgeDomain, resolvedDomainJudgeProvider, type DomainJudgeResult } from "@/lib/agents/domain-judge";
+import { strategistRecommend } from "@/lib/agents/strategist";
+import { routerReflect } from "@/lib/agents/router";
 import type { GatekeeperReport } from "@/lib/agents/gatekeeper";
 import {
   appendAudit,
@@ -277,33 +279,14 @@ export function buildReflection(gate: GatekeeperReport, judge: JudgeResult): str
   return "Verification failed; remove any assertion not backed by a merchant field.";
 }
 
-/**
- * The orchestrator's DEFAULT reflect seam — the A2 domain-blind reflection wrapped in the RevisionPlan
- * shape. Kept as the default so A3-5 adds the `reflect?` seam WITHOUT changing loop behavior (every
- * existing trajectory assertion holds: the instruction is byte-identical to buildReflection's). The strong
- * multi-critic baseline (`strongReflection`, router.ts) is wired as the default at A3-6. `route`/holdForHuman
- * are ADVISORY — recorded, never wired. `signals` is ["faithfulness"] by construction (domain-blind).
- */
-function defaultReflect(ctx: {
-  gate: GatekeeperReport;
-  judge: JudgeResult;
-  domain: DomainJudgeResult | null;
-  merchant: Merchant;
-}): RevisionPlan {
-  const ineligible = ctx.merchant.suppression_reason.trim() !== "" || !ctx.merchant.contact_eligible;
-  return {
-    instruction: buildReflection(ctx.gate, ctx.judge),
-    signals: ["faithfulness"],
-    // ADVISORY (recommend-only): a failing draft is held; an ineligible merchant is suppressed. Recorded,
-    // never an input to the send (the post-loop route + assertEligibilityUntouched are the only authorities).
-    route: ineligible ? "suppress" : "hold_for_review",
-    holdForHuman: true,
-    rationale: "Deterministic A2 reflection (domain-blind): the revision targets the faithfulness failure.",
-  };
-}
+// A3-6 wired the Router (routerReflect → strongReflection offline) as the orchestrator's reflect DEFAULT,
+// superseding the A3-5 interim `defaultReflect` (the domain-blind buildReflection wrapper, now removed as
+// dead code). `buildReflection` (above) stays exported as the documented domain-blind A2 baseline + the
+// Router anti-theater eval's RED comparator (evals/router.test.ts), the parallel to defaultRecommend.
 
 /**
- * Run the A2 single-agent verify-and-self-correct loop over one stalled merchant.
+ * Run the integrated multi-agent verify-and-self-correct loop over one stalled merchant (A3-6: Strategist
+ * plan → Drafter → Faithfulness + Domain critics → Router reflect/route).
  * Offline-provable via injected draftGenerate/judgeGenerate; live cross-family (Gemini drafter +
  * Groq judge) when BOTH keys are present (owner-gated, A3-7).
  */
@@ -342,10 +325,20 @@ export async function runAgentLoop(
     );
   }
   const live = opts.live ?? crossFamilyReady;
-  const recommend = opts.recommend ?? defaultRecommend;
-  // The Router/Conductor's reflect seam (R-A3-5). Default = the domain-blind A2 reflection; the strong
-  // multi-critic baseline / the LLM Router wire in via opts.reflect IFF the R-A3-1 eval earns it (A3-6).
-  const reflect = opts.reflect ?? defaultReflect;
+  // A3-6 — THE INTEGRATED MULTI-AGENT DEFAULTS. The plan seam defaults to the Strategist; the reflect seam
+  // to the Router. Same pattern as the A3-3 Gemini Drafter default: OFFLINE (live off, no DI generate) each
+  // branches to its STRONG DETERMINISTIC baseline (strongRecommend / strongReflection — $0, a genuine
+  // upgrade over the naive A2 stand-ins defaultRecommend / buildReflection, which stay exported as the
+  // documented baselines + the Strategist/Router evals' RED comparators); LIVE each hits Groq behind the
+  // A3-7 cross-family gate. TOOL-UNTIL-EARNED still holds (AM-2 / R-A3-1): wiring them as defaults does NOT
+  // flip the trajectory labels — the Strategist + Router labels DEFER (their anti-theater evals TIE the
+  // deterministic baselines on the finite structural axis), so the plan + reflect steps stay "tool". Only
+  // the genuinely-generative Drafter is an agent today. budget/live are captured by closure (the Groq
+  // Strategist/Router are free => $0; threaded for the cumulative ledger + the A3-7 live path).
+  const recommend: RecommendFn =
+    opts.recommend ?? ((m, d) => strategistRecommend(m, d, { platformName, live, budget }));
+  const reflect: RouterFn =
+    opts.reflect ?? ((ctx) => routerReflect(ctx, { platformName, live, budget }));
   const recorder = new TrajectoryRecorder();
 
   // ─────────────────────────────── PLAN ───────────────────────────────

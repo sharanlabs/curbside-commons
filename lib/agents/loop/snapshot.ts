@@ -96,10 +96,11 @@ export async function buildAgentLoopSnapshot(): Promise<AgentLoopSnapshot> {
     audit: result.audit,
     note:
       `${A2_HONESTY_NOTE} | SCRIPTED deterministic machinery demonstration (planted->clean draft, ` +
-      "flag->clean verdict); the advisory domain critic shown here is the DETERMINISTIC mock baseline " +
-      "(its label DEFERS — the A3-4 anti-theater eval shows the live judge ties the mock on the gold). " +
-      "The live cross-family self-correction trajectory (Gemini drafter, Groq judge) is frozen at the " +
-      "owner-gated A3-7 live run.",
+      "flag->clean verdict). The Strategist plan, the Router reflect, and the advisory Domain critic shown " +
+      "here are their DETERMINISTIC baselines (strongRecommend / strongReflection / mockDomainJudge, $0) — " +
+      "the seams are wired (A3-6) but the LLM agents and the live cross-family self-correction trajectory " +
+      "(real Gemini drafter + Groq critics) are frozen at the owner-gated A3-7 live run and swapped in " +
+      "behind this same accessor.",
   });
 }
 

@@ -1,0 +1,112 @@
+=== A3-6 raw verify:full evidence — 2026-06-28T21:25:16Z ===
+cwd: /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+### git diff --name-only HEAD ###
+evals/agent-loop.test.ts
+lib/agents/loop/orchestrator.ts
+lib/agents/loop/snapshot.ts
+lib/agents/loop/trajectory.ts
+
+### differential lane touched? (MUST be empty) ###
+(empty above = differential UNTOUCHED, 20/20)
+
+### npm run verify ###
+
+> activationops-ai@0.1.0 verify
+> npm run typecheck && npm run lint && npm run test && npm run build
+
+
+> activationops-ai@0.1.0 typecheck
+> tsc --noEmit
+
+
+> activationops-ai@0.1.0 lint
+> eslint . --max-warnings=0
+
+
+> activationops-ai@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.9 /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+
+ Test Files  25 passed | 5 skipped (30)
+      Tests  296 passed | 5 skipped (301)
+   Start at  17:25:21
+   Duration  1.43s (transform 1.40s, setup 1.48s, import 3.85s, tests 665ms, environment 2ms)
+
+
+> activationops-ai@0.1.0 build
+> next build
+
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1661ms
+  Running TypeScript ...
+  Finished TypeScript in 2.5s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/28) ...
+  Generating static pages using 7 workers (7/28) 
+  Generating static pages using 7 workers (14/28) 
+  Generating static pages using 7 workers (21/28) 
+✓ Generating static pages using 7 workers (28/28) in 185ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /audit
+├ ○ /console
+├ ○ /cost
+├ ○ /eval
+├ ● /merchant/[id]
+│ ├ /merchant/M001
+│ ├ /merchant/M002
+│ ├ /merchant/M003
+│ └ [+17 more paths]
+└ ○ /metrics
+
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+
+VERIFY_EXIT: 0
+
+ RUN  v4.1.9 /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+
+ Test Files  25 passed | 5 skipped (30)
+      Tests  296 passed | 5 skipped (301)
+   Start at  17:25:29
+   Duration  1.37s (transform 1.38s, setup 1.34s, import 3.68s, tests 662ms, environment 2ms)
+
+### test:e2e ###
+
+> activationops-ai@0.1.0 test:e2e
+> playwright test
+
+
+Running 4 tests using 4 workers
+
+  ✓  3 [chromium] › evals/e2e/console.spec.ts:20:5 › Console renders the queue with both human-in-the-loop outcomes visible (1.5s)
+  ✓  4 [chromium] › evals/e2e/console.spec.ts:3:5 › Landing renders the arc: honest H1, the shown catch, and the honesty footer (1.5s)
+  ✓  2 [chromium] › evals/e2e/console.spec.ts:31:5 › a merchant opens its full why-chain end to end (2.4s)
+  ✓  1 [chromium] › evals/e2e/console.spec.ts:50:5 › console nav reaches every surface; active link carries aria-current (2.4s)
+
+  4 passed (5.6s)
+E2E_EXIT: 0
+
+### RED-GREEN: A3-6 integration proof (revert defaults to naive A2 stand-ins) ###
+-- RED (recommend=defaultRecommend, reflect=domain-blind buildReflection): expect the A3-6 test to FAIL --
+     × plan uses strongRecommend (Strategist baseline) + reflect uses strongReflection (Router) — proven by content, $0 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected 'Made progress then went inactive — li…' to match /risk=/
+/risk=/
+    734|     expect(result.recommendation.rationale).toMatch(/risk=/);
+    735|     expect(result.recommendation.rationale).toMatch(/tenure=/);
+      Tests  1 failed | 2 passed | 18 skipped (21)
+-- GREEN (integrated defaults restored: strategistRecommend / routerReflect): expect PASS --
+      Tests  3 passed | 18 skipped (21)

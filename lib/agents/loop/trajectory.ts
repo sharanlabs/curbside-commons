@@ -95,14 +95,21 @@ export interface AgentLoopSnapshot {
 /**
  * The default honesty note stamped on a frozen trajectory (AM-7 + R-ARCH-3). Named A2_* for its
  * origin (the grill record cites this constant as where the caveat lives); the CONTENT tracks the
- * live architecture, updated at A3-3 when the Drafter became Gemini (cross-family restored).
+ * live architecture, updated at A3-3 (Drafter→Gemini, cross-family restored) and A3-6 (the four agents
+ * wired through the orchestrator seams as the integrated default, with honest tool-until-earned labels).
  */
 export const A2_HONESTY_NOTE =
-  "Single-agent verify-and-self-correct loop. CROSS-FAMILY maker!=judge (R-ARCH-3, restored at A3-3): " +
-  "the Drafter is Gemini Flash and the reverse-faithfulness judge is Groq gpt-oss-120b (different " +
-  "families). The loop proves CONVERGENCE/machinery; the faithfulness judge's calibration label stays " +
-  "'directional' and was NOT re-calibrated on live Gemini prose (R-A3-8). No real spend offline; a live " +
-  "Gemini Drafter bills every re-draft, ledger-tracked under the $5 cap (live run owner-gated, A3-7).";
+  "Integrated multi-agent verify-and-self-correct loop (A3-6): the four agents are wired through the " +
+  "orchestrator seams — Strategist (plan) → Drafter (Gemini Flash) → Faithfulness + Domain critics " +
+  "(verify) → Router (reflect/route). CROSS-FAMILY maker!=judge (R-ARCH-3, restored at A3-3): the Drafter " +
+  "is Gemini, both critics are Groq gpt-oss-120b. HONEST LABELS (tool-until-earned, AM-2): only the " +
+  "genuinely-generative Drafter EARNS the agent label; the Strategist, Domain Critic, and Router DEFER " +
+  "(their anti-theater evals TIE their strong deterministic baselines on the finite structural axis), so " +
+  "those steps read 'tool' — 1 earned + 3 deterministic-tied components wired through the agent seams, NOT " +
+  "'four agents reasoning'. Whether the deferred agents beat their baselines is decidable ONLY at the " +
+  "owner-gated A3-7 live run (real Gemini prose, cross-family Groq judge). Offline = $0 (strong " +
+  "deterministic baselines); a live Gemini Drafter bills every re-draft, ledger-tracked under the $5 cap " +
+  "(R-A3-8: the judges' 'directional' calibration label is held — not re-calibrated on live Gemini prose).";
 
 /**
  * Freeze a completed loop run into the serializable REPLAY snapshot. PURE — the orchestrator hands in

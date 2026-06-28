@@ -698,3 +698,56 @@ describe("A3-3 cost integrity — the metered Gemini Drafter accrues into the lo
     expect(result.costUsd).toBeCloseTo(estimate, 10); // charged the estimate, NOT $0
   });
 });
+
+// ───────────────────── A3-6 — the integrated multi-agent defaults are WIRED ─────────────────────
+
+describe("A3-6 — the orchestrator default IS the Strategist (plan) + the Router (reflect), not the A2 stand-ins", () => {
+  it("plan uses strongRecommend (Strategist baseline) + reflect uses strongReflection (Router) — proven by content, $0", async () => {
+    const merchant = normalizeRow(mediumInput("Integrated Idli", 1, 2), 1);
+    // A domain-DEFECTIVE verdict injected at the (gatekeeper-approved) domain critic — ONLY the Router
+    // (strongReflection) surfaces it at reflect; the old domain-blind buildReflection structurally cannot.
+    const domainDefective = async () => ({
+      object: {
+        dimensions: [
+          { dimension: "matched_to_blocker", pass: true, rationale: "ok" },
+          { dimension: "engagement_appropriate", pass: true, rationale: "ok" },
+          { dimension: "no_over_promise", pass: false, rationale: "implied an approval timeline" },
+        ],
+        any_dimension_failed: true, // required by DomainVerdictSchema (domain_defective is recomputed from dimensions)
+      },
+      usage: ZERO_USAGE,
+    });
+    const result = await runAgentLoop(
+      { input: mediumInput("Integrated Idli", 1, 2), index: 1 },
+      {
+        // NO recommend / reflect injected -> the A3-6 INTEGRATED DEFAULTS run (strategistRecommend ->
+        // strongRecommend offline; routerReflect -> strongReflection offline). $0.
+        draftGenerate: scriptedDraftGenerate(merchant, FABRICATION),
+        judgeGenerate: scriptedJudgeGenerate(FABRICATION),
+        domainGenerate: domainDefective,
+      },
+    );
+    expect(result.costUsd).toBe(0); // integrated defaults are deterministic offline -> $0
+
+    // PLAN default = the Strategist baseline (strongRecommend), NOT the naive defaultRecommend:
+    // strongRecommend's rationale carries engagement/risk/tenure; defaultRecommend's is just the root cause.
+    expect(result.recommendation.rationale).toMatch(/risk=/);
+    expect(result.recommendation.rationale).toMatch(/tenure=/);
+    const planStep = result.trajectory.find((s) => s.phase === "plan")!;
+    expect(planStep.modelMode).toBe("DETERMINISTIC_RULES"); // strongRecommend offline ($0)
+    expect(planStep.agent).toBe("tool"); // label DEFERS (tool-until-earned) — strategist NOT claimed
+
+    // REFLECT default = the Router (strongReflection), NOT the domain-blind buildReflection: the iter-0
+    // reflect surfaces the ADVISORY domain signal (no_over_promise) ALONGSIDE the gating faithfulness fix.
+    const reflect0 = result.trajectory.find((s) => s.phase === "reflect")!;
+    expect(reflect0.verdictSummary).toContain(FABRICATION); // faithfulness fix (gating) — still first
+    expect(reflect0.verdictSummary).toMatch(/no_over_promise/); // domain addendum — buildReflection CANNOT produce this
+    expect(reflect0.agent).toBe("tool"); // label DEFERS — router NOT claimed
+
+    // tool-until-earned still holds across the whole integrated trajectory: only the Drafter is an agent.
+    expect(result.trajectory.some((s) => s.agent === "strategist")).toBe(false);
+    expect(result.trajectory.some((s) => s.agent === "router")).toBe(false);
+    expect(result.trajectory.some((s) => s.agent === "domain_critic")).toBe(false);
+    expect(result.trajectory.filter((s) => s.agent === "drafter").length).toBeGreaterThan(0);
+  });
+});
