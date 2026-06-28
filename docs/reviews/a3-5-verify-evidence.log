@@ -1,0 +1,94 @@
+=== A3-5 raw verify evidence — 2026-06-28T20:58:39Z ===
+cwd: /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+### git diff --name-only HEAD (changed product/test files) ###
+evals/agent-loop.test.ts
+lib/agents/loop/orchestrator.ts
+
+### NEW untracked product/test files ###
+?? docs/reviews/a3-5-verify-evidence.log
+?? docs/reviews/codex-2026-06-28-a3-5-router.md
+?? evals/router.test.ts
+?? lib/agents/router.ts
+
+### differential lane touched? (MUST be empty) ###
+(empty above = differential UNTOUCHED, 20/20)
+
+### npm run verify (tail) ###
+
+> activationops-ai@0.1.0 verify
+> npm run typecheck && npm run lint && npm run test && npm run build
+
+
+> activationops-ai@0.1.0 typecheck
+> tsc --noEmit
+
+
+> activationops-ai@0.1.0 lint
+> eslint . --max-warnings=0
+
+
+> activationops-ai@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.9 /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+
+ Test Files  25 passed | 5 skipped (30)
+      Tests  295 passed | 5 skipped (300)
+   Start at  16:58:45
+   Duration  1.94s (transform 1.60s, setup 2.29s, import 5.54s, tests 582ms, environment 7ms)
+
+
+> activationops-ai@0.1.0 build
+> next build
+
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.5s
+  Running TypeScript ...
+  Finished TypeScript in 3.6s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/28) ...
+  Generating static pages using 7 workers (7/28) 
+  Generating static pages using 7 workers (14/28) 
+  Generating static pages using 7 workers (21/28) 
+✓ Generating static pages using 7 workers (28/28) in 276ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /audit
+├ ○ /console
+├ ○ /cost
+├ ○ /eval
+├ ● /merchant/[id]
+│ ├ /merchant/M001
+│ ├ /merchant/M002
+│ ├ /merchant/M003
+│ └ [+17 more paths]
+└ ○ /metrics
+
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+
+VERIFY_EXIT: 0
+
+### vitest run — full count ###
+ Test Files  25 passed | 5 skipped (30)
+      Tests  295 passed | 5 skipped (300)
+
+### RED-GREEN #1: recommend-only reflect-clone (revert {...merchant} -> merchant) ###
+-- RED (clone removed): expect mutation-isolation test to throw R-LOOP-1b --
+     × a reflect seam that MUTATES its merchant arg cannot corrupt the loop (isolated by clone) [A3-5] 7ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+Error: R-LOOP-1b violation: the agent mutated deterministic eligibility "review_required" (true -> false). The agent RECOMMENDS only.
+    242|         `R-LOOP-1b violation: the agent mutated deterministic eligibil…
+      Tests  1 failed | 1 passed | 18 skipped (20)
+-- GREEN (clone restored) --
+      Tests  2 passed | 18 skipped (20)

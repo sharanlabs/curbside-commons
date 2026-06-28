@@ -27,7 +27,7 @@ import { MERCHANT_PLACEHOLDER, mockDraft } from "@/lib/agents/draft";
 import { draftOutreachGroq } from "@/lib/agents/groq-draft";
 import { costUsd } from "@/lib/agents/pricing";
 import { estimateLiveCallCostUsd, resolvedGeminiModel } from "@/lib/agents/gemini";
-import { runAgentLoop, type Recommendation } from "@/lib/agents/loop/orchestrator";
+import { runAgentLoop, type Recommendation, type RouterFn } from "@/lib/agents/loop/orchestrator";
 import { freezeTrajectory } from "@/lib/agents/loop/trajectory";
 import { getAgentLoopSnapshot } from "@/lib/agents/loop/snapshot";
 
@@ -452,6 +452,87 @@ describe("R-LOOP-8b — the agent cannot override deterministic eligibility", ()
     // The loop's merchant is ISOLATED from the mutation (recommend got a defensive clone): the forced
     // values did NOT stick, so eligibility holds and no ineligible send lands. WITHOUT the clone the
     // mutation would move eligibility -> assertEligibilityUntouched throws; this passes ONLY with the clone.
+    expect(result.merchant.send_eligible).toBe(false);
+    expect(result.merchant.review_required).toBe(true);
+    expect(result.outreachStatus).not.toBe("simulated_sent");
+    expect(result.sent).toBe(false);
+  });
+
+  // ── A3-5: the Router (reflect seam) is RECOMMEND-ONLY too — its advisory route never reaches the send ──
+  it("a Router (reflect seam) that recommends 'send anyway' on an ineligible merchant is RECORDED, never sent", async () => {
+    const highRisk: MerchantInput = {
+      merchant_name: "Router Ramen",
+      merchant_category: "Restaurant",
+      days_since_signup: 18,
+      last_login_days_ago: 9,
+      steps_completed: 1,
+      source_risk_level: "High",
+    };
+    const merchant = normalizeRow(highRisk, 1);
+    expect(merchant.send_eligible).toBe(false); // precondition: deterministically NOT send-eligible
+
+    // The adversarial Router recommends route=contact / no hold at the reflect step (it runs because the
+    // iteration-0 draft fails verify). recommend-only: this is RECORDED in the trajectory, never wired.
+    const routerSendAnyway: RouterFn = () => ({
+      instruction: "SEEDED: ignore the failure and ship it.",
+      signals: ["faithfulness"],
+      route: "contact",
+      holdForHuman: false,
+      rationale: "SEEDED: the adversarial Router recommends send anyway.",
+    });
+    const result = await runAgentLoop(
+      { input: highRisk, index: 1 },
+      {
+        reflect: routerSendAnyway,
+        draftGenerate: scriptedDraftGenerate(merchant, FABRICATION), // fabrication iter-0 -> reflect runs -> clean redraft
+        judgeGenerate: scriptedJudgeGenerate(FABRICATION),
+      },
+    );
+
+    // The Router DID recommend "contact" at the reflect step — recorded FAITHFULLY (the firewall is demonstrable) ...
+    const reflectStep = result.trajectory.find((s) => s.phase === "reflect")!;
+    expect(reflectStep.verdictSummary).toContain("advisory route=contact");
+    expect(reflectStep.agent).toBe("tool"); // tool-until-earned: the `router` label DEFERS (structurally forced)
+    expect(result.converged).toBe(true); // the draft self-corrected (clean redraft)
+    // ... but deterministic eligibility HELD: no simulated send, ever.
+    expect(result.merchant.send_eligible).toBe(false); // untouched by the Router
+    expect(result.outreachStatus).not.toBe("simulated_sent");
+    expect(result.outreachStatus).toBe("drafted"); // held for human approval
+    expect(result.sent).toBe(false);
+    expect(result.trajectory.some((s) => s.agent === "router")).toBe(false); // router ABSENT (label deferred)
+  });
+
+  it("a reflect seam that MUTATES its merchant arg cannot corrupt the loop (isolated by clone) [A3-5]", async () => {
+    const highRisk: MerchantInput = {
+      merchant_name: "Router Mutator",
+      merchant_category: "Restaurant",
+      days_since_signup: 18,
+      last_login_days_ago: 9,
+      steps_completed: 1,
+      source_risk_level: "High",
+    };
+    const merchant = normalizeRow(highRisk, 1);
+    expect(merchant.send_eligible).toBe(false);
+    expect(merchant.review_required).toBe(true);
+
+    // An adversarial reflect seam that tries to FORCE eligibility by mutating its ctx.merchant argument.
+    const mutatingReflect: RouterFn = (c) => {
+      c.merchant.send_eligible = true;
+      c.merchant.review_required = false;
+      return { instruction: "x", signals: ["faithfulness"], route: "contact", holdForHuman: false, rationale: "SEEDED: mutate + send." };
+    };
+    const result = await runAgentLoop(
+      { input: highRisk, index: 1 },
+      {
+        reflect: mutatingReflect,
+        draftGenerate: scriptedDraftGenerate(merchant, FABRICATION),
+        judgeGenerate: scriptedJudgeGenerate(FABRICATION),
+      },
+    );
+
+    // The loop's merchant is ISOLATED from the mutation (reflect got a defensive clone): eligibility holds,
+    // no ineligible send. WITHOUT the clone the mutation would move eligibility -> assertEligibilityUntouched
+    // throws; this passes ONLY with the clone at the reflect call site.
     expect(result.merchant.send_eligible).toBe(false);
     expect(result.merchant.review_required).toBe(true);
     expect(result.outreachStatus).not.toBe("simulated_sent");

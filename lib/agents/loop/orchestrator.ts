@@ -81,6 +81,44 @@ export interface Recommendation {
 
 export type RecommendFn = (merchant: Merchant, diagnosis: Diagnosis) => Recommendation | Promise<Recommendation>;
 
+/** Which critic signals a revision plan incorporates — the STRUCTURAL anti-theater discriminator (A3-5).
+ *  A domain-blind reflection (buildReflection) carries only "faithfulness"; one that ALSO reads the domain
+ *  verdict can carry "domain". Recomputed in code from the inputs — never trusted from a model's self-report. */
+export type CriticSignal = "faithfulness" | "domain";
+
+/**
+ * The Router/Conductor's revision plan (A3-5). `instruction` is the concrete revision fed to the re-draft
+ * (R-LOOP-2). `route`/`holdForHuman`/`rationale` are ADVISORY — RECORDED in the trajectory, NEVER wired to
+ * the send (R-A3-3 recommend-not-decide: the send is computeSendEligible/simulate_send's alone). `signals`
+ * is the structural coverage the anti-theater eval grades (does the plan address the domain signal?).
+ */
+export interface RevisionPlan {
+  instruction: string;
+  signals: CriticSignal[];
+  route: RecommendedRoute;
+  holdForHuman: boolean;
+  rationale: string;
+  /** Honest provenance ("LIVE_AI" | "DETERMINISTIC_RULES" | "FAILED_TO_FALLBACK"); undefined ⇒ deterministic. */
+  mode?: string;
+  /** Set when a live Router fell back — the honest reason, surfaced in the trajectory summary. */
+  errorClass?: string;
+}
+
+/**
+ * The reflect/route seam (R-A3-5). Reads BOTH critics — the faithfulness verdict (GATING) and the domain
+ * verdict (ADVISORY) — and returns a RevisionPlan. The orchestrator DEFAULT is the deterministic A2
+ * reflection (`defaultReflect`, domain-blind — no behavior change this slice); the strong multi-critic
+ * baseline (`strongReflection`) + the LLM Router (`routerReflect`) live in `lib/agents/router.ts` and are
+ * wired via this seam IFF the Router clears its R-A3-1 anti-theater eval (A3-6 wires the default). May be
+ * sync or async (an LLM Router is async) — the loop awaits either.
+ */
+export type RouterFn = (ctx: {
+  gate: GatekeeperReport;
+  judge: JudgeResult;
+  domain: DomainJudgeResult | null;
+  merchant: Merchant;
+}) => RevisionPlan | Promise<RevisionPlan>;
+
 export type StopReason = "verified" | "max_iterations" | "budget_guard";
 
 export interface AgentLoopInput {
@@ -110,6 +148,10 @@ export interface AgentLoopOptions {
   seedDraft?: OutreachDraft;
   /** The agent's plan-judgment seam (default = a deterministic A2 stand-in). */
   recommend?: RecommendFn;
+  /** The Router/Conductor's reflect/route seam (R-A3-5; default = the deterministic A2 reflection,
+   *  domain-blind). The strong multi-critic baseline + the LLM Router (router.ts) wire in here IFF the
+   *  Router clears its R-A3-1 anti-theater eval (A3-6). RECOMMEND-ONLY: its route never gates the send. */
+  reflect?: RouterFn;
   /** DI: the Drafter's object-generate (offline machinery — provider-agnostic; feeds the Gemini Drafter). */
   draftGenerate?: GenerateObjectFn;
   /** DI: the reverse-faithfulness judge generate (offline machinery — inject the failing verdict). */
@@ -210,8 +252,15 @@ function assertEligibilityUntouched(
   }
 }
 
-/** Reflect: read the verify failure and form a CONCRETE revision instruction (R-LOOP-2). */
-function buildReflection(gate: GatekeeperReport, judge: JudgeResult): string {
+/**
+ * The A2 DOMAIN-BLIND reflection: read the verify failure and form a CONCRETE revision instruction
+ * (R-LOOP-2). Its signature takes ONLY the gatekeeper + faithfulness judge — it STRUCTURALLY CANNOT
+ * surface the advisory domain critic's signal. That is the A3-5 anti-theater RED baseline: on a
+ * multi-failure case (faithfulness-fail + domain-defective) it addresses only the faithfulness issue;
+ * `strongReflection` (lib/agents/router.ts) reads BOTH critics and covers the domain signal too. Exported
+ * so evals/router.test.ts can grade against it as the literal "before" behavior.
+ */
+export function buildReflection(gate: GatekeeperReport, judge: JudgeResult): string {
   if (!gate.approvedForHumanReview && gate.failures.length > 0) {
     return (
       `Gatekeeper blocked the draft: ${gate.failures.join("; ")}. ` +
@@ -226,6 +275,31 @@ function buildReflection(gate: GatekeeperReport, judge: JudgeResult): string {
     );
   }
   return "Verification failed; remove any assertion not backed by a merchant field.";
+}
+
+/**
+ * The orchestrator's DEFAULT reflect seam — the A2 domain-blind reflection wrapped in the RevisionPlan
+ * shape. Kept as the default so A3-5 adds the `reflect?` seam WITHOUT changing loop behavior (every
+ * existing trajectory assertion holds: the instruction is byte-identical to buildReflection's). The strong
+ * multi-critic baseline (`strongReflection`, router.ts) is wired as the default at A3-6. `route`/holdForHuman
+ * are ADVISORY — recorded, never wired. `signals` is ["faithfulness"] by construction (domain-blind).
+ */
+function defaultReflect(ctx: {
+  gate: GatekeeperReport;
+  judge: JudgeResult;
+  domain: DomainJudgeResult | null;
+  merchant: Merchant;
+}): RevisionPlan {
+  const ineligible = ctx.merchant.suppression_reason.trim() !== "" || !ctx.merchant.contact_eligible;
+  return {
+    instruction: buildReflection(ctx.gate, ctx.judge),
+    signals: ["faithfulness"],
+    // ADVISORY (recommend-only): a failing draft is held; an ineligible merchant is suppressed. Recorded,
+    // never an input to the send (the post-loop route + assertEligibilityUntouched are the only authorities).
+    route: ineligible ? "suppress" : "hold_for_review",
+    holdForHuman: true,
+    rationale: "Deterministic A2 reflection (domain-blind): the revision targets the faithfulness failure.",
+  };
 }
 
 /**
@@ -269,6 +343,9 @@ export async function runAgentLoop(
   }
   const live = opts.live ?? crossFamilyReady;
   const recommend = opts.recommend ?? defaultRecommend;
+  // The Router/Conductor's reflect seam (R-A3-5). Default = the domain-blind A2 reflection; the strong
+  // multi-critic baseline / the LLM Router wire in via opts.reflect IFF the R-A3-1 eval earns it (A3-6).
+  const reflect = opts.reflect ?? defaultReflect;
   const recorder = new TrajectoryRecorder();
 
   // ─────────────────────────────── PLAN ───────────────────────────────
@@ -484,17 +561,32 @@ export async function runAgentLoop(
       break;
     }
 
-    // ── REFLECT: which claim/field failed -> a concrete revision instruction (R-LOOP-2) ──
-    instruction = buildReflection(gate, judge);
+    // ── REFLECT: the Router/Conductor synthesizes the verify failure(s) into a revision instruction ──
+    // The Router's SEAM (R-A3-5) reads BOTH critics — faithfulness (gating) + the advisory domain verdict
+    // (`lastDomain`, computed just above for a gatekeeper-approved draft). The default `reflect` is the A2
+    // domain-blind buildReflection (no behavior change this slice). RECOMMEND-ONLY (R-A3-3): plan.route /
+    // plan.holdForHuman are ADVISORY — RECORDED below, NEVER wired to the send (the post-loop route flows
+    // ONLY through simulate_send + assertEligibilityUntouched). recommend gets a defensive CLONE so an
+    // injected Router physically cannot mutate the loop's merchant (mirrors the recommend isolation).
+    const plan = await reflect({ gate, judge, domain: lastDomain, merchant: { ...merchant } });
+    instruction = plan.instruction;
     recorder.record({
       phase: "reflect",
-      // buildReflection is the Router/Conductor's revision-synthesis seam, deterministic in A2; it
-      // flips to "router" in A3-5 IFF the Router clears its R-A3-1 eval vs buildReflection. Until then "tool".
+      // tool-until-earned (R-A3-6 / R-A3-1): the reflect seam is the deterministic conductor in A2; it
+      // flips to "router" IFF the Router clears its anti-theater eval — STRUCTURALLY IMPOSSIBLE OFFLINE
+      // (the discriminators here — domain coverage / which-fix-first / route — are finite axes a
+      // deterministic table reproduces by construction; an LLM can only EARN on an open-ended-quality axis
+      // scored by an INDEPENDENT CROSS-FAMILY judge ⇒ for a Groq Router that is Gemini ⇒ live ⇒ A3-7). So
+      // it stays "tool"; the count stays "1 earned (Drafter) + 3 deferred". [advisor 2026-06-28]
       agent: "tool",
       iteration: i,
       toolCalls: [],
-      modelMode: "DETERMINISTIC_RULES",
-      verdictSummary: instruction,
+      modelMode: plan.mode ?? "DETERMINISTIC_RULES",
+      // verdictSummary keeps the instruction (it names the failing claim — locked by agent-loop.test.ts)
+      // and RECORDS the advisory route honestly (recommend-only; it does not gate the send).
+      verdictSummary:
+        `${instruction} (advisory route=${plan.route}, hold_for_human=${plan.holdForHuman} — RECORDED, does not gate the send)` +
+        (plan.errorClass ? ` [fallback: ${plan.errorClass}]` : ""),
     });
     // loop continues -> re-draft with `instruction`; if i was the last, the loop exits -> "max_iterations".
   }
