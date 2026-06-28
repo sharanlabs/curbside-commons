@@ -1,5 +1,5 @@
 /**
- * LIVE A3-2b — the Strategist CONFIRMATORY floor check on free Groq gpt-oss-120b ($0). KEY-GATED +
+ * LIVE A3-2b — the Strategist CONFIRMATORY floor check on a Groq free-tier gpt-oss-120b key. KEY-GATED +
  * auto-skipping offline (mirrors evals/agent-loop.live.test.ts). NOT part of `npm test` — vitest does
  * not load .env, so groqLiveEnabled() is false and this whole suite SKIPS (zero Groq-window usage). Run
  * it DELIBERATELY:
@@ -96,7 +96,11 @@ describe.skipIf(!live)("LIVE A3-2b — the Strategist clears the anti-theater fl
         await evalMerchant(normalizeRow(input(`${s.engagement} High`, "High", s), 2), "High", s.engagement);
       }
 
-      // F-1 ($0): the free-Groq path never charges the ledger.
+      // F-1: our budget ledger is never charged (the free-tier Groq path prices a call at 0 and
+      // discards reported usage). NOTE (Codex A3-2b P1): this is NOT an independent provider-billing
+      // measurement — "$0" rests on the key being a Groq FREE-tier key (rate-limited, not billed);
+      // gpt-oss-120b's STANDARD price is $0.15/M in + $0.60/M out (groq.com/pricing, 2026-06-28). See
+      // the cost-honesty note in docs/strategist-confirmatory-status.md.
       expect(budget.spentUsd).toBe(0);
       // F-3 (consistency): per-merchant caution stable across reps (temperature 0).
       for (const row of rows) expect(new Set(row.cautionByRep).size).toBe(1);
@@ -113,7 +117,10 @@ describe.skipIf(!live)("LIVE A3-2b — the Strategist clears the anti-theater fl
           model: resolvedGroqModel(),
           reps: REPS,
           n_pairs: pairSpecs().length,
-          cost_usd: 0,
+          cost_basis:
+            "Groq FREE-tier key (rate-limited, not billed) => $0; our budget ledger was not charged. NOT " +
+            "an independent provider-billing measurement. Standard gpt-oss-120b: $0.15/M in + $0.60/M out " +
+            "(groq.com/pricing, 2026-06-28). [Codex A3-2b P1]",
           note:
             "A3-2b CONFIRMATORY floor check (NOT label-earning). caution is a finite enum a deterministic " +
             "baseline matches; the `strategist` label DEFERS to the A3-3 cross-family judge. Strategy/tone " +

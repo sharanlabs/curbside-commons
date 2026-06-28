@@ -8,7 +8,7 @@
 
 **Verdict (per the pinned bar):** viable candidate; the `strategist` label **DEFERS to the A3-3 cross-family judge** (floor-not-ceiling — the structural caution axis is deterministically matchable AND the prompt states the rule, so the live pass confirms instruction-following, not certified judgment). Plan-step `agent` stays "tool"; public count stays "3 agents + a candidate".
 
-**Gate:** `npm run verify` green **277 + 5 skipped** (the live test skips in CI); differential lane UNTOUCHED. Codex methodology review running (background; record on completion).
+**Gate:** `npm run verify` green **277 + 5 skipped** (the live test skips in CI); differential lane UNTOUCHED. **Codex methodology review = BLOCK→2 reconciled primary-model-final + test-verified** — P1 (cost-honesty): the bare "$0/free" claim was overclaimed (the eval asserts the ledger, never meters billing); reframed to "Groq free-tier key, not metered" + a RULES §6 freshness check (groq.com/pricing 2026-06-28: gpt-oss-120b = $0.15/M in + $0.60/M out; ≈$0.003 if standard-billed; $0 on the free tier); P3: a stale "must beat strongRecommend" comment → floor-not-ceiling. Record: `docs/reviews/codex-2026-06-28-a3-2b-strategist-live.md`. The live floor result is unchanged (the findings were honesty-framing, not result-validity).
 
 **Next:** A3-3 (Drafter→Gemini OFFLINE machinery + §4.2 prevention wiring + the cross-family judge). Skills/tools: codex-guarded (A3-2b methodology review). Commit owner-authorized; push HELD (no remote).
 

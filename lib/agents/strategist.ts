@@ -1,13 +1,17 @@
 /**
- * THE STRATEGIST (A3-2) — and, FIRST, the STRONG deterministic baseline it must beat.
+ * THE STRATEGIST (A3-2) — and, FIRST, the STRONG deterministic baseline it must at least MATCH (the
+ * anti-theater FLOOR).
  *
  * WHY a strong baseline (advisor-cross-checked; AM-2 "no agent costumes" + R-A3-1): grading the LLM
  * Strategist against the naive A2 stand-in (`defaultRecommend`, which sets `strategy = play.touch`)
  * would let a costume "pass" — R-A3-1's literal wording ("diverges from `diagnose().play`") is WEAKER
  * than AM-2 requires. `diagnose().play` routes ONLY on `engagement_state × blocker_source`; it provably
  * IGNORES `risk_level`, tenure, and the specific root-cause. The honest anti-theater bar is therefore
- * "beats `strongRecommend`" — a deterministic function that ALREADY reads those ignored factors and
- * produces differentiated strategy/tone/caution.
+ * "at least MATCHES `strongRecommend`" (the FLOOR) — a deterministic function that ALREADY reads those
+ * ignored factors and produces differentiated strategy/tone/caution. FLOOR-NOT-CEILING (A3-2b confirmed):
+ * because `caution` is a finite enum a deterministic baseline computes perfectly, the structural axis can
+ * only TIE — so this eval FAILS a worse-than-baseline costume but CANNOT certify open-ended value; the
+ * `strategist` label DEFERS to the A3-3 cross-family judge.
  *
  * `strongRecommend` is THREE things at once: (1) the honest anti-theater BASELINE; (2) the DEMOTION
  * FALLBACK if the Strategist cannot beat it (AM-7: demote-to-tool + correct the "4 agents" count is a
