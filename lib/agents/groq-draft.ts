@@ -25,7 +25,7 @@ import type { AgentRunUsage, BudgetContext } from "@/lib/agents/gemini";
 import { BudgetExceededError } from "@/lib/agents/budget";
 import { applyInjectionCut, buildPrompt, GeneratedDraftSchema, mockDraft, type DraftResult } from "@/lib/agents/draft";
 import { liveGroqGenerateObject, resolvedGroqModel } from "@/lib/agents/groq";
-import { judgeLiveEnabled } from "@/lib/server/env-flags";
+import { groqLiveEnabled } from "@/lib/server/env-flags";
 
 /** The injectable generate (test/DI) — same shape as draft.ts / semantic-judge.ts. */
 type GenerateObjectFn = (a: {
@@ -63,9 +63,9 @@ function withRevision(prompt: string, instruction: string): string {
 
 /**
  * Produce an outreach draft on Groq gpt-oss-120b. Default = the deterministic stub (no spend). The
- * live path runs only when `live` (default = the A2 Groq gate judgeLiveEnabled(), which checks
- * ENABLE_LIVE_AI + GROQ_API_KEY) OR an injected `generate` is supplied (test/DI, never bills). A live
- * failure -> FAILED_TO_FALLBACK with the stub, honestly labeled.
+ * live path runs only when `live` (default = the A2 Groq gate groqLiveEnabled(), which checks
+ * ENABLE_LIVE_AI + GROQ_API_KEY with NO provider switch — the drafter is always Groq) OR an injected
+ * `generate` is supplied (test/DI, never bills). A live failure -> FAILED_TO_FALLBACK, honestly labeled.
  *
  * `instruction` is the reflect-step revision instruction (R-LOOP-2); when present the prompt asks the
  * model to remove the flagged content without adding new facts.
@@ -81,7 +81,7 @@ export async function draftOutreachGroq(
   } = {},
 ): Promise<DraftResult> {
   const platformName = opts.platformName ?? REFERENCE_PLATFORM_NAME;
-  const live = opts.live ?? judgeLiveEnabled();
+  const live = opts.live ?? groqLiveEnabled();
 
   // Deterministic path (live off, no injected generate): the bounded stub, $0.
   if (!live && !opts.generate) {
@@ -89,7 +89,7 @@ export async function draftOutreachGroq(
   }
 
   // Provider boundary (defense-in-depth): a REAL (non-injected) live call REQUIRES the Groq key.
-  if (!opts.generate && !judgeLiveEnabled()) return fallback(merchant, platformName, "LIVE_AI_DISABLED");
+  if (!opts.generate && !groqLiveEnabled()) return fallback(merchant, platformName, "LIVE_AI_DISABLED");
 
   // The cumulative ledger is required on the live path — no ledger => fail closed (no call). On the
   // free tier this never actually trips; it is threaded for honesty/symmetry, not as the real guard.

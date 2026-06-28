@@ -70,9 +70,15 @@ export interface Recommendation {
   strategy: string;
   tone: string;
   rationale: string;
+  /** Optional provenance so the trajectory's modelMode stays honest when an LLM recommend (the A3-2
+   *  Strategist) is wired: "LIVE_AI" | "DETERMINISTIC_RULES" | "FAILED_TO_FALLBACK". A deterministic
+   *  recommend (defaultRecommend) leaves it undefined ⇒ recorded as DETERMINISTIC_RULES. */
+  mode?: string;
+  /** Set when a live recommend fell back — the honest reason, surfaced in the trajectory summary. */
+  errorClass?: string;
 }
 
-export type RecommendFn = (merchant: Merchant, diagnosis: Diagnosis) => Recommendation;
+export type RecommendFn = (merchant: Merchant, diagnosis: Diagnosis) => Recommendation | Promise<Recommendation>;
 
 export type StopReason = "verified" | "max_iterations" | "budget_guard";
 
@@ -250,16 +256,31 @@ export async function runAgentLoop(
     tool: "diagnose_blocker",
     summary: `engagement=${diagnosis.engagement_state}; play=${diagnosis.play.touch}`,
   });
-  const recommendation = recommend(merchant, diagnosis);
+  // `recommend` may be sync (defaultRecommend) or async (the A3-2 LLM Strategist) — await covers both.
+  // RECOMMEND-NOT-DECIDE (R-A3-3 / R-LOOP-1b), enforced two ways:
+  //   (1) ISOLATION: recommend gets a defensive CLONE, so a recommend impl physically cannot mutate the
+  //       loop's merchant (eligibility) — the contract is structural, not just the end-of-loop assert
+  //       (which stays as belt). [Codex A3-2a P3]
+  //   (2) ADVISORY, NOT CLAMPED: the recommendation is the agent's voice, recorded FAITHFULLY — NOT
+  //       clamped here, so the trajectory honestly shows what the agent recommended (incl. an over-eager
+  //       route) and the firewall stays demonstrable (R-LOOP-8b seeds a "send anyway" route and proves
+  //       the system holds). `route` never feeds the send (eligibility is computeSendEligible's alone);
+  //       each recommend owns its OWN envelope discipline — the live Strategist clamps its LLM route
+  //       inside strategistRecommend (clampRouteToEnvelope), never trusting the model.
+  const recommendation = await recommend({ ...merchant }, diagnosis);
   recorder.record({
     phase: "plan",
-    // tool-until-earned (R-A3-6): the recommend seam is a deterministic stand-in in A2; it flips to
+    // tool-until-earned (R-A3-6): the recommend seam is a deterministic stand-in in A2/A3-1; it flips to
     // "strategist" in A3-2 IFF the Strategist clears its R-A3-1 anti-theater eval. Until then, "tool".
     agent: "tool",
     iteration: 0,
     toolCalls: planToolCalls,
-    modelMode: "DETERMINISTIC_RULES",
-    verdictSummary: `recommend=${recommendation.route}; strategy=${recommendation.strategy}; ${recommendation.rationale}`,
+    // HONEST PROVENANCE (Codex A3-2a P2): reflect the recommend's actual mode (an LLM Strategist may be
+    // LIVE_AI/FAILED_TO_FALLBACK), NOT a hardcoded literal — even while `agent` stays "tool".
+    modelMode: recommendation.mode ?? "DETERMINISTIC_RULES",
+    verdictSummary:
+      `recommend=${recommendation.route}; strategy=${recommendation.strategy}; ${recommendation.rationale}` +
+      (recommendation.errorClass ? ` (fallback: ${recommendation.errorClass})` : ""),
   });
 
   // ──────────────── DRAFT -> VERIFY -> REFLECT -> RE-DRAFT (bounded) ────────────────

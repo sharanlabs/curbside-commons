@@ -30,6 +30,25 @@ Newest entries on top.
 
 ---
 
+## 2026-06-28 A3-2a — Strategist agent + anti-theater eval: a FLOOR (not a ceiling), a clamp reversal, and a Codex BLOCK reconciled
+
+- What changed: Built the Strategist seam offline-first — `lib/agents/strategist.ts` (`strongRecommend` deterministic baseline + `allowedRoute`/`clampRouteToEnvelope` + the LLM `strategistRecommend` on Groq), `lib/agents/loop/orchestrator.ts` (`RecommendFn` sync-or-async + a defensive clone + honest plan-step `modelMode`), `evals/strategist.test.ts` (units + the anti-theater eval). Codex reconciliation added `lib/server/env-flags.ts` (`groqLiveEnabled`), touched `lib/agents/groq-draft.ts`, and added a regression to `evals/agent-loop.test.ts`. Offline, $0; differential 20/20 untouched.
+- Why it changed: A3-2 of the multi-agent split — give the loop a real strategy-synthesis seam, gated by an anti-theater proof so it can't be a deterministic pipeline stage in an agent costume (AM-2/R-A3-1).
+- Challenge or failure that appeared: (1) The naive eval (grade the LLM vs `diagnose().play`/`defaultRecommend`) would "pass" a costume. (2) The advisor-suggested orchestrator route-clamp broke the R-LOOP-8b firewall *demonstration*. (3) Codex BLOCK: 4 findings (P1 the Strategist live-gate read the faithfulness judge's `JUDGE_PROVIDER` namespace; P2 the trajectory would mislabel a live recommendation as deterministic; P2 the DI eval didn't prove the prompt carries the discriminating facts; P3 the recommend seam should fail earlier on mutation).
+- Why it happened: (1) R-A3-1's literal wording ("diverges from `diagnose().play`") is weaker than AM-2; `play` ignores risk/tenure/root_cause, so the honest bar is a STRONG deterministic baseline that already reads them. (2) Clamping the advisory route in the orchestrator muzzled the agent's voice, so "agent recommends send → system holds" could no longer be shown. (3) I mirrored `groq-draft.ts`'s gate (`judgeLiveEnabled`) without noticing it reads `JUDGE_PROVIDER` — the same bug class already fixed for the domain judge.
+- How it was diagnosed: advisor BEFORE writing (floor-not-ceiling, red-green teeth, push-needs-genuine-Codex); a failing R-LOOP-8b test pinned the clamp regression; Codex changed-files review AFTER caught the 4 findings; verified `judgeLiveEnabled` against env-flags.ts source (Codex was right).
+- Options considered: clamp in the orchestrator (rejected — muzzles the recommendation + weakens the firewall test) vs clamp inside the Strategist + keep the orchestrator a recommend-agnostic firewall (adopted). For the eval: structural certification (rejected as a ceiling — finite enums are deterministically matchable) vs a structural FLOOR that fails a worse-than-baseline Strategist, deferring the real (open-ended) certification to the A3-3 cross-family judge (adopted).
+- Final fix: `strongRecommend` is the honest baseline; the eval is an explicit RED-GREEN floor (naive baselines + risk-blind mock FAIL; strong + risk-aware mock PASS); `groqLiveEnabled()` gates both Groq agents; `Recommendation.mode` makes the trajectory honest; `buildStrategistPrompt` is exported + regression-locked (facts present, name absent); the orchestrator passes a clone so a recommender can't mutate the loop's merchant.
+- Why this fix: it keeps the maker≠judge / recommend-not-decide invariants structural, the honesty claims test-locked, and the public "4 agents → 3 + a candidate" claim accurate (a demote/defer is an AM-7 success).
+- How it was implemented: 9 files; `npm run verify` green 277+4 (+7 regression tests); each Codex finding has a regression test.
+- How it was verified: full `verify` (typecheck/lint/test/build); the F4 fix is red-green by construction (the mutation regression passes only with the clone); Codex confirming re-pass on the FIXED diff.
+- Prevention step for the future: a Groq-only agent must use `groqLiveEnabled()`, never the faithfulness judge's `judgeLiveEnabled()`; an eval that injects the discriminator must ALSO regression-lock the prompt wiring (else "the agent received the facts" is unproven).
+- Files changed: `lib/agents/strategist.ts`, `lib/agents/loop/orchestrator.ts`, `lib/agents/groq-draft.ts`, `lib/server/env-flags.ts`, `evals/strategist.test.ts`, `evals/agent-loop.test.ts` (+ state docs + `docs/reviews/codex-2026-06-28-a3-2a-strategist.md`).
+- Reviewer notes (Codex / human): Codex BLOCK (4 findings) → all reconciled primary-model-final + test-locked; confirming re-pass on the fixed diff. Owner authorized commit + push for this slice after codex + reconciliation.
+- Human decision: commit + push authorized (2026-06-28) conditioned on the Codex gate + reconciliation being complete.
+
+---
+
 ## 2026-06-27 A3-1 — trajectory `agent` attribution (R-A3-6): a Codex-caught honesty bug, reconciled + red-green-locked
 
 - What changed: Added a `TrajectoryAgent` type + a **required** `agent` field on `TrajectoryStep` (`lib/agents/loop/trajectory.ts`), attributed every `record()` site (`lib/agents/loop/orchestrator.ts`), and added 2 R-A3-6 tests + a served-snapshot agent-lock (`evals/agent-loop.test.ts`). Offline, $0, no behavior change.

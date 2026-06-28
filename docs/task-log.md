@@ -1,5 +1,17 @@
 # Task Log
 
+## 2026-06-28 (A3-2a — Strategist agent + anti-theater eval; Codex BLOCK→4 reconciled + test-locked; owner-authorized commit+push after the gate)
+
+**Process:** FULL (per-slice A3 gate) · risk: AI-behavior/architecture but offline/$0/reversible · Effort: MAX (owner-set this session; ship-gating architecture + AI behavior). Advisor called BEFORE writing (sharpened: floor-not-ceiling, red-green teeth, push-needs-genuine-Codex). Owner: "all approval given comit and push after codex and reconcillation done."
+
+**Did:** Built the Strategist seam offline-first — `strongRecommend` (the honest anti-theater BASELINE reading risk/tenure/engagement, which `diagnose().play` ignores) + envelope helpers + the LLM `strategistRecommend` (Groq `gpt-oss-120b`, DI `generate`, route-clamped, prompt withholds the raw merchant_name) in `lib/agents/strategist.ts`; `RecommendFn` sync-or-async + clone-isolation + honest plan-step `modelMode` in `lib/agents/loop/orchestrator.ts` (plan-step `agent` STAYS `tool` — tool-until-earned); `evals/strategist.test.ts` units + the anti-theater eval with explicit RED-GREEN. **Mid-build correction:** the orchestrator route-clamp (advisor-suggested) broke the R-LOOP-8b firewall *demonstration* (it muzzled the seeded "send anyway" recommendation) → reverted; clamping lives INSIDE `strategistRecommend`, the orchestrator stays the recommend-agnostic deterministic firewall.
+
+**Gate:** `npm run verify` green **277 + 4 skipped** (was 270; +7 regression tests); differential **20/20** UNTOUCHED. **Codex changed-files review (`codex-guarded exec -s read-only`) RAN → BLOCK (4: 1 P1 + 2 P2 + 1 P3) → ALL reconciled primary-model-final + fixed + test-locked**: F1 (P1) Strategist live-gate misrouted via `JUDGE_PROVIDER` → new `groqLiveEnabled()` (`ENABLE_LIVE_AI && GROQ_API_KEY`), used in `strategist.ts` + the identical latent `groq-draft.ts` (surfaced); F2 (P2) trajectory mode honesty (`Recommendation.mode`); F3 (P2) prompt-wiring regression-lock (export `buildStrategistPrompt` + fact/no-name asserts); F4 (P3) recommend mutation-isolation (defensive clone + async-mutator regression). Record: `docs/reviews/codex-2026-06-28-a3-2a-strategist.md`. Confirming re-pass IN FLIGHT.
+
+**Honest conclusion (floor-not-ceiling — advisor + Codex):** the structural discriminator (`caution`) is a finite enum a deterministic baseline computes perfectly → the eval is a NECESSARY anti-theater FLOOR (it FAILS a worse-than-baseline Strategist), NOT a label-earning ceiling → the `strategist` label DEFERS to the A3-3 cross-family judge; the "4 agents" claim = "3 + a candidate".
+
+**Next:** confirming Codex SHIP → commit (explicit paths) + push (owner-authorized for this slice) → A3-2b live $0 confirmatory eval. Skills/tools: advisor (×1), codex-guarded (review + confirming re-pass).
+
 ## 2026-06-27 (A3-1 — trajectory `agent` attribution (R-A3-6); test-verified + fully gated; Codex BLOCK→reconciled; UNCOMMITTED)
 
 **Process:** FULL (per-slice A3 gate) · low-risk (offline, $0, additive metadata field — no behavior/eligibility/send change) · Effort auto-routed (code: moderate; the Codex ship-gating review: xhigh). Advisor called BEFORE writing on the one judgment call (the agent-attribution mapping). Owner: "resume" / "complete it is past 7:40pm".

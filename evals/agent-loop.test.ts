@@ -270,6 +270,43 @@ describe("R-LOOP-8b — the agent cannot override deterministic eligibility", ()
     expect(result.outreachStatus).toBe("drafted"); // held for human approval
     expect(result.sent).toBe(false);
   });
+
+  it("an async recommender that MUTATES its merchant arg cannot corrupt the loop (isolated by clone) [Codex A3-2a P3]", async () => {
+    const highRisk: MerchantInput = {
+      merchant_name: "Mutator Diner",
+      merchant_category: "Restaurant",
+      days_since_signup: 18,
+      last_login_days_ago: 9,
+      steps_completed: 1,
+      source_risk_level: "High",
+    };
+    const merchant = normalizeRow(highRisk, 1);
+    expect(merchant.send_eligible).toBe(false);
+    expect(merchant.review_required).toBe(true);
+
+    // An adversarial ASYNC recommender that tries to FORCE eligibility by mutating its argument.
+    const mutating = async (m: Merchant): Promise<Recommendation> => {
+      m.send_eligible = true;
+      m.review_required = false;
+      return { route: "contact", strategy: "self_serve_nudge", tone: "pushy", rationale: "SEEDED: mutate + send." };
+    };
+    const result = await runAgentLoop(
+      { input: highRisk, index: 1 },
+      {
+        recommend: mutating,
+        draftGenerate: async () => ({ object: generatedFrom(merchant) }),
+        judgeGenerate: async () => ({ object: cleanVerdict() }),
+      },
+    );
+
+    // The loop's merchant is ISOLATED from the mutation (recommend got a defensive clone): the forced
+    // values did NOT stick, so eligibility holds and no ineligible send lands. WITHOUT the clone the
+    // mutation would move eligibility -> assertEligibilityUntouched throws; this passes ONLY with the clone.
+    expect(result.merchant.send_eligible).toBe(false);
+    expect(result.merchant.review_required).toBe(true);
+    expect(result.outreachStatus).not.toBe("simulated_sent");
+    expect(result.sent).toBe(false);
+  });
 });
 
 // ───────────────────── R-LOOP-6 — trajectory freeze + $0 REPLAY seam ─────────────────────

@@ -33,6 +33,17 @@ export function judgeLiveEnabled(): boolean {
 }
 
 /**
+ * The Groq-only A2 agents' live gate (the drafter `draftOutreachGroq` + the A3-2 Strategist) —
+ * ENABLE_LIVE_AI && GROQ_API_KEY, with NO provider switch. These agents are ALWAYS Groq gpt-oss-120b, so
+ * they must NOT ride the faithfulness judge's judgeLiveEnabled() (which reads JUDGE_PROVIDER and would
+ * misroute to GEMINI_API_KEY under a JUDGE_PROVIDER=gemini override) — the same bug class as the
+ * domainJudgeLiveEnabled() split below. [Codex A3-2a P1, 2026-06-28]
+ */
+export function groqLiveEnabled(): boolean {
+  return envBool("ENABLE_LIVE_AI") && Boolean(process.env.GROQ_API_KEY?.trim());
+}
+
+/**
  * The LIVE DOMAIN-QUALITY judge's gate — a SEPARATE namespace from the faithfulness judge above.
  * It reads DOMAIN_JUDGE_PROVIDER (matching resolvedDomainJudgeProvider() in domain-judge.ts), NOT
  * JUDGE_PROVIDER. Without this the documented DOMAIN_JUDGE_* override was misrouted: a domain judge
