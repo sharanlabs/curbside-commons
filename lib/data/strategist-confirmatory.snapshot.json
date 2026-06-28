@@ -1,0 +1,129 @@
+{
+  "_provenance": {
+    "recorded_at_note": "stamp the date at commit time (no wall-clock in tests)",
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "reps": 2,
+    "n_pairs": 4,
+    "cost_usd": 0,
+    "note": "A3-2b CONFIRMATORY floor check (NOT label-earning). caution is a finite enum a deterministic baseline matches; the `strategist` label DEFERS to the A3-3 cross-family judge. Strategy/tone prose captured below as samples for that future judge."
+  },
+  "floor": {
+    "low_standard": "4/4",
+    "high_elevated": "4/4"
+  },
+  "rows": [
+    {
+      "engagement": "actively_stuck",
+      "risk": "Low",
+      "mode": "LIVE_AI",
+      "caution": "standard",
+      "strongCaution": "standard",
+      "route": "contact",
+      "strategy": "Highlight the ease of updating business hours in the portal and offer a quick walkthrough to resolve the availability block, pre‑empting concerns about time‑consumption or platform complexity.",
+      "tone": "Supportive and collaborative, acknowledging the merchant’s effort so far while encouraging a simple next step.",
+      "cautionByRep": [
+        "standard",
+        "standard"
+      ]
+    },
+    {
+      "engagement": "actively_stuck",
+      "risk": "High",
+      "mode": "LIVE_AI",
+      "caution": "elevated",
+      "strongCaution": "elevated",
+      "route": "hold_for_review",
+      "strategy": "Provide a concise, data‑driven prompt to confirm and update the merchant's business hours, offering step‑by‑step guidance within the self‑serve portal and a direct line to a specialist if they encounter any roadblocks.",
+      "tone": "Supportive yet urgent, acknowledging their effort so far while emphasizing the importance of resolving the hours issue promptly to avoid further delays.",
+      "cautionByRep": [
+        "elevated",
+        "elevated"
+      ]
+    },
+    {
+      "engagement": "dormant",
+      "risk": "Low",
+      "mode": "LIVE_AI",
+      "caution": "standard",
+      "strongCaution": "standard",
+      "route": "contact",
+      "strategy": "Highlight the immediate benefit of setting business hours to unlock order flow, and offer a brief walkthrough to quickly configure availability. Pre‑empt concerns about time constraints by proposing a 5‑minute setup call and emphasizing that once hours are live, orders can start arriving without further effort.",
+      "tone": "Encouraging and supportive, acknowledging the merchant’s recent progress while gently nudging them to regain momentum.",
+      "cautionByRep": [
+        "standard",
+        "standard"
+      ]
+    },
+    {
+      "engagement": "dormant",
+      "risk": "High",
+      "mode": "LIVE_AI",
+      "caution": "elevated",
+      "strongCaution": "elevated",
+      "route": "hold_for_review",
+      "strategy": "Highlight the immediate benefit of setting a few core business hours to unlock order flow, and pre‑empt concerns about staffing by offering flexible scheduling guidance and a simple step‑by‑step setup call.",
+      "tone": "Supportive and motivating, acknowledging the merchant’s busy schedule while encouraging a quick re‑engagement.",
+      "cautionByRep": [
+        "elevated",
+        "elevated"
+      ]
+    },
+    {
+      "engagement": "ghosted",
+      "risk": "Low",
+      "mode": "LIVE_AI",
+      "caution": "standard",
+      "strongCaution": "standard",
+      "route": "contact",
+      "strategy": "Highlight the revenue and brand visibility benefits of going live, while offering hands‑on help to quickly finalize the menu upload. Pre‑empt the menu‑setup objection by proposing a short, guided session with a support specialist to remove any friction.",
+      "tone": "Supportive and encouraging, acknowledging the merchant’s busy schedule and focusing on the immediate value of activation.",
+      "cautionByRep": [
+        "standard",
+        "standard"
+      ]
+    },
+    {
+      "engagement": "ghosted",
+      "risk": "High",
+      "mode": "LIVE_AI",
+      "caution": "elevated",
+      "strongCaution": "elevated",
+      "route": "hold_for_review",
+      "strategy": "Highlight the revenue and brand visibility benefits of activating on DoorDash, acknowledge the merchant's busy schedule, and proactively address the perceived menu‑setup hurdle by offering a quick, hands‑on walkthrough or dedicated support to get the menu uploaded.",
+      "tone": "empathetic yet urgent, conveying partnership and a clear call to action without over‑promising timelines.",
+      "cautionByRep": [
+        "elevated",
+        "elevated"
+      ]
+    },
+    {
+      "engagement": "progressing",
+      "risk": "Low",
+      "mode": "LIVE_AI",
+      "caution": "standard",
+      "strongCaution": "standard",
+      "route": "contact",
+      "strategy": "Provide a concise, step‑by‑step guide to complete the final verification, highlighting any common missing items and offering direct assistance to resolve them quickly.",
+      "tone": "Supportive and reassuring, acknowledging the merchant’s progress while encouraging them to finish the last step.",
+      "cautionByRep": [
+        "standard",
+        "standard"
+      ]
+    },
+    {
+      "engagement": "progressing",
+      "risk": "High",
+      "mode": "LIVE_AI",
+      "caution": "elevated",
+      "strongCaution": "elevated",
+      "route": "hold_for_review",
+      "strategy": "Provide a concise, step‑by‑step guide to resolve the final verification block, highlighting the specific documents or information needed and offering direct help from a support specialist.",
+      "tone": "Supportive yet urgent, acknowledging the merchant’s progress while stressing the importance of completing verification promptly to avoid further delays.",
+      "cautionByRep": [
+        "elevated",
+        "elevated"
+      ]
+    }
+  ]
+}

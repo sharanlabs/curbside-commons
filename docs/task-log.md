@@ -1,5 +1,17 @@
 # Task Log
 
+## 2026-06-28 (A3-2b — Strategist live $0 Groq confirmatory eval; CLEARED the pre-registered anti-theater floor; label defers to A3-3)
+
+**Process:** per-slice A3 gate · low-risk (evidence/eval only — no product/core/behavior change; $0 free Groq; internal artifact) · Effort auto-routed. Pre-registered the floor bar BEFORE the run (R-DCAL-7 honesty discipline). Owner said "resume" → continued autonomously per the RESUME DIRECTIVE.
+
+**Did:** Built `evals/strategist.live.test.ts` (key-gated, auto-skips offline) — runs the LIVE Strategist on free Groq gpt-oss-120b over 4 same-play.touch/different-risk pairs × K=2 reps; asserts LIVE_AI ($0), per-merchant caution stable across reps, Low→standard / High→elevated on ALL pairs. Pinned the bar in `docs/strategist-confirmatory-status.md` BEFORE reading numbers. Ran live → **CLEARED**: Low→standard 4/4, High→elevated 4/4, 16/16 LIVE_AI, $0; snapshot `lib/data/strategist-confirmatory.snapshot.json` (captures the strategy/tone prose as samples for the A3-3 judge).
+
+**Verdict (per the pinned bar):** viable candidate; the `strategist` label **DEFERS to the A3-3 cross-family judge** (floor-not-ceiling — the structural caution axis is deterministically matchable AND the prompt states the rule, so the live pass confirms instruction-following, not certified judgment). Plan-step `agent` stays "tool"; public count stays "3 agents + a candidate".
+
+**Gate:** `npm run verify` green **277 + 5 skipped** (the live test skips in CI); differential lane UNTOUCHED. Codex methodology review running (background; record on completion).
+
+**Next:** A3-3 (Drafter→Gemini OFFLINE machinery + §4.2 prevention wiring + the cross-family judge). Skills/tools: codex-guarded (A3-2b methodology review). Commit owner-authorized; push HELD (no remote).
+
 ## 2026-06-28 (A3-2a — Strategist agent + anti-theater eval; Codex BLOCK→4 reconciled + test-locked; owner-authorized commit+push after the gate)
 
 **Process:** FULL (per-slice A3 gate) · risk: AI-behavior/architecture but offline/$0/reversible · Effort: MAX (owner-set this session; ship-gating architecture + AI behavior). Advisor called BEFORE writing (sharpened: floor-not-ceiling, red-green teeth, push-needs-genuine-Codex). Owner: "all approval given comit and push after codex and reconcillation done."
