@@ -1,5 +1,7 @@
 # Codex changed-files review — A3-4 (Domain Critic as the 2nd VERIFY-phase critic, advisory)
 
+> **✅ DISCHARGED 2026-06-28 (batched on the reset seat) — the round-3 re-confirm returned SHIP (no new findings). Canonical record: [codex-2026-06-28-a3-batch-confirm.md](codex-2026-06-28-a3-batch-confirm.md). The SEAT-BLOCKED / dated-obligation status below is now historical.**
+
 **Date:** 2026-06-28 · **Reviewer:** Codex (config default `gpt-5.5` @ `xhigh`), read-only, via `~/claude-os/bin/codex-guarded` · **Target:** the uncommitted A3-4 diff (4 modified + 1 new eval) · **Reconciliation:** primary-model-final (Opus 4.8).
 
 ## Verdict: BLOCK (round 1) → reconciled → round-2 confirming found 1 RESIDUAL P1 → patched + test-locked → round-3 re-confirm SEAT-BLOCKED (dated obligation ~7:25 PM); proceeding TEST-VERIFIED

@@ -30,6 +30,20 @@ Newest entries on top.
 
 ---
 
+## 2026-06-28 A3-4/5/6 — the batched Codex gate caught a cross-family hole the A3-6 wiring re-opened (P1), reconciled + red-green
+
+- What changed: discharged the three batched dated Codex obligations (A3-4 round-3 + A3-5 + A3-6) on the reset seat in one batched read-only review; reconciled all findings primary-model-final and flipped the three acceptance-gates to SHIP 5/5 — the A3-1..A3-6 offline build is now FULLY GATED.
+- Why it changed: the offline build was COMPLETE but gate-2 (the mandatory cross-model review) was named-open on all three slices (seat usage-limited until ~7:25 PM ET). The batch was the only reversible work left before the owner-gated A3-7.
+- Challenge / failure that appeared: the review returned A3-4 SHIP, A3-5 SHIP+1 P2, A3-6 BLOCK+1 P1. The P1 — A3-6 made the Strategist (`recommend`) + Router (`reflect`) defaults live-capable, but the `fullyInjectedDI` cross-family guard still checked only the three OLD generates (draft+judge+domain) — so a forced `live:true` non-cross-family run with the three old hooks could skip the R-A3-2 throw and make a REAL Groq Strategist/Router call. This is the IDENTICAL bug class A3-4 round-2 had already closed for the domain critic, re-opened by the A3-6 wiring.
+- Why it happened: `fullyInjectedDI` is an enumerated allowlist ("every live-capable seam is DI'd"); adding two new live seams in A3-6 without extending the allowlist silently widened the exemption. A green CI couldn't catch it — the existing "exempt" test asserted the 3-hook case RESOLVES, which was now precisely the bug.
+- How it was diagnosed: Codex changed-files review (gpt-5.5 @ xhigh) over the committed slices; confirmed against source (strategist.ts / router.ts both reach `liveGroqGenerateObject` when `live && groqLiveEnabled() && budget` and not DI-injected).
+- Final fix: require ALL FIVE live-capable seams injected (`… && opts.recommend && opts.reflect`); the regression flips — the 3-hook case now THROWS (case c), only all-five-injected is exempt (case d). RED-GREEN proven (revert → case c FAILS because the loop runs the Strategist/Router to FAILED_TO_FALLBACK, i.e. attempts the real call; restore → green). Also fixed the A3-5 P2 (Router-prompt "no injection surface" overclaim → `{{MERCHANT}}` injection-cut + adversarial-name regression) and the P3 stale comments (incl. the `AgentLoopOptions` field docs the first confirming pass caught).
+- How it was verified: `npm run verify` exit 0 — 297 passed + 5 skipped + build green; differential 20/20 UNTOUCHED; two confirming Codex re-passes → final VERDICT SHIP.
+- Prevention step for the future: when a new live-capable seam is added, extend the `fullyInjectedDI` allowlist in the SAME slice — the guard is an enumerated allowlist, not structural, so it does NOT auto-cover new seams. The "exempt" regression case is the canary: if a new seam is added and the all-DI exempt case still passes with the old hook set, the allowlist is stale.
+- Files changed: `lib/agents/loop/orchestrator.ts`, `lib/agents/router.ts`, `evals/agent-loop.test.ts`, `evals/router.test.ts`; records `docs/reviews/codex-2026-06-28-a3-batch-confirm.md` + `a3-batch-reconcile-evidence.log` (+ 6 gate/review docs stamped DISCHARGED / SHIP 5/5).
+- Reviewer notes (Codex): batched review BLOCK → reconciled → 2 confirming re-passes → SHIP. Advisor (stronger-model) cross-checked the reconciliation: sound, ship — and caught that the state docs asserted "committed" before the commit existed (the named stale-git-line failure mode; fixed by committing + re-deriving git state).
+- Human decision: NEXT = A3-7 (owner-gated live spend). Surfaced; not started autonomously.
+
 ## 2026-06-28 A3-4 — the Domain Critic defers its label too: the anti-theater discipline working as designed
 
 **Goal:** wire the existing calibrated domain-quality judge (`judgeDomain`, from B1/B2) into the agent loop's VERIFY phase as the 2nd critic — Groq, cross-family vs the Gemini drafter, ADVISORY, INDEPENDENT of the faithfulness judge (R-A3-4). Offline only; the live run is A3-7.

@@ -1,5 +1,7 @@
 # Codex changed-files review — A3-6 (integrated multi-agent orchestrator wired + $0 trajectory fixture)
 
+> **✅ DISCHARGED 2026-06-28 (batched on the reset seat) — the review found 1 P1 (the cross-family `fullyInjectedDI` hole the A3-6 wiring re-opened) + 1 P3, BOTH fixed (P1 RED-GREEN proven) + a confirming re-pass returned SHIP. Canonical record: [codex-2026-06-28-a3-batch-confirm.md](codex-2026-06-28-a3-batch-confirm.md). The SEAT-BLOCKED / dated-obligation status below is now historical.**
+
 **Date:** 2026-06-28 · **Reviewer:** Codex (config default `gpt-5.5` @ `xhigh`), read-only, via `~/claude-os/bin/codex-guarded` · **Target:** the A3-6 diff (4 modified) · **Reconciliation:** primary-model-final (Opus 4.8).
 
 ## Status: SEAT-BLOCKED — DATED OBLIGATION (now batched as the THIRD of three: A3-4 round-3 + A3-5 + A3-6); proceeding TEST-VERIFIED

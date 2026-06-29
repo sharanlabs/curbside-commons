@@ -1,0 +1,48 @@
+A3-4/5/6 BATCHED CODEX GATE — reconciliation evidence (2026-06-28, ~7:40 PM ET)
+================================================================================
+
+SEAT: Codex seat reset confirmed alive at 19:32 ET (smoke-test → SEAT_OK).
+
+BATCHED READ-ONLY REVIEW (codex gpt-5.5 @ xhigh, ~249k tokens) over the three
+committed slices d60f66e (A3-4) / 46f9a2b (A3-5) / b2852d9 (A3-6):
+  SLICE A3-4: SHIP (round-3 re-confirm clean — no ship-blocking findings)
+  SLICE A3-5: SHIP  + 1 P2 (Router prompt "no injection surface" overclaim)
+  SLICE A3-6: BLOCK + 1 P1 (fullyInjectedDI omits the new live seams) + 1 P3 (stale comments)
+  Differential lane: CONFIRMED UNTOUCHED across all three commits.
+  OVERALL = BLOCK (A3-6, finding #1).
+
+RECONCILIATION (primary-model-final, Opus 4.8) — ALL THREE ACCEPTED + FIXED:
+
+[P1 / A3-6] orchestrator.ts:319 — fullyInjectedDI checked only draft+judge+domain
+  generates, but A3-6 made the Strategist (recommend) + Router (reflect) seams
+  live-capable by default → a forced live:true + non-cross-family config + the three
+  OLD hooks could skip the R-A3-2 throw and make a REAL Groq Strategist/Router call.
+  FIX: require ALL FIVE live-capable seams injected
+       (draftGenerate && judgeGenerate && domainGenerate && opts.recommend && opts.reflect).
+
+  RED-GREEN PROVEN (evals/agent-loop.test.ts "forced live:true ..." case c):
+   - REVERT to the 3-hook predicate → the case FAILS:
+       × a forced live:true ... FAILS CLOSED — throws (the loop did NOT throw; it ran the
+         Strategist + Router live seams to "mode": "FAILED_TO_FALLBACK" — i.e. it ATTEMPTED
+         the real provider call the fix prevents). Tests 1 failed | 20 skipped.
+   - RESTORE the 5-hook predicate → GREEN.
+  Regression encodes Codex's exact case: (c) three generates only → STILL throws R-A3-2;
+  (d) all five seams injected → exempt, resolves.
+
+[P2 / A3-5] router.ts buildRouterPrompt — the comment claimed "no prompt-injection
+  surface" but the unsupported-claim texts (draft-derived) could echo the real
+  merchant_name verbatim.
+  FIX: placeholderize merchant_name → {{MERCHANT}} in each unsupported-claim text via a
+  redactMerchantName helper (the SAME injection-cut the Drafter uses); comment corrected
+  to be true-not-weakened. NEW regression (evals/router.test.ts "A3-5 P2 — injection-cut"):
+  a claim text echoing the name → the prompt contains {{MERCHANT}}, NOT the raw name.
+
+[P3 / A3-6] orchestrator.ts — two stale comments still said the reflect default was the
+  A3-5 domain-blind defaultReflect/buildReflection. FIX: updated to "default is now
+  routerReflect; OFFLINE strongReflection; buildReflection retained only as the eval RED baseline."
+
+GATE AFTER FIX: npm run verify exit 0 — 297 passed | 5 skipped (was 296; +1 = the P2
+injection-cut test); typecheck/lint/build green. Differential lane CLEAN (git diff --name-only
+HEAD touches only orchestrator.ts, router.ts, agent-loop.test.ts, router.test.ts).
+
+CONFIRMING CODEX RE-PASS on the fixed working-tree diff: see codex-2026-06-28-a3-batch-confirm.md.

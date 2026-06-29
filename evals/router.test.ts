@@ -33,7 +33,8 @@ import { z } from "zod";
 import { normalizeRow } from "@/lib/core/pipeline";
 import type { MerchantInput } from "@/lib/core/types";
 import { buildReflection } from "@/lib/agents/loop/orchestrator";
-import { strongReflection, routerReflect, criticSignals, type RouterContext } from "@/lib/agents/router";
+import { strongReflection, routerReflect, criticSignals, buildRouterPrompt, type RouterContext } from "@/lib/agents/router";
+import { MERCHANT_PLACEHOLDER } from "@/lib/agents/draft";
 import type { GatekeeperReport } from "@/lib/agents/gatekeeper";
 import type { JudgeResult } from "@/lib/agents/semantic-judge";
 import type { DomainJudgeResult } from "@/lib/agents/domain-judge";
@@ -191,5 +192,24 @@ describe("A3-5 anti-theater — Router/Conductor vs its deterministic counterpar
     const plan = strongReflection(blockedCtx);
     expect(plan.signals).toEqual(["faithfulness"]); // no domain signal
     expect(plan.instruction).toBe(buildReflection(blocked, judgeFlag)); // identical to the domain-blind reflection
+  });
+});
+
+describe("A3-5 P2 — Router prompt injection-cut (Codex A3-5 P2)", () => {
+  it("placeholderizes the merchant_name out of unsupported-claim texts → the raw name never enters the prompt", () => {
+    // An unsupported claim text that ECHOES the real merchant_name (the draft-derived injection surface
+    // Codex flagged: the name is withheld as a field but could re-enter verbatim via the claim prose).
+    const nameEcho = `${eligibleMerchant.merchant_name} will be fully approved by Friday — guaranteed.`;
+    const judgeWithName: JudgeResult = {
+      ...judgeFlag,
+      verdict: { claims: [{ text: nameEcho, supported: false, evidence_field: null }], any_unsupported: true },
+    };
+    const prompt = buildRouterPrompt(
+      { gate: gateApproved, judge: judgeWithName, domain: domainDefective, merchant: eligibleMerchant },
+      "TestPlatform",
+    );
+    expect(eligibleMerchant.merchant_name.length).toBeGreaterThan(0); // sanity: the name is non-empty
+    expect(prompt).not.toContain(eligibleMerchant.merchant_name); // the raw untrusted name is GONE
+    expect(prompt).toContain(MERCHANT_PLACEHOLDER); // replaced by the {{MERCHANT}} injection-cut
   });
 });

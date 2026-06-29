@@ -44,6 +44,16 @@ import { allowedRoute, clampRouteToEnvelope } from "@/lib/agents/strategist";
 import type { BudgetContext } from "@/lib/agents/gemini";
 import { liveGroqGenerateObject, resolvedGroqModel } from "@/lib/agents/groq";
 import { groqLiveEnabled } from "@/lib/server/env-flags";
+import { MERCHANT_PLACEHOLDER } from "@/lib/agents/draft";
+
+/**
+ * The {{MERCHANT}} injection-cut for Router-prompt inputs (Codex A3-5 P2). The unsupported-claim texts are
+ * draft-derived and can echo the real merchant_name; placeholderize it back to {{MERCHANT}} — the SAME cut
+ * the Drafter uses — so the untrusted name never re-enters the Router prompt. (Empty name → no-op.)
+ */
+function redactMerchantName(text: string, merchantName: string): string {
+  return merchantName ? text.split(merchantName).join(MERCHANT_PLACEHOLDER) : text;
+}
 
 /** Honest provenance of a Router revision plan (mirrors the Strategist / draft mode taxonomy). */
 export type RouterMode = "LIVE_AI" | "DETERMINISTIC_RULES" | "FAILED_TO_FALLBACK";
@@ -177,15 +187,18 @@ const RouterOutputSchema = z.object({
 });
 
 /**
- * The Router prompt — STRUCTURED critic verdicts only. It deliberately does NOT include the raw
- * merchant_name (no prompt-injection surface; the untrusted name reaches only the Drafter behind the
- * {{MERCHANT}} injection-cut). The unsupported-claim texts ARE included (the Router must know what to
- * remove) and are treated as DATA, never instructions — mirroring how the faithfulness judge handles
- * draft prose. The Router has NO eligibility authority — `route` is advisory and clamped after the call.
+ * The Router prompt — STRUCTURED critic verdicts only. It withholds the raw merchant_name field, AND
+ * placeholderizes any merchant_name echoed inside the unsupported-claim texts back to {{MERCHANT}} (the SAME
+ * injection-cut the Drafter uses) — so the untrusted name never enters the Router prompt (Codex A3-5 P2).
+ * The unsupported-claim texts ARE included (the Router must know what to remove) and are treated as DATA,
+ * never instructions — mirroring how the faithfulness judge handles draft prose. The Router has NO
+ * eligibility authority — `route` is advisory and clamped after the call.
  */
 export function buildRouterPrompt(ctx: RouterContext, platformName: string): string {
   const { gate, judge, domain, merchant } = ctx;
-  const unsupported = judge.verdict.claims.filter((c) => !c.supported).map((c) => c.text);
+  const unsupported = judge.verdict.claims
+    .filter((c) => !c.supported)
+    .map((c) => redactMerchantName(c.text, merchant.merchant_name));
   const failedDims =
     domain && domain.verdict.domain_defective
       ? domain.verdict.dimensions.filter((d) => !d.pass).map((d) => d.dimension)

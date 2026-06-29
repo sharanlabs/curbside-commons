@@ -1,5 +1,7 @@
 # Codex changed-files review — A3-5 (Router/Conductor agent + reflect seam, recommend-only)
 
+> **✅ DISCHARGED 2026-06-28 (batched on the reset seat) — VERDICT SHIP; the 1 P2 (Router prompt "no injection surface" overclaim) was fixed (`{{MERCHANT}}` injection-cut on the unsupported-claim texts + regression) + confirmed primary-model-final. Canonical record: [codex-2026-06-28-a3-batch-confirm.md](codex-2026-06-28-a3-batch-confirm.md). The SEAT-BLOCKED / dated-obligation status below is now historical.**
+
 **Date:** 2026-06-28 · **Reviewer:** Codex (config default `gpt-5.5` @ `xhigh`), read-only, via `~/claude-os/bin/codex-guarded` · **Target:** the uncommitted/just-committed A3-5 diff (2 modified + 2 new) · **Reconciliation:** primary-model-final (Opus 4.8).
 
 ## Status: SEAT-BLOCKED — DATED OBLIGATION (batched with the A3-4 round-3 re-confirm); proceeding TEST-VERIFIED

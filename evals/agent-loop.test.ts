@@ -28,6 +28,8 @@ import { draftOutreachGroq } from "@/lib/agents/groq-draft";
 import { costUsd } from "@/lib/agents/pricing";
 import { estimateLiveCallCostUsd, resolvedGeminiModel } from "@/lib/agents/gemini";
 import { runAgentLoop, type Recommendation, type RouterFn } from "@/lib/agents/loop/orchestrator";
+import { strongRecommend } from "@/lib/agents/strategist";
+import { strongReflection } from "@/lib/agents/router";
 import { freezeTrajectory } from "@/lib/agents/loop/trajectory";
 import { getAgentLoopSnapshot } from "@/lib/agents/loop/snapshot";
 
@@ -329,9 +331,9 @@ describe("A3-4 — the domain critic is ADVISORY + INDEPENDENT of faithfulness (
       // Critic would make a REAL Gemini call. The exemption requires FULLY-injected DI, not just any.
       await expect(runAgentLoop(input, { live: true, draftGenerate: gen })).rejects.toThrow(R_A3_2);
 
-      // (c) FULLY-injected DI is exempt (no real provider call anywhere) → runs, does NOT throw.
-      const di = {
-        live: true as const,
+      // The three OLD generates (draft + judge + domain). A3-6 made the Strategist (recommend) + Router
+      // (reflect) seams live-capable by default, so these THREE alone are no longer "fully injected".
+      const threeGenerates = {
         draftGenerate: gen,
         judgeGenerate: async () => ({ object: cleanVerdict() }),
         domainGenerate: async () => ({
@@ -345,7 +347,21 @@ describe("A3-4 — the domain critic is ADVISORY + INDEPENDENT of faithfulness (
           },
         }),
       };
-      await expect(runAgentLoop(input, di)).resolves.toBeDefined();
+
+      // (c) The three generates only — NO recommend/reflect — STILL throws (Codex A3-6 P1): a forced-live
+      // run with the Strategist + Router seams non-injected would make a REAL Groq Strategist + Router call.
+      await expect(runAgentLoop(input, { live: true, ...threeGenerates })).rejects.toThrow(R_A3_2);
+
+      // (d) ALL FIVE live-capable seams injected (the three generates + recommend + reflect) → no real
+      // provider call on ANY seam → exempt, runs, does NOT throw.
+      await expect(
+        runAgentLoop(input, {
+          live: true,
+          ...threeGenerates,
+          recommend: (m, d) => ({ ...strongRecommend(m, d), mode: "DETERMINISTIC_RULES" }),
+          reflect: (rctx) => strongReflection(rctx),
+        }),
+      ).resolves.toBeDefined();
     } finally {
       for (const k of keys) {
         if (saved[k] === undefined) delete process.env[k];
