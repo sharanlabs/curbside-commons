@@ -213,13 +213,27 @@ function fallback(
   };
 }
 
-/** Read provider usage off a thrown SDK error (e.g. the AI SDK's NoObjectGeneratedError carries usage). */
+/**
+ * Read provider usage off a thrown SDK error. The AI SDK's NoObjectGeneratedError carries `usage`
+ * (token counts) AND `finishReason` as SEPARATE, top-level properties (verified against the
+ * installed `ai` typings — index.d.ts NoObjectGeneratedError: `readonly usage` + `readonly
+ * finishReason`). The token usage object does NOT contain finishReason, so we MUST read it off the
+ * error directly and merge it in.
+ *
+ * WHY this matters (A3-7 drafter-reliability): a structured-output truncation reports finishReason
+ * "length" (the SDK's normalization of Gemini's MAX_TOKENS). Capturing it here threads it onto
+ * DraftResult.usage (and into the trajectory), making the A3-7 "redraft fails to parse ~75%"
+ * truncation hypothesis PROVABLE on the owner-gated live re-run: a failed redraft whose
+ * finishReason is "length" is truncation, not a transient parse glitch. Before this, finishReason
+ * was silently dropped on exactly the failure path that needed it.
+ */
 function usageFromError(err: unknown): AgentRunUsage | undefined {
-  if (err && typeof err === "object" && "usage" in err) {
-    const u = (err as { usage?: unknown }).usage;
-    if (u && typeof u === "object") return u as AgentRunUsage;
-  }
-  return undefined;
+  if (!err || typeof err !== "object") return undefined;
+  const e = err as { usage?: unknown; finishReason?: unknown };
+  const base = e.usage && typeof e.usage === "object" ? { ...(e.usage as AgentRunUsage) } : undefined;
+  const finishReason = typeof e.finishReason === "string" ? e.finishReason : undefined;
+  if (!base && finishReason === undefined) return undefined;
+  return { ...(base ?? {}), ...(finishReason !== undefined ? { finishReason } : {}) };
 }
 
 /**
@@ -236,7 +250,15 @@ function priceLive(
   // count) is NOT "known" — pricing the missing leg at $0 would undercount real spend (Codex P1).
   const ok = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n) && n >= 0;
   if (usage && ok(usage.inputTokens) && ok(usage.outputTokens)) {
-    return { cost: costUsd(modelId, usage.inputTokens, usage.outputTokens), known: true };
+    // Gemini bills THINKING (reasoning) tokens at the OUTPUT rate, reported as a SEPARATE
+    // reasoningTokens count. Price the full billable output (completion + reasoning) so the ledger
+    // never undercounts on the thinkingBudget-ignored path (Codex slice-1 P1). Reasoning is NOT
+    // bounded by maxOutputTokens, so the pre-call estimate reserves it separately
+    // (estimateLiveCallCostUsd uses MAX_LIVE_OUTPUT_TOKENS + MAX_LIVE_REASONING_TOKENS_RESERVED) as a
+    // CONSERVATIVE BEST-EFFORT bound on this sum; a soft-budget overflow beyond the reserve is caught
+    // by the orchestrator's post-call overflow stop, not by this estimate (Codex slice-1 confirming P1).
+    const billableOutput = usage.outputTokens + (ok(usage.reasoningTokens) ? usage.reasoningTokens : 0);
+    return { cost: costUsd(modelId, usage.inputTokens, billableOutput), known: true };
   }
   return { cost: budget.estimatedNextUsd, known: false };
 }

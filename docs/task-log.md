@@ -1402,3 +1402,13 @@ Create governance and acceptance-criteria docs before any integration build:
 - Decide canonical onboarding steps and blocker taxonomy.
 - Define Supabase schema only after the data model is approved.
 - Define n8n, Slack, Resend, and Gemini behavior only after workflow safety controls are approved.
+
+## ROADMAP SLICE 1 — drafter-reliability fix (2026-06-29)
+
+- **Task type / mode:** AI-behavior reliability fix + budget-integrity hardening · FULL loop · Effort MAX (ship-gating).
+- **What:** fixed the A3-7 ~75% Gemini-redraft parse failure — (a) instrument: `usageFromError` merges the SDK error's top-level `finishReason` → `DraftResult.usage` → trajectory; (b) fix: disable thinking on the bounded draft (`thinkingBudget=0`) + raise `MAX_LIVE_OUTPUT_TOKENS` 2000→4096. A pricing change (`output+reasoning`) pulled in a budget arc → `maxRetries:0`, reasoning reserved + priced, $5 cap downgraded to an honest fail-closed best-effort bound + a post-call `budget_overflow` stop.
+- **Skills/tools used:** codex-guarded (cross-model gate ×5), acceptance-gate subagent (ship gate), Monitor/background Bash (await long steps). See `docs/tooling-and-skills-usage.md`.
+- **Gates:** `npm run verify` exit 0 — 305 passed + 5 skipped; typecheck/lint/build green; differential 20/20 UNTOUCHED (`git diff --name-only -- lib/core evals/gold lib/data/*.snapshot.json` empty); RED-GREEN proven ×7 (`docs/reviews/slice1-drafter-reliability-verify-evidence.log`). Codex gate-2 CLEARED (5 passes, all reconciled primary-model-final; `docs/reviews/codex-2026-06-29-slice1-drafter-reliability.md`). acceptance-gate SHIP.
+- **Honesty bound:** proves the fix is WIRED offline/$0; does NOT prove the live parse-rate recovers — that is the owner-gated SLICE 2 (R-A3-9) live re-run.
+- **Commit:** owner-authorized per the roadmap directive (re-derive SHA via `git log`); push HELD (no remote).
+- **Next:** STOP + surface SLICE 2 to the owner (OWNER-GATED live spend, ≤$5).

@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { NoObjectGeneratedError } from "ai";
 import { normalizeRow, makeDraft } from "@/lib/core/pipeline";
 import type { MerchantInput } from "@/lib/core/types";
 import { costUsd } from "@/lib/agents/pricing";
@@ -183,6 +184,50 @@ describe("draftOutreach — mode taxonomy, cost, fail-closed budget", () => {
     expect(called).toBe(false); // never invoked
     expect(res.mode).toBe("FAILED_TO_FALLBACK");
     expect(res.errorClass).toContain("Budget hard-stop");
+  });
+
+  it("captures the SDK error finishReason on a truncated structured-output call (A3-7 truncation proof)", async () => {
+    // A REAL NoObjectGeneratedError from the installed `ai` SDK — the EXACT error generateObject
+    // throws when Gemini 2.5 Flash structured output truncates: message "could not parse the
+    // response", finishReason "length" (the SDK's normalization of Gemini MAX_TOKENS). The
+    // drafter-reliability fix (usageFromError) must surface that finishReason onto DraftResult.usage
+    // so the A3-7 "redraft fails to parse ~75%" hypothesis is PROVABLE at the owner-gated live re-run.
+    const generate = async () => {
+      throw new NoObjectGeneratedError({
+        message: "No object generated: could not parse the response.",
+        response: { id: "r1", timestamp: new Date(0), modelId: resolvedGeminiModel() },
+        usage: { inputTokens: 1200, outputTokens: 4096, totalTokens: 5296 },
+        finishReason: "length",
+      });
+    };
+    const res = await draftOutreach(merchant, { generate, budget });
+    expect(res.mode).toBe("FAILED_TO_FALLBACK");
+    // finishReason was SILENTLY DROPPED before the fix (usageFromError read only err.usage, but the
+    // SDK puts finishReason at the top level of the error). "length" === provable truncation.
+    expect(res.usage?.finishReason).toBe("length");
+    // LOCK usage + cost preservation (Codex P3): the billed call's tokens must survive (NOT collapse
+    // to UNKNOWN_USAGE), and the real cost must be charged from the reported usage — not the estimate.
+    expect(res.usage?.inputTokens).toBe(1200);
+    expect(res.usage?.outputTokens).toBe(4096);
+    expect(res.errorClass).not.toContain("UNKNOWN_USAGE");
+    expect(res.costUsd).toBeCloseTo(costUsd(resolvedGeminiModel(), 1200, 4096), 10);
+  });
+
+  it("prices reasoning (thinking) tokens at the output rate so the ledger never undercounts (Codex P1)", async () => {
+    // The thinkingBudget-ignored insurance path: a billed call reports heavy reasoningTokens SEPARATE
+    // from a small completion. Google bills thinking at the output rate, so the cost MUST include both.
+    const generate = async () => {
+      throw new NoObjectGeneratedError({
+        message: "No object generated: could not parse the response.",
+        response: { id: "r2", timestamp: new Date(0), modelId: resolvedGeminiModel() },
+        usage: { inputTokens: 1000, outputTokens: 100, reasoningTokens: 3000, totalTokens: 4100 },
+        finishReason: "length",
+      });
+    };
+    const res = await draftOutreach(merchant, { generate, budget });
+    // billable output = completion (100) + reasoning (3000) = 3100 — NOT just 100.
+    expect(res.costUsd).toBeCloseTo(costUsd(resolvedGeminiModel(), 1000, 3100), 10);
+    expect(res.costUsd).toBeGreaterThan(costUsd(resolvedGeminiModel(), 1000, 100)); // reasoning really priced
   });
 
   it("fail-closed: the live path with no budget ledger does NOT call (no silent spentUsd:0)", async () => {

@@ -28,6 +28,18 @@ export type AgentRunUsage = {
   inputTokens?: number;
   outputTokens?: number;
   totalTokens?: number;
+  /**
+   * Thinking ("reasoning") tokens (the SDK maps Gemini's thoughtsTokenCount here). SEPARATE from
+   * outputTokens, and Google bills them at the OUTPUT rate — so the cost ledger MUST price them too
+   * (Codex slice-1 P1). IMPORTANT (Codex slice-1 confirming P1): reasoning tokens are NOT bounded by
+   * maxOutputTokens (that cap governs only the response/completion candidate; thoughtsTokenCount is a
+   * separate budget). So the pre-call estimate reserves them SEPARATELY (MAX_LIVE_REASONING_TOKENS_
+   * RESERVED, below) as a CONSERVATIVE BEST-EFFORT bound — Gemini's thinking budget is soft, so this
+   * is not a provider-proven hard ceiling; the orchestrator's post-call overflow stop covers the
+   * residual. With thinkingBudget=0 this should be 0; non-zero here is the fingerprint of the "model
+   * ignored thinkingBudget" path (and the reason it must be priced).
+   */
+  reasoningTokens?: number;
   finishReason?: string | null;
 };
 
@@ -101,11 +113,83 @@ export type BudgetContext = { spentUsd: number; estimatedNextUsd: number; capUsd
 export type LiveGenerateResult = { object: unknown; usage: AgentRunUsage };
 
 /**
- * Hard output-token ceiling on every live call — what makes the pre-call cost ESTIMATE
- * a true upper bound (and thus the $5 hard-stop a guarantee). Sized with headroom for
- * one outreach draft + its claims; too tight truncates the JSON mid-object.
+ * The completion-token ceiling on every live call. The pre-call cost ESTIMATE reserves it (plus a
+ * separate thinking reserve, MAX_LIVE_REASONING_TOKENS_RESERVED) as a CONSERVATIVE BEST-EFFORT bound —
+ * the $5 hard-stop is fail-closed, NOT a provider-proven hard guarantee (Gemini's thinking budget is a
+ * soft limit; see budget.ts + the orchestrator's post-call overflow stop). Sized with headroom for one
+ * outreach draft + its claims; too tight truncates the JSON mid-object.
+ *
+ * RAISED 2_000 -> 4_096 (drafter-reliability slice, 2026-06-28). The A3-7 live run found the
+ * Gemini 2.5 Flash redraft failed to parse ~75% of the time ("No object generated: could not
+ * parse the response" = the AI SDK's NoObjectGeneratedError, finishReason "length"). ROOT CAUSE
+ * (RULES §6, freshness-checked 2026-06-28 against the AI SDK + Google docs): gemini-2.5-flash is
+ * a THINKING model with thinking ON by default, and thinking tokens are billed against
+ * maxOutputTokens — so a 2_000 ceiling let internal reasoning starve the JSON, truncating
+ * structured output (sources: github.com/valentinfrlch/ha-llmvision#609; github.com/vercel/ai#14377).
+ * The PRIMARY fix is disabling thinking (LIVE_THINKING_BUDGET_TOKENS=0, below); this larger ceiling
+ * is cheap insurance for the case where the model ignores thinkingBudget=0 (a reported intermittent
+ * behavior) — it leaves room for both reasoning AND the JSON to finish. Cost impact is negligible:
+ * the ceiling only sizes the pre-call ESTIMATE (an upper bound), not actual spend; a full R-A3-9
+ * run stays far under the $5 cap. The live confirmation (finishReason no longer "length") is the
+ * owner-gated slice-2 re-run; this slice wires + proves the fix offline only.
  */
-const MAX_LIVE_OUTPUT_TOKENS = 2_000;
+const MAX_LIVE_OUTPUT_TOKENS = 4_096;
+
+/**
+ * Worst-case THINKING (reasoning) tokens to reserve in the pre-call cost ESTIMATE (Codex slice-1
+ * confirming P1). Reasoning tokens are billed at the output rate but are NOT bounded by
+ * maxOutputTokens (Gemini's thoughtsTokenCount is a separate budget), so the estimate must reserve
+ * them separately or it under-reserves the thinkingBudget-ignored path. 24_576 is gemini-2.5-flash's
+ * DOCUMENTED maximum CONFIGURABLE thinking budget (RULES §6, dated 2026-06-29). HONEST LIMIT (Codex
+ * slice-1 confirming P1): Google documents the thinking budget as a SOFT limit that can overflow, so
+ * this is a CONSERVATIVE BEST-EFFORT reservation covering the expected ceiling — NOT a provider-proven
+ * hard cap. The residual (a soft-budget overflow beyond this) is bounded to a single call by the
+ * orchestrator's post-call fail-closed overflow stop (it halts the run if any call's actual cost
+ * exceeds its reservation). With thinking actually disabled (thinkingBudget=0) real reasoning is 0, so
+ * in practice this just makes the reservation conservative. Re-verify the max at use-time if the model
+ * id changes.
+ */
+const MAX_LIVE_REASONING_TOKENS_RESERVED = 24_576;
+
+/**
+ * Thinking-token budget for the structured drafting call. 0 DISABLES Gemini 2.5 thinking
+ * (per the @ai-sdk/google thinkingConfig contract — "0 disables thinking, if the model
+ * supports it"; gemini-2.5-flash supports 0). This is the PRIMARY drafter-reliability fix:
+ * for a bounded, schema-constrained outreach draft, extended reasoning adds no value but DOES
+ * compete with the JSON for the output budget (the A3-7 truncation root cause). Disabling it
+ * also keeps cost honest — no thinking tokens billed at the output rate. RULES §6 freshness-
+ * checked 2026-06-28; the live EFFECT (parse rate recovers) is PENDING — measured at the
+ * owner-gated slice-2 run, not yet confirmed.
+ */
+export const LIVE_THINKING_BUDGET_TOKENS = 0;
+
+/**
+ * The non-model generateObject options for a live drafting call, as a PURE function so the
+ * thinking-disable + output-ceiling + no-retry wiring is unit-provable offline (the default
+ * `generate` closure below only runs live). Spread into generateObject alongside the
+ * model/schema/prompt.
+ */
+export function liveGenerationOptions(): {
+  maxOutputTokens: number;
+  maxRetries: number;
+  providerOptions: { google: { thinkingConfig: { thinkingBudget: number; includeThoughts: boolean } } };
+} {
+  return {
+    maxOutputTokens: MAX_LIVE_OUTPUT_TOKENS,
+    // maxRetries=0 (Codex slice-1 P1): keeps ONE pre-call reservation (estimateLiveCallCostUsd)
+    // mapped to exactly ONE billed SDK provider attempt. The AI SDK default is 2, which would let a
+    // single reserve silently cover up to THREE billed attempts — breaking that 1:1 accounting. This
+    // does NOT make the reserve a provider-proven hard ceiling: a soft thinking-budget overflow or an
+    // oversized prompt can still bill above the reservation on that one attempt — that residual is
+    // caught by the orchestrator's post-call budget_overflow stop (the fail-closed best-effort bound),
+    // NOT here. A structured-output parse failure is non-retryable anyway, and the LOOP re-drafts on a
+    // verify failure (retry at the right layer).
+    maxRetries: 0,
+    providerOptions: {
+      google: { thinkingConfig: { thinkingBudget: LIVE_THINKING_BUDGET_TOKENS, includeThoughts: false } },
+    },
+  };
+}
 
 /**
  * The SINGLE live-call boundary. (1) budget hard-stop BEFORE the billable call (a breach
@@ -135,7 +219,7 @@ export async function liveGenerateObject(args: {
         model: geminiModel(a.model),
         schema: a.schema,
         prompt: a.prompt,
-        maxOutputTokens: MAX_LIVE_OUTPUT_TOKENS,
+        ...liveGenerationOptions(),
       });
       return {
         object: result.object,
@@ -143,6 +227,7 @@ export async function liveGenerateObject(args: {
           inputTokens: result.usage?.inputTokens,
           outputTokens: result.usage?.outputTokens,
           totalTokens: result.usage?.totalTokens,
+          reasoningTokens: result.usage?.reasoningTokens, // billed at the output rate — priced in the ledger (Codex P1)
           finishReason: result.finishReason ?? null,
         } satisfies AgentRunUsage,
       };
@@ -153,15 +238,22 @@ export async function liveGenerateObject(args: {
 }
 
 /**
- * A conservative upper-bound USD estimate for one live call (used as estimatedNextUsd
- * for the budget pre-check). Prices a fixed envelope at the call's model; the output
- * leg is locked to the live output cap so the estimate can never under-price a call.
+ * A conservative upper-bound USD estimate for one live call (used as estimatedNextUsd for the budget
+ * pre-check). Prices a fixed envelope at the call's model. The output leg reserves the FULL billable
+ * output domain that priceLive() charges — completion (MAX_LIVE_OUTPUT_TOKENS) PLUS the worst-case
+ * reasoning budget (MAX_LIVE_REASONING_TOKENS_RESERVED) — because Gemini bills thinking tokens at the
+ * output rate and they are NOT capped by maxOutputTokens (Codex slice-1 confirming P1). This makes the
+ * estimate a CONSERVATIVE BEST-EFFORT reservation over the documented thinking ceiling — it covers the
+ * expected worst case, but Gemini's thinking budget is a SOFT limit, so it is not a provider-proven
+ * hard bound; the orchestrator's post-call fail-closed overflow stop bounds any soft-overflow to one
+ * call. With thinking actually disabled the real cost is far lower — the reservation is deliberately
+ * conservative, never under-priced in the expected case.
  */
 export function estimateLiveCallCostUsd(
   model: string,
   envelope: { inputTokens: number; outputTokens: number } = {
     inputTokens: 2_000,
-    outputTokens: MAX_LIVE_OUTPUT_TOKENS,
+    outputTokens: MAX_LIVE_OUTPUT_TOKENS + MAX_LIVE_REASONING_TOKENS_RESERVED,
   },
 ): number {
   return costUsd(model, envelope.inputTokens, envelope.outputTokens);

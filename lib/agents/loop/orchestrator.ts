@@ -121,7 +121,9 @@ export type RouterFn = (ctx: {
   merchant: Merchant;
 }) => RevisionPlan | Promise<RevisionPlan>;
 
-export type StopReason = "verified" | "max_iterations" | "budget_guard";
+// "budget_overflow" = a live call BILLED above its pre-call reservation (a soft thinking-budget
+// overflow or oversized prompt) — the fail-closed post-call stop (Codex slice-1 confirming P1).
+export type StopReason = "verified" | "max_iterations" | "budget_guard" | "budget_overflow";
 
 export interface AgentLoopInput {
   /** A raw row to triage in-loop (plan calls triage_merchant). */
@@ -461,14 +463,31 @@ export async function runAgentLoop(
         iteration: i,
         toolCalls: [{ tool: "draft_outreach", summary: `mode=${draftResult.mode}` }],
         modelMode: draftMode,
+        // finishReason is recorded when present (A3-7 drafter-reliability): a redraft that fell back
+        // with finishReason "length" is PROVABLE truncation in the trajectory/fixture, not a guess.
+        // Offline DI fixtures carry no finishReason -> clause omitted -> existing locked summaries hold.
         verdictSummary:
           `subject="${draft.draft_subject}"; claims=${draft.claims.length}` +
-          (draftErrorClass ? `; errorClass=${draftErrorClass}` : ""),
+          (draftErrorClass ? `; errorClass=${draftErrorClass}` : "") +
+          (draftResult.usage?.finishReason ? `; finishReason=${draftResult.usage.finishReason}` : ""),
       });
       // Budget-guard trip: a Gemini cap breach surfaces as "Budget hard-stop" -> stop bounded, held
       // (the metered Drafter CAN trip this now; offline DI never does). NOT the agent touching eligibility.
       if (draftErrorClass?.includes("Budget hard-stop")) {
         stopReason = "budget_guard";
+        break;
+      }
+      // FAIL-CLOSED post-call overflow stop (Codex slice-1 confirming P1). The pre-call reservation
+      // (budget.estimatedNextUsd = estimateLiveCallCostUsd) reserves a CONSERVATIVE envelope — input +
+      // completion cap + the DOCUMENTED max thinking budget — but Gemini's thinking budget is a SOFT
+      // limit (Google's docs), and the fixed input leg is not length-proven, so a provider thinking
+      // overflow OR an oversized prompt could bill ABOVE the reservation. If a call's ACTUAL cost
+      // exceeded what we reserved for it, STOP rather than let later calls compound the overshoot —
+      // bounding any over-reservation to a SINGLE call. This is what makes the $5 cap a fail-closed
+      // best-effort bound rather than relying on a provider hard-ceiling we cannot prove. (Offline DI:
+      // actual 0 <= reserve, never trips.)
+      if (draftResult.costUsd > budget.estimatedNextUsd) {
+        stopReason = "budget_overflow";
         break;
       }
     }

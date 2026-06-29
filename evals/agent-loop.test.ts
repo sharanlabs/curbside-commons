@@ -21,6 +21,7 @@
  */
 import { writeFileSync, readFileSync } from "node:fs";
 import { describe, it, expect } from "vitest";
+import { NoObjectGeneratedError } from "ai";
 import { normalizeRow } from "@/lib/core/pipeline";
 import type { Merchant, MerchantInput } from "@/lib/core/types";
 import { MERCHANT_PLACEHOLDER, mockDraft } from "@/lib/agents/draft";
@@ -213,6 +214,55 @@ describe("R-LOOP-8 — the loop self-corrects a planted fabrication (injected ve
       expect(result.outreachStatus).toBe("simulated_sent");
       expect(result.costUsd).toBe(0);
     }
+  });
+
+  it("records finishReason on a truncated redraft — the A3-7 ~75%-parse-failure is provable in the trajectory", async () => {
+    // The A3-7 dominant finding: the live Gemini redraft failed to parse ~75% of the time. To make
+    // that PROVABLE (not a guess) at the owner-gated live re-run, a redraft that truncates must surface
+    // finishReason "length" in the recorded trajectory. Here iter-0 plants a fabrication (verify fails
+    // -> reflect -> redraft), and the redraft (call 1) throws the EXACT SDK truncation error.
+    const merchant = normalizeRow(mediumInput("Truncated Tacos", 5, 2), 1);
+    let call = 0;
+    const truncatingDraftGenerate = async () => {
+      if (call++ === 0) return { object: generatedFrom(merchant, FABRICATION), usage: ZERO_USAGE };
+      throw new NoObjectGeneratedError({
+        message: "No object generated: could not parse the response.",
+        response: { id: "r1", timestamp: new Date(0), modelId: resolvedGeminiModel() },
+        usage: { inputTokens: 1200, outputTokens: 4096, totalTokens: 5296 },
+        finishReason: "length",
+      });
+    };
+    const result = await runAgentLoop(
+      { input: mediumInput("Truncated Tacos", 5, 2), index: 1 },
+      { draftGenerate: truncatingDraftGenerate, judgeGenerate: scriptedJudgeGenerate(FABRICATION) },
+    );
+
+    const redraft = result.trajectory.find((s) => s.phase === "redraft")!;
+    // The redraft truncated -> fell back to the clean deterministic stub (SAFETY HELD), but the
+    // truncation signal is preserved: finishReason "length" + the parse-failure errorClass.
+    expect(redraft.modelMode).toBe("FAILED_TO_FALLBACK");
+    expect(redraft.verdictSummary).toContain("finishReason=length");
+    expect(redraft.verdictSummary).toContain("errorClass=");
+    // COST LOCK (Codex P3): the truncated redraft BILLED (usage 1200/4096) — that spend must be
+    // accrued into the run ledger, not lost as $0 (iter-0 draft was ZERO_USAGE $0).
+    expect(result.costUsd).toBeCloseTo(costUsd(resolvedGeminiModel(), 1200, 4096), 10);
+  });
+
+  it("FAILS CLOSED if a live call bills above its reservation — bounds soft-budget overflow to one call (Codex confirming P1)", async () => {
+    const merchant = normalizeRow(mediumInput("Overflow Oeufs", 6, 2), 1);
+    // A valid draft whose reported reasoning tokens overflow far beyond the reserved envelope (the
+    // thinkingBudget-ignored soft-overflow case Google's docs warn about): actual cost >> the per-call
+    // reservation (estimateLiveCallCostUsd). The loop must STOP rather than make more billable calls.
+    const overflowDraftGenerate = async () => ({
+      object: generatedFrom(merchant),
+      usage: { inputTokens: 2_000, outputTokens: 100, reasoningTokens: 100_000, totalTokens: 102_100 },
+    });
+    const result = await runAgentLoop(
+      { input: mediumInput("Overflow Oeufs", 6, 2), index: 1 },
+      { live: false, draftGenerate: overflowDraftGenerate, judgeGenerate: async () => ({ object: cleanVerdict() }) },
+    );
+    expect(result.stopReason).toBe("budget_overflow");
+    expect(result.sent).toBe(false); // fail-closed: nothing sent on an overflow stop
   });
 
   it("bounded: a verdict that NEVER clears stops at maxIterations and holds — never unbounded (R-LOOP-3)", async () => {

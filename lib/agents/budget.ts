@@ -7,11 +7,19 @@
  * never fires. Pure + DI-friendly (spent/next/cap are params, no global, no network),
  * so the block and allow paths are unit-provable with no spend.
  *
- * SCOPE: this is a PER-CALL guard. The "<= $5 TOTAL" guarantee holds only when the caller
+ * SCOPE: this is a PER-CALL guard. The "<= $5 TOTAL" bound holds only when the caller
  * threads CUMULATIVE spent-so-far across calls (the Phase-B live batch driver's job; the
  * live path in lib/agents/draft.ts requires an explicit budget ledger and never defaults
  * spentUsd to 0). In this slice the live path is OFF (ENABLE_LIVE_AI=false, no key), so this
  * never fires here — it is the rail that makes the Phase-B live smoke safe.
+ *
+ * HONEST LIMIT (Codex slice-1 confirming P1): this pre-call guard reserves a CONSERVATIVE estimate
+ * (estimateLiveCallCostUsd: input + completion cap + the documented max thinking budget). Because
+ * Gemini's thinking budget is a SOFT limit and the prompt size is not length-proven, a single call's
+ * actual cost CAN exceed its reservation — so the $5 cap is a FAIL-CLOSED BEST-EFFORT bound, not a
+ * provider-enforced hard quota. The orchestrator pairs this pre-call guard with a POST-call overflow
+ * stop (halt the run if any call billed above its reservation), bounding any overshoot to a single
+ * call. With thinkingBudget=0 the expected reasoning is 0, so in practice spend stays far under the cap.
  */
 
 /** The default spend cap in USD. The doctrine number, named once. */

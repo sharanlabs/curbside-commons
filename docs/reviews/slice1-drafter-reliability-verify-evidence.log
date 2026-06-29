@@ -1,0 +1,59 @@
+=== Slice 1 — drafter-reliability fix — VERIFY + RED-GREEN evidence (2026-06-29) ===
+
+GREEN (full suite):
+  Test Files  25 passed | 5 skipped (30)
+  Tests       301 passed | 5 skipped (306)     [was 297+5 at A3-7; +4 new tests]
+  typecheck + lint + build: green (next build compiled, 28 static pages)
+  differential lane: lib/core + oracle + gold + snapshots UNTOUCHED (git diff --name-only clean)
+  Changed files (6): lib/agents/gemini.ts, lib/agents/draft.ts, lib/agents/loop/orchestrator.ts,
+                     evals/gemini.test.ts, evals/draft.test.ts, evals/agent-loop.test.ts
+
+--- RED-GREEN 1/3 — usageFromError must merge the SDK error's top-level finishReason ---
+Reverted lib/agents/draft.ts usageFromError to drop finishReason (the pre-fix bug):
+  × captures the SDK error finishReason on a truncated structured-output call (A3-7 truncation proof)
+      AssertionError: expected undefined to be 'length'  (res.usage?.finishReason)
+  × records finishReason on a truncated redraft — A3-7 ~75%-parse-failure provable in the trajectory
+      AssertionError: expected 'subject="..."' to contain 'finishReason=length'
+  Tests  2 failed | 35 passed
+Restored -> both pass.
+
+--- RED-GREEN 2/3 — orchestrator must thread finishReason into the trajectory verdictSummary ---
+Reverted only the orchestrator.ts verdictSummary append (usageFromError fix kept):
+  × records finishReason on a truncated redraft — ... provable in the trajectory
+      AssertionError: expected 'subject="..."' to contain 'finishReason=length'
+  Tests  1 failed | 21 passed   [the draft-level test STILL PASSES — clean isolation: the value is
+                                 captured in usage but not surfaced in the trajectory until this append]
+Restored -> passes.
+
+--- RED-GREEN 3/3 — the thinking-disable fix is wired (thinkingBudget=0) ---
+Set LIVE_THINKING_BUDGET_TOKENS = 512 (thinking NOT disabled):
+  × disables Gemini 2.5 thinking for structured drafting (thinkingBudget=0)
+      AssertionError: expected 512 to be +0
+  Tests  1 failed | 6 passed
+Restored -> passes.
+
+NOTE: The LIVE parse-rate recovery is NOT proven here ($0 offline). This slice proves (a) the
+instrumentation that makes truncation provable at the live re-run, and (b) the fix is WIRED. The
+live confirmation (finishReason no longer "length"; parse rate recovers) is the owner-gated
+slice-2 R-A3-9 re-run.
+
+=== CODEX RECONCILIATION red-green (2026-06-29, post-BLOCK) ===
+Full verify after the 4 Codex fixes: 303 passed | 5 skipped (was 301; +2 budget-integrity tests); build green; differential 20/20 UNTOUCHED.
+
+--- RED — Codex P1#1 (maxRetries=0) + P1#2 (price reasoning tokens) reverted ---
+  × disables SDK retries so the pre-call budget reserve is a true upper bound (Codex P1)
+      AssertionError: expected 999 to be +0
+  × prices reasoning (thinking) tokens at the output rate so the ledger never undercounts (Codex P1)
+      AssertionError: expected 0.00055 to be close to 0.00805 (diff 0.0075)
+  Tests  2 failed | 22 passed
+Restored both -> green.
+
+=== CODEX CONFIRMING ROUNDS (2026-06-29) ===
+Confirm-1 BLOCK (1 P1): estimateLiveCallCostUsd reserved only output, but priceLive bills output+reasoning and reasoning is NOT capped by maxOutputTokens -> estimate under-reserves the thinkingBudget-ignored path. FIX: reserve MAX_LIVE_REASONING_TOKENS_RESERVED=24576 in the estimate.
+  RED (estimate output-only): expected 0.01084 to be >= 0.07228  -> restored, green.
+Confirm-2 BLOCK (1 P1 + 1 P3): 24576 is the documented max CONFIGURABLE thinking budget but Google docs call it a SOFT limit -> not a provable hard ceiling -> the "hard $5 guarantee" overclaims; P3: the fixed 2000 input leg is not length-proven. FIX (per Codex's prescription): (a) DOWNGRADE the claim to fail-closed BEST-EFFORT (comments in gemini.ts/draft.ts/budget.ts); (b) ADD a post-call fail-closed overflow stop in the orchestrator (halt if any call's ACTUAL cost > its reservation) — bounds any soft-overflow OR input-overflow to a single call (covers P1 + P3).
+  RED (overflow stop disabled): expected 'verified' to be 'budget_overflow'  -> restored, green.
+Post-reconciliation: npm run verify exit 0 — 305 passed + 5 skipped; build green; differential 20/20 UNTOUCHED.
+
+=== CONFIRM-3 (final) seat-limited + residual-overclaim fix (2026-06-29) ===
+Confirm-3 hit the Codex usage limit mid-review (raw: "try again at 6:03 AM"), no full verdict. Before the limit it flagged: the remaining "true upper bound/guarantee" comments are material. -> 3 residual overclaim comments fixed (gemini.ts MAX_LIVE_OUTPUT_TOKENS header + reasoningTokens comment; draft.ts priceLive) to "conservative best-effort bound ... NOT a provider-proven hard guarantee". grep -n "true upper bound|hard guarantee|provider-enforced hard|hard ceiling" over the budget files -> only NEGATIONS remain (the honest framing). verify still 305 passed + 5 skipped (comment-only change). gate-2 NAMED-OPEN: final clean confirming verdict deferred to seat reset (06:03).
