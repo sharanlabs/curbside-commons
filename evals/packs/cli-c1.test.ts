@@ -113,6 +113,18 @@ describe("C1 one-command validator (real process)", () => {
     expect(r.status).toBe(2);
   }, 60000);
 
+  it("exit 2 when --op is passed WITHOUT --conformance — a conformance option must not be silently ignored on the truth leg (M1 confirm P3)", () => {
+    const r = runCli([
+      "check",
+      join(fixtures, "acp-feed.faithful.json"),
+      "--against",
+      join(fixtures, "sor.catalog.json"),
+      "--op",
+      "lookup",
+    ]);
+    expect(r.status).toBe(2);
+  }, 60000);
+
   it("exit 2 on an UNKNOWN flag — a typo must fail loudly, never silently use a default (W3)", () => {
     // Regression-locks the documented flag surface being REAL: before this,
     // any unrecognized flag (e.g. a --json typo) was silently ignored and the

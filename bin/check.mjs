@@ -107,6 +107,12 @@ async function main(argv) {
     );
     return 2;
   }
+  // The converse hole (confirming-pass P3): --op is a conformance-leg option;
+  // accepting it on the truth leg would silently ignore it.
+  if (args.includes("--op") && !args.includes("--conformance")) {
+    process.stderr.write(`check: --op only applies to --conformance\n\n${USAGE}`);
+    return 2;
+  }
 
   const feedPath = args[1];
 

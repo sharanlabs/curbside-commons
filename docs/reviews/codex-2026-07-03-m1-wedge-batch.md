@@ -29,3 +29,11 @@ Verdict **PROCEED** with two directives, both honored: (1) the confirming Codex 
 ## Confirming pass
 
 See the CONFIRMING PASS section appended below the reconciliation (same seat, mapped to the seven rows above).
+
+## CONFIRMING PASS (same seat, mapped per the frontier-advisor directive — ran against the finding→fix table, not a cold diff)
+
+**Result: ALL SEVEN DISCHARGED** (file:line evidence per finding in the raw output; Codex additionally ran DIRECT CLI checks — mixed mode exit 2, surplus positionals exit 2 — because its sandbox blocked vitest temp-dir writes, and cross-checked the recorded green evidence in `m1-reconcile-evidence.log`). Both special checks confirmed: the `sameMutationAs` known-limit is recorded; the spec-version-skew carve-out is explicit and freeze-lock-backed.
+
+**One NEW residual [P3]:** `--op` (a conformance-leg option) was silently accepted on the truth leg (direct check: exit 0). **ACCEPTED + FIXED primary-model-final same session:** `--op` without `--conformance` now exits 2 (`bin/check.mjs`), regression in `cli-c1.test.ts` ("M1 confirm P3"), **executed RED pre-fix → GREEN 17/17**. This closes the converse of the P1 mixed-mode hole; the fix is the identical, twice-confirmed pattern — reconciled primary-model-final per house precedent for residual P3s.
+
+**Codex formal verdict line was BLOCK (on the sole new P3); with that P3 fixed red-green, the M1 cross-model gate is DISCHARGED. W1's conditional SHIP condition (this review) is now MET.**
