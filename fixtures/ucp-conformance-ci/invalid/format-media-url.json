@@ -1,0 +1,133 @@
+{
+  "simulated": true,
+  "ucp": {
+    "version": "2026-04-08",
+    "status": "success"
+  },
+  "products": [
+    {
+      "id": "item-001",
+      "title": "Crispy Calamari",
+      "description": {
+        "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 2150,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2750,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-001-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2150,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "sku": "SIM-item-001-0",
+          "url": "https://example.com/curbside-commons-simulated/v/item-001-v1",
+          "options": [
+            {
+              "name": "Size",
+              "label": "Small"
+            }
+          ]
+        },
+        {
+          "id": "item-001-v2",
+          "title": "Medium",
+          "description": {
+            "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2450,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "sku": "SIM-item-001-1",
+          "url": "https://example.com/curbside-commons-simulated/v/item-001-v2",
+          "options": [
+            {
+              "name": "Size",
+              "label": "Medium"
+            }
+          ]
+        },
+        {
+          "id": "item-001-v3",
+          "title": "Large",
+          "description": {
+            "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2750,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "sku": "SIM-item-001-2",
+          "url": "https://example.com/curbside-commons-simulated/v/item-001-v3",
+          "options": [
+            {
+              "name": "Size",
+              "label": "Large"
+            }
+          ]
+        }
+      ],
+      "url": "https://example.com/curbside-commons-simulated/p/item-001",
+      "handle": "simulated-item-001",
+      "categories": [
+        {
+          "value": "Food > Appetizers",
+          "taxonomy": "merchant"
+        }
+      ],
+      "tags": [
+        "simulated"
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "http://[bad",
+          "alt_text": "simulated",
+          "width": 800,
+          "height": 600
+        }
+      ],
+      "options": [
+        {
+          "name": "Size",
+          "values": [
+            {
+              "label": "Small"
+            },
+            {
+              "label": "Medium"
+            },
+            {
+              "label": "Large"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

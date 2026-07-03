@@ -44,6 +44,13 @@ export type { DriftManifestEntry, DriftSurface, DriftedFeedBundle } from "./drif
 export { applyCorpusDrift } from "./drift.ts";
 export type { UcpCatalogItem, UcpCatalogResponseFixture } from "./ucp.ts";
 export { UCP_PINNED_VERSION, buildUcpResponse } from "./ucp.ts";
+export type {
+  UcpPrice,
+  UcpSearchResponse,
+  UcpWireProduct,
+  UcpWireVariant,
+} from "./ucp-wire.ts";
+export { buildUcpSearchResponse, ucpSearchResponseToClaims } from "./ucp-wire.ts";
 export { acpFeedToClaims, ucpResponseToClaims } from "./adapters.ts";
 export { expectedTitle, indexCatalog, sorReference } from "./reference.ts";
 export { listingsDetectors, mojibake } from "./detectors.ts";

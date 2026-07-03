@@ -1,0 +1,107 @@
+{
+  "simulated": true,
+  "ucp": {
+    "version": "2026-04-08",
+    "status": "success"
+  },
+  "products": [
+    {
+      "id": "item-001",
+      "title": "Crispy Calamari",
+      "description": {
+        "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 2150,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2750,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-001-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2150,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          }
+        },
+        {
+          "id": "item-001-v2",
+          "title": "Medium",
+          "description": {
+            "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2450,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          }
+        },
+        {
+          "id": "item-001-v3",
+          "title": "Large",
+          "description": {
+            "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2750,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          }
+        }
+      ]
+    },
+    {
+      "id": "item-002",
+      "title": "Garden Salad",
+      "description": {
+        "plain": "Garden Salad — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 2200,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2200,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-002-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Garden Salad — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2200,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": false,
+            "status": "out_of_stock"
+          }
+        }
+      ]
+    }
+  ]
+}

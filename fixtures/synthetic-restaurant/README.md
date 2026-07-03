@@ -19,6 +19,14 @@ merchant data — every artifact is SIMULATED and labeled so.**
 | `drift-manifest.json` | The ground-truth answer key: every injection's class, target row, before/after, and which surfaces carry it. |
 | `expected-report.acp.json` / `expected-report.ucp.json` | The golden verifier reports for the drifted copies — byte-compared in CI (deterministic output ordering makes this exact). |
 
+> **Shape honesty note (W2):** the two `ucp-catalog-response.*.json` files are the
+> truth-leg's **normalized/simplified** shape, built for W1 while the real UCP food
+> schemas were still pending — they are **not** UCP wire-shape documents and (by
+> design, nothing planted) do **not** pass the W2 conformance leg against the pinned
+> real schemas (both miss required `ucp` + `products`; recorded verbatim in
+> `docs/reviews/w2-verify-evidence.log`). Real wire-shape documents live in
+> `fixtures/ucp-conformance-ci/` — the conformance leg runs there.
+
 ## Reproducibility (seeded, plan §8)
 
 The corpus is the deterministic output of a seeded generator — no hand-tampering

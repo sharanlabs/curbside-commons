@@ -1,0 +1,91 @@
+{
+  "simulated": true,
+  "ucp": {
+    "version": "2026-04-08",
+    "status": "success"
+  },
+  "products": [
+    {
+      "id": "item-003",
+      "title": "Café Latte",
+      "description": {
+        "plain": "Café Latte — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 700,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 1300,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-003-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Café Latte — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 700,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-003-v1",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-003-v2",
+          "title": "Medium",
+          "description": {
+            "plain": "Café Latte — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 1000,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-003-v2",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-003-v3",
+          "title": "Large",
+          "description": {
+            "plain": "Café Latte — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 1300,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-003-v3",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -48,6 +48,16 @@ export function makeFinding(input: FindingInput): Finding {
   if (input.claim === undefined || input.claim === null || !isNonEmptyString(input.claim.id)) {
     throw new MissingEvidenceError("C2 violated: finding requires a claim with a non-empty id");
   }
+  // P3-3 (W1 gate advisory): a claim must also name WHAT was asserted and WHERE
+  // it came from — an id alone is not enough evidence. Both truth findings and the
+  // W2 conformance findings (source `ucp-catalog`, field = the failing JSON pointer)
+  // carry these, so the tighter check strengthens C2 without narrowing any surface.
+  if (!isNonEmptyString(input.claim.source)) {
+    throw new MissingEvidenceError("C2 violated: finding requires a claim with a non-empty source");
+  }
+  if (!isNonEmptyString(input.claim.field)) {
+    throw new MissingEvidenceError("C2 violated: finding requires a claim with a non-empty field");
+  }
   if (!isNonEmptyString(input.referenceRowId)) {
     throw new MissingEvidenceError("C2 violated: finding requires a non-empty referenceRowId");
   }

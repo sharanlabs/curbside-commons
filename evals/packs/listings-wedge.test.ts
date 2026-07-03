@@ -153,3 +153,19 @@ describe("required drift classes are present in the corpus (C3/Codex amendment 5
     }
   });
 });
+
+describe("injector invariant: no two injections share a live target row (P3-2)", () => {
+  // Direct test of the drift injector's touched-set invariant (the W1 gate
+  // advisory): each injection lands on a distinct row, so every taxonomy class is
+  // independently detectable (no stacking that could mask a rule).
+  it("every manifest entry targets a distinct row", () => {
+    const targets = bundle.manifest.map((e) => e.targetFeedItemId);
+    expect(new Set(targets).size, `duplicate target rows: ${targets.join(", ")}`).toBe(targets.length);
+  });
+
+  it("no injection targets a row a prior injection re-keyed (the live legacy id)", () => {
+    // drift-010 re-keys a row to `legacy-pos-4471`; the touched-set must prevent
+    // any later injection from selecting that live id.
+    expect(bundle.manifest.some((e) => e.targetFeedItemId === "legacy-pos-4471")).toBe(false);
+  });
+});

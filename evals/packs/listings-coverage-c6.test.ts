@@ -26,8 +26,15 @@ const sor = generateCatalog(CORPUS_SEED, CORPUS_AS_OF);
 const faithful = buildFaithfulFeed(sor);
 const { feed: drifted, manifest } = applyCorpusDrift(faithful, sor);
 
+// P3-1 (W1 gate advisory): the spec-version-skew class is injected at UCP fixture
+// build (not by applyCorpusDrift), so DERIVE it from the committed manifest's
+// ucpVersionSkew block rather than hand-adding the literal — the corpus stays the
+// single source of truth for what was injected.
+const driftManifestFile = JSON.parse(
+  readFileSync(join(process.cwd(), "fixtures", "synthetic-restaurant", "drift-manifest.json"), "utf8"),
+) as { ucpVersionSkew: { class: string } };
 const injectedClasses = new Set<string>(manifest.map((e) => e.class));
-injectedClasses.add("spec-version-skew"); // injected at UCP fixture build (drift-manifest.ucpVersionSkew)
+injectedClasses.add(driftManifestFile.ucpVersionSkew.class);
 
 const acpReport = runListingsVerification(acpFeedToClaims(drifted), sor);
 const ucpReport = runListingsVerification(

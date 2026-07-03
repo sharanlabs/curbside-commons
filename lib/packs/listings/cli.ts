@@ -16,6 +16,7 @@ import type { VerifierReport } from "../../verifier-core/index.ts";
 import { serializeReport } from "../../verifier-core/verify.ts";
 import type { AcpFeed } from "./acp-feed.ts";
 import { acpFeedToClaims, ucpResponseToClaims } from "./adapters.ts";
+import { runUcpConformance, type UcpCatalogOp } from "./conformance.ts";
 import { runListingsVerification } from "./run.ts";
 import type { SyntheticCatalog } from "./types.ts";
 import type { UcpCatalogResponseFixture } from "./ucp.ts";
@@ -50,4 +51,21 @@ export function runCheck(
     output: serializeReport(report),
     exitCode: report.ok ? 0 : 1,
   };
+}
+
+/**
+ * Run the UCP CONFORMANCE leg (W2): validate a UCP catalog-response document
+ * against the pinned published UCP schemas (conformance.ts). This is the
+ * SEPARATE second question — is the document spec-SHAPED — and it needs no SOR
+ * (`--against`): the reference is the schema, not the merchant catalog. Findings
+ * are the `LST-CONF-*` family. Zero LLM / network; reads pinned schemas from disk.
+ */
+export function runConformanceCheck(
+  docPath: string,
+  op: UcpCatalogOp = "search",
+  schemaDir?: string,
+): CliResult {
+  const doc = JSON.parse(readFileSync(docPath, "utf8")) as unknown;
+  const report = runUcpConformance(doc, { op, schemaDir });
+  return { report, output: serializeReport(report), exitCode: report.ok ? 0 : 1 };
 }

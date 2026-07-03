@@ -1,0 +1,741 @@
+{
+  "simulated": true,
+  "ucp": {
+    "version": "2026-04-08",
+    "status": "success"
+  },
+  "products": [
+    {
+      "id": "item-001",
+      "title": "Crispy Calamari",
+      "description": {
+        "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 2150,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2750,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-001-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2150,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-001-v1",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-001-v2",
+          "title": "Medium",
+          "description": {
+            "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2450,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-001-v2",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-001-v3",
+          "title": "Large",
+          "description": {
+            "plain": "Crispy Calamari — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2750,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-001-v3",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-002",
+      "title": "Garden Salad",
+      "description": {
+        "plain": "Garden Salad — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 2200,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2200,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-002-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Garden Salad — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2200,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": false,
+            "status": "out_of_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-002-v1",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-003",
+      "title": "Café Latte",
+      "description": {
+        "plain": "Café Latte — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 700,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 1300,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-003-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Café Latte — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 700,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-003-v1",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-003-v2",
+          "title": "Medium",
+          "description": {
+            "plain": "Café Latte — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 1000,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-003-v2",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-003-v3",
+          "title": "Large",
+          "description": {
+            "plain": "Café Latte — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 1300,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-003-v3",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-004",
+      "title": "Jalapeño Poppers",
+      "description": {
+        "plain": "Jalapeño Poppers — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 2350,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2950,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-004-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Jalapeño Poppers — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2350,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-004-v1",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-004-v2",
+          "title": "Medium",
+          "description": {
+            "plain": "Jalapeño Poppers — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2650,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-004-v2",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-004-v3",
+          "title": "Large",
+          "description": {
+            "plain": "Jalapeño Poppers — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2950,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-004-v3",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-005",
+      "title": "Margherita Pizza",
+      "description": {
+        "plain": "Margherita Pizza — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 1900,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2500,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-005-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Margherita Pizza — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 1900,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-005-v1",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-005-v2",
+          "title": "Medium",
+          "description": {
+            "plain": "Margherita Pizza — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2200,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-005-v2",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-005-v3",
+          "title": "Large",
+          "description": {
+            "plain": "Margherita Pizza — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2500,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-005-v3",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-006",
+      "title": "Smoked Brisket Plate",
+      "description": {
+        "plain": "Smoked Brisket Plate — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 1000,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 1000,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-006-v1",
+          "title": "Regular",
+          "description": {
+            "plain": "Smoked Brisket Plate — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 1000,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-006-v1",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-007",
+      "title": "Pad Thai",
+      "description": {
+        "plain": "Pad Thai — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 1700,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 1700,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-007-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Pad Thai — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 1700,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-007-v1",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-008",
+      "title": "Crème Brûlée",
+      "description": {
+        "plain": "Crème Brûlée — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 2100,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2100,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-008-v1",
+          "title": "Regular",
+          "description": {
+            "plain": "Crème Brûlée — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2100,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": false,
+            "status": "out_of_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-008-v1",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-009",
+      "title": "Lemonade",
+      "description": {
+        "plain": "Lemonade — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 1900,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2500,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-009-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Lemonade — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 1900,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-009-v1",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-009-v2",
+          "title": "Medium",
+          "description": {
+            "plain": "Lemonade — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2200,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-009-v2",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-009-v3",
+          "title": "Large",
+          "description": {
+            "plain": "Lemonade — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2500,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-009-v3",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-010",
+      "title": "Truffle Fries",
+      "description": {
+        "plain": "Truffle Fries — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 600,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 900,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-010-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Truffle Fries — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 600,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-010-v1",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-010-v2",
+          "title": "Large",
+          "description": {
+            "plain": "Truffle Fries — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 900,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-010-v2",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-011",
+      "title": "Bánh Mì Sandwich",
+      "description": {
+        "plain": "Bánh Mì Sandwich — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 2100,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2400,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-011-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Bánh Mì Sandwich — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2100,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-011-v1",
+              "match": "exact"
+            }
+          ]
+        },
+        {
+          "id": "item-011-v2",
+          "title": "Large",
+          "description": {
+            "plain": "Bánh Mì Sandwich — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2400,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-011-v2",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-012",
+      "title": "Açaí Bowl",
+      "description": {
+        "plain": "Açaí Bowl — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 1050,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 1050,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-012-v1",
+          "title": "Regular",
+          "description": {
+            "plain": "Açaí Bowl — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 1050,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": true,
+            "status": "in_stock"
+          },
+          "inputs": [
+            {
+              "id": "item-012-v1",
+              "match": "exact"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

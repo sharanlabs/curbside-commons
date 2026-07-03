@@ -1,0 +1,43 @@
+{
+  "simulated": true,
+  "ucp": {
+    "version": "2026-04-08",
+    "status": "success"
+  },
+  "products": [
+    {
+      "id": "item-002",
+      "title": "Garden Salad",
+      "description": {
+        "plain": "Garden Salad — a simulated menu item for the synthetic corpus (not a real product)."
+      },
+      "price_range": {
+        "min": {
+          "amount": 2200,
+          "currency": "USD"
+        },
+        "max": {
+          "amount": 2200,
+          "currency": "USD"
+        }
+      },
+      "variants": [
+        {
+          "id": "item-002-v1",
+          "title": "Small",
+          "description": {
+            "plain": "Garden Salad — a simulated menu item for the synthetic corpus (not a real product)."
+          },
+          "price": {
+            "amount": 2200,
+            "currency": "USD"
+          },
+          "availability": {
+            "available": false,
+            "status": "out_of_stock"
+          }
+        }
+      ]
+    }
+  ]
+}

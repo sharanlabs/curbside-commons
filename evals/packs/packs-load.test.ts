@@ -3,9 +3,11 @@ import { LISTINGS_PACK } from "@/lib/packs/listings";
 import { FEES_PACK } from "@/lib/packs/fees";
 
 /**
- * W0 placeholder — asserts the listings (UC-2) and fees (UC-1) pack skeletons
- * load and enumerate their plan §7 classes, so evals/packs is a real (tracked)
- * directory. Real pack detector/classifier tests land in W1 / F1.
+ * Pack-load smoke — asserts the listings (UC-2) and fees (UC-1) pack descriptors
+ * load and enumerate their plan §7 classes. The listings pack's real behavior is
+ * exercised by the W1 wedge evals + the W2 conformance evals (listings-*.test.ts,
+ * ucp-conformance.test.ts, acp-field-rules.test.ts); the fees (UC-1) detectors
+ * still land in F1.
  */
 describe("verifier packs skeleton (W0)", () => {
   it("listings pack (UC-2) loads with its §7 drift classes", () => {

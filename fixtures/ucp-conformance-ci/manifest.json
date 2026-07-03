@@ -1,0 +1,278 @@
+{
+  "simulated": true,
+  "note": "Constructed-simulation UCP catalog-response corpus for the W2 conformance leg. Each invalid fixture violates exactly ONE named schema rule. Verdicts asserted in evals/packs/ucp-conformance.test.ts; optional cargo differential oracle in scripts-ts/ucp-oracle-diff.mts.",
+  "seed": 20260703,
+  "asOf": "2026-07-03T00:00:00Z",
+  "specVersion": "2026-04-08",
+  "schemaSource": "fixtures/ucp-schemas/2026-04-08 (Universal-Commerce-Protocol/ucp @ v2026-04-08, Apache-2.0)",
+  "counts": {
+    "total": 35,
+    "valid": 14,
+    "invalid": 21
+  },
+  "violationClasses": [
+    "LST-CONF-ARRAY-BOUNDS",
+    "LST-CONF-ENUM",
+    "LST-CONF-FORMAT",
+    "LST-CONF-NUMBER-RANGE",
+    "LST-CONF-OBJECT-SHAPE",
+    "LST-CONF-PATTERN",
+    "LST-CONF-REQUIRED-MISSING",
+    "LST-CONF-TYPE"
+  ],
+  "headlineExhibit": "valid/conformant-but-false.json",
+  "entries": [
+    {
+      "file": "valid/search-full-catalog.json",
+      "valid": true,
+      "op": "search",
+      "note": "full faithful catalog (all products/variants)"
+    },
+    {
+      "file": "valid/search-single-product.json",
+      "valid": true,
+      "op": "search",
+      "note": "single product"
+    },
+    {
+      "file": "valid/search-multi-variant.json",
+      "valid": true,
+      "op": "search",
+      "note": "a product with ≥3 variants"
+    },
+    {
+      "file": "valid/search-single-variant.json",
+      "valid": true,
+      "op": "search",
+      "note": "a single-variant product"
+    },
+    {
+      "file": "valid/search-enriched-optionals.json",
+      "valid": true,
+      "op": "search",
+      "note": "optional fields present (url/media/options/categories)"
+    },
+    {
+      "file": "valid/search-messages-present.json",
+      "valid": true,
+      "op": "search",
+      "note": "optional messages array present (valid message_info)"
+    },
+    {
+      "file": "valid/search-two-products.json",
+      "valid": true,
+      "op": "search",
+      "note": "two products"
+    },
+    {
+      "file": "valid/search-half-catalog.json",
+      "valid": true,
+      "op": "search",
+      "note": "six products"
+    },
+    {
+      "file": "valid/lookup-full.json",
+      "valid": true,
+      "op": "lookup",
+      "note": "lookup response, full list (variants carry inputs correlation)"
+    },
+    {
+      "file": "valid/lookup-single.json",
+      "valid": true,
+      "op": "lookup",
+      "note": "lookup response, one product"
+    },
+    {
+      "file": "valid/get-product-single.json",
+      "valid": true,
+      "op": "get_product",
+      "note": "get_product response (singular)"
+    },
+    {
+      "file": "valid/get-product-multi-variant.json",
+      "valid": true,
+      "op": "get_product",
+      "note": "get_product with ≥3 variants"
+    },
+    {
+      "file": "valid/search-free-item-amount-zero.json",
+      "valid": true,
+      "op": "search",
+      "note": "amount:0 free item (valid, minimum 0)"
+    },
+    {
+      "file": "valid/conformant-but-false.json",
+      "valid": true,
+      "op": "search",
+      "note": "HEADLINE: spec-VALID (passes ajv) yet truth-FALSE (variant[0] price inflated +200 minor units vs SOR) — the conformance-vs-truth distinction"
+    },
+    {
+      "file": "invalid/req-missing-root-products.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-REQUIRED-MISSING",
+      "keyword": "required",
+      "note": "root missing required `products`"
+    },
+    {
+      "file": "invalid/req-missing-ucp-version.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-REQUIRED-MISSING",
+      "keyword": "required",
+      "note": "ucp object missing required `version`"
+    },
+    {
+      "file": "invalid/req-missing-product-title.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-REQUIRED-MISSING",
+      "keyword": "required",
+      "note": "product missing required `title`"
+    },
+    {
+      "file": "invalid/req-missing-product-price-range.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-REQUIRED-MISSING",
+      "keyword": "required",
+      "note": "product missing required `price_range`"
+    },
+    {
+      "file": "invalid/req-missing-variant-price.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-REQUIRED-MISSING",
+      "keyword": "required",
+      "note": "variant missing required `price`"
+    },
+    {
+      "file": "invalid/req-missing-product-description.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-REQUIRED-MISSING",
+      "keyword": "required",
+      "note": "product missing required `description`"
+    },
+    {
+      "file": "invalid/type-products-not-array.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-TYPE",
+      "keyword": "type",
+      "note": "`products` is an object, must be array"
+    },
+    {
+      "file": "invalid/type-amount-string.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-TYPE",
+      "keyword": "type",
+      "note": "price.amount is a string, must be integer"
+    },
+    {
+      "file": "invalid/type-availability-available-string.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-TYPE",
+      "keyword": "type",
+      "note": "availability.available is a string, must be boolean"
+    },
+    {
+      "file": "invalid/pattern-currency-lowercase.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-PATTERN",
+      "keyword": "pattern",
+      "note": "currency `usd` fails ^[A-Z]{3}$"
+    },
+    {
+      "file": "invalid/pattern-currency-two-letter.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-PATTERN",
+      "keyword": "pattern",
+      "note": "currency `US` fails ^[A-Z]{3}$"
+    },
+    {
+      "file": "invalid/range-amount-negative.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-NUMBER-RANGE",
+      "keyword": "minimum",
+      "note": "price.amount -5 < minimum 0"
+    },
+    {
+      "file": "invalid/range-media-width-zero.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-NUMBER-RANGE",
+      "keyword": "minimum",
+      "note": "media.width 0 < minimum 1"
+    },
+    {
+      "file": "invalid/array-variants-empty.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-ARRAY-BOUNDS",
+      "keyword": "minItems",
+      "note": "variants [] violates minItems 1"
+    },
+    {
+      "file": "invalid/format-product-url.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-FORMAT",
+      "keyword": "format",
+      "note": "product.url is not a uri"
+    },
+    {
+      "file": "invalid/format-media-url.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-FORMAT",
+      "keyword": "format",
+      "note": "media.url is not a uri"
+    },
+    {
+      "file": "invalid/object-product-description-empty.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-OBJECT-SHAPE",
+      "keyword": "minProperties",
+      "note": "product.description {} violates minProperties 1"
+    },
+    {
+      "file": "invalid/object-variant-description-empty.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-OBJECT-SHAPE",
+      "keyword": "minProperties",
+      "note": "variant.description {} violates minProperties 1"
+    },
+    {
+      "file": "invalid/enum-ucp-status.json",
+      "valid": false,
+      "op": "search",
+      "violationClass": "LST-CONF-ENUM",
+      "keyword": "enum",
+      "note": "ucp.status `bogus` not in [success, error]"
+    },
+    {
+      "file": "invalid/lookup-req-missing-products.json",
+      "valid": false,
+      "op": "lookup",
+      "violationClass": "LST-CONF-REQUIRED-MISSING",
+      "keyword": "required",
+      "note": "lookup response missing required `products`"
+    },
+    {
+      "file": "invalid/get-product-req-missing-product.json",
+      "valid": false,
+      "op": "get_product",
+      "violationClass": "LST-CONF-REQUIRED-MISSING",
+      "keyword": "required",
+      "note": "get_product response missing required `product`"
+    }
+  ]
+}

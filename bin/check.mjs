@@ -13,19 +13,26 @@
  * receipts and fails loudly if the copy lies. Free to run, no AI calls.
  */
 
-const USAGE = `verifier — deterministic serving-copy vs system-of-record checker (simulated corpus)
+const USAGE = `verifier — deterministic serving-copy checker (simulated corpus)
 
 Usage:
   check <feed.json> --against <catalog.json> [--surface acp|ucp]
-      Verify a serving copy against the SOR catalog. Exit 0 = clean, 1 = drift found.
+      TRUTH leg: verify a serving copy against the SOR catalog (does it LIE?).
+      Exit 0 = clean, 1 = drift found.
+  check <doc.json> --conformance [--op search|lookup|get_product]
+      CONFORMANCE leg: validate a UCP catalog-response document against the pinned
+      published UCP schemas (is it correctly SHAPED?). No --against needed — the
+      reference is the schema. Exit 0 = conformant, 1 = schema violation(s).
   help
       Show this message.
 
 Notes:
-  - No LLM / network calls on this path (C1: the wedge is $0-LLM).
-  - --surface defaults to acp (static ACP-shaped feed); ucp = constructed
-    UCP catalog-response fixture (labeled simulated).
-  - Zero-config demo: npm run check:fixtures
+  - No LLM / network calls on either path (C1: $0-LLM; conformance reads pinned
+    schemas from disk via ajv).
+  - conformance vs truth: a spec-VALID document can still be FALSE. The two legs
+    answer different questions and use distinct rule families (LST-* vs LST-CONF-*).
+  - --surface defaults to acp; --op defaults to search.
+  - Zero-config demos: npm run check:fixtures  |  npm run check:conformance
 `;
 
 /** @param {string[]} argv */
@@ -44,6 +51,31 @@ async function main(argv) {
   }
 
   const feedPath = args[1];
+
+  // CONFORMANCE leg (W2): validate a UCP doc against the pinned schemas.
+  if (args.includes("--conformance")) {
+    const opIdx = args.indexOf("--op");
+    const op = opIdx >= 0 ? args[opIdx + 1] : "search";
+    if (!feedPath || feedPath.startsWith("--")) {
+      process.stderr.write(`check: --conformance needs <doc.json>\n\n${USAGE}`);
+      return 2;
+    }
+    if (op !== "search" && op !== "lookup" && op !== "get_product") {
+      process.stderr.write(`check: --op must be "search", "lookup" or "get_product" (got "${op}")\n\n${USAGE}`);
+      return 2;
+    }
+    try {
+      const { runConformanceCheck } = await import("../lib/packs/listings/cli.ts");
+      const result = runConformanceCheck(feedPath, op);
+      process.stdout.write(result.output);
+      return result.exitCode;
+    } catch (err) {
+      process.stderr.write(`check: ${err instanceof Error ? err.message : String(err)}\n`);
+      return 2;
+    }
+  }
+
+  // TRUTH leg (W1): verify a serving copy against the SOR catalog.
   const againstIdx = args.indexOf("--against");
   const catalogPath = againstIdx >= 0 ? args[againstIdx + 1] : undefined;
   const surfaceIdx = args.indexOf("--surface");

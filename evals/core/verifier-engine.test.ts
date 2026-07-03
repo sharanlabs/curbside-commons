@@ -36,6 +36,9 @@ describe("C2 evidence guard (makeFinding)", () => {
     ["empty ruleId", { ...validInput, ruleId: "  " }],
     ["invalid severity", { ...validInput, severity: "fatal" as never }],
     ["claim without id", { ...validInput, claim: { ...claim, id: "" } }],
+    // P3-3: source + field are part of the receipts, not optional.
+    ["claim without source", { ...validInput, claim: { ...claim, source: "" as never } }],
+    ["claim without field", { ...validInput, claim: { ...claim, field: "  " } }],
   ])("throws MissingEvidenceError on %s", (_label, input) => {
     expect(() => makeFinding(input)).toThrow(MissingEvidenceError);
   });

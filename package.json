@@ -18,12 +18,20 @@
     "verify:full": "npm run verify && npm run test:e2e",
     "check:fixtures": "node bin/check.mjs check fixtures/synthetic-restaurant/acp-feed.drifted.json --against fixtures/synthetic-restaurant/sor.catalog.json",
     "check:fixtures:clean": "node bin/check.mjs check fixtures/synthetic-restaurant/acp-feed.faithful.json --against fixtures/synthetic-restaurant/sor.catalog.json",
-    "fixtures:wedge": "node scripts-ts/generate-wedge-fixtures.mts"
+    "check:conformance": "node bin/check.mjs check fixtures/ucp-conformance-ci/valid/search-full-catalog.json --conformance",
+    "fixtures:wedge": "node scripts-ts/generate-wedge-fixtures.mts",
+    "fixtures:ucp": "node scripts-ts/generate-ucp-conformance-corpus.mts",
+    "test:ucp-oracle": "node scripts-ts/ucp-oracle-diff.mts"
+  },
+  "engines": {
+    "node": ">=24"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.11",
     "@ai-sdk/groq": "^2.0.42",
     "ai": "^5.0.98",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.555.0",

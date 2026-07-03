@@ -1,0 +1,97 @@
+W2 VERIFY + RED-GREEN EVIDENCE — conformance leg (UCP ajv) + P3 fold-ins
+Repo: ActivationOps AI verifier. Slice: W2 (plan §5 W2 + §4 C3/C5). Node v24.15.0.
+
+===== W2 RED-GREEN EVIDENCE — executed 2026-07-03T15:57:41.859Z =====
+Each block: MUTATE a load-bearing line -> targeted vitest RED -> revert -> GREEN.
+
+----- RG-1: conformance keyword→LST-CONF-* class mapping (ucp-conformance verdicts) -----
+--- mutate lib/packs/listings/conformance.ts (evals/packs/ucp-conformance.test.ts)
+Test Files  1 failed (1)
+Tests  1 failed | 11 passed (12)
+--- reverted; re-run:
+Test Files  1 passed (1)
+Tests  12 passed (12)
+
+----- RG-2: C2 guard P3-3 (claim.source presence required) -----
+--- mutate lib/verifier-core/guard.ts (evals/core/verifier-engine.test.ts)
+Test Files  1 failed (1)
+Tests  1 failed | 13 passed (14)
+--- reverted; re-run:
+Test Files  1 passed (1)
+Tests  14 passed (14)
+
+----- RG-3: conformance-vs-truth headline (real-UCP adapter emits the price claim) -----
+--- mutate lib/packs/listings/ucp-wire.ts (evals/packs/ucp-conformance.test.ts)
+Test Files  1 failed (1)
+Tests  1 failed | 11 passed (12)
+--- reverted; re-run:
+Test Files  1 passed (1)
+Tests  12 passed (12)
+
+----- RG-4: CLI conformance exit semantics (non-zero on schema violation) -----
+--- mutate lib/packs/listings/cli.ts (evals/packs/cli-c1.test.ts)
+Test Files  1 failed (1)
+Tests  1 failed | 9 passed (10)
+--- reverted; re-run:
+Test Files  1 passed (1)
+Tests  10 passed (10)
+
+----- RG-5: corpus freeze-integrity (every committed fixture byte-locked, P2-1) -----
+--- mutate fixtures/ucp-conformance-ci/valid/search-single-product.json (evals/packs/ucp-conformance.test.ts)
+Test Files  1 failed (1)
+Tests  1 failed | 11 passed (12)
+--- reverted; re-run:
+Test Files  1 passed (1)
+Tests  12 passed (12)
+
+----- RG-6: pinned-schema sha256 lock (schemas tamper-evident) -----
+--- mutate fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/amount.json (evals/packs/ucp-conformance.test.ts)
+Test Files  1 failed (1)
+Tests  1 failed | 11 passed (12)
+--- reverted; re-run:
+Test Files  1 passed (1)
+Tests  12 passed (12)
+
+----- RG-7: ACP per-field-rule audit (a detector rule id regression is caught) -----
+--- mutate lib/packs/listings/detectors.ts (evals/packs/acp-field-rules.test.ts)
+Test Files  1 failed (1)
+Tests  1 failed | 20 passed (21)
+--- reverted; re-run:
+Test Files  1 passed (1)
+Tests  21 passed (21)
+
+===== W2 FULL-SUITE + CONSTRAINT EVIDENCE (executed 2026-07-03) =====
+--- npm run verify (typecheck + lint + test + build) -> EXIT 0
+  Test Files  37 passed | 4 skipped (41)
+       Tests  478 passed | 5 skipped (483)
+  next build: ✓ Compiled successfully; Finished TypeScript; ✓ Generating static pages (28/28)
+  (W1 baseline was 411 passed | 5 skipped; W2 adds +67 tests.)
+
+--- npm run test:legacy (hard constraint: unchanged) -> EXIT 0
+  Test Files  26 passed | 4 skipped (30)
+       Tests  306 passed | 5 skipped (311)
+
+--- one-command demos (C1) + optional oracle lane
+  npm run check:fixtures         -> exit 1 (drift found)          [truth leg, unchanged]
+  npm run check:fixtures:clean   -> exit 0 (faithful clean)       [truth leg, unchanged]
+  npm run check:conformance      -> exit 0 (conformant UCP doc)   [NEW conformance leg]
+  npm run test:ucp-oracle        -> "ucp-schema differential oracle SKIPPED: cargo not
+                                     installed — C5 agreement UNMEASURED on this machine"  exit 0
+
+--- corpus verdict cross-check (35 fixtures vs manifest ground truth)
+  ALL 35 VERDICTS MATCH MANIFEST (14 valid + 21 invalid); 8 violation classes.
+
+--- ajv / cargo environment (verified 2026-07-03)
+  ajv 8.20.0 (MIT), ajv-formats 3.0.1 (MIT); node v24.15.0.
+  cargo: NOT FOUND · rustc: NOT FOUND · ucp-schema: NOT FOUND  (C5 oracle UNMEASURED locally)
+
+===== W2 item-3 literal check: the two committed W1 UCP fixtures vs the real schema =====
+(Task item 3: "validate BOTH committed UCP fixtures ... report what it actually is.")
+  ucp-catalog-response.faithful.json: conformance ok=false, findings=2, classes=[LST-CONF-REQUIRED-MISSING]
+  ucp-catalog-response.drifted.json:  conformance ok=false, findings=2, classes=[LST-CONF-REQUIRED-MISSING]
+HONEST FINDING: both W1 fixtures are the truth-leg NORMALIZED shape ({items, session,
+supported_versions}) built when UCP food schemas were pending — NOT the real UCP wire shape
+({ucp, products}). Validating them against the real search_response schema is a category
+error; they fail on missing required `ucp` + `products` (nothing was planted). The
+conformance-vs-truth HEADLINE is therefore demonstrated on a purpose-built REAL-UCP exhibit
+(fixtures/ucp-conformance-ci/valid/conformant-but-false.json), not on these. See slice-record E-2.
