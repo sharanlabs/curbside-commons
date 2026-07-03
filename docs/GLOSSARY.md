@@ -2,7 +2,7 @@
 
 The shared decoder ring for this project (per [`documentation-standard.md`](documentation-standard.md)). Every term of art used in the docs gets an entry: the **precise definition** first, then **in plain words**. Grows at first use of any new term — an undefined term in a doc is a defect.
 
-*Sorted alphabetically. Last updated: 2026-07-03 (P1 fee-cap terms added; duplicate SOR/Drift rows merged; re-sorted).*
+*Sorted alphabetically. Last updated: 2026-07-03 (P1 fee-cap terms + W1 wedge terms added; duplicate SOR/Drift rows merged; re-sorted).*
 
 | Term | Precise definition | In plain words |
 | --- | --- | --- |
@@ -16,10 +16,14 @@ The shared decoder ring for this project (per [`documentation-standard.md`](docu
 | **Cross-family (models)** | Using models from different vendors/architectures for maker vs judge roles (e.g., Gemini drafts, Groq-hosted GPT-OSS judges) to mitigate self-preference bias. | The player and the referee come from different teams, so the referee isn't biased toward its own side. |
 | **Deterministic verification** | Comparison logic with a single, repeatable, rule-defined outcome for given inputs — no ML, no sampling, no variance. | Exact checking, like arithmetic: same inputs, same answer, every time. Can't hallucinate. |
 | **Drift** | Any divergence between a serving copy (feed, listing, agent-visible catalog response, fee statement line) and the SOR — price, availability, existence, identity, staleness, encoding, version skew. | The copy no longer matching the original — wrong price, item that's actually sold out, a fee that isn't what was agreed. |
+| **Drift injector** | The W1 tool that takes a truthful serving copy and deterministically plants documented drift into it, one taxonomy class per row, recording every mutation in a ground-truth manifest. | The lie-planter: it breaks the copy of the menu in each documented way, and writes down every break so tests know exactly what must be caught. |
 | **Enhanced service fee** | NYC §20-563 (LL79/2025): a fee for services beyond the basic service, chargeable only if the platform also offers the basic-service tier; capped at 20% of the purchase price per order, or on the calendar-month average (§20-563.3(d)). | Optional extras (e.g., marketing) — max 20%, and only allowed if a plain basic plan exists too. |
+| **Entity resolution (ID-mismatch)** | Recovering which truth row a serving-copy row refers to when identifiers don't line up (e.g. a legacy POS id vs the catalog id) — in W1, a deterministic exact-name heuristic; a required C3 drift class. | Figuring out "this is actually the same burger" when the copy calls it by a different id. |
 | **Evals / gold set** | A curated, labeled test suite with known-correct answers used to measure system quality; the gold set is the answer key, evals are the exams run against it. | Answer-keyed practice tests we grade the system on, so quality is measured, not vibes. |
 | **Evidence-cited (finding)** | A reported discrepancy that carries machine-checkable pointers to both sources (e.g., row IDs, timestamps, rule/policy versions) supporting the claim. | Every accusation comes with receipts attached. |
 | **Fee cap** | A statutory ceiling on the commission/fees a delivery platform may charge merchants in a jurisdiction (e.g., NYC Local Law 79/2025's tiered caps). | A legal maximum on what the app is allowed to take from a restaurant's sales. |
+| **Freeze-integrity (of a corpus)** | An eval asserting the committed fixture files are byte-identical to the seeded generator's output, so the corpus cannot be hand-edited without CI failing. | Proof the demo data wasn't quietly tampered with: rebuild it from the recipe and it must match to the byte. |
+| **Golden report / golden fixture** | A frozen expected-output file the test suite byte-compares against the live output (possible because the verifier's output ordering is deterministic). | The answer sheet: the exact report the verifier must produce, saved, and compared character-for-character. |
 | **HITL (human-in-the-loop)** | A control pattern where the system recommends and a human approves before any consequential action executes. | The tool suggests; a person decides. Nothing fires on its own. |
 | **Hybrid data** | A dataset combining real open-source records with a synthetic overlay, each provenance-labeled. | Real public data as the base, made-up (and clearly labeled) details layered on top. |
 | **LLM judge** | A language model used to evaluate outputs or resolve fuzzy equivalences, always calibration-measured and never the sole gate on consequential actions. | An AI referee for judgment calls — used narrowly, and only after we've scored how reliable it is. |
