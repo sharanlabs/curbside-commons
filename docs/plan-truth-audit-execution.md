@@ -1,6 +1,6 @@
 # Execution Plan — The Verifier Program (UC-2 truth-audit toolkit + UC-1 fee audit)
 
-**Status: v1.0 — GO (owner ratified 2026-07-02, decision-log; NO-WAIT doctrine + real-first data doctrine + O4 declined recorded there). G8 runs inline immediately; build proceeds. Confidence: MEDIUM, conditional on G8's outcome.**
+**Status: v1.0 — GO (owner ratified 2026-07-02, decision-log; NO-WAIT doctrine + real-first data doctrine + O4 declined recorded there). G8 runs inline immediately; build proceeds. Confidence: MEDIUM, conditional on G8's outcome.** → **G8 RAN INLINE 2026-07-02: PASS** (copy layer is in-protocol per the UCP catalog spec; independent seat unoccupied after teardown; buyer claim consciously declined) — `docs/reviews/gate-2026-07-02-g8-crux.md`. **Build is live; next slice = restructure (§6) + W1.**
 **Register note (per `docs/documentation-standard.md`):** professional register leads; *plain-English lines are marked ▸*. New terms land in `docs/GLOSSARY.md`. Successor to `docs/plan-multi-agent-execution.md` (superseded for the active program; retained as the provenance spec of the verification spine).
 
 ---
