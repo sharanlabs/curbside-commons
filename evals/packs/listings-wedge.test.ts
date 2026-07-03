@@ -51,6 +51,39 @@ describe("corpus freeze-integrity (seeded generator, plan §8)", () => {
   it("generator is deterministic: same seed twice → identical catalogs", () => {
     expect(asJson(generateCatalog(CORPUS_SEED, CORPUS_AS_OF))).toBe(asJson(sor));
   });
+
+  // Gate route-back P2-1 (gate-2026-07-03-w1-wedge): the UCP fixtures and the
+  // manifest's ucpVersionSkew block are byte-locked too — the corpus README's
+  // "no hand-tampering without CI catching it" claim must hold for EVERY
+  // committed fixture file, not just the ACP set.
+  it("ucp-catalog-response.{faithful,drifted}.json are exactly buildUcpResponse(...) at the pinned params", () => {
+    const ucpFaithful = buildUcpResponse(faithful, {
+      supportedVersions: [UCP_PINNED_VERSION],
+      sessionId: "sess-sim-faithful-001",
+    });
+    const ucpDrifted = buildUcpResponse(bundle.feed, {
+      supportedVersions: ["2026-03-01-draft"],
+      sessionId: "sess-sim-drifted-001",
+    });
+    expect(readFixture("ucp-catalog-response.faithful.json")).toBe(asJson(ucpFaithful));
+    expect(readFixture("ucp-catalog-response.drifted.json")).toBe(asJson(ucpDrifted));
+  });
+
+  it("drift-manifest.json ucpVersionSkew block matches the pinned skew exactly", () => {
+    const manifest = JSON.parse(readFixture("drift-manifest.json")) as {
+      simulated: boolean;
+      asOf: string;
+      ucpVersionSkew: unknown;
+    };
+    expect(manifest.simulated).toBe(true);
+    expect(manifest.asOf).toBe(CORPUS_AS_OF);
+    expect(manifest.ucpVersionSkew).toEqual({
+      class: "spec-version-skew",
+      surfaces: "ucp-only",
+      pinned: UCP_PINNED_VERSION,
+      served: ["2026-03-01-draft"],
+    });
+  });
 });
 
 describe("faithful copies produce ZERO findings (both surfaces)", () => {
