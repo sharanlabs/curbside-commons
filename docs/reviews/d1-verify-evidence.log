@@ -1,0 +1,88 @@
+D1 DEMO SLICE — EXECUTED VERIFICATION + RED-GREEN EVIDENCE
+==========================================================
+Date: 2026-07-03 (night). Node v24. cwd = repo root.
+All commands run live; outputs pasted verbatim (trimmed to the load-bearing lines).
+
+----------------------------------------------------------
+BASELINE (before D1) : verify 515 passed + 5 skipped ; legacy 306 + 5.
+
+----------------------------------------------------------
+FULL-SUITE AFTER D1
+  $ npm test
+    Test Files  42 passed | 4 skipped (46)
+         Tests  557 passed | 5 skipped (562)     (+42 vs 515 baseline)
+  $ npm run typecheck        -> clean (tsc --noEmit, exit 0)
+  $ npm run lint             -> clean (eslint --max-warnings=0, exit 0)
+  $ npm run build            -> success; route `/demo` = ○ (Static) prerender
+  $ npm run test:legacy
+    Test Files  26 passed | 4 skipped (30)
+         Tests  306 passed | 5 skipped (311)      (untouched)
+
+CLI SMOKE
+  $ node bin/check.mjs demo            ; echo $?   -> 0
+  $ node bin/check.mjs demo --json     ; echo $?   -> 0   (valid JSON, 4 beats)
+  $ node bin/check.mjs demo --against x ; echo $?  -> 2   (mixed/unknown flag, loud)
+  $ node bin/check.mjs demo extra.json ; echo $?   -> 2   (surplus positional, loud)
+
+==========================================================
+RED-GREEN 1 — BEATS COMPUTE (faithful-feed mutation flips the verdict)
+Load-bearing change: transcript.ts derives the selected-item verdict from the
+real verifier result (ok: k === 0), never a hardcoded string.
+
+REVERT (break): transcript.ts verifierFindsBeat verdict `ok: k === 0` -> `ok: false`.
+  $ npx vitest run evals/packs/demo-transcript.test.ts
+    × the FAITHFUL feed makes the same selected item show NO drift (verdict flips)
+    AssertionError: expected false to be true // Object.is equality
+      82| expect(beat(drifted.beats,"verifier-finds").verdicts?.[0].ok).toBe(false)
+      83| expect(beat(faithful.beats,"verifier-finds").verdicts?.[0].ok).toBe(true)
+    Test Files  1 failed (1) ; Tests 1 failed | 7 passed (8)
+RESTORE (fix): `ok: false` -> `ok: k === 0`.
+  $ npx vitest run evals/packs/demo-transcript.test.ts   -> 8 passed (GREEN)
+
+==========================================================
+RED-GREEN 2 — ACTOR SOR-BLINDNESS (transitive import ban)
+Load-bearing change: actor.ts imports ONLY the feed shape; the blindness eval
+walks its transitive imports and forbids reference.ts + fixtures.
+
+REVERT (break): add `import { sorReference } from "../reference.ts";` to actor.ts.
+  $ npx vitest run evals/packs/demo-blindness.test.ts
+    × the actor never imports the SOR reference resolver (reference.ts)
+    AssertionError: expected true to be false // Object.is equality
+      75| expect(reached.some((f) => /lib\/packs\/listings\/reference\.ts$/.test(f)))
+    Test Files  1 failed (1) ; Tests 1 failed | 6 passed (7)
+RESTORE (fix): remove the reference.ts import.
+  $ npx vitest run evals/packs/demo-blindness.test.ts   -> 7 passed (GREEN)
+
+==========================================================
+RED-GREEN 3 — HONESTY GATE (banned "agent caught" framing absent)
+Load-bearing change: the C7 verbatim claim is single-sourced; framing that puts
+the agent in the caught position is machine-forbidden across all demo files.
+
+REVERT (break): DEMO_SUBHEAD in copy.ts -> "... watch as the agent gets caught in the act."
+  $ npx vitest run evals/packs/honesty-c10.test.ts
+    × .../demo/copy.ts never frames the agent as 'caught' (banned headline)
+    AssertionError: banned framing /\bagent (?:gets|is|was|got) caught\b/i in
+      .../demo/copy.ts: agent gets caught: expected false to be true
+    Test Files  1 failed (1) ; Tests 1 failed | 51 passed (52)
+RESTORE (fix): DEMO_SUBHEAD back to the mechanism-framed line.
+  $ npx vitest run evals/packs/honesty-c10.test.ts   -> 52 passed (GREEN)
+
+==========================================================
+RED-GREEN 4 — GOLDEN LOCK (CLI text byte-frozen)
+Load-bearing change: renderDemoText output is byte-frozen to expected-demo.txt.
+
+REVERT (break): render-text.ts header line += " [golden-lock probe]" (no golden regen).
+  $ npx vitest run evals/packs/demo-cli.test.ts
+    × `demo` exits 0 and prints the byte-frozen golden text
+    - Expected / + Received
+    + ActivationOps AI — verifier demo (SIMULATED) [golden-lock probe]
+    Test Files  1 failed (1) ; Tests 1 failed | 3 passed (4)
+RESTORE (fix): revert the header line.
+  $ npx vitest run evals/packs/demo-cli.test.ts   -> 4 passed (GREEN)
+
+==========================================================
+POST-RESTORE COMBINED GREEN (all four probes reverted)
+  $ npx vitest run evals/packs/demo-transcript.test.ts \
+        evals/packs/demo-blindness.test.ts \
+        evals/packs/demo-cli.test.ts evals/packs/honesty-c10.test.ts
+    Test Files  4 passed (4) ; Tests 71 passed (71)

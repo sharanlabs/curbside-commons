@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -245,9 +245,26 @@ describe("C1 $0-LLM: structural import-graph proof", () => {
     return specs;
   }
 
-  function resolveRelative(fromFile: string, spec: string): string | null {
-    if (!spec.startsWith(".")) return null;
-    return join(fromFile, "..", spec);
+  // Alias-capable resolver, adopted from report-view-c1.test.ts (D1 fold-in
+  // advisory ii): resolves "@/..." against the repo root AND relative specifiers,
+  // trying the TS/MJS/JSON/index candidates. The blindness eval uses the same
+  // resolver, so the two import walks agree on what a specifier means. Bare
+  // specifiers (react, ajv, node:*) return null — unresolvable to a repo file,
+  // checked for the ban but not walked.
+  function resolve(fromFile: string, spec: string): string | null {
+    let base: string | null = null;
+    if (spec.startsWith("@/")) base = join(root, spec.slice(2));
+    else if (spec.startsWith(".")) base = join(fromFile, "..", spec);
+    if (base === null) return null;
+    const candidates = [
+      base,
+      `${base}.ts`,
+      `${base}.tsx`,
+      `${base}.mjs`,
+      `${base}.json`,
+      join(base, "index.ts"),
+    ];
+    return candidates.find((c) => existsSync(c) && /\.(ts|tsx|mjs|json)$/.test(c)) ?? null;
   }
 
   it("no module reachable from bin/check.mjs matches a banned pattern", () => {
@@ -257,14 +274,13 @@ describe("C1 $0-LLM: structural import-graph proof", () => {
       const file = queue.pop() as string;
       if (seen.has(file)) continue;
       seen.add(file);
+      if (file.endsWith(".json")) continue; // data leaf, no imports
       for (const spec of importsOf(file)) {
         for (const pattern of banned) {
           expect(pattern.test(spec), `banned import "${spec}" in ${file}`).toBe(false);
         }
-        const resolved = resolveRelative(file, spec);
-        if (resolved !== null && (resolved.endsWith(".ts") || resolved.endsWith(".mjs"))) {
-          queue.push(resolved);
-        }
+        const resolved = resolve(file, spec);
+        if (resolved !== null) queue.push(resolved);
       }
     }
     // Sanity: the walk actually traversed the engine + pack, not just the entry.
@@ -282,6 +298,7 @@ describe("C1 $0-LLM: structural import-graph proof", () => {
       const file = queue.pop() as string;
       if (seen.has(file)) continue;
       seen.add(file);
+      if (file.endsWith(".json")) continue; // data leaf, no source to scan
       let text: string;
       try {
         text = readFileSync(file, "utf8");
@@ -290,10 +307,8 @@ describe("C1 $0-LLM: structural import-graph proof", () => {
       }
       expect(/(^|[^.\w])fetch\s*\(/.test(text), `bare fetch( reachable from the CLI in ${file}`).toBe(false);
       for (const spec of importsOf(file)) {
-        const resolved = resolveRelative(file, spec);
-        if (resolved !== null && (resolved.endsWith(".ts") || resolved.endsWith(".mjs"))) {
-          queue.push(resolved);
-        }
+        const resolved = resolve(file, spec);
+        if (resolved !== null) queue.push(resolved);
       }
     }
     expect(seen.size).toBeGreaterThan(10);

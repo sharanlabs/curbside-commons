@@ -60,7 +60,13 @@ bytes must match (freeze-integrity evals enforce it):
 ```
 npm run fixtures:wedge   # regenerates synthetic-restaurant/   (seed 20260703, as-of 2026-07-03)
 npm run fixtures:ucp     # regenerates ucp-conformance-ci/      (seed 20260703, as-of 2026-07-03)
+npm run fixtures:demo    # regenerates synthetic-restaurant/expected-demo.{json,txt} (the D1 demo transcript goldens)
 ```
+
+`synthetic-restaurant/expected-demo.{json,txt}` are the byte-frozen goldens of the
+scripted demo transcript (`node bin/check.mjs demo` / `--json`): the JSON is what
+the `/demo` page renders, and a test byte-asserts the live engine output against
+it, so the web demo provably cannot drift from the real verifier.
 
 The pinned UCP schemas under `ucp-schemas/` are NOT generated — they are a pinned
 upstream fetch, sha256-recorded in their `PROVENANCE.json`.
@@ -81,6 +87,16 @@ npm shortcuts: `npm run check:fixtures` · `npm run check:fixtures:clean` ·
 `npm run check:conformance`. No LLM or network call happens on any path (C1:
 $0-LLM, enforced by an import-graph eval). The report page at `/report` renders
 the golden reports for these fixtures as a printable one-pager.
+
+```
+# DEMO leg (D1) — the scripted walkthrough on this corpus (always exits 0)
+node bin/check.mjs demo          # plain text
+node bin/check.mjs demo --json   # the machine transcript
+```
+
+The demo plays a labeled, simulated, SOR-blind demonstration actor over the
+drifted copy, then the verifier over the same copy, then the conformance-foil
+beat — deterministic, $0, rendered at `/demo` as a one-pager.
 
 ## Shape-honesty note (carried verbatim from `synthetic-restaurant/`)
 

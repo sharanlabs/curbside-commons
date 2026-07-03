@@ -1,0 +1,65 @@
+============================================================================
+ActivationOps AI — verifier demo (SIMULATED)
+============================================================================
+
+Demo claim: a spec-faithful simulated agent follows a spec-valid but false surface; the verifier catches the surface/SOR mismatch
+Actor:      spec-faithful demonstration actor — simulated
+Spec pin:   taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08
+Simulated:  true
+
+----------------------------------------------------------------------------
+BEAT 1 · The agent reads the published serving copy — spec-faithful demonstration actor — simulated
+
+  ▸ A shopping agent reads the published menu feed — the same data any AI assistant would consume — and never sees the restaurant's own records.
+
+  intent: Order the "Smoked Brisket Plate" if the published feed lists it as available.
+  source read: the published ACP serving copy only (no system-of-record access)
+
+----------------------------------------------------------------------------
+BEAT 2 · The agent selects an item, trusting the surface
+
+  ▸ Trusting the feed at face value, the agent picks its target item and is ready to order it at the price the surface shows.
+
+  selected item: "Smoked Brisket Plate" (row id item-006-v1)
+  read off the surface: price 12.00 USD · availability in_stock
+  the agent is now ready to order at that price — the demo stops here (no checkout).
+
+  verdict: [OK] SELECTED (from the surface)
+
+----------------------------------------------------------------------------
+BEAT 3 · The verifier checks that same copy against the records
+
+  ▸ The verifier checks the exact same feed against the restaurant's system-of-record and flags what the agent had no way to see.
+
+  1 finding for the selected item ("Smoked Brisket Plate"); full report: 16 findings across the whole copy.
+
+  verdict: [FLAG] DRIFT ON THE SELECTED ITEM — the agent could not have seen it
+
+  evidence (each catch carries its four receipts):
+    01. [ERROR] The served price 12.00 does not match the catalog price 10.00.
+        claim:      item-006-v1#price.amount  (acp-feed · price.amount = 12.00)
+        reference:  item-006-v1
+        rule:       LST-PRICE-VALUE
+        class:      price
+
+----------------------------------------------------------------------------
+BEAT 4 · Conformance-foil: spec-valid is not the same as true
+
+  ▸ The same document passes the official schema check — it is correctly shaped — and still misstates the price versus the records.
+
+  passes the official schema check; still lies — conformance: PASS (spec-shape); truth: 1 finding(s) vs the system-of-record.
+
+  verdict: [OK] CONFORMANT (spec-valid)
+  verdict: [FLAG] FALSE vs SOR (still lies)
+
+  evidence (each catch carries its four receipts):
+    01. [ERROR] The served price 23.50 does not match the catalog price 21.50.
+        claim:      item-001-v1#price.amount  (ucp-catalog · price.amount = 23.50)
+        reference:  item-001-v1
+        rule:       LST-PRICE-VALUE
+        class:      price
+
+============================================================================
+No language model runs in this demo; the comparison is exact, deterministic
+logic. Simulated data, run on demand — not a live service, no platform access.
+============================================================================

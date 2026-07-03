@@ -40,11 +40,13 @@ function covers(report: typeof acpReport, entry: (typeof manifest)[number]): boo
   return report.findings.some(
     (f) =>
       f.category === entry.class &&
+      // The ID-mismatch entry records the ORIGINAL id; the finding anchors the
+      // resolved truth row to it (as referenceRowId) while the claim carries the
+      // re-keyed id — so the referenceRowId clause below already covers it (the
+      // earlier explicit `field === "item_id"` clause was strictly implied and
+      // was removed, D1 fold-in advisory i).
       (f.claim.id.startsWith(`${entry.targetFeedItemId}#`) ||
-        f.referenceRowId === entry.targetFeedItemId ||
-        // the ID-mismatch entry records the ORIGINAL id; the finding anchors the
-        // resolved truth row to it while the claim carries the re-keyed id
-        (entry.field === "item_id" && f.referenceRowId === entry.targetFeedItemId)),
+        f.referenceRowId === entry.targetFeedItemId),
   );
 }
 

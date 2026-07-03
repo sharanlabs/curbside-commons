@@ -31,6 +31,11 @@ Usage:
       CONFORMANCE leg: validate a UCP catalog-response document against the pinned
       published UCP schemas (is it correctly SHAPED?). No --against needed — the
       reference is the schema. Exit 0 = conformant, 1 = schema violation(s).
+  demo [--json]
+      DEMO leg (D1): play the scripted walkthrough on the shipped corpus — a
+      spec-faithful simulated agent follows a spec-valid but false surface; the
+      verifier catches the surface/SOR mismatch. Deterministic, $0, zero-config.
+      Prints plain text, or the machine transcript with --json. Always exit 0.
   help
       Show this message.
 
@@ -57,6 +62,34 @@ async function main(argv) {
   if (!cmd || cmd === "help" || cmd === "--help" || cmd === "-h") {
     process.stdout.write(USAGE);
     return 0;
+  }
+
+  // DEMO leg (D1): a scripted walkthrough. Strict-flag discipline mirrors the
+  // check legs — the ONLY accepted flag is --json; any other flag or any
+  // positional exits 2 loudly (a typo'd `demo --agdainst x` must never silently
+  // run the plain demo). Always exit 0 on success (it is a walkthrough, not a gate).
+  if (cmd === "demo") {
+    let json = false;
+    for (let i = 1; i < args.length; i++) {
+      const arg = args[i];
+      if (arg === "--json") {
+        json = true;
+        continue;
+      }
+      process.stderr.write(
+        `check: "demo" accepts only --json (got "${arg}")\n\n${USAGE}`,
+      );
+      return 2;
+    }
+    try {
+      const { runDemo } = await import("../lib/packs/listings/cli.ts");
+      const result = runDemo({ json });
+      process.stdout.write(result.output);
+      return result.exitCode;
+    } catch (err) {
+      process.stderr.write(`check: ${err instanceof Error ? err.message : String(err)}\n`);
+      return 2;
+    }
   }
 
   if (cmd !== "check") {

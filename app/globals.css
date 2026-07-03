@@ -1412,4 +1412,103 @@ body {
   .rpt-head {
     break-after: avoid;
   }
+  /* D1 demo: keep each beat whole across page breaks */
+  .dmo-beat {
+    break-inside: avoid;
+  }
+}
+
+/* ============================================================================
+   D1 — the one-page verifier demo (/demo). Reuses the report's Ledger system
+   (rpt-* classes) and adds a beat-list layout. Desktop-first, printable.
+   dmo-* namespace.
+   ========================================================================== */
+.dmo-meta {
+  margin-top: 18px;
+}
+.dmo-beats {
+  margin-top: 28px;
+  border-top: 1px solid var(--rule-2);
+}
+.dmo-beat {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.dmo-beat-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.dmo-beat-no {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  flex: none;
+}
+.dmo-beat-title {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.dmo-beat-plain {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  max-width: 72ch;
+}
+.dmo-beat-lines {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+.dmo-beat-lines li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--body);
+  padding-left: 14px;
+  position: relative;
+}
+.dmo-beat-lines li::before {
+  content: "·";
+  position: absolute;
+  left: 2px;
+  color: var(--graphite);
+}
+.dmo-verdicts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.dmo-verdict {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.dmo-verdict.ok {
+  color: var(--ink);
+  background: var(--bg-2);
+  border-color: var(--rule-3);
+}
+.dmo-verdict.flag {
+  color: var(--signal-text);
+  background: var(--signal-tint);
+  border-color: var(--signal-rule);
+}
+.dmo-findings {
+  margin-top: 16px;
+  border-top: 1px solid var(--rule-2);
 }

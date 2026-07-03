@@ -19,8 +19,10 @@
     "check:fixtures": "node bin/check.mjs check fixtures/synthetic-restaurant/acp-feed.drifted.json --against fixtures/synthetic-restaurant/sor.catalog.json",
     "check:fixtures:clean": "node bin/check.mjs check fixtures/synthetic-restaurant/acp-feed.faithful.json --against fixtures/synthetic-restaurant/sor.catalog.json",
     "check:conformance": "node bin/check.mjs check fixtures/ucp-conformance-ci/valid/search-full-catalog.json --conformance",
+    "demo": "node bin/check.mjs demo",
     "fixtures:wedge": "node scripts-ts/generate-wedge-fixtures.mts",
     "fixtures:ucp": "node scripts-ts/generate-ucp-conformance-corpus.mts",
+    "fixtures:demo": "node scripts-ts/generate-demo-transcript.mts",
     "test:ucp-oracle": "node scripts-ts/ucp-oracle-diff.mts"
   },
   "engines": {

@@ -12,6 +12,7 @@
  * print the receipts, and fail the build if the copy lies.
  */
 import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import type { VerifierReport } from "../../verifier-core/index.ts";
 import { serializeReport } from "../../verifier-core/verify.ts";
 import type { AcpFeed } from "./acp-feed.ts";
@@ -20,6 +21,8 @@ import { runUcpConformance, type UcpCatalogOp } from "./conformance.ts";
 import { runListingsVerification } from "./run.ts";
 import type { SyntheticCatalog } from "./types.ts";
 import type { UcpCatalogResponseFixture } from "./ucp.ts";
+import type { UcpSearchResponse } from "./ucp-wire.ts";
+import { buildDemoTranscript, renderDemoText } from "./demo/index.ts";
 
 export type CliSurface = "acp" | "ucp";
 
@@ -68,4 +71,38 @@ export function runConformanceCheck(
   const doc = JSON.parse(readFileSync(docPath, "utf8")) as unknown;
   const report = runUcpConformance(doc, { op, schemaDir });
   return { report, output: serializeReport(report), exitCode: report.ok ? 0 : 1 };
+}
+
+/** Result of the demo leg — a scripted narration, not a gate (always exit 0). */
+export interface DemoCliResult {
+  readonly output: string;
+  /** Demo is always exit 0: it is a walkthrough, not a pass/fail check. */
+  readonly exitCode: 0;
+}
+
+/**
+ * Run the DEMO leg (D1): read the shipped drifted feed, the SOR, and the
+ * conformant-but-false UCP document from the corpus (zero-config), build the
+ * deterministic transcript, and render it as plain text (default) or the machine
+ * transcript JSON (`--json`). Zero LLM / network; reads fixtures + pinned schemas
+ * from disk. Exit 0 always — the demo is a walkthrough of the mechanism, not a
+ * pass/fail gate. Throws on unreadable input (bin maps that to exit 2).
+ */
+export function runDemo(opts: { json?: boolean } = {}): DemoCliResult {
+  const restaurant = join("fixtures", "synthetic-restaurant");
+  const sor = JSON.parse(
+    readFileSync(join(restaurant, "sor.catalog.json"), "utf8"),
+  ) as SyntheticCatalog;
+  const feed = JSON.parse(
+    readFileSync(join(restaurant, "acp-feed.drifted.json"), "utf8"),
+  ) as AcpFeed;
+  const conformanceDoc = JSON.parse(
+    readFileSync(join("fixtures", "ucp-conformance-ci", "valid", "conformant-but-false.json"), "utf8"),
+  ) as UcpSearchResponse;
+
+  const transcript = buildDemoTranscript({ feed, sor, conformanceDoc });
+  const output = opts.json
+    ? `${JSON.stringify(transcript, null, 2)}\n`
+    : renderDemoText(transcript);
+  return { output, exitCode: 0 };
 }
