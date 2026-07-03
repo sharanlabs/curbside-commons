@@ -1,0 +1,165 @@
+{
+  "simulated": true,
+  "seed": 20260703,
+  "asOf": "2026-07-03T00:00:00Z",
+  "ucpVersionSkew": {
+    "class": "spec-version-skew",
+    "surfaces": "ucp-only",
+    "pinned": "2026-04-08",
+    "served": [
+      "2026-03-01-draft"
+    ]
+  },
+  "entries": [
+    {
+      "id": "drift-001",
+      "class": "price",
+      "targetFeedItemId": "item-006-v1",
+      "field": "price",
+      "before": "10.00",
+      "after": "12.00",
+      "surfaces": "both",
+      "note": "price value drift: copy charges more than the SOR price"
+    },
+    {
+      "id": "drift-002",
+      "class": "price",
+      "targetFeedItemId": "item-001-v1",
+      "field": "price",
+      "before": "21.50",
+      "after": "2150",
+      "surfaces": "both",
+      "note": "cents-vs-decimal drift: amount serialized as raw cents"
+    },
+    {
+      "id": "drift-003",
+      "class": "price",
+      "targetFeedItemId": "item-001-v2",
+      "field": "currency",
+      "before": "USD",
+      "after": "usd",
+      "surfaces": "both",
+      "note": "currency-form drift: ISO-4217 code case-mangled"
+    },
+    {
+      "id": "drift-004",
+      "class": "price",
+      "targetFeedItemId": "item-001-v3",
+      "field": "sale_price",
+      "before": "(unset)",
+      "after": "28.50",
+      "surfaces": "acp-only",
+      "note": "price drift: sale_price exceeds price (extracted invariant sale_price ≤ price)"
+    },
+    {
+      "id": "drift-005",
+      "class": "cross-field-invariant",
+      "targetFeedItemId": "item-002-v1",
+      "field": "is_eligible_search",
+      "before": "true",
+      "after": "false",
+      "surfaces": "acp-only",
+      "note": "cross-field invariant break: is_eligible_checkout ⇒ is_eligible_search violated"
+    },
+    {
+      "id": "drift-006",
+      "class": "availability",
+      "targetFeedItemId": "item-008-v1",
+      "field": "availability",
+      "before": "out_of_stock",
+      "after": "in_stock",
+      "surfaces": "both",
+      "note": "availability drift: 86'd item served as orderable"
+    },
+    {
+      "id": "drift-007",
+      "class": "availability",
+      "targetFeedItemId": "item-002-v2",
+      "field": "existence",
+      "before": "hidden (not served)",
+      "after": "served in_stock",
+      "surfaces": "both",
+      "note": "availability drift: hidden variation exposed on the serving surface"
+    },
+    {
+      "id": "drift-008",
+      "class": "existence",
+      "targetFeedItemId": "ghost-001",
+      "field": "existence",
+      "before": "(absent from SOR)",
+      "after": "served",
+      "surfaces": "both",
+      "note": "existence drift: ghost item — on the copy, not in the SOR"
+    },
+    {
+      "id": "drift-009",
+      "class": "existence",
+      "targetFeedItemId": "item-003-v1",
+      "field": "existence",
+      "before": "served",
+      "after": "(missing from copy)",
+      "surfaces": "both",
+      "note": "existence drift: in-stock SOR item absent from the serving copy"
+    },
+    {
+      "id": "drift-010",
+      "class": "identity",
+      "targetFeedItemId": "item-003-v2",
+      "field": "item_id",
+      "before": "item-003-v2",
+      "after": "legacy-pos-4471",
+      "surfaces": "both",
+      "note": "identity drift (REQUIRED class): copy keys the row by a legacy id — entity resolution must recover the SOR row by title"
+    },
+    {
+      "id": "drift-011",
+      "class": "identity",
+      "targetFeedItemId": "item-004-v2",
+      "field": "variant_dict",
+      "before": "{\"variation\":\"Medium\"}",
+      "after": "{\"variation\":\"Small\"}",
+      "surfaces": "both",
+      "note": "identity drift (REQUIRED class): duplicate variant_dict — variants of the group are no longer distinguishable"
+    },
+    {
+      "id": "drift-012",
+      "class": "staleness",
+      "targetFeedItemId": "item-003-v3",
+      "field": "expiration_date",
+      "before": "(unset)",
+      "after": "2026-01-01T00:00:00Z",
+      "surfaces": "acp-only",
+      "note": "staleness drift: row expired before the catalog asOf and is still served"
+    },
+    {
+      "id": "drift-013",
+      "class": "staleness",
+      "targetFeedItemId": "item-004-v1",
+      "field": "availability_date",
+      "before": "(in_stock)",
+      "after": "pre_order @ 2026-02-01",
+      "surfaces": "acp-only",
+      "note": "staleness drift: pre_order promise whose availability_date already passed (also an availability-state drift vs the SOR)"
+    },
+    {
+      "id": "drift-014",
+      "class": "encoding",
+      "targetFeedItemId": "item-004-v3",
+      "field": "title",
+      "before": "Jalapeño Poppers (Large)",
+      "after": "JalapeÃ±o Poppers (Large)",
+      "surfaces": "both",
+      "note": "encoding drift: UTF-8 title double-encoded (mojibake) on the copy"
+    },
+    {
+      "id": "drift-015",
+      "class": "encoding",
+      "targetFeedItemId": "item-005-v2",
+      "field": "title",
+      "before": "Margherita Pizza (Medium)",
+      "after": "Margherita…",
+      "surfaces": "both",
+      "note": "encoding drift: title truncated by a length limit on the copy"
+    }
+  ]
+}

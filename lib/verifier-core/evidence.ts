@@ -10,7 +10,7 @@
  * Plain: a "finding" is a caught drift WITH its receipts — what was claimed, which
  * truth row it was checked against, which rule it broke, and how bad it is.
  */
-import type { Claim } from "./claim";
+import type { Claim } from "./claim.ts";
 
 /** Severity ladder for a finding (W1 may refine thresholds). */
 export type Severity = "info" | "warn" | "error";
@@ -30,6 +30,14 @@ export interface Finding {
   readonly ruleId: string;
   /** How severe the drift is (C2). */
   readonly severity: Severity;
+  /**
+   * Optional generic grouping tag (e.g. a taxonomy class id). The engine treats
+   * it as an opaque string — packs populate it (the listings pack sets the plan
+   * §7 drift class) so the coverage eval (C6) can measure "% classes caught"
+   * without the engine knowing any domain taxonomy. Not one of the four required
+   * C2 fields; purely for reporting/coverage.
+   */
+  readonly category?: string;
   /** Plain-words line for the one-page report (C4); optional until W3. */
   readonly plainLine?: string;
 }

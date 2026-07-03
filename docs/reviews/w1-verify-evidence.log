@@ -1,0 +1,27 @@
+W1 RED-GREEN EVIDENCE — executed 2026-07-03 10:42:08 EDT
+Each block: MUTATE a load-bearing line -> targeted vitest RED -> revert -> GREEN.
+
+===== RG-1: C2 guard (makeFinding ruleId check) =====
+--- mutate: disable the ruleId guard in lib/verifier-core/guard.ts
+ Test Files  1 failed (1)
+      Tests  3 failed | 9 passed (12)
+--- reverted; re-run:
+      Tests  12 passed (12)
+
+===== RG-2: price detector (cents-vs-decimal + value drift detection) =====
+--- mutate: price.amount detector returns [] unconditionally in lib/packs/listings/detectors.ts
+      Tests  19 failed | 70 passed (89)
+--- reverted; re-run:
+      Tests  89 passed (89)
+
+===== RG-3: CLI exit semantics (C1 non-zero on drift) =====
+--- mutate: exitCode forced to 0 in lib/packs/listings/cli.ts
+      Tests  2 failed | 3 passed (5)
+--- reverted; re-run:
+      Tests  5 passed (5)
+
+===== RG-4: completeness sweep (missing-item detection) =====
+--- mutate: skip the missing-variation loop in lib/packs/listings/run.ts
+      Tests  17 failed | 72 passed (89)
+--- reverted; re-run:
+      Tests  89 passed (89)

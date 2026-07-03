@@ -15,7 +15,10 @@
     "test:e2e": "playwright test",
     "coverage": "vitest run --coverage",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run build",
-    "verify:full": "npm run verify && npm run test:e2e"
+    "verify:full": "npm run verify && npm run test:e2e",
+    "check:fixtures": "node bin/check.mjs check fixtures/synthetic-restaurant/acp-feed.drifted.json --against fixtures/synthetic-restaurant/sor.catalog.json",
+    "check:fixtures:clean": "node bin/check.mjs check fixtures/synthetic-restaurant/acp-feed.faithful.json --against fixtures/synthetic-restaurant/sor.catalog.json",
+    "fixtures:wedge": "node scripts-ts/generate-wedge-fixtures.mts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.11",

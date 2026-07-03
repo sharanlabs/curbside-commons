@@ -1,0 +1,230 @@
+{
+  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "matchingMode": "synthetic-controlled",
+  "simulated": true,
+  "findings": [
+    {
+      "claim": {
+        "id": "item-002-v2#existence",
+        "source": "acp-feed",
+        "field": "existence",
+        "value": true
+      },
+      "referenceRowId": "item-002-v2",
+      "ruleId": "LST-AVAIL-HIDDEN-SHOWN",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "This item is hidden in the merchant's own catalog but is being served to customers."
+    },
+    {
+      "claim": {
+        "id": "item-004-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "pre_order"
+      },
+      "referenceRowId": "item-004-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"pre_order\" but the catalog state is in stock (expected \"in_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-008-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "in_stock"
+      },
+      "referenceRowId": "item-008-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-002-v1#invariants",
+        "source": "acp-feed",
+        "field": "invariants",
+        "value": {
+          "price": "22.00",
+          "is_eligible_search": false,
+          "is_eligible_checkout": true
+        }
+      },
+      "referenceRowId": "item-002-v1",
+      "ruleId": "LST-XF-CHECKOUT-SEARCH",
+      "severity": "error",
+      "category": "cross-field-invariant",
+      "plainLine": "The row is checkout-eligible but not search-eligible — the extracted invariant requires checkout ⇒ search."
+    },
+    {
+      "claim": {
+        "id": "item-005-v2#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "Margherita…"
+      },
+      "referenceRowId": "item-005-v2",
+      "ruleId": "LST-ENC-TRUNC",
+      "severity": "warn",
+      "category": "encoding",
+      "plainLine": "The name is cut off on the serving copy: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\"."
+    },
+    {
+      "claim": {
+        "id": "item-004-v3#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "JalapeÃ±o Poppers (Large)"
+      },
+      "referenceRowId": "item-004-v3",
+      "ruleId": "LST-ENC-UTF8",
+      "severity": "warn",
+      "category": "encoding",
+      "plainLine": "The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the real \"Jalapeño Poppers (Large)\"."
+    },
+    {
+      "claim": {
+        "id": "ghost-001#existence",
+        "source": "acp-feed",
+        "field": "existence",
+        "value": true
+      },
+      "referenceRowId": "catalog-meta",
+      "ruleId": "LST-EXIST-GHOST",
+      "severity": "error",
+      "category": "existence",
+      "plainLine": "The copy serves \"Phantom Platter (simulated ghost item)\" but no such item exists in the merchant's catalog."
+    },
+    {
+      "claim": {
+        "id": "item-003-v1#existence",
+        "source": "acp-feed",
+        "field": "existence",
+        "value": false
+      },
+      "referenceRowId": "item-003-v1",
+      "ruleId": "LST-EXIST-MISSING",
+      "severity": "error",
+      "category": "existence",
+      "plainLine": "\"Café Latte (Small)\" exists in the merchant's catalog but is missing from the serving copy."
+    },
+    {
+      "claim": {
+        "id": "legacy-pos-4471#existence",
+        "source": "acp-feed",
+        "field": "existence",
+        "value": true
+      },
+      "referenceRowId": "item-003-v2",
+      "ruleId": "LST-IDENT-ID-MISMATCH",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The copy keys this row as \"legacy-pos-4471\" but the catalog row is \"item-003-v2\" — same item, mismatched identity (resolved by exact name)."
+    },
+    {
+      "claim": {
+        "id": "item-004-v2#variant_dict",
+        "source": "acp-feed",
+        "field": "variant_dict",
+        "value": {
+          "group": "item-004",
+          "dict": {
+            "variation": "Small"
+          }
+        }
+      },
+      "referenceRowId": "item-004-v2",
+      "ruleId": "LST-IDENT-MODIFIER-AMBIG",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The variant label says \"Small\" but this row is the \"Medium\" variation — variants of this item can no longer be told apart."
+    },
+    {
+      "claim": {
+        "id": "item-001-v1#price.amount",
+        "source": "acp-feed",
+        "field": "price.amount",
+        "value": "2150"
+      },
+      "referenceRowId": "item-001-v1",
+      "ruleId": "LST-PRICE-CENTS-AS-DECIMAL",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The price is serialized in cents (2150) where dollars are expected (21.50) — a 100× overstatement."
+    },
+    {
+      "claim": {
+        "id": "item-001-v2#price.currency",
+        "source": "acp-feed",
+        "field": "price.currency",
+        "value": "usd"
+      },
+      "referenceRowId": "item-001-v2",
+      "ruleId": "LST-PRICE-CURRENCY-FORM",
+      "severity": "warn",
+      "category": "price",
+      "plainLine": "The currency code is malformed: \"usd\" instead of ISO-4217 \"USD\"."
+    },
+    {
+      "claim": {
+        "id": "item-001-v3#invariants",
+        "source": "acp-feed",
+        "field": "invariants",
+        "value": {
+          "price": "27.50",
+          "sale_price": "28.50",
+          "is_eligible_search": true,
+          "is_eligible_checkout": true
+        }
+      },
+      "referenceRowId": "item-001-v3",
+      "ruleId": "LST-PRICE-SALE-GT",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The sale price 28.50 is higher than the regular price 27.50 — a \"sale\" that costs more."
+    },
+    {
+      "claim": {
+        "id": "item-006-v1#price.amount",
+        "source": "acp-feed",
+        "field": "price.amount",
+        "value": "12.00"
+      },
+      "referenceRowId": "item-006-v1",
+      "ruleId": "LST-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The served price 12.00 does not match the catalog price 10.00."
+    },
+    {
+      "claim": {
+        "id": "item-004-v1#availability_date",
+        "source": "acp-feed",
+        "field": "availability_date",
+        "value": "2026-02-01T00:00:00Z"
+      },
+      "referenceRowId": "item-004-v1",
+      "ruleId": "LST-STALE-AVAILDATE",
+      "severity": "warn",
+      "category": "staleness",
+      "plainLine": "The pre-order availability date 2026-02-01T00:00:00Z already passed (catalog as-of 2026-07-03T00:00:00Z) — the promise is stale."
+    },
+    {
+      "claim": {
+        "id": "item-003-v3#expiration_date",
+        "source": "acp-feed",
+        "field": "expiration_date",
+        "value": "2026-01-01T00:00:00Z"
+      },
+      "referenceRowId": "item-003-v3",
+      "ruleId": "LST-STALE-EXPIRED",
+      "severity": "warn",
+      "category": "staleness",
+      "plainLine": "This row expired 2026-01-01T00:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z)."
+    }
+  ],
+  "ok": false
+}

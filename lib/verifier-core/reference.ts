@@ -9,7 +9,7 @@
  * Plain: the "truth" side of the check. Menus check against the merchant's
  * catalog; fees check against the codified rule table. Same socket, different plug.
  */
-import type { Claim } from "./claim";
+import type { Claim } from "./claim.ts";
 
 /** Kinds of reference a pack can plug in (plan §3). */
 export type ReferenceKind = "json-schema" | "pos-catalog" | "fee-rule-table";

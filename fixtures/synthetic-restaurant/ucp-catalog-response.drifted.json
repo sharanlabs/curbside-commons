@@ -1,0 +1,338 @@
+{
+  "simulated": true,
+  "note": "CONSTRUCTED SIMULATION of a UCP catalog-capability response shape (our interpretation; UCP food schemas pending as of 2026-07-02). Not recorded from any real marketplace.",
+  "capability": "catalog",
+  "supported_versions": [
+    "2026-03-01-draft"
+  ],
+  "session": {
+    "id": "sess-sim-drifted-001"
+  },
+  "items": [
+    {
+      "id": "item-001-v1",
+      "title": "Crispy Calamari (Small)",
+      "price": {
+        "amount": "2150",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-001",
+      "variant": {
+        "variation": "Small"
+      }
+    },
+    {
+      "id": "item-001-v2",
+      "title": "Crispy Calamari (Medium)",
+      "price": {
+        "amount": "24.50",
+        "currency": "usd"
+      },
+      "availability": "available",
+      "group_id": "item-001",
+      "variant": {
+        "variation": "Medium"
+      }
+    },
+    {
+      "id": "item-001-v3",
+      "title": "Crispy Calamari (Large)",
+      "price": {
+        "amount": "27.50",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-001",
+      "variant": {
+        "variation": "Large"
+      }
+    },
+    {
+      "id": "item-002-v1",
+      "title": "Garden Salad (Small)",
+      "price": {
+        "amount": "22.00",
+        "currency": "USD"
+      },
+      "availability": "unavailable",
+      "group_id": "item-002",
+      "variant": {
+        "variation": "Small"
+      }
+    },
+    {
+      "id": "legacy-pos-4471",
+      "title": "Café Latte (Medium)",
+      "price": {
+        "amount": "10.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-003",
+      "variant": {
+        "variation": "Medium"
+      }
+    },
+    {
+      "id": "item-003-v3",
+      "title": "Café Latte (Large)",
+      "price": {
+        "amount": "13.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-003",
+      "variant": {
+        "variation": "Large"
+      }
+    },
+    {
+      "id": "item-004-v1",
+      "title": "Jalapeño Poppers (Small)",
+      "price": {
+        "amount": "23.50",
+        "currency": "USD"
+      },
+      "availability": "unavailable",
+      "group_id": "item-004",
+      "variant": {
+        "variation": "Small"
+      }
+    },
+    {
+      "id": "item-004-v2",
+      "title": "Jalapeño Poppers (Medium)",
+      "price": {
+        "amount": "26.50",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-004",
+      "variant": {
+        "variation": "Small"
+      }
+    },
+    {
+      "id": "item-004-v3",
+      "title": "JalapeÃ±o Poppers (Large)",
+      "price": {
+        "amount": "29.50",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-004",
+      "variant": {
+        "variation": "Large"
+      }
+    },
+    {
+      "id": "item-005-v1",
+      "title": "Margherita Pizza (Small)",
+      "price": {
+        "amount": "19.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-005",
+      "variant": {
+        "variation": "Small"
+      }
+    },
+    {
+      "id": "item-005-v2",
+      "title": "Margherita…",
+      "price": {
+        "amount": "22.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-005",
+      "variant": {
+        "variation": "Medium"
+      }
+    },
+    {
+      "id": "item-005-v3",
+      "title": "Margherita Pizza (Large)",
+      "price": {
+        "amount": "25.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-005",
+      "variant": {
+        "variation": "Large"
+      }
+    },
+    {
+      "id": "item-006-v1",
+      "title": "Smoked Brisket Plate",
+      "price": {
+        "amount": "12.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-006",
+      "variant": {
+        "variation": "Regular"
+      }
+    },
+    {
+      "id": "item-007-v1",
+      "title": "Pad Thai (Small)",
+      "price": {
+        "amount": "17.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-007",
+      "variant": {
+        "variation": "Small"
+      }
+    },
+    {
+      "id": "item-008-v1",
+      "title": "Crème Brûlée",
+      "price": {
+        "amount": "21.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-008",
+      "variant": {
+        "variation": "Regular"
+      }
+    },
+    {
+      "id": "item-009-v1",
+      "title": "Lemonade (Small)",
+      "price": {
+        "amount": "19.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-009",
+      "variant": {
+        "variation": "Small"
+      }
+    },
+    {
+      "id": "item-009-v2",
+      "title": "Lemonade (Medium)",
+      "price": {
+        "amount": "22.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-009",
+      "variant": {
+        "variation": "Medium"
+      }
+    },
+    {
+      "id": "item-009-v3",
+      "title": "Lemonade (Large)",
+      "price": {
+        "amount": "25.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-009",
+      "variant": {
+        "variation": "Large"
+      }
+    },
+    {
+      "id": "item-010-v1",
+      "title": "Truffle Fries (Small)",
+      "price": {
+        "amount": "6.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-010",
+      "variant": {
+        "variation": "Small"
+      }
+    },
+    {
+      "id": "item-010-v2",
+      "title": "Truffle Fries (Large)",
+      "price": {
+        "amount": "9.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-010",
+      "variant": {
+        "variation": "Large"
+      }
+    },
+    {
+      "id": "item-011-v1",
+      "title": "Bánh Mì Sandwich (Small)",
+      "price": {
+        "amount": "21.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-011",
+      "variant": {
+        "variation": "Small"
+      }
+    },
+    {
+      "id": "item-011-v2",
+      "title": "Bánh Mì Sandwich (Large)",
+      "price": {
+        "amount": "24.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-011",
+      "variant": {
+        "variation": "Large"
+      }
+    },
+    {
+      "id": "item-012-v1",
+      "title": "Açaí Bowl",
+      "price": {
+        "amount": "10.50",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-012",
+      "variant": {
+        "variation": "Regular"
+      }
+    },
+    {
+      "id": "item-002-v2",
+      "title": "Garden Salad (Large)",
+      "price": {
+        "amount": "25.00",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "item-002",
+      "variant": {
+        "variation": "Large"
+      }
+    },
+    {
+      "id": "ghost-001",
+      "title": "Phantom Platter (simulated ghost item)",
+      "price": {
+        "amount": "9.99",
+        "currency": "USD"
+      },
+      "availability": "available",
+      "group_id": "ghost-group",
+      "variant": {
+        "variation": "Regular"
+      }
+    }
+  ]
+}

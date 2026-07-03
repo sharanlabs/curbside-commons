@@ -1,15 +1,18 @@
 /**
- * Listings pack (UC-2) — W0 PLACEHOLDER (plan §6, §7).
+ * Listings pack (UC-2) — W1 (plan §5 W1, §7).
  *
- * Will hold the drift classes the comparator detects between a merchant SOR and
- * its serving copies (static ACP feed / live UCP catalog). No detectors yet — W1
- * fills them, and coverage is MEASURED per C6 (never an "all edge cases" claim).
+ * The menu-truth pack: seeded synthetic SOR (Square-Catalog-shaped, simulated) →
+ * faithful ACP-shaped feed → taxonomy-keyed drift injection → surface adapters
+ * (ACP feed · constructed UCP catalog response) → deterministic detectors →
+ * evidence-cited report. Coverage of the classes below is MEASURED by the C6
+ * eval — bounded to the enumerated taxonomy, never claimed total.
  *
- * Plain: the menu-drift rulebook — the kinds of ways a menu copy can drift from
- * the merchant's real menu.
+ * Plain: the menu-drift rulebook plus the machinery that builds a fake menu,
+ * breaks its copies in documented ways, and proves the verifier catches every
+ * documented break — with receipts.
  */
 
-/** Drift classes enumerated in plan §7 (listings). Names only in W0. */
+/** Drift classes enumerated in plan §7 (listings). */
 export const LISTINGS_DRIFT_CLASSES = [
   "price",
   "availability",
@@ -27,6 +30,21 @@ export type ListingsDriftClass = (typeof LISTINGS_DRIFT_CLASSES)[number];
 export const LISTINGS_PACK = {
   id: "listings",
   useCase: "UC-2",
-  status: "placeholder-w0",
+  status: "w1-wedge",
   classes: LISTINGS_DRIFT_CLASSES,
 } as const;
+
+// Public pack surface (the CLI entry lives in ./cli.ts and is intentionally NOT
+// re-exported here — it imports node:fs, which the browser-safe barrel avoids).
+export type { SorItem, SorModifierList, SorVariation, SorStockState, SyntheticCatalog } from "./types.ts";
+export { CORPUS_AS_OF, CORPUS_SEED, generateCatalog, mulberry32 } from "./generate.ts";
+export type { AcpAvailability, AcpFeed, AcpFeedItem } from "./acp-feed.ts";
+export { buildFaithfulFeed, centsToDecimal } from "./acp-feed.ts";
+export type { DriftManifestEntry, DriftSurface, DriftedFeedBundle } from "./drift.ts";
+export { applyCorpusDrift } from "./drift.ts";
+export type { UcpCatalogItem, UcpCatalogResponseFixture } from "./ucp.ts";
+export { UCP_PINNED_VERSION, buildUcpResponse } from "./ucp.ts";
+export { acpFeedToClaims, ucpResponseToClaims } from "./adapters.ts";
+export { expectedTitle, indexCatalog, sorReference } from "./reference.ts";
+export { listingsDetectors, mojibake } from "./detectors.ts";
+export { LISTINGS_SPEC_VERSION, runListingsVerification } from "./run.ts";

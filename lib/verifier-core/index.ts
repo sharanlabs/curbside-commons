@@ -1,17 +1,23 @@
 /**
- * verifier-core — W0 skeleton barrel (plan §6).
+ * verifier-core — W1 barrel (plan §6, §3).
  *
- * Honest STUBS only: claim schema, swappable reference interface, evidence /
- * finding types, and the report model. No drift logic yet — W1 fills these.
+ * The generic verification engine: claim schema, swappable reference interface,
+ * evidence/finding types with the C2 runtime guard, report model, and the
+ * deterministic compare/report machinery. Domain logic lives in the packs
+ * (lib/packs/*) — the core knows no taxonomy.
  *
- * Plain: the empty frame of the verifier engine. The shapes are fixed so the
- * packs can plug in; the actual checking is built next (W1).
+ * Plain: the referee's engine room — shapes, receipts discipline, and the
+ * always-the-same-way comparison loop. The rulebooks plug in from the packs.
  */
-export type { Claim, ClaimSource } from "./claim";
-export type { MatchingMode, Reference, ReferenceKind, ReferenceMatch } from "./reference";
-export type { Finding, Severity } from "./evidence";
-export { SEVERITY_LEVELS } from "./evidence";
-export type { VerifierReport } from "./report";
+export type { Claim, ClaimSource } from "./claim.ts";
+export type { MatchingMode, Reference, ReferenceKind, ReferenceMatch } from "./reference.ts";
+export type { Finding, Severity } from "./evidence.ts";
+export { SEVERITY_LEVELS } from "./evidence.ts";
+export type { VerifierReport } from "./report.ts";
+export type { FindingInput } from "./guard.ts";
+export { MissingEvidenceError, assertHasEvidence, makeFinding } from "./guard.ts";
+export type { Detector, VerifyOptions } from "./verify.ts";
+export { buildReport, serializeReport, sortFindings, verifyClaims } from "./verify.ts";
 
-/** Skeleton marker — verifier-core is scaffolded but carries no logic yet. */
-export const VERIFIER_CORE_STATUS = "skeleton-w0";
+/** Build-stage marker — the engine is live as of the W1 wedge. */
+export const VERIFIER_CORE_STATUS = "w1-wedge";

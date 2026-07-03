@@ -1,0 +1,53 @@
+/**
+ * CLI entry logic for the listings wedge — W1 (C1: one-command validator).
+ *
+ * Loaded by bin/check.mjs via Node's native TypeScript type-stripping (Node ≥ 24;
+ * this repo runs v24). Reads the serving copy + the SOR catalog from disk, picks
+ * the surface adapter, runs the deterministic verification, and returns the
+ * report plus the exit code (non-zero iff findings exist — CI-usable). This path
+ * makes ZERO LLM/network calls; the $0 property is enforced by an import-graph
+ * eval, not just promised.
+ *
+ * Plain: the brain behind the `check` command — read the two files, compare,
+ * print the receipts, and fail the build if the copy lies.
+ */
+import { readFileSync } from "node:fs";
+import type { VerifierReport } from "../../verifier-core/index.ts";
+import { serializeReport } from "../../verifier-core/verify.ts";
+import type { AcpFeed } from "./acp-feed.ts";
+import { acpFeedToClaims, ucpResponseToClaims } from "./adapters.ts";
+import { runListingsVerification } from "./run.ts";
+import type { SyntheticCatalog } from "./types.ts";
+import type { UcpCatalogResponseFixture } from "./ucp.ts";
+
+export type CliSurface = "acp" | "ucp";
+
+export interface CliResult {
+  readonly report: VerifierReport;
+  readonly output: string;
+  /** 0 = clean, 1 = findings present (C1: non-zero on any drift). */
+  readonly exitCode: 0 | 1;
+}
+
+/** Run one check. Throws on unreadable/invalid input (bin maps that to exit 2). */
+export function runCheck(
+  feedPath: string,
+  catalogPath: string,
+  surface: CliSurface,
+): CliResult {
+  const sor = JSON.parse(readFileSync(catalogPath, "utf8")) as SyntheticCatalog;
+  if (!Array.isArray(sor.items)) {
+    throw new Error(`--against file does not look like a catalog SOR: ${catalogPath}`);
+  }
+  const raw = JSON.parse(readFileSync(feedPath, "utf8")) as unknown;
+  const claims =
+    surface === "acp"
+      ? acpFeedToClaims(raw as AcpFeed)
+      : ucpResponseToClaims(raw as UcpCatalogResponseFixture);
+  const report = runListingsVerification(claims, sor);
+  return {
+    report,
+    output: serializeReport(report),
+    exitCode: report.ok ? 0 : 1,
+  };
+}

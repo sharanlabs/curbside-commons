@@ -8,8 +8,8 @@
  * Plain: the one-page result — every catch with its receipts, stamped with the
  * spec version it was checked against, and labeled if anything is simulated.
  */
-import type { Finding } from "./evidence";
-import type { MatchingMode } from "./reference";
+import type { Finding } from "./evidence.ts";
+import type { MatchingMode } from "./reference.ts";
 
 /** Machine-readable verifier report (CI-usable, C1). */
 export interface VerifierReport {
