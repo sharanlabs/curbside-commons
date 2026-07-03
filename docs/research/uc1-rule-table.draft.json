@@ -1,0 +1,220 @@
+{
+  "$schema_note": "Draft rule table for UC-1 (NYC fee-cap audit). Schema is of our design and is documented inline in docs/research/uc1-rule-table.md §'JSON schema'. NOT wired into lib/packs/fees/ — that is slice F1. This file is a research artifact, human-readable, provider-agnostic.",
+  "meta": {
+    "jurisdiction": "US-NY-NYC",
+    "statute": "NYC Administrative Code § 20-563.3 (Fee caps), Subchapter 36 (Third-Party Food Delivery Services)",
+    "amending_law": "Local Law 79 of 2025 (Council Int. No. 762-B of 2024)",
+    "enacted_became_law_date": "2025-05-31",
+    "effective_date": "2025-06-30",
+    "effective_date_status": "VERIFIED_PRIMARY",
+    "supersedes": "Local Law 103 of 2021 baseline of § 20-563.3",
+    "cap_base_term": "purchase price of each online order",
+    "cap_base_definition_status": "UNVERIFIED",
+    "as_of": "2026-07-03",
+    "source_primary": "Enacted LL79/2025 certified PDF via intro.nyc/local-laws/2025-79 (pdftotext); Legistar Int 0762-2024 action history",
+    "quarantine": "All sources treated as untrusted data per Law 11; facts extracted only.",
+    "coverage_disclaimer": "Codifies enforceable constraints found in § 20-563.3 as amended. Does NOT claim to cover all edge cases or the full Subchapter 36. Penalty/restitution provisions live outside this section (UNVERIFIED)."
+  },
+  "definitions": [
+    { "term": "delivery_fee", "ref": "§ 20-563 (as amended by LL79 §1)", "text": "fee for a service delivering food to customers within at least 1 mile of the establishment", "status": "VERIFIED_PRIMARY" },
+    { "term": "basic_service_fee", "ref": "§ 20-563 (LL79 §2)", "text": "fee for a service that (i) lets the establishment receive delivery/pickup orders on all of the platform's sites/apps and (ii) makes it searchable/discoverable by name in relevant results", "status": "VERIFIED_PRIMARY" },
+    { "term": "enhanced_service_fee", "ref": "§ 20-563 (LL79 §2)", "text": "fee for a service other than what basic-service/delivery/transaction fees cover", "status": "VERIFIED_PRIMARY" },
+    { "term": "transaction_fee", "ref": "§ 20-563 (LL100/2021 baseline; unchanged label)", "text": "fee related to processing the online order", "status": "PARTIAL_verbatim_definition_not_re-extracted" },
+    { "term": "exigent_circumstances", "ref": "§ 20-563 (LL79 §2)", "text": "circumstances outside the platform's control, such as severe weather or natural disasters", "status": "VERIFIED_PRIMARY" }
+  ],
+  "fee_categories": ["delivery_fee", "basic_service_fee", "transaction_fee", "enhanced_service_fee"],
+  "rules": [
+    {
+      "id": "NYC-563.3-a-1",
+      "source_clause": "§ 20-563.3(a)",
+      "category": "delivery_fee",
+      "kind": "per_order_cap",
+      "cap_pct": 15,
+      "base": "purchase_price_per_online_order",
+      "predicate": "line.category=='delivery_fee' => line.amount <= 0.15 * line.order_purchase_price",
+      "exception": "may be satisfied instead by the monthly-average alternative NYC-563.3-a-2",
+      "drift_classes": ["over-cap", "misclassification"],
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-a-2",
+      "source_clause": "§ 20-563.3(a) (averaging clause)",
+      "category": "delivery_fee",
+      "kind": "monthly_average_cap",
+      "cap_pct": 15,
+      "base": "sum_purchase_price_all_orders_in_calendar_month",
+      "predicate": "sum(delivery_fees_in_month) <= 0.15 * sum(purchase_price_of_all_orders_in_month)",
+      "window": "calendar_month",
+      "drift_classes": ["over-cap", "relabeling"],
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-a-3",
+      "source_clause": "§ 20-563.3(a) (delivery obligation)",
+      "category": "delivery_fee",
+      "kind": "service_obligation",
+      "predicate": "charges_delivery_fee => provides_delivery_within('>=1 mile') OR exigent_circumstances",
+      "drift_classes": [],
+      "note": "Structural obligation, not a fee-numeric check. Not machine-checkable from a statement alone.",
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-b-1",
+      "source_clause": "§ 20-563.3(b)",
+      "category": "basic_service_fee",
+      "kind": "per_order_cap",
+      "cap_pct": 5,
+      "base": "purchase_price_per_online_order",
+      "predicate": "line.category=='basic_service_fee' => line.amount <= 0.05 * line.order_purchase_price",
+      "exception": "monthly-average alternative NYC-563.3-b-2",
+      "drift_classes": ["over-cap", "misclassification"],
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-b-2",
+      "source_clause": "§ 20-563.3(b) (averaging clause)",
+      "category": "basic_service_fee",
+      "kind": "monthly_average_cap",
+      "cap_pct": 5,
+      "base": "sum_purchase_price_all_orders_in_calendar_month",
+      "predicate": "sum(basic_service_fees_in_month) <= 0.05 * sum(purchase_price_of_all_orders_in_month)",
+      "window": "calendar_month",
+      "drift_classes": ["over-cap", "relabeling"],
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-c-1",
+      "source_clause": "§ 20-563.3(c)",
+      "category": "transaction_fee",
+      "kind": "per_order_cap",
+      "cap_pct": 3,
+      "base": "purchase_price_per_online_order",
+      "predicate": "line.category=='transaction_fee' => line.amount <= 0.03 * line.order_purchase_price OR passthrough_exception_met (NYC-563.3-c-2)",
+      "no_averaging": true,
+      "note": "No calendar-month averaging clause for transaction fees, and NO refund safe harbor (subd. e omits c).",
+      "drift_classes": ["over-cap", "processing-fee base inflation"],
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-c-2",
+      "source_clause": "§ 20-563.3(c)(i)-(ii)",
+      "category": "transaction_fee",
+      "kind": "passthrough_exception",
+      "predicate": "transaction_fee > 0.03 * order_purchase_price ALLOWED ONLY IF (i) line.amount == actual_processor_charge_for_order AND (ii) proof_available_to(department) AND proof_available_to(establishment)",
+      "drift_classes": ["processing-fee base inflation", "over-cap"],
+      "note": "A transaction fee above 3% is unlawful UNLESS it is a documented dollar-for-dollar pass-through of the processor's charge with proof available on request.",
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-d-1",
+      "source_clause": "§ 20-563.3(d) (category lock)",
+      "category": "ALL",
+      "kind": "category_whitelist",
+      "predicate": "line.category IN {delivery_fee, basic_service_fee, transaction_fee, enhanced_service_fee} ; any other charged fee is unlawful",
+      "drift_classes": ["misclassification", "relabeling", "promotion-deduction mischaracterization", "bundling"],
+      "note": "Any fee that cannot be classified into the four permitted categories is per se unlawful. Catches disguised/relabeled/bundled charges and charges dressed as 'promotion deductions' when they are actually fees.",
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-d-2",
+      "source_clause": "§ 20-563.3(d)",
+      "category": "enhanced_service_fee",
+      "kind": "per_order_cap",
+      "cap_pct": 20,
+      "base": "purchase_price_per_online_order",
+      "predicate": "line.category=='enhanced_service_fee' => line.amount <= 0.20 * line.order_purchase_price",
+      "exception": "monthly-average alternative NYC-563.3-d-3",
+      "drift_classes": ["over-cap"],
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-d-3",
+      "source_clause": "§ 20-563.3(d) (averaging clause)",
+      "category": "enhanced_service_fee",
+      "kind": "monthly_average_cap",
+      "cap_pct": 20,
+      "base": "sum_purchase_price_all_orders_in_calendar_month",
+      "predicate": "sum(enhanced_service_fees_in_month) <= 0.20 * sum(purchase_price_of_all_orders_in_month)",
+      "window": "calendar_month",
+      "drift_classes": ["over-cap", "relabeling"],
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-d-4",
+      "source_clause": "§ 20-563.3(d) (gating clause)",
+      "category": "enhanced_service_fee",
+      "kind": "eligibility_gate",
+      "predicate": "charges_enhanced_service_fee => also_offers_service_for_which_it_charges_basic_service_fee",
+      "drift_classes": ["misclassification"],
+      "note": "An enhanced service fee is permitted ONLY for a platform that also offers (and charges a basic service fee for) the basic service. Enhanced-without-basic is disallowed.",
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-e-1",
+      "source_clause": "§ 20-563.3(e)",
+      "category": "ALL",
+      "kind": "over_cap_refund_safe_harbor",
+      "predicate": "over_cap_amount(subd in {a,b,d}) is NOT a violation IF refunded within 30 calendar days of the final day of the month in which the charge occurred",
+      "excludes": ["transaction_fee (subd. c)"],
+      "drift_classes": ["over-cap", "promotion-deduction mischaracterization"],
+      "note": "Audit MUST NOT flag an over-cap month (a/b/d) as a violation until this 30-day window closes. The safe harbor does NOT extend to transaction-fee over-cap (subd. c). A 'refund' mislabeled or netted against other charges does not satisfy the safe harbor.",
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-g-1-iv",
+      "source_clause": "§ 20-563.3(g)(1)(iv)",
+      "category": "ALL",
+      "kind": "fee_change_notice",
+      "predicate": "fee_change.effective_date >= notice_date + 30 days",
+      "drift_classes": ["relabeling"],
+      "note": "A fee change effective sooner than 30 days after notice (or a mid-month relabel not preceded by notice) is a violation. Supports cross-month relabeling detection.",
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-g-3",
+      "source_clause": "§ 20-563.3(g)(3)",
+      "category": "ALL",
+      "kind": "disclosure_duty",
+      "predicate": "every fee/commission/charge under any agreement MUST be disclosed clear-and-conspicuous",
+      "drift_classes": ["bundling", "relabeling"],
+      "note": "Undisclosed or opaquely-bundled charges violate the disclosure duty; enables bundling detection (an amount with no disclosed line = defect).",
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-h-1",
+      "source_clause": "§ 20-563.3(h)",
+      "category": "ALL",
+      "kind": "itemization_duty",
+      "predicate": "each month the platform MUST provide an itemized list of each transaction including any fees charged, for the preceding month",
+      "drift_classes": ["bundling", "relabeling"],
+      "note": "Defines the audit's minimum input contract: a monthly per-transaction itemized statement. A single bundled line covering multiple fee types violates itemization and defeats classification.",
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-f-1",
+      "source_clause": "§ 20-563.3(f)",
+      "category": "basic_service_fee",
+      "kind": "service_obligation",
+      "predicate": "pays_basic_service_fee => searchable_on_all_platforms AND not_omitted_from_relevant_results",
+      "drift_classes": [],
+      "note": "Context: value the basic service fee must deliver. Not statement-auditable numerically.",
+      "status": "VERIFIED_PRIMARY"
+    },
+    {
+      "id": "NYC-563.3-l-1",
+      "source_clause": "§ 20-563.3(l)",
+      "category": "ALL",
+      "kind": "agency_reporting",
+      "predicate": "commissioner report due <= 2026-09-30 covering fee-cap effects (factors 1-8 incl. penalties imposed, restitution recovered)",
+      "drift_classes": [],
+      "note": "Context only; confirms restitution/penalty enforcement exists under the subchapter (amounts UNVERIFIED here).",
+      "status": "VERIFIED_PRIMARY"
+    }
+  ],
+  "open_gaps": [
+    { "id": "U1", "gap": "'purchase price of each online order' base not defined (tax/tip/discount inclusion)", "impact": "processing-fee base inflation + all cap checks", "resolve_in": "F1" },
+    { "id": "U2", "gap": "penalty amounts / enforcement section outside § 20-563.3 not extracted", "impact": "restitution/complaint drafting", "resolve_in": "F1" },
+    { "id": "U3", "gap": "pre-LL79 (LL103/2021) verbatim text for statement periods straddling 2025-06-30", "impact": "historical-period audits", "resolve_in": "F1" },
+    { "id": "U4", "gap": "live amlegal-codified text not reconciled (403); no later amendment found as of 2026-07-03", "impact": "freshness", "resolve_in": "F1 re-check" }
+  ]
+}
