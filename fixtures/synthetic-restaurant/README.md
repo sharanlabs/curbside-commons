@@ -14,7 +14,7 @@ merchant data — every artifact is SIMULATED and labeled so.**
 | --- | --- |
 | `sor.catalog.json` | The merchant **system-of-record** — a simulated menu in a Square-Catalog-API-shaped subset (items → variations → prices in cents, modifier lists). The truth side of every check. |
 | `acp-feed.faithful.json` | The truthful serving copy in the ACP product-feed shape (field surface per the primary-extracted spec, 2026-07-02; the menu→retail-shape mapping is our labeled interpretation). |
-| `acp-feed.drifted.json` | The same feed with **15 planted drifts** across the plan §7 taxonomy. |
+| `acp-feed.drifted.json` | The same feed with **15 planted mutations recorded as 16 drift effects** across the plan §7 taxonomy (one mutation, drift-013, changes two fields — its staleness effect is ACP-only, its availability-state effect shows on both surfaces; the manifest records each effect separately). |
 | `ucp-catalog-response.faithful.json` / `.drifted.json` | **Constructed simulations** of a UCP catalog-capability response shape over the same menu state (UCP food schemas are pending; we record none of this from any real marketplace and claim no access). The drifted response also skews `supported_versions` (§7 spec-version-skew). |
 | `drift-manifest.json` | The ground-truth answer key: every injection's class, target row, before/after, and which surfaces carry it. |
 | `expected-report.acp.json` / `expected-report.ucp.json` | The golden verifier reports for the drifted copies — byte-compared in CI (deterministic output ordering makes this exact). |

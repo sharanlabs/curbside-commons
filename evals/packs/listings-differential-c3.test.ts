@@ -71,6 +71,35 @@ describe("C3: one comparator, two adapters", () => {
     },
   );
 
+  // ANSWER-KEY COMPLETENESS per surface (M1 Codex P2 reconciliation, 2026-07-03):
+  // every finding a surface's report shows must be explained by a manifest entry
+  // whose surfaces label includes that surface (spec-version-skew is keyed by the
+  // manifest's dedicated ucpVersionSkew block). This is the invariant the original
+  // defect broke: drift-013's shared availability flip surfaced on UCP while the
+  // manifest called the mutation acp-only — an UNEXPLAINED finding is a lying key.
+  function explainedBy(f: (typeof acpReport.findings)[number], surface: "acp" | "ucp"): boolean {
+    if (f.category === "spec-version-skew") return surface === "ucp"; // ucpVersionSkew block
+    return manifest.some(
+      (e) =>
+        (e.surfaces === "both" || e.surfaces === `${surface}-only`) &&
+        f.category === e.class &&
+        (f.claim.id.startsWith(`${e.targetFeedItemId}#`) ||
+          f.referenceRowId === e.targetFeedItemId),
+    );
+  }
+
+  it("every ACP finding is explained by an acp-visible manifest entry", () => {
+    for (const f of acpReport.findings) {
+      expect(explainedBy(f, "acp"), `unexplained ACP finding ${f.ruleId} @ ${f.referenceRowId}`).toBe(true);
+    }
+  });
+
+  it("every UCP finding is explained by a ucp-visible manifest entry", () => {
+    for (const f of ucpReport.findings) {
+      expect(explainedBy(f, "ucp"), `unexplained UCP finding ${f.ruleId} @ ${f.referenceRowId}`).toBe(true);
+    }
+  });
+
   it("ucp-only spec-version skew is detected on the UCP surface", () => {
     expect(ucpReport.findings.some((f) => f.category === "spec-version-skew")).toBe(true);
     expect(acpReport.findings.some((f) => f.category === "spec-version-skew")).toBe(false);

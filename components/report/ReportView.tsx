@@ -57,7 +57,10 @@ function FindingCard({ row, index }: { row: FindingRow; index: number }) {
           <dd>
             <span className="rpt-mono">{row.claimId}</span>
             <span className="rpt-rc-sub">
-              {row.claimField} = {row.claimValue}
+              {/* M1 P2: the claim's SOURCE surface is part of the receipt —
+                  ACP/UCP rows share field paths, so "which copy said it"
+                  must be visible, not implied. */}
+              {row.claimSource} · {row.claimField} = {row.claimValue}
             </span>
           </dd>
         </div>
@@ -121,8 +124,8 @@ export function ReportView() {
         <p className="rpt-intro">
           A serving copy of a menu (what an AI shopping assistant would read) checked, line by line,
           against the restaurant&rsquo;s own system-of-record. Below is every difference the checker
-          caught &mdash; each in plain words first, then the exact receipts. Deterministic, $0, no AI:
-          the same input always gives this same report.
+          caught &mdash; each in plain words first, then the exact receipts. Deterministic and $0,
+          with no AI calls in this verifier runtime: the same input always gives this same report.
         </p>
       </header>
 
@@ -180,9 +183,9 @@ export function ReportView() {
       <footer className="rpt-foot">
         <p>
           Every row above carries its four receipts &mdash; the claim, the catalog row it was checked
-          against, the rule it broke, and how severe it is. Nothing here is inferred by a language
-          model; the comparison is exact arithmetic. Simulated prototype, run on demand &mdash; not a
-          live service. Human-led, AI-assisted, professionally reviewed.
+          against, the rule it broke, and how severe it is. No language model runs in this verifier
+          &mdash; the comparison is exact, deterministic logic. Simulated prototype, run on demand
+          &mdash; not a live service. Human-led, AI-assisted, professionally reviewed.
         </p>
       </footer>
     </main>

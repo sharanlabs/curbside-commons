@@ -120,6 +120,11 @@ describe("C2 — the view preserves every evidence field (no synthesis, no drop)
       expect(row.referenceRowId).toBe(f.referenceRowId);
       expect(row.ruleId).toBe(f.ruleId);
       expect(row.severity).toBe(f.severity);
+      // The claim's SOURCE surface is part of the receipt (M1 Codex P2): with
+      // ACP/UCP/conformance rows sharing field paths, "which copy said it"
+      // must survive the view — verbatim and non-empty.
+      expect(row.claimSource).toBe(f.claim.source);
+      expect(row.claimSource).not.toBe("");
       // No field is empty — the renderer would otherwise hide a receipt.
       expect(row.claimId).not.toBe("");
       expect(row.referenceRowId).not.toBe("");

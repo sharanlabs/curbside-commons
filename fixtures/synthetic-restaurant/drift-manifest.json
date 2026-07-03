@@ -139,7 +139,18 @@
       "before": "(in_stock)",
       "after": "pre_order @ 2026-02-01",
       "surfaces": "acp-only",
-      "note": "staleness drift: pre_order promise whose availability_date already passed (also an availability-state drift vs the SOR)"
+      "note": "staleness drift: pre_order promise whose availability_date already passed (ACP-only field; the shared state flip is recorded as drift-013b)"
+    },
+    {
+      "id": "drift-013b",
+      "class": "availability",
+      "targetFeedItemId": "item-004-v1",
+      "field": "availability",
+      "before": "in_stock",
+      "after": "pre_order",
+      "surfaces": "both",
+      "sameMutationAs": "drift-013",
+      "note": "availability-state component of the drift-013 mutation: the shared availability field drifts on BOTH serving surfaces"
     },
     {
       "id": "drift-014",

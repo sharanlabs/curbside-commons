@@ -71,6 +71,32 @@ describe("C6 measured taxonomy coverage", () => {
       expect(caughtClasses.has(c), `class "${c}" injected but never caught`).toBe(true);
     }
   });
+
+  // PER-ENTRY teeth under the class summary (M1 Codex P2 reconciliation,
+  // 2026-07-03): "8/8 classes caught" could in principle be satisfied by a
+  // false positive in the same class while a planted row goes missed. So the
+  // measured claim is grounded entry-by-entry: EVERY manifest entry must be
+  // caught as (its class, anchored to ITS row) on at least one of its labeled
+  // surfaces — the class tally above is the compressed summary of this.
+  it("per-ENTRY: every planted manifest entry is caught by class AND row on a labeled surface", () => {
+    for (const e of manifest) {
+      const reports =
+        e.surfaces === "both"
+          ? [acpReport, ucpReport]
+          : e.surfaces === "acp-only"
+            ? [acpReport]
+            : [ucpReport];
+      const caught = reports.some((rep) =>
+        rep.findings.some(
+          (f) =>
+            f.category === e.class &&
+            (f.claim.id.startsWith(`${e.targetFeedItemId}#`) ||
+              f.referenceRowId === e.targetFeedItemId),
+        ),
+      );
+      expect(caught, `${e.id} (${e.class} @ ${e.targetFeedItemId}) not caught on its surface(s)`).toBe(true);
+    }
+  });
 });
 
 describe("C6/C10 overclaim guardrail", () => {

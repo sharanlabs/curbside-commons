@@ -158,9 +158,21 @@ describe("injector invariant: no two injections share a live target row (P3-2)",
   // Direct test of the drift injector's touched-set invariant (the W1 gate
   // advisory): each injection lands on a distinct row, so every taxonomy class is
   // independently detectable (no stacking that could mask a rule).
-  it("every manifest entry targets a distinct row", () => {
-    const targets = bundle.manifest.map((e) => e.targetFeedItemId);
+  it("every MUTATION targets a distinct row (companion effect entries share their parent's)", () => {
+    // One physical mutation may be recorded as several manifest effects (e.g.
+    // drift-013 + drift-013b, M1 reconciliation) — companions carry
+    // sameMutationAs and legitimately share the parent's row. The anti-stacking
+    // guard counts distinct MUTATIONS: a genuinely second mutation on a row
+    // (no sameMutationAs) must still fail here.
+    const mutations = bundle.manifest.filter((e) => e.sameMutationAs === undefined);
+    const targets = mutations.map((e) => e.targetFeedItemId);
     expect(new Set(targets).size, `duplicate target rows: ${targets.join(", ")}`).toBe(targets.length);
+    // Every companion points at a real parent entry and shares its row exactly.
+    for (const c of bundle.manifest.filter((e) => e.sameMutationAs !== undefined)) {
+      const parent = bundle.manifest.find((e) => e.id === c.sameMutationAs);
+      expect(parent, `${c.id} names a missing parent ${c.sameMutationAs}`).toBeDefined();
+      expect(c.targetFeedItemId).toBe(parent?.targetFeedItemId);
+    }
   });
 
   it("no injection targets a row a prior injection re-keyed (the live legacy id)", () => {

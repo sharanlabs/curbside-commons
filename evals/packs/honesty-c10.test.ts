@@ -38,6 +38,10 @@ const scannedFiles = [
   join(root, "fixtures", "synthetic-restaurant", "README.md"),
   join(root, "fixtures", "ucp-schemas", UCP_PINNED_VERSION, "README.md"),
   join(root, "fixtures", "ucp-schemas", UCP_PINNED_VERSION, "PROVENANCE.json"),
+  // W3 public report surface (M1 Codex P3): the page a viewer actually reads
+  // must sit inside the same honesty gate as the corpus docs.
+  join(root, "components", "report", "ReportView.tsx"),
+  join(root, "app", "report", "page.tsx"),
 ];
 
 const BANNED_CLAIMS: readonly RegExp[] = [

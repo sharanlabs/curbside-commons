@@ -40,7 +40,9 @@ Notes:
   - Output is the machine-readable report (JSON) on stdout — CI-usable, always
     carrying the C10 header surface (specVersion · matchingMode · simulated).
     --json is the explicit, trailing alias for that default serialization.
-  - Unknown flags exit 2 (loud) — a typo never silently falls back to a default.
+  - Unknown flags, surplus positionals, and mixed modes exit 2 (loud) — a typo
+    never silently falls back to a default, and --conformance never silently
+    swallows a truth-leg request (the legs are separate commands by design).
   - conformance vs truth: a spec-VALID document can still be FALSE. The two legs
     answer different questions and use distinct rule families (LST-* vs LST-CONF-*).
   - --surface defaults to acp; --op defaults to search.
@@ -72,14 +74,38 @@ async function main(argv) {
     ["--op", 1],
     ["--json", 0],
   ]);
+  const positionals = [];
   for (let i = 1; i < args.length; i++) {
     const arg = args[i];
-    if (!arg.startsWith("--")) continue;
+    if (!arg.startsWith("--")) {
+      positionals.push(arg);
+      continue;
+    }
     if (!KNOWN_FLAGS.has(arg)) {
       process.stderr.write(`check: unknown flag "${arg}"\n\n${USAGE}`);
       return 2;
     }
     i += KNOWN_FLAGS.get(arg);
+  }
+
+  // Each leg takes exactly ONE input document; surplus positionals are a user
+  // error, not something to silently ignore (M1 reconciliation).
+  if (positionals.length > 1) {
+    process.stderr.write(
+      `check: expected ONE input file, got ${positionals.length} (${positionals.join(", ")})\n\n${USAGE}`,
+    );
+    return 2;
+  }
+
+  // The two legs answer DIFFERENT questions and are mutually exclusive: a
+  // mixed command must refuse loudly, or "--conformance --against sor.json"
+  // would silently skip the truth leg — and a conformant document can still
+  // lie (that is the program's headline). (M1 Codex P1.)
+  if (args.includes("--conformance") && (args.includes("--against") || args.includes("--surface"))) {
+    process.stderr.write(
+      `check: --conformance (shape) and --against/--surface (truth) are separate checks — run them as two commands\n\n${USAGE}`,
+    );
+    return 2;
   }
 
   const feedPath = args[1];

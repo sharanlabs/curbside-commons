@@ -1,0 +1,37 @@
+M1 RECONCILIATION — raw red-green evidence (Fable seat, 2026-07-03)
+====================================================================
+
+--- P1 mixed-mode + P3-b surplus positionals (cli-c1.test.ts, RED pre-fix):
+  npx vitest run evals/packs/cli-c1.test.ts -t "M1 P"
+   × exit 2 on MIXED MODE — --conformance with --against/--surface must refuse ...
+   × exit 2 on SURPLUS positional arguments — extra file args must not be silently ignored ...
+      Tests  2 failed | 14 skipped (16)
+  ... bin/check.mjs fix (mutual exclusion + one-positional rule) ...
+      Tests  16 passed (16)
+
+--- P2-a answer-key completeness invariant (listings-differential-c3.test.ts):
+  RED executed against the OLD generator (drift.ts reverted via git checkout, patch re-applied after):
+   AssertionError: unexplained ACP finding LST-AVAIL-STATE @ item-004-v1: expected false to be true
+   AssertionError: unexplained UCP finding LST-AVAIL-STATE @ item-004-v1: expected false to be true
+      Tests  2 failed | 18 passed (20)
+  ... drift-013/drift-013b manifest split restored ...
+      Tests  21 passed (21)
+  Fixture regeneration: npm run fixtures:wedge -> "done: 16 injected drifts; acp findings=16, ucp findings=13"
+  git status fixtures/ -> ONLY fixtures/synthetic-restaurant/drift-manifest.json modified
+  (feeds + expected-report.{acp,ucp}.json byte-identical; freeze evals green)
+  Anti-stacking invariant reworked to count distinct MUTATIONS (sameMutationAs companions
+  share the parent's row; each companion must name a real parent + share its row exactly):
+  listings-wedge.test.ts -> 16 passed. KNOWN LIMIT (frontier-advisor D, recorded): nothing
+  machine-checks that a companion describes the same physical patch as its parent.
+
+--- P2-c claimSource lock (report-view-c1.test.ts), mutation red-green:
+  mutation: toReportView claimSource -> "" => RED (test failed); restore => 9 passed (9)
+
+--- P2-d exactly-one strengthened: verified empirically first (all 21 invalid fixtures
+  observe EXACTLY their declared class), then assertion upgraded to set-equality. Green.
+
+--- P2-b per-ENTRY C6 + P3-a wording/C10-scan: green over the full pack suite.
+
+--- FULL GATE (post-reconciliation, live):
+  npm run verify      -> EXIT 0 — Test Files 39 passed | 4 skipped; Tests 514 passed | 5 skipped
+  npm run test:legacy -> EXIT 0 — 306 passed | 5 skipped (unchanged)

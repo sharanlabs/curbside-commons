@@ -88,12 +88,18 @@ describe("C5 conformance correctness — ajv verdicts vs manifest ground truth",
     }
   });
 
-  it("every INVALID fixture is caught with its DECLARED violation class (red-green per rule)", () => {
+  it("every INVALID fixture is caught with EXACTLY its declared violation class — no more, no less (red-green per rule)", () => {
+    // The corpus PROMISES "each invalid fixture violates exactly ONE named
+    // schema rule" (manifest note). `.toContain` alone cannot hold that promise
+    // — a fixture accidentally violating a second class would still pass. The
+    // distinct observed rule set must EQUAL the declared class. (M1 Codex P2.)
     for (const e of manifestOnDisk.entries.filter((x) => !x.valid)) {
       const rep = runUcpConformance(JSON.parse(readFixture(e.file)), { op: e.op });
       expect(rep.ok, `${e.file} should have failed conformance`).toBe(false);
-      const rules = rep.findings.map((f) => f.ruleId);
-      expect(rules, `${e.file} missing ${e.violationClass}`).toContain(e.violationClass);
+      const distinct = [...new Set(rep.findings.map((f) => f.ruleId))];
+      expect(distinct, `${e.file} declared ${e.violationClass}, observed ${distinct.join("+")}`).toEqual([
+        e.violationClass,
+      ]);
     }
   });
 

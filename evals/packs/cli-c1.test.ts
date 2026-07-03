@@ -78,6 +78,41 @@ describe("C1 one-command validator (real process)", () => {
     ).toBe(2);
   }, 60000);
 
+  it("exit 2 on MIXED MODE — --conformance with --against/--surface must refuse, never silently skip the truth leg (M1 P1)", () => {
+    // The M1 Codex P1: `--conformance` won over `--against`, so a user asking
+    // for BOTH checks got conformance only — and the headline exhibit is
+    // exactly a doc that passes conformance while lying vs the SOR. Mixed mode
+    // must exit 2, not silently answer half the question.
+    const ucpDir = join(root, "fixtures", "ucp-conformance-ci");
+    const mixed = runCli([
+      "check",
+      join(ucpDir, "valid", "conformant-but-false.json"),
+      "--conformance",
+      "--against",
+      join(fixtures, "sor.catalog.json"),
+    ]);
+    expect(mixed.status).toBe(2);
+    const mixedSurface = runCli([
+      "check",
+      join(ucpDir, "valid", "conformant-but-false.json"),
+      "--conformance",
+      "--surface",
+      "ucp",
+    ]);
+    expect(mixedSurface.status).toBe(2);
+  }, 60000);
+
+  it("exit 2 on SURPLUS positional arguments — extra file args must not be silently ignored (M1 P3)", () => {
+    const r = runCli([
+      "check",
+      join(fixtures, "acp-feed.faithful.json"),
+      join(fixtures, "acp-feed.drifted.json"),
+      "--against",
+      join(fixtures, "sor.catalog.json"),
+    ]);
+    expect(r.status).toBe(2);
+  }, 60000);
+
   it("exit 2 on an UNKNOWN flag — a typo must fail loudly, never silently use a default (W3)", () => {
     // Regression-locks the documented flag surface being REAL: before this,
     // any unrecognized flag (e.g. a --json typo) was silently ignored and the

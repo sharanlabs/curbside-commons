@@ -35,6 +35,13 @@ export interface DriftManifestEntry {
   readonly after: string;
   readonly surfaces: DriftSurface;
   readonly note: string;
+  /**
+   * Set when this entry records an ADDITIONAL effect of another entry's single
+   * mutation (e.g. drift-013b = the availability-state component of drift-013's
+   * row patch). The anti-stacking invariant counts distinct MUTATIONS, so
+   * companion entries share their parent's row without weakening the guard.
+   */
+  readonly sameMutationAs?: string;
 }
 
 export interface DriftedFeedBundle {
@@ -281,10 +288,21 @@ export function applyCorpusDrift(
       availability_date: "2026-02-01T00:00:00Z",
     });
     touched.add(t.item_id);
+    // ONE mutation, TWO recorded effects (M1 Codex P2 reconciliation, 2026-07-03):
+    // the availability_date staleness rides an ACP-only FIELD, but the same
+    // mutation flips the shared `availability` state, which the UCP surface
+    // serves too. Each effect gets its own manifest entry under its own surfaces
+    // label so the C3 answer key never claims "acp-only" for drift the UCP
+    // report visibly carries.
     manifest.push({
       id: "drift-013", class: "staleness", targetFeedItemId: t.item_id, field: "availability_date",
       before: "(in_stock)", after: "pre_order @ 2026-02-01", surfaces: "acp-only",
-      note: "staleness drift: pre_order promise whose availability_date already passed (also an availability-state drift vs the SOR)",
+      note: "staleness drift: pre_order promise whose availability_date already passed (ACP-only field; the shared state flip is recorded as drift-013b)",
+    });
+    manifest.push({
+      id: "drift-013b", class: "availability", targetFeedItemId: t.item_id, field: "availability",
+      before: "in_stock", after: "pre_order", surfaces: "both", sameMutationAs: "drift-013",
+      note: "availability-state component of the drift-013 mutation: the shared availability field drifts on BOTH serving surfaces",
     });
   }
 
