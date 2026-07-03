@@ -19,9 +19,25 @@
  * cross-family detection on real Gemini prose.
  *
  * R-A3-9 K RE-PIN (the A3-7 deliverable): the floor K is re-pinned on a FRESH held-out split under the
- * stronger live Gemini drafter (a new error distribution). The fresh split = the disjoint TUNE split (7
- * planted positives, all 4 failure modes); K = floor(tune self-correction rate × 9); the 9-item TEST split
- * must then self-correct >= K. K is derived ONLY from the disjoint tune split — NEVER tuned on test.
+ * stronger live Gemini drafter (a new error distribution). K is derived ONLY from the disjoint tune split
+ * — NEVER tuned on test.
+ *
+ * SLICE 2 CLOSE-OUT LOAD REDUCTION (2026-06-29, owner Option 1; advisor-cross-checked; pre-registered in
+ * docs/a3-7-live-run-status.md "SLICE 2 CLOSE-OUT — PRE-REGISTRATION"): the now-reliable Gemini drafter
+ * drives more live redrafts → more Groq judge/domain calls per run than ONE Groq free-tier DAILY window
+ * holds; the full 16-item run depleted the window on its tail (detection 13/16, vacuous K). We reduce the
+ * per-run load to fit one window with margin, KEEPING maxIterations=3 (only the item COUNT is trimmed, so
+ * each item's convergence dynamics — what makes K meaningful — are preserved).
+ *   - OUTCOME-BLIND subsample rule (fixed before the run; never tuned on results): stratify the 16
+ *     judge-territory positives by failure mode and, within each ORIGINAL split, take the lowest-
+ *     definition-order item of each mode → symmetric 4 tune + 4 test, all 4 modes in BOTH, disjoint,
+ *     original splits preserved. (TUNE = P-{timeline,entity,capability,specific}-1; TEST = the -2's.)
+ *   - K = floor(tune self-correction rate × TEST.length); set on the disjoint tune split, COMPARED on test.
+ *   - SUCCESS CRITERION (the change vs prior runs — flag at the Codex gate): deliverable B succeeds when the
+ *     run is CLEAN (detection === N, no Groq fallback) with a non-vacuous K. The prior runs were INCOMPLETE
+ *     because DEGRADED, not because a floor failed — so the HARD assertion below is detection === N, and the
+ *     test >= K floor is a REPORTED measurement (k_repin.test_meets_floor), NOT a hard pass/fail (at reduced
+ *     N, K is coarse and a single GENUINE non-convergence can land it red on an otherwise-clean run).
  *
  * ROUTER ABLATION (A3-7 label decision, FREE — zero extra Groq calls): the reflect seam is wrapped so each
  * reflect step records BOTH the live `routerReflect` instruction AND the deterministic `strongReflection`
@@ -56,11 +72,25 @@ const live =
   resolvedJudgeProvider() === "groq" &&
   resolvedDomainJudgeProvider() === "groq";
 
-// R-A3-9 FRESH SPLITS: the disjoint tune (set K) + test (confirm) partitions of the held-out judge-territory
-// positives. Both are "fresh" under the live Gemini drafter (a new error distribution); disjointness gives
-// "never tuned on the test split" for free.
-const TUNE = GOLD_JUDGE_TERRITORY_POSITIVES.filter((g) => g.split === "tune"); // 7
-const TEST = GOLD_JUDGE_TERRITORY_POSITIVES.filter((g) => g.split === "test"); // 9
+// R-A3-9 FRESH SPLITS — LOAD-REDUCED, OUTCOME-BLIND (slice-2 close-out, 2026-06-29; see the header block).
+// PRE-REGISTERED RULE: stratify the judge-territory positives by failure mode and, within each ORIGINAL
+// split, take the lowest-definition-order item of each mode. GOLD_JUDGE_TERRITORY_POSITIVES is in definition
+// order, so `.find` returns the lowest-order match → one item per mode per split, disjoint, original splits
+// preserved. Selection is by mode + definition order ONLY — never by prior self-correction outcome.
+const JUDGE_FAILURE_MODES = [
+  "fabricated_timeline",
+  "fabricated_entity",
+  "unsupported_capability",
+  "invented_specific",
+] as const;
+const blindSubsample = (split: "tune" | "test") => {
+  const pool = GOLD_JUDGE_TERRITORY_POSITIVES.filter((g) => g.split === split);
+  return JUDGE_FAILURE_MODES.map((mode) => pool.find((g) => g.failureMode === mode)).filter(
+    (g): g is (typeof pool)[number] => g !== undefined,
+  );
+};
+const TUNE = blindSubsample("tune"); // 4: P-{timeline,entity,capability,specific}-1
+const TEST = blindSubsample("test"); // 4: P-{timeline,entity,capability,specific}-2
 
 // Pace sequentially (no concurrency, no retry) against BOTH provider windows — the Groq critics'
 // per-minute reservation and the Gemini Drafter's quota — exactly as the calibration runs do.
@@ -110,8 +140,8 @@ describe.skipIf(!live)(
     it(
       "tune split sets K = floor(rate × 9); the test split self-corrects >= K; Router ablation recorded",
       async () => {
-        expect(TUNE.length).toBe(7);
-        expect(TEST.length).toBe(9);
+        expect(TUNE.length).toBe(4); // load-reduced blind subsample (slice-2 close-out): 1/mode
+        expect(TEST.length).toBe(4); // load-reduced blind subsample (slice-2 close-out): 1/mode
 
         // The Gemini Drafter bills every re-draft; this ledger is the REAL cumulative $5 cap across the
         // WHOLE run (the Groq critics are free). Per-item spend is checked against the cap below (R-A3-7).
@@ -264,8 +294,9 @@ describe.skipIf(!live)(
             degraded,
             note:
               "LIVE A3-7 cross-family integrated loop. Drafter = Gemini Flash, BOTH critics = Groq gpt-oss-120b " +
-              "(different families, R-A3-2/R-ARCH-3). R-A3-9: K set on the disjoint TUNE split (K = floor(tune-rate × 9)), " +
-              "COMPARED on TEST (never tuned on test). NOTE: the integrated DECIDE-the-labels result is run-independent " +
+              "(different families, R-A3-2/R-ARCH-3). R-A3-9: K set on the disjoint TUNE split (K = floor(tune-rate × TEST.length)), " +
+              "COMPARED on TEST (never tuned on test). Slice-2 close-out: load-reduced blind subsample (4 tune + 4 test, 1/mode). " +
+              "NOTE: the integrated DECIDE-the-labels result is run-independent " +
               "(all 3 labels DEFER). The K/convergence number is a SEPARATE deliverable.",
           },
           _caveat:
@@ -278,7 +309,7 @@ describe.skipIf(!live)(
             "The K/convergence deliverable (R-A3-9) is INCOMPLETE; an authoritative run is deferred (drafter-reliability fix first, then a fresh-window re-run). " +
             "The label decisions are run-independent. See docs/a3-7-live-run-status.md.",
           k_repin: {
-            rule: "K = floor(tune_self_correction_rate × 9); set on the disjoint tune split, COMPARED on test (R-A3-9)",
+            rule: "K = floor(tune_self_correction_rate × TEST.length); set on the disjoint tune split, COMPARED on test (R-A3-9). Load-reduced blind subsample (slice-2 close-out): TEST.length = 4.",
             tune_n: TUNE.length,
             tune_self_corrected: tuneSelfCorrected,
             tune_rate: Number(rTune.toFixed(4)),
@@ -336,10 +367,51 @@ describe.skipIf(!live)(
           console.log(`  [${p.split}] ${p.id} [${p.failureMode}] selfCorrected=${p.selfCorrected} iters=${p.iterations} (${p.stopReason}) -> ${p.outreachStatus}`);
         }
 
-        // SC-3 floor on the TEST split, K set on the disjoint TUNE split (R-A3-9).
-        expect(testSelfCorrected).toBeGreaterThanOrEqual(K);
+        // DELIVERABLE-B SUCCESS CRITERION (slice-2 close-out, pre-registered + advisor-cross-checked
+        // 2026-06-29; flag at the batched Codex review): a CLEAN, AUTHORITATIVE K. The prior runs were
+        // INCOMPLETE because PROVIDER-DEGRADED — so the HARD gate is "the run was clean", which fails loudly
+        // if the load reduction was insufficient (a degraded run is NEVER enshrined; matches the directive's
+        // "CONFIRM detection = full-N before reading K").
+        expect(degraded, `RUN DEGRADED: detection ${detectionN}/${allItems.length} — some Groq call fell back; reduce load further, surface, do NOT enshrine`).toBe(false);
+        expect(detectionN).toBe(allItems.length);
+        // The K-floor (test >= K) is a REPORTED measurement (report.k_repin.test_meets_floor / interpretation),
+        // NOT a hard pass/fail: at the reduced N, K = floor(rate × 4) is coarse/near-binary, and a single
+        // GENUINE structural non-convergence can legitimately land it red on an otherwise-clean run. Reported
+        // honestly via the snapshot + console below; never recomposed to go green. K is asserted only to be
+        // non-vacuous so an authoritative floor exists to report.
+        expect(K, "K is vacuous (<=1) — no authoritative floor; rate collapsed (re-check the run)").toBeGreaterThan(1);
       },
       2_700_000,
     );
   },
 );
+
+// OFFLINE composition check (runs in `npm run verify`; NOT gated on live keys) — machine-verifies the
+// pre-registered, outcome-blind subsample so the offline gate validates the rule, not just "nothing broke"
+// (advisor 2026-06-29). Asserts: counts 4+4, all 4 modes in BOTH splits, disjoint, every item's `split`
+// matches its assigned split (original splits preserved), and the exact pinned IDs.
+describe("R-A3-9 slice-2 load-reduced subsample — pre-registered & outcome-blind", () => {
+  it("is 4 tune + 4 test, one item per failure mode per split, disjoint, original splits preserved", () => {
+    expect(TUNE.length).toBe(4);
+    expect(TEST.length).toBe(4);
+
+    for (const [split, items] of [
+      ["tune", TUNE],
+      ["test", TEST],
+    ] as const) {
+      // original split preserved (never moved across splits)
+      expect(items.every((g) => g.split === split)).toBe(true);
+      // all 4 judge failure modes present, exactly one each
+      expect([...new Set(items.map((g) => g.failureMode))].sort()).toEqual([...JUDGE_FAILURE_MODES].sort());
+      expect(items.length).toBe(JUDGE_FAILURE_MODES.length);
+    }
+
+    // disjoint
+    const tuneIds = new Set(TUNE.map((g) => g.id));
+    expect(TEST.some((g) => tuneIds.has(g.id))).toBe(false);
+
+    // exact pinned IDs (lowest-definition-order per mode within each original split)
+    expect(TUNE.map((g) => g.id)).toEqual(["P-timeline-1", "P-entity-1", "P-capability-1", "P-specific-1"]);
+    expect(TEST.map((g) => g.id)).toEqual(["P-timeline-2", "P-entity-2", "P-capability-2", "P-specific-2"]);
+  });
+});

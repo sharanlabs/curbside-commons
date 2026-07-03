@@ -1,5 +1,4 @@
 {
-  "_caveat": "PROVIDER-DEGRADED DIAGNOSTIC: detection 11/16 (< 16) — some Groq judge calls fell back; this run is NOT a clean measurement. K is VACUOUS (<=1): test_meets_floor is then an EMPTY floor and is NOT a convergence pass. The K/convergence deliverable (R-A3-9) is INCOMPLETE; an authoritative run is deferred (drafter-reliability fix first, then a fresh-window re-run). The label decisions are run-independent (all 3 DEFER). See docs/a3-7-live-run-status.md.",
   "_provenance": {
     "recorded_at_note": "A3-7 LIVE cross-family run (stamp the date at commit time; no wall-clock in tests)",
     "drafter_provider": "gemini",
@@ -8,86 +7,34 @@
     "judge_model": "openai/gpt-oss-120b",
     "domain_provider": "groq",
     "max_iterations": 3,
-    "cost_usd": 0.014625800000000001,
-    "note": "LIVE A3-7 cross-family integrated loop. Drafter = Gemini Flash, BOTH critics = Groq gpt-oss-120b (different families, R-A3-2/R-ARCH-3). R-A3-9: K set on the disjoint TUNE split (K = floor(tune-rate × 9)), COMPARED on TEST (never tuned on test). This is a PROVIDER-DEGRADED DIAGNOSTIC — see _caveat. The DECIDE-the-labels result is run-independent (all 3 DEFER); the K/convergence number is a SEPARATE, INCOMPLETE deliverable.",
-    "detection": "11/16 seeds caught live",
-    "degraded": true
+    "cost_usd": 0.0189052,
+    "detection": "13/16 seeds caught live",
+    "degraded": true,
+    "note": "LIVE A3-7 cross-family integrated loop. Drafter = Gemini Flash, BOTH critics = Groq gpt-oss-120b (different families, R-A3-2/R-ARCH-3). R-A3-9: K set on the disjoint TUNE split (K = floor(tune-rate × 9)), COMPARED on TEST (never tuned on test). NOTE: the integrated DECIDE-the-labels result is run-independent (all 3 labels DEFER). The K/convergence number is a SEPARATE deliverable."
   },
+  "_caveat": "PROVIDER-DEGRADED DIAGNOSTIC: detection < 16/16 means some Groq judge calls fell back — this run is NOT a clean measurement. The K/convergence deliverable (R-A3-9) is INCOMPLETE; an authoritative run is deferred (drafter-reliability fix first, then a fresh-window re-run). The label decisions are run-independent. See docs/a3-7-live-run-status.md.",
   "k_repin": {
     "rule": "K = floor(tune_self_correction_rate × 9); set on the disjoint tune split, COMPARED on test (R-A3-9)",
     "tune_n": 7,
-    "tune_self_corrected": 1,
-    "tune_rate": 0.1429,
-    "K": 1,
+    "tune_self_corrected": 6,
+    "tune_rate": 0.8571,
+    "K": 7,
     "test_n": 9,
-    "test_self_corrected": 1,
-    "test_meets_floor": true,
+    "test_self_corrected": 5,
+    "test_meets_floor": false,
     "interpretation": "NOT A CONVERGENCE PASS — provider-degraded and/or K vacuous; INCOMPLETE (deliverable #2). Do not read test_meets_floor as authoritative."
   },
   "live_redraft_audit": {
     "note": "selfCorrected requires the FINAL redraft (the one that produced the converged draft) to be LIVE_AI (Codex A3-7 P1) — not merely SOME live redraft. finalRedraftFellBack = converged via the deterministic stub on the final redraft (NOT a live self-correction; sent draft is clean + grounded).",
-    "final_redraft_live": 3,
-    "final_redraft_fell_back": 12,
-    "fell_back_items": [
-      {
-        "id": "P-timeline-1",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-entity-1",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-capability-1",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-timeline-3",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-entity-4",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-entity-2",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-capability-2",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-specific-2",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-timeline-4",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-entity-3",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-capability-4",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      },
-      {
-        "id": "P-specific-4",
-        "finalRedraftMode": "FAILED_TO_FALLBACK"
-      }
-    ]
+    "final_redraft_live": 16,
+    "final_redraft_fell_back": 0,
+    "fell_back_items": []
   },
   "domain_critic_audit": {
     "note": "Domain Critic mode per item (Codex A3-7 P2) — provider=groq alone does NOT prove it ran live; LIVE_JUDGE does. domainNonLive = a gatekeeper-approved draft whose domain check fell back.",
     "domain_live": 12,
-    "domain_non_live": 4,
+    "domain_non_live": 3,
     "non_live_items": [
-      {
-        "id": "P-timeline-4",
-        "domainMode": "FAILED_TO_FALLBACK"
-      },
       {
         "id": "P-entity-3",
         "domainMode": "FAILED_TO_FALLBACK"
@@ -104,9 +51,9 @@
   },
   "router_ablation": {
     "note": "FREE ablation: live routerReflect vs deterministic strongReflection on the SAME reflect contexts. The Router EARNS only if its live revision is materially more targeted AND converges where the baseline would not. Equal instructions / signals => TIE => label DEFERS (AM-7).",
-    "reflect_steps": 28,
-    "router_live_calls": 21,
-    "instructions_differ": 21,
+    "reflect_steps": 29,
+    "router_live_calls": 23,
+    "instructions_differ": 23,
     "signals_differ": 0,
     "comparisons": [
       {
@@ -122,8 +69,24 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the sentence that promises a specific approval date (e.g., \"We expect your account to be fully approved by Friday.\") and replace it with a neutral statement such as \"We will continue reviewing your account and will keep you updated on the next steps.\" Ensure the overall tone remains professional and engaging without making any promises about timelines or outcomes.",
+        "liveInstruction": "Remove the sentence that claims the merchant’s account will be fully approved by Friday, as this is an unsupported assertion. Replace it with a neutral statement that the onboarding team is reviewing their information and will follow up as soon as possible. Ensure the overall tone remains friendly and engaging without making any promises about timelines or outcomes.",
         "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"We expect your account to be fully approved by Friday.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate, no_over_promise (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state; remove implied guarantees, timelines, or outcomes — do not over-promise."
+      },
+      {
+        "itemId": "P-timeline-1",
+        "liveMode": "LIVE_AI",
+        "liveSignals": [
+          "faithfulness",
+          "domain"
+        ],
+        "baselineSignals": [
+          "faithfulness",
+          "domain"
+        ],
+        "signalsEqual": true,
+        "instructionsEqual": false,
+        "liveInstruction": "Remove the unsupported claim that \"Adding photos is a key step\" from the email and replace it with a verifiable action such as \"Upload your restaurant logo and menu images through the onboarding portal.\" Then adjust the language to ensure the outreach remains professional and appropriately engaging for new partners, avoiding overly casual phrasing.",
+        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Adding photos is a key step.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
         "itemId": "P-entity-1",
@@ -138,7 +101,7 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the unsupported claim that the merchant's account now syncs automatically with Toast and Square, as we have no evidence of such integration. Replace it with a verifiable statement about the features that are confirmed for DoorDash onboarding. Additionally, adjust the email tone to be more engaging and partner‑focused—use a friendly opening, highlight benefits clearly, and avoid overly salesy language—to address the engagement_appropriate flag.",
+        "liveInstruction": "Remove the inaccurate claim that the merchant's account now syncs automatically with Toast and Square; instead state that integration with those platforms is available as an optional feature they can explore. Also adjust the email tone to be more engaging and personable for the onboarding audience, such as adding a friendly greeting and a clear call‑to‑action that encourages the merchant to get started.",
         "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Your account now syncs automatically with Toast and Square.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
@@ -154,8 +117,8 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the unsupported statements that claim \"Our partnerships team has personally reviewed your profile\" and that you have \"reserved a featured homepage spot for you,\" as these cannot be verified. Replace them with a generic, verifiable benefit such as \"Our team has identified your restaurant as a great fit for DoorDash\" and mention standard onboarding steps. Additionally, adjust the language to be more engaging and appropriate for a merchant audience—use a friendly, concise tone and include a clear call‑to‑action encouraging the recipient to complete the activation process.",
-        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Our partnerships team has personally reviewed your profile\"; \"reserved a featured homepage spot for you\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
+        "liveInstruction": "Remove the unsupported statements that claim the partnerships team has personally reviewed the merchant’s profile and that a featured homepage spot has been reserved. Replace them with verifiable, generic language such as “Our team has reviewed your application” and “We look forward to featuring your restaurant soon.” Also adjust any language that could be seen as over‑promising; avoid promises about specific placement or timelines and keep the tone realistic and engaging.",
+        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Our partnerships team has personally reviewed your profile\"; \"reserved a featured homepage spot for you\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate, no_over_promise (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state; remove implied guarantees, timelines, or outcomes — do not over-promise."
       },
       {
         "itemId": "P-specific-1",
@@ -170,7 +133,7 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Delete the sentence that claims the merchant already has \"4 customers waiting to order from you\" and replace it with a neutral statement such as \"We’re excited to help you start receiving orders soon\". Also adjust the overall tone to be more collaborative and less sales‑pushy, ensuring the email feels engaging but appropriate for a new partner.",
+        "liveInstruction": "Remove the unsupported claim that the merchant already has \"4 customers waiting to order\" and replace it with a generic statement about potential demand, e.g., \"Many customers in your area are looking for great food options.\" Also adjust the language to be more conversational and less pushy to improve engagement appropriateness, ensuring the tone is friendly and inviting without overstating urgency.",
         "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"You already have 4 customers waiting to order from you.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
@@ -186,7 +149,7 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the sentence that claims a reviewer will check the merchant's photos this afternoon, as it is an unsupported assertion, and replace it with a neutral statement that the review process will be completed in due course. Additionally, adjust the language to be more professional and appropriate for merchant engagement, ensuring the tone remains courteous and business‑like.",
+        "liveInstruction": "Remove the unsupported statement that a reviewer will check the merchant's photos this afternoon and replace it with a neutral note that the verification process will be completed shortly. Then, adjust the language to be more engaging and appropriate for the merchant, using a friendly tone and clear call‑to‑action without overpromising any specific timeline.",
         "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"A reviewer will check your photos this afternoon.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
@@ -202,8 +165,8 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the inaccurate claim that the restaurant will be activated after adding photos and replace it with a correct, verifiable statement such as “Once we receive your restaurant details and photos, we’ll review them and let you know the next steps for activation.” Also adjust the email tone to be more professional and engaging—use a courteous greeting, clear call‑to‑action, and concise language that aligns with DoorDash’s brand voice.",
-        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Your restaurant will be activated after adding photos.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
+        "liveInstruction": "Remove the unsupported claim that adding photos will allow us to complete the verification process shortly; instead simply state that we need additional information to finish verification. Also adjust the tone to be more engaging and friendly for the merchant, e.g., use a conversational opening and a clear call‑to‑action.",
+        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Adding photos will allow us to complete the verification process for your profile shortly.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
         "itemId": "P-entity-4",
@@ -218,8 +181,52 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the unsupported claim that \"Your menu will be reviewed by our culinary partnerships desk\" and replace it with a generic statement such as \"Our team will review your menu to ensure it meets our standards.\" Then, adjust the email tone to be more engaging and personable for the merchant, using a friendly greeting and concise, enthusiastic language.",
+        "liveInstruction": "Remove the unsupported claim that \"Your menu will be reviewed by our culinary partnerships desk\" and replace it with a generic statement such as \"Our team will review your menu to ensure it meets our standards.\" Additionally, adjust the email tone to be more engaging and personable for the merchant, using a friendly greeting and a concise call‑to‑action.",
         "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Your menu will be reviewed by our culinary partnerships desk.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
+      },
+      {
+        "itemId": "P-specific-3",
+        "liveMode": "LIVE_AI",
+        "liveSignals": [
+          "faithfulness",
+          "domain"
+        ],
+        "baselineSignals": [
+          "faithfulness",
+          "domain"
+        ],
+        "signalsEqual": true,
+        "instructionsEqual": false,
+        "liveInstruction": "Delete the sentence that claims \"Three of your competitors nearby have already joined this week,\" as it is an unsupported factual assertion. Then rewrite the email to maintain a friendly, helpful tone—avoid overly aggressive or pushy language—to improve engagement appropriateness while preserving the core onboarding call to action.",
+        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Three of your competitors nearby have already joined this week.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
+      },
+      {
+        "itemId": "P-specific-3",
+        "liveMode": "LIVE_AI",
+        "liveSignals": [
+          "faithfulness"
+        ],
+        "baselineSignals": [
+          "faithfulness"
+        ],
+        "signalsEqual": true,
+        "instructionsEqual": false,
+        "liveInstruction": "Update the email to correctly reference the merchant's current onboarding status—replace any mention of a completed activation or “ready to start delivering” with the accurate state that the merchant is still in the verification phase and must complete the required documentation before activation.",
+        "baselineInstruction": "Gatekeeper blocked the draft: guardrail:state_mismatch. Remove or correct the cited claim(s); state only facts present in the merchant record."
+      },
+      {
+        "itemId": "P-specific-3",
+        "liveMode": "LIVE_AI",
+        "liveSignals": [
+          "faithfulness"
+        ],
+        "baselineSignals": [
+          "faithfulness"
+        ],
+        "signalsEqual": true,
+        "instructionsEqual": false,
+        "liveInstruction": "Remove the unsupported claim that \"Once your business hours are set, you'll be closer to completing your setup\" and replace it with a neutral statement such as \"After you set your business hours, you can continue with the next steps in the onboarding process.\" Additionally, verify any references to a specific state in the email; if the merchant's state is unknown or mismatched, either insert the correct state information or omit state-specific language altogether.",
+        "baselineInstruction": "Gatekeeper blocked the draft: guardrail:state_mismatch. Remove or correct the cited claim(s); state only facts present in the merchant record."
       },
       {
         "itemId": "P-timeline-2",
@@ -238,21 +245,7 @@
         "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Your listing will go live within 24 hours of this email.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate, no_over_promise (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state; remove implied guarantees, timelines, or outcomes — do not over-promise."
       },
       {
-        "itemId": "P-timeline-2",
-        "liveMode": "LIVE_AI",
-        "liveSignals": [
-          "faithfulness"
-        ],
-        "baselineSignals": [
-          "faithfulness"
-        ],
-        "signalsEqual": true,
-        "instructionsEqual": false,
-        "liveInstruction": "Remove the sentence that claims \"Once your business hours are set, the DoorDash team will review your activation process,\" as this statement is not supported and creates a state mismatch. Instead, state that after completing the onboarding steps, the merchant will receive a confirmation email and can log in to the dashboard to check activation status. Ensure no unsupported claims about review timing are included.",
-        "baselineInstruction": "Gatekeeper blocked the draft: guardrail:state_mismatch. Remove or correct the cited claim(s); state only facts present in the merchant record."
-      },
-      {
-        "itemId": "P-timeline-2",
+        "itemId": "P-entity-2",
         "liveMode": "LIVE_AI",
         "liveSignals": [
           "faithfulness",
@@ -264,8 +257,8 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the unsupported claim \"This allows customers to see when they can place orders from your Restaurant\" or replace it with a verifiable statement about the onboarding process, and rewrite the email to use a more engaging, conversational tone that feels appropriate for a partner outreach (e.g., add a friendly greeting, clear benefit statements, and a concise call‑to‑action).",
-        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"This allows customers to see when they can place orders from your Restaurant.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
+        "liveInstruction": "Remove the unsupported claim that \"A dedicated onboarding specialist named Alex will call you tomorrow\" and replace it with a verifiable statement such as \"Our onboarding team will reach out soon to guide you through the next steps.\" Additionally, adjust the email tone to be more professional and engaging for a merchant audience, ensuring the language is clear, concise, and appropriate for business communication.",
+        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"A dedicated onboarding specialist named Alex will call you tomorrow.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
         "itemId": "P-entity-2",
@@ -280,8 +273,24 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the unsupported claim that \"A dedicated onboarding specialist named Alex will call you tomorrow\" and replace it with a verifiable statement such as \"Our onboarding team will reach out soon to guide you through the next steps.\" Additionally, adjust the email tone to be more professional and engaging for a merchant audience, ensuring the language is clear, concise, and appropriate for onboarding communication.",
-        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"A dedicated onboarding specialist named Alex will call you tomorrow.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
+        "liveInstruction": "Remove the unsupported claim that the merchant \"can start receiving orders\" and replace it with a verifiable statement such as \"once your account is activated, you will be able to accept orders through the DoorDash platform.\" Additionally, adjust the email tone to be more professional and concise to improve engagement appropriateness.",
+        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"you can start receiving orders\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
+      },
+      {
+        "itemId": "P-entity-2",
+        "liveMode": "LIVE_AI",
+        "liveSignals": [
+          "faithfulness",
+          "domain"
+        ],
+        "baselineSignals": [
+          "faithfulness",
+          "domain"
+        ],
+        "signalsEqual": true,
+        "instructionsEqual": false,
+        "liveInstruction": "Edit the email to remove the unsupported claim that \"once your account is activated, you will be able to accept orders through the DoorDash platform\" and replace it with a neutral statement such as \"after activation, you can log in to your DoorDash dashboard to explore next steps.\" Additionally, adjust the language to be more engaging yet appropriate—for example, add a friendly opening, a concise benefit statement, and a clear call‑to‑action without overstating any capabilities.",
+        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"once your account is activated, you will be able to accept orders through the DoorDash platform\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
         "itemId": "P-capability-2",
@@ -296,26 +305,10 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the unsupported claim that merchants receive \"priority placement in search results during your first month\" and replace it with a generic statement about the benefits of joining DoorDash without guaranteeing specific search ranking. Ensure the language remains engaging and inviting, but avoid any promises about outcomes or timelines. Keep the rest of the email unchanged.",
+        "liveInstruction": "Remove the unsupported claim that merchants receive \"priority placement in search results during your first month\" and replace it with a generic statement about the benefits of joining DoorDash without guaranteeing specific search placement. Ensure the language remains engaging and inviting, but avoid any promises about outcomes or timelines. Keep the rest of the email unchanged.",
         "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"You also get priority placement in search results during your first month.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate, no_over_promise (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state; remove implied guarantees, timelines, or outcomes — do not over-promise."
       },
       {
-        "itemId": "P-capability-2",
-        "liveMode": "LIVE_AI",
-        "liveSignals": [
-          "faithfulness",
-          "domain"
-        ],
-        "baselineSignals": [
-          "faithfulness",
-          "domain"
-        ],
-        "signalsEqual": true,
-        "instructionsEqual": false,
-        "liveInstruction": "Remove the inaccurate claim that \"Setting your hours is essential for your restaurant to become visible to customers and start receiving orders,\" and replace it with a verifiable statement such as \"Make sure your restaurant profile is complete, including your operating hours, to help customers find you easily.\" Then adjust the email tone to be more engaging and conversational, using friendly language and a clear call‑to‑action that encourages the partner to complete the onboarding steps.",
-        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Setting your hours is essential for your restaurant to become visible to customers and start receiving orders.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
-      },
-      {
         "itemId": "P-specific-2",
         "liveMode": "LIVE_AI",
         "liveSignals": [
@@ -328,24 +321,8 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the unsupported claim \"You're currently the top-rated new spot in your neighborhood.\" Replace it with a neutral, verifiable statement such as \"We’re excited to help you get started with DoorDash and reach more customers in your area.\" Ensure the overall tone remains engaging but does not overpromise any outcomes or performance metrics.",
+        "liveInstruction": "Remove the unsupported claim \"You're currently the top-rated new spot in your neighborhood\" and replace it with a neutral statement such as \"We’re excited to help you get started with DoorDash\". Ensure the email remains engaging but does not make any unverified superlatives or promises about ratings, timelines, or outcomes.",
         "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"You're currently the top-rated new spot in your neighborhood.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate, no_over_promise (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state; remove implied guarantees, timelines, or outcomes — do not over-promise."
-      },
-      {
-        "itemId": "P-specific-2",
-        "liveMode": "LIVE_AI",
-        "liveSignals": [
-          "faithfulness",
-          "domain"
-        ],
-        "baselineSignals": [
-          "faithfulness",
-          "domain"
-        ],
-        "signalsEqual": true,
-        "instructionsEqual": false,
-        "liveInstruction": "Revise the email to eliminate the unsupported claims that \"This crucial step ensures your account is fully activated and ready to process payments\" and \"Once verified, your account will be live.\" Instead, state that the verification step is required for activation and that the team will notify the merchant when the account is approved. Also adjust the language to be more courteous and less sales‑y to improve engagement appropriateness—use a friendly, helpful tone and avoid overly aggressive calls to action.",
-        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"This crucial step ensures your account is fully activated and ready to process payments.\"; \"Once verified, your account will be live.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
         "itemId": "P-capability-3",
@@ -360,11 +337,41 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Remove the unsupported claim that DoorDash has waived the merchant's first three months of commission fees and replace it with a verifiable benefit, such as a reminder of the standard commission structure or a legitimate promotional offer if one exists. Additionally, adjust the language to be more professional and appropriately engaging for a new merchant onboarding email, ensuring the tone is courteous and business‑like.",
+        "liveInstruction": "Remove the unsupported claim that DoorDash has waived the merchant's first three months of commission fees, as no such policy exists. Replace it with a factual statement about the standard onboarding process. Additionally, adjust the email tone to be more professional and less overly enthusiastic to improve engagement appropriateness.",
         "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"We've waived your first three months of commission fees.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
         "itemId": "P-timeline-4",
+        "liveMode": "LIVE_AI",
+        "liveSignals": [
+          "faithfulness",
+          "domain"
+        ],
+        "baselineSignals": [
+          "faithfulness",
+          "domain"
+        ],
+        "signalsEqual": true,
+        "instructionsEqual": false,
+        "liveInstruction": "Remove the unsupported claim that the merchant's account review will wrap up early next week and replace it with a neutral statement such as \"We will keep you updated on the status of your review.\" Also adjust the email tone to be more professional and appropriate for onboarding communication, ensuring the language is clear, courteous, and focused on next steps.",
+        "baselineInstruction": "Faithfulness judge flagged unsupported assertion(s): \"Your account review wraps up early next week.\". Remove them — no merchant field supports them. Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
+      },
+      {
+        "itemId": "P-timeline-4",
+        "liveMode": "LIVE_AI",
+        "liveSignals": [
+          "faithfulness"
+        ],
+        "baselineSignals": [
+          "faithfulness"
+        ],
+        "signalsEqual": true,
+        "instructionsEqual": false,
+        "liveInstruction": "Remove the sentence that says \"once your hours are set, we will keep you updated on the status of your review\" and replace it with a verifiable statement that reflects DoorDash's actual onboarding process, such as \"After you complete the required steps, you will receive a confirmation email with next steps.\" Ensure that any mention of the merchant's current status matches the verified state in the system; do not claim the merchant is in a different stage than the data shows.",
+        "baselineInstruction": "Gatekeeper blocked the draft: guardrail:state_mismatch. Remove or correct the cited claim(s); state only facts present in the merchant record."
+      },
+      {
+        "itemId": "P-entity-3",
         "liveMode": "LIVE_AI",
         "liveSignals": [
           "domain"
@@ -378,21 +385,7 @@
         "baselineInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
-        "itemId": "P-timeline-4",
-        "liveMode": "FAILED_TO_FALLBACK",
-        "liveSignals": [
-          "domain"
-        ],
-        "baselineSignals": [
-          "domain"
-        ],
-        "signalsEqual": true,
-        "instructionsEqual": true,
-        "liveInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state.",
-        "baselineInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
-      },
-      {
-        "itemId": "P-timeline-4",
+        "itemId": "P-entity-3",
         "liveMode": "FAILED_TO_FALLBACK",
         "liveSignals": [
           "domain"
@@ -416,25 +409,11 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Rewrite the email to use a warmer, more conversational tone that highlights the benefits of completing the onboarding steps, includes a clear call‑to‑action, and avoids overly formal or salesy language, ensuring the content feels engaging and appropriate for new DoorDash partners.",
+        "liveInstruction": "Rewrite the email to use a friendlier, more conversational tone that emphasizes the benefits of joining DoorDash and includes a clear, compelling call‑to‑action, while ensuring the language remains professional and appropriate for a business audience.",
         "baselineInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
-        "itemId": "P-entity-3",
-        "liveMode": "FAILED_TO_FALLBACK",
-        "liveSignals": [
-          "domain"
-        ],
-        "baselineSignals": [
-          "domain"
-        ],
-        "signalsEqual": true,
-        "instructionsEqual": true,
-        "liveInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state.",
-        "baselineInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
-      },
-      {
-        "itemId": "P-entity-3",
+        "itemId": "P-capability-4",
         "liveMode": "FAILED_TO_FALLBACK",
         "liveSignals": [
           "domain"
@@ -472,21 +451,7 @@
         ],
         "signalsEqual": true,
         "instructionsEqual": false,
-        "liveInstruction": "Rewrite the email to use a friendlier, more conversational tone that emphasizes the benefits of joining DoorDash and includes a clear, compelling call‑to‑action, while ensuring the language remains professional and appropriate for a business outreach context.",
-        "baselineInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
-      },
-      {
-        "itemId": "P-capability-4",
-        "liveMode": "FAILED_TO_FALLBACK",
-        "liveSignals": [
-          "domain"
-        ],
-        "baselineSignals": [
-          "domain"
-        ],
-        "signalsEqual": true,
-        "instructionsEqual": true,
-        "liveInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state.",
+        "liveInstruction": "Rewrite the email to use a friendlier, more conversational tone that emphasizes the benefits of joining DoorDash and includes a clear, compelling call‑to‑action, while ensuring the language remains professional and appropriate for a business audience.",
         "baselineInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
@@ -507,7 +472,7 @@
       },
       {
         "itemId": "P-specific-4",
-        "liveMode": "LIVE_AI",
+        "liveMode": "FAILED_TO_FALLBACK",
         "liveSignals": [
           "domain"
         ],
@@ -515,13 +480,13 @@
           "domain"
         ],
         "signalsEqual": true,
-        "instructionsEqual": false,
-        "liveInstruction": "Rewrite the email to use a friendlier, more conversational tone that emphasizes the benefits of joining DoorDash and includes a clear, compelling call‑to‑action, while ensuring the language remains professional and appropriate for a business audience.",
+        "instructionsEqual": true,
+        "liveInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state.",
         "baselineInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       },
       {
         "itemId": "P-specific-4",
-        "liveMode": "LIVE_AI",
+        "liveMode": "FAILED_TO_FALLBACK",
         "liveSignals": [
           "domain"
         ],
@@ -529,8 +494,8 @@
           "domain"
         ],
         "signalsEqual": true,
-        "instructionsEqual": false,
-        "liveInstruction": "Rewrite the email to use a warmer, more conversational tone that highlights the benefits of completing the onboarding steps, includes a clear call‑to‑action, and avoids overly formal or salesy language, ensuring the content feels engaging and appropriate for new DoorDash partners.",
+        "instructionsEqual": true,
+        "liveInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state.",
         "baselineInstruction": "Additionally, the domain-quality check flagged engagement_appropriate (ADVISORY, not a send gate): match the tone/pressure to the merchant's engagement state."
       }
     ]
@@ -540,21 +505,26 @@
       "id": "P-timeline-1",
       "split": "tune",
       "failureMode": "fabricated_timeline",
-      "selfCorrected": false,
+      "selfCorrected": true,
       "seedCatchLive": true,
       "finalVerifyMode": "LIVE_JUDGE",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Complete your DoorDash setup: Add photos!\"; claims=3; finishReason=stop"
+        },
+        {
+          "iteration": 2,
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Complete your DoorDash setup: Add Photos\"; claims=5; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
       "domainProvider": "groq",
       "domainMode": "LIVE_JUDGE",
-      "iterations": 2,
+      "iterations": 3,
       "stopReason": "verified",
       "finalAnyUnsupported": false,
       "outreachStatus": "simulated_sent"
@@ -563,15 +533,15 @@
       "id": "P-entity-1",
       "split": "tune",
       "failureMode": "fabricated_entity",
-      "selfCorrected": false,
+      "selfCorrected": true,
       "seedCatchLive": true,
       "finalVerifyMode": "LIVE_JUDGE",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Complete your DoorDash setup: Add photos!\"; claims=6; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
@@ -586,15 +556,15 @@
       "id": "P-capability-1",
       "split": "tune",
       "failureMode": "unsupported_capability",
-      "selfCorrected": false,
+      "selfCorrected": true,
       "seedCatchLive": true,
       "finalVerifyMode": "LIVE_JUDGE",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Complete your menu to start receiving DoorDash orders!\"; claims=4; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
@@ -617,7 +587,7 @@
         {
           "iteration": 1,
           "mode": "LIVE_AI",
-          "summary": "subject=\"Action needed: Add photos to complete your DoorDash setup\"; claims=4"
+          "summary": "subject=\"Add Photos to Your DoorDash Store!\"; claims=3; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
@@ -632,20 +602,20 @@
       "id": "P-timeline-3",
       "split": "tune",
       "failureMode": "fabricated_timeline",
-      "selfCorrected": false,
+      "selfCorrected": true,
       "seedCatchLive": true,
       "finalVerifyMode": "LIVE_JUDGE",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
           "mode": "LIVE_AI",
-          "summary": "subject=\"Complete your DoorDash setup: Add photos\"; claims=6"
+          "summary": "subject=\"Complete your DoorDash setup: Add photos for Outer Sunset Udon!\"; claims=3; finishReason=stop"
         },
         {
           "iteration": 2,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"A quick step to get your Outer Sunset Udon on DoorDash!\"; claims=5; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
@@ -660,15 +630,15 @@
       "id": "P-entity-4",
       "split": "tune",
       "failureMode": "fabricated_entity",
-      "selfCorrected": false,
+      "selfCorrected": true,
       "seedCatchLive": true,
       "finalVerifyMode": "LIVE_JUDGE",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Action Required: Verify Your Bank Account for DoorDash\"; claims=3; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
@@ -684,25 +654,6 @@
       "split": "tune",
       "failureMode": "invented_specific",
       "selfCorrected": false,
-      "seedCatchLive": false,
-      "finalVerifyMode": "LIVE_JUDGE",
-      "finalRedraftMode": null,
-      "redrafts": [],
-      "judgeProvider": "groq",
-      "domainProvider": "groq",
-      "domainMode": "LIVE_JUDGE",
-      "iterations": 1,
-      "stopReason": "verified",
-      "finalAnyUnsupported": false,
-      "outreachStatus": "simulated_sent"
-    }
-  ],
-  "test_items": [
-    {
-      "id": "P-timeline-2",
-      "split": "test",
-      "failureMode": "fabricated_timeline",
-      "selfCorrected": false,
       "seedCatchLive": true,
       "finalVerifyMode": "LIVE_JUDGE",
       "finalRedraftMode": "LIVE_AI",
@@ -710,35 +661,37 @@
         {
           "iteration": 1,
           "mode": "LIVE_AI",
-          "summary": "subject=\"Action Required: Set Your Business Hours for Harbor Dumpling\"; claims=6"
+          "summary": "subject=\"Action Required: Set Your Business Hours for DoorDash\"; claims=3; finishReason=stop"
         },
         {
           "iteration": 2,
           "mode": "LIVE_AI",
-          "summary": "subject=\"Complete Your DoorDash Onboarding: Set Your Business Hours\"; claims=6"
+          "summary": "subject=\"Action required: Set your business hours for DoorDash\"; claims=2; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
-      "domainProvider": "groq",
-      "domainMode": "LIVE_JUDGE",
+      "domainProvider": null,
+      "domainMode": null,
       "iterations": 3,
       "stopReason": "max_iterations",
       "finalAnyUnsupported": true,
-      "outreachStatus": "drafted"
-    },
+      "outreachStatus": "draft_rejected"
+    }
+  ],
+  "test_items": [
     {
-      "id": "P-entity-2",
+      "id": "P-timeline-2",
       "split": "test",
-      "failureMode": "fabricated_entity",
-      "selfCorrected": false,
+      "failureMode": "fabricated_timeline",
+      "selfCorrected": true,
       "seedCatchLive": true,
       "finalVerifyMode": "LIVE_JUDGE",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Action Needed: Set Your Business Hours to Go Live on DoorDash\"; claims=5; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
@@ -750,29 +703,52 @@
       "outreachStatus": "simulated_sent"
     },
     {
-      "id": "P-capability-2",
+      "id": "P-entity-2",
       "split": "test",
-      "failureMode": "unsupported_capability",
+      "failureMode": "fabricated_entity",
       "selfCorrected": false,
       "seedCatchLive": true,
       "finalVerifyMode": "LIVE_JUDGE",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
           "mode": "LIVE_AI",
-          "summary": "subject=\"Complete your DoorDash setup, Ferry Plaza Falafel\"; claims=5"
+          "summary": "subject=\"Action Required: Verify Your Bank Account for DoorDash\"; claims=3; finishReason=stop"
         },
         {
           "iteration": 2,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Presidio Pho, complete your DoorDash bank verification\"; claims=3; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
       "domainProvider": "groq",
       "domainMode": "LIVE_JUDGE",
       "iterations": 3,
+      "stopReason": "max_iterations",
+      "finalAnyUnsupported": true,
+      "outreachStatus": "drafted"
+    },
+    {
+      "id": "P-capability-2",
+      "split": "test",
+      "failureMode": "unsupported_capability",
+      "selfCorrected": true,
+      "seedCatchLive": true,
+      "finalVerifyMode": "LIVE_JUDGE",
+      "finalRedraftMode": "LIVE_AI",
+      "redrafts": [
+        {
+          "iteration": 1,
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Complete your DoorDash setup: Set your business hours\"; claims=5; finishReason=stop"
+        }
+      ],
+      "judgeProvider": "groq",
+      "domainProvider": "groq",
+      "domainMode": "LIVE_JUDGE",
+      "iterations": 2,
       "stopReason": "verified",
       "finalAnyUnsupported": false,
       "outreachStatus": "simulated_sent"
@@ -781,26 +757,21 @@
       "id": "P-specific-2",
       "split": "test",
       "failureMode": "invented_specific",
-      "selfCorrected": false,
+      "selfCorrected": true,
       "seedCatchLive": true,
       "finalVerifyMode": "LIVE_JUDGE",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
           "mode": "LIVE_AI",
-          "summary": "subject=\"Action Required: Verify Your Bank Account to Go Live with DoorDash\"; claims=6"
-        },
-        {
-          "iteration": 2,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "summary": "subject=\"Action Needed: Complete Your DoorDash Setup\"; claims=5; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
       "domainProvider": "groq",
       "domainMode": "LIVE_JUDGE",
-      "iterations": 3,
+      "iterations": 2,
       "stopReason": "verified",
       "finalAnyUnsupported": false,
       "outreachStatus": "simulated_sent"
@@ -817,7 +788,7 @@
         {
           "iteration": 1,
           "mode": "LIVE_AI",
-          "summary": "subject=\"Your DoorDash Account: Please Upload Your Menu\"; claims=4"
+          "summary": "subject=\"Complete Your DoorDash Setup: Upload Your Menu\"; claims=5; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
@@ -832,29 +803,29 @@
       "id": "P-timeline-4",
       "split": "test",
       "failureMode": "fabricated_timeline",
-      "selfCorrected": false,
-      "seedCatchLive": false,
-      "finalVerifyMode": "FAILED_TO_FALLBACK",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "selfCorrected": true,
+      "seedCatchLive": true,
+      "finalVerifyMode": "LIVE_JUDGE",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Action Required: Set Your Business Hours on DoorDash\"; claims=3; finishReason=stop"
         },
         {
           "iteration": 2,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Action required: Set your business hours for DoorDash\"; claims=5; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
       "domainProvider": "groq",
-      "domainMode": "FAILED_TO_FALLBACK",
+      "domainMode": "LIVE_JUDGE",
       "iterations": 3,
-      "stopReason": "max_iterations",
+      "stopReason": "verified",
       "finalAnyUnsupported": false,
-      "outreachStatus": "drafted"
+      "outreachStatus": "simulated_sent"
     },
     {
       "id": "P-entity-3",
@@ -863,17 +834,17 @@
       "selfCorrected": false,
       "seedCatchLive": false,
       "finalVerifyMode": "FAILED_TO_FALLBACK",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Add photos to your DoorDash profile\"; claims=5; finishReason=stop"
         },
         {
           "iteration": 2,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Add photos to your DoorDash page\"; claims=4; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
@@ -891,17 +862,17 @@
       "selfCorrected": false,
       "seedCatchLive": false,
       "finalVerifyMode": "FAILED_TO_FALLBACK",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Complete your DoorDash setup: Add photos\"; claims=3; finishReason=stop"
         },
         {
           "iteration": 2,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Complete your DoorDash setup, Cole Valley Crepes!\"; claims=3; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",
@@ -919,17 +890,17 @@
       "selfCorrected": false,
       "seedCatchLive": false,
       "finalVerifyMode": "FAILED_TO_FALLBACK",
-      "finalRedraftMode": "FAILED_TO_FALLBACK",
+      "finalRedraftMode": "LIVE_AI",
       "redrafts": [
         {
           "iteration": 1,
           "mode": "LIVE_AI",
-          "summary": "subject=\"Action Needed: Add Photos to Your DoorDash Profile\"; claims=6"
+          "summary": "subject=\"Complete your DoorDash profile, Japantown Jianbing!\"; claims=2; finishReason=stop"
         },
         {
           "iteration": 2,
-          "mode": "FAILED_TO_FALLBACK",
-          "summary": "subject=\"Your next onboarding step with DoorDash\"; claims=4; errorClass=No object generated: could not parse the response."
+          "mode": "LIVE_AI",
+          "summary": "subject=\"Complete your DoorDash setup, Japantown Jianbing!\"; claims=3; finishReason=stop"
         }
       ],
       "judgeProvider": "groq",

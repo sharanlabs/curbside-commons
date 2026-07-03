@@ -247,3 +247,121 @@ drafter fix + a fresh-window re-run.**
 3. **Codex currency:** Codex reviewed run #1's snapshot + the `.some()` harness; the committed artifact is
    run #3's snapshot + the post-review conditional-assert fix — so the final diff needs a Codex confirming
    pass (or is committed test-verified with the re-pass as a dated obligation; push is HELD = reversible).
+
+---
+
+## RESULTS — SLICE 2 RE-RUN (R-A3-9, post-drafter-fix), 2026-06-29
+
+> Run: `ENABLE_LIVE_AI=true node --env-file=.env node_modules/.bin/vitest run evals/agent-loop.live.test.ts`
+> (live armed via CLI override only — `.env` stays `ENABLE_LIVE_AI=false`, re-confirmed after the run).
+> Duration ~28.5 min. Frozen evidence: `lib/data/agent-loop.snapshot.json` (overwrote run #3; run #3 preserved
+> in git history). Owner GO 2026-06-29 ("GO, batch the Codex review"). Cost **$0.0189** (« the $5 cap).
+> **RULES §6 freshness re-anchored 2026-06-29** (Tier-1 official ai.google.dev/gemini-api/docs/pricing):
+> `gemini-2.5-flash` available, input $0.30 / output $2.50 per 1M — matches the pinned table, no change.
+> Newer models now listed (Gemini 3.5 Flash, 3.1 Flash-Lite, 3 Flash Preview) — staying on 2.5-flash is the
+> calibrated default; switching is a consequential owner+Codex pick, not assumed.
+
+This re-run had **two deliverables with OPPOSITE outcomes** (as anticipated, but the split moved):
+
+### Deliverable A — DRAFTER-RELIABILITY (the slice-1 fix's first LIVE test) → ✅ CONFIRMED, CLEAN
+This is the PRIMARY purpose of slice 2, and it is **clean** (it concerns the Gemini drafter axis, which performed perfectly — independent of the Groq degradation below):
+- **`final_redraft_live: 16/16`, `final_redraft_fell_back: 0`** — every final redraft was a genuine live Gemini
+  authoring (vs run #3: only ~3/16; 12/16 failed to parse).
+- **`finishReason=length` in 0 / 24 redraft steps** — every redraft shows `finishReason=stop` (clean
+  completion). The A3-7 ~75% structured-output parse-failure (`NoObjectGeneratedError`, truncation) is **GONE**.
+  The slice-1 fix (thinking disabled `thinkingBudget=0` + `MAX_LIVE_OUTPUT_TOKENS` 2000→4096) **works live**,
+  confirming the offline-only wiring from slice 1.
+- **Advisor carry-forward — ANSWERED:** the **Drafter still EARNS its label under disabled thinking**, and more
+  robustly than before — every converged draft is live-authored, zero stub fallbacks on the final redraft. The
+  reliability fix did NOT quietly demote the one earned agent; it strengthened it. No ledger change.
+
+### Deliverable B — R-A3-9 AUTHORITATIVE CLEAN K → ⚠️ STILL INCOMPLETE (Groq-degraded again; NEW root cause)
+- **K is now REAL, not vacuous** — tune 6/7 (0.857) → **K = floor(0.857 × 9) = 7** (vs run #3's vacuous K=1).
+- **But `test_meets_floor: false`** (test 5/9 < K=7) and the run is **`degraded: true` (detection 13/16)** — so
+  this is **NOT an authoritative pass** (the snapshot's own `_caveat`/`interpretation` say so). The vitest
+  floor assertion `testSelfCorrected >= K` therefore **FAILED live** (5 < 7). That failure is NOT a code
+  regression and NOT in `npm run verify` (the live test auto-skips offline; verify is green) — it is the
+  honest red of a degraded run that did not vacuously pass. **The test was NOT modified to make it green.**
+- **The unmet floor is SUBSTANTIALLY a degradation artifact**, not a capability miss. Of the 4 test misses:
+  - **P-entity-2** = a GENUINE non-convergence — clean live redrafts (`finishReason=stop`), live judge,
+    `finalAnyUnsupported=true` across 3 iters → correctly **HELD** (`drafted`, not sent). The firewall working.
+    (1 real capability miss.)
+  - **P-entity-3 / P-capability-4 / P-specific-4** = the **Groq-depleted tail**: `seedCatchLive=false`, judge +
+    domain both `FAILED_TO_FALLBACK`. Their *drafter* redrafts parsed fine (`LIVE_AI`, `finishReason=stop`) —
+    the **Groq judge** fell back. These 3 are Groq degradation, NOT drafter capability. (Had the window held,
+    the test rate would plausibly be 7–8/9, i.e. ≈ tune.)
+- **NEW STRUCTURAL ROOT CAUSE (the material finding):** the now-RELIABLE drafter executes MORE live redrafts →
+  MORE live Groq judge/domain calls per run → a single 16-item × 3-iteration run depletes the Groq free-tier
+  DAILY window on the tail. **Fixing the drafter pushed HARDER on the binding constraint** (the Groq window,
+  not the $5 cap). "Fresh calendar day" was necessary but NOT sufficient: today's window WAS fresh at start
+  (groq-preflight: TPM 7927/8000; new day; zero prior usage), yet the run itself depleted it by the last ~3
+  items — the same tail pattern as run #3, now with a clear cause. (Preflight tool added: `scripts-ts/groq-preflight.mjs`.)
+
+### Labels — UNCHANGED, all 3 DEFER (run-independent; re-confirmed)
+Router ablation: 29 reflect steps, 23 live Router calls, **`signals_differ: 0`** (structurally identical to
+`strongReflection`, as in both prior runs) → the structural tie holds. Strategist DEFER by construction,
+Domain Critic DEFER by R-A3-8 cap, Router DEFER by the structural tie. Ledger unchanged:
+**"1 earned (Drafter) + 3 deferred."** Codex already independently confirmed all three; this run re-confirms.
+
+### Honest one-line headline
+**Slice 2 CONFIRMED the slice-1 drafter fix LIVE (parse recovery 16/16, zero truncations, the Drafter earns
+robustly) — its primary purpose — but the authoritative R-A3-9 clean K is STILL incomplete: the reliable
+drafter now drives enough Groq judge load that one full run depletes the free-tier daily window on the tail
+(detection 13/16). A clean K needs a fresh window AND a reduced per-run Groq load — an owner decision (live
+spend + methodology/resourcing), surfaced; NOT blind-re-run on the now-depleted window.**
+
+### Next steps for deliverable B (OWNER-GATED — needs an owner call before any second live run)
+The clean K is one fresh-window run away, but it must FIT the Groq daily window or it re-degrades. Options
+surfaced to the owner (each is consequential — live spend, and the paid path touches the tech-stack rule):
+1. **Reduce per-run Groq load** so a full run fits one free-tier window: a smaller demo set, fewer
+   `maxIterations`, or fewer Groq critic calls per iteration (the cheapest, free path; some statistical-power
+   loss on small N). Then re-run on a fresh window.
+2. **Split the run across days / windows** (no methodology change; just operational pacing).
+3. **Paid Groq tier** for the one authoritative run (relaxed tech-stack rule allows it where it materially
+   serves the goal; consequential → owner sign-off + Codex; small spend).
+4. **Accept K as directional** and stop chasing a clean floor (honest, but leaves R-A3-9 short of "authoritative").
+
+---
+
+## SLICE 2 CLOSE-OUT — PRE-REGISTRATION (owner chose Option 1, 2026-06-29; advisor-cross-checked)
+
+The owner picked **Option 1 — reduce per-run Groq load, then re-run on a FRESH window.** This section is
+written **BEFORE** the close-out live run so the method is fixed, not fitted to results (R-A3-9 discipline).
+
+**Pre-registered, OUTCOME-BLIND subsample (harness-only, `evals/agent-loop.live.test.ts`):**
+- **Rule:** stratify the 16 judge-territory positives by failure mode (4 modes: `fabricated_timeline`,
+  `fabricated_entity`, `unsupported_capability`, `invented_specific`), and within each **ORIGINAL split**
+  (tune/test) take the **lowest-definition-order** item of each mode. Selection is by **mode + definition
+  order ONLY — never by prior self-correction outcome.**
+- **Result:** symmetric **4 tune + 4 test** (one item per mode per split), all 4 modes in BOTH splits,
+  disjoint, original splits preserved. Concretely:
+  - TUNE = `P-timeline-1`, `P-entity-1`, `P-capability-1`, `P-specific-1`
+  - TEST = `P-timeline-2`, `P-entity-2`, `P-capability-2`, `P-specific-2`
+- **`maxIterations` stays 3** (only the item COUNT is trimmed, so each item's convergence dynamics are
+  preserved — what makes K meaningful). 8 items ≈ 50% of the prior 16 → a safe margin below the ~item-13
+  point where the prior run depleted the daily window.
+- An **offline composition unit test** (runs in `npm run verify`) machine-checks the rule: counts 4+4,
+  all 4 modes in each split, disjoint, every item's `split` matches its assigned split. So the offline gate
+  verifies the pre-registered rule, not just "nothing else broke."
+
+**Pre-registered success criterion for deliverable B (the change from the prior runs — flag at the Codex gate):**
+- Deliverable B succeeds when the run is **CLEAN (detection === N, no Groq fallback)** with a **non-vacuous K**.
+  The prior runs were INCOMPLETE because **DEGRADED**, not because a floor failed. The harness's hard live
+  assertion is therefore **`detection === N` / `!degraded`** (a degraded run fails loudly so it is never
+  enshrined — matches the directive's "CONFIRM detection = full-N before reading K").
+- **`test ≥ K` (the K-floor) is now a REPORTED measurement** (`k_repin.test_meets_floor` / `interpretation`),
+  **NOT a hard pass/fail.** Rationale (advisor 2026-06-29): at the reduced N, `K = floor(rate × 4)` is coarse
+  and near-binary, and a single **genuine** structural non-convergence (e.g. `P-entity-2`, which converged
+  cleanly-but-not-within-3-iters in the degraded run — a real loop-ceiling item, not a fallback) can land the
+  floor red on an otherwise-clean, authoritative run. That is a **complete authoritative result**, reported
+  honestly — **never recomposed to go green.** This success-criterion refinement is to be **confirmed at the
+  batched Codex review** that gates the live run.
+
+**Hard precondition — a FRESH Groq daily window (HELD as of 2026-06-29 15:26 UTC):**
+- The 2026-06-29 run **depleted today's daily window** (that is why the tail fell back). The Groq free-tier
+  binding limit is the **daily token budget (TPD)**, which `groq-preflight` does **NOT** expose — it reads only
+  the per-MINUTE (TPM) header (preflight 2026-06-29 15:26 UTC showed TPM 7927/8000 = 99.1%, which says nothing
+  about the daily window). Groq's exact daily-reset semantics (calendar 00:00 UTC vs rolling 24h) are
+  **UNVERIFIED-from-memory (RULES §6)** — re-verify before arming. Either way the window is **not fresh today**
+  (depletion was hours ago, same UTC day). Next clean run = a **fresh-day session**; confirm freshness
+  (a genuinely new window with zero prior usage) before arming the owner-gated live spend.
