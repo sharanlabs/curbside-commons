@@ -38,3 +38,11 @@ test-results/
 
 # UI-redesign exploration screenshots — regenerable (large PNGs); the source mockups/*.html are tracked.
 mockups/shots/
+
+# Harness/session scaffolding (2026-07-03) — machine-local Claude Code artifacts, not product source.
+# Keeps `git status` clean so the per-slice differential/diff gates stay honest.
+.agents/
+.claude/skills/
+.claude/settings.local.json
+screenshots/
+skills-lock.json
