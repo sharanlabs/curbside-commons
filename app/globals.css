@@ -1088,3 +1088,328 @@ body {
     transition: none;
   }
 }
+
+/* ============================================================================
+   W3 — the one-page verifier report (/report). Reuses the Ledger Enterprise
+   system (hairlines, mono field keys, single vermilion signal). Desktop web +
+   printable (see the @media print block at the end). rpt-* namespace.
+   ========================================================================== */
+.rpt-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 32px 72px;
+}
+@media (max-width: 560px) {
+  .rpt-wrap {
+    padding: 20px;
+  }
+}
+
+/* THE honesty label — unmissable, and it survives print (color-adjust: exact). */
+.rpt-sim {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--signal);
+  border-radius: 7px;
+  background: var(--signal-tint);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.rpt-sim-tag {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: var(--signal);
+  padding: 4px 10px;
+  border-radius: 5px;
+  flex: none;
+}
+.rpt-sim-text {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--signal-text);
+}
+
+.rpt-head {
+  margin-top: 26px;
+}
+.rpt-eyebrow {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--graphite);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+.rpt-title {
+  font-size: clamp(24px, 3.4vw, 32px);
+  line-height: 1.08;
+  letter-spacing: -0.026em;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 10px 0 0;
+  text-wrap: balance;
+}
+.rpt-intro {
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.58;
+  color: var(--body);
+  max-width: 68ch;
+}
+
+/* surface toggle */
+.rpt-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-top: 24px;
+  border-bottom: 1px solid var(--rule-2);
+}
+.rpt-tab {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.006em;
+  cursor: pointer;
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--graphite);
+  margin-bottom: -1px;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.rpt-tab:hover {
+  color: var(--ink);
+}
+.rpt-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--signal);
+}
+
+/* verdict banner */
+.rpt-verdict {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  padding: 13px 16px;
+  border-radius: 7px;
+  border: 1px solid var(--rule-3);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.rpt-verdict.fail {
+  border-color: var(--signal-rule);
+  background: var(--signal-tint);
+}
+.rpt-verdict.ok {
+  background: var(--bg-2);
+}
+.rpt-verdict-flag {
+  font-family: var(--ff-mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.rpt-verdict.fail .rpt-verdict-flag {
+  color: var(--signal-text);
+}
+.rpt-verdict.ok .rpt-verdict-flag {
+  color: var(--ink);
+}
+.rpt-verdict-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.rpt-verdict-tally {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--graphite);
+  margin-left: auto;
+}
+
+/* header-surface meta ledger (C10) */
+.rpt-meta {
+  margin: 18px 0 0;
+  border: 1px solid var(--rule-2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.rpt-mrow {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 16px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--rule);
+}
+.rpt-mrow:first-child {
+  border-top: none;
+}
+.rpt-mrow dt {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--graphite);
+}
+.rpt-mrow dd {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+/* findings list */
+.rpt-findings {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--rule-2);
+}
+.rpt-finding {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.rpt-finding-lead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.rpt-idx {
+  font-family: var(--ff-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--graphite);
+  flex: none;
+}
+.rpt-plain {
+  margin: 0;
+  flex: 1 1 auto;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: -0.008em;
+}
+.rpt-sev {
+  flex: none;
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.rpt-sev.error {
+  color: var(--signal-text);
+  background: var(--signal-tint);
+  border-color: var(--signal-rule);
+}
+.rpt-sev.warn {
+  color: #8a5a06;
+  background: #fdf3e3;
+  border-color: #f0dcbb;
+}
+.rpt-sev.info {
+  color: var(--graphite);
+  background: var(--bg-3);
+  border-color: var(--rule-2);
+}
+
+/* the four receipts (C2) */
+.rpt-receipts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 24px;
+  margin: 12px 0 0 28px;
+}
+@media (max-width: 560px) {
+  .rpt-receipts {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+  }
+}
+.rpt-rc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rpt-rc dt {
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.rpt-rc dd {
+  margin: 0;
+  min-width: 0;
+}
+.rpt-mono {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--ink);
+  word-break: break-word;
+}
+.rpt-rc-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--graphite);
+  margin-top: 1px;
+}
+
+.rpt-foot {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule-2);
+}
+.rpt-foot p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--faint);
+  max-width: 76ch;
+}
+
+/* ----- print: one clean report per page, honesty labels preserved ----------- */
+@media print {
+  nav,
+  footer,
+  .ds-skip,
+  .rpt-toolbar {
+    display: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  body {
+    font-size: 12px;
+  }
+  .rpt-wrap {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  @page {
+    margin: 14mm;
+  }
+  /* never split a finding (with its receipts) across a page break */
+  .rpt-finding,
+  .rpt-sim,
+  .rpt-verdict,
+  .rpt-meta {
+    break-inside: avoid;
+  }
+  .rpt-head {
+    break-after: avoid;
+  }
+}

@@ -78,6 +78,7 @@ describe("C6/C10 overclaim guardrail", () => {
 
   it("corpus README and pack sources never claim 'all edge cases'", () => {
     const files: string[] = [];
+    files.push(join(process.cwd(), "fixtures", "README.md"));
     const fixturesDir = join(process.cwd(), "fixtures", "synthetic-restaurant");
     files.push(join(fixturesDir, "README.md"));
     const packDir = join(process.cwd(), "lib", "packs", "listings");

@@ -2,24 +2,32 @@
 /**
  * Verifier CLI — W1 (plan §5 W1, C1: one-command validator).
  *
- * `check <feed.json> --against <catalog.json> [--surface acp|ucp]`
+ * `check <feed.json> --against <catalog.json> [--surface acp|ucp] [--json]`
  * Runs the deterministic drift verification and prints the machine-readable
  * report (JSON). Exit codes: 0 = clean · 1 = findings (any drift) · 2 = usage /
  * input error. This path performs ZERO LLM or network calls (C1: $0-LLM) — the
  * comparator is loaded from the TypeScript source via Node's native
  * type-stripping (Node ≥ 24) so there is exactly ONE implementation.
  *
+ * Machine-JSON leg (W3, C1): the report IS the output — canonical
+ * `JSON.stringify(report, null, 2)` on stdout, always carrying the C10 header
+ * surface (specVersion pin · matchingMode · simulated). JSON is the default and
+ * only serialization; `--json` is an explicit, CI-friendly alias that requests
+ * it by name (trailing flag; the default is byte-identical, which is why the
+ * frozen golden reports stay locked). Exit-code semantics are unchanged.
+ *
  * Plain: point it at the copy and the truth; it prints every catch with
- * receipts and fails loudly if the copy lies. Free to run, no AI calls.
+ * receipts (as machine-readable JSON a CI job can gate on) and fails loudly if
+ * the copy lies. Free to run, no AI calls.
  */
 
 const USAGE = `verifier — deterministic serving-copy checker (simulated corpus)
 
 Usage:
-  check <feed.json> --against <catalog.json> [--surface acp|ucp]
+  check <feed.json> --against <catalog.json> [--surface acp|ucp] [--json]
       TRUTH leg: verify a serving copy against the SOR catalog (does it LIE?).
       Exit 0 = clean, 1 = drift found.
-  check <doc.json> --conformance [--op search|lookup|get_product]
+  check <doc.json> --conformance [--op search|lookup|get_product] [--json]
       CONFORMANCE leg: validate a UCP catalog-response document against the pinned
       published UCP schemas (is it correctly SHAPED?). No --against needed — the
       reference is the schema. Exit 0 = conformant, 1 = schema violation(s).
@@ -29,6 +37,10 @@ Usage:
 Notes:
   - No LLM / network calls on either path (C1: $0-LLM; conformance reads pinned
     schemas from disk via ajv).
+  - Output is the machine-readable report (JSON) on stdout — CI-usable, always
+    carrying the C10 header surface (specVersion · matchingMode · simulated).
+    --json is the explicit, trailing alias for that default serialization.
+  - Unknown flags exit 2 (loud) — a typo never silently falls back to a default.
   - conformance vs truth: a spec-VALID document can still be FALSE. The two legs
     answer different questions and use distinct rule families (LST-* vs LST-CONF-*).
   - --surface defaults to acp; --op defaults to search.
@@ -48,6 +60,26 @@ async function main(argv) {
   if (cmd !== "check") {
     process.stderr.write(`Unknown command: ${cmd}\n\n${USAGE}`);
     return 2;
+  }
+
+  // Flags are validated loudly (W3): a typo'd flag must NEVER silently fall
+  // back to a default — CI would then gate on the wrong check. Known flags and
+  // how many value arguments each consumes:
+  const KNOWN_FLAGS = new Map([
+    ["--against", 1],
+    ["--surface", 1],
+    ["--conformance", 0],
+    ["--op", 1],
+    ["--json", 0],
+  ]);
+  for (let i = 1; i < args.length; i++) {
+    const arg = args[i];
+    if (!arg.startsWith("--")) continue;
+    if (!KNOWN_FLAGS.has(arg)) {
+      process.stderr.write(`check: unknown flag "${arg}"\n\n${USAGE}`);
+      return 2;
+    }
+    i += KNOWN_FLAGS.get(arg);
   }
 
   const feedPath = args[1];

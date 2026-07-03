@@ -34,6 +34,7 @@ function packSources(): string[] {
 const scannedFiles = [
   ...packSources(),
   join(root, "bin", "check.mjs"),
+  join(root, "fixtures", "README.md"),
   join(root, "fixtures", "synthetic-restaurant", "README.md"),
   join(root, "fixtures", "ucp-schemas", UCP_PINNED_VERSION, "README.md"),
   join(root, "fixtures", "ucp-schemas", UCP_PINNED_VERSION, "PROVENANCE.json"),

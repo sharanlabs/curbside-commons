@@ -44,7 +44,7 @@ describe("C1 one-command validator (real process)", () => {
     const report = JSON.parse(r.stdout) as { ok: boolean; findings: unknown[] };
     expect(report.ok).toBe(true);
     expect(report.findings).toHaveLength(0);
-  });
+  }, 60000);
 
   it("exit non-zero (1) on the drifted fixture, output = the golden report", () => {
     const r = runCli([
@@ -55,7 +55,7 @@ describe("C1 one-command validator (real process)", () => {
     ]);
     expect(r.status).toBe(1);
     expect(r.stdout).toBe(readFileSync(join(fixtures, "expected-report.acp.json"), "utf8"));
-  });
+  }, 60000);
 
   it("ucp surface: exit 1 on the drifted catalog response, golden byte-equal", () => {
     const r = runCli([
@@ -68,7 +68,7 @@ describe("C1 one-command validator (real process)", () => {
     ]);
     expect(r.status).toBe(1);
     expect(r.stdout).toBe(readFileSync(join(fixtures, "expected-report.ucp.json"), "utf8"));
-  });
+  }, 60000);
 
   it("exit 2 on usage errors (unknown command, missing --against, bad surface)", () => {
     expect(runCli(["frobnicate"]).status).toBe(2);
@@ -76,7 +76,21 @@ describe("C1 one-command validator (real process)", () => {
     expect(
       runCli(["check", "a.json", "--against", "b.json", "--surface", "carrier-pigeon"]).status,
     ).toBe(2);
-  });
+  }, 60000);
+
+  it("exit 2 on an UNKNOWN flag — a typo must fail loudly, never silently use a default (W3)", () => {
+    // Regression-locks the documented flag surface being REAL: before this,
+    // any unrecognized flag (e.g. a --json typo) was silently ignored and the
+    // run proceeded on defaults — poison for CI.
+    const r = runCli([
+      "check",
+      join(fixtures, "acp-feed.faithful.json"),
+      "--against",
+      join(fixtures, "sor.catalog.json"),
+      "--jsn",
+    ]);
+    expect(r.status).toBe(2);
+  }, 60000);
 });
 
 describe("C1 conformance leg — UCP schema validation (real process, W2)", () => {
@@ -88,7 +102,7 @@ describe("C1 conformance leg — UCP schema validation (real process, W2)", () =
     const report = JSON.parse(r.stdout) as { ok: boolean; specVersion: string };
     expect(report.ok).toBe(true);
     expect(report.specVersion).toContain("2026-04-08");
-  });
+  }, 60000);
 
   it("exit 1 (non-zero) on a schema-violating document, findings in the LST-CONF-* family", () => {
     const r = runCli(["check", join(ucp, "invalid", "pattern-currency-lowercase.json"), "--conformance"]);
@@ -96,16 +110,71 @@ describe("C1 conformance leg — UCP schema validation (real process, W2)", () =
     const report = JSON.parse(r.stdout) as { ok: boolean; findings: { ruleId: string }[] };
     expect(report.ok).toBe(false);
     expect(report.findings.every((f) => f.ruleId.startsWith("LST-CONF-"))).toBe(true);
-  });
+  }, 60000);
 
   it("HEADLINE: the conformant-but-false doc PASSES conformance (exit 0) — still a lie", () => {
     const r = runCli(["check", join(ucp, "valid", "conformant-but-false.json"), "--conformance"]);
     expect(r.status).toBe(0);
-  });
+  }, 60000);
 
   it("exit 2 on a bad --op", () => {
     expect(runCli(["check", "x.json", "--conformance", "--op", "bogus"]).status).toBe(2);
-  });
+  }, 60000);
+});
+
+describe("C1 machine-JSON leg — --json alias + C10 header surface (W3)", () => {
+  const ucp = join(root, "fixtures", "ucp-conformance-ci");
+
+  it("--json emits the canonical report: byte-equal to the frozen golden, exit unchanged", () => {
+    // Single spawn (cold Node TS-strip is slow) — comparing to the LOCKED golden
+    // both proves the --json alias is byte-identical to the default (which the
+    // default-vs-golden test above already pins) and that the goldens stay locked.
+    const json = runCli([
+      "check",
+      join(fixtures, "acp-feed.drifted.json"),
+      "--against",
+      join(fixtures, "sor.catalog.json"),
+      "--json",
+    ]);
+    expect(json.status).toBe(1);
+    expect(json.stdout).toBe(readFileSync(join(fixtures, "expected-report.acp.json"), "utf8"));
+  }, 60000);
+
+  it("the truth-leg JSON always carries the C10 header surface", () => {
+    const r = runCli([
+      "check",
+      join(fixtures, "acp-feed.drifted.json"),
+      "--against",
+      join(fixtures, "sor.catalog.json"),
+      "--json",
+    ]);
+    const report = JSON.parse(r.stdout) as {
+      specVersion: string;
+      matchingMode: string;
+      simulated: boolean;
+    };
+    expect(report.specVersion).toContain("ucp-pin-2026-04-08");
+    expect(["synthetic-controlled", "real-world"]).toContain(report.matchingMode);
+    expect(report.simulated).toBe(true);
+  }, 60000);
+
+  it("the conformance-leg JSON also carries the C10 header surface", () => {
+    const r = runCli([
+      "check",
+      join(ucp, "valid", "search-full-catalog.json"),
+      "--conformance",
+      "--json",
+    ]);
+    expect(r.status).toBe(0);
+    const report = JSON.parse(r.stdout) as {
+      specVersion: string;
+      matchingMode: string;
+      simulated: boolean;
+    };
+    expect(report.specVersion).toContain("2026-04-08");
+    expect(["synthetic-controlled", "real-world"]).toContain(report.matchingMode);
+    expect(report.simulated).toBe(true);
+  }, 60000);
 });
 
 describe("C1 $0-LLM: structural import-graph proof", () => {
@@ -123,7 +192,8 @@ describe("C1 $0-LLM: structural import-graph proof", () => {
   function importsOf(file: string): string[] {
     const text = readFileSync(file, "utf8");
     const specs: string[] = [];
-    const re = /(?:from\s+|import\s*\(\s*)["']([^"']+)["']/g;
+    // `... from "x"`, dynamic `import("x")`, and bare side-effect `import "x"`.
+    const re = /(?:from\s+|import\s*\(\s*|import\s+)["']([^"']+)["']/g;
     for (let m = re.exec(text); m; m = re.exec(text)) specs.push(m[1]);
     return specs;
   }

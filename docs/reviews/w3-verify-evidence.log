@@ -1,0 +1,145 @@
+W3 VERIFY + RED-GREEN EVIDENCE — one-page report (web + machine JSON) + corpus packaging (C4/C9)
+Repo: ActivationOps AI verifier. Slice: W3 (plan §5 W3 + §4 C1/C2/C4/C9/C10). Node v24.
+
+===== W3 RED-GREEN EVIDENCE =====
+Each block: back up a load-bearing file -> MUTATE it -> targeted vitest RED -> restore -> GREEN.
+Raw vitest summary lines captured verbatim below (populated by the run harness).
+
+----- RG-1: machine-JSON leg / C10 header surface (verify.ts buildReport specVersion) -----
+--- mutate lib/verifier-core/verify.ts (evals/packs/cli-c1.test.ts)
+ Test Files  1 failed (1)
+      Tests  5 failed | 8 passed (13)
+--- restored; re-run:
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+
+----- RG-2: report-path $0-LLM import-graph (plant a SIDE-EFFECT banned import in ReportView.tsx) -----
+NOTE: first attempt used `import "@/lib/agents/gemini";` (a bare side-effect import) and did NOT
+go RED — the walk's importsOf regex only caught `... from "x"` / dynamic `import("x")`, missing the
+side-effect form. HARDENED both walks (report-view-c1 + cli-c1) to also catch `import "x"`; re-ran.
+--- mutate components/report/ReportView.tsx  ->  import "@/lib/agents/gemini";  (evals/packs/report-view-c1.test.ts)
+AssertionError: banned import "@/lib/agents/gemini" in components/report/ReportView.tsx: expected true to be false
+ Test Files  1 failed (1)
+      Tests  2 failed | 7 passed (9)
+--- restored; re-run:
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+
+----- RG-3: C2 evidence visibility (drop referenceRowId in toReportView) -----
+--- mutate lib/packs/listings/report-view.ts (evals/packs/report-view-c1.test.ts)
+ Test Files  1 failed (1)
+      Tests  2 failed | 7 passed (9)
+--- restored; re-run:
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+
+----- RG-4: C4 plain-line lead (blank plainLine in toReportView) -----
+--- mutate lib/packs/listings/report-view.ts (evals/packs/report-view-c1.test.ts)
+ Test Files  1 failed (1)
+      Tests  2 failed | 7 passed (9)
+--- restored; re-run:
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+
+----- RG-5: C9 shape-honesty caveat survives verbatim (soften it in fixtures/README.md) -----
+--- mutate fixtures/README.md (evals/packs/corpus-packaging-c9.test.ts)
+ Test Files  1 failed (1)
+      Tests  1 failed | 12 passed (13)
+--- restored; re-run:
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+
+----- RG-6: C9 license-is-owner-call (plant a LICENSE in synthetic-restaurant/) -----
+--- add fixtures/synthetic-restaurant/LICENSE (evals/packs/corpus-packaging-c9.test.ts)
+ Test Files  1 failed (1)
+      Tests  1 failed | 12 passed (13)
+--- removed; re-run:
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+
+----- RG-7: C10 view header surface (drop specVersion passthrough in toReportView) -----
+--- mutate lib/packs/listings/report-view.ts (evals/packs/report-view-c1.test.ts)
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+--- restored; re-run:
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+
+===== W3 FULL-SUITE + CONSTRAINT EVIDENCE (executed 2026-07-03T16:39:13Z) =====
+--- npm run verify (typecheck + lint + test + build)
+  exit 0
+ Test Files  39 passed | 4 skipped (43)
+      Tests  505 passed | 5 skipped (510)
+✓ Compiled successfully in 9.0s
+--- npm run test:legacy (hard constraint: 306 passed + 5 skipped, unchanged)
+  exit 0
+ Test Files  26 passed | 4 skipped (30)
+      Tests  306 passed | 5 skipped (311)
+--- one-command CLI demos (C1) — machine-JSON leg incl. --json alias
+  check ... --json (drifted)     -> exit 1  (1 = drift, machine JSON)
+  check ... (faithful, default)  -> exit 0  (0 = clean)
+  check ... --conformance --json -> exit 0  (0 = conformant)
+--- git status (only intended W3 files touched)
+ M app/globals.css
+ M bin/check.mjs
+ M components/Nav.tsx
+ M evals/packs/cli-c1.test.ts
+ M evals/packs/honesty-c10.test.ts
+ M evals/packs/listings-coverage-c6.test.ts
+?? app/report/
+?? components/report/
+?? docs/reviews/w3-verify-evidence.log
+?? evals/packs/corpus-packaging-c9.test.ts
+?? evals/packs/report-view-c1.test.ts
+?? fixtures/README.md
+?? lib/packs/listings/report-view.ts
+
+===== W3 POST-FIX NOTE (flake found in own new test, fixed) =====
+Under full `npm run verify` (parallel test files + build load), the first form of the
+`--json` byte-identity test spawned the CLI TWICE (default + --json); cold Node-24 TS-strip
+child processes pushed the pair past vitest's 20s default -> Error: Test timed out in 20000ms
+(1 failed | 504 passed). FIX: reduced to a SINGLE spawn comparing --json output to the FROZEN
+golden (byte-identity still proven; default-vs-golden is pinned separately), and gave the three
+new child-process tests a 60000ms timeout. Re-run:
+  npm run verify      -> EXIT 0 — Test Files 39 passed | 4 skipped; Tests 505 passed | 5 skipped; build ✓
+  npm run test:legacy -> EXIT 0 — 306 passed | 5 skipped (unchanged)
+
+=====================================================================
+FABLE ELEVATION PASS (2026-07-03, orchestrator seat — post-equivalence-review fixes)
+=====================================================================
+
+--- F-1 (RG-8): --json was DOCUMENTED but never PARSED — any unknown flag was
+    silently ignored (a CI typo fell back to defaults). Fix: explicit known-flag
+    table in bin/check.mjs; unknown flags exit 2 loudly. RED executed BEFORE the
+    fix (new test, permissive parser still in place):
+  npx vitest run evals/packs/cli-c1.test.ts -t "UNKNOWN flag"
+   Test Files  1 failed (1)
+        Tests  1 failed | 13 skipped (14)        <- expected 2, got 0 (flag ignored)
+  ... fix applied (KNOWN_FLAGS validation in bin/check.mjs) ...
+  npx vitest run evals/packs/cli-c1.test.ts
+   Test Files  1 passed (1)
+        Tests  14 passed (14)                    <- GREEN, all legs + new lock
+
+--- F-3: FLAKE caught by the orchestrator's INDEPENDENT full-verify re-run (the
+    equivalence bar's live re-run, not the builder's run): 2 W2-era spawn tests
+    in cli-c1.test.ts timed out at the default 20s under full-suite parallel
+    load (raw: "Error: Test timed out in 20000ms." on the drifted exit-1 test +
+    the HEADLINE conformant-but-false test; Tests 2 failed | 503 passed). Root
+    cause: W3 added 3 more cold CLI spawns to the same file; each cold spawn
+    TS-strips the whole import graph. Fix: the SAME 60s timeout treatment the
+    builder gave its new tests, applied to all 7 W2-era spawn tests. No logic
+    change; no assertion weakened.
+
+--- F-2: honesty wording on /report — the UCP tab plain label now says
+    "constructed simulation of the Google-led live-catalog shape (normalized,
+    not wire format)" (aligns the page with the corpus shape-honesty note), and
+    the SIMULATED banner no longer implies the truth-leg reference is a schema
+    (it is the simulated SOR): "The verification rules and the pinned
+    data-format standard are real; the restaurant, its menu, and its records
+    are invented."
+
+--- Post-elevation full gate: see FINAL VERIFY section appended below.
+
+--- FINAL VERIFY (post-elevation, orchestrator live run)
+  npm run verify      -> EXIT 0 — Test Files 39 passed | 4 skipped; Tests 506 passed | 5 skipped; next build ✓ (/report ○ Static)
+  npm run test:legacy -> EXIT 0 — 306 passed | 5 skipped (unchanged)
