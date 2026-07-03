@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getReplaySnapshot, type ReplayMerchant } from "@/lib/replay/run";
+import { getReplaySnapshot, type ReplayMerchant } from "@/legacy/activation/lib/replay/run";
 import { PLATFORM_NAME, HONEST_DATA_LABEL } from "@/lib/product";
 
 const RISK_STYLES: Record<string, string> = {

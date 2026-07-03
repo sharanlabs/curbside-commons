@@ -113,7 +113,7 @@ async function main() {
     entities,
   };
 
-  const outUrl = new URL("../lib/data/sf-entities.snapshot.json", import.meta.url);
+  const outUrl = new URL("../legacy/activation/lib/data/sf-entities.snapshot.json", import.meta.url);
   writeFileSync(outUrl, JSON.stringify(snapshot, null, 2) + "\n");
   console.log(
     `Wrote ${entities.length} entities ` +

@@ -1,4 +1,4 @@
-import { getReplaySnapshot } from "@/lib/replay/run";
+import { getReplaySnapshot } from "@/legacy/activation/lib/replay/run";
 import { PLATFORM_NAME } from "@/lib/product";
 import { GEMINI_PRICING, PRICING_VERSION } from "@/lib/agents/pricing";
 import { DEFAULT_BUDGET_CAP_USD } from "@/lib/agents/budget";

@@ -7,13 +7,21 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     testTimeout: 20_000,
-    include: ["evals/**/*.test.ts", "evals/**/*.test.tsx"],
+    // Verifier-core/pack tests live under evals/**; the archived activation suite
+    // (W0 restructure, 2026-07-03) runs from legacy/activation/evals/** so `npm run
+    // verify` keeps executing all 306 passing + 5 skipped tests — none dropped.
+    include: [
+      "evals/**/*.test.ts",
+      "evals/**/*.test.tsx",
+      "legacy/activation/evals/**/*.test.ts",
+      "legacy/activation/evals/**/*.test.tsx",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text-summary", "json-summary"],
       // Cover the deterministic business logic + API routes. Demo/seed data and
       // type decls carry no logic; tests cover themselves.
-      include: ["lib/**/*.ts", "app/api/**/*.ts"],
+      include: ["lib/**/*.ts", "legacy/activation/lib/**/*.ts", "app/api/**/*.ts"],
       exclude: ["lib/data/**", "**/*.d.ts"],
       // Ratchet (Phase-A): a floor set just below the achieved coverage (statements
       // ~85 / branches ~75 / functions ~88 / lines ~89). Guards regressions; enforced on

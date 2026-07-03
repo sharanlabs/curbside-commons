@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getReplaySnapshot, type ReplayMerchant } from "@/lib/replay/run";
+import { getReplaySnapshot, type ReplayMerchant } from "@/legacy/activation/lib/replay/run";
 import { PLATFORM_NAME } from "@/lib/product";
 
 function finalState(rm: ReplayMerchant): string {

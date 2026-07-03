@@ -1,4 +1,4 @@
-import { getReplaySnapshot } from "@/lib/replay/run";
+import { getReplaySnapshot } from "@/legacy/activation/lib/replay/run";
 import { PLATFORM_NAME } from "@/lib/product";
 
 function Bar({ label, value, total }: { label: string; value: number; total: number }) {

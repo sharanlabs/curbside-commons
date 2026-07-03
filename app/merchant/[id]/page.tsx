@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getReplaySnapshot, getReplayMerchant } from "@/lib/replay/run";
+import { getReplaySnapshot, getReplayMerchant } from "@/legacy/activation/lib/replay/run";
 import { PLATFORM_NAME, HONEST_DATA_LABEL } from "@/lib/product";
-import { TOTAL_STEPS } from "@/lib/core/constants";
-import { DIMENSION_SPECS } from "@/lib/domain/effective-rubric";
+import { TOTAL_STEPS } from "@/legacy/activation/lib/core/constants";
+import { DIMENSION_SPECS } from "@/legacy/activation/lib/domain/effective-rubric";
 
 export function generateStaticParams() {
   return getReplaySnapshot(PLATFORM_NAME).merchants.map((rm) => ({ id: rm.merchant.merchant_id }));

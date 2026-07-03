@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { getReplaySnapshot } from "@/lib/replay/run";
-import { liveSamples } from "@/lib/replay/live-samples";
+import { getReplaySnapshot } from "@/legacy/activation/lib/replay/run";
+import { liveSamples } from "@/legacy/activation/lib/replay/live-samples";
 import { PLATFORM_NAME } from "@/lib/product";
 
 const DIMS = ["structure", "state-consistency", "policy", "no-leakage"] as const;
