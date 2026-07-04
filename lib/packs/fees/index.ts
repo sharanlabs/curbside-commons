@@ -87,3 +87,25 @@ export {
   buildFeeAnswerKey,
   buildCorpusReports,
 } from "./generate.ts";
+
+// F1b classifier seam (plan §5 F1b, C8) — zero network/LLM imports (verified by
+// the extended fees-cli import-graph eval). The live lane is DESIGNED, not wired.
+export type {
+  ClassifierInput,
+  ClassifierPrediction,
+  LineItemClassifier,
+  TrueCategoryLabel,
+} from "./classifier.ts";
+export {
+  DeterministicBaselineClassifier,
+  LiveClassifierNotWiredError,
+  LIVE_CLASSIFIER_DESIGN,
+  NOT_A_PERMITTED_FEE,
+  SEVEN_CLASS_TRUE_CATEGORY_NOTE,
+  TRUE_CATEGORY_LABELS,
+  isTrueCategoryLabel,
+  makeMockOracleClassifier,
+  toClassifierInput,
+} from "./classifier.ts";
+export type { ClassifierAdvisoryFinding, ClassifiedFeeAuditReport } from "./classified-audit.ts";
+export { auditWithClassification } from "./classified-audit.ts";

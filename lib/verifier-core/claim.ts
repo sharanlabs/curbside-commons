@@ -11,8 +11,14 @@
  * against the truth.
  */
 
-/** Where a claim came from — the serving surface (plan §3, C3 surface-agnostic). */
-export type ClaimSource = "acp-feed" | "ucp-catalog" | "fee-statement";
+/**
+ * Where a claim came from — the serving surface (plan §3, C3 surface-agnostic).
+ * `"classifier"` (F1b) is an ADVISORY source: a claim asserted by an injected
+ * line-item classifier's prediction, never a serving-copy read — reserved for
+ * classifier-derived advisory findings (lib/packs/fees/classified-audit.ts), which
+ * never gate a report's `ok`.
+ */
+export type ClaimSource = "acp-feed" | "ucp-catalog" | "fee-statement" | "classifier";
 
 /** A single assertion under audit. The field set is intentionally minimal in W0. */
 export interface Claim {

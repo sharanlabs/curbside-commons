@@ -1,0 +1,51 @@
+F1b VERIFY EVIDENCE — classification layer (plan §5 F1, C8)
+Date: 2026-07-04. Executed on the FABLE seat (inline tail — the delegated builder
+died twice before writing this log: seat limit "You've hit your session limit ·
+resets 6pm (America/New_York)" [owner-confirmed retry ran] then "API Error:
+Overloaded" [NO-WAIT inline conversion, W1 precedent]. All build artifacts were
+the builder's; the RED-GREEN cycles below were EXECUTED INDEPENDENTLY by the
+Fable reviewer, which doubles as review-authentication of the teeth.)
+
+----------------------------------------------------------------
+RG-A  BASELINE PIN — the measurement has teeth
+----------------------------------------------------------------
+MUTATION (attempt 1, too weak — recorded honestly): dropped "transaction" from the
+  card/payment keyword rule (classifier.ts BASELINE_RULES).
+CMD: npx vitest run evals/gold/fee-baseline-measurement.test.ts
+  -> 7 passed (NO red: every transaction-labeled gold item also matches
+     processing|card|payment — the rule still fired. Mutation strengthened.)
+MUTATION (attempt 2): flipped the rule's TARGET category
+  to: "transaction_fee" -> to: "delivery_fee".
+CMD: npx vitest run evals/gold/fee-baseline-measurement.test.ts
+  -> RED: 5 failed | 2 passed (accuracy pin 19/21 broken; per-category matrix
+     pins for transaction_fee + delivery_fee broken; misses list changed).
+RESTORE -> npx vitest run fee-baseline-measurement + fees-classifier
+  -> GREEN: 21 passed (7 + 14).
+
+----------------------------------------------------------------
+RG-B  F1a GOLDENS-UNCHANGED RE-ASSERTION — byte teeth
+----------------------------------------------------------------
+MUTATION: expected-report.drifted.json "violation": 5 -> 4 (one byte of a frozen
+  F1a golden).
+CMD: npx vitest run evals/packs/fees-classifier.test.ts evals/packs/fees-freeze.test.ts
+  -> RED: 2 failed | 22 passed (BOTH the F1a freeze test AND F1b's own
+     goldens-unchanged re-assertion caught it independently).
+RESTORE (git checkout) -> same cmd -> GREEN: 24 passed.
+
+----------------------------------------------------------------
+RG-C  GOLD-SET COMPOSITION — split discipline has teeth
+----------------------------------------------------------------
+MUTATION: item "relabel-test-2" split "test" -> "tune" (fee-lines-gold.ts).
+CMD: npx vitest run evals/gold/fee-lines-gold-composition.test.ts
+  -> RED: 3 failed | 3 passed (21/21 sizes, per-class-per-split counts, pinned
+     test-ID equality all broke).
+RESTORE -> composition + metrics tests -> GREEN: 18 passed (6 + 12).
+
+----------------------------------------------------------------
+FINAL GATES (independent Fable re-run)
+----------------------------------------------------------------
+CMD: npm run verify      -> EXIT 0.  Test Files 54 passed | 4 skipped;
+                            Tests 715 passed | 5 skipped  (+47 over F1a's 668).
+CMD: npm run test:legacy -> EXIT 0.  Tests 306 passed | 5 skipped (UNCHANGED).
+typecheck clean · lint (--max-warnings=0) clean · next build succeeded.
+(Re-run AFTER the same-breath doc edits + this log: see final commit gate below.)
