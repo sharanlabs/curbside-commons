@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "simulated": true,
+    "generator": {
+      "name": "synthetic-fee-statements",
+      "seed": 20260703,
+      "version": "1.0.0"
+    },
+    "merchant": "Curbside Commons Test Kitchen (simulated)",
+    "month": "2026-06",
+    "currency": "USD",
+    "asOf": "2026-07-10",
+    "purchasePriceBaseConvention": "order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)"
+  },
+  "lines": [
+    {
+      "orderId": "ORD-K1",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 360,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-K2",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 360,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    }
+  ]
+}

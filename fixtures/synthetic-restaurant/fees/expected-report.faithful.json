@@ -1,0 +1,13 @@
+{
+  "specVersion": "uc1-rule-table-draft/2026-07-03+NYC§20-563.3+LL79-2025+base-U1-unresolved",
+  "simulated": true,
+  "classification": "as-declared by the platform; deterministic audit; LLM line-item classifier DEFERRED (F1b)",
+  "assumedPurchasePriceBase": "order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)",
+  "findings": [],
+  "verdictTally": {
+    "violation": 0,
+    "conditional-pending-refund-window": 0,
+    "cured-by-refund": 0
+  },
+  "ok": true
+}

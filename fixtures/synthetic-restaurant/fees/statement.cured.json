@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "simulated": true,
+    "generator": {
+      "name": "synthetic-fee-statements",
+      "seed": 20260703,
+      "version": "1.0.0"
+    },
+    "merchant": "Curbside Commons Test Kitchen (simulated)",
+    "month": "2026-06",
+    "currency": "USD",
+    "asOf": "2026-08-15",
+    "purchasePriceBaseConvention": "order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)"
+  },
+  "lines": [
+    {
+      "orderId": "ORD-C1",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 360,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-C2",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 360,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-C1",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Refund: delivery over-cap correction",
+      "amountCents": 120,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": true,
+      "passthroughDocumented": false,
+      "refundedAtDate": "2026-07-15"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "specVersion": "uc1-rule-table-draft/2026-07-03+NYC§20-563.3+LL79-2025+base-U1-unresolved",
+  "simulated": true,
+  "classification": "as-declared by the platform; deterministic audit; LLM line-item classifier DEFERRED (F1b)",
+  "assumedPurchasePriceBase": "order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)",
+  "findings": [
+    {
+      "claim": {
+        "id": "2026-06#delivery_fee",
+        "source": "fee-statement",
+        "field": "monthlyAverage",
+        "value": {
+          "sumFeesCents": 720,
+          "sumPurchasePriceCents": 4000,
+          "capPct": 15
+        }
+      },
+      "referenceRowId": "§ 20-563.3(a) (averaging clause)",
+      "ruleId": "NYC-563.3-a-2",
+      "severity": "error",
+      "category": "over-cap",
+      "plainLine": "Across the month, delivery fees came to 18.0% of order value — over the 15% limit even on the monthly average. The excess was refunded in time, so this is not a violation. (Depends on the still-open definition of \"purchase price\", U1.)",
+      "verdict": "cured-by-refund",
+      "feeClass": "over-cap",
+      "provisional": [
+        "U1-base"
+      ],
+      "professionalLine": "Delivery fees total $7.20 on $40.00 of monthly purchases = 18.0% vs the 15% cap (NYC-563.3-a-2); over-cap under the ASSUMED base \"order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)\" — PROVISIONAL (U1); cured by a refund within the 30-day window (not a violation)."
+    }
+  ],
+  "verdictTally": {
+    "violation": 0,
+    "conditional-pending-refund-window": 0,
+    "cured-by-refund": 1
+  },
+  "ok": true
+}

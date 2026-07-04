@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "simulated": true,
+    "generator": {
+      "name": "synthetic-fee-statements",
+      "seed": 20260703,
+      "version": "1.0.0"
+    },
+    "merchant": "Curbside Commons Test Kitchen (simulated)",
+    "month": "2026-06",
+    "currency": "USD",
+    "asOf": "2026-08-15",
+    "purchasePriceBaseConvention": "order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)"
+  },
+  "lines": [
+    {
+      "orderId": "ORD-1",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 360,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-1",
+      "month": "2026-06",
+      "declaredCategory": "transaction_fee",
+      "label": "Card processing",
+      "amountCents": 160,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-2",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 360,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-2",
+      "month": "2026-06",
+      "declaredCategory": "enhanced_service_fee",
+      "label": "Premium placement",
+      "amountCents": 200,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-3",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 360,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-3",
+      "month": "2026-06",
+      "declaredCategory": "service_and_delivery",
+      "label": "Combined service + delivery bundle",
+      "amountCents": 150,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-4",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 360,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-4",
+      "month": "2026-06",
+      "declaredCategory": "promotion_deduction",
+      "label": "Promo recovery charge",
+      "amountCents": 120,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-5",
+      "month": "2026-06",
+      "declaredCategory": "transaction_fee",
+      "label": "Fees (service + processing bundle)",
+      "amountCents": 20,
+      "orderPurchasePriceCents": 1000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-5",
+      "month": "2026-06",
+      "declaredCategory": "enhanced_service_fee",
+      "label": "Marketing (formerly delivery)",
+      "amountCents": 150,
+      "orderPurchasePriceCents": 1000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    }
+  ]
+}

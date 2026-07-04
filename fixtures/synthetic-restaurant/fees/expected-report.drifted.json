@@ -1,0 +1,107 @@
+{
+  "specVersion": "uc1-rule-table-draft/2026-07-03+NYC§20-563.3+LL79-2025+base-U1-unresolved",
+  "simulated": true,
+  "classification": "as-declared by the platform; deterministic audit; LLM line-item classifier DEFERRED (F1b)",
+  "assumedPurchasePriceBase": "order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)",
+  "findings": [
+    {
+      "claim": {
+        "id": "ORD-3#service_and_delivery",
+        "source": "fee-statement",
+        "field": "declaredCategory",
+        "value": "service_and_delivery"
+      },
+      "referenceRowId": "§ 20-563.3(d) (category lock)",
+      "ruleId": "NYC-563.3-d-1",
+      "severity": "error",
+      "category": "bundling",
+      "plainLine": "The bill charges $1.50 as \"service_and_delivery\" — that isn't one of the four fee types the law allows, so it's not permitted no matter what it's called.",
+      "verdict": "violation",
+      "feeClass": "bundling",
+      "provisional": [],
+      "professionalLine": "Line \"Combined service + delivery bundle\" is charged under the non-permitted category \"service_and_delivery\" ($1.50 on order ORD-3) — §20-563.3(d) permits only the four categories; any other fee is unlawful."
+    },
+    {
+      "claim": {
+        "id": "2026-06#enhanced-without-basic",
+        "source": "fee-statement",
+        "field": "declaredCategory",
+        "value": "enhanced_service_fee"
+      },
+      "referenceRowId": "§ 20-563.3(d) (gating clause)",
+      "ruleId": "NYC-563.3-d-4",
+      "severity": "error",
+      "category": "misclassification",
+      "plainLine": "They billed an 'extras' fee without ever offering the plain basic plan — the law only allows the extras fee if the basic plan exists too.",
+      "verdict": "violation",
+      "feeClass": "misclassification",
+      "provisional": [],
+      "professionalLine": "An enhanced service fee is charged but the statement carries no basic service fee — §20-563.3(d) permits the enhanced tier only for a platform that also offers (and charges a basic service fee for) the basic service."
+    },
+    {
+      "claim": {
+        "id": "2026-06#delivery_fee",
+        "source": "fee-statement",
+        "field": "monthlyAverage",
+        "value": {
+          "sumFeesCents": 1440,
+          "sumPurchasePriceCents": 9000,
+          "capPct": 15
+        }
+      },
+      "referenceRowId": "§ 20-563.3(a) (averaging clause)",
+      "ruleId": "NYC-563.3-a-2",
+      "severity": "error",
+      "category": "over-cap",
+      "plainLine": "Across the month, delivery fees came to 16.0% of order value — over the 15% limit even on the monthly average. The 30-day window to refund the overcharge has closed with no refund, so this is a violation. (Depends on the still-open definition of \"purchase price\", U1.)",
+      "verdict": "violation",
+      "feeClass": "over-cap",
+      "provisional": [
+        "U1-base"
+      ],
+      "professionalLine": "Delivery fees total $14.40 on $90.00 of monthly purchases = 16.0% vs the 15% cap (NYC-563.3-a-2); over-cap under the ASSUMED base \"order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)\" — PROVISIONAL (U1); violation (the 30-day refund window has closed with no covering refund)."
+    },
+    {
+      "claim": {
+        "id": "ORD-1#transaction_fee",
+        "source": "fee-statement",
+        "field": "amountCents",
+        "value": 160
+      },
+      "referenceRowId": "§ 20-563.3(c)",
+      "ruleId": "NYC-563.3-c-1",
+      "severity": "error",
+      "category": "processing-fee-base-inflation",
+      "plainLine": "The card-processing fee here is 8.0% — over the flat 3% limit, with no proof it's just passing through the real card cost. (This depends on what \"purchase price\" includes — still an open question, U1.)",
+      "verdict": "violation",
+      "feeClass": "processing-fee-base-inflation",
+      "provisional": [
+        "U1-base"
+      ],
+      "professionalLine": "Transaction fee $1.60 on order ORD-1 is 8.0% of the purchase price — over the hard 3% cap, not documented as a pass-through (§20-563.3(c)); over-cap under the ASSUMED base \"order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)\" — PROVISIONAL (U1). No refund safe harbor applies to the transaction fee."
+    },
+    {
+      "claim": {
+        "id": "ORD-4#promotion_deduction",
+        "source": "fee-statement",
+        "field": "declaredCategory",
+        "value": "promotion_deduction"
+      },
+      "referenceRowId": "§ 20-563.3(d) (category lock)",
+      "ruleId": "NYC-563.3-d-1",
+      "severity": "error",
+      "category": "promotion-deduction-mischaracterization",
+      "plainLine": "The bill charges $1.20 as \"promotion_deduction\" — that isn't one of the four fee types the law allows, so it's not permitted no matter what it's called.",
+      "verdict": "violation",
+      "feeClass": "promotion-deduction-mischaracterization",
+      "provisional": [],
+      "professionalLine": "Line \"Promo recovery charge\" is charged under the non-permitted category \"promotion_deduction\" ($1.20 on order ORD-4) — §20-563.3(d) permits only the four categories; any other fee is unlawful."
+    }
+  ],
+  "verdictTally": {
+    "violation": 5,
+    "conditional-pending-refund-window": 0,
+    "cured-by-refund": 0
+  },
+  "ok": false
+}

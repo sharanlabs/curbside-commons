@@ -23,6 +23,7 @@ their generators so the corpus cannot be hand-tampered without CI failing.
 | Set | Directory | Which leg it drives | What it is |
 | --- | --- | --- | --- |
 | **Synthetic restaurant** | [`synthetic-restaurant/`](synthetic-restaurant/README.md) | Truth leg (`LST-*`) | A simulated restaurant system-of-record, faithful + deliberately-drifted serving copies (ACP feed + a constructed UCP response), a ground-truth drift manifest, and the golden verifier reports. |
+| **Fee-audit (UC-1)** | [`synthetic-restaurant/fees/`](synthetic-restaurant/fees/README.md) | Fee truth leg (`NYC-563.3-*`) | Simulated monthly delivery **fee statements** (faithful + drifted + refund-window cases) audited against the real codified NYC §20-563.3 caps, with a machine answer key keyed to the plan §7 fee-line classes and golden fee-audit reports. |
 | **UCP conformance CI** | [`ucp-conformance-ci/`](ucp-conformance-ci/manifest.json) | Conformance leg (`LST-CONF-*`) | 35 real-UCP-wire-shape catalog-response documents (14 valid + 21 each violating exactly one named schema rule) + a `manifest.json` ground-truth key, plus the headline `conformant-but-false.json` exhibit. |
 | **UCP schemas (reference)** | [`ucp-schemas/`](ucp-schemas/2026-04-08/README.md) | Conformance leg (reference) | The 78 official UCP JSON Schemas (`v2026-04-08`), pinned + sha256-locked, Apache-2.0. This is upstream reference data, not our synthetic corpus — its own LICENSE stands and is untouched. |
 
@@ -60,6 +61,7 @@ bytes must match (freeze-integrity evals enforce it):
 ```
 npm run fixtures:wedge   # regenerates synthetic-restaurant/   (seed 20260703, as-of 2026-07-03)
 npm run fixtures:ucp     # regenerates ucp-conformance-ci/      (seed 20260703, as-of 2026-07-03)
+npm run fixtures:fees    # regenerates synthetic-restaurant/fees/ (seed 20260703; UC-1 fee statements + answer key + goldens)
 npm run fixtures:demo    # regenerates synthetic-restaurant/expected-demo.{json,txt} (the D1 demo transcript goldens)
 ```
 

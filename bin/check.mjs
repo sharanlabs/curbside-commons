@@ -31,6 +31,12 @@ Usage:
       CONFORMANCE leg: validate a UCP catalog-response document against the pinned
       published UCP schemas (is it correctly SHAPED?). No --against needed — the
       reference is the schema. Exit 0 = conformant, 1 = schema violation(s).
+  fees <statement.json> [--json]
+      FEE-AUDIT leg (F1a, UC-1): audit a monthly delivery fee statement against
+      the codified NYC §20-563.3 caps (deterministic, $0, no LLM). Classification
+      is AS-DECLARED by the platform; the LLM line-item classifier is DEFERRED to
+      F1b. Prints a two-register text report, or the machine report with --json.
+      Exit 0 = no violations, 1 = at least one violation, 2 = usage / bad input.
   demo [--json]
       DEMO leg (D1): play the scripted walkthrough on the shipped corpus — a
       spec-faithful simulated agent follows a spec-valid but false surface; the
@@ -84,6 +90,42 @@ async function main(argv) {
     try {
       const { runDemo } = await import("../lib/packs/listings/cli.ts");
       const result = runDemo({ json });
+      process.stdout.write(result.output);
+      return result.exitCode;
+    } catch (err) {
+      process.stderr.write(`check: ${err instanceof Error ? err.message : String(err)}\n`);
+      return 2;
+    }
+  }
+
+  // FEES leg (F1a, UC-1): audit one monthly fee statement. Strict-flag discipline
+  // mirrors the other legs — the ONLY accepted flag is --json; any other flag or a
+  // surplus/absent positional exits 2 loudly (a typo must never silently run on a
+  // default). Exit 0 = no violations, 1 = ≥1 violation, 2 = usage / bad input.
+  if (cmd === "fees") {
+    let json = false;
+    const positionals = [];
+    for (let i = 1; i < args.length; i++) {
+      const arg = args[i];
+      if (arg === "--json") {
+        json = true;
+        continue;
+      }
+      if (arg.startsWith("--")) {
+        process.stderr.write(`check: "fees" accepts only --json (got "${arg}")\n\n${USAGE}`);
+        return 2;
+      }
+      positionals.push(arg);
+    }
+    if (positionals.length !== 1) {
+      process.stderr.write(
+        `check: "fees" needs exactly ONE <statement.json> (got ${positionals.length})\n\n${USAGE}`,
+      );
+      return 2;
+    }
+    try {
+      const { runFeeCheck } = await import("../lib/packs/fees/cli.ts");
+      const result = runFeeCheck(positionals[0], { json });
       process.stdout.write(result.output);
       return result.exitCode;
     } catch (err) {

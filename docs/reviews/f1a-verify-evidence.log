@@ -1,0 +1,122 @@
+F1a — UC-1 FEE-AUDIT DETERMINISTIC SPINE — VERIFICATION EVIDENCE
+================================================================
+Date: 2026-07-04.  Node v24.15.0.  Offline, $0-LLM.  No commit (Fable seat reviews first).
+
+Baseline (pre-slice): full suite 557 passed + 5 skipped; test:legacy 306 passed + 5 skipped.
+After F1a:            full suite 668 passed + 5 skipped; test:legacy 306 passed + 5 skipped.
+Delta: +111 tests, +8 eval files (fees-drift-lock, fees-parser, fees-finding-u1,
+       fees-audit-e1, fees-freeze, fees-coverage-c6, fees-cli, fees-honesty-c10).
+
+Every RED below was produced by a real, temporary source/fixture mutation, captured,
+then REVERTED; the GREEN is the restored state. Reverts confirmed by the final
+`npm run verify` (exit 0) and freeze-integrity evals passing.
+
+----------------------------------------------------------------
+RG-1  DRIFT-LOCK (both directions + 1:1 cap/base/drift_classes)
+----------------------------------------------------------------
+Mutation: lib/packs/fees/rules.ts  NYC-563.3-a-1 capPct 15 -> 14.
+CMD: npx vitest run evals/packs/fees-drift-lock.test.ts
+RED:
+  × NYC-563.3-a-1 matches cap_pct / base / drift_classes
+  AssertionError: expected 14 to be 15 // Object.is equality
+  Tests  1 failed | 18 passed (19)
+Revert -> 15.
+GREEN: Tests  19 passed (19)   [confirmed in the full fees-suite run: 111 passed]
+Note: the reverse direction ("no TS rule absent from the twin") and the
+XOR/set-equality checks pass in GREEN; the expected non-checkable set is asserted
+exactly {a-3, f-1, l-1, g-1-iv, g-3, h-1}.
+
+----------------------------------------------------------------
+RG-2  U1 PROVISIONAL-MARKER ENFORCEMENT (makeFeeFinding)
+----------------------------------------------------------------
+Mutation: lib/packs/fees/finding.ts  guard `if (BASE_DERIVED... )` -> `if (false && ...)`.
+CMD: npx vitest run evals/packs/fees-finding-u1.test.ts
+RED:
+  × RED: a base-derived rule without the U1 marker throws
+  AssertionError: expected function to throw an error, but it didn't
+  Tests  1 failed | 6 passed (7)
+Revert -> guard restored.
+GREEN: Tests  15 passed (15)   (base-derived a-2/c-1 goldens all carry "U1-base";
+  non-base d-1/d-4 carry no marker; PURCHASE_PRICE_BASE_STATUS === "unresolved-U1").
+
+----------------------------------------------------------------
+RG-3  e-1 REFUND-WINDOW AS VERDICT STATE
+----------------------------------------------------------------
+Mutation: lib/packs/fees/audit.ts refundWindowClose  +30 days -> +0 days.
+CMD: npx vitest run evals/packs/fees-audit-e1.test.ts
+RED:
+  × CONDITIONAL: window still open (asOf inside +30d), no refund -> NOT a violation
+  AssertionError: expected 'violation' to be 'conditional-pending-refund-window'
+  × CURED: excess refunded within the window, evaluated after close -> NOT a violation
+  Tests  2 failed | ...
+Revert -> +30 days.
+GREEN: Tests  10 passed (10).  Verified states:
+  - window closed, no refund            -> violation      (report.ok=false)
+  - window open, no refund              -> conditional-pending-refund-window (ok=true)
+  - refunded-in-window, covers excess   -> cured-by-refund (ok=true)
+  - refund dated AFTER window           -> violation (does not cure)
+  - partial refund below excess         -> violation
+  - transaction (c) over-cap + refund   -> violation  (NO safe harbor — c excluded)
+  - documented pass-through (c-2) >3%   -> NOT flagged
+
+----------------------------------------------------------------
+RG-4  FREEZE-INTEGRITY (committed corpus == seeded builder)
+----------------------------------------------------------------
+Mutation: fixtures/synthetic-restaurant/fees/statement.drifted.json  amountCents 360 -> 361.
+CMD: npx vitest run evals/packs/fees-freeze.test.ts
+RED:
+  × statement.drifted.json is exactly the pinned builder output
+  AssertionError: expected '{...}' to be '{...}'
+  Tests  1 failed | 9 passed (10)
+Regenerate: node scripts-ts/generate-fee-fixtures.mts
+GREEN: Tests  10 passed (10)   (all statements + answer key + 4 golden reports byte-locked;
+  audit deterministic across two runs).
+
+----------------------------------------------------------------
+RG-5  PARSER REJECTIONS (loud typed errors, no silent defaulting)
+----------------------------------------------------------------
+CMD: npx vitest run evals/packs/fees-parser.test.ts
+GREEN: Tests passed. 17 malformed inputs each throw StatementParseError
+  (non-object top level; missing/!array lines; missing meta; simulated!=true;
+   currency!=USD; bad month "2026-6"; bad asOf; float amountCents; negative amount;
+   zero/float purchase; bad line.month; empty declaredCategory; non-boolean isRefund;
+   refund without date; refundedAtDate on non-refund; invalid JSON text).
+  GREEN counterparts: a well-formed statement parses (object & string identical);
+  a refund WITH a valid date parses.
+  (Each assert-throws IS the red path exercised as a passing assertion.)
+
+----------------------------------------------------------------
+RG-6  CLI EXIT CODES (real child process) + $0-LLM import graph
+----------------------------------------------------------------
+CMD: node bin/check.mjs fees <statement.json> [--json]   (live capture)
+  faithful     -> EXIT 0
+  drifted      -> EXIT 1   (5 violations)
+  cured        -> EXIT 0   (cured-by-refund, ok true)
+  conditional  -> EXIT 0   (conditional, ok true)
+  --bogus flag -> EXIT 2
+  no positional-> EXIT 2
+  surplus pos. -> EXIT 2
+  missing file -> EXIT 2   (StatementParseError/ENOENT -> usage)
+  package.json (valid JSON, wrong shape) -> EXIT 2
+  --json byte-equal to expected-report.drifted.json (golden) — confirmed via diff.
+CMD: npx vitest run evals/packs/fees-cli.test.ts  -> passed (import-graph proof: no
+  lib/agents, @ai-sdk, ai, node:http(s), undici, groq|gemini reachable; no bare fetch().
+
+----------------------------------------------------------------
+RG-7  COVERAGE (C6) + answer-key completeness
+----------------------------------------------------------------
+CMD: npx vitest run evals/packs/fees-coverage-c6.test.ts  -> passed.
+  fixture coverage: 6/6 §7 fee-line classes have >=1 planted fixture.
+  detection split: 5/6 classes caught DETERMINISTICALLY; remainder = [relabeling]
+    DEFERRED-TO-CLASSIFIER (honest, not faked).
+  completeness (both directions): every emitted finding maps to a deterministic
+    answer-key entry (claimId + ruleId + verdict); every deterministic entry is caught.
+  every deferred entry genuinely emits NO finding.
+  overclaim guardrail: no fees source or fees README says "all edge cases".
+
+----------------------------------------------------------------
+FINAL GATES
+----------------------------------------------------------------
+CMD: npm run verify        -> EXIT 0.  Test Files 50 passed | 4 skipped;  Tests 668 passed | 5 skipped.
+CMD: npm run test:legacy   -> EXIT 0.  Test Files 26 passed | 4 skipped;  Tests 306 passed | 5 skipped (UNCHANGED).
+typecheck: clean.  lint (eslint --max-warnings=0): clean.  next build: succeeded.
