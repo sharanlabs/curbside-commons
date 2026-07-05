@@ -201,6 +201,23 @@ describe("F1b advisory audit path — default path stays byte-identical; advisor
     expect(base.findings.length).toBe(direct.findings.length);
     expect(base.verdictTally).toEqual(direct.verdictTally);
   });
+
+  it("two same-order, same-category candidate lines yield DISTINCT advisory claim ids (C2 traceability; M2 finding #4)", () => {
+    const statement = buildDriftedStatement();
+    const dupLine = { ...statement.lines[0], label: "Marketing push A", declaredCategory: "marketing_fee" };
+    const dupLine2 = { ...dupLine, label: "Marketing push B" };
+    const withDups = { meta: statement.meta, lines: [dupLine, dupLine2] };
+    // A test-local classifier that flags every line — both duplicates become candidates.
+    const flagAll = {
+      name: "test-flag-all",
+      earnsLabel: false as const,
+      classify: () => ({ predicted: NOT_A_PERMITTED_FEE, rationale: "test: always a candidate" }),
+    };
+    const { advisoryFindings } = auditWithClassification(withDups, flagAll);
+    expect(advisoryFindings).toHaveLength(2);
+    const ids = advisoryFindings.map((f) => f.claim.id);
+    expect(new Set(ids).size).toBe(2); // RED without the statement-position tag
+  });
 });
 
 describe("F1b wiring proof (deliverable 7) — the mock oracle surfaces the deferred ORD-5 candidates; the honest baseline does not", () => {

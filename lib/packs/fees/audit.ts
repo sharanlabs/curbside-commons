@@ -20,8 +20,11 @@
  *    only once the 30-day window closes with no covering refund; still-open →
  *    `conditional-pending-refund-window`; refunded-in-window → `cured-by-refund`.
  *  - TRANSACTION FEE (c): a hard 3% per-order cap, NO averaging and NO safe harbor
- *    (verdict is always `violation`) — unless documented as an exact pass-through
- *    (c-2, an asserted flag the audit cannot independently verify).
+ *    (verdict is always `violation`). A line above 3% carrying the c-2 pass-through
+ *    flag is NOT cleared silently: the flag is asserted by the platform and the
+ *    statement cannot verify the fee equals the actual processor charge, so the
+ *    reliance is surfaced as a non-gating `asserted-passthrough-unverified` warn
+ *    (M2 Codex finding #1, 2026-07-04).
  *  - d-4: an enhanced fee with no basic fee in the statement is disallowed.
  *
  * Plain: read the bill line by line against the legal caps, and say for each catch
@@ -124,6 +127,8 @@ function verdictPhrase(verdict: FeeVerdict, windowClose: string): string {
       return `conditional — pending the 30-day refund window (closes ${windowClose})`;
     case "cured-by-refund":
       return "cured by a refund within the 30-day window (not a violation)";
+    case "asserted-passthrough-unverified":
+      return "not verifiable from the statement — the pass-through exception is asserted, not proven";
   }
 }
 
@@ -137,6 +142,10 @@ export function auditStatement(statement: MonthlyStatement): FeeAuditReport {
   const asOf = statement.meta.asOf;
   const windowClose = refundWindowClose(month);
   const nonRefund = statement.lines.filter((l) => !l.isRefund);
+  // Statement-position tag — makes per-line claim ids unique when the same order
+  // carries repeated lines of one category (C2 traceability; M2 Codex finding #4).
+  const lineIndex = new Map<StatementLine, number>(statement.lines.map((l, i) => [l, i]));
+  const lineTag = (l: StatementLine) => `L${lineIndex.get(l)}`;
 
   // ── d-1 category lock: unlawful DECLARED categories (per-line) ──────────────
   const d1 = FEE_RULE_BY_ID.get("NYC-563.3-d-1")!;
@@ -145,7 +154,7 @@ export function auditStatement(statement: MonthlyStatement): FeeAuditReport {
     const feeClass: FeeLineClass = classifyUnlawful(line.declaredCategory);
     findings.push(
       makeFeeFinding({
-        claim: { id: `${line.orderId}#${line.declaredCategory}`, source: "fee-statement", field: "declaredCategory", value: line.declaredCategory },
+        claim: { id: `${line.orderId}#${line.declaredCategory}#${lineTag(line)}`, source: "fee-statement", field: "declaredCategory", value: line.declaredCategory },
         referenceRowId: d1.sourceClause,
         ruleId: d1.id,
         severity: "error",
@@ -184,12 +193,32 @@ export function auditStatement(statement: MonthlyStatement): FeeAuditReport {
     if (category === "transaction_fee") {
       // c-1: hard 3% per order, NO averaging, NO safe harbor; c-2 exception.
       const c1 = FEE_RULE_BY_ID.get("NYC-563.3-c-1")!;
+      const c2 = FEE_RULE_BY_ID.get("NYC-563.3-c-2")!;
       for (const line of catLines) {
         if (!perOrderCapExceeded(line.amountCents, line.orderPurchasePriceCents, cfg.capPct)) continue;
-        if (transactionPassthroughAllowed(line)) continue; // c-2 exception (asserted flag)
+        if (transactionPassthroughAllowed(line)) {
+          // c-2 exception — but the flag is ASSERTED by the platform; the statement
+          // cannot verify the fee equals the actual processor charge (§20-563.3(c)(i)–(ii)
+          // requires exactly that). Never clear silently: surface the reliance as a
+          // non-gating warn (M2 Codex finding #1). `ok` is unaffected (not a violation).
+          findings.push(
+            makeFeeFinding({
+              claim: { id: `${line.orderId}#transaction_fee#${lineTag(line)}`, source: "fee-statement", field: "passthroughDocumented", value: true },
+              referenceRowId: c2.sourceClause,
+              ruleId: c2.id,
+              severity: "warn",
+              verdict: "asserted-passthrough-unverified",
+              feeClass: "processing-fee-base-inflation",
+              provisional: [PROVISIONAL_U1],
+              professionalLine: `Transaction fee ${dollars(line.amountCents)} on order ${line.orderId} is ${pctOf(line.amountCents, line.orderPurchasePriceCents)} of the purchase price — above the 3% cap, relying on the §20-563.3(c)(i)–(ii) pass-through exception AS ASSERTED by the platform's passthroughDocumented flag. The statement cannot verify the fee equals the actual processor charge; ${provisionalQualifier()}. Not counted as a violation; flagged for evidence-backed verification outside the statement.`,
+              plainLine: `The card-processing fee here is ${pctOf(line.amountCents, line.orderPurchasePriceCents)} — over the 3% limit, but the platform says it's just passing through the real card cost. This bill alone can't prove that, so we flag it instead of clearing it or calling it a violation. (Also depends on the open "purchase price" question, U1.)`,
+            }),
+          );
+          continue;
+        }
         findings.push(
           makeFeeFinding({
-            claim: { id: `${line.orderId}#transaction_fee`, source: "fee-statement", field: "amountCents", value: line.amountCents },
+            claim: { id: `${line.orderId}#transaction_fee#${lineTag(line)}`, source: "fee-statement", field: "amountCents", value: line.amountCents },
             referenceRowId: c1.sourceClause,
             ruleId: c1.id,
             severity: "error",
@@ -280,5 +309,6 @@ function plainVerdict(verdict: FeeVerdict, windowClose: string): string {
     case "violation": return "The 30-day window to refund the overcharge has closed with no refund, so this is a violation.";
     case "conditional-pending-refund-window": return `It's not a violation yet — the platform still has until ${windowClose} to refund the excess.`;
     case "cured-by-refund": return "The excess was refunded in time, so this is not a violation.";
+    case "asserted-passthrough-unverified": return "The platform says this is a straight pass-through of the card processor's charge — this bill alone can't prove or disprove that.";
   }
 }

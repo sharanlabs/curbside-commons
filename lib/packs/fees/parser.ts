@@ -152,6 +152,16 @@ export function parseStatement(input: unknown): MonthlyStatement {
   }
   const meta = parseMeta(raw.meta);
   const lines = raw.lines.map((l, i) => parseLine(l, i));
+  // A statement is MONTHLY: the audit sums every line against meta.month's caps
+  // and refund window, so a line from another month would corrupt the monthly
+  // averages and e-1 cure logic (M2 Codex finding #3). Reject loudly, never coerce.
+  for (const [i, line] of lines.entries()) {
+    if (line.month !== meta.month) {
+      throw new StatementParseError(
+        `lines[${i}].month "${line.month}" does not match meta.month "${meta.month}" — a monthly statement must not mix months`,
+      );
+    }
+  }
   return { meta, lines };
 }
 

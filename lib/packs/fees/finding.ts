@@ -4,7 +4,8 @@
  * A {@link FeeFinding} is a verifier-core {@link Finding} (all four C2 receipts,
  * built through the ONLY sanctioned constructor `makeFinding`) EXTENDED with the
  * fee-domain state the report needs:
- *  - a {@link FeeVerdict} (the §20-563.3(e) refund-window verdict state — a state,
+ *  - a {@link FeeVerdict} (the fee-domain verdict state — the §20-563.3(e)
+ *    refund-window states plus the c-2 asserted-pass-through state; a state,
  *    not prose);
  *  - the plan §7 fee-line class it belongs to;
  *  - a PROVISIONAL marker array — {@link makeFeeFinding} REQUIRES the U1 marker on
@@ -26,25 +27,34 @@ import { ASSUMED_PURCHASE_PRICE_BASE } from "./statement.ts";
 export const PROVISIONAL_U1 = "U1-base" as const;
 
 /**
- * The §20-563.3(e) verdict state of an over-cap finding, ENCODED (never prose):
- *  - `violation` — settled: over cap and (for a/b/d) the 30-day refund window
- *    closed with no covering refund, or (for c) no safe harbor exists at all;
+ * The fee-domain verdict state of a finding, ENCODED (never prose):
+ *  - `violation` — settled: over cap and (for a/b/d) the §20-563.3(e) 30-day
+ *    refund window closed with no covering refund, or (for c) no safe harbor
+ *    exists at all;
  *  - `conditional-pending-refund-window` — over cap on a/b/d but the 30-day
  *    window is still open (not yet a violation — the statute defers the verdict);
  *  - `cured-by-refund` — over cap on a/b/d, fully refunded within the window (not
- *    a violation).
+ *    a violation);
+ *  - `asserted-passthrough-unverified` — a transaction fee above the 3% cap whose
+ *    §20-563.3(c)(i)–(ii) pass-through exception rests SOLELY on the platform's
+ *    asserted `passthroughDocumented` flag. The statement cannot verify the
+ *    underlying processor charge, so the audit neither clears the line silently
+ *    nor calls it a violation — it surfaces the reliance (M2 Codex finding #1,
+ *    2026-07-04). Never counts toward `ok:false`.
  * Non-over-cap findings (category lock, enhanced-without-basic) are always
  * `violation`.
  */
 export type FeeVerdict =
   | "violation"
   | "conditional-pending-refund-window"
-  | "cured-by-refund";
+  | "cured-by-refund"
+  | "asserted-passthrough-unverified";
 
 export const FEE_VERDICTS: readonly FeeVerdict[] = [
   "violation",
   "conditional-pending-refund-window",
   "cured-by-refund",
+  "asserted-passthrough-unverified",
 ] as const;
 
 /** A fee finding: a C2-valid core Finding + fee-domain state (both registers). */
@@ -164,6 +174,7 @@ export function buildFeeReport(
     violation: 0,
     "conditional-pending-refund-window": 0,
     "cured-by-refund": 0,
+    "asserted-passthrough-unverified": 0,
   };
   for (const f of sorted) verdictTally[f.verdict] += 1;
   return Object.freeze({

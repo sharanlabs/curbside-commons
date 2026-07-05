@@ -6,7 +6,7 @@
   "findings": [
     {
       "claim": {
-        "id": "ORD-3#service_and_delivery",
+        "id": "ORD-3#service_and_delivery#L5",
         "source": "fee-statement",
         "field": "declaredCategory",
         "value": "service_and_delivery"
@@ -63,7 +63,7 @@
     },
     {
       "claim": {
-        "id": "ORD-1#transaction_fee",
+        "id": "ORD-1#transaction_fee#L1",
         "source": "fee-statement",
         "field": "amountCents",
         "value": 160
@@ -82,7 +82,7 @@
     },
     {
       "claim": {
-        "id": "ORD-4#promotion_deduction",
+        "id": "ORD-4#promotion_deduction#L7",
         "source": "fee-statement",
         "field": "declaredCategory",
         "value": "promotion_deduction"
@@ -101,7 +101,8 @@
   "verdictTally": {
     "violation": 5,
     "conditional-pending-refund-window": 0,
-    "cured-by-refund": 0
+    "cured-by-refund": 0,
+    "asserted-passthrough-unverified": 0
   },
   "ok": false
 }

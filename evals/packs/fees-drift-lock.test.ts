@@ -19,6 +19,8 @@ import {
 
 interface TwinRule {
   readonly id: string;
+  readonly source_clause: string;
+  readonly kind: string;
   readonly cap_pct?: number;
   readonly base?: string;
   readonly drift_classes: readonly string[];
@@ -76,12 +78,19 @@ describe("drift-lock: every twin rule is implemented XOR registered non-checkabl
 });
 
 describe("drift-lock: implemented rules match the twin field-for-field (1:1)", () => {
-  it.each(FEE_RULES.map((r) => [r.id, r] as const))("%s matches cap_pct / base / drift_classes", (_id, rule) => {
-    const t = twinById.get(rule.id)!;
-    expect(rule.capPct).toBe(t.cap_pct);
-    expect(rule.base).toBe(t.base);
-    expect(rule.driftClasses).toEqual(normalizeTwinDriftClasses(t.drift_classes));
-  });
+  it.each(FEE_RULES.map((r) => [r.id, r] as const))(
+    "%s matches source_clause / kind / cap_pct / base / drift_classes",
+    (_id, rule) => {
+      const t = twinById.get(rule.id)!;
+      // ALL mirrored metadata is locked (M2 Codex finding #5): a twin edit to the
+      // clause reference or rule kind must fail here, not drift silently.
+      expect(rule.sourceClause).toBe(t.source_clause);
+      expect(rule.kind).toBe(t.kind);
+      expect(rule.capPct).toBe(t.cap_pct);
+      expect(rule.base).toBe(t.base);
+      expect(rule.driftClasses).toEqual(normalizeTwinDriftClasses(t.drift_classes));
+    },
+  );
 });
 
 describe("drift-lock: base-derived set is DERIVED from the twin's `base` field (item 5.ii)", () => {

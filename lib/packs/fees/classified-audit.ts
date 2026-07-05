@@ -13,20 +13,23 @@
  *
  * DESIGN ESCALATION E-1 (freeze-safety over literal wording): the packet describes
  * this wiring as flowing "through makeFeeFinding" with a distinct `claim.source`.
- * `makeFeeFinding` (lib/packs/fees/finding.ts) requires a {@link FeeVerdict}, whose
- * three members (`violation` / `conditional-pending-refund-window` /
- * `cured-by-refund`) are all STATUTORY DISPOSITIONS of a settled cap check — none
- * honestly describes an unconfirmed AI-derived relabeling candidate, and adding a
- * fourth member to the union would force `buildFeeReport`'s `verdictTally` record
- * (finding.ts, an F1a file) to grow a new key that serializes into EVERY frozen
- * golden report's JSON (byte-breaking the hard "F1a goldens byte-unchanged"
- * constraint) even though the value would always be 0 on the base path. Resolution
- * (conservative): reuse the SAME universal C2 receipts constructor every finding in
- * this repo is built through (`makeFinding`, verifier-core/guard.ts — the function
- * `makeFeeFinding` itself wraps), and define a fees-domain advisory type
- * ({@link ClassifierAdvisoryFinding}) alongside it, entirely outside `FeeVerdict` /
- * `buildFeeReport`. `finding.ts` is untouched; F1a goldens cannot be affected because
- * this module never calls `buildFeeReport`. The one live change borrowed from the
+ * `makeFeeFinding` (lib/packs/fees/finding.ts) requires a {@link FeeVerdict} —
+ * at F1b build time its three members (`violation` /
+ * `conditional-pending-refund-window` / `cured-by-refund`) were all STATUTORY
+ * DISPOSITIONS of a settled cap check; none honestly describes an unconfirmed
+ * AI-derived relabeling candidate, and growing the union just for the advisory
+ * lane would have byte-broken the frozen F1a goldens via `verdictTally`.
+ * (The M2 reconciliation, 2026-07-04, later DID add a fourth member —
+ * `asserted-passthrough-unverified`, a c-2 statement-side state — under a
+ * SANCTIONED golden regeneration; that state belongs to the deterministic audit,
+ * still not to advisory candidates, so this resolution stands unchanged.)
+ * Resolution (conservative): reuse the SAME universal C2 receipts constructor
+ * every finding in this repo is built through (`makeFinding`,
+ * verifier-core/guard.ts — the function `makeFeeFinding` itself wraps), and
+ * define a fees-domain advisory type ({@link ClassifierAdvisoryFinding})
+ * alongside it, entirely outside `FeeVerdict` / `buildFeeReport`. F1a goldens
+ * cannot be affected because this module never calls `buildFeeReport`.
+ * The one live change borrowed from the
  * literal spec is the claim source: `ClaimSource` (verifier-core/claim.ts) gains the
  * `"classifier"` member (a plain string-literal addition with no exhaustive switch
  * anywhere in the codebase — verified before the edit — so it cannot break anything
@@ -95,12 +98,15 @@ const ruleIdFor = (classifier: LineItemClassifier): string =>
 
 function buildAdvisoryFinding(
   line: StatementLine,
+  lineTag: string,
   prediction: ClassifierPrediction,
   classifier: LineItemClassifier,
 ): ClassifierAdvisoryFinding {
   const core = makeFinding({
     claim: {
-      id: `${line.orderId}#${line.declaredCategory}#classifier`,
+      // Statement-position tag keeps ids unique across repeated same-order,
+      // same-category lines (C2 traceability; M2 Codex finding #4).
+      id: `${line.orderId}#${line.declaredCategory}#${lineTag}#classifier`,
       source: "classifier",
       field: "predictedTrueCategory",
       value: prediction.predicted,
@@ -135,13 +141,14 @@ export function auditWithClassification(
   const base = auditStatement(statement);
   const nonRefund = statement.lines.filter((l) => !l.isRefund);
   const siblingDeclaredCategories = [...new Set(nonRefund.map((l) => l.declaredCategory))];
+  const lineIndex = new Map<StatementLine, number>(statement.lines.map((l, i) => [l, i]));
 
   const advisoryFindings: ClassifierAdvisoryFinding[] = [];
   for (const line of nonRefund) {
     const input = toClassifierInput(line, siblingDeclaredCategories);
     const prediction = classifier.classify(input);
     if (prediction.predicted === line.declaredCategory) continue; // no candidate — classifier agrees with the declared label
-    advisoryFindings.push(buildAdvisoryFinding(line, prediction, classifier));
+    advisoryFindings.push(buildAdvisoryFinding(line, `L${lineIndex.get(line)}`, prediction, classifier));
   }
 
   return Object.freeze({ base, advisoryFindings: Object.freeze(advisoryFindings) });

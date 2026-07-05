@@ -131,7 +131,7 @@ a missed one lets a real mislabel stand.
 
 | Metric | Floor | Note |
 | --- | --- | --- |
-| **Overall held-out accuracy** | **≥ 0.90** | the deterministic baseline already measures 19/21 = 0.905 on this split — the live classifier must be AT LEAST this good, ideally strictly better |
+| **Overall held-out accuracy** | **≥ 20/21 (≈ 0.952) — strictly MORE than the pinned baseline's 19/21** | the deterministic baseline measures 19/21 = 0.905 on this split; a live run that only TIES 19/21 does NOT clear this floor (tie = DEFER, the domain-critic precedent — AM-7). **AMENDED 2026-07-04, pre-run** (M2 Codex finding #2): the original "≥ 0.90" admitted a baseline tie, contradicting §1's "earns only by beating the baseline"; strengthened upward before any live run — floors may only ever tighten pre-run, never loosen |
 | **Overall held-out precision (macro, across the 5 labels)** | **≥ 0.85** | macro-averaged across `delivery_fee / basic_service_fee / transaction_fee / enhanced_service_fee / not-a-permitted-fee` |
 | **Per-class recall — every one of the 5 labels** | **≥ 0.70** | the binding per-class floor; a class the live run cannot resolve at all fails outright, not silently averaged away |
 | **Per-class recall — `enhanced_service_fee` and `not-a-permitted-fee` specifically** | **≥ 0.80** | these are the two classes carrying the genuine relabeling/bundling drift the baseline MISSES (`relabel-test-2`, `bundle-test-2`) — the live run must show it actually resolves the cases the floor cannot, not just match it elsewhere |

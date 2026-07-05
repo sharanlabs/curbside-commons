@@ -1,0 +1,21 @@
+# Acceptance-gate record — M2 module boundary, F1 fee-audit module
+
+**Date:** 2026-07-04 (eleventh session). **Judge:** independent `acceptance-gate` subagent (read-only on the artifact; no Bash in its thread — gate 3 ran as an explicit verify-handoff, returned raw and judged). **Maker≠judge:** the makers were the delegated F1a/F1b builders + the Fable-seat M2 reconciliation; the gate produced none of the artifact. **Scope:** F1a `896ab59` + F1b `bda6314` + the working-tree M2 reconciliation diff (18 modified files + 4 new `docs/reviews/` records; committed immediately after this verdict — see git log).
+
+## Verdict: **SHIP — all five ordered gates PASS.** The F1 fee-audit module is **ACCEPTED at the M2 boundary**.
+
+| Gate | Result | Substance |
+| --- | --- | --- |
+| 1 · grill | PASS | The gate independently re-derived the "monthly-fail ⟺ both statutory bases fail" equivalence (exact); U1 provisionality confirmed constructor-ENFORCED, not narrated; the denominator-undercount limitation documented in code + corpus README; relabeling honestly deferred (null answer-key ids). "No hand-waving found." |
+| 2 · codex cross-model | PASS (authenticated, not re-run) | The M2 batch (BLOCK 2P1+2P2+1P3) → reconciliation (ALL 5 accepted + red-green) → mapped confirming pass (ALL FIVE DISCHARGED + 1 residual P3 comment fix) chain authenticated against the raw records and the code — every fix physically present at the claimed lines. |
+| 3 · verify | PASS (via handoff) | Its thread had no Bash → 4-item handoff executed by the main session and returned raw: `npm run verify` EXIT=0 **720 passed + 5 skipped** (54+4 files); `npm run test:legacy` EXIT=0 **306+5**; statement fixtures byte-unchanged (empty numstat); `lib/packs/listings` / `legacy` / `evals/gold` untouched (empty diff); the e1 test-count discrepancy it tripwired (F1a log "10" vs committed 8) resolved with git evidence — two pre-commit-transient builder-tree tests, never committed, nothing deleted from any commit; honesty note added to the M2 record. The gate confirmed the decomposition "reconciles all three number chains simultaneously — the strongest available signal the return is genuine." |
+| 4 · enterprise+taste | PASS (full) | Integer-cent money, pure clockless engine, loud zero-coercion parser, single sanctioned constructor enforcing C2+U1 at runtime, canonical serialization + deterministic ordering, both-direction drift-lock. Three NON-BLOCKING advisory nits recorded for a future slice: stale field-level comment `finding.ts:63`; object-identity `lineIndex` in `audit.ts` (unreachable via the parser); `#` inside arbitrary `declaredCategory` makes claim ids unparseable though still unique. |
+| 5 · anti-slop | PASS | No debug residue/TODO/dead code/AI tells across the module + records; em-dash density = the repo's owner-ratified house style, checked-and-accepted; advisory `deslop_code.py --base main` = **0/100 clean, 0 findings**. |
+
+## Consequences (the gate's own terms)
+
+1. The module is ACCEPTED **as it stands on disk**; the reconciliation diff is committed as-is; any edit beyond it re-opens the gate. The three gate-4 advisory nits are deliberately LEFT UNTOUCHED for the next slice for exactly this reason.
+2. **The owner-gated live classifier run may now be SURFACED — surfaced, not started.** It remains an explicit OWNER decision bound to the pre-registered floors of `docs/plan-f1b-classifier.md` §3.1 (accuracy ≥ 20/21 STRICTLY beating the 19/21 baseline, tie = DEFER; per-class recall floors; K=3 at temp 0; one paced Groq pass with preflight; scored on the held-out test split only).
+3. Process lesson (routed to `~/claude-os/tasks/lessons.md`): re-run or annotate an evidence log's red-green counts AT COMMIT TIME, not only mid-build — the F1a log faithfully recorded a pre-commit state that two never-committed tests made unrepresentative of the shipped artifact.
+
+**Advisor note:** the gate's thread found the harness advisor tool unavailable (12th consecutive observation across threads). Main-session `advisor()` also down (11th session); `frontier-advisor` consults succeeded at both M2 judgment boundaries (pre-approach ruling carried from the tenth session; pre-verdict consult this session after one owner-confirmed seat-limit retry).

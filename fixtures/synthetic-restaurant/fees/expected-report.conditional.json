@@ -31,7 +31,8 @@
   "verdictTally": {
     "violation": 0,
     "conditional-pending-refund-window": 1,
-    "cured-by-refund": 0
+    "cured-by-refund": 0,
+    "asserted-passthrough-unverified": 0
   },
   "ok": true
 }

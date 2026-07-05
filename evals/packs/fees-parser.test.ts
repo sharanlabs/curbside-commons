@@ -61,6 +61,9 @@ describe("parser RED: each malformed input throws StatementParseError", () => {
     ["non-boolean isRefund", { ...validStatement, lines: [{ ...validLine, isRefund: "yes" }] }],
     ["refund without a date", { ...validStatement, lines: [{ ...validLine, isRefund: true }] }],
     ["refundedAtDate on a non-refund line", { ...validStatement, lines: [{ ...validLine, refundedAtDate: "2026-07-15" }] }],
+    // M2 Codex finding #3: a monthly statement must not mix months — a stray-month
+    // line would silently corrupt monthly averages and the e-1 refund window.
+    ["line.month differs from meta.month", { ...validStatement, lines: [validLine, { ...validLine, orderId: "ORD-2", month: "2026-07" }] }],
   ];
 
   it.each(bad)("rejects: %s", (_name, input) => {

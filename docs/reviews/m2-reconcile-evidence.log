@@ -1,0 +1,51 @@
+# M2 reconciliation — red-green evidence log (2026-07-04, eleventh session)
+# Reviewer-executed on the Fable seat. Pattern per file: backup -> mutation -> RED -> restore -> GREEN.
+# Backups: scratchpad rg-backup/ (session-local); restores byte-identical (cp from backup).
+# Post-run residue check: grep for mutation markers across lib/ -> empty.
+
+BASELINE (pre-reconciliation, re-grounded at session start):
+  npm run verify -> exit 0; Tests 715 passed | 5 skipped (720)
+  npm test counts: Test Files 54 passed | 4 skipped (58)
+
+FREEZE-TEETH DEMONSTRATION (pre-regeneration, after the claim-id fix landed in code):
+  npx vitest run fees-audit-e1 fees-parser fees-drift-lock fees-classifier
+  -> Tests 1 failed | 65 passed (66)
+  -> the ONE failure = fees-classifier.test.ts "the F1a frozen golden reports are UNCHANGED"
+     (byte assertion firing on the sanctioned claim-id change — the freeze lock works)
+  THEN: npm run fixtures:fees (seeded generator) -> goldens + answer key regenerated
+  git diff fixtures/ reviewed line-by-line: deltas are EXACTLY
+    (a) 3 claim ids gaining #L1/#L5/#L7 (expected-report.drifted.json),
+    (b) "asserted-passthrough-unverified": 0 added to verdictTally in all 4 reports,
+    (c) 3 matching expectedClaimId values (fee-answer-key.json).
+  statement.*.json BYTE-UNCHANGED. Full pack+gold suite after regen: 398 passed (398).
+
+RG-1  (finding #1 — c-2 never silently cleared)
+  MUTATION: audit.ts c-2 branch reverted to `if (transactionPassthroughAllowed(line)) continue;`
+  RED:     fees-audit-e1.test.ts -> Tests 1 failed | 10 passed (11)
+           (failed: "an asserted pass-through (c-2) above 3% is SURFACED as a non-gating warn")
+  RESTORE: fees-audit-e1.test.ts -> Tests 11 passed (11)
+
+RG-2  (finding #3 — parser rejects mixed months)
+  MUTATION: parser.ts month-consistency check disabled (`if (false)`)
+  RED:     fees-parser.test.ts -> Tests 1 failed | 20 passed (21)
+           (failed: rejects "line.month differs from meta.month")
+  RESTORE: fees-parser.test.ts -> Tests 21 passed (21)
+
+RG-3  (finding #4 — claim-id uniqueness, audit + advisory)
+  MUTATION: lineTag dropped from audit.ts (d-1 + c-1) AND classified-audit.ts (advisory)
+  RED:     fees-audit-e1 + fees-classifier -> Tests 4 failed | 22 passed (26)
+           (failed: both e1 uniqueness tests; the advisory dup-id test; the golden byte re-assertion)
+  RESTORE: -> Tests 26 passed (26)
+
+RG-4  (finding #5 — drift-lock locks kind/source_clause)
+  MUTATION: rules.ts NYC-563.3-a-1 kind "per_order_cap" -> "monthly_average_cap"
+  RED:     fees-drift-lock.test.ts -> Tests 1 failed | 18 passed (19)
+           (failed: "NYC-563.3-a-1 matches source_clause / kind / cap_pct / base / drift_classes")
+  RESTORE: fees-drift-lock.test.ts -> Tests 19 passed (19)
+
+FINDING #2 (floor amendment): doc-only — grep confirmed no test/code encodes the 0.90 floor;
+  docs/plan-f1b-classifier.md row amended in place with the dated note (strengthened pre-run).
+
+FINAL GATE (all fixes in, mutations restored, residue check clean):
+  npm run verify -> VERIFY_EXIT=0; Tests 720 passed | 5 skipped (725)   [715 -> 720: +5 tests]
+  npm run test:legacy -> Tests 306 passed | 5 skipped (311)             [unchanged]

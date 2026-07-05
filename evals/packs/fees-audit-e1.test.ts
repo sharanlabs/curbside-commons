@@ -121,14 +121,62 @@ describe("e-1: transaction fee (c) gets NO safe harbor", () => {
     expect(report.ok).toBe(false);
   });
 
-  it("a documented pass-through (c-2) above 3% is NOT flagged", () => {
+  it("an asserted pass-through (c-2) above 3% is SURFACED as a non-gating warn — never silently cleared, never a violation (M2 finding #1)", () => {
     const report = auditStatement({
       meta: meta("2026-08-15"),
       lines: [
         line({ orderId: "ORD-1", declaredCategory: "transaction_fee", label: "Card processing (pass-through)", amountCents: 160, orderPurchasePriceCents: 2000, passthroughDocumented: true }),
       ],
     });
+    // Not a c-1 violation…
     expect(report.findings.some((f) => f.ruleId === "NYC-563.3-c-1")).toBe(false);
+    // …but the reliance on the ASSERTED flag is visible, warn-severity, non-gating.
+    const c2 = report.findings.find((f) => f.ruleId === "NYC-563.3-c-2");
+    expect(c2?.severity).toBe("warn");
+    expect(c2?.verdict).toBe("asserted-passthrough-unverified");
+    expect(c2?.claim.field).toBe("passthroughDocumented");
+    expect(c2?.professionalLine).toMatch(/asserted/i);
+    expect(report.ok).toBe(true); // a warn is not a violation — ok is unaffected
+    expect(report.verdictTally["asserted-passthrough-unverified"]).toBe(1);
+  });
+
+  it("a pass-through-asserted fee AT/UNDER 3% produces NO finding at all (the warn fires only over the cap)", () => {
+    const report = auditStatement({
+      meta: meta("2026-08-15"),
+      lines: [
+        line({ orderId: "ORD-1", declaredCategory: "transaction_fee", label: "Card processing (pass-through)", amountCents: 60, orderPurchasePriceCents: 2000, passthroughDocumented: true }),
+      ],
+    });
+    expect(report.findings).toHaveLength(0);
+    expect(report.ok).toBe(true);
+  });
+});
+
+describe("claim-id uniqueness (C2 traceability; M2 finding #4)", () => {
+  it("two same-order, same-category over-cap transaction lines yield DISTINCT claim ids", () => {
+    const report = auditStatement({
+      meta: meta("2026-08-15"),
+      lines: [
+        line({ orderId: "ORD-1", declaredCategory: "transaction_fee", label: "Card processing A", amountCents: 160, orderPurchasePriceCents: 2000 }),
+        line({ orderId: "ORD-1", declaredCategory: "transaction_fee", label: "Card processing B", amountCents: 170, orderPurchasePriceCents: 2000 }),
+      ],
+    });
+    const ids = report.findings.filter((f) => f.ruleId === "NYC-563.3-c-1").map((f) => f.claim.id);
+    expect(ids).toHaveLength(2);
+    expect(new Set(ids).size).toBe(2); // RED without the statement-position tag
+  });
+
+  it("two same-order, same-unlawful-category lines (d-1) yield DISTINCT claim ids", () => {
+    const report = auditStatement({
+      meta: meta("2026-08-15"),
+      lines: [
+        line({ orderId: "ORD-1", declaredCategory: "marketing_fee", label: "Marketing A", amountCents: 100 }),
+        line({ orderId: "ORD-1", declaredCategory: "marketing_fee", label: "Marketing B", amountCents: 120 }),
+      ],
+    });
+    const ids = report.findings.filter((f) => f.ruleId === "NYC-563.3-d-1").map((f) => f.claim.id);
+    expect(ids).toHaveLength(2);
+    expect(new Set(ids).size).toBe(2);
   });
 });
 

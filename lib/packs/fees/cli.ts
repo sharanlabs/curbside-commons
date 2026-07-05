@@ -46,6 +46,7 @@ const VERDICT_TAG: Readonly<Record<FeeFinding["verdict"], string>> = {
   violation: "VIOLATION",
   "conditional-pending-refund-window": "CONDITIONAL (refund window open)",
   "cured-by-refund": "CURED BY REFUND (not a violation)",
+  "asserted-passthrough-unverified": "ASSERTED PASS-THROUGH (unverified — not a violation)",
 };
 
 /** Human-readable two-register text render (the default CLI output). */
@@ -57,7 +58,7 @@ export function renderFeeReportText(report: FeeAuditReport): string {
   lines.push(`assumed purchase-price base (U1 unresolved): ${report.assumedPurchasePriceBase}`);
   lines.push(`verdict: ${report.ok ? "PASS (no violations)" : "FAIL (violations present)"}`);
   lines.push(
-    `findings: ${report.findings.length} — violation ${report.verdictTally.violation}, conditional ${report.verdictTally["conditional-pending-refund-window"]}, cured ${report.verdictTally["cured-by-refund"]}`,
+    `findings: ${report.findings.length} — violation ${report.verdictTally.violation}, conditional ${report.verdictTally["conditional-pending-refund-window"]}, cured ${report.verdictTally["cured-by-refund"]}, asserted-passthrough ${report.verdictTally["asserted-passthrough-unverified"]}`,
   );
   lines.push("");
   if (report.findings.length === 0) {
