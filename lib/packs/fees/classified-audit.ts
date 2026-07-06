@@ -55,7 +55,7 @@
  */
 import { makeFinding } from "../../verifier-core/guard.ts";
 import type { Finding } from "../../verifier-core/index.ts";
-import { auditStatement } from "./audit.ts";
+import { auditStatement, claimIdPart, makeLineTagger } from "./audit.ts";
 import {
   toClassifierInput,
   type ClassifierPrediction,
@@ -109,7 +109,7 @@ function buildAdvisoryFinding(
     claim: {
       // Statement-position tag keeps ids unique across repeated same-order,
       // same-category lines (C2 traceability; M2 Codex finding #4).
-      id: `${line.orderId}#${line.declaredCategory}#${lineTag}#classifier`,
+      id: `${claimIdPart(line.orderId)}#${claimIdPart(line.declaredCategory)}#${lineTag}#classifier`,
       source: "classifier",
       field: "predictedTrueCategory",
       value: prediction.predicted,
@@ -145,14 +145,14 @@ export function auditWithClassification(
   const base = auditStatement(statement);
   const nonRefund = statement.lines.filter((l) => !l.isRefund);
   const siblingDeclaredCategories = [...new Set(nonRefund.map((l) => l.declaredCategory))];
-  const lineIndex = new Map<StatementLine, number>(statement.lines.map((l, i) => [l, i]));
+  const lineTag = makeLineTagger(statement);
 
   const advisoryFindings: ClassifierAdvisoryFinding[] = [];
   for (const line of nonRefund) {
     const input = toClassifierInput(line, siblingDeclaredCategories);
     const prediction = classifier.classify(input);
     if (prediction.predicted === line.declaredCategory) continue; // no candidate — classifier agrees with the declared label
-    advisoryFindings.push(buildAdvisoryFinding(line, `L${lineIndex.get(line)}`, prediction, classifier));
+    advisoryFindings.push(buildAdvisoryFinding(line, lineTag(line), prediction, classifier));
   }
 
   return Object.freeze({ base, advisoryFindings: Object.freeze(advisoryFindings) });

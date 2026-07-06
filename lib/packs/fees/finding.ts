@@ -59,7 +59,7 @@ export const FEE_VERDICTS: readonly FeeVerdict[] = [
 
 /** A fee finding: a C2-valid core Finding + fee-domain state (both registers). */
 export interface FeeFinding extends Finding {
-  /** The §20-563.3(e) verdict state (a state, not prose). */
+  /** The fee verdict state (a state, not prose): the §20-563.3(e) refund states plus the c-2 `asserted-passthrough-unverified` warn (M2, 2026-07-04). */
   readonly verdict: FeeVerdict;
   /** Plan §7 fee-line class this finding belongs to. */
   readonly feeClass: FeeLineClass;

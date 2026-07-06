@@ -136,16 +136,40 @@ function verdictPhrase(verdict: FeeVerdict, windowClose: string): string {
  * Audit one parsed monthly statement. Pure in (statement); no clock, no network,
  * no LLM. Returns the machine-readable, evidence-cited fee report.
  */
+/**
+ * Escape the claim-id separator in ARBITRARY statement strings (`orderId`,
+ * `declaredCategory`): '%' → '%25', '#' → '%23'. Keeps `id.split("#")`
+ * unambiguous while staying byte-identity on every committed corpus value
+ * (no fixture contains '#' or '%' — goldens unchanged). Reversible.
+ * Closes the M2 gate-4 advisory nit (2026-07-04 gate record, gate 4).
+ */
+export const claimIdPart = (s: string): string => s.replace(/%/g, "%25").replace(/#/g, "%23");
+
+/**
+ * Statement-position tagger — makes per-line claim ids unique when the same order
+ * carries repeated lines of one category (C2 traceability; M2 Codex finding #4).
+ * The map is OBJECT-IDENTITY keyed, so a line not a member of `statement.lines`
+ * throws loudly instead of rendering a silent "Lundefined" (M2 gate-4 advisory;
+ * unreachable via the parser — a defensive contract for direct constructors).
+ */
+export function makeLineTagger(statement: MonthlyStatement): (l: StatementLine) => string {
+  const index = new Map<StatementLine, number>(statement.lines.map((l, i) => [l, i]));
+  return (l) => {
+    const i = index.get(l);
+    if (i === undefined) {
+      throw new Error(`fees audit: line "${l.label}" (order ${l.orderId}) is not a member of statement.lines — the statement-position tag is object-identity based`);
+    }
+    return `L${i}`;
+  };
+}
+
 export function auditStatement(statement: MonthlyStatement): FeeAuditReport {
   const findings: FeeFinding[] = [];
   const month = statement.meta.month;
   const asOf = statement.meta.asOf;
   const windowClose = refundWindowClose(month);
   const nonRefund = statement.lines.filter((l) => !l.isRefund);
-  // Statement-position tag — makes per-line claim ids unique when the same order
-  // carries repeated lines of one category (C2 traceability; M2 Codex finding #4).
-  const lineIndex = new Map<StatementLine, number>(statement.lines.map((l, i) => [l, i]));
-  const lineTag = (l: StatementLine) => `L${lineIndex.get(l)}`;
+  const lineTag = makeLineTagger(statement);
 
   // ── d-1 category lock: unlawful DECLARED categories (per-line) ──────────────
   const d1 = FEE_RULE_BY_ID.get("NYC-563.3-d-1")!;
@@ -154,7 +178,7 @@ export function auditStatement(statement: MonthlyStatement): FeeAuditReport {
     const feeClass: FeeLineClass = classifyUnlawful(line.declaredCategory);
     findings.push(
       makeFeeFinding({
-        claim: { id: `${line.orderId}#${line.declaredCategory}#${lineTag(line)}`, source: "fee-statement", field: "declaredCategory", value: line.declaredCategory },
+        claim: { id: `${claimIdPart(line.orderId)}#${claimIdPart(line.declaredCategory)}#${lineTag(line)}`, source: "fee-statement", field: "declaredCategory", value: line.declaredCategory },
         referenceRowId: d1.sourceClause,
         ruleId: d1.id,
         severity: "error",
@@ -203,7 +227,7 @@ export function auditStatement(statement: MonthlyStatement): FeeAuditReport {
           // non-gating warn (M2 Codex finding #1). `ok` is unaffected (not a violation).
           findings.push(
             makeFeeFinding({
-              claim: { id: `${line.orderId}#transaction_fee#${lineTag(line)}`, source: "fee-statement", field: "passthroughDocumented", value: true },
+              claim: { id: `${claimIdPart(line.orderId)}#transaction_fee#${lineTag(line)}`, source: "fee-statement", field: "passthroughDocumented", value: true },
               referenceRowId: c2.sourceClause,
               ruleId: c2.id,
               severity: "warn",
@@ -218,7 +242,7 @@ export function auditStatement(statement: MonthlyStatement): FeeAuditReport {
         }
         findings.push(
           makeFeeFinding({
-            claim: { id: `${line.orderId}#transaction_fee#${lineTag(line)}`, source: "fee-statement", field: "amountCents", value: line.amountCents },
+            claim: { id: `${claimIdPart(line.orderId)}#transaction_fee#${lineTag(line)}`, source: "fee-statement", field: "amountCents", value: line.amountCents },
             referenceRowId: c1.sourceClause,
             ruleId: c1.id,
             severity: "error",

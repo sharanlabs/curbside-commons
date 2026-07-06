@@ -80,6 +80,8 @@ export {
   FEES_SPEC_VERSION,
   FEES_CLASSIFICATION_LABEL,
   auditStatement,
+  claimIdPart,
+  makeLineTagger,
 } from "./audit.ts";
 export type { FeeAnswerKey, FeeAnswerKeyEntry, FeeDetectionMode } from "./generate.ts";
 export {

@@ -1,0 +1,61 @@
+# M2 GATE-4 ADVISORY NITS — RED-GREEN EVIDENCE (2026-07-06, fourteenth session)
+
+Scope: the three NON-BLOCKING advisory nits recorded at the M2 acceptance gate
+(docs/reviews/gate-2026-07-04-m2-f1-module.md, gate 4) and deliberately left
+"for a future slice" per the gate's commit-as-is terms. This is that slice.
+Owner arming word (verbatim): "so complete all other steps now except github,
+design everyother aspect." (2026-07-06)
+
+## Nit 3 — '#' in arbitrary declaredCategory/orderId made claim ids unparseable
+
+RED (executed 2026-07-06, pre-fix):
+  - evals/packs/fees-advisory-nits.test.ts: 6/6 FAILED (claimIdPart/makeLineTagger not exported)
+  - behavioral probe (node --experimental-strip-types, direct-constructed statement,
+    orderId "OR#D-9", declaredCategory "promo#extra"):
+      PRE-FIX d-1 claim id: OR#D-9#promo#extra#L0 | split('#') segments: 5   <-- ambiguous
+GREEN (executed 2026-07-06, post-fix):
+  - same probe: OR%23D-9#promo%23extra#L0 | split('#') segments: 3          <-- unambiguous, reversible
+  - fix: claimIdPart escape ('%'->'%25', '#'->'%23') on the ARBITRARY id components
+    (orderId, declaredCategory) in lib/packs/fees/audit.ts (d-1, c-1, c-2 warn ids)
+    + lib/packs/fees/classified-audit.ts (advisory id). Enum categories + schema
+    month untouched. BYTE-IDENTITY on every committed corpus value (no fixture
+    contains '#' or '%'): all fees freeze/golden tests pass unchanged.
+
+## Nit 2 — object-identity lineIndex rendered a silent "Lundefined"
+
+RED: no loud path existed; lineTag(l) returned "Lundefined" for a non-member line
+  (unreachable via the parser; reachable by direct construction/refactor).
+GREEN: shared makeLineTagger(statement) in audit.ts (also adopted by
+  classified-audit.ts, replacing its duplicate map) THROWS
+  "not a member of statement.lines" on an object-identity miss;
+  test "throws LOUDLY on a line object that is not a member" passes (value-equal
+  clone of a member line -> throw).
+
+## Nit 1 — stale field-level comment (finding.ts:63)
+
+The FeeFinding.verdict comment claimed the field is "the §20-563.3(e) verdict
+state" — stale since M2 added the non-(e) c-2 state `asserted-passthrough-unverified`.
+Reworded to name both families. Comment-only.
+
+## Suite
+
+  npx vitest run evals/packs/fees-advisory-nits.test.ts  -> 6 passed (RED: 6 failed pre-fix)
+  npm run verify                                          -> EXIT 0, 749 passed + 6 skipped
+                                                             (743+6 -> 749+6; +6 = this test file)
+  Golden freeze tests (fees + listings + demo): PASS — corpus byte-unchanged.
+  CODE diff scope: lib/packs/fees/{audit,classified-audit,finding,index}.ts
+              + evals/packs/fees-advisory-nits.test.ts (new). No other CODE touched.
+              (Same-session doc updates ride the same commit: docs/suggestions-ledger.md
+              status sync + S-11 screen, this log, and the Codex raw — Codex P3
+              wording catch, accepted 2026-07-06.)
+
+## Codex changed-files review (RULES §13 lightweight loop)
+
+  ~/claude-os/bin/codex-guarded exec --sandbox read-only (2026-07-06): verdict
+  CLEAN on all five challenged paths — (a) byte-freeze independently re-verified
+  (no '#'/'%' in any committed orderId/declaredCategory/month), (b) escape order
+  + test inverse correct, (c) no missed id construction or split consumer,
+  (d) tagger throw dead on parser paths + advisory L-tags unchanged,
+  (e) verdict comment matches the union. ONE P3 (this log's "Nothing else
+  touched" wording vs the working tree) — accepted + fixed in this revision.
+  Raw: docs/reviews/codex-2026-07-06-advisory-nits-raw.md
