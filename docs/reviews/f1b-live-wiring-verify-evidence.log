@@ -1,0 +1,105 @@
+# F1b LIVE-WIRING slice — verify + red-green evidence (2026-07-05)
+
+Slice: wire the live Groq fee-classifier lane (lib/agents/fee-classifier.ts) per
+LIVE_CLASSIFIER_DESIGN under the owner GO ("all four", decision-log 2026-07-05);
+flip wired→true; add multiClassFlipRate; live calibration harness + pre-registered
+status doc. Executed inline on the Fable seat (single coherent ~300-line lane +
+harness; the judgment seat authored AND the M2-style cross-model gate follows at
+this slice's Codex review — maker≠judge restored there).
+
+## Offline verify (BEFORE the live run)
+
+npm run verify → EXIT 0
+  typecheck: clean
+  lint: clean (one unused eslint-disable removed)
+  test: 732 passed | 6 skipped (was 720+5 → +12 offline tests, +1 skipped live harness)
+  build: clean (all routes prerender; /demo /report Static unchanged)
+
+New/changed tests:
+  evals/agents/fee-classifier-live-lane.test.ts   9 tests (new)
+  evals/gold/metrics.test.ts                      +3 (multiClassFlipRate)
+  evals/packs/fees-classifier.test.ts             wired assertion consciously flipped true
+  evals/gold/fee-classifier-calibration.live.test.ts (auto-skips offline; the 6th skip)
+
+## Executed red-green cycles (mutation → RED → restore → GREEN)
+
+RG-1  LEAK TEETH — buildFeeClassifierPrompt mutated to include the string
+      "trueCategory: leaked-for-red-test".
+      RED:   evals/agents/fee-classifier-live-lane.test.ts → 1 failed
+             ("no prompt contains the answer-key field name…")
+      GREEN: restored → 9 passed.
+
+RG-2  FALLBACK HONESTY TEETH — the schema-failure branch mutated to return the
+      model's INVENTED out-of-vocabulary label as mode LIVE_CLASSIFIER.
+      RED:   "schema-invalid model output → FAILED_TO_FALLBACK to the BASELINE's
+             prediction (never the invented label)" → 1 failed | 8 passed
+      GREEN: restored → 9 passed.
+
+RG-3  WIRED DRIFT-LOCK — LIVE_CLASSIFIER_DESIGN.wired mutated back to false.
+      RED:   evals/packs/fees-classifier.test.ts → 1 failed | 14 passed
+             ("the live lane is WIRED (owner GO 2026-07-05)…")
+      GREEN: restored → 24 passed (both files).
+
+## Structural proofs re-confirmed
+
+- The fees pack's zero-network import-graph walk (fees-classifier.test.ts) still
+  PASSES with the live lane present: the lane lives in lib/agents/ and the pack
+  never imports it (verified by the passing walk, not by assertion).
+- Pre-registration pinned BEFORE the run: docs/fee-classifier-calibration-status.md
+  (dated decision-rule tightening [owner-sourced], rep-0, 0/0-precision convention,
+  run-integrity-hard/floors-reported harness semantics, prompt provenance).
+- frontier-advisor pre-approach consult: PROCEED-WITH-CONSTRAINTS, all 5 adopted
+  (session transcript 2026-07-05); harness advisor() down — 12th consecutive session.
+
+════════════════════════════════════════════════════════════════════════
+GATE-FLIP DISCHARGE APPENDIX (2026-07-05 evening — acceptance-gate flip
+conditions; the gate's BLOCK was narrow/evidence-completeness)
+
+## Flip 1 — the final narrow Codex confirm, RE-RUN WITH ITS RAW ON THE RECORD
+Raw: docs/reviews/codex-2026-07-05-f1b-live-final-confirm-raw.md
+Verdict (verbatim): "VERDICT: SHIP" — both confirming-pass residuals
+DISCHARGED at exact lines (plan §1 plain-line honest DEFER wording, grep 0
+remaining; ucp-oracle-diff.mts cargoBin PATH-or-~/.cargo/bin at lines 92-94).
+
+## Flip 2a — RAW suite runs (executed by the main session, output verbatim)
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+
+VERIFY_EXIT=0
+npm run test (the verify chain's test stage, counts):
+
+ Test Files  56 passed | 5 skipped (61)
+      Tests  737 passed | 6 skipped (743)
+   Start at  20:12:00
+   Duration  12.70s (transform 8.95s, setup 12.10s, import 22.71s, tests 26.98s, environment 9ms)
+
+TEST_EXIT=0
+npm run test:legacy:
+      Tests  306 passed | 5 skipped (311)
+   Start at  20:11:23
+   Duration  1.60s (transform 1.54s, setup 1.63s, import 4.54s, tests 395ms, environment 2ms)
+
+LEGACY_EXIT=0
+
+## Flip 2b — RG-4 DURABLE red-green (snapshot verdict-tamper; was transcript-only)
+=== RG-4 DURABLE RE-EXECUTION (2026-07-05 20:10 EDT) ===
+--- RED (snapshot floorsCleared tampered false->true) ---
+     × THE VERDICT STATE IS LOCKED: floorsCleared=false — the label DEFERS; the single miss is relabel-test-2, unanimous 3ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 4 passed (5)
+--- GREEN (restored) ---
+      Tests  5 passed (5)
+
+## Flip 2c — deslop advisory (gate-5 input)
+code-slop score: 1/100 (clean) | 10 files analyzed | high 0 medium 0 low 1
+  lib/agents/fee-classifier.ts:187 [low] redundant-return-undefined (advisory
+  only — left as-is post-confirm to keep the reviewed tree stable; next-slice nit)
+
+## Gate advisories folded same-session (non-blocking)
+(a) lib/packs/fees/index.ts:8,12 stale "deferred to F1b / comes next slice"
+    header → reworded to wired-but-DEFERRED reality.
+(b) ucp-oracle-diff.mts:76-77 "slice record + PROJECT_STATE carries the measured
+    split" → made TRUE (docs/reviews/f1b-live-slice-record.md + the
+    PROJECT_STATE 2026-07-05 build update carry 33/35 + 2 documented
+    format-class divergences).
+(c) state docs synced with the 2026-07-05 outcome (same commit as this log).
+(d) slice record written: docs/reviews/f1b-live-slice-record.md.

@@ -198,3 +198,21 @@ export function accuracy<L extends string>(items: readonly LabeledClassification
   for (const it of items) if (it.predicted === it.actual) correct++;
   return correct / items.length;
 }
+
+/**
+ * Multi-class test-retest flip-rate: the fraction of items whose K repeated predicted
+ * LABELS are not unanimous. The typed multi-class analogue of the ported boolean
+ * {@link flipRate} (same semantics — "any rep differs from rep-0 ⇒ flipped"); a separate
+ * function rather than a string-through-boolean coercion so the ported binary core stays
+ * verbatim (frontier-advisor ruling, 2026-07-05). `labelsPerItem[i]` = item i's K labels.
+ */
+export function multiClassFlipRate<L extends string>(labelsPerItem: readonly (readonly L[])[]): number {
+  if (labelsPerItem.length === 0) return 0;
+  let flipped = 0;
+  for (const runs of labelsPerItem) {
+    if (runs.length <= 1) continue;
+    const first = runs[0];
+    if (runs.some((v) => v !== first)) flipped++;
+  }
+  return flipped / labelsPerItem.length;
+}

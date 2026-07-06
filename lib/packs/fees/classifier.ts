@@ -14,16 +14,19 @@
  *   - the offline {@link MockOracleClassifier} CANNOT earn it — it reads the answer
  *     and is a WIRING STUB only (it proves the seam surfaces a relabeling, never
  *     that any model can);
- *   - there is NO live classifier wired here — the live lane is DESIGNED
- *     ({@link LIVE_CLASSIFIER_DESIGN}, a typed prompt-input contract + doc) but
- *     NOT connected to any provider. Zero network imports; a test proves it.
- * No file in this seam calls a model or the network. The gold set is SIMULATED.
+ *   - the live lane ({@link LIVE_CLASSIFIER_DESIGN}) is WIRED as of the owner GO
+ *     (2026-07-05, decision-log) — but it lives in `lib/agents/fee-classifier.ts`,
+ *     env-gated, and is NEVER imported by this pack: THIS module and everything the
+ *     deterministic audit reaches stay zero-network (a test proves it). Wired ≠
+ *     calibrated — the label is decided only by the pre-registered held-out run
+ *     (`docs/fee-classifier-calibration-status.md`).
+ * No file in THIS pack calls a model or the network. The gold set is SIMULATED.
  *
- * Plain: the piece that would read what a fee REALLY is when the bill mislabels it.
- * Right now it's a measured floor (dumb keyword rules) plus a test stand-in that
- * cheats by reading the answer — the real AI version is fully specced but not
- * plugged in, and it isn't allowed to claim it's good until it out-scores the floor
- * on held-out examples in an owner-approved live run.
+ * Plain: the piece that reads what a fee REALLY is when the bill mislabels it.
+ * The measured floor (dumb keyword rules) lives here; the real AI version is now
+ * plugged in — in a separate, owner-gated module that this rulebook never touches —
+ * and it isn't allowed to claim it's good until it out-scores the floor on held-out
+ * examples in the owner-approved live run.
  */
 import type { FeeLineClass } from "./index.ts";
 import {
@@ -141,9 +144,11 @@ export interface ClassifierPrediction {
 
 /**
  * The line-item classifier SEAM (DI, like the legacy semantic/domain judges). Every
- * implementation is a pure function object — the deterministic baseline, the mock
- * wiring stub, and the DESIGNED-but-unwired live lane all satisfy this one interface,
- * so `auditWithClassification` is agnostic to which is injected.
+ * implementation is a pure function object — the deterministic baseline and the mock
+ * wiring stub satisfy this one interface, so `auditWithClassification` is agnostic
+ * to which is injected. (The wired live lane, `lib/agents/fee-classifier.ts`, is
+ * async/env-gated and is scored directly on gold in its calibration harness — it is
+ * not one of this sync seam's implementations.)
  */
 export interface LineItemClassifier {
   /** A stable name for provenance / reporting (e.g. "deterministic-baseline"). */
@@ -151,8 +156,9 @@ export interface LineItemClassifier {
   /**
    * Whether this classifier's label is EARNED. `false` for the baseline (it IS the
    * floor, not a beat-the-floor result) and for the mock (it cheats). Only an
-   * owner-gated live run that beats the baseline on held-out gold may set this true —
-   * and no live classifier is wired here, so nothing sets it true in this slice.
+   * owner-gated live run that beats the baseline on held-out gold could flip this —
+   * and the 2026-07-05 armed run DEFERRED (missed one pre-registered floor; see
+   * docs/fee-classifier-calibration-status.md), so it stays `false` everywhere.
    */
   readonly earnsLabel: false;
   classify(input: ClassifierInput): ClassifierPrediction;
@@ -244,13 +250,14 @@ export function makeMockOracleClassifier(
   };
 }
 
-// ── LIVE LANE — DESIGNED, NOT WIRED ────────────────────────────────────────────
+// ── LIVE LANE — the design contract (wired 2026-07-05 in lib/agents/, not here) ─
 
 /**
- * The DESIGN of the live LLM classifier (deliverable 6a) — data + doc only, NO
- * provider call, NO network import. The full recalibration + pre-registration plan
- * lives in `docs/plan-f1b-classifier.md`; this const is the machine-readable spine
- * of it (so a later, owner-gated slice wires a provider to exactly this contract).
+ * The DESIGN of the live LLM classifier (deliverable 6a) — the machine-readable
+ * spine of `docs/plan-f1b-classifier.md`. This const itself stays data-only (NO
+ * provider call, NO network import in this module); the wiring that implements it
+ * is `lib/agents/fee-classifier.ts` (owner GO 2026-07-05, decision-log), which
+ * imports this contract — never the reverse.
  */
 export const LIVE_CLASSIFIER_DESIGN = {
   /** Model lane: Groq free tier first (plan §5; gpt-oss-120b precedent), cross-family judge. */
@@ -263,16 +270,7 @@ export const LIVE_CLASSIFIER_DESIGN = {
   fallback: "on parse/schema/timeout failure → FAILED_TO_FALLBACK: defer to the deterministic baseline; NEVER silently invent a label",
   /** The honesty gate. */
   ownerGate: "no live run without the owner's word; no 'calibrated' claim below the pre-registered floor (docs/plan-f1b-classifier.md)",
-  /** Not wired in this slice. */
-  wired: false,
+  /** WIRED 2026-07-05 (owner GO "all four", decision-log): `lib/agents/fee-classifier.ts`
+   *  implements this contract, env-gated (groqLiveEnabled). Wired ≠ calibrated. */
+  wired: true,
 } as const;
-
-/** Thrown if code ever tries to run the live classifier — it is DESIGNED, not wired (fail loud). */
-export class LiveClassifierNotWiredError extends Error {
-  constructor() {
-    super(
-      "the live LLM classifier is DESIGNED (LIVE_CLASSIFIER_DESIGN + docs/plan-f1b-classifier.md) but NOT wired to any provider — no live run without the owner gate",
-    );
-    this.name = "LiveClassifierNotWiredError";
-  }
-}

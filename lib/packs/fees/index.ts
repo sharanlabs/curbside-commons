@@ -5,11 +5,15 @@
  * codified NYC §20-563.3 rules as typed predicates (drift-locked to the JSON
  * twin), a deterministic audit engine with the §20-563.3(e) refund-window verdict
  * states, the U1-provisional finding wrapper, and a seeded corpus + answer key.
- * The LLM line-item classifier (true-vs-declared category) is DEFERRED to F1b.
+ * The LLM line-item classifier seam (true-vs-declared category) is F1b: the
+ * deterministic baseline + mock live here; the wired live lane is
+ * `lib/agents/fee-classifier.ts` (owner-armed run 2026-07-05 → label DEFERRED —
+ * `docs/fee-classifier-calibration-status.md`).
  *
  * Plain: the fee-drift rulebook plus the machinery that reads a delivery bill,
  * checks every fee against the real legal caps, and proves each catch with
- * receipts — the deterministic half; the AI classifier comes next slice.
+ * receipts. The AI fee-reader exists and took its one-shot test — it beat the
+ * simple-rules benchmark but missed one pre-agreed bar, so it holds no title.
  */
 
 /** Fee-line classes enumerated in plan §7 (fees). */
@@ -28,7 +32,7 @@ export type FeeLineClass = (typeof FEE_LINE_CLASSES)[number];
 export const FEES_PACK = {
   id: "fees",
   useCase: "UC-1",
-  status: "f1a-deterministic-spine",
+  status: "f1b-classifier-layer; live lane wired + run 2026-07-05: label DEFERRED (docs/fee-classifier-calibration-status.md)",
   classes: FEE_LINE_CLASSES,
 } as const;
 
@@ -89,7 +93,9 @@ export {
 } from "./generate.ts";
 
 // F1b classifier seam (plan §5 F1b, C8) — zero network/LLM imports (verified by
-// the extended fees-cli import-graph eval). The live lane is DESIGNED, not wired.
+// the extended fees-cli import-graph eval). The live lane is WIRED (2026-07-05,
+// owner GO) but lives OUTSIDE this pack (`lib/agents/fee-classifier.ts`, env-gated)
+// and is never imported here, so the pack's zero-network proof still holds.
 export type {
   ClassifierInput,
   ClassifierPrediction,
@@ -98,7 +104,6 @@ export type {
 } from "./classifier.ts";
 export {
   DeterministicBaselineClassifier,
-  LiveClassifierNotWiredError,
   LIVE_CLASSIFIER_DESIGN,
   NOT_A_PERMITTED_FEE,
   SEVEN_CLASS_TRUE_CATEGORY_NOTE,

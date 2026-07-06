@@ -36,7 +36,10 @@
  * that reads `Claim.source`).
  *
  * HONESTY (AM-7 / C8): whichever classifier is injected, its `earnsLabel` is always
- * `false` in this slice (no live classifier is wired — see classifier.ts). An
+ * `false` (the 2026-07-05 owner-armed live run DEFERRED on a pre-registered floor,
+ * so no classifier anywhere has earned the label — see classifier.ts and
+ * docs/fee-classifier-calibration-status.md; the wired live lane in
+ * lib/agents/fee-classifier.ts is async and not injected here at all). An
  * advisory finding built from the {@link MockOracleClassifier} PROVES the seam CAN
  * surface a relabeling (deliverable 7's wiring proof); it is never presented as a
  * caught violation, and the C6 coverage eval (unmodified) keeps reporting the
@@ -132,7 +135,8 @@ function buildAdvisoryFinding(
 /**
  * Run the advisory classifier pass on top of the unchanged deterministic audit.
  * Pure in (statement, classifier) — no clock, no network, no LLM (whichever
- * classifier is injected must itself be $0/offline; the live lane is not wired).
+ * classifier is injected must itself be $0/offline; the wired live lane is async
+ * and cannot be injected into this sync seam).
  */
 export function auditWithClassification(
   statement: MonthlyStatement,

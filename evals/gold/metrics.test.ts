@@ -6,6 +6,7 @@ import {
   f1,
   flipRate,
   metricReport,
+  multiClassFlipRate,
   perClassReport,
   precision,
   recall,
@@ -144,5 +145,32 @@ describe("multi-class extension (F1b) — one-vs-rest reduces to the ported bina
   it("accuracy is the fraction of exactly-correct labels", () => {
     expect(accuracy(items)).toBeCloseTo(7 / 8, 10);
     expect(accuracy([])).toBe(0);
+  });
+});
+
+describe("multiClassFlipRate — the typed multi-class analogue of the ported boolean flipRate", () => {
+  it("hand-computed: 1 flippy item of 4 ⇒ 0.25 (unanimity per item, rep-0 as reference)", () => {
+    const runs: string[][] = [
+      ["delivery_fee", "delivery_fee", "delivery_fee"], // unanimous
+      ["transaction_fee", "transaction_fee", "transaction_fee"], // unanimous
+      ["not-a-permitted-fee", "delivery_fee", "not-a-permitted-fee"], // FLIPPY
+      ["basic_service_fee", "basic_service_fee", "basic_service_fee"], // unanimous
+    ];
+    expect(multiClassFlipRate(runs)).toBeCloseTo(1 / 4, 10);
+  });
+
+  it("edge conventions match the ported binary flipRate: empty ⇒ 0; K=1 items can never flip", () => {
+    expect(multiClassFlipRate([])).toBe(0);
+    expect(multiClassFlipRate([["delivery_fee"], ["transaction_fee"]])).toBe(0);
+  });
+
+  it("agrees with the ported boolean flipRate on a binary-encodable case (same semantics, typed lane)", () => {
+    const asLabels: string[][] = [
+      ["pos", "pos", "pos"],
+      ["pos", "neg", "pos"],
+      ["neg", "neg", "neg"],
+    ];
+    const asBools: boolean[][] = asLabels.map((runs) => runs.map((v) => v === "pos"));
+    expect(multiClassFlipRate(asLabels)).toBeCloseTo(flipRate(asBools), 10);
   });
 });

@@ -1,13 +1,23 @@
 # F1b — LLM line-item classifier: design + judge-recalibration plan
 
-**Status (2026-07-04): DESIGN ONLY — no live classifier is wired. This document is
-the pre-registration; nothing here is a "calibrated" claim. The classifier seam
-(`lib/packs/fees/classifier.ts`) exists and is measured against the deterministic
-baseline (`evals/gold/fee-baseline-measurement.test.ts`); the live lane described
-below requires an explicit **owner GO** before any provider call happens.**
-▸ *Plain: this page is the recipe for the AI version of the fee-line classifier —
-written down and agreed on BEFORE anyone runs it, so nobody can move the goalposts
-after seeing the score. Nothing here has actually called an AI model yet.*
+**Status (2026-07-05): the live lane is WIRED (`lib/agents/fee-classifier.ts`,
+env-gated) and the owner-armed run RAN — verdict: the "calibrated" label
+DEFERS.** The owner armed the run 2026-07-05 ("all four", decision-log); it
+cleared 5 of the 6 pre-registered §3.1 floors (held-out accuracy **20/21**,
+strictly beating the pinned 19/21 baseline; macro precision 0.971; κ 0.944;
+flip-rate 0.000) but missed the ≥0.80 `enhanced_service_fee` recall floor at
+3/4 = 0.75 — and the rule is conjunctive, so the label defers exactly as
+pre-registered. Full record + the one miss verbatim:
+`docs/fee-classifier-calibration-status.md`; frozen snapshot
+`lib/data/fee-classifier-calibration.snapshot.json` (eval-locked). This split is
+now exposed and may not be re-scored for label purposes; any future attempt is a
+new owner-gated arming with its own pre-registration.
+▸ *Plain: the AI version is now plugged in (still off unless the owner flips the
+switch) and it took the locked test once, for free. It beat the dumb-rules floor
+overall — 20/21 vs 19/21 — but the rules written down in advance also demanded it
+catch the sneaky-relabel category at a higher rate than it managed, so it does NOT
+get to call itself "calibrated." The score sheet is frozen; a retake would be a
+new, separately-approved test.*
 
 **Plan:** `docs/plan-truth-audit-execution.md` §5 F1, C8 · **Precedent:** the domain
 judge's R-DHON-3 pre-registration (`docs/domain-calibration-status.md`) and the
@@ -39,14 +49,20 @@ gold, in an **owner-gated live run**. Until that happens:
   itself — it is honestly imperfect (misses genuine relabeling/bundling that
   keyword rules cannot resolve from label text alone; see the pinned baseline
   measurement for the exact misses);
-- **no code path in this repo calls a live model for this classifier.**
-  `LIVE_CLASSIFIER_DESIGN.wired === false` is machine-asserted
-  (`evals/packs/fees-classifier.test.ts`).
+- ~~no code path in this repo calls a live model for this classifier~~
+  **SUPERSEDED 2026-07-05 (owner GO):** the live lane is now wired at
+  `lib/agents/fee-classifier.ts` (env-gated, outside the fees pack — the pack's
+  own zero-network proof still holds); `LIVE_CLASSIFIER_DESIGN.wired === true`
+  is machine-asserted (`evals/packs/fees-classifier.test.ts`). The armed run's
+  outcome (label DEFERS) is in the status header above and
+  `docs/fee-classifier-calibration-status.md`.
 
 ▸ *Plain: the "dumb keyword rules" floor is deliberately not very smart — that's the
 whole point. The AI version only gets to call itself good once it actually beats
 that floor on examples it has never seen, in a real run the owner explicitly
-approves. Right now, nothing has run for real.*
+approves. That real run happened on 2026-07-05: the AI scored 20/21 — better than
+the floor's 19 — but missed one pre-agreed category bar, so it still does NOT get
+to call itself good. The full score sheet is in the status doc above.*
 
 ---
 
@@ -56,7 +72,7 @@ approves. Right now, nothing has run for real.*
 
 | Lane | Model | Cost | Status |
 | --- | --- | --- | --- |
-| **Primary** | Groq free tier, `openai/gpt-oss-120b` class (the same cross-family model already calibrated for the domain judge — `docs/domain-calibration-status.md`) | $0 | Precedent, not yet run for F1b |
+| **Primary** | Groq free tier, `openai/gpt-oss-120b` class (the same cross-family model already calibrated for the domain judge — `docs/domain-calibration-status.md`) | $0 | RAN 2026-07-05 (owner-armed) — label DEFERS (see status header) |
 | **Secondary / demo color** | Gemini, current production model, freshness-checked at time of use | ≤ $5 hard cap (project-wide; F1b shares the same budget, never a separate allowance) | Demo-scoped only — never load-bearing for the C8 claim |
 
 ▸ *Plain: the free AI lane (Groq) does the real work; the paid one (Gemini) never
@@ -157,6 +173,15 @@ citing the exact gold-set size as the honesty caveat (this gold set is small and
 synthetic — see §4). ELSE → tune the prompt/threshold on the **tune** split only
 and re-run; **never tune on the test split** (tune-on-tune/report-on-test
 discipline, unchanged from every prior calibration in this repo).
+
+> **ELSE-branch SUPERSEDED for the 2026-07-05 arming (recorded pre-run):** the
+> owner's arming directive (HANDOFF, committed `c73c100`) tightened this to ONE
+> scored pass — **a missed floor → the label DEFERS; no same-split re-run toward
+> green; no post-hoc floor change**. That is what executed: run #2 missed the
+> enhanced-recall floor and DEFERRED (`docs/fee-classifier-calibration-status.md`).
+> The held-out split is now EXPOSED and may not be re-scored for label purposes;
+> any future attempt is a NEW owner-gated arming with its own pre-registration
+> (fresh or extended held-out gold).
 
 ### 3.3 Groq daily-window pacing lesson (carried forward)
 

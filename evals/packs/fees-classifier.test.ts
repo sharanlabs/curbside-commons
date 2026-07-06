@@ -51,8 +51,12 @@ describe("F1b classifier seam — DI + honesty markers", () => {
     expect(mock.name).toBe("mock-oracle-wiring-stub");
   });
 
-  it("the live lane is DESIGNED but explicitly NOT wired", () => {
-    expect(LIVE_CLASSIFIER_DESIGN.wired).toBe(false);
+  it("the live lane is WIRED (owner GO 2026-07-05) — outside this pack, env-gated", () => {
+    // Flipped consciously with the wiring slice (was false through F1a/F1b/M2).
+    // Wired ≠ calibrated: the label is decided only by the pre-registered held-out
+    // run (docs/fee-classifier-calibration-status.md). The import-graph proof below
+    // still holds — the pack itself reaches no network module.
+    expect(LIVE_CLASSIFIER_DESIGN.wired).toBe(true);
   });
 
   it("both classifiers satisfy the same LineItemClassifier shape (interchangeable via DI)", () => {
