@@ -44,7 +44,7 @@ function beatBlock(beat: DemoBeat, ordinal: number): string[] {
 export function renderDemoText(t: DemoTranscript): string {
   const lines: string[] = [
     RULE,
-    "ActivationOps AI — verifier demo (SIMULATED)",
+    "Commerce Truth Audit — verifier demo (SIMULATED)",
     RULE,
     "",
     `Demo claim: ${t.claim}`,

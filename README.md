@@ -1,60 +1,87 @@
-# ActivationOps AI
+# Commerce Truth Audit
 
-A **human-led, AI-assisted** prototype for activating **stalled / pre-live, long-tail merchants** on a local-commerce **delivery marketplace** (DoorDash / Uber Eats / Grubhub-style). It spots which signed-up merchants are stuck getting set up, diagnoses **why**, drafts a next message whose **every declared claim is checked against the merchant's own data** (and forbidden-claim patterns), holds it for human approval, scores it for quality, and logs every step — built to be **measured, audited, and adopted**.
+**An independent, deterministic verifier for agentic commerce: it checks what delivery platforms and AI-agent surfaces *say* about a merchant against the merchant's own system of record, and audits fee statements against codified law. The truth layer for agentic commerce.**
 
-> **Not affiliated with, endorsed by, or connected to** DoorDash, Uber Eats, Grubhub, DataSF, or any named business — an independent, company-agnostic prototype (those names appear only as style comparisons). It runs on **hybrid demo data** — **fictional** merchant names for display (the adapter ingests real public-domain DataSF names; the demo shows invented ones so synthetic risk states aren't pinned on real businesses) + a **synthetic** activation overlay — with **no real merchant relationship, account, or PII**, and makes **no real business-impact claims**. All metrics are simulated. Working platform name: **"Curbside Commons"** (pending an owner trademark check).
+A **human-led, AI-assisted** prototype, built and reviewed under a dual-model engineering process with every claim below backed by a committed test or record in this repo.
 
-## The problem
+> **Not affiliated with, endorsed by, or connected to** DoorDash, Uber Eats, Grubhub, Square, Toast, OpenAI, Stripe, Google, or any named business or protocol body. This is an independent, company-agnostic prototype. **Everything it runs on is a labeled synthetic corpus** — no real merchant relationship, account, data, or PII anywhere, and no real business-impact claims. All metrics are simulated or measured on synthetic fixtures, and every artifact says so on its face.
 
-A delivery marketplace's signed-up-but-never-live merchants are real lost GMV, and the long tail is too large to work by hand. Merchants stall partway through onboarding (verify business → menu → photos → hours → banking → final check) and the people who unstick them work in a spreadsheet with no easy way to see who's at risk, **why**, what to do next, or who was already contacted. The #1 reason reactivation outreach fails is being **generic instead of matched to the actual blocker**.
+## The problem, in plain words
 
-## What it does
+When you order food through an app, or tell an AI assistant to do it, the menu being acted on is **not the restaurant's actual menu**. It is a copy, passed along a chain: the merchant's till system → sync software → marketplaces → and now AI agents. Copies go stale: the price went up and the copy didn't, the wings sold out an hour ago, a fee got renamed on a payout statement.
 
-Deterministic risk + blocker **triage** → a domain **diagnosis** (engagement state + root-cause hypothesis + a reactivation play that varies by *why* they're stuck, not just which step) → **bounded, schema-constrained LLM drafting** → a **claims-gatekeeper** that ties every *declared* claim to the merchant's own data (+ forbidden-claim guardrails) → an **eval harness** that scores the draft → a **human-in-the-loop gate** (hold / reject / send) with a full **audit trail** and a **cost ledger**. The design is a direct antidote to the AI-outreach failure frontier (false claims, churn, *Moffatt v. Air Canada*, FTC Operation AI Comply).
+A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the order.** And every seat that could check the copies is conflicted: platforms won't audit each other, sync vendors would be grading their own homework, and it isn't the AI companies' job. The neutral-referee seat is structurally empty.
 
-## Today vs target (honest status)
+This project builds that referee, as an open prototype:
 
-**Built today — green (`npm run typecheck && npm run lint && npm run test && npm run build`; 161 tests + 3 Playwright e2e):**
-- Single-stack **Next.js + TypeScript + Tailwind + React** app; a desktop **console**: Overview/queue · Merchant Detail (full why-chain) · Eval/Quality · Metrics · Audit · Cost.
-- The **deterministic core ported to TS** and pinned **byte-for-byte to the Python v1 oracle** by a differential test.
-- **Hybrid dataset** — the public demo shows **fictional** merchant names (so synthetic risk states are never pinned on real businesses); the **source-swappable adapter** ingests real DataSF entities (PII-scrubbed, license-clean) + a trust-boundary sanitizer + a deterministic synthetic overlay. Real-data *capability*, fictional *display*.
-- **Bounded Gemini drafting**, with the **claims-gatekeeper**, a **draft-quality eval** (corrupted-record teeth), a **$5 fail-closed budget** (per-call + cumulative), model preflight, and a **prompt-injection cut** (untrusted name never reaches the model).
-- A **recorded real Gemini run** (one merchant per blocker, $0.0042 — 5 parsed live drafts, 1 billed parse-failure that fell back safely) that the eval scored. This **exercised the plumbing, fallback, and cost-accounting end-to-end** (and surfaced + fixed a real guardrail-precision issue) — it is **not** evidence of broad model quality at scale. The public **demo stays REPLAY-only** (no live calls, zero spend); reproduce the run locally with your own key.
+1. **Truth leg** — compare a serving copy (an ACP-style feed, or a UCP catalog response) line by line against the merchant's system of record. Deterministic. No LLM anywhere on this path.
+2. **Conformance leg** — validate a UCP catalog response against the **78 pinned official UCP JSON Schemas** (spec `v2026-04-08`). A document can be perfectly spec-shaped and still false, which is the point:
 
-**Designed but gated / target:**
-- **Vercel deploy** (REPLAY-only public demo, key gated off) — owner-gated.
-- **Deeper blocker root-causes** — need instrumentation signals (named in `lib/domain/diagnosis.ts`, not faked).
-- A **calibrated LLM-judge** for semantic unsupported-claim detection (the deterministic graders + the claims-gatekeeper are forward-only today — an honest, documented boundary).
+> **The headline exhibit, machine-checked in CI:** `fixtures/ucp-conformance-ci/valid/conformant-but-false.json` **passes** official-schema conformance and **fails** the truth leg on a price lie. Shape-valid is not true.
 
-## Run it
+3. **Fee-audit leg** — audit a monthly delivery fee statement against the codified **NYC § 20-563.3** fee caps (17-rule table built from primary legal text, 11 statement-checkable rules implemented, 6 registered as not statement-checkable with written reasons). Deterministic, $0.
+4. **Demo** — "a spec-faithful simulated agent follows a spec-valid but false surface; the verifier catches the surface/SOR mismatch." Scripted, deterministic, labeled *spec-faithful demonstration actor — simulated*; every verdict in the transcript is computed by the real verifier, never narrated.
+
+## Quickstart
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000  (REPLAY demo, no live AI, no spend)
-npm run verify     # typecheck + lint + test + build
+node bin/check.mjs demo                                          # the scripted walkthrough, $0, zero-config
+node bin/check.mjs check <feed.json> --against <catalog.json>    # truth leg (exit 1 = drift found)
+node bin/check.mjs check <doc.json> --conformance                # conformance leg (pinned UCP schemas)
+node bin/check.mjs fees <statement.json>                         # NYC §20-563.3 fee audit
+npm run verify                                                   # typecheck + lint + tests + build
 ```
 
-Live AI stays off unless you set `GEMINI_API_KEY` + `ENABLE_LIVE_AI=true` in a (gitignored) `.env` — see `.env.example`.
+Zero network and zero LLM calls on every CLI path — enforced structurally by an import-graph eval, not by promise. A desktop web console (`npm run dev`: `/report`, `/demo`) renders the same machine reports in two registers, plain words first.
 
-## Stack
+## Honest status (measured, not asserted)
 
-Single stack: **Next.js (App Router) · TypeScript · Tailwind v4 · React 19**, deploy target **Vercel (free tier)**, tests **Vitest** (+ Playwright e2e, target). **Free-first**; the only paid runtime is the **Gemini API**, hard-capped at **$5 total** and ledgered. Gemini key is **server-side only**.
+| Surface | Status |
+| --- | --- |
+| Test suite | `npm run verify` green: **743 passed + 6 skipped** (the skips are live-network harnesses, off by default) |
+| Listings drift taxonomy (8 classes) | **8/8 injected and caught, measured** by the C6 coverage eval; never an "all edge cases" claim |
+| Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
+| Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |
+| LLM line-item classifier | Live-calibrated on a held-out split: **20/21 accuracy, beating the pinned deterministic baseline (19/21)** — and still **honestly DEFERRED**, because one per-class recall floor (0.75 vs a pre-registered ≥ 0.80) was missed. The floors were committed before the run and did not move after it. |
+| Corpus | Seeded, deterministic, freeze-locked (regenerate ⇒ bytes must match); every fixture taxonomy-keyed; publishable under this repo's license |
 
-## Key documents
+That DEFER is the project's character: **the bar never moves after the run.** A near-miss is reported as a near-miss.
 
-- **`docs/WHY.md`** — the decision rationale (every load-bearing "why", each naming the rejected alternative + its cost).
-- **`docs/ENTERPRISE-READINESS.md`** — controls inventory · demo boundaries · honest production gaps · the adapter-based **adoption contract** + expansion path.
-- `~/.claude/plans/gentle-forging-starlight.md` — the canonical goal, DoD, phases, and binding blindspots.
-- `docs/research/merchant-activation-domain-2026-06-19.md` — the cited domain research behind the diagnosis layer.
-- `lib/data/PROVENANCE.md` — the hybrid-data source/license/PII label.
-- `docs/decision-log.md` · `PROJECT_STATE.md` · `HANDOFF.md` — decisions, status, next step.
+## Where AI is used, and where it is not
 
-## Development workflow (internal — not the product)
+The comparators, conformance checks, fee rules, evidence model, and report generation are **deterministic code**. An LLM appears in exactly one place: an **advisory** line-item classifier for genuinely fuzzy relabeling cases, which never gates a verdict, is fed a leak-free input contract (no answer keys), and is measured against pre-registered floors before its label counts. It runs on the Groq free tier (an open-weight model); a self-hosted alternative (Ollama / llama.cpp with any open-weight model) works through the same seam. The legacy module used Gemini's free tier; a self-hosted open-weight model is the free alternative there too.
 
-Built under human direction with **Claude Code** (planning + implementation) and **Codex** (adversarial + changed-file review), Git, and a cross-model ship gate. This is how it's built and reviewed; it is not the product runtime. See `docs/dual-model-workflow.md`.
+Every finding carries **receipts**: the claim, the reference row, the rule or spec-clause id, and a severity. An eval asserts no finding can exist without all four.
 
-## Adoption boundary
+## Why now (as of 2026-07)
 
-Adoption-**grade** means the architecture, controls, evals, the real-data adapter, and a documented adoption path are credible enough for a marketplace to inherit — **not** "production-ready." Honest gaps: auth/multi-tenancy, real integrations (Slack/email/CRM), persistence/observability at scale, a calibrated LLM-judge for semantic claims (the deterministic eval — including the no-leakage grader — caught register/disclosure leaks in 3 of the 5 parsed live drafts, and the gatekeeper now blocks them; a calibrated *semantic* unsupported-claim judge remains unbuilt), and deeper blocker instrumentation. A marketplace adopts it by swapping the hybrid dataset's real layer for its own export against the adapter's documented contract.
+- Agentic ordering is live: ChatGPT and Claude can order food via Square (launched 2026-07-01), and DoorDash ordering inside Google's Gemini assistant began piloting in March 2026.
+- The protocol layer is settling: ACP (OpenAI + Stripe) and UCP (spec `v2026-04-08`, the version pinned here) are both Apache-2.0 and moving fast; UCP's Food vertical schemas were still pending at the pinned tag.
+- Fee enforcement is real: NYC's first restaurant-side fee-cap enforcement was an **$875,000+ settlement, including over $580,000 in restitution to 380+ restaurants** (announced 2026-04-08), and DCWP has an active rulemaking on recordkeeping for delivery-fee-cap compliance (hearing July 2026).
 
-Human-led, AI-assisted, professionally reviewed.
+Dated source records for these claims live in `docs/research/` (source lockfile included).
+
+## Limitations and non-goals
+
+- **A prototype run on demand, not an operated service.** No uptime, hosting, or SLA ambitions; the enterprise path is documented, not built.
+- The corpus is **synthetic by design** (labeled on every surface); real-world entity matching is harder than the synthetic-controlled matching here, and reports label which mode was used.
+- Fee verdicts that depend on the statutory "purchase price" base are marked **provisional** pending that open legal question; the marker is enforced by the type system, not a footnote.
+- Operator demand is **not validated** (no first-person merchant research yet); this repo demonstrates capability, not market proof.
+- The web console is desktop-only.
+
+## The corpus
+
+`fixtures/` is a publishable, self-contained test corpus: a synthetic restaurant system-of-record with faithful and deliberately-drifted serving copies, ground-truth manifests, golden reports, 35 UCP conformance CI documents, and simulated monthly fee statements with answer keys. See `fixtures/README.md` for the index, taxonomy keying, and regeneration commands.
+
+## Lineage
+
+This repo's first life was **ActivationOps AI**, a merchant-activation prototype (deterministic triage → bounded LLM drafting → claims-gatekeeper → human-in-the-loop gate). It is archived **runnable** under `legacy/activation/` (`npm run test:legacy`, 306 tests green) and its verification spine is what the truth-audit engine grew from. Its own README and honesty labels stand unchanged.
+
+## Development workflow (note)
+
+Built human-led with AI assistance: Claude Code as planner/builder, OpenAI Codex as adversarial reviewer, with module-boundary review gates and an independent acceptance gate; records live in `docs/reviews/`. These are development tools — **none of them is the product runtime**. This repo never presents itself as AI-free, and never as AI-built without human direction and review.
+
+## License
+
+Apache-2.0 (see `LICENSE`). The vendored official UCP schemas under `fixtures/ucp-schemas/` keep their own upstream Apache-2.0 license and provenance record.

@@ -13,8 +13,8 @@ catalog-response correctly shaped per the published schemas?). Seeded generators
 make every byte reproducible; freeze-integrity evals lock the committed files to
 their generators so the corpus cannot be hand-tampered without CI failing.
 
-> **This corpus is packaged for publication but NOT yet published, and carries no
-> license file.** See [Licensing](#licensing) below.
+> **This corpus is published under the repo-wide Apache-2.0 `LICENSE`** (decided
+> at the Pub gate, 2026-07-06). See [Licensing](#licensing) below.
 
 ---
 
@@ -112,10 +112,10 @@ beat — deterministic, $0, rendered at `/demo` as a one-pager.
 
 ## Licensing
 
-**License: pending owner decision.** This corpus is packaged for publication but
-is **not yet published**, and **no license file is included** — the license is an
-explicit owner call, gated on the plan's Pub slice (plan §5 / owner call O6).
-Until the owner designates one, the corpus is all-rights-reserved by default.
+**License: Apache-2.0** (decided at the Pub gate, 2026-07-06; plan §5 / owner
+call O6 — repo-wide `LICENSE` at the root covers this synthetic corpus). The
+corpus may be used, modified, and redistributed under those terms; it is
+synthetic, simulated-labeled, and carries no real merchant data to restrict.
 
 *(Separate and untouched: `ucp-schemas/` carries the upstream **Apache-2.0**
 license of the official UCP schemas, pinned from `Universal-Commerce-Protocol/ucp

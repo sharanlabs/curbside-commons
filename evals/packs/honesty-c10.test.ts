@@ -50,8 +50,18 @@ const demoScanned = [
   join(root, "fixtures", "synthetic-restaurant", "expected-demo.json"),
 ];
 
+// Pub slice (plan §5 Pub): the root README and the publication writeup are the
+// primary PUBLIC prose surfaces — they sit inside the same honesty gates as
+// every other viewer-facing artifact (both the platform-claims gate and the
+// demo framing gate below).
+const publicProse = [
+  join(root, "README.md"),
+  join(root, "docs", "PUBLICATION.md"),
+];
+
 const scannedFiles = [
   ...packSources(),
+  ...publicProse,
   join(root, "bin", "check.mjs"),
   join(root, "fixtures", "README.md"),
   join(root, "fixtures", "synthetic-restaurant", "README.md"),
@@ -133,7 +143,12 @@ describe("D1 demo honesty surface (plan §5 D1, C7/C10)", () => {
     expect(/\bthe agent gets caught\b/i.test(DEMO_CLAIM)).toBe(false);
   });
 
-  it.each(demoScanned)("%s never frames the agent as 'caught' (banned headline)", (file) => {
+  it("the root README quotes the C7 claim VERBATIM (drift-locked to copy.ts)", () => {
+    const readme = readFileSync(join(root, "README.md"), "utf8");
+    expect(readme).toContain(DEMO_CLAIM);
+  });
+
+  it.each([...demoScanned, ...publicProse])("%s never frames the agent as 'caught' (banned headline)", (file) => {
     const text = readFileSync(file, "utf8");
     for (const pattern of BANNED_FRAMING) {
       const m = text.match(pattern);

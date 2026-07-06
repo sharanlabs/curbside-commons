@@ -4,7 +4,7 @@
 
 **Where the precise version lives:** this is the *plain register*. The professional register — full technical, business, and operational terminology — lives in the working docs, decoded by [`GLOSSARY.md`](GLOSSARY.md), under the rules of [`documentation-standard.md`](documentation-standard.md). Same truth, two registers.
 
-**Status as of 2026-07-02:** this describes the *planned direction*, accepted for planning by the owner. It becomes the decided plan only after independent review gates pass and the owner gives the final GO. Nothing described below is built yet under the new direction; the verification technology it reuses is already built and tested.
+**Status as of 2026-07-06:** the direction described below has been **built and independently review-gated** — the menu-truth checker (with official UCP schema conformance), the scripted demo, and the NYC fee-cap audit (module two) all exist, tested green, on a fully synthetic and labeled corpus. The one AI piece (the fuzzy fee-line classifier) was measured against bars set before the test and **missed one bar by a hair — so its label honestly says "deferred," and the bar did not move**. The repo is packaged for publication at the Pub gate (2026-07-06, Apache-2.0); the plain-English story below is the story of what now exists, not a plan.
 
 ---
 

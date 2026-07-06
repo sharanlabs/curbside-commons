@@ -24,9 +24,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ActivationOps AI",
+  title: "Commerce Truth Audit",
   description:
-    "Merchant activation for a local-commerce delivery marketplace — deterministic triage, eval-gated bounded AI outreach, human approval, audit. Simulated data; company-agnostic prototype.",
+    "The truth layer for agentic commerce — a deterministic verifier of platform/AI-agent serving copies vs the merchant system-of-record, UCP conformance, and NYC fee-cap audit. Simulated corpus; company-agnostic prototype.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -1,8 +1,9 @@
 {
-  "name": "activationops-ai",
+  "name": "commerce-truth-audit",
   "version": "0.1.0",
   "private": true,
-  "description": "Merchant activation AI for a local-commerce delivery marketplace: deterministic triage + explainable blocker diagnosis + eval-gated bounded Gemini outreach drafting + claims gatekeeper + human-approval gate + audit. Company-agnostic prototype on hybrid (real open-source entities + synthetic activation) data.",
+  "license": "Apache-2.0",
+  "description": "The truth layer for agentic commerce: a deterministic verifier of what platforms and AI-agent surfaces claim (menus, prices, availability) vs the merchant system-of-record, UCP/ACP conformance checking, and an NYC §20-563.3 fee-cap audit. Simulated corpus; prototype. Lineage: the ActivationOps AI activation module is archived runnable under legacy/.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

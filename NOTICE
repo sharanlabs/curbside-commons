@@ -1,0 +1,8 @@
+Commerce Truth Audit
+Copyright 2026 Sharan Kumar
+
+This product includes the official Universal Commerce Protocol (UCP) JSON
+Schemas, pinned verbatim under fixtures/ucp-schemas/ from
+https://github.com/Universal-Commerce-Protocol/ucp (tag v2026-04-08),
+licensed under the Apache License 2.0 by the UCP Authors. Their upstream
+LICENSE and a per-file sha256 provenance record are retained alongside them.

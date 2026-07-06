@@ -7,10 +7,10 @@ import { describe, expect, it } from "vitest";
  *
  * Asserts the top-level corpus index is self-contained and taxonomy-keyed across
  * BOTH fixture sets, that the `ucp-catalog-response.*` shape-honesty caveat
- * survives verbatim (un-softened), that licensing is left as an explicit owner
- * call (no LICENSE file added, "pending owner decision" stated), and that
- * packaging added documentation only — it did not add a license file to the
- * synthetic corpus dirs.
+ * survives verbatim (un-softened), and that licensing is DECIDED and coherent:
+ * Apache-2.0 via the repo-root LICENSE (Pub gate, 2026-07-06 — the O6 owner call
+ * this test previously held open as "pending"), stated in the index, with no
+ * stray per-dir license files shadowing the root one.
  */
 
 const root = process.cwd();
@@ -74,16 +74,24 @@ describe("C9 shape-honesty caveat survives verbatim (not softened)", () => {
   });
 });
 
-describe("C9 licensing is an explicit owner call — packaged, not published/licensed", () => {
-  it("the index states the license is pending an owner decision", () => {
-    expect(/license:\s*pending owner decision/i.test(indexText)).toBe(true);
+describe("C9 licensing decided at the Pub gate — Apache-2.0 via the repo root", () => {
+  it("the index states the Apache-2.0 license (the O6 call is closed, not pending)", () => {
+    expect(/license:\s*apache-2\.0/i.test(indexText)).toBe(true);
+    expect(/license:\s*pending owner decision/i.test(indexText)).toBe(false);
   });
-  it("no LICENSE file was added to the synthetic corpus dirs (owner call)", () => {
+  it("the repo-root LICENSE exists and is the Apache License 2.0", () => {
+    const licensePath = join(root, "LICENSE");
+    expect(existsSync(licensePath)).toBe(true);
+    const license = readFileSync(licensePath, "utf8");
+    expect(license).toContain("Apache License");
+    expect(license).toContain("Version 2.0, January 2004");
+  });
+  it("no per-dir LICENSE file shadows the root one in the synthetic corpus dirs", () => {
     for (const dir of ["synthetic-restaurant", "ucp-conformance-ci"]) {
       for (const name of ["LICENSE", "LICENSE.md", "LICENSE.txt"]) {
         expect(
           existsSync(join(fixtures, dir, name)),
-          `unexpected ${name} in fixtures/${dir} — license is an owner call`,
+          `unexpected ${name} in fixtures/${dir} — the root LICENSE governs`,
         ).toBe(false);
       }
     }

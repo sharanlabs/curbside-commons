@@ -7,7 +7,7 @@ Deterministic, as-of-based timestamps (no wall-clock) so runs are reproducible
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SOURCE_CSV = REPO_ROOT / "DoorDash Merchant Nudge Engine - Merchant Directory.csv"
+SOURCE_CSV = REPO_ROOT / "legacy" / "activation" / "merchant-directory.dummy.csv"
 DEFAULT_OUT_DIR = REPO_ROOT / "out"
 
 # Fixed reference points (no wall-clock; owner may change the as-of date).

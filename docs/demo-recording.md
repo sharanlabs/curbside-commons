@@ -1,3 +1,13 @@
+# Demo recording (Pub slice) — the scripted walkthrough, executed
+
+*Recorded 2026-07-06 on Node v24.15.0 with `node bin/check.mjs demo` (exit 0, $0, zero-config,
+no network). The output below is BYTE-IDENTICAL to the committed golden
+`fixtures/synthetic-restaurant/expected-demo.txt`, which a test byte-locks to the live engine —
+so this recording provably cannot drift from what the verifier actually computes. Every verdict
+in it is computed by the real verifier/conformance entry points, never narrated. Simulated
+corpus; spec-faithful demonstration actor — simulated.*
+
+```text
 ============================================================================
 Commerce Truth Audit — verifier demo (SIMULATED)
 ============================================================================
@@ -63,3 +73,4 @@ BEAT 4 · Conformance-foil: spec-valid is not the same as true
 No language model runs in this demo; the comparison is exact, deterministic
 logic. Simulated data, run on demand — not a live service, no platform access.
 ============================================================================
+```

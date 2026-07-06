@@ -23,7 +23,7 @@ export function Nav() {
           aria-current={pathname === "/" ? "page" : undefined}
           className="mr-3 font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         >
-          ActivationOps AI
+          Commerce Truth Audit
         </Link>
         {LINKS.map((l) => {
           const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
