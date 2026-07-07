@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activationops.local/tools/get_rule.input.schema.json",
+  "title": "get_rule input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ruleId": { "type": "string", "minLength": 1 }
+  }
+}

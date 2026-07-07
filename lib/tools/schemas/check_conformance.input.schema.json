@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activationops.local/tools/check_conformance.input.schema.json",
+  "title": "check_conformance input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["docPath"],
+  "properties": {
+    "docPath": { "type": "string", "minLength": 1 },
+    "op": { "type": "string", "enum": ["search", "lookup", "get_product"] },
+    "schemaDir": { "type": "string", "minLength": 1 }
+  }
+}

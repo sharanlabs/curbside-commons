@@ -1,0 +1,243 @@
+=== A0 tool-registry RED-GREEN evidence — 2026-07-07T18:57:09Z ===
+cwd: /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+Five mutation cycles, one per load-bearing behavior named in the dispatch
+packet: (RG-1) input validation, (RG-2) differential equality, (RG-3)
+demoOnly flag, (RG-4) advisory-never-gates, (RG-5) import walk. Each: mutate
+-> run targeted eval (RED) -> revert -> run targeted eval (GREEN).
+
+
+--- RG-1: input validation (AC-1) ---
+Mutation: lib/tools/schemas/check_feed.input.schema.json — removed the "surface" enum
+constraint (surface: {"type":"string"} only), so an invalid surface value passes ajv.
+Command: npx vitest run evals/tools/registry-ac1.test.ts
+RED (1 failed, 20 passed):
+
+ RUN  v4.1.9 /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+ ❯ evals/tools/registry-ac1.test.ts (21 tests | 1 failed) 82ms
+       × invalid input (bad surface enum) -> typed ToolInputError with ajv errors attached 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  evals/tools/registry-ac1.test.ts > AC-1 registry contract — every tool > check_feed > invalid input (bad surface enum) -> typed ToolInputError with ajv errors attached
+AssertionError: expected error to be instance of ToolInputError
+
+- Expected:
+[Function ToolInputError]
+
++ Received:
+TypeError {
+  "message": "Cannot read properties of undefined (reading 'includes')",
+}
+
+ ❯ evals/tools/registry-ac1.test.ts:64:85
+     62|
+     63|     it("invalid input (bad surface enum) -> typed ToolInputError with …
+     64|       expect(() => callTool("check_feed", { ...valid, surface: "carrie…
+       |                                                                                     ^
+     65|         ToolInputError,
+     66|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+
+Revert: restored the committed enum. Command: npx vitest run evals/tools/registry-ac1.test.ts
+GREEN:
+
+ RUN  v4.1.9 /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  14:57:42
+   Duration  837ms (transform 196ms, setup 292ms, import 262ms, tests 82ms, environment 0ms)
+
+
+--- RG-2: differential equality (AC-2) ---
+Mutation: lib/tools/tools/check-feed.ts — appended "MUTATED-RG-2" to the tool's
+canonical output (canonical: result.output + "MUTATED-RG-2").
+Command: npx vitest run evals/tools/registry-ac2-differential.test.ts
+RED (4 failed, 34 passed — exactly the 4 check_feed cases; check_conformance/
+audit_statement/classify_and_audit/get_rule/run_demo cases unaffected):
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  evals/tools/registry-ac2-differential.test.ts > AC-2 differential — check_feed vs runCheck (SAME serializeReport) > acp faithful: registry canonical === direct runCheck (byte-identical) + exit-code parity
+ FAIL  evals/tools/registry-ac2-differential.test.ts > AC-2 differential — check_feed vs runCheck (SAME serializeReport) > ucp faithful: registry canonical === direct runCheck (byte-identical) + exit-code parity
+ FAIL  evals/tools/registry-ac2-differential.test.ts > AC-2 differential — check_feed vs runCheck (SAME serializeReport) > acp drifted: registry canonical === direct runCheck (byte-identical) + exit-code parity
+ FAIL  evals/tools/registry-ac2-differential.test.ts > AC-2 differential — check_feed vs runCheck (SAME serializeReport) > ucp drifted: registry canonical === direct runCheck (byte-identical) + exit-code parity
+      Tests  4 failed | 34 passed (38)
+
+Revert: restored the committed check-feed.ts. Command: npx vitest run evals/tools/registry-ac2-differential.test.ts
+GREEN:
+      Tests  38 passed (38)
+
+--- RG-3: demoOnly flag (Codex amendment 7) ---
+Mutation: lib/tools/tools/run-demo.ts — omitted "demoOnly: true" from the envelope.
+Command: npx vitest run evals/tools/registry-ac1.test.ts evals/tools/registry-envelope-goldens.test.ts
+RED (3 failed, 24 passed — caught on THREE independent surfaces: the AC-1
+demoOnly:true assertion, the run_demo output-envelope schema's required
+"demoOnly" property (ajv), AND the byte-frozen golden):
+     × run_demo golden is byte-identical 6ms
+       × happy case (default format=json): runs + envelope validates + demoOnly:true 4ms
+       × happy case (format=text): runs + envelope validates 2ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  3 failed | 24 passed (27)
+
+Revert: restored the committed run-demo.ts. Command: npx vitest run evals/tools/registry-ac1.test.ts evals/tools/registry-envelope-goldens.test.ts
+GREEN:
+      Tests  27 passed (27)
+
+--- RG-4: advisory-never-gates (recommend-don't-decide) ---
+Mutation: lib/tools/tools/classify-and-audit.ts — let a nonzero advisory finding
+GATE the result (gatedByAdvisory = base.ok && advisoryFindings.length>0; ok/exitCode
+now false/1 whenever advisories exist, even on a clean base audit).
+Command: npx vitest run evals/tools/registry-advisory-never-gates.test.ts evals/tools/registry-ac2-differential.test.ts
+RED (1 failed, 40 passed — note: the AC-2 differential over the 4 COMMITTED
+corpus fixtures did NOT catch this, because none of them combine a clean base
+audit with a nonzero advisory finding; only the dedicated in-memory
+advisory-never-gates eval caught it — this is exactly why that eval exists):
+     × the registry tool reports ok:true, exitCode:0 despite the nonzero advisory finding 3ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 40 passed (41)
+
+Revert: restored the committed classify-and-audit.ts. Command: npx vitest run evals/tools/registry-advisory-never-gates.test.ts evals/tools/registry-ac2-differential.test.ts
+GREEN:
+      Tests  41 passed (41)
+
+--- RG-5: import walk ($0-LLM, AC-3) ---
+Mutation: lib/tools/registry.ts — planted `import "node:https";` (a banned module).
+Command: npx vitest run evals/tools/registry-ac3-import-graph.test.ts
+RED (1 failed, 3 passed):
+     × no module reachable from lib/tools/registry.ts matches a banned pattern 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 3 passed (4)
+
+Revert: restored the committed registry.ts. Command: npx vitest run evals/tools/registry-ac3-import-graph.test.ts
+GREEN:
+      Tests  4 passed (4)
+
+--- Post-revert sanity: all 5 mutated files byte-diffed against their pre-mutation backups ---
+diff /tmp/check-feed.ts.bak lib/tools/tools/check-feed.ts && diff /tmp/run-demo.ts.bak lib/tools/tools/run-demo.ts && diff /tmp/classify-and-audit.ts.bak lib/tools/tools/classify-and-audit.ts && diff /tmp/registry.ts.bak lib/tools/registry.ts && diff /tmp/check_feed.input.schema.json.bak lib/tools/schemas/check_feed.input.schema.json
+=> ALL CLEAN — no residual mutations (empty diff on all five)
+
+--- FINAL: npm run verify (full raw tail) ---
+      Show this message.
+
+Notes:
+  - No LLM / network calls on either path (C1: $0-LLM; conformance reads pinned
+    schemas from disk via ajv).
+  - Output is the machine-readable report (JSON) on stdout — CI-usable, always
+    carrying the C10 header surface (specVersion · matchingMode · simulated).
+    --json is the explicit, trailing alias for that default serialization.
+  - Unknown flags, surplus positionals, and mixed modes exit 2 (loud) — a typo
+    never silently falls back to a default, and --conformance never silently
+    swallows a truth-leg request (the legs are separate commands by design).
+  - conformance vs truth: a spec-VALID document can still be FALSE. The two legs
+    answer different questions and use distinct rule families (LST-* vs LST-CONF-*).
+  - --surface defaults to acp; --op defaults to search.
+  - Zero-config demos: npm run check:fixtures  |  npm run check:conformance
+
+ Test Files  62 passed | 5 skipped (67)
+      Tests  821 passed | 6 skipped (827)
+   Start at  15:01:02
+   Duration  4.98s (transform 3.82s, setup 4.62s, import 10.15s, tests 8.07s, environment 14ms)
+
+
+> commerce-truth-audit@0.1.0 build
+> next build
+
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 7.1s
+  Running TypeScript ...
+  Finished TypeScript in 3.6s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/30) ...
+  Generating static pages using 7 workers (7/30) 
+  Generating static pages using 7 workers (14/30) 
+  Generating static pages using 7 workers (22/30) 
+✓ Generating static pages using 7 workers (30/30) in 241ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /audit
+├ ○ /console
+├ ○ /cost
+├ ○ /demo
+├ ○ /eval
+├ ● /merchant/[id]
+│ ├ /merchant/M001
+│ ├ /merchant/M002
+│ ├ /merchant/M003
+│ └ [+17 more paths]
+├ ○ /metrics
+└ ○ /report
+
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+
+
+--- FINAL: npm run test:legacy (full raw tail) ---
+
+> commerce-truth-audit@0.1.0 test:legacy
+> vitest run legacy/activation/evals
+
+
+ RUN  v4.1.9 /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+
+ Test Files  26 passed | 4 skipped (30)
+      Tests  306 passed | 5 skipped (311)
+   Start at  15:01:21
+   Duration  1.60s (transform 1.50s, setup 1.67s, import 4.32s, tests 403ms, environment 3ms)
+
+
+--- FINAL (after docs same-breath edits + slice record written): re-run in full ---
+npm run verify -> exit 0; Test Files 62 passed | 5 skipped (67); Tests 821 passed | 6 skipped (827)
+npm run test:legacy -> exit 0; Test Files 26 passed | 4 skipped (30); Tests 306 passed | 5 skipped (311)
+npx eslint . --max-warnings=0 -> exit 0
+
+--- FINAL diff-scope proof (git status --porcelain, sorted) ---
+ M docs/decision-log.md
+ M docs/GLOSSARY.md
+ M docs/PLAIN-ENGLISH.md
+?? docs/reviews/a0-slice-record.md
+?? docs/reviews/a0-verify-evidence.log
+?? evals/tools/
+?? lib/tools/
+
+Only "M docs/decision-log.md" (pre-existing, the owner's 2026-07-07 GO entry —
+predates this implementer session, not touched by this slice; verified via
+`git diff docs/decision-log.md`, whose only hunk is that GO entry), plus new
+files under evals/tools/, lib/tools/, and docs/reviews/a0-*, plus the intended
+same-breath edits to docs/PLAIN-ENGLISH.md and docs/GLOSSARY.md. No file under
+lib/packs/**, lib/verifier-core/**, lib/agents/**, bin/check.mjs, any existing
+evals/** file, fixtures/**, or any golden/snapshot was modified.
+
+=== A0 CODEX RECONCILIATION ADDENDUM — 2026-07-07 (Fable seat) ===
+Codex changed-files review (codex-guarded, read-only, xhigh): VERDICT findings — 3 P2 + 1 P3;
+engine files verified untouched by Codex itself. ALL FOUR ACCEPTED primary-model-final:
+  F1 (P2) runnable REGISTRY exposed run() bypassing callTool validation -> RUNNABLE now module-private;
+        public view = TOOLS (metadata-only, frozen, no run). Test: 'metadata-only' assertion in registry-ac1.
+  F2 (P2) classify_and_audit differential self-referential -> independent assertions added:
+        parsed base === audit_statement's own canonical; advisoryFindings === direct engine report list.
+  F3 (P2) import walker escape hatches -> ban list extended (node:net/tls/dgram, node-fetch/axios/got/ws);
+        new fail-closed test: no require()/createRequire/non-literal dynamic import in ANY reachable source.
+  F4 (P3) demoOnly ignorable by consumers -> assertDecisionGrade() helper shipped now (throws on demoOnly/advisory);
+        A1/A2/A4 consumers are REQUIRED to call it where a verdict is consumed (recorded for those slices).
+
+--- RG-6: public TOOLS view leaks run() (F1 teeth) ---
+Mutation: TOOLS built from Object.freeze({...t}) (full definition incl. run).
+RED: registry-ac1 1 failed / 23 ('tool "audit_statement" leaks a run function on the public view').
+Revert: byte-diffed clean. GREEN: 23 passed.
+
+--- RG-7: require() escape hatch (F3 teeth) ---
+Mutation: appended 'const rg7 = require("node:fs")' to lib/tools/serializers.ts (reachable).
+RED: registry-ac3 1 failed / 5 (CJS require reachable — walker cannot follow it).
+Revert: byte-diffed clean. GREEN: 5 passed.

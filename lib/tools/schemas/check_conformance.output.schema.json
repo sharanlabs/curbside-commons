@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activationops.local/tools/check_conformance.output.schema.json",
+  "title": "check_conformance output envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tool", "ok", "exitCode", "canonical"],
+  "properties": {
+    "tool": { "const": "check_conformance" },
+    "ok": { "type": "boolean" },
+    "exitCode": { "type": "integer", "enum": [0, 1] },
+    "demoOnly": { "type": "boolean", "const": false },
+    "advisory": { "type": "boolean", "const": false },
+    "earnsLabel": { "type": "boolean" },
+    "canonical": { "type": "string", "minLength": 1 }
+  }
+}

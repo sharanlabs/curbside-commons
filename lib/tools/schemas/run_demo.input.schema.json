@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activationops.local/tools/run_demo.input.schema.json",
+  "title": "run_demo input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format": { "type": "string", "enum": ["text", "json"] }
+  }
+}

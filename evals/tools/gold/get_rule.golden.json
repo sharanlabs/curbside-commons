@@ -1,0 +1,6 @@
+{
+  "tool": "get_rule",
+  "ok": true,
+  "exitCode": 0,
+  "canonical": "{\n  \"id\": \"NYC-563.3-a-1\",\n  \"sourceClause\": \"§ 20-563.3(a)\",\n  \"kind\": \"per_order_cap\",\n  \"capPct\": 15,\n  \"base\": \"purchase_price_per_online_order\",\n  \"driftClasses\": [\n    \"over-cap\",\n    \"misclassification\"\n  ]\n}\n"
+}

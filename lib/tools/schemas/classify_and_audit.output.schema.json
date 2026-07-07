@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activationops.local/tools/classify_and_audit.output.schema.json",
+  "title": "classify_and_audit output envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tool", "ok", "exitCode", "advisory", "earnsLabel", "canonical"],
+  "properties": {
+    "tool": { "const": "classify_and_audit" },
+    "ok": { "type": "boolean" },
+    "exitCode": { "type": "integer", "enum": [0, 1] },
+    "demoOnly": { "type": "boolean", "const": false },
+    "advisory": { "type": "boolean", "const": true },
+    "earnsLabel": { "type": "boolean", "const": false },
+    "canonical": { "type": "string", "minLength": 1 }
+  }
+}

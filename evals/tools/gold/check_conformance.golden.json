@@ -1,0 +1,6 @@
+{
+  "tool": "check_conformance",
+  "ok": true,
+  "exitCode": 0,
+  "canonical": "{\n  \"specVersion\": \"ucp-catalog-search@2026-04-08\",\n  \"matchingMode\": \"synthetic-controlled\",\n  \"simulated\": true,\n  \"findings\": [],\n  \"ok\": true\n}\n"
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activationops.local/tools/run_demo.output.schema.json",
+  "title": "run_demo output envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tool", "ok", "exitCode", "demoOnly", "canonical"],
+  "properties": {
+    "tool": { "const": "run_demo" },
+    "ok": { "type": "boolean", "const": true },
+    "exitCode": { "type": "integer", "const": 0 },
+    "demoOnly": { "type": "boolean", "const": true },
+    "advisory": { "type": "boolean", "const": false },
+    "earnsLabel": { "type": "boolean" },
+    "canonical": { "type": "string", "minLength": 1 }
+  }
+}

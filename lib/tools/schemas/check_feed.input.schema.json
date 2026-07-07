@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activationops.local/tools/check_feed.input.schema.json",
+  "title": "check_feed input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["feedPath", "catalogPath", "surface"],
+  "properties": {
+    "feedPath": { "type": "string", "minLength": 1 },
+    "catalogPath": { "type": "string", "minLength": 1 },
+    "surface": { "type": "string", "enum": ["acp", "ucp"] }
+  }
+}
