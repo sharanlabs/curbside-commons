@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "step": "initialize",
+      "serverInfo": {
+        "name": "commerce-truth-audit",
+        "version": "0.1.0"
+      },
+      "capabilities": {
+        "tools": {}
+      },
+      "instructions": "commerce-truth-audit MCP server — SIMULATED demonstration data throughout, never real merchant data. Deterministic, $0, offline engine underneath every tool: agents recommend, the engine decides (no AI call sits in any of these six tools' decision paths). run_demo is a demo_only walkthrough, never an audit result. classify_and_audit is advisory — candidate leads, never a verdict; its classifier has not earned a calibrated label (earnsLabel: false)."
+    },
+    {
+      "step": "tools/list",
+      "tools": [
+        {
+          "name": "check_feed",
+          "description": "SIMULATED data (never real merchant data): deterministic $0 drift check comparing a serving-copy feed (ACP or UCP surface) against the merchant system-of-record catalog fixture — flags any mismatch between what a platform/agent-facing surface shows and the underlying truth. No AI call sits in this tool's decision path.",
+          "inputSchema": {
+            "$id": "https://activationops.local/tools/check_feed.input.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "additionalProperties": false,
+            "properties": {
+              "catalogPath": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "feedPath": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "surface": {
+                "enum": [
+                  "acp",
+                  "ucp"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "feedPath",
+              "catalogPath",
+              "surface"
+            ],
+            "title": "check_feed input",
+            "type": "object"
+          }
+        },
+        {
+          "name": "check_conformance",
+          "description": "SIMULATED data (never real merchant data): deterministic $0 schema-conformance check validating a UCP catalog-response document against the pinned published UCP JSON Schemas — answers \"is it correctly shaped\", the separate question from check_feed's \"is it true\". No AI call sits in this tool's decision path.",
+          "inputSchema": {
+            "$id": "https://activationops.local/tools/check_conformance.input.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "additionalProperties": false,
+            "properties": {
+              "docPath": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "op": {
+                "enum": [
+                  "search",
+                  "lookup",
+                  "get_product"
+                ],
+                "type": "string"
+              },
+              "schemaDir": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "docPath"
+            ],
+            "title": "check_conformance input",
+            "type": "object"
+          }
+        },
+        {
+          "name": "audit_statement",
+          "description": "SIMULATED data (never real merchant data): deterministic $0 audit of a monthly delivery-fee statement against the codified NYC Local Law section 20-563.3 fee caps. The exit code reflects the audit verdict directly — no AI sits in the decision path.",
+          "inputSchema": {
+            "$id": "https://activationops.local/tools/audit_statement.input.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "additionalProperties": false,
+            "properties": {
+              "statementPath": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "statementPath"
+            ],
+            "title": "audit_statement input",
+            "type": "object"
+          }
+        },
+        {
+          "name": "classify_and_audit",
+          "description": "ADVISORY — candidate leads, never a verdict; classifier has NOT earned a calibrated label. SIMULATED data (never real merchant data): runs the SAME deterministic fee-cap audit as audit_statement, plus a separate list of line-item classification leads from the deterministic baseline classifier. These leads never gate the audit's pass/fail outcome — recommend, never decide.",
+          "inputSchema": {
+            "$id": "https://activationops.local/tools/classify_and_audit.input.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "additionalProperties": false,
+            "properties": {
+              "statementPath": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "statementPath"
+            ],
+            "title": "classify_and_audit input",
+            "type": "object"
+          }
+        },
+        {
+          "name": "get_rule",
+          "description": "SIMULATED demonstration project (every statement/feed this toolset otherwise audits is SIMULATED fixture data, never real merchant data): looks up one (or all, if ruleId is omitted) codified NYC Local Law section 20-563.3 fee rule(s) by id. The rule TABLE itself is the real published law text, not simulated — only the audited statements/feeds elsewhere in this toolset are.",
+          "inputSchema": {
+            "$id": "https://activationops.local/tools/get_rule.input.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "additionalProperties": false,
+            "properties": {
+              "ruleId": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "title": "get_rule input",
+            "type": "object"
+          }
+        },
+        {
+          "name": "run_demo",
+          "description": "DEMO-ONLY WALKTHROUGH — never an audit result. SIMULATED data (never real merchant data): plays the scripted demonstration in which a spec-valid-but-false surface is caught against the SOR catalog. Always exits successfully; this is a narration, not a pass/fail check.",
+          "inputSchema": {
+            "$id": "https://activationops.local/tools/run_demo.input.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "additionalProperties": false,
+            "properties": {
+              "format": {
+                "enum": [
+                  "text",
+                  "json"
+                ],
+                "type": "string"
+              }
+            },
+            "title": "run_demo input",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "step": "tools/call",
+      "request": {
+        "name": "check_feed",
+        "arguments": {
+          "feedPath": "fixtures/synthetic-restaurant/acp-feed.faithful.json",
+          "catalogPath": "fixtures/synthetic-restaurant/sor.catalog.json",
+          "surface": "acp"
+        }
+      },
+      "response": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"specVersion\": \"taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08\",\n  \"matchingMode\": \"synthetic-controlled\",\n  \"simulated\": true,\n  \"findings\": [],\n  \"ok\": true\n}\n"
+          }
+        ],
+        "structuredContent": {
+          "advisory": false,
+          "demoOnly": false,
+          "earnsLabel": null,
+          "exitCode": 0,
+          "ok": true,
+          "tool": "check_feed"
+        }
+      }
+    },
+    {
+      "step": "tools/call",
+      "request": {
+        "name": "check_conformance",
+        "arguments": {
+          "docPath": "fixtures/ucp-conformance-ci/valid/search-full-catalog.json",
+          "op": "search"
+        }
+      },
+      "response": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"specVersion\": \"ucp-catalog-search@2026-04-08\",\n  \"matchingMode\": \"synthetic-controlled\",\n  \"simulated\": true,\n  \"findings\": [],\n  \"ok\": true\n}\n"
+          }
+        ],
+        "structuredContent": {
+          "advisory": false,
+          "demoOnly": false,
+          "earnsLabel": null,
+          "exitCode": 0,
+          "ok": true,
+          "tool": "check_conformance"
+        }
+      }
+    },
+    {
+      "step": "tools/call",
+      "request": {
+        "name": "audit_statement",
+        "arguments": {
+          "statementPath": "fixtures/synthetic-restaurant/fees/statement.faithful.json"
+        }
+      },
+      "response": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"specVersion\": \"uc1-rule-table-draft/2026-07-03+NYC§20-563.3+LL79-2025+base-U1-unresolved\",\n  \"simulated\": true,\n  \"classification\": \"as-declared by the platform; deterministic audit; LLM line-item classifier DEFERRED (F1b)\",\n  \"assumedPurchasePriceBase\": \"order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)\",\n  \"findings\": [],\n  \"verdictTally\": {\n    \"violation\": 0,\n    \"conditional-pending-refund-window\": 0,\n    \"cured-by-refund\": 0,\n    \"asserted-passthrough-unverified\": 0\n  },\n  \"ok\": true\n}\n"
+          }
+        ],
+        "structuredContent": {
+          "advisory": false,
+          "demoOnly": false,
+          "earnsLabel": null,
+          "exitCode": 0,
+          "ok": true,
+          "tool": "audit_statement"
+        }
+      }
+    },
+    {
+      "step": "tools/call",
+      "request": {
+        "name": "classify_and_audit",
+        "arguments": {
+          "statementPath": "fixtures/synthetic-restaurant/fees/statement.faithful.json"
+        }
+      },
+      "response": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"base\": {\n    \"specVersion\": \"uc1-rule-table-draft/2026-07-03+NYC§20-563.3+LL79-2025+base-U1-unresolved\",\n    \"simulated\": true,\n    \"classification\": \"as-declared by the platform; deterministic audit; LLM line-item classifier DEFERRED (F1b)\",\n    \"assumedPurchasePriceBase\": \"order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)\",\n    \"findings\": [],\n    \"verdictTally\": {\n      \"violation\": 0,\n      \"conditional-pending-refund-window\": 0,\n      \"cured-by-refund\": 0,\n      \"asserted-passthrough-unverified\": 0\n    },\n    \"ok\": true\n  },\n  \"advisoryFindings\": []\n}\n"
+          }
+        ],
+        "structuredContent": {
+          "advisory": true,
+          "demoOnly": false,
+          "earnsLabel": false,
+          "exitCode": 0,
+          "ok": true,
+          "tool": "classify_and_audit"
+        }
+      }
+    },
+    {
+      "step": "tools/call",
+      "request": {
+        "name": "get_rule",
+        "arguments": {
+          "ruleId": "NYC-563.3-a-1"
+        }
+      },
+      "response": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"id\": \"NYC-563.3-a-1\",\n  \"sourceClause\": \"§ 20-563.3(a)\",\n  \"kind\": \"per_order_cap\",\n  \"capPct\": 15,\n  \"base\": \"purchase_price_per_online_order\",\n  \"driftClasses\": [\n    \"over-cap\",\n    \"misclassification\"\n  ]\n}\n"
+          }
+        ],
+        "structuredContent": {
+          "advisory": false,
+          "demoOnly": false,
+          "earnsLabel": null,
+          "exitCode": 0,
+          "ok": true,
+          "tool": "get_rule"
+        }
+      }
+    },
+    {
+      "step": "tools/call",
+      "request": {
+        "name": "run_demo",
+        "arguments": {
+          "format": "json"
+        }
+      },
+      "response": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"claim\": \"a spec-faithful simulated agent follows a spec-valid but false surface; the verifier catches the surface/SOR mismatch\",\n  \"actorLabel\": \"spec-faithful demonstration actor — simulated\",\n  \"simulated\": true,\n  \"specVersion\": \"taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08\",\n  \"selection\": {\n    \"intent\": \"Order the \\\"Smoked Brisket Plate\\\" if the published feed lists it as available.\",\n    \"targetTitle\": \"Smoked Brisket Plate\",\n    \"selectedItemId\": \"item-006-v1\",\n    \"selectedTitle\": \"Smoked Brisket Plate\",\n    \"observedPrice\": \"12.00\",\n    \"observedCurrency\": \"USD\",\n    \"observedAvailability\": \"in_stock\"\n  },\n  \"totalFindingCount\": 16,\n  \"beats\": [\n    {\n      \"id\": \"actor-reads\",\n      \"title\": \"The agent reads the published serving copy — spec-faithful demonstration actor — simulated\",\n      \"plain\": \"A shopping agent reads the published menu feed — the same data any AI assistant would consume — and never sees the restaurant's own records.\",\n      \"lines\": [\n        \"intent: Order the \\\"Smoked Brisket Plate\\\" if the published feed lists it as available.\",\n        \"source read: the published ACP serving copy only (no system-of-record access)\"\n      ]\n    },\n    {\n      \"id\": \"actor-selects\",\n      \"title\": \"The agent selects an item, trusting the surface\",\n      \"plain\": \"Trusting the feed at face value, the agent picks its target item and is ready to order it at the price the surface shows.\",\n      \"lines\": [\n        \"selected item: \\\"Smoked Brisket Plate\\\" (row id item-006-v1)\",\n        \"read off the surface: price 12.00 USD · availability in_stock\",\n        \"the agent is now ready to order at that price — the demo stops here (no checkout).\"\n      ],\n      \"verdicts\": [\n        {\n          \"ok\": true,\n          \"label\": \"SELECTED (from the surface)\"\n        }\n      ]\n    },\n    {\n      \"id\": \"verifier-finds\",\n      \"title\": \"The verifier checks that same copy against the records\",\n      \"plain\": \"The verifier checks the exact same feed against the restaurant's system-of-record and flags what the agent had no way to see.\",\n      \"lines\": [\n        \"1 finding for the selected item (\\\"Smoked Brisket Plate\\\"); full report: 16 findings across the whole copy.\"\n      ],\n      \"findings\": [\n        {\n          \"plainLine\": \"The served price 12.00 does not match the catalog price 10.00.\",\n          \"claimId\": \"item-006-v1#price.amount\",\n          \"claimSource\": \"acp-feed\",\n          \"claimField\": \"price.amount\",\n          \"claimValue\": \"12.00\",\n          \"referenceRowId\": \"item-006-v1\",\n          \"ruleId\": \"LST-PRICE-VALUE\",\n          \"severity\": \"error\",\n          \"category\": \"price\"\n        }\n      ],\n      \"verdicts\": [\n        {\n          \"ok\": false,\n          \"label\": \"DRIFT ON THE SELECTED ITEM — the agent could not have seen it\"\n        }\n      ]\n    },\n    {\n      \"id\": \"conformance-foil\",\n      \"title\": \"Conformance-foil: spec-valid is not the same as true\",\n      \"plain\": \"The same document passes the official schema check — it is correctly shaped — and still misstates the price versus the records.\",\n      \"lines\": [\n        \"passes the official schema check; still lies — conformance: PASS (spec-shape); truth: 1 finding(s) vs the system-of-record.\"\n      ],\n      \"findings\": [\n        {\n          \"plainLine\": \"The served price 23.50 does not match the catalog price 21.50.\",\n          \"claimId\": \"item-001-v1#price.amount\",\n          \"claimSource\": \"ucp-catalog\",\n          \"claimField\": \"price.amount\",\n          \"claimValue\": \"23.50\",\n          \"referenceRowId\": \"item-001-v1\",\n          \"ruleId\": \"LST-PRICE-VALUE\",\n          \"severity\": \"error\",\n          \"category\": \"price\"\n        }\n      ],\n      \"verdicts\": [\n        {\n          \"ok\": true,\n          \"label\": \"CONFORMANT (spec-valid)\"\n        },\n        {\n          \"ok\": false,\n          \"label\": \"FALSE vs SOR (still lies)\"\n        }\n      ]\n    }\n  ]\n}\n"
+          }
+        ],
+        "structuredContent": {
+          "advisory": false,
+          "demoOnly": true,
+          "earnsLabel": null,
+          "exitCode": 0,
+          "ok": true,
+          "tool": "run_demo"
+        }
+      }
+    },
+    {
+      "step": "tools/call (invalid)",
+      "request": {
+        "name": "check_feed",
+        "arguments": {
+          "feedPath": "x",
+          "catalogPath": "y",
+          "surface": "carrier-pigeon"
+        }
+      },
+      "response": {
+        "isError": true,
+        "content": [
+          {
+            "type": "text",
+            "text": "tool \"check_feed\": input failed schema validation (1 error(s)): /surface must be equal to one of the allowed values"
+          }
+        ],
+        "structuredContent": null
+      }
+    },
+    {
+      "step": "tools/call (invalid)",
+      "request": {
+        "name": "get_rule",
+        "arguments": {
+          "ruleId": 12345
+        }
+      },
+      "response": {
+        "isError": true,
+        "content": [
+          {
+            "type": "text",
+            "text": "tool \"get_rule\": input failed schema validation (1 error(s)): /ruleId must be string"
+          }
+        ],
+        "structuredContent": null
+      }
+    }
+  ]
+}

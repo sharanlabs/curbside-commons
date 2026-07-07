@@ -23,6 +23,8 @@
     "check:fees": "node bin/check.mjs fees fixtures/synthetic-restaurant/fees/statement.drifted.json",
     "check:fees:clean": "node bin/check.mjs fees fixtures/synthetic-restaurant/fees/statement.faithful.json",
     "demo": "node bin/check.mjs demo",
+    "mcp": "node bin/mcp-server.mjs",
+    "mcp:record-transcript": "node evals/mcp/record-transcript.mjs",
     "fixtures:wedge": "node scripts-ts/generate-wedge-fixtures.mts",
     "fixtures:fees": "node scripts-ts/generate-fee-fixtures.mts",
     "fixtures:ucp": "node scripts-ts/generate-ucp-conformance-corpus.mts",
@@ -35,6 +37,7 @@
   "dependencies": {
     "@ai-sdk/google": "^2.0.11",
     "@ai-sdk/groq": "^2.0.42",
+    "@modelcontextprotocol/sdk": "1.29.0",
     "ai": "^5.0.98",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",

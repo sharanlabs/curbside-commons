@@ -1,0 +1,177 @@
+=== A1 MCP server RED-GREEN evidence — 2026-07-07 ===
+cwd: /Users/sharan_98/Desktop/AI DoorDash Merchant Engine
+
+Four mutation cycles, one per load-bearing behavior named in the dispatch
+packet: (RG-1) schema drift caught by tools/list, (RG-2) differential
+equality mutation, (RG-3) isError mapping swallowed, (RG-4) import-walk
+escape. Each: mutate ONLY lib/mcp/server.ts -> run targeted eval (RED) ->
+revert -> byte-diff against pre-mutation backup (empty) -> run targeted eval
+(GREEN). lib/tools/** was never touched by any mutation.
+
+
+--- RG-1: schema drift caught by tools/list (AC-4) ---
+Mutation: lib/mcp/server.ts, listedTools() — appended `RG1_MUTATED: true` to
+every advertised inputSchema (so the server's tools/list output no longer
+matches the committed schema file on disk).
+Command: npx vitest run evals/mcp/mcp-conformance.test.ts
+RED (6 failed, 11 passed):
+
+ FAIL  evals/mcp/mcp-conformance.test.ts > AC-4 MCP conformance — tools/list (real spawned server) > get_rule: advertised inputSchema is canonically byte-equal to the committed schema file on disk
+AssertionError: expected '{"$id":"https://activationops.local/t…' to be '{"$id":"https://activationops.local/t…' // Object.is equality
+
+Expected: "{"$id":"https://activationops.local/tools/get_rule.input.schema.json","$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"ruleId":{"minLength":1,"type":"string"}},"title":"get_rule input","type":"object"}"
+Received: "{"$id":"https://activationops.local/tools/get_rule.input.schema.json","$schema":"https://json-schema.org/draft/2020-12/schema","RG1_MUTATED":true,"additionalProperties":false,"properties":{"ruleId":{"minLength":1,"type":"string"}},"title":"get_rule input","type":"object"}"
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 11 passed (17)
+
+Revert: restored the pre-mutation server.ts. `diff` against the backup: empty
+(byte-identical). Command: npx vitest run evals/mcp/mcp-conformance.test.ts
+GREEN:
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+
+
+--- RG-2: differential equality (AC-2) ---
+Mutation: lib/mcp/server.ts, toolCallResult() — appended "MUTATED-RG-2" to
+every tool's content[0].text (the MCP tool-result canonical string), so it no
+longer matches the direct callTool(...) canonical.
+Command: npx vitest run evals/mcp/mcp-differential.test.ts
+RED (12 failed, 12 total — every case in the file):
+
+ FAIL  evals/mcp/mcp-differential.test.ts > ... > run_demo (both formats) > format=text: MCP canonical + exit code === direct callTool, demoOnly:true
+AssertionError: expected '=====================================…' to be '=====================================…' // Object.is equality
+- Expected
++ Received
+@@ -61,6 +61,6 @@
+  ============================================================================
+  No language model runs in this demo; the comparison is exact, deterministic
+  logic. Simulated data, run on demand — not a live service, no platform access.
+  ============================================================================
+-
++ MUTATED-RG-2
+
+ Test Files  1 failed (1)
+      Tests  12 failed (12)
+
+Revert: restored the pre-mutation server.ts. `diff` against the backup: empty
+(byte-identical). Command: npx vitest run evals/mcp/mcp-differential.test.ts
+GREEN:
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+
+
+--- RG-3: isError mapping (invalid-input leg) ---
+Mutation: lib/mcp/server.ts, toolCallResult() catch branch — changed the
+ToolInputError mapping's `isError: true` to `isError: false` (swallowing every
+schema-validation failure into a fake success).
+Command: npx vitest run evals/mcp/mcp-invalid-input.test.ts
+RED (6 failed, 1 passed — the unregistered-tool case, a different code path,
+still passed):
+
+ FAIL  evals/mcp/mcp-invalid-input.test.ts > ... > check_feed: malformed "surface" -> isError:true, ...
+AssertionError: expected false to be true // Object.is equality
+- Expected: true
++ Received: false
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 1 passed (7)
+
+Revert: restored the pre-mutation server.ts. `diff` against the backup: empty
+(byte-identical). Command: npx vitest run evals/mcp/mcp-invalid-input.test.ts
+GREEN:
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+
+
+--- RG-4: import-walk escape ($0-LLM / zero-network, AC-3/AC-4) ---
+Mutation: lib/mcp/server.ts — planted `import "node:https";` alongside the
+existing node:fs/node:path/node:url imports.
+Command: npx vitest run evals/mcp/mcp-import-walk.test.ts
+RED (1 failed, 6 passed):
+
+ FAIL  evals/mcp/mcp-import-walk.test.ts > A1 transitive $0/offline + zero-HTTP-transport proof (reuses the A0 AC-3 walker pattern) > no module reachable from lib/mcp/server.ts matches a banned LLM/network pattern
+AssertionError: banned import "node:https" in .../lib/mcp/server.ts: expected true to be false // Object.is equality
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+
+Revert: restored the pre-mutation server.ts. `diff` against the backup: empty
+(byte-identical). Command: npx vitest run evals/mcp/mcp-import-walk.test.ts
+GREEN:
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+
+
+=== Post-revert full-suite confirmation ===
+
+Command: npm run verify
+Result: exit 0.
+  Test Files  67 passed | 5 skipped (72)
+       Tests  870 passed | 6 skipped (876)
+  next build: Compiled successfully, TypeScript check passed, 30/30 static
+  pages generated.
+
+Baseline (immediately before this slice, `npx vitest run --exclude "evals/mcp/**"`):
+  Test Files  62 passed | 5 skipped (67)
+       Tests  824 passed | 6 skipped (830)
+=> A1 added exactly 46 new tests (824 -> 870), across 5 new test files
+   (evals/mcp/mcp-conformance.test.ts, mcp-differential.test.ts,
+   mcp-invalid-input.test.ts, mcp-import-walk.test.ts,
+   mcp-transcript-freeze.test.ts).
+
+Command: npm run test:legacy
+Result: exit 0.
+  Test Files  26 passed | 4 skipped (30)
+       Tests  306 passed | 5 skipped (311)
+=> unchanged (hard constraint honored).
+
+Command: npx eslint . --max-warnings=0 (via npm run lint)
+Result: exit 0, no output (clean).
+
+Command: npx tsc --noEmit (via npm run typecheck)
+Result: exit 0, no output (clean).
+
+Transcript determinism check (independent of the RED-GREEN cycles above):
+regenerated evals/mcp/gold/mcp-session.transcript.json TWICE to two separate
+scratch paths via `node evals/mcp/record-transcript.mjs --out <scratch>` and
+byte-diffed both against each other AND against the committed golden — all
+three identical (see docs/reviews/a1-slice-record.md §5 for the freeze test
+that also proves this on every `npm run verify`).
+
+Diff-scope proof (git status --porcelain immediately after this slice, before
+docs/reviews/a1-slice-record.md was itself written):
+  M package-lock.json     <- PRE-EXISTS this slice (the @modelcontextprotocol/sdk
+                              install already present in the working tree
+                              before this session began, per the packet's
+                              "already installed" note; not modified further
+                              by this slice)
+  M package.json          <- this slice's ONLY edit: two new npm scripts
+                              ("mcp", "mcp:record-transcript"); the
+                              "@modelcontextprotocol/sdk": "1.29.0" dependency
+                              line PRE-EXISTS this slice for the same reason
+  ?? bin/mcp-server.mjs   <- new (sanctioned)
+  ?? evals/mcp/           <- new (sanctioned)
+  ?? lib/mcp/             <- new (sanctioned)
+No file under lib/packs/**, lib/verifier-core/**, lib/agents/**, lib/tools/**,
+bin/check.mjs, fixtures/**, or any pre-existing evals/** file was modified.
+
+=== A1 CODEX RECONCILIATION ADDENDUM — 2026-07-07 (Fable seat) ===
+Codex changed-files review (codex-guarded, read-only, xhigh): VERDICT findings — 2 P3, NO P0-P2;
+protected paths confirmed untouched by Codex itself. BOTH ACCEPTED primary-model-final:
+  P3-1 SDK-internal stdio proof missing -> new describe block in mcp-import-walk.test.ts walks the
+       PINNED SDK's dist/esm relative-import graph from server/index.js + server/stdio.js + types.js,
+       bans streamableHttp/sse/express/hono/cors/node:http/eventsource/raw-body; +2 tests.
+  P3-2 slice-record dependency provenance misleading -> reworded (the SDK pin IS in this diff vs HEAD;
+       installed by the orchestrator at A1 entry post-freshness-check, not by the builder).
+
+--- RG-5: SDK-internal banned import (P3-1 teeth) ---
+Mutation: appended 'import "express"' to node_modules/.../dist/esm/shared/stdio.js (reachable from the stdio path).
+RED: mcp-import-walk 1 failed / 9. Revert: byte-diffed clean. GREEN: 9 passed.
+
+Also note (orchestrator, honesty): the A0 commit message at 2ae6654 reads 'import-graph /bin/zsh proof' —
+an unescaped $0 shell expansion; intended text: 'import-graph $0 proof'. Cosmetic; history not rewritten.
