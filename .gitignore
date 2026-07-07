@@ -46,3 +46,4 @@ mockups/shots/
 .claude/settings.local.json
 screenshots/
 skills-lock.json
+.n8n-artifacts/

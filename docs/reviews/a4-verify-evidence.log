@@ -1,0 +1,40 @@
+=== A4 n8n-lane RED-GREEN evidence — 2026-07-07 (INLINE on the Fable seat, same recorded conversion) ===
+
+O-A4 DISPOSITION: docker NOT installed (verified live at GO); the runtime fork was
+surfaced to the owner at A4 entry via AskUserQuestion (npx / docker / spec-only) —
+owner AFK at the ask (60s timeout) → REVERSIBLE DEFAULT taken per the 2026-07-06
+defaults-taken precedent: build all universal artifacts + the command-level dry
+run; NO docker install, NO n8n runtime download without the owner's word. Honest
+label everywhere: "workflow spec + command-level dry run; n8n runtime execution
+pending O-A4." Re-surfaced at the wrap as an open owner call.
+
+WHY THE DRY RUN COUNTS: the test executes the workflow's OWN committed command
+strings VERBATIM from the repo root (extracted from the JSON, not re-typed) and
+byte-compares the final artifact against a direct registry→A3-builder build —
+the lane's substance (same tested tools, deterministic pipeline) is proven; the
+only thing pending is the n8n runtime shell around it.
+
+--- RG-1: cron trigger node smuggled into the committed workflow ---
+RED: evals/n8n 1 failed / 5 ("standing/transport node smuggled in: n8n-nodes-base.cron"
+ — the AC-12 structural gate).
+Revert: byte-diffed clean. GREEN.
+
+--- RG-2: stage-1 command tampered (drifted -> faithful fixture) ---
+RED: evals/n8n 1 failed / 5 (command-level dry run byte mismatch — the committed
+ command strings cannot silently drift from what the tests verify).
+Revert: byte-diffed clean. GREEN: 5 passed (5).
+
+Also in-suite: run_demo refused at stage 1 (assertDecisionGrade in the script —
+the demo transcript cannot enter the automation pipeline; artifact proven absent).
+
+=== A4 CODEX RECONCILIATION ADDENDUM — 2026-07-07 (Fable seat) ===
+Codex changed-files review (codex-guarded, read-only, xhigh; briefed inline-built): 1 P1 + 1 P2 — BOTH ACCEPTED + FIXED:
+  P1 command allowlist prefix-bypassable via shell chaining (n8n executeCommand runs a real shell) ->
+     parseWorkflowCommand: full-shape argv validation, ALL shell metacharacters rejected (; & | < > backtick
+     $( newline backslash), single-quote-only tokenizing, dry run now executes via execFileSync WITHOUT a
+     shell; 8 negative cases added (&&, ;, |, >, $( ), backtick, background &, newline node -e) — all FIRE.
+  P2 runbook overconfident: official n8n docs (checked by Codex 2026-07-07) — v2.0+ DISABLES the Execute
+     Command node by default (self-hosted only, conscious enablement) -> runbook caveat + NODES_EXCLUDE step
+     + security warning + 'runtime import/execution UNVERIFIED pending O-A4' wording; slice record fixed.
+Codex also independently confirmed: label honesty sound (no executed-n8n claim anywhere), protected paths
+untouched. Post-fix: evals/n8n 6 passed (6); tsc + eslint clean.

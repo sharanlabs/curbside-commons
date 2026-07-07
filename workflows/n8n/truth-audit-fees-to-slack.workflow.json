@@ -1,0 +1,46 @@
+{
+  "name": "Commerce Truth Audit — fees statement to Slack payload (SIMULATED, episodic)",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger-0001",
+      "name": "Manual Trigger (episodic only — never scheduled)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "command": "node scripts-ts/n8n/audit-to-canonical.mjs --tool audit_statement --params '{\"statementPath\":\"fixtures/synthetic-restaurant/fees/statement.drifted.json\"}' --out .n8n-artifacts/canonical.json"
+      },
+      "id": "execute-audit-0002",
+      "name": "Audit via the A0 registry (deterministic, $0, offline)",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "command": "node scripts-ts/n8n/canonical-to-payload.mjs --in .n8n-artifacts/canonical.json --format slack --tool audit_statement --subject 'statement 2026-06 (simulated)' --out .n8n-artifacts/slack-payload.json"
+      },
+      "id": "build-payload-0003",
+      "name": "Build the A3 Slack payload (SIMULATED banner; never sent)",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [440, 0]
+    }
+  ],
+  "connections": {
+    "Manual Trigger (episodic only — never scheduled)": {
+      "main": [[{ "node": "Audit via the A0 registry (deterministic, $0, offline)", "type": "main", "index": 0 }]]
+    },
+    "Audit via the A0 registry (deterministic, $0, offline)": {
+      "main": [[{ "node": "Build the A3 Slack payload (SIMULATED banner; never sent)", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "note": "SIMULATED data throughout. This workflow is committed as the A4 automation lane (plan-agentic-extension v1.0 §5 A4): fixture -> registry tool -> A3 payload artifact. active:false by design; the ONLY trigger is manual (prototype-not-service, AC-12); no send node exists (L-2/L-3 are owner-gated). Run n8n from the REPO ROOT so the relative command paths resolve (docs/n8n-runbook.md)."
+  }
+}
