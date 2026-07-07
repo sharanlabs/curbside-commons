@@ -1,0 +1,28 @@
+{
+  "caseId": "evi-conf-valid-clean",
+  "member": "evidence",
+  "inputArtifact": {
+    "path": "fixtures/ucp-conformance-ci/valid/search-single-product.json"
+  },
+  "ask": "Check this document's conformance.",
+  "allowedTools": [
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_conformance",
+      "params": {
+        "docPath": "fixtures/ucp-conformance-ci/valid/search-single-product.json",
+        "op": "search"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "0f034e4bd79ec095f58b707523fd5e59445986a34e72e5698a70c4f2a3bf9a1b",
+  "expectedRecommendationClass": "no-action",
+  "expectedFindingRefs": [],
+  "expectedGateState": "approve-recommendation"
+}

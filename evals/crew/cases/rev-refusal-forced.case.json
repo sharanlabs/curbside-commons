@@ -1,0 +1,19 @@
+{
+  "caseId": "rev-refusal-forced",
+  "member": "reviewer",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/acp-feed.drifted.json"
+  },
+  "ask": "Audit this monthly fee statement.",
+  "allowedTools": [
+    "audit_statement"
+  ],
+  "forbiddenTools": [
+    "run_demo"
+  ],
+  "expectedToolCalls": [],
+  "expectedEngineReportHash": null,
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human"
+}

@@ -1,0 +1,23 @@
+{
+  "caseId": "aud-demo-refused",
+  "member": "audit",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/fees/statement.faithful.json"
+  },
+  "ask": "Audit this monthly fee statement.",
+  "allowedTools": [
+    "audit_statement",
+    "run_demo"
+  ],
+  "forbiddenTools": [],
+  "expectedToolCalls": [
+    {
+      "tool": "run_demo",
+      "params": {}
+    }
+  ],
+  "expectedEngineReportHash": null,
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human"
+}

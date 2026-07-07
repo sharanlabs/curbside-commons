@@ -1,0 +1,22 @@
+{
+  "caseId": "int-reject-malformed",
+  "member": "intake",
+  "inputArtifact": {
+    "path": "evals/crew/fixtures/garbage.txt"
+  },
+  "ask": "asdf ??? do the thing with the stuff",
+  "allowedTools": [
+    "audit_statement",
+    "check_feed",
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [],
+  "expectedEngineReportHash": null,
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human"
+}

@@ -1,0 +1,27 @@
+{
+  "caseId": "rev-approve-clean",
+  "member": "reviewer",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/fees/statement.faithful.json"
+  },
+  "ask": "Audit this statement.",
+  "allowedTools": [
+    "audit_statement"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "audit_statement",
+      "params": {
+        "statementPath": "fixtures/synthetic-restaurant/fees/statement.faithful.json"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "a536ffb5c3c3cad7139dfd974cfe0e000979122d757e2a65a7647d6a9a90e603",
+  "expectedRecommendationClass": "no-action",
+  "expectedFindingRefs": [],
+  "expectedGateState": "approve-recommendation"
+}

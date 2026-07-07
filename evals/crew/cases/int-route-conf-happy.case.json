@@ -1,0 +1,30 @@
+{
+  "caseId": "int-route-conf-happy",
+  "member": "intake",
+  "inputArtifact": {
+    "path": "fixtures/ucp-conformance-ci/invalid/pattern-currency-lowercase.json"
+  },
+  "ask": "Is this catalog document shaped the way the official UCP schema requires?",
+  "allowedTools": [
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_conformance",
+      "params": {
+        "docPath": "fixtures/ucp-conformance-ci/invalid/pattern-currency-lowercase.json",
+        "op": "search"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "2fe187bab9c5a44b12461835bd03bec24c74b822a7d9bc5fc07e009bf05b84f7",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "/products/0/variants/0/price/currency (pattern)"
+  ],
+  "expectedGateState": "approve-recommendation"
+}

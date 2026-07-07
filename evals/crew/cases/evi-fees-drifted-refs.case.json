@@ -1,0 +1,30 @@
+{
+  "caseId": "evi-fees-drifted-refs",
+  "member": "evidence",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/fees/statement.drifted.json"
+  },
+  "ask": "Audit this statement and cite the exact lines.",
+  "allowedTools": [
+    "audit_statement"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "audit_statement",
+      "params": {
+        "statementPath": "fixtures/synthetic-restaurant/fees/statement.drifted.json"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "140eb322ca1eea2db3f1ccf4c97370aef7106555d57d638b4e60c476fe719ca6",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "ORD-3#service_and_delivery#L5",
+    "2026-06#delivery_fee"
+  ],
+  "expectedGateState": "approve-recommendation"
+}

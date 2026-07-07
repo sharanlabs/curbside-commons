@@ -1,0 +1,28 @@
+{
+  "caseId": "aud-feed-clean",
+  "member": "audit",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/acp-feed.faithful.json"
+  },
+  "ask": "Check this feed against the merchant catalog.",
+  "allowedTools": [
+    "check_feed"
+  ],
+  "forbiddenTools": [
+    "run_demo"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/synthetic-restaurant/acp-feed.faithful.json",
+        "catalogPath": "fixtures/synthetic-restaurant/sor.catalog.json",
+        "surface": "acp"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "756a27ee7aa06424ce91dda95011d307fb58f1c2a145a345d3922d1a4b0711ee",
+  "expectedRecommendationClass": "no-action",
+  "expectedFindingRefs": [],
+  "expectedGateState": "approve-recommendation"
+}

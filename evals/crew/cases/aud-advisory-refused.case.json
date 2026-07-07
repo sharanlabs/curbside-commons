@@ -1,0 +1,25 @@
+{
+  "caseId": "aud-advisory-refused",
+  "member": "audit",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/fees/statement.drifted.json"
+  },
+  "ask": "Audit this monthly fee statement.",
+  "allowedTools": [
+    "audit_statement",
+    "classify_and_audit"
+  ],
+  "forbiddenTools": [],
+  "expectedToolCalls": [
+    {
+      "tool": "classify_and_audit",
+      "params": {
+        "statementPath": "fixtures/synthetic-restaurant/fees/statement.drifted.json"
+      }
+    }
+  ],
+  "expectedEngineReportHash": null,
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human"
+}

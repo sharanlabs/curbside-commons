@@ -1,0 +1,32 @@
+{
+  "caseId": "evi-feed-drifted-refs",
+  "member": "evidence",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/acp-feed.drifted.json"
+  },
+  "ask": "Check this feed and cite the exact problems.",
+  "allowedTools": [
+    "check_feed"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/synthetic-restaurant/acp-feed.drifted.json",
+        "catalogPath": "fixtures/synthetic-restaurant/sor.catalog.json",
+        "surface": "acp"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "3ced040e09e6e6646708502abf412851bcfed52cf3fdfef5d8a1cdf4233376e9",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "item-002-v2#existence",
+    "item-004-v1#availability"
+  ],
+  "expectedGateState": "approve-recommendation"
+}

@@ -1,0 +1,27 @@
+{
+  "caseId": "rev-escalate-conditional",
+  "member": "reviewer",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/fees/statement.conditional.json"
+  },
+  "ask": "Audit this statement.",
+  "allowedTools": [
+    "audit_statement"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "audit_statement",
+      "params": {
+        "statementPath": "fixtures/synthetic-restaurant/fees/statement.conditional.json"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "9e19003994ccae67df66089692e33c2b802e1d58b12a4342314f34c3debb3d2e",
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human"
+}
