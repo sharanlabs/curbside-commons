@@ -46,7 +46,7 @@ const wf = JSON.parse(readFileSync(WORKFLOW, "utf8")) as {
  * (the JSON --params values) are the only quoting allowed.
  */
 function parseWorkflowCommand(cmd: string): string[] {
-  if (/[;&|<>`\\\n\r]|\$\(/.test(cmd)) {
+  if (/[;&|<>`$\\\n\r]/.test(cmd)) {
     throw new Error(`shell metacharacter in workflow command — rejected: ${cmd}`);
   }
   const argv: string[] = [];
@@ -103,6 +103,7 @@ describe("A4 structural veracity (AC-9, AC-12)", () => {
       "node scripts-ts/n8n/audit-to-canonical.mjs --tool `whoami`",
       `${base} &`,
       `${base}\nnode -e "bad()"`,
+      `${base} --out $HOME/x.json`,
     ]) {
       expect(() => parseWorkflowCommand(evil), `not rejected: ${evil}`).toThrow(/metacharacter|shape/);
     }
