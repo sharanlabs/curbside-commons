@@ -1,0 +1,151 @@
+{
+  "text": "🧪 SIMULATED DATA — Commerce Truth Audit demonstration output. Not real merchant data, not legal advice. ❌ FAIL — violations present (16 finding(s))",
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*🧪 SIMULATED DATA — Commerce Truth Audit demonstration output. Not real merchant data, not legal advice.*"
+      }
+    },
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "Truth-audit result: ACP feed vs catalog (simulated)",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*❌ FAIL — violations present (16 finding(s))*\n_tool: `check_feed` · deterministic engine · $0 offline_"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* This item is hidden in the merchant's own catalog but is being served to customers.\n`item-002-v2#existence` · rule `LST-AVAIL-HIDDEN-SHOWN`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The copy says \"pre_order\" but the catalog state is in stock (expected \"in_stock\").\n`item-004-v1#availability` · rule `LST-AVAIL-STATE`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\").\n`item-008-v1#availability` · rule `LST-AVAIL-STATE`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The row is checkout-eligible but not search-eligible — the extracted invariant requires checkout ⇒ search.\n`item-002-v1#invariants` · rule `LST-XF-CHECKOUT-SEARCH`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[warn]* The name is cut off on the serving copy: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\".\n`item-005-v2#title` · rule `LST-ENC-TRUNC`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[warn]* The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the real \"Jalapeño Poppers (Large)\".\n`item-004-v3#title` · rule `LST-ENC-UTF8`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The copy serves \"Phantom Platter (simulated ghost item)\" but no such item exists in the merchant's catalog.\n`ghost-001#existence` · rule `LST-EXIST-GHOST`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* \"Café Latte (Small)\" exists in the merchant's catalog but is missing from the serving copy.\n`item-003-v1#existence` · rule `LST-EXIST-MISSING`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The copy keys this row as \"legacy-pos-4471\" but the catalog row is \"item-003-v2\" — same item, mismatched identity (resolved by exact name).\n`legacy-pos-4471#existence` · rule `LST-IDENT-ID-MISMATCH`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The variant label says \"Small\" but this row is the \"Medium\" variation — variants of this item can no longer be told apart.\n`item-004-v2#variant_dict` · rule `LST-IDENT-MODIFIER-AMBIG`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The price is serialized in cents (2150) where dollars are expected (21.50) — a 100× overstatement.\n`item-001-v1#price.amount` · rule `LST-PRICE-CENTS-AS-DECIMAL`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[warn]* The currency code is malformed: \"usd\" instead of ISO-4217 \"USD\".\n`item-001-v2#price.currency` · rule `LST-PRICE-CURRENCY-FORM`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The sale price 28.50 is higher than the regular price 27.50 — a \"sale\" that costs more.\n`item-001-v3#invariants` · rule `LST-PRICE-SALE-GT`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The served price 12.00 does not match the catalog price 10.00.\n`item-006-v1#price.amount` · rule `LST-PRICE-VALUE`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[warn]* The pre-order availability date 2026-02-01T00:00:00Z already passed (catalog as-of 2026-07-03T00:00:00Z) — the promise is stale.\n`item-004-v1#availability_date` · rule `LST-STALE-AVAILDATE`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[warn]* This row expired 2026-01-01T00:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z).\n`item-003-v3#expiration_date` · rule `LST-STALE-EXPIRED`"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "SIMULATED · Commerce Truth Audit · recommendations only — the engine decides, humans approve."
+        }
+      ]
+    }
+  ]
+}

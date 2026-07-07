@@ -1,0 +1,44 @@
+=== A3 delivery-builders RED-GREEN evidence — 2026-07-07 (INLINE on the Fable seat) ===
+
+Inline rationale: the delegated seat was still inside the 7:20pm ET limit window
+at A3 start (checked 5:32pm ET) — same recorded NO-WAIT conversion as A2; a
+dispatch into a known-limited seat would be theater. Mitigation unchanged:
+per-slice cross-model Codex review + AM ceremony enumerating the inline slices.
+
+Freshness (slice entry, per plan §7): docs.slack.dev/reference/block-kit fetched
+LIVE 2026-07-07 — "up to 50 blocks in each message" (verbatim); NO official
+machine-readable Block Kit JSON Schema published → AC-8's "where available"
+clause satisfied via structural self-checks (50-block assert + conservative
+3000/150-char caps, self-imposed) + byte-frozen goldens.
+
+--- RG-1: SIMULATED banner block removed from the slack builder ---
+RED: delivery suite 6 failed / 14 (all three goldens + banner test + fallback +
+the builder's own belt-and-suspenders throw).
+Revert: byte-diffed clean. GREEN.
+
+--- RG-2: truncation marker removed (silent drop) ---
+RED: 1 failed / 14 ("truncation is explicit" — the 'and 40 more' block gone).
+Revert: byte-diffed clean. GREEN.
+
+--- RG-3: EMAIL_TO_PLACEHOLDER flipped to a non-.example address ---
+RED: 2 failed / 14 (address invariant + email golden).
+Revert: byte-diffed clean. GREEN: 14 passed (14).
+
+Determinism: no Date header (sender adds at transmit time — recorded design
+choice), fixed MIME boundary, rebuild byte-identity asserted in-suite.
+
+=== A3 CODEX RECONCILIATION ADDENDUM — 2026-07-07 (Fable seat) ===
+Codex changed-files review (codex-guarded, read-only, xhigh; briefed inline-built): 1 P1 + 2 P2 + 1 P3 — ALL ACCEPTED + FIXED:
+  P1 email not RFC-well-formed -> Date is now a REQUIRED caller input (determinism preserved; goldens use a
+     fixed committed date labeled simulated); CRLF-only asserted; body = quoted-printable, attachment =
+     base64/76-wrap (no 8-bit under a 7bit label; no line >998); whole-message-ASCII asserted.
+  P2 header injection via meta.subject -> assertHeaderSafe rejects CR/LF/control/non-ASCII on subject/tool/
+     date; adversarial Bcc-injection tests added (subject AND date vectors).
+  P2 Slack mrkdwn mention injection -> escapeSlackText (&, <, >) on ALL report-derived text; adversarial
+     <!here>/<@U12345> test asserts escaped output; header block stays plain_text (inert).
+  P3 transport test weaker than claim -> ban list extended (node:http(s)/net/tls/dgram, WebSocket,
+     XMLHttpRequest, side-effect imports).
+Sanctioned golden regen recorded (email fully re-encoded; slack re-emitted — escaping byte-neutral on the
+committed corpus). Post-fix: delivery suite 16 passed (16); tsc + eslint clean.
+Seat event during this reconciliation: one transient harness classifier outage blocked a Bash call
+(raw: 'claude-opus-4-8[1m] is temporarily unavailable...'); retried clean on the owner's resume.

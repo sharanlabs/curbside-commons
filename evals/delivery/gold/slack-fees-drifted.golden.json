@@ -1,0 +1,74 @@
+{
+  "text": "🧪 SIMULATED DATA — Commerce Truth Audit demonstration output. Not real merchant data, not legal advice. ❌ FAIL — violations present (5 finding(s))",
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*🧪 SIMULATED DATA — Commerce Truth Audit demonstration output. Not real merchant data, not legal advice.*"
+      }
+    },
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "Truth-audit result: statement 2026-06 (simulated)",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*❌ FAIL — violations present (5 finding(s))*\n_tool: `audit_statement` · deterministic engine · $0 offline_"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The bill charges $1.50 as \"service_and_delivery\" — that isn't one of the four fee types the law allows, so it's not permitted no matter what it's called.\n`ORD-3#service_and_delivery#L5` · rule `NYC-563.3-d-1`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* They billed an 'extras' fee without ever offering the plain basic plan — the law only allows the extras fee if the basic plan exists too.\n`2026-06#enhanced-without-basic` · rule `NYC-563.3-d-4`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* Across the month, delivery fees came to 16.0% of order value — over the 15% limit even on the monthly average. The 30-day window to refund the overcharge has closed with no refund, so this is a violation. (Depends on the still-open definition of \"purchase price\", U1.)\n`2026-06#delivery_fee` · rule `NYC-563.3-a-2`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The card-processing fee here is 8.0% — over the flat 3% limit, with no proof it's just passing through the real card cost. (This depends on what \"purchase price\" includes — still an open question, U1.)\n`ORD-1#transaction_fee#L1` · rule `NYC-563.3-c-1`"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*[error]* The bill charges $1.20 as \"promotion_deduction\" — that isn't one of the four fee types the law allows, so it's not permitted no matter what it's called.\n`ORD-4#promotion_deduction#L7` · rule `NYC-563.3-d-1`"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "SIMULATED · Commerce Truth Audit · recommendations only — the engine decides, humans approve."
+        }
+      ]
+    }
+  ]
+}

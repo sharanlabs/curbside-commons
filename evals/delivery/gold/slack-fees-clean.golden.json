@@ -1,0 +1,39 @@
+{
+  "text": "🧪 SIMULATED DATA — Commerce Truth Audit demonstration output. Not real merchant data, not legal advice. ✅ PASS — no violations (0 non-gating finding(s))",
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*🧪 SIMULATED DATA — Commerce Truth Audit demonstration output. Not real merchant data, not legal advice.*"
+      }
+    },
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "Truth-audit result: statement 2026-06 faithful (simulated)",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*✅ PASS — no violations (0 non-gating finding(s))*\n_tool: `audit_statement` · deterministic engine · $0 offline_"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "SIMULATED · Commerce Truth Audit · recommendations only — the engine decides, humans approve."
+        }
+      ]
+    }
+  ]
+}
