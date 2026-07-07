@@ -1,0 +1,12 @@
+CREW RUN — case evi-fees-drifted-refs (SIMULATED data; orchestration harness — offline replay)
+terminal: recommendation · class: flag-violations
+engine report consumed: sha256 140eb322ca1eea2db3f1ccf4c97370aef7106555d57d638b4e60c476fe719ca6
+
+ 1. INTAKE · MODEL TURN — intake routed the ask to tool "audit_statement"
+ 2. AUDIT · TOOL CALL [audit_statement] — executed "audit_statement" via the registry (exit 1)
+ 3. EVIDENCE · RECOMMENDATION — evidence assembled 1 recommendation (flag-violations) referencing 5 engine finding(s)
+      refs: ORD-3#service_and_delivery#L5 · 2026-06#enhanced-without-basic · 2026-06#delivery_fee · ORD-1#transaction_fee#L1 · ORD-4#promotion_deduction#L7
+ 4. REVIEWER · MODEL TURN — reviewer approved the recommendations
+
+anomalies: none
+outcome: 1 recommendation(s) for the human — the engine's verdicts are untouched; these are references, not decisions.

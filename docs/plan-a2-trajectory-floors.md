@@ -65,3 +65,9 @@ A **member × case result matrix** is committed with the replay run (`evals/crew
 | Audit | deterministic workflow | tool execution via `callTool` + decision-grade refusal is pure procedure |
 | Evidence | deterministic workflow | references + derived class; the model never picks the class |
 | Reviewer | model-directed step (under the human gate) | judgment call, but containment overrides approval on any anomaly |
+
+## 6 · Strengthening addendum (2026-07-07, post-Codex A2 review — tightens only, never loosens)
+
+- **Param-level containment (Codex P2-1):** the orchestrator blocks an allowed-tool request whose argument digest deviates from the case's call contract BEFORE execution (not executed-then-caught). **L-1 arming requirement added:** every live case must carry the same call contract or a deterministic param mapper/allowlist — a live model may never turn free text into executable params directly.
+- **Independent reference floor (Codex P1):** the harness now independently asserts every recommendation reference exists in the consumed engine report (`consumedFindingIds` carried on the record) — the constructor guarantee is no longer the only line of defense.
+- **Import boundary tightened (Codex P2-2):** crew code may resolve only `lib/tools/registry.ts` / `lib/tools/types.ts` (never tool implementations or serializers).
