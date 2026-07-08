@@ -1,27 +1,30 @@
 <!--
   TOKEN PLAN — DESIGN SAMPLE 6 "THE INSTRUMENT" (light-ground evidence instrument; full narrative arc, Sections 0-6)
   LIGHT GROUND PER OWNER WORD 2026-07-08 ("no dark background") — same structure/copy, palette re-derived
-  for stark white; gallery white matches the implemented /report surface ground (coherence, picked not defaulted).
+  for a light ground. SECOND REFINEMENT PER OWNER WORD 2026-07-08 ("give a gallery white or apple 2026
+  premium white background") — page ground #FFFFFF -> #FBFBFD (premium page white, Apple-style), panel
+  -> #F5F5F7 (the Apple neutral), grid alpha .05 -> .03 (nearly disappears — calm, not drafted),
+  surface retuned to sit between the two grounds. Ink/neutrals/accent/severity/banner unchanged.
 
-  Named values (core palette; contrast computed on #FFFFFF unless noted):
-    --paper    #FFFFFF  the base ground — gallery/stark white (the 2026 pole of this genre; = /report ground)
-    --panel    #F6F8F7  a barely-raised surface (verdict panel ground)
-    --ink      #17221E  deep green-tinted ink — headlines, plain finding lines, mono values (16.4:1)
-    --body     #38443F  long-form body text (10.2:1)
-    --muted    #55605B  labels, mono keys, secondary (6.5:1; 6.1:1 on panel)
-    --faint    #5F6964  finest captions, receipt labels, footer (5.7:1) — used sparingly
+  Named values (core palette; contrast computed on #FBFBFD unless noted):
+    --paper    #FBFBFD  the base ground — premium page white, barely off pure (Apple-2026-class)
+    --panel    #F5F5F7  a barely-raised surface (verdict panel ground; the Apple neutral)
+    --ink      #17221E  deep green-tinted ink — headlines, plain finding lines, mono values (15.8:1)
+    --body     #38443F  long-form body text (9.8:1)
+    --muted    #55605B  labels, mono keys, secondary (6.3:1; 6.0:1 on panel)
+    --faint    #5F6964  finest captions, receipt labels, footer (5.5:1) — used sparingly
     --line     rgba(23,34,30,.14)  hairline rules (everywhere)
     --line-2   rgba(23,34,30,.22)  emphasized rules (section tops, readout frame)
-    --surface  rgba(23,34,30,.03)  callout / hover ground
-    --grid     rgba(23,34,30,.05)  the blueprint grid (1px lines, 24px pitch — sensed, not seen)
+    --surface  rgba(23,34,30,.02)  callout / hover ground (composites ~#F6F7F9 — between paper and panel)
+    --grid     rgba(23,34,30,.03)  the blueprint grid (1px lines, 24px pitch — sensed, not seen)
     --signal   #0A6349  the ONE accent — deep viridian, the light-ground descendant of the dark
-                        sample's aquamarine-mint family (7.3:1; 5.9:1 on panel). NOT any sibling accent
+                        sample's aquamarine-mint family (7.0:1; 6.7:1 on panel). NOT any sibling accent
                         (not ultramarine #1B3EB8 / oxblood #6E1423 / slate-teal #2F6D7A / console cyan).
                         Line-work only: kicker ticks, section + finding index numerals, the two callout
                         left-rules, wordmark mark, command tokens, focus rings. NEVER a fill, NEVER on severity.
     Semantic severity (mark SHAPE + WORD, kept apart from the accent, distinguishable without color):
-      error #B02A1C  (brick red, 6.6:1; 6.2:1 on panel)  mark = filled disc
-      warn  #7D5205  (deep bronze, 6.8:1)                mark = filled triangle
+      error #B02A1C  (brick red, 6.4:1; 6.0:1 on panel)  mark = filled disc
+      warn  #7D5205  (deep bronze, 6.6:1)                mark = filled triangle
     Banner (the ONE solid-ink band): ground #17221E · text #DCE3E0 (12.5:1 on band) · tag inverted
       white-on-band with #17221E type (16.4:1).
 
@@ -47,21 +50,21 @@
 <style>
   body {
     margin: 0;
-    background: #ffffff;
+    background: #fbfbfd;
     color-scheme: light;
   }
 
   .i6 {
-    --paper: #ffffff;
-    --panel: #f6f8f7;
+    --paper: #fbfbfd;
+    --panel: #f5f5f7;
     --ink: #17221e;
     --body: #38443f;
     --muted: #55605b;
     --faint: #5f6964;
     --line: rgba(23, 34, 30, 0.14);
     --line-2: rgba(23, 34, 30, 0.22);
-    --surface: rgba(23, 34, 30, 0.03);
-    --grid: rgba(23, 34, 30, 0.05);
+    --surface: rgba(23, 34, 30, 0.02);
+    --grid: rgba(23, 34, 30, 0.03);
     --signal: #0a6349;
     --err: #b02a1c;
     --warn: #7d5205;
