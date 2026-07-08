@@ -56,7 +56,7 @@ function FindingCard({ row, index }: { row: FindingRow; index: number }) {
           <dt>claim</dt>
           <dd>
             <span className="rpt-mono">{row.claimId}</span>
-            <span className="rpt-rc-sub">
+            <span className="rpt-mono-sub">
               {/* M1 P2: the claim's SOURCE surface is part of the receipt —
                   ACP/UCP rows share field paths, so "which copy said it"
                   must be visible, not implied. */}
@@ -145,48 +145,75 @@ export function ReportView() {
         ))}
       </div>
 
-      <Verdict report={report} />
+      {/* The Ledger modular grid: a caption rail against one continuous hairline,
+          every block flush-left. The rail labels are layout armature (they mirror
+          the owner-picked sample's rails), not report copy. */}
+      <section className="rpt-sec" aria-labelledby="rpt-rail-verdict">
+        <h2 id="rpt-rail-verdict" className="rpt-rail">
+          Verdict
+        </h2>
+        <div className="rpt-bodycol">
+          <Verdict report={report} />
+        </div>
+      </section>
 
       {/* C10 header surface — spec pin · matching mode · simulated flag — as a ledger. */}
-      <dl className="rpt-meta">
-        <div className="rpt-mrow">
-          <dt>surface</dt>
-          <dd>
-            {active.label} <span className="rpt-rc-sub">({active.plain})</span>
-          </dd>
+      <section className="rpt-sec" aria-labelledby="rpt-rail-meta">
+        <h2 id="rpt-rail-meta" className="rpt-rail">
+          Meta
+        </h2>
+        <div className="rpt-bodycol">
+          <dl className="rpt-meta">
+            <div className="rpt-mrow">
+              <dt>surface</dt>
+              <dd>
+                {active.label} <span className="rpt-rc-sub">({active.plain})</span>
+              </dd>
+            </div>
+            <div className="rpt-mrow">
+              <dt>spec version</dt>
+              <dd className="rpt-mono">{report.specVersion}</dd>
+            </div>
+            <div className="rpt-mrow">
+              <dt>matching mode</dt>
+              <dd>
+                <span className="rpt-mono">{report.matchingMode}</span>
+                <span className="rpt-rc-sub">{report.matchingModePlain}</span>
+              </dd>
+            </div>
+            <div className="rpt-mrow">
+              <dt>data</dt>
+              <dd>
+                <span className="rpt-mono">simulated: {String(report.simulated)}</span>
+              </dd>
+            </div>
+          </dl>
         </div>
-        <div className="rpt-mrow">
-          <dt>spec version</dt>
-          <dd className="rpt-mono">{report.specVersion}</dd>
-        </div>
-        <div className="rpt-mrow">
-          <dt>matching mode</dt>
-          <dd>
-            <span className="rpt-mono">{report.matchingMode}</span>
-            <span className="rpt-rc-sub">{report.matchingModePlain}</span>
-          </dd>
-        </div>
-        <div className="rpt-mrow">
-          <dt>data</dt>
-          <dd>
-            <span className="rpt-mono">simulated: {String(report.simulated)}</span>
-          </dd>
-        </div>
-      </dl>
+      </section>
 
-      <ol className="rpt-findings">
-        {report.rows.map((row, i) => (
-          <FindingCard key={`${row.claimId}:${row.ruleId}`} row={row} index={i} />
-        ))}
-      </ol>
+      <section className="rpt-sec" aria-labelledby="rpt-rail-findings">
+        <h2 id="rpt-rail-findings" className="rpt-rail">
+          Findings
+        </h2>
+        <div className="rpt-bodycol">
+          <ol className="rpt-findings">
+            {report.rows.map((row, i) => (
+              <FindingCard key={`${row.claimId}:${row.ruleId}`} row={row} index={i} />
+            ))}
+          </ol>
+        </div>
+      </section>
 
-      <footer className="rpt-foot">
-        <p>
+      <footer className="rpt-sec rpt-foot">
+        <div className="rpt-rail" aria-hidden="true" />
+        <div className="rpt-bodycol">
+          <p>
           Every row above carries its four receipts &mdash; the claim, the catalog row it was checked
           against, the rule it broke, and how severe it is. No language model runs in this verifier
           &mdash; the comparison is exact, deterministic logic. Simulated prototype, run on demand
           &mdash; not a live service. Human-led, AI-assisted, professionally reviewed.
-        </p>
+          </p>
+        </div>
       </footer>
     </main>
   );

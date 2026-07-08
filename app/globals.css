@@ -1090,93 +1090,134 @@ body {
 }
 
 /* ============================================================================
-   W3 — the one-page verifier report (/report). Reuses the Ledger Enterprise
-   system (hairlines, mono field keys, single vermilion signal). Desktop web +
-   printable (see the @media print block at the end). rpt-* namespace.
+   THE "LEDGER" DESIGN SYSTEM (owner-picked 2026-07-08) — a Swiss / International-
+   Typographic audit certificate on a gallery-white ground. Scoped to the two real
+   verifier surfaces (/report + /demo, both mount .rpt-wrap); the landing keeps its
+   own system untouched. Reference (adapted, never copied):
+   mockups/design-samples-2026-07-08/sample-1-ledger.html.
+
+   Ultramarine is the ONE accent — SIMULATED tag block · masthead rule · finding
+   index numerals — NEVER on severity. Severity carries its own three marks
+   (error / warn / info), kept apart from the accent. No radii, no shadows, no
+   gradients: the precision of the hairline rules and the spacing IS the design.
+   Desktop web + printable (see the @media print block below). rpt-* / dmo-*.
    ========================================================================== */
 .rpt-wrap {
-  max-width: 900px;
+  /* Ledger tokens — pre-decided; #ffffff is the owner gallery-white modification
+     (the sample used #f9f9f6). Kept as ONE --paper token so text-on-ink surfaces
+     (the banner text, the FAIL flag) follow to #ffffff automatically. */
+  --paper: #ffffff; /* ground + every text-on-ink surface (banner text, verdict flag) */
+  --ink: #101014; /* near-black ink: headline, banner ground, verdict stamp, hard marks */
+  --body: #33333b; /* long-form body text */
+  --graphite: #50505a; /* rail captions, labels, secondary mono */
+  --hairline: #dcdcd4; /* the modular-grid rules (1px, warm-on-white by intent) */
+  --um: #1b3eb8; /* ultramarine — the ONE accent */
+  --sev-err: #a8231b;
+  --sev-warn: #8a5a06;
+  --sev-info: #55555e;
+  /* system font stacks only — no new dependency. Grotesk display + a tabular mono. */
+  --ledger-sans: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
+  --ledger-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 28px 32px 72px;
-}
-@media (max-width: 560px) {
-  .rpt-wrap {
-    padding: 20px;
-  }
+  padding: 48px 64px 120px;
+  background: var(--paper);
+  color: var(--body);
+  font-family: var(--ledger-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: 0;
 }
 
-/* THE honesty label — unmissable, and it survives print (color-adjust: exact). */
+/* ---- SIMULATED banner — solid ink band, unmissable, first thing on the page.
+   Text uses --paper (#ffffff) on the ink ground; survives print exact. ---- */
 .rpt-sim {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  border: 1.5px solid var(--signal);
-  border-radius: 7px;
-  background: var(--signal-tint);
+  align-items: flex-start;
+  gap: 22px;
+  padding: 20px 24px;
+  border: none;
+  border-radius: 0;
+  background: var(--ink);
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
 .rpt-sim-tag {
-  font-family: var(--ff-mono);
+  flex: none;
+  font-family: var(--ledger-mono);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #fff;
-  background: var(--signal);
-  padding: 4px 10px;
-  border-radius: 5px;
-  flex: none;
+  letter-spacing: 0.16em;
+  color: var(--paper);
+  background: var(--um);
+  padding: 7px 12px;
+  border-radius: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 .rpt-sim-text {
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--signal-text);
+  min-width: 0;
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--paper);
+  max-width: 92ch;
 }
 
+/* ---- masthead — flush-left, closed by the single 4px ultramarine rule ---- */
 .rpt-head {
-  margin-top: 26px;
+  margin-top: 0;
+  padding: 44px 0 30px;
+  border-bottom: 4px solid var(--um);
 }
 .rpt-eyebrow {
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  color: var(--graphite);
-  letter-spacing: 0.01em;
   margin: 0;
+  font-family: var(--ledger-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--graphite);
 }
 .rpt-title {
-  font-size: clamp(24px, 3.4vw, 32px);
-  line-height: 1.08;
-  letter-spacing: -0.026em;
-  font-weight: 700;
+  margin: 16px 0 0;
+  font-family: var(--ledger-sans);
+  font-size: clamp(34px, 4.4vw, 52px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
   color: var(--ink);
-  margin: 10px 0 0;
+  max-width: 24ch;
   text-wrap: balance;
 }
 .rpt-intro {
-  margin: 14px 0 0;
-  font-size: 15px;
-  line-height: 1.58;
+  margin: 22px 0 0;
+  font-size: 15.5px;
+  line-height: 1.6;
   color: var(--body);
   max-width: 68ch;
 }
 
-/* surface toggle */
+/* ---- surface toggle — a flush mono tab strip on a hairline; ink underline for
+   the active surface (ultramarine is reserved for its three sanctioned roles) -- */
 .rpt-toolbar {
   display: flex;
-  gap: 6px;
-  margin-top: 24px;
-  border-bottom: 1px solid var(--rule-2);
+  gap: 0;
+  margin-top: 28px;
+  border-bottom: 1px solid var(--hairline);
 }
 .rpt-tab {
   font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.006em;
+  font-family: var(--ledger-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
   cursor: pointer;
-  padding: 9px 14px;
-  border: 1px solid transparent;
+  padding: 10px 16px 11px;
+  border: none;
   border-bottom: 2px solid transparent;
+  border-radius: 0;
   background: none;
   color: var(--graphite);
   margin-bottom: -1px;
@@ -1184,203 +1225,352 @@ body {
     color 0.15s ease,
     border-color 0.15s ease;
 }
+.rpt-tab:first-child {
+  padding-left: 0;
+}
 .rpt-tab:hover {
   color: var(--ink);
 }
 .rpt-tab.active {
   color: var(--ink);
-  border-bottom-color: var(--signal);
+  border-bottom-color: var(--ink);
 }
 
-/* verdict banner */
+/* ---- the modular-grid armature: 184px caption rail | continuous hairline | body */
+.rpt-sec {
+  display: grid;
+  grid-template-columns: 184px minmax(0, 1fr);
+  border-top: 1px solid var(--hairline);
+}
+.rpt-toolbar + .rpt-sec {
+  border-top: none;
+}
+.rpt-rail {
+  margin: 0;
+  padding: 30px 20px 30px 0;
+  font-family: var(--ledger-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.rpt-bodycol {
+  min-width: 0;
+  border-left: 1px solid var(--hairline);
+  padding: 30px 0 34px 40px;
+}
+
+/* ---- verdict — the flag is a solid ink stamp (paper-white text on ink, per the
+   --paper token note); the count is mono; the frozen tally sits on its own ruled
+   row as a single mono line (it is one text node — never split into squares) ---- */
 .rpt-verdict {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
+  align-items: center;
   flex-wrap: wrap;
-  margin-top: 22px;
-  padding: 13px 16px;
-  border-radius: 7px;
-  border: 1px solid var(--rule-3);
+  column-gap: 22px;
+  row-gap: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+.rpt-verdict-flag {
+  font-family: var(--ledger-sans);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--paper);
+  background: var(--ink);
+  padding: 11px 18px;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
-.rpt-verdict.fail {
-  border-color: var(--signal-rule);
-  background: var(--signal-tint);
-}
-.rpt-verdict.ok {
-  background: var(--bg-2);
-}
-.rpt-verdict-flag {
-  font-family: var(--ff-mono);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-.rpt-verdict.fail .rpt-verdict-flag {
-  color: var(--signal-text);
-}
-.rpt-verdict.ok .rpt-verdict-flag {
-  color: var(--ink);
-}
 .rpt-verdict-count {
-  font-size: 14px;
-  font-weight: 600;
+  font-family: var(--ledger-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--ink);
 }
 .rpt-verdict-tally {
-  font-family: var(--ff-mono);
-  font-size: 12px;
+  width: 100%;
+  margin: 20px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--ledger-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
   color: var(--graphite);
-  margin-left: auto;
 }
 
-/* header-surface meta ledger (C10) */
+/* ---- meta ledger ---- */
 .rpt-meta {
-  margin: 18px 0 0;
-  border: 1px solid var(--rule-2);
-  border-radius: 6px;
-  overflow: hidden;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
 }
 .rpt-mrow {
   display: grid;
-  grid-template-columns: 130px 1fr;
-  gap: 16px;
-  padding: 10px 16px;
-  border-top: 1px solid var(--rule);
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 24px;
+  padding: 12px 0;
+  border-top: 1px solid var(--hairline);
 }
 .rpt-mrow:first-child {
   border-top: none;
+  padding-top: 0;
+}
+.rpt-mrow:last-child {
+  padding-bottom: 0;
 }
 .rpt-mrow dt {
-  font-family: var(--ff-mono);
-  font-size: 12px;
+  font-family: var(--ledger-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--graphite);
 }
 .rpt-mrow dd {
   margin: 0;
-  font-size: 13px;
+  min-width: 0;
+  font-size: 13.5px;
   color: var(--ink);
 }
 
-/* findings list */
+/* ---- findings — numbered rows: the plain line leads, four ruled mono receipt
+   columns follow; index numerals wear the ultramarine accent ---- */
 .rpt-findings {
   list-style: none;
-  margin: 26px 0 0;
+  margin: 0;
   padding: 0;
-  border-top: 1px solid var(--rule-2);
+  border-top: none;
 }
 .rpt-finding {
-  padding: 16px 0;
-  border-bottom: 1px solid var(--rule);
+  padding: 22px 0 24px;
+  border-top: 1px solid var(--hairline);
+  border-bottom: none;
+}
+.rpt-finding:first-child {
+  padding-top: 0;
+  border-top: none;
 }
 .rpt-finding-lead {
-  display: flex;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  column-gap: 18px;
   align-items: baseline;
-  gap: 12px;
 }
 .rpt-idx {
-  font-family: var(--ff-mono);
+  font-family: var(--ledger-sans);
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
-  font-size: 12px;
-  color: var(--graphite);
+  color: var(--um);
   flex: none;
 }
 .rpt-plain {
   margin: 0;
-  flex: 1 1 auto;
-  font-size: 15px;
+  flex: initial;
+  font-size: 16px;
   line-height: 1.45;
-  color: var(--ink);
-  letter-spacing: -0.008em;
-}
-.rpt-sev {
-  flex: none;
-  font-family: var(--ff-mono);
-  font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid transparent;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  max-width: 74ch;
+}
+/* severity — typographic weight + a 9px square mark (no pill, no radius). The
+   square is a ::before so no markup changes and the frozen text nodes stay put. */
+.rpt-sev {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  text-transform: none;
+  white-space: nowrap;
+  font-family: var(--ledger-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.rpt-sev::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  flex: none;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
 .rpt-sev.error {
-  color: var(--signal-text);
-  background: var(--signal-tint);
-  border-color: var(--signal-rule);
+  color: var(--sev-err);
+  font-weight: 700;
+}
+.rpt-sev.error::before {
+  background: var(--sev-err);
 }
 .rpt-sev.warn {
-  color: #8a5a06;
-  background: #fdf3e3;
-  border-color: #f0dcbb;
+  color: var(--sev-warn);
+  font-weight: 500;
+}
+.rpt-sev.warn::before {
+  background: var(--sev-warn);
 }
 .rpt-sev.info {
-  color: var(--graphite);
-  background: var(--bg-3);
-  border-color: var(--rule-2);
+  color: var(--sev-info);
+  font-weight: 400;
+}
+.rpt-sev.info::before {
+  background: var(--sev-info);
 }
 
-/* the four receipts (C2) */
+/* the four receipts — held in hairline-separated mono columns, aligned under the
+   plain line (past the 56px numeral column + 18px gap) */
 .rpt-receipts {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 24px;
-  margin: 12px 0 0 28px;
-}
-@media (max-width: 560px) {
-  .rpt-receipts {
-    grid-template-columns: 1fr;
-    margin-left: 0;
-  }
+  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 0.9fr);
+  gap: 0;
+  margin: 16px 0 0 74px;
+  border-top: 1px solid var(--hairline);
 }
 .rpt-rc {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: block;
   min-width: 0;
+  padding: 11px 18px 0 0;
+}
+.rpt-rc + .rpt-rc {
+  border-left: 1px solid var(--hairline);
+  padding-left: 18px;
 }
 .rpt-rc dt {
-  font-family: var(--ff-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.01em;
-  color: var(--muted);
+  margin: 0 0 5px;
+  font-family: var(--ledger-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--graphite);
 }
 .rpt-rc dd {
   margin: 0;
   min-width: 0;
 }
 .rpt-mono {
-  font-family: var(--ff-mono);
+  font-family: var(--ledger-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
   color: var(--ink);
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
+/* meta prose sub — grotesk secondary (the plain-language explanation) */
 .rpt-rc-sub {
   display: block;
-  font-size: 12px;
+  margin-top: 3px;
+  font-family: var(--ledger-sans);
+  font-size: 12.5px;
+  line-height: 1.55;
   color: var(--graphite);
-  margin-top: 1px;
+}
+/* findings claim-value sub — mono tabular (the technical receipt value) */
+.rpt-mono-sub {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--ledger-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--graphite);
+  overflow-wrap: anywhere;
 }
 
+/* ---- footer — honesty paragraph on the same armature (report: empty rail;
+   demo: a plain ruled block, no rail grid) ---- */
 .rpt-foot {
+  margin: 0;
+  padding: 0;
+  border-top: none;
+}
+.rpt-sec.rpt-foot .rpt-bodycol {
+  padding-bottom: 0;
+}
+.dmo-wrap .rpt-foot {
   margin-top: 22px;
   padding-top: 16px;
-  border-top: 1px solid var(--rule-2);
+  border-top: 1px solid var(--hairline);
 }
 .rpt-foot p {
   margin: 0;
   font-size: 12.5px;
-  line-height: 1.6;
-  color: var(--faint);
-  max-width: 76ch;
+  line-height: 1.65;
+  color: var(--graphite);
+  max-width: 78ch;
 }
 
-/* ----- print: one clean report per page, honesty labels preserved ----------- */
+/* ---- collapse below the desktop measure — the grid discipline folds to one
+   column (the surface targets desktop web; this only guards narrow viewports) -- */
+@media (max-width: 900px) {
+  .rpt-wrap {
+    padding: 28px 24px 96px;
+  }
+  .rpt-sec {
+    grid-template-columns: 1fr;
+  }
+  .rpt-rail {
+    padding: 22px 0 0;
+  }
+  .rpt-bodycol {
+    border-left: none;
+    padding: 14px 0 28px;
+  }
+  .rpt-finding-lead {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  .rpt-sev {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: 8px;
+  }
+  .rpt-receipts {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    margin-left: 0;
+  }
+  .rpt-rc {
+    padding-top: 12px;
+  }
+  .rpt-rc:nth-child(odd) {
+    border-left: none;
+    padding-left: 0;
+  }
+  .rpt-sim {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+@media (max-width: 560px) {
+  .rpt-wrap {
+    padding: 20px;
+  }
+  .rpt-receipts {
+    grid-template-columns: 1fr;
+  }
+  .rpt-rc + .rpt-rc {
+    border-left: none;
+    padding-left: 0;
+  }
+  .rpt-mrow {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* ----- print: one clean report per page, the ink banner preserved on its ground.
+   The SIMULATED banner keeps print-color-adjust: exact (on .rpt-sim above) so it
+   prints on the ink ground, and stays the first thing on the printed page. ----- */
 @media print {
   nav,
   footer,
@@ -1420,40 +1610,41 @@ body {
 
 /* ============================================================================
    D1 — the one-page verifier demo (/demo). Reuses the report's Ledger system
-   (rpt-* classes) and adds a beat-list layout. Desktop-first, printable.
-   dmo-* namespace.
+   (rpt-* classes: banner, masthead, findings, receipts) and adds a beat list.
+   Desktop-first, printable. dmo-* namespace.
    ========================================================================== */
 .dmo-meta {
   margin-top: 18px;
 }
 .dmo-beats {
   margin-top: 28px;
-  border-top: 1px solid var(--rule-2);
+  border-top: 1px solid var(--hairline);
 }
 .dmo-beat {
-  padding: 22px 0;
-  border-bottom: 1px solid var(--rule);
+  padding: 24px 0;
+  border-bottom: 1px solid var(--hairline);
 }
 .dmo-beat-head {
   display: flex;
   align-items: baseline;
-  gap: 12px;
+  gap: 14px;
 }
 .dmo-beat-no {
-  font-family: var(--ff-mono);
+  flex: none;
+  font-family: var(--ledger-mono);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--graphite);
-  flex: none;
 }
 .dmo-beat-title {
   margin: 0;
-  font-size: 17px;
+  font-family: var(--ledger-sans);
+  font-size: 18px;
   line-height: 1.25;
-  font-weight: 700;
-  letter-spacing: -0.015em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 .dmo-beat-plain {
@@ -1469,11 +1660,11 @@ body {
   padding: 0;
 }
 .dmo-beat-lines li {
+  position: relative;
+  padding-left: 16px;
   font-size: 13px;
   line-height: 1.55;
   color: var(--body);
-  padding-left: 14px;
-  position: relative;
 }
 .dmo-beat-lines li::before {
   content: "·";
@@ -1481,34 +1672,49 @@ body {
   left: 2px;
   color: var(--graphite);
 }
+/* demo verdict chips — flat severity marks (no pill / radius), consistent with
+   the report's typographic severity */
 .dmo-verdicts {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px 24px;
   margin-top: 14px;
 }
 .dmo-verdict {
-  font-family: var(--ff-mono);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  font-family: var(--ledger-mono);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.02em;
-  padding: 4px 10px;
-  border-radius: 5px;
-  border: 1px solid transparent;
+}
+.dmo-verdict::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  flex: none;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
 .dmo-verdict.ok {
   color: var(--ink);
-  background: var(--bg-2);
-  border-color: var(--rule-3);
+}
+.dmo-verdict.ok::before {
+  background: var(--ink);
 }
 .dmo-verdict.flag {
-  color: var(--signal-text);
-  background: var(--signal-tint);
-  border-color: var(--signal-rule);
+  color: var(--sev-err);
+  font-weight: 700;
+}
+.dmo-verdict.flag::before {
+  background: var(--sev-err);
 }
 .dmo-findings {
   margin-top: 16px;
-  border-top: 1px solid var(--rule-2);
+  border-top: 1px solid var(--hairline);
 }

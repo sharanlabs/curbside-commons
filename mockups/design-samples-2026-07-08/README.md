@@ -6,7 +6,7 @@ Design-shotgun pattern: five parallel `frontend-specialist` subagents, one direc
 all rendering the SAME real committed golden fixture
 (`fixtures/synthetic-restaurant/expected-report.acp.json` — FAIL · 16 findings · 11 error / 5 warn / 0 info).
 
-**Status: SAMPLES ONLY — no direction picked, no product code changed.** These are
+**Status: PICKED — the owner chose #1 Ledger with a gallery-white ground (2026-07-08, eighteenth session; decision-log row).** The implementation slice restyled the real `/report` + `/demo` surfaces to sample 1's token plan with `--paper` moved `#F9F9F6 → #FFFFFF` (single-token swap, advisor-ruled; every other token verbatim). These files stay as
 internal mockups (like the sibling files in `mockups/`), not shipped surfaces. Each file
 is a self-contained HTML fragment (inline CSS, zero external requests) written for the
 claude.ai artifact wrapper; open locally by adding a doctype/body wrapper or view the

@@ -165,3 +165,34 @@ describe("determinism — the transform is pure", () => {
     expect(toReportView(acp)).toEqual(toReportView(acp));
   });
 });
+
+describe("print fidelity — the SIMULATED banner survives print on its ink ground", () => {
+  // The report is a printable one-pager. Chrome/Safari drop background colours
+  // when printing unless color-adjust is forced exact — without it the SIMULATED
+  // banner (paper text on an ink ground) would print as invisible white-on-white,
+  // silently stripping the honesty label from a printed copy. No existing test
+  // guards this; this is the print-checklist assertion for the Ledger restyle.
+  const css = readFileSync(join(root, "app", "globals.css"), "utf8");
+
+  it("globals.css keeps an @media print block", () => {
+    expect(css).toMatch(/@media\s+print\s*\{/);
+  });
+
+  it("keeps print-color-adjust: exact (both standard + -webkit- forms)", () => {
+    expect(css).toMatch(/(?:^|[^-])print-color-adjust:\s*exact/m);
+    expect(css).toMatch(/-webkit-print-color-adjust:\s*exact/);
+  });
+
+  it("the .rpt-sim banner rule itself carries both color-adjust forms", () => {
+    // Scope to the banner's own rule block so moving the property OFF the banner
+    // fails the gate — not merely that the string appears somewhere in the file.
+    // Both the -webkit- prefixed form and the standard (un-prefixed) form must be
+    // present; the standard-form regex is anchored to NOT match inside the webkit
+    // string, so dropping either property from the banner turns this red.
+    const simRule = css.match(/\.rpt-sim\s*\{[^}]*\}/);
+    expect(simRule, ".rpt-sim rule block found in globals.css").not.toBeNull();
+    const block = simRule?.[0] ?? "";
+    expect(block).toMatch(/-webkit-print-color-adjust:\s*exact/);
+    expect(block).toMatch(/(?:^|[^-])print-color-adjust:\s*exact/m);
+  });
+});

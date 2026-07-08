@@ -38,7 +38,7 @@ function Receipts({ finding, index }: { finding: DemoFinding; index: number }) {
           <dt>claim</dt>
           <dd>
             <span className="rpt-mono">{finding.claimId}</span>
-            <span className="rpt-rc-sub">
+            <span className="rpt-mono-sub">
               {finding.claimSource} · {finding.claimField} = {finding.claimValue}
             </span>
           </dd>

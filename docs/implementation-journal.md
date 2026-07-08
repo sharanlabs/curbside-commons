@@ -30,6 +30,18 @@ Newest entries on top.
 
 ---
 
+## 2026-07-08 DESIGN-IMPL — Ledger restyle shipped; a reviewer `git restore` wiped the uncommitted CSS mid-review (recovered byte-exact)
+
+- What changed: `/report` + `/demo` restyled to the owner-picked Ledger system (sample 1) with the gallery-white `--paper: #ffffff` modification — `app/globals.css` (+381/−175, scoped to `.rpt-wrap`, `:root`/landing untouched), caption-rail grid wrapping in `ReportView.tsx`, one class swap in `DemoView.tsx`, +3 print-fidelity assertions in `report-view-c1.test.ts`. All committed copy byte-identical (three new rail captions "Verdict"/"Meta"/"Findings" accepted as layout armature).
+- Why: owner design pick 2026-07-08 (decision-log row; confirm: "Yes — Ledger + gallery white") under the same-day owner standard "Opus model + Fable-level quality for design work."
+- Challenge/failure: during the reviewer-executed red-green on the new print assertion, the restore step ran `git checkout -- app/globals.css` — which restores from HEAD and silently WIPED the builder's uncommitted 556-line restyle. The GREEN run still passed because the OLD file also carries the print properties, masking the wipe.
+- How diagnosed: immediate post-restore `git diff --stat` (empty for globals.css) + `grep -c ledger-sans` = 0.
+- Final fix: the Opus builder agent, resumed from its own transcript, restored the file byte-exact from the snapshot it had taken during its own red-green demo (37,136 bytes; identical +381/−175 stat); all spot-checks matched the pre-incident review outputs; full verify independently re-run green.
+- How verified: `npm run verify` = 947 passed + 6 skipped exit 0 (run independently pre-incident AND post-recovery); `test:legacy` 306+5; reviewer-executed red-green (RED 1-failed with the banner property stripped → GREEN 12/12); Codex changed-files xhigh: BLOCK 1 P2 → REFUTED with evidence primary-model-final (the negative tracking IS the picked sample's committed spec; no repo rule mandates 0), all six constraint checks otherwise CONFIRM (`docs/reviews/codex-2026-07-08-design-slice{,-raw}.md`).
+- Prevention: lesson routed to `~/claude-os/tasks/lessons.md` — copy a file carrying uncommitted work aside (or `git stash push -- <file>`) BEFORE any destructive red demonstration and restore from THAT; verify `git diff --stat` non-empty afterward; never trust a green that the old version would also pass.
+- Files changed: the four slice files + docs (decision-log ×2, PLAIN-ENGLISH row, mockups README status, this entry, review records).
+- Human decision: the pick itself; deploy remains a separate owner act (design-first ruling 2026-07-03).
+
 ## 2026-06-28 A3-4/5/6 — the batched Codex gate caught a cross-family hole the A3-6 wiring re-opened (P1), reconciled + red-green
 
 - What changed: discharged the three batched dated Codex obligations (A3-4 round-3 + A3-5 + A3-6) on the reset seat in one batched read-only review; reconciled all findings primary-model-final and flipped the three acceptance-gates to SHIP 5/5 — the A3-1..A3-6 offline build is now FULLY GATED.
