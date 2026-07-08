@@ -85,8 +85,10 @@ interface DegradedCase {
 }
 
 class ReviewerCarrier extends Error {
-  constructor(readonly input: ReviewerTurnInput) {
+  readonly input: ReviewerTurnInput;
+  constructor(input: ReviewerTurnInput) {
     super("reviewer input carrier — never a real failure");
+    this.input = input;
   }
 }
 
@@ -107,6 +109,13 @@ const degraded: DegradedCase[] = [];
 const records: Array<{ caseId: string; record: TrajectoryRecord }> = [];
 const matrix: MatrixRow[] = [];
 
+/** Fixed inter-call pacing (NOT a retry): the free-tier window is 8,000 tokens/min
+ *  (preflight-read 2026-07-07) and each turn spends ~1–2K incl. reasoning — pacing
+ *  ~6 calls/min keeps a predictable 429 from degrading cases the model never saw.
+ *  The A3-7 depletion lesson, applied before spend rather than diagnosed after. */
+const PACE_MS = 10_000;
+const pace = () => new Promise((r) => setTimeout(r, PACE_MS));
+
 function flushTurns(): void {
   // Raws land on disk as each case completes — BEFORE any scoring exists.
   writeFileSync(TURNS_PATH, `${JSON.stringify({ ...header, turns, degraded }, null, 2)}\n`);
@@ -121,6 +130,7 @@ for (const c of cases) {
     quarantinedArtifactExcerpt: quarantineExcerpt(rawArtifact),
     allowedTools: c.allowedTools,
   };
+  await pace();
   const intake = await fetchIntakeTurnLive(intakeInput, c.inputArtifact.path);
   turns.push({
     caseId: c.caseId,
@@ -151,6 +161,7 @@ for (const c of cases) {
     record = runCase(c, captureModel); // intake-reject path: reviewer never consulted
   } catch (err) {
     if (!(err instanceof ReviewerCarrier)) throw err;
+    await pace();
     const review = await fetchReviewerTurnLive(err.input);
     turns.push({
       caseId: c.caseId,

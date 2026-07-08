@@ -1,6 +1,6 @@
 # n8n Lane Runbook — episodic, self-hosted, SIMULATED
 
-**Status + honest label (2026-07-07):** the committed lane is a **workflow spec + command-level dry run** — the workflow's exact command strings execute and byte-verify in CI (`evals/n8n/n8n-workflow.test.ts`); **execution under the n8n runtime itself is PENDING the owner's O-A4 call** (surfaced at A4 entry; owner AFK → reversible default taken per house precedent). Until an n8n runtime run happens, no surface may claim "executed n8n lane" (plan AC-9 as amended).
+**Status + honest label (updated 2026-07-07, evening):** **EXECUTED n8n lane — one recorded episodic runtime run.** The owner's 2026-07-07 directive resolved O-A4 to **Option A (npx, no docker)** and the committed workflow ran UNDER n8n 2.29.7 (`n8n execute --id`, `mode: cli`, `status: success`); both artifacts byte-matched direct engine builds. Full record: `docs/reviews/l3-n8n-runtime-run-2026-07-07.md`. The lane remains episodic and sendless — the CI dry run (`evals/n8n/n8n-workflow.test.ts`) stays the standing gate; the runtime run is a dated, recorded demonstration, not a standing service. (Import note: n8n 2.x's importer requires a top-level `id` — import a scratch copy with one injected field; the committed workflow file stays id-less by design.)
 
 ## What the lane is
 
@@ -8,7 +8,7 @@ One committed workflow — `workflows/n8n/truth-audit-fees-to-slack.workflow.jso
 
 ## Running it (episodic — owner-armed for the runtime leg)
 
-**⚠ Runtime caveat (Codex A4 review P2, verified against official n8n docs 2026-07-07):** current n8n (v2.0+) **disables the Execute Command node by default**; it is available on SELF-HOSTED instances only and must be consciously enabled (e.g. `NODES_EXCLUDE="[]"` in the environment — official node-blocking docs). Enabling it lets workflows run host shell commands — which is exactly why this repo's structural test pins the committed commands to an exact allowlisted argv shape and rejects every shell metacharacter. **Runtime import/execution is therefore UNVERIFIED pending O-A4 and the owner's own n8n setup** — nothing below is claimed to have run.
+**⚠ Runtime caveat (Codex A4 review P2, verified against official n8n docs 2026-07-07):** current n8n (v2.0+) **disables the Execute Command node by default**; it is available on SELF-HOSTED instances only and must be consciously enabled (e.g. `NODES_EXCLUDE="[]"` in the environment — official node-blocking docs). Enabling it lets workflows run host shell commands — which is exactly why this repo's structural test pins the committed commands to an exact allowlisted argv shape and rejects every shell metacharacter. **Runtime status (updated 2026-07-07, evening): the O-A4 call was resolved (npx, Option A) and one episodic runtime run EXECUTED and byte-verified** — record + evidence hashes: `docs/reviews/l3-n8n-runtime-run-2026-07-07.md`. `NODES_EXCLUDE="[]"` was set session-locally for that run only and is not persisted anywhere; any future runtime run re-applies it consciously, per this caveat.
 
 **Option A — npx (no docker; recommended at O-A4):**
 ```bash

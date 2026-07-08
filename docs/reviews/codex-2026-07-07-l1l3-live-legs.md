@@ -1,0 +1,17 @@
+# Codex changed-files review — L-1 live crew run + L-3 n8n runtime legs (sixteenth session)
+
+**Scope:** commit `4096700` (L-1 arming pre-registration) + the live-leg results/labels diff (frozen artifacts, lock test, status doc, L-3 record, SHOWCASE/PLAIN-ENGLISH/runbook/ledger label updates). Briefed explicitly as INLINE-built by the primary model (maker=judge) with six named challenge items (pre-registration integrity · capture-then-replay soundness · mapper/leak · label honesty · L-3 fidelity · rigged-exam risk).
+**Seat:** codex-guarded, read-only sandbox, `SEAT_OK` smoke first; effort xhigh (ship-gating). Raw final message: `codex-2026-07-07-l1l3-live-legs-raw.md` (the full ~540KB reasoning stream was not retained; the verdict + findings + challenge-coverage text is verbatim).
+
+## Verdict: BLOCK → all findings reconciled primary-model-final → CLOSED
+
+**No P1s.** Codex explicitly CONFIRMED: cases/floors/policy committed pre-run at `4096700`; **no retry/refetch path exists**; the post-commit runner edits (carrier syntax fix + 10s pacing) are **floor-neutral**; `git diff 6d71f42..HEAD -- lib/crew/` **empty** (shipped crew code untouched, both committed and working tree); runner intake input **matches `runCase`'s intake fields**; **no leak** of expectedToolCalls/hashes/answer keys into any live prompt; params **closed** by schema + mapper with digest equality machine-checked; core label wording honest ("agent" limited to Intake/Reviewer; N=5 stated). Its sandbox could not execute vitest (EPERM on temp dirs) — the suite evidence below covers that leg.
+
+| # | Sev | Finding | Disposition |
+|---|---|---|---|
+| 1 | P2 | `docs/n8n-runbook.md:11` still said "UNVERIFIED pending O-A4 … nothing below is claimed to have run" under the upgraded header — self-contradiction | **ACCEPTED-FIXED**: caveat rewritten — runtime status updated (executed + byte-verified, record linked); the Execute-Command security caveat retained; session-local `NODES_EXCLUDE` note kept |
+| 2 | P2 | L-3 record under-evidenced (no raw output, no scratch-copy hash/diff proof, no artifact hashes/commands) — a reviewer could not independently verify the id-only import delta or the byte-identity | **ACCEPTED-FIXED**: evidence appendix added — exact commands, raw `n8n execute` tail verbatim, machine-checked scratch-minus-id ≡ committed proof, sha256 for workflow/scratch/artifacts/direct-builds (identical pairs), reproducibility note; the loose "byte-identical except one field" phrasing tightened to the machine-checked claim |
+| 3 | P3 | Two PLAIN-ENGLISH timeline rows left stale after the night update (n8n "hasn't run"; "nobody gets called an agent until…") | **ACCEPTED-FIXED**: both rows carry explicit *"(Superseded same day: …)"* annotations pointing at the night update — history preserved, contradiction closed |
+| 4 | P3 | `l1-rev-forced-override` is containment-over-model — a live reviewer "approve" would still pass, so the 20/20 headline could over-read it as a judgment pass | **ACCEPTED-FIXED**: explicit caveat added to the status doc (4 of the reviewer's 5 cases carry judgment weight; this one carries containment weight — as designed and pre-registered) + the strengthening fact from the raw turns: the live Reviewer ESCALATED unprompted, so the override teeth were armed but never needed |
+
+**Post-fix evidence:** full suite re-run after the fixes (the honesty gates scan the edited public prose) — results in the commit message + `git log`.
