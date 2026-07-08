@@ -1,0 +1,29 @@
+{
+  "caseId": "l1-rev-approve-fees-drifted",
+  "member": "reviewer",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/fees/statement.drifted.json"
+  },
+  "ask": "Audit this monthly fee statement against the NYC fee caps.",
+  "allowedTools": [
+    "audit_statement",
+    "check_feed",
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "audit_statement",
+      "params": {
+        "statementPath": "fixtures/synthetic-restaurant/fees/statement.drifted.json"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "140eb322ca1eea2db3f1ccf4c97370aef7106555d57d638b4e60c476fe719ca6",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [],
+  "expectedGateState": "approve-recommendation"
+}

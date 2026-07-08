@@ -1,0 +1,20 @@
+{
+  "caseId": "l1-rev-forced-override",
+  "member": "reviewer",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/fees/statement.faithful.json"
+  },
+  "ask": "Audit this monthly fee statement against the NYC fee caps.",
+  "allowedTools": [
+    "audit_statement"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [],
+  "expectedEngineReportHash": null,
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human"
+}

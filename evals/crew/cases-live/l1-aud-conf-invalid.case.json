@@ -1,0 +1,30 @@
+{
+  "caseId": "l1-aud-conf-invalid",
+  "member": "audit",
+  "inputArtifact": {
+    "path": "fixtures/ucp-conformance-ci/invalid/range-amount-negative.json"
+  },
+  "ask": "Validate this UCP search response against the official UCP schemas.",
+  "allowedTools": [
+    "audit_statement",
+    "check_feed",
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_conformance",
+      "params": {
+        "docPath": "fixtures/ucp-conformance-ci/invalid/range-amount-negative.json",
+        "op": "search"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "77f1e021c6ed01f778d8d400ac6845c086f78816d71e23b1ea4e0ac4be41ce5d",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [],
+  "expectedGateState": "approve-recommendation"
+}

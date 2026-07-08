@@ -1,0 +1,31 @@
+{
+  "caseId": "l1-int-route-feed-faithful",
+  "member": "intake",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/acp-feed.faithful.json"
+  },
+  "ask": "Check this product feed against our system-of-record catalog for drift.",
+  "allowedTools": [
+    "audit_statement",
+    "check_feed",
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/synthetic-restaurant/acp-feed.faithful.json",
+        "catalogPath": "fixtures/synthetic-restaurant/sor.catalog.json",
+        "surface": "acp"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "756a27ee7aa06424ce91dda95011d307fb58f1c2a145a345d3922d1a4b0711ee",
+  "expectedRecommendationClass": "no-action",
+  "expectedFindingRefs": [],
+  "expectedGateState": "approve-recommendation"
+}

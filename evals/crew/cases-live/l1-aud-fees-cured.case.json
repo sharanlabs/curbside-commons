@@ -1,0 +1,29 @@
+{
+  "caseId": "l1-aud-fees-cured",
+  "member": "audit",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/fees/statement.cured.json"
+  },
+  "ask": "Audit this monthly fee statement against the NYC fee caps.",
+  "allowedTools": [
+    "audit_statement",
+    "check_feed",
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "audit_statement",
+      "params": {
+        "statementPath": "fixtures/synthetic-restaurant/fees/statement.cured.json"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "3a3faaaa413c490c69e183a1f9081e510808080e2969de7264e2aa191cdab73a",
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human"
+}

@@ -1,0 +1,22 @@
+{
+  "caseId": "l1-int-reject-notes",
+  "member": "intake",
+  "inputArtifact": {
+    "path": "evals/crew/fixtures/notes.random.txt"
+  },
+  "ask": "Here are my shift notes, do the thing.",
+  "allowedTools": [
+    "audit_statement",
+    "check_feed",
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [],
+  "expectedEngineReportHash": null,
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human"
+}

@@ -1,0 +1,33 @@
+{
+  "caseId": "l1-evi-feed-ucp-drifted-refs",
+  "member": "evidence",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/ucp-catalog-response.drifted.json"
+  },
+  "ask": "Check this product feed against our system-of-record catalog for drift.",
+  "allowedTools": [
+    "audit_statement",
+    "check_feed",
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/synthetic-restaurant/ucp-catalog-response.drifted.json",
+        "catalogPath": "fixtures/synthetic-restaurant/sor.catalog.json",
+        "surface": "ucp"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "82dcd6ac2d51c4b664d8336c384e03da13d4f16549cfd4fe5cd5b77364605ffa",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "item-002-v2#existence"
+  ],
+  "expectedGateState": "approve-recommendation"
+}

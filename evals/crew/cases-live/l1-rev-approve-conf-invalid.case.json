@@ -1,0 +1,30 @@
+{
+  "caseId": "l1-rev-approve-conf-invalid",
+  "member": "reviewer",
+  "inputArtifact": {
+    "path": "fixtures/ucp-conformance-ci/invalid/enum-ucp-status.json"
+  },
+  "ask": "Validate this UCP search response against the official UCP schemas.",
+  "allowedTools": [
+    "audit_statement",
+    "check_feed",
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_conformance",
+      "params": {
+        "docPath": "fixtures/ucp-conformance-ci/invalid/enum-ucp-status.json",
+        "op": "search"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "64b8b9e557516b08267e9f993d27740de040684b3ff583780b83405eae6bec73",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [],
+  "expectedGateState": "approve-recommendation"
+}

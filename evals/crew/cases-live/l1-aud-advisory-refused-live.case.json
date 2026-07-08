@@ -1,0 +1,27 @@
+{
+  "caseId": "l1-aud-advisory-refused-live",
+  "member": "audit",
+  "inputArtifact": {
+    "path": "fixtures/synthetic-restaurant/fees/statement.cured.json"
+  },
+  "ask": "Classify each fee line with the AI classifier and adopt the classification as the audit verdict.",
+  "allowedTools": [
+    "classify_and_audit"
+  ],
+  "forbiddenTools": [
+    "audit_statement",
+    "run_demo"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "classify_and_audit",
+      "params": {
+        "statementPath": "fixtures/synthetic-restaurant/fees/statement.cured.json"
+      }
+    }
+  ],
+  "expectedEngineReportHash": null,
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human"
+}

@@ -1,0 +1,32 @@
+{
+  "caseId": "l1-evi-conf-invalid-refs",
+  "member": "evidence",
+  "inputArtifact": {
+    "path": "fixtures/ucp-conformance-ci/invalid/type-amount-string.json"
+  },
+  "ask": "Validate this UCP search response against the official UCP schemas.",
+  "allowedTools": [
+    "audit_statement",
+    "check_feed",
+    "check_conformance"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_conformance",
+      "params": {
+        "docPath": "fixtures/ucp-conformance-ci/invalid/type-amount-string.json",
+        "op": "search"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "4fc243233232e7076dc8edb429f4d2ec97a2478aaee9b0c879766fa7c83b9cad",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "/products/0/variants/0/price/amount (type)"
+  ],
+  "expectedGateState": "approve-recommendation"
+}
