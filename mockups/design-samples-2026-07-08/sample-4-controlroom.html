@@ -1,0 +1,800 @@
+<!--
+TOKEN PLAN — Sample 4 "Control Room"
+Named values:
+  ground      #eef3f4  (cool light neutral, hue-biased toward the accent)
+  ink         #182528  (near-black with the same cool bias; banner + text)
+  accent      #2f6d7a  (slate-teal — structure, links, focus; 5.8:1 on white)
+  sev-error   #bc3d19  (critical red-orange; 5.5:1 on white)
+  sev-warn    #8a5a06  (amber; 5.9:1 on white)
+  sev-info    #2b5f9e  (info blue; 6.5:1 on white)
+Type roles: system-ui sans for all UI text (titles, plain lines, legends);
+ui-monospace + tabular-nums for every id, rule, value, count, and ledger figure.
+Layout concept: a full-width SIMULATED status strip sits above a two-region
+desktop grid — a sticky 300px instrument rail (verdict, proportional severity
+bar, run metadata, class breakdown as jump links) beside a scannable findings
+column of hairline-bordered cards, each with a severity stripe on its leading
+edge, the plain-English line as the card title, and a four-cell aligned receipt
+grid below. Depth system: hairline borders only, no shadows; radius 6px cards /
+4px chips, everywhere.
+-->
+<title>Sample 4 — Control Room · Commerce Truth Audit</title>
+<style>
+  body {
+    margin: 0;
+    background: #eef3f4;
+    color: #182528;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .s4-root {
+    --ground: #eef3f4;
+    --panel: #ffffff;
+    --ink: #182528;
+    --body: #33454a;
+    --muted: #52686d;
+    --hairline: #d7e0e2;
+    --hairline-2: #c6d3d6;
+    --accent: #2f6d7a;
+    --accent-deep: #275d68;
+    --accent-tint: #e7eff0;
+    --err: #bc3d19;
+    --err-tint: #faece6;
+    --err-rule: #edd0c5;
+    --warn: #8a5a06;
+    --warn-tint: #faf1de;
+    --warn-rule: #ead9b0;
+    --info: #2b5f9e;
+    --info-tint: #e9f0f8;
+    --info-rule: #c9daec;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 20px 28px 96px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .s4-root * {
+    box-sizing: border-box;
+  }
+  .s4-root a:focus-visible,
+  .s4-root :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  .s4-mono {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- SIMULATED status strip: full width, above both regions, dominant ---- */
+  .s4-sim {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--ink);
+    color: #e9f0f1;
+    border-radius: 6px;
+    padding: 13px 18px;
+  }
+  .s4-sim-tag {
+    flex: none;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #1d1503;
+    background: #f2a33c;
+    padding: 5px 11px;
+    border-radius: 4px;
+  }
+  .s4-sim-text {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* ---- report header (full width) ---- */
+  .s4-head {
+    margin: 26px 2px 22px;
+  }
+  .s4-eyebrow {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.01em;
+    color: var(--accent-deep);
+  }
+  .s4-title {
+    margin: 8px 0 0;
+    font-size: clamp(23px, 2.6vw, 29px);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .s4-intro {
+    margin: 12px 0 0;
+    font-size: 14.5px;
+    line-height: 1.58;
+    color: var(--body);
+    max-width: 76ch;
+  }
+
+  /* ---- two-region grid ---- */
+  .s4-cols {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* ---- left rail: the instrument stack ---- */
+  .s4-rail {
+    position: sticky;
+    top: 16px;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+  }
+  .s4-rail-sec {
+    padding: 15px 18px 16px;
+    border-top: 1px solid var(--hairline);
+  }
+  .s4-rail-sec:first-child {
+    border-top: none;
+  }
+  .s4-rail-h {
+    margin: 0 0 10px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .s4-verdict {
+    background: var(--err-tint);
+    border-bottom: 1px solid var(--err-rule);
+    border-radius: 6px 6px 0 0;
+  }
+  .s4-flag {
+    display: block;
+    font-family: var(--mono);
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    color: var(--err);
+  }
+  .s4-verdict-count {
+    display: block;
+    margin-top: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .s4-verdict-tally {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 11.5px;
+    color: var(--body);
+  }
+
+  .s4-bar {
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--hairline);
+  }
+  .s4-bar span {
+    display: block;
+    height: 100%;
+  }
+  .s4-bar .b-err {
+    background: var(--err);
+  }
+  .s4-bar .b-warn {
+    background: var(--warn);
+  }
+  .s4-legend {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+  }
+  .s4-legend li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 12.5px;
+    color: var(--body);
+  }
+  .s4-legend .dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .s4-legend .dot.d-err { background: var(--err); }
+  .s4-legend .dot.d-warn { background: var(--warn); }
+  .s4-legend .dot.d-info { background: var(--info); }
+  .s4-legend .n {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    color: var(--ink);
+  }
+
+  .s4-meta {
+    margin: 0;
+  }
+  .s4-meta dt {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 11px;
+  }
+  .s4-meta dt:first-child {
+    margin-top: 0;
+  }
+  .s4-meta dd {
+    margin: 3px 0 0;
+    font-size: 12.5px;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .s4-meta dd .s4-mono {
+    font-size: 11.5px;
+  }
+  .s4-meta .sub {
+    display: block;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .s4-cats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .s4-cats a {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 8px;
+    margin: 0 -8px;
+    border-radius: 4px;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 13px;
+    transition: background-color 0.12s ease, color 0.12s ease;
+  }
+  .s4-cats a:hover {
+    background: var(--accent-tint);
+    color: var(--accent-deep);
+  }
+  .s4-cats .n {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .s4-cats a:hover .n {
+    color: var(--accent-deep);
+  }
+
+  /* ---- right region: findings ---- */
+  .s4-main-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 2px 2px 12px;
+  }
+  .s4-main-head h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .s4-main-count {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .s4-cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+  .s4-card {
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-left-width: 3px;
+    border-radius: 6px;
+    padding: 13px 18px 15px 17px;
+    scroll-margin-top: 16px;
+  }
+  .s4-card.sev-error { border-left-color: var(--err); }
+  .s4-card.sev-warn { border-left-color: var(--warn); }
+  .s4-card.sev-info { border-left-color: var(--info); }
+
+  .s4-card-top {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 12px;
+    align-items: start;
+  }
+  .s4-idx {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--muted);
+    padding-top: 3px;
+  }
+  .s4-plain {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.45;
+    letter-spacing: -0.008em;
+    color: var(--ink);
+  }
+  .s4-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    margin-top: 1px;
+  }
+  .s4-chip .cd {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex: none;
+  }
+  .s4-chip.error {
+    color: var(--err);
+    background: var(--err-tint);
+    border-color: var(--err-rule);
+  }
+  .s4-chip.error .cd { background: var(--err); }
+  .s4-chip.warn {
+    color: var(--warn);
+    background: var(--warn-tint);
+    border-color: var(--warn-rule);
+  }
+  .s4-chip.warn .cd { background: var(--warn); }
+  .s4-chip.info {
+    color: var(--info);
+    background: var(--info-tint);
+    border-color: var(--info-rule);
+  }
+  .s4-chip.info .cd { background: var(--info); }
+
+  .s4-receipts {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 0.9fr);
+    gap: 14px;
+    margin: 11px 0 0;
+    padding-top: 11px;
+    border-top: 1px solid var(--hairline);
+  }
+  .s4-rc {
+    min-width: 0;
+  }
+  .s4-rc dt {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .s4-rc dd {
+    margin: 3px 0 0;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .s4-rc .sub {
+    display: block;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---- footer ---- */
+  .s4-foot {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--hairline-2);
+  }
+  .s4-foot p {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.62;
+    color: var(--muted);
+    max-width: 84ch;
+  }
+
+  /* ---- sample identity tag ---- */
+  .s4-sample-tag {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 40;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    color: #dfe9ea;
+    background: #182528;
+    border: 1px solid rgba(233, 240, 241, 0.18);
+    padding: 6px 11px;
+    border-radius: 4px;
+  }
+
+  /* ---- narrow fallback (desktop-first; never scroll horizontally) ---- */
+  @media (max-width: 980px) {
+    .s4-cols {
+      grid-template-columns: 1fr;
+    }
+    .s4-rail {
+      position: static;
+    }
+    .s4-receipts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 620px) {
+    .s4-root {
+      padding: 14px 16px 90px;
+    }
+    .s4-sim {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .s4-receipts {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="s4-root">
+
+  <div class="s4-sim" role="note" aria-label="Simulated data notice">
+    <span class="s4-sim-tag">SIMULATED</span>
+    <p class="s4-sim-text">Synthetic test data — an invented restaurant, invented menu, invented prices. Not real DoorDash / Square / Uber&nbsp;Eats / Grubhub data, access, or business impact. The verification rules and the pinned data-format standard are real; the restaurant, its menu, and its records are invented.</p>
+  </div>
+
+  <header class="s4-head">
+    <p class="s4-eyebrow">Verifier report &middot; listings truth check</p>
+    <h1 class="s4-title">What the copy says vs. what the restaurant&rsquo;s records say</h1>
+    <p class="s4-intro">A serving copy of a menu (what an AI shopping assistant would read) checked, line by line, against the restaurant&rsquo;s own system-of-record. Below is every difference the checker caught &mdash; each in plain words first, then the exact receipts. Deterministic and $0, with no AI calls in this verifier runtime: the same input always gives this same report.</p>
+  </header>
+
+  <div class="s4-cols">
+
+    <aside class="s4-rail" aria-label="Run summary">
+
+      <section class="s4-rail-sec s4-verdict" aria-label="Verdict">
+        <span class="s4-flag">FAIL</span>
+        <span class="s4-verdict-count">16 findings</span>
+        <span class="s4-verdict-tally">11 error &middot; 5 warn &middot; 0 info</span>
+      </section>
+
+      <section class="s4-rail-sec" aria-label="Severity tally">
+        <h2 class="s4-rail-h">Severity</h2>
+        <div class="s4-bar" role="img" aria-label="Severity distribution: 11 of 16 error, 5 of 16 warn, 0 info">
+          <span class="b-err" style="flex-grow: 11;"></span>
+          <span class="b-warn" style="flex-grow: 5;"></span>
+        </div>
+        <ul class="s4-legend">
+          <li><span class="dot d-err"></span>error<span class="n">11</span></li>
+          <li><span class="dot d-warn"></span>warn<span class="n">5</span></li>
+          <li><span class="dot d-info"></span>info<span class="n">0</span></li>
+        </ul>
+      </section>
+
+      <section class="s4-rail-sec" aria-label="Run metadata">
+        <h2 class="s4-rail-h">Run</h2>
+        <dl class="s4-meta">
+          <dt>surface</dt>
+          <dd>ACP static feed <span class="sub">(OpenAI/Stripe product-feed shape)</span></dd>
+          <dt>spec version</dt>
+          <dd><span class="s4-mono">taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08</span></dd>
+          <dt>matching mode</dt>
+          <dd><span class="s4-mono">synthetic-controlled</span><span class="sub">synthetic-controlled &mdash; the copy and the catalog share item IDs, so matching is exact (no entity resolution)</span></dd>
+          <dt>data</dt>
+          <dd><span class="s4-mono">simulated: true</span></dd>
+        </dl>
+      </section>
+
+      <nav class="s4-rail-sec" aria-label="Finding classes">
+        <h2 class="s4-rail-h">Classes</h2>
+        <ul class="s4-cats">
+          <li><a href="#f-01">availability<span class="n">3</span></a></li>
+          <li><a href="#f-04">cross-field-invariant<span class="n">1</span></a></li>
+          <li><a href="#f-05">encoding<span class="n">2</span></a></li>
+          <li><a href="#f-07">existence<span class="n">2</span></a></li>
+          <li><a href="#f-09">identity<span class="n">2</span></a></li>
+          <li><a href="#f-11">price<span class="n">4</span></a></li>
+          <li><a href="#f-15">staleness<span class="n">2</span></a></li>
+        </ul>
+      </nav>
+
+    </aside>
+
+    <section aria-label="Findings">
+      <div class="s4-main-head">
+        <h2>Findings</h2>
+        <span class="s4-main-count">16 of 16 shown</span>
+      </div>
+
+      <ol class="s4-cards">
+
+        <li class="s4-card sev-error" id="f-01">
+          <div class="s4-card-top">
+            <span class="s4-idx">01</span>
+            <p class="s4-plain">This item is hidden in the merchant's own catalog but is being served to customers.</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-002-v2#existence<span class="sub">acp-feed &middot; existence = true</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-002-v2</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-AVAIL-HIDDEN-SHOWN</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>availability</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-02">
+          <div class="s4-card-top">
+            <span class="s4-idx">02</span>
+            <p class="s4-plain">The copy says "pre_order" but the catalog state is in stock (expected "in_stock").</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-004-v1#availability<span class="sub">acp-feed &middot; availability = pre_order</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-004-v1</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-AVAIL-STATE</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>availability</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-03">
+          <div class="s4-card-top">
+            <span class="s4-idx">03</span>
+            <p class="s4-plain">The copy says "in_stock" but the catalog state is 86'd/sold out (expected "out_of_stock").</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-008-v1#availability<span class="sub">acp-feed &middot; availability = in_stock</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-008-v1</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-AVAIL-STATE</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>availability</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-04">
+          <div class="s4-card-top">
+            <span class="s4-idx">04</span>
+            <p class="s4-plain">The row is checkout-eligible but not search-eligible &mdash; the extracted invariant requires checkout &rArr; search.</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-002-v1#invariants<span class="sub">acp-feed &middot; invariants = {"price":"22.00","is_eligible_search":false,"is_eligible_checkout":true}</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-002-v1</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-XF-CHECKOUT-SEARCH</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>cross-field-invariant</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-warn" id="f-05">
+          <div class="s4-card-top">
+            <span class="s4-idx">05</span>
+            <p class="s4-plain">The name is cut off on the serving copy: "Margherita&hellip;" vs the real "Margherita Pizza (Medium)".</p>
+            <span class="s4-chip warn"><span class="cd"></span>warn</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-005-v2#title<span class="sub">acp-feed &middot; title = Margherita&hellip;</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-005-v2</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-ENC-TRUNC</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>encoding</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-warn" id="f-06">
+          <div class="s4-card-top">
+            <span class="s4-idx">06</span>
+            <p class="s4-plain">The name is garbled by a text-encoding error: served "Jalape&Atilde;&plusmn;o Poppers (Large)" vs the real "Jalape&ntilde;o Poppers (Large)".</p>
+            <span class="s4-chip warn"><span class="cd"></span>warn</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-004-v3#title<span class="sub">acp-feed &middot; title = Jalape&Atilde;&plusmn;o Poppers (Large)</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-004-v3</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-ENC-UTF8</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>encoding</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-07">
+          <div class="s4-card-top">
+            <span class="s4-idx">07</span>
+            <p class="s4-plain">The copy serves "Phantom Platter (simulated ghost item)" but no such item exists in the merchant's catalog.</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>ghost-001#existence<span class="sub">acp-feed &middot; existence = true</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>catalog-meta</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-EXIST-GHOST</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>existence</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-08">
+          <div class="s4-card-top">
+            <span class="s4-idx">08</span>
+            <p class="s4-plain">"Caf&eacute; Latte (Small)" exists in the merchant's catalog but is missing from the serving copy.</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-003-v1#existence<span class="sub">acp-feed &middot; existence = false</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-003-v1</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-EXIST-MISSING</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>existence</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-09">
+          <div class="s4-card-top">
+            <span class="s4-idx">09</span>
+            <p class="s4-plain">The copy keys this row as "legacy-pos-4471" but the catalog row is "item-003-v2" &mdash; same item, mismatched identity (resolved by exact name).</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>legacy-pos-4471#existence<span class="sub">acp-feed &middot; existence = true</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-003-v2</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-IDENT-ID-MISMATCH</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>identity</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-10">
+          <div class="s4-card-top">
+            <span class="s4-idx">10</span>
+            <p class="s4-plain">The variant label says "Small" but this row is the "Medium" variation &mdash; variants of this item can no longer be told apart.</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-004-v2#variant_dict<span class="sub">acp-feed &middot; variant_dict = {"group":"item-004","dict":{"variation":"Small"}}</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-004-v2</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-IDENT-MODIFIER-AMBIG</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>identity</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-11">
+          <div class="s4-card-top">
+            <span class="s4-idx">11</span>
+            <p class="s4-plain">The price is serialized in cents (2150) where dollars are expected (21.50) &mdash; a 100&times; overstatement.</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-001-v1#price.amount<span class="sub">acp-feed &middot; price.amount = 2150</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-001-v1</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-PRICE-CENTS-AS-DECIMAL</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>price</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-warn" id="f-12">
+          <div class="s4-card-top">
+            <span class="s4-idx">12</span>
+            <p class="s4-plain">The currency code is malformed: "usd" instead of ISO-4217 "USD".</p>
+            <span class="s4-chip warn"><span class="cd"></span>warn</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-001-v2#price.currency<span class="sub">acp-feed &middot; price.currency = usd</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-001-v2</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-PRICE-CURRENCY-FORM</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>price</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-13">
+          <div class="s4-card-top">
+            <span class="s4-idx">13</span>
+            <p class="s4-plain">The sale price 28.50 is higher than the regular price 27.50 &mdash; a "sale" that costs more.</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-001-v3#invariants<span class="sub">acp-feed &middot; invariants = {"price":"27.50","sale_price":"28.50","is_eligible_search":true,"is_eligible_checkout":true}</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-001-v3</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-PRICE-SALE-GT</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>price</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-error" id="f-14">
+          <div class="s4-card-top">
+            <span class="s4-idx">14</span>
+            <p class="s4-plain">The served price 12.00 does not match the catalog price 10.00.</p>
+            <span class="s4-chip error"><span class="cd"></span>error</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-006-v1#price.amount<span class="sub">acp-feed &middot; price.amount = 12.00</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-006-v1</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-PRICE-VALUE</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>price</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-warn" id="f-15">
+          <div class="s4-card-top">
+            <span class="s4-idx">15</span>
+            <p class="s4-plain">The pre-order availability date 2026-02-01T00:00:00Z already passed (catalog as-of 2026-07-03T00:00:00Z) &mdash; the promise is stale.</p>
+            <span class="s4-chip warn"><span class="cd"></span>warn</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-004-v1#availability_date<span class="sub">acp-feed &middot; availability_date = 2026-02-01T00:00:00Z</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-004-v1</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-STALE-AVAILDATE</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>staleness</dd></div>
+          </dl>
+        </li>
+
+        <li class="s4-card sev-warn" id="f-16">
+          <div class="s4-card-top">
+            <span class="s4-idx">16</span>
+            <p class="s4-plain">This row expired 2026-01-01T00:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z).</p>
+            <span class="s4-chip warn"><span class="cd"></span>warn</span>
+          </div>
+          <dl class="s4-receipts" aria-label="evidence">
+            <div class="s4-rc"><dt>claim</dt><dd>item-003-v3#expiration_date<span class="sub">acp-feed &middot; expiration_date = 2026-01-01T00:00:00Z</span></dd></div>
+            <div class="s4-rc"><dt>reference row</dt><dd>item-003-v3</dd></div>
+            <div class="s4-rc"><dt>rule / spec-clause</dt><dd>LST-STALE-EXPIRED</dd></div>
+            <div class="s4-rc"><dt>class</dt><dd>staleness</dd></div>
+          </dl>
+        </li>
+
+      </ol>
+    </section>
+
+  </div>
+
+  <footer class="s4-foot" aria-label="Method note">
+    <p>Every row above carries its four receipts &mdash; the claim, the catalog row it was checked against, the rule it broke, and how severe it is. No language model runs in this verifier &mdash; the comparison is exact, deterministic logic. Simulated prototype, run on demand &mdash; not a live service. Human-led, AI-assisted, professionally reviewed.</p>
+  </footer>
+
+</div>
+
+<div class="s4-sample-tag">DESIGN SAMPLE 4 / 5 &mdash; CONTROL ROOM</div>

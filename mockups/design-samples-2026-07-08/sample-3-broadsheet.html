@@ -1,0 +1,765 @@
+<title>Sample 3 — Broadsheet · Commerce Truth Audit</title>
+<!--
+  TOKEN PLAN — "THE BROADSHEET" (design sample 3/5)
+  Ground:   ~paper   #f7f8fa  cold near-white, slight blue-grey bias (NOT warm cream)
+  Ink:      ~ink     #16181d  near-black cool ink — headlines, decks, mono values
+  Body:     ~body    #33373f  reading-copy grey-ink (intro, running text)
+  Muted:    ~graphite#4a4f59  kickers, evidence labels, glosses, warn severity (7.7:1 on paper)
+  Hairline: ~rule    #d9dce3  the few deliberate rules (dateline foot, footer)
+  Accent:   ~oxblood #6e1423  THE one editorial accent — deep oxblood/maroon: correction band,
+                              FAIL flag, error severity marks (11:1 on paper)
+  Type roles: display/deck/body = Charter/'Iowan Old Style'/Georgia/Palatino serif
+              (headline clamp ~62px tight leading + text-wrap:balance; decks 22px;
+              intro 19px @ 65ch); all receipts/labels/dateline values = ui-monospace.
+  Layout: masthead-like header (kicker → thesis headline → intro → thick-thin nameplate
+  rule → 4-column meta-ledger dateline), then a FAIL pull-quote, then 16 findings as
+  numbered exhibits on a 150px folio rail (EXHIBIT n + severity mark) with the plain
+  line as a serif deck and a hanging-indent mono evidence block beneath. Rules are
+  concentrated at the masthead; whitespace (58px exhibit gaps) does the separating.
+-->
+<style>
+  .bs3-root {
+    --paper: #f7f8fa;
+    --ink: #16181d;
+    --body: #33373f;
+    --graphite: #4a4f59;
+    --rule: #d9dce3;
+    --oxblood: #6e1423;
+    --serif: Charter, "Iowan Old Style", Georgia, "Palatino Linotype", Palatino, "Times New Roman", serif;
+    --mono: ui-monospace, "SF Mono", Menlo, "Cascadia Mono", Consolas, monospace;
+    background: var(--paper);
+    color: var(--body);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 0;
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .bs3-root * {
+    box-sizing: border-box;
+  }
+
+  /* ---- correction-notice band: the SIMULATED label, unmissable ------------- */
+  .bs3-sim {
+    background: var(--oxblood);
+    color: var(--paper);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .bs3-sim-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 15px 48px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .bs3-sim-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    border: 1.5px solid var(--paper);
+    padding: 5px 10px;
+    flex: none;
+    margin-top: 2px;
+  }
+  .bs3-sim-text {
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.55;
+    max-width: 92ch;
+  }
+
+  /* ---- sheet ---------------------------------------------------------------- */
+  .bs3-sheet {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 48px 96px;
+  }
+
+  /* ---- masthead ------------------------------------------------------------- */
+  .bs3-kicker {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  .bs3-headline {
+    margin: 20px 0 0;
+    font-size: clamp(40px, 4.8vw, 62px);
+    line-height: 1.02;
+    letter-spacing: -0.014em;
+    font-weight: 700;
+    color: var(--ink);
+    text-wrap: balance;
+    max-width: 24ch;
+  }
+  .bs3-intro {
+    margin: 26px 0 0;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--body);
+    max-width: 65ch;
+  }
+
+  /* the nameplate rule: one deliberate thick-thin pair */
+  .bs3-mastrule {
+    margin-top: 38px;
+    border-top: 3px solid var(--ink);
+  }
+  .bs3-mastrule::after {
+    content: "";
+    display: block;
+    border-top: 1px solid var(--ink);
+    margin-top: 3px;
+  }
+
+  /* ---- dateline: the meta ledger as an edition line ------------------------- */
+  .bs3-dateline {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1.1fr 1.6fr 2fr 0.7fr;
+    gap: 0 36px;
+    padding: 16px 0 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .bs3-dcell dt {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  .bs3-dcell dd {
+    margin: 6px 0 0;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .bs3-gloss {
+    display: block;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--graphite);
+    margin-top: 2px;
+    overflow-wrap: normal;
+  }
+
+  /* ---- verdict: pull-quote weight ------------------------------------------- */
+  .bs3-verdict {
+    margin-top: 64px;
+  }
+  .bs3-verdict-rule {
+    width: 56px;
+    border-top: 3px solid var(--oxblood);
+    margin-bottom: 22px;
+  }
+  .bs3-verdict-line {
+    margin: 0;
+    font-size: clamp(34px, 3.6vw, 46px);
+    line-height: 1.05;
+    letter-spacing: -0.012em;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .bs3-verdict-flag {
+    color: var(--oxblood);
+  }
+  .bs3-verdict-tally {
+    margin: 14px 0 0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    color: var(--graphite);
+  }
+
+  /* ---- exhibits ------------------------------------------------------------- */
+  .bs3-exhibits {
+    list-style: none;
+    margin: 76px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 58px;
+  }
+  .bs3-exhibit {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 0 30px;
+  }
+  .bs3-rail {
+    padding-top: 5px;
+  }
+  .bs3-exlbl {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  .bs3-exno {
+    display: block;
+    margin-top: 6px;
+    font-size: 30px;
+    line-height: 1;
+    font-weight: 700;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .bs3-sev {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .bs3-sq {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .bs3-sev.error {
+    color: var(--oxblood);
+    font-weight: 700;
+  }
+  .bs3-sev.error .bs3-sq {
+    background: var(--oxblood);
+  }
+  .bs3-sev.warn {
+    color: var(--graphite);
+  }
+  .bs3-sev.warn .bs3-sq {
+    border: 1.5px solid var(--graphite);
+  }
+
+  .bs3-deck {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.35;
+    letter-spacing: -0.008em;
+    color: var(--ink);
+    max-width: 62ch;
+  }
+  /* hanging-indent evidence block: labels flush in a narrow column, values wrap
+     with the label column left hanging */
+  .bs3-evidence {
+    margin: 18px 0 0 30px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .bs3-erow {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 0 18px;
+  }
+  .bs3-erow dt {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    padding-top: 3px;
+  }
+  .bs3-erow dd {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .bs3-claimsub {
+    display: block;
+    font-size: 12px;
+    color: var(--graphite);
+  }
+
+  /* ---- colophon footer ------------------------------------------------------ */
+  .bs3-foot {
+    margin-top: 88px;
+    border-top: 1px solid var(--rule);
+    padding-top: 20px;
+  }
+  .bs3-foot p {
+    margin: 0;
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--graphite);
+    max-width: 78ch;
+  }
+
+  /* ---- sample identification tag -------------------------------------------- */
+  .bs3-sampletag {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 40;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--paper);
+    background: var(--ink);
+    padding: 7px 11px;
+  }
+
+  /* ---- responsive collapse (no horizontal scroll, ever) ---------------------- */
+  @media (max-width: 960px) {
+    .bs3-dateline {
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 32px;
+    }
+  }
+  @media (max-width: 860px) {
+    .bs3-sheet {
+      padding: 44px 24px 80px;
+    }
+    .bs3-sim-inner {
+      padding: 14px 24px;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .bs3-exhibit {
+      grid-template-columns: 1fr;
+      gap: 10px 0;
+    }
+    .bs3-rail {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding-top: 0;
+    }
+    .bs3-exno {
+      margin-top: 0;
+      font-size: 22px;
+    }
+    .bs3-sev {
+      margin-top: 0;
+    }
+    .bs3-evidence {
+      margin-left: 0;
+    }
+    .bs3-erow {
+      grid-template-columns: 128px minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .bs3-dateline {
+      grid-template-columns: 1fr;
+    }
+    .bs3-erow {
+      grid-template-columns: 1fr;
+      gap: 2px 0;
+    }
+  }
+
+  /* ---- print: a document someone files as evidence --------------------------- */
+  @media print {
+    .bs3-sampletag {
+      display: none;
+    }
+    .bs3-sheet {
+      max-width: none;
+      padding: 24px 0 48px;
+    }
+    .bs3-sim,
+    .bs3-verdict,
+    .bs3-dateline,
+    .bs3-exhibit,
+    .bs3-foot {
+      break-inside: avoid;
+    }
+    .bs3-exhibits {
+      gap: 36px;
+    }
+  }
+</style>
+
+<article class="bs3-root" lang="en">
+  <div class="bs3-sim" role="note">
+    <div class="bs3-sim-inner">
+      <span class="bs3-sim-tag">SIMULATED</span>
+      <span class="bs3-sim-text">Synthetic test data — an invented restaurant, invented menu, invented prices. Not real DoorDash / Square / Uber&nbsp;Eats / Grubhub data, access, or business impact. The verification rules and the pinned data-format standard are real; the restaurant, its menu, and its records are invented.</span>
+    </div>
+  </div>
+
+  <div class="bs3-sheet">
+    <header class="bs3-mast">
+      <p class="bs3-kicker">Verifier report · listings truth check</p>
+      <h1 class="bs3-headline">What the copy says vs. what the restaurant&rsquo;s records say</h1>
+      <p class="bs3-intro">A serving copy of a menu (what an AI shopping assistant would read) checked, line by line, against the restaurant&rsquo;s own system-of-record. Below is every difference the checker caught &mdash; each in plain words first, then the exact receipts. Deterministic and $0, with no AI calls in this verifier runtime: the same input always gives this same report.</p>
+
+      <div class="bs3-mastrule" aria-hidden="true"></div>
+
+      <dl class="bs3-dateline">
+        <div class="bs3-dcell">
+          <dt>surface</dt>
+          <dd>ACP static feed<span class="bs3-gloss">(OpenAI/Stripe product-feed shape)</span></dd>
+        </div>
+        <div class="bs3-dcell">
+          <dt>spec version</dt>
+          <dd>taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08</dd>
+        </div>
+        <div class="bs3-dcell">
+          <dt>matching mode</dt>
+          <dd>synthetic-controlled<span class="bs3-gloss">synthetic-controlled &mdash; the copy and the catalog share item IDs, so matching is exact (no entity resolution)</span></dd>
+        </div>
+        <div class="bs3-dcell">
+          <dt>data</dt>
+          <dd>simulated: true</dd>
+        </div>
+      </dl>
+    </header>
+
+    <section class="bs3-verdict" aria-label="verdict">
+      <div class="bs3-verdict-rule" aria-hidden="true"></div>
+      <p class="bs3-verdict-line"><span class="bs3-verdict-flag">FAIL</span> &mdash; 16 findings</p>
+      <p class="bs3-verdict-tally">11 error &middot; 5 warn &middot; 0 info</p>
+    </section>
+
+    <ol class="bs3-exhibits">
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">01</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">This item is hidden in the merchant&rsquo;s own catalog but is being served to customers.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-002-v2#existence<span class="bs3-claimsub">acp-feed &middot; existence = true</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-002-v2</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-AVAIL-HIDDEN-SHOWN</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>availability</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">02</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The copy says &quot;pre_order&quot; but the catalog state is in stock (expected &quot;in_stock&quot;).</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-004-v1#availability<span class="bs3-claimsub">acp-feed &middot; availability = pre_order</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-004-v1</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-AVAIL-STATE</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>availability</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">03</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The copy says &quot;in_stock&quot; but the catalog state is 86&rsquo;d/sold out (expected &quot;out_of_stock&quot;).</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-008-v1#availability<span class="bs3-claimsub">acp-feed &middot; availability = in_stock</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-008-v1</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-AVAIL-STATE</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>availability</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">04</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The row is checkout-eligible but not search-eligible &mdash; the extracted invariant requires checkout &#8658; search.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-002-v1#invariants<span class="bs3-claimsub">acp-feed &middot; invariants = {&quot;price&quot;:&quot;22.00&quot;,&quot;is_eligible_search&quot;:false,&quot;is_eligible_checkout&quot;:true}</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-002-v1</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-XF-CHECKOUT-SEARCH</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>cross-field-invariant</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">05</span>
+          <span class="bs3-sev warn"><span class="bs3-sq" aria-hidden="true"></span>warn</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The name is cut off on the serving copy: &quot;Margherita&hellip;&quot; vs the real &quot;Margherita Pizza (Medium)&quot;.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-005-v2#title<span class="bs3-claimsub">acp-feed &middot; title = Margherita&hellip;</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-005-v2</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-ENC-TRUNC</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>encoding</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">06</span>
+          <span class="bs3-sev warn"><span class="bs3-sq" aria-hidden="true"></span>warn</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The name is garbled by a text-encoding error: served &quot;JalapeÃ±o Poppers (Large)&quot; vs the real &quot;Jalape&ntilde;o Poppers (Large)&quot;.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-004-v3#title<span class="bs3-claimsub">acp-feed &middot; title = JalapeÃ±o Poppers (Large)</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-004-v3</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-ENC-UTF8</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>encoding</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">07</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The copy serves &quot;Phantom Platter (simulated ghost item)&quot; but no such item exists in the merchant&rsquo;s catalog.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>ghost-001#existence<span class="bs3-claimsub">acp-feed &middot; existence = true</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>catalog-meta</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-EXIST-GHOST</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>existence</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">08</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">&quot;Caf&eacute; Latte (Small)&quot; exists in the merchant&rsquo;s catalog but is missing from the serving copy.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-003-v1#existence<span class="bs3-claimsub">acp-feed &middot; existence = false</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-003-v1</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-EXIST-MISSING</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>existence</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">09</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The copy keys this row as &quot;legacy-pos-4471&quot; but the catalog row is &quot;item-003-v2&quot; &mdash; same item, mismatched identity (resolved by exact name).</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>legacy-pos-4471#existence<span class="bs3-claimsub">acp-feed &middot; existence = true</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-003-v2</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-IDENT-ID-MISMATCH</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>identity</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">10</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The variant label says &quot;Small&quot; but this row is the &quot;Medium&quot; variation &mdash; variants of this item can no longer be told apart.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-004-v2#variant_dict<span class="bs3-claimsub">acp-feed &middot; variant_dict = {&quot;group&quot;:&quot;item-004&quot;,&quot;dict&quot;:{&quot;variation&quot;:&quot;Small&quot;}}</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-004-v2</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-IDENT-MODIFIER-AMBIG</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>identity</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">11</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The price is serialized in cents (2150) where dollars are expected (21.50) &mdash; a 100&times; overstatement.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-001-v1#price.amount<span class="bs3-claimsub">acp-feed &middot; price.amount = 2150</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-001-v1</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-PRICE-CENTS-AS-DECIMAL</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>price</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">12</span>
+          <span class="bs3-sev warn"><span class="bs3-sq" aria-hidden="true"></span>warn</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The currency code is malformed: &quot;usd&quot; instead of ISO-4217 &quot;USD&quot;.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-001-v2#price.currency<span class="bs3-claimsub">acp-feed &middot; price.currency = usd</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-001-v2</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-PRICE-CURRENCY-FORM</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>price</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">13</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The sale price 28.50 is higher than the regular price 27.50 &mdash; a &quot;sale&quot; that costs more.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-001-v3#invariants<span class="bs3-claimsub">acp-feed &middot; invariants = {&quot;price&quot;:&quot;27.50&quot;,&quot;sale_price&quot;:&quot;28.50&quot;,&quot;is_eligible_search&quot;:true,&quot;is_eligible_checkout&quot;:true}</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-001-v3</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-PRICE-SALE-GT</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>price</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">14</span>
+          <span class="bs3-sev error"><span class="bs3-sq" aria-hidden="true"></span>error</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The served price 12.00 does not match the catalog price 10.00.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-006-v1#price.amount<span class="bs3-claimsub">acp-feed &middot; price.amount = 12.00</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-006-v1</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-PRICE-VALUE</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>price</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">15</span>
+          <span class="bs3-sev warn"><span class="bs3-sq" aria-hidden="true"></span>warn</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">The pre-order availability date 2026-02-01T00:00:00Z already passed (catalog as-of 2026-07-03T00:00:00Z) &mdash; the promise is stale.</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-004-v1#availability_date<span class="bs3-claimsub">acp-feed &middot; availability_date = 2026-02-01T00:00:00Z</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-004-v1</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-STALE-AVAILDATE</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>staleness</dd></div>
+          </dl>
+        </div>
+      </li>
+
+      <li class="bs3-exhibit">
+        <div class="bs3-rail">
+          <span class="bs3-exlbl">Exhibit</span>
+          <span class="bs3-exno">16</span>
+          <span class="bs3-sev warn"><span class="bs3-sq" aria-hidden="true"></span>warn</span>
+        </div>
+        <div class="bs3-body">
+          <p class="bs3-deck">This row expired 2026-01-01T00:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z).</p>
+          <dl class="bs3-evidence" aria-label="evidence">
+            <div class="bs3-erow">
+              <dt>claim</dt>
+              <dd>item-003-v3#expiration_date<span class="bs3-claimsub">acp-feed &middot; expiration_date = 2026-01-01T00:00:00Z</span></dd>
+            </div>
+            <div class="bs3-erow"><dt>reference row</dt><dd>item-003-v3</dd></div>
+            <div class="bs3-erow"><dt>rule / spec-clause</dt><dd>LST-STALE-EXPIRED</dd></div>
+            <div class="bs3-erow"><dt>class</dt><dd>staleness</dd></div>
+          </dl>
+        </div>
+      </li>
+    </ol>
+
+    <footer class="bs3-foot">
+      <p>Every row above carries its four receipts &mdash; the claim, the catalog row it was checked against, the rule it broke, and how severe it is. No language model runs in this verifier &mdash; the comparison is exact, deterministic logic. Simulated prototype, run on demand &mdash; not a live service. Human-led, AI-assisted, professionally reviewed.</p>
+    </footer>
+  </div>
+
+  <div class="bs3-sampletag" aria-hidden="true">DESIGN SAMPLE 3 / 5 &mdash; BROADSHEET</div>
+</article>

@@ -1,0 +1,810 @@
+<!--
+  TOKEN PLAN — DESIGN SAMPLE 1 / 5 "THE LEDGER" (Swiss/International-Typographic audit certificate)
+
+  Named values (6 core):
+    - -/-paper      #F9F9F6  ground (paper white, faintly warm)
+    - -/-ink        #101014  near-black ink: text, the banner ground, hard rules
+    - -/-body       #33333B  long-form body text
+    - -/-graphite   #50505A  labels, rail captions, secondary mono
+    - -/-hairline   #DCDCD4  the modular-grid rules (1px, everywhere)
+    - -/-um         #1B3EB8  ultramarine — the ONE accent: SIMULATED tag block, the 4px masthead
+                             rule, finding index numerals. Never used on severity.
+    Semantic severity (marks + severity word ONLY, kept apart from the accent):
+      error #A8231B · warn #8A5A06 · info #55555E
+
+  Type roles:
+    - Display: "Helvetica Neue"/Arial grotesk, 800, tight tracking (headline, FAIL flag, numerals)
+    - Body:    same grotesk at 13.5–16px
+    - Receipts/ids/meta values: ui-monospace with tabular-nums, always mono for rules/ids
+
+  Layout concept (two sentences): A formal certificate of examination on a two-column modular
+  grid — a 184px caption rail against one continuous hairline divider, every block flush-left,
+  findings numbered 01–16 because the fixture is an ordered list, severity encoded typographically
+  (weight + a 9px square) and receipts held in four hairline-separated mono columns. No radii, no
+  shadows, no gradients — the precision of the rules and spacing IS the design.
+-->
+<title>Sample 1 — Ledger · Commerce Truth Audit</title>
+<style>
+  body { margin: 0; background: #F9F9F6; }
+
+  .s1 {
+    --paper: #F9F9F6;
+    --ink: #101014;
+    --body: #33333B;
+    --graphite: #50505A;
+    --hairline: #DCDCD4;
+    --um: #1B3EB8;
+    --sev-err: #A8231B;
+    --sev-warn: #8A5A06;
+    --sev-info: #55555E;
+    --sans: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    background: var(--paper);
+    color: var(--body);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.55;
+    padding: 48px 64px 150px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .s1, .s1 * { box-sizing: border-box; }
+  .s1 .doc { max-width: 1180px; margin: 0 auto; }
+
+  /* ---- SIMULATED banner — solid ink band, unmissable, first thing on the page ---- */
+  .s1 .sim {
+    display: flex;
+    align-items: flex-start;
+    gap: 22px;
+    background: var(--ink);
+    color: #F4F4EF;
+    padding: 20px 24px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .s1 .sim-tag {
+    flex: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #FFFFFF;
+    background: var(--um);
+    padding: 7px 12px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .s1 .sim-text {
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    max-width: 92ch;
+  }
+
+  /* ---- masthead — flush-left, closed by the single 4px ultramarine rule ---- */
+  .s1 .head { padding: 44px 0 32px; border-bottom: 4px solid var(--um); }
+  .s1 .eyebrow {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  .s1 .title {
+    margin: 16px 0 0;
+    font-size: clamp(34px, 4.4vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+    color: var(--ink);
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+  .s1 .intro {
+    margin: 22px 0 0;
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--body);
+    max-width: 68ch;
+  }
+
+  /* ---- the modular-grid armature: 184px caption rail | one continuous hairline | content ---- */
+  .s1 .sec {
+    display: grid;
+    grid-template-columns: 184px minmax(0, 1fr);
+    border-top: 1px solid var(--hairline);
+  }
+  .s1 .head + .sec { border-top: none; }
+  .s1 .rail {
+    margin: 0;
+    padding: 30px 20px 30px 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  .s1 .body-col {
+    min-width: 0;
+    border-left: 1px solid var(--hairline);
+    padding: 30px 0 34px 40px;
+  }
+
+  /* ---- verdict — the flag is typographic, the tally wears the severity squares ---- */
+  .s1 .v-row { display: flex; align-items: baseline; gap: 26px; flex-wrap: wrap; }
+  .s1 .v-flag {
+    font-size: clamp(56px, 7vw, 84px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    color: var(--ink);
+  }
+  .s1 .v-count {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .s1 .v-tally {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+    padding-top: 14px;
+    border-top: 1px solid var(--hairline);
+  }
+  .s1 .t-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 12.5px;
+  }
+  .s1 .t-cell.err { color: var(--sev-err); font-weight: 700; }
+  .s1 .t-cell.warn { color: var(--sev-warn); font-weight: 500; }
+  .s1 .t-cell.info { color: var(--sev-info); font-weight: 400; }
+  .s1 .sq {
+    width: 9px;
+    height: 9px;
+    flex: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .s1 .sq.err { background: var(--sev-err); }
+  .s1 .sq.warn { background: var(--sev-warn); }
+  .s1 .sq.info { background: var(--sev-info); }
+
+  /* ---- meta ledger ---- */
+  .s1 .meta { margin: 0; }
+  .s1 .m-row {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 24px;
+    padding: 12px 0;
+    border-top: 1px solid var(--hairline);
+  }
+  .s1 .m-row:first-child { border-top: none; padding-top: 0; }
+  .s1 .m-row:last-child { padding-bottom: 0; }
+  .s1 .m-row dt {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  .s1 .m-row dd { margin: 0; font-size: 13.5px; color: var(--ink); min-width: 0; }
+  .s1 .mono {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 12.5px;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .s1 .sub { display: block; font-size: 12.5px; line-height: 1.55; color: var(--graphite); margin-top: 3px; }
+  .s1 .msub {
+    display: block;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--graphite);
+    margin-top: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---- findings — numbered rows: plain line leads, four ruled mono receipt columns follow ---- */
+  .s1 .findings { list-style: none; margin: 0; padding: 0; }
+  .s1 .f { padding: 22px 0 24px; border-top: 1px solid var(--hairline); }
+  .s1 .f:first-child { border-top: none; padding-top: 0; }
+  .s1 .f-lead {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    column-gap: 18px;
+    align-items: baseline;
+  }
+  .s1 .f-no {
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--um);
+  }
+  .s1 .f-plain {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.45;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+    max-width: 74ch;
+  }
+  .s1 .f-sev {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .s1 .f-sev.error { color: var(--sev-err); font-weight: 700; }
+  .s1 .f-sev.warn { color: var(--sev-warn); font-weight: 500; }
+  .s1 .receipts {
+    display: grid;
+    grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 0.9fr);
+    margin: 16px 0 0 74px;
+    border-top: 1px solid var(--hairline);
+  }
+  .s1 .rc { min-width: 0; padding: 11px 18px 0 0; }
+  .s1 .rc + .rc { border-left: 1px solid var(--hairline); padding-left: 18px; }
+  .s1 .rc dt {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    margin: 0 0 5px;
+  }
+  .s1 .rc dd { margin: 0; }
+
+  /* ---- footer — honesty paragraph on the same armature (rail left empty) ---- */
+  .s1 .foot .body-col { padding-bottom: 0; }
+  .s1 .foot p {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--graphite);
+    max-width: 78ch;
+  }
+
+  /* ---- fixed sample tag ---- */
+  .s1 .sample-tag {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 7px 11px;
+  }
+
+  @media print {
+    .s1 .sample-tag { display: none; }
+    .s1 { padding: 0; }
+  }
+
+  /* ---- collapse below the desktop measure — grid discipline folds to one column ---- */
+  @media (max-width: 900px) {
+    .s1 { padding: 24px 20px 120px; }
+    .s1 .sec { grid-template-columns: 1fr; }
+    .s1 .rail { padding: 24px 0 0; }
+    .s1 .body-col { border-left: none; padding: 16px 0 28px; }
+    .s1 .f-lead { grid-template-columns: 44px minmax(0, 1fr); }
+    .s1 .f-sev { grid-column: 2; justify-self: start; margin-top: 8px; }
+    .s1 .receipts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-left: 0; }
+    .s1 .rc { padding-top: 12px; }
+    .s1 .rc:nth-child(odd) { border-left: none; padding-left: 0; }
+    .s1 .sim { flex-direction: column; gap: 12px; }
+  }
+  @media (max-width: 560px) {
+    .s1 .receipts { grid-template-columns: 1fr; }
+    .s1 .rc + .rc { border-left: none; padding-left: 0; }
+    .s1 .m-row { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+<main class="s1" id="report">
+  <div class="doc">
+
+    <div class="sim" role="note">
+      <span class="sim-tag">SIMULATED</span>
+      <p class="sim-text">Synthetic test data &mdash; an invented restaurant, invented menu, invented prices. Not real DoorDash / Square / Uber&nbsp;Eats / Grubhub data, access, or business impact. The verification rules and the pinned data-format standard are real; the restaurant, its menu, and its records are invented.</p>
+    </div>
+
+    <header class="head">
+      <p class="eyebrow">Verifier report &middot; listings truth check</p>
+      <h1 class="title">What the copy says vs. what the restaurant&rsquo;s records say</h1>
+      <p class="intro">A serving copy of a menu (what an AI shopping assistant would read) checked, line by line, against the restaurant&rsquo;s own system-of-record. Below is every difference the checker caught &mdash; each in plain words first, then the exact receipts. Deterministic and $0, with no AI calls in this verifier runtime: the same input always gives this same report.</p>
+    </header>
+
+    <section class="sec" aria-labelledby="s1-verdict">
+      <h2 class="rail" id="s1-verdict">Verdict</h2>
+      <div class="body-col">
+        <div class="v-row">
+          <span class="v-flag">FAIL</span>
+          <span class="v-count">16 findings</span>
+        </div>
+        <div class="v-tally">
+          <span class="t-cell err"><span class="sq err" aria-hidden="true"></span>11 error</span>
+          <span class="t-cell warn"><span class="sq warn" aria-hidden="true"></span>5 warn</span>
+          <span class="t-cell info"><span class="sq info" aria-hidden="true"></span>0 info</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="s1-meta">
+      <h2 class="rail" id="s1-meta">Meta</h2>
+      <div class="body-col">
+        <dl class="meta">
+          <div class="m-row">
+            <dt>surface</dt>
+            <dd>ACP static feed <span class="sub">(OpenAI/Stripe product-feed shape)</span></dd>
+          </div>
+          <div class="m-row">
+            <dt>spec version</dt>
+            <dd><span class="mono">taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08</span></dd>
+          </div>
+          <div class="m-row">
+            <dt>matching mode</dt>
+            <dd><span class="mono">synthetic-controlled</span><span class="sub">synthetic-controlled &mdash; the copy and the catalog share item IDs, so matching is exact (no entity resolution)</span></dd>
+          </div>
+          <div class="m-row">
+            <dt>data</dt>
+            <dd><span class="mono">simulated: true</span></dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="s1-findings">
+      <h2 class="rail" id="s1-findings">Findings</h2>
+      <div class="body-col">
+        <ol class="findings">
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">01</span>
+              <p class="f-plain">This item is hidden in the merchant's own catalog but is being served to customers.</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-002-v2#existence</span><span class="msub">acp-feed &middot; existence = true</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-002-v2</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-AVAIL-HIDDEN-SHOWN</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">availability</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">02</span>
+              <p class="f-plain">The copy says "pre_order" but the catalog state is in stock (expected "in_stock").</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-004-v1#availability</span><span class="msub">acp-feed &middot; availability = pre_order</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-004-v1</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-AVAIL-STATE</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">availability</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">03</span>
+              <p class="f-plain">The copy says "in_stock" but the catalog state is 86'd/sold out (expected "out_of_stock").</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-008-v1#availability</span><span class="msub">acp-feed &middot; availability = in_stock</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-008-v1</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-AVAIL-STATE</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">availability</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">04</span>
+              <p class="f-plain">The row is checkout-eligible but not search-eligible &mdash; the extracted invariant requires checkout &#8658; search.</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-002-v1#invariants</span><span class="msub">acp-feed &middot; invariants = {"price":"22.00","is_eligible_search":false,"is_eligible_checkout":true}</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-002-v1</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-XF-CHECKOUT-SEARCH</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">cross-field-invariant</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">05</span>
+              <p class="f-plain">The name is cut off on the serving copy: "Margherita&#8230;" vs the real "Margherita Pizza (Medium)".</p>
+              <span class="f-sev warn"><span class="sq warn" aria-hidden="true"></span>warn</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-005-v2#title</span><span class="msub">acp-feed &middot; title = Margherita&#8230;</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-005-v2</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-ENC-TRUNC</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">encoding</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">06</span>
+              <p class="f-plain">The name is garbled by a text-encoding error: served "Jalape&Atilde;&plusmn;o Poppers (Large)" vs the real "Jalape&ntilde;o Poppers (Large)".</p>
+              <span class="f-sev warn"><span class="sq warn" aria-hidden="true"></span>warn</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-004-v3#title</span><span class="msub">acp-feed &middot; title = Jalape&Atilde;&plusmn;o Poppers (Large)</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-004-v3</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-ENC-UTF8</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">encoding</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">07</span>
+              <p class="f-plain">The copy serves "Phantom Platter (simulated ghost item)" but no such item exists in the merchant's catalog.</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">ghost-001#existence</span><span class="msub">acp-feed &middot; existence = true</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">catalog-meta</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-EXIST-GHOST</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">existence</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">08</span>
+              <p class="f-plain">"Caf&eacute; Latte (Small)" exists in the merchant's catalog but is missing from the serving copy.</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-003-v1#existence</span><span class="msub">acp-feed &middot; existence = false</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-003-v1</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-EXIST-MISSING</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">existence</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">09</span>
+              <p class="f-plain">The copy keys this row as "legacy-pos-4471" but the catalog row is "item-003-v2" &mdash; same item, mismatched identity (resolved by exact name).</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">legacy-pos-4471#existence</span><span class="msub">acp-feed &middot; existence = true</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-003-v2</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-IDENT-ID-MISMATCH</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">identity</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">10</span>
+              <p class="f-plain">The variant label says "Small" but this row is the "Medium" variation &mdash; variants of this item can no longer be told apart.</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-004-v2#variant_dict</span><span class="msub">acp-feed &middot; variant_dict = {"group":"item-004","dict":{"variation":"Small"}}</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-004-v2</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-IDENT-MODIFIER-AMBIG</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">identity</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">11</span>
+              <p class="f-plain">The price is serialized in cents (2150) where dollars are expected (21.50) &mdash; a 100&times; overstatement.</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-001-v1#price.amount</span><span class="msub">acp-feed &middot; price.amount = 2150</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-001-v1</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-PRICE-CENTS-AS-DECIMAL</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">price</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">12</span>
+              <p class="f-plain">The currency code is malformed: "usd" instead of ISO-4217 "USD".</p>
+              <span class="f-sev warn"><span class="sq warn" aria-hidden="true"></span>warn</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-001-v2#price.currency</span><span class="msub">acp-feed &middot; price.currency = usd</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-001-v2</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-PRICE-CURRENCY-FORM</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">price</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">13</span>
+              <p class="f-plain">The sale price 28.50 is higher than the regular price 27.50 &mdash; a "sale" that costs more.</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-001-v3#invariants</span><span class="msub">acp-feed &middot; invariants = {"price":"27.50","sale_price":"28.50","is_eligible_search":true,"is_eligible_checkout":true}</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-001-v3</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-PRICE-SALE-GT</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">price</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">14</span>
+              <p class="f-plain">The served price 12.00 does not match the catalog price 10.00.</p>
+              <span class="f-sev error"><span class="sq err" aria-hidden="true"></span>error</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-006-v1#price.amount</span><span class="msub">acp-feed &middot; price.amount = 12.00</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-006-v1</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-PRICE-VALUE</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">price</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">15</span>
+              <p class="f-plain">The pre-order availability date 2026-02-01T00:00:00Z already passed (catalog as-of 2026-07-03T00:00:00Z) &mdash; the promise is stale.</p>
+              <span class="f-sev warn"><span class="sq warn" aria-hidden="true"></span>warn</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-004-v1#availability_date</span><span class="msub">acp-feed &middot; availability_date = 2026-02-01T00:00:00Z</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-004-v1</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-STALE-AVAILDATE</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">staleness</span></dd>
+              </div>
+            </dl>
+          </li>
+
+          <li class="f">
+            <div class="f-lead">
+              <span class="f-no" aria-hidden="true">16</span>
+              <p class="f-plain">This row expired 2026-01-01T00:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z).</p>
+              <span class="f-sev warn"><span class="sq warn" aria-hidden="true"></span>warn</span>
+            </div>
+            <dl class="receipts" aria-label="evidence">
+              <div class="rc">
+                <dt>claim</dt>
+                <dd><span class="mono">item-003-v3#expiration_date</span><span class="msub">acp-feed &middot; expiration_date = 2026-01-01T00:00:00Z</span></dd>
+              </div>
+              <div class="rc">
+                <dt>reference row</dt>
+                <dd><span class="mono">item-003-v3</span></dd>
+              </div>
+              <div class="rc">
+                <dt>rule / spec-clause</dt>
+                <dd><span class="mono">LST-STALE-EXPIRED</span></dd>
+              </div>
+              <div class="rc">
+                <dt>class</dt>
+                <dd><span class="mono">staleness</span></dd>
+              </div>
+            </dl>
+          </li>
+
+        </ol>
+      </div>
+    </section>
+
+    <footer class="sec foot">
+      <div class="rail" aria-hidden="true"></div>
+      <div class="body-col">
+        <p>Every row above carries its four receipts &mdash; the claim, the catalog row it was checked against, the rule it broke, and how severe it is. No language model runs in this verifier &mdash; the comparison is exact, deterministic logic. Simulated prototype, run on demand &mdash; not a live service. Human-led, AI-assisted, professionally reviewed.</p>
+      </div>
+    </footer>
+
+  </div>
+  <span class="sample-tag" aria-hidden="true">DESIGN SAMPLE 1 / 5 &mdash; LEDGER</span>
+</main>
