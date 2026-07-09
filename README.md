@@ -1,4 +1,4 @@
-# Commerce Truth Audit
+# Curbside Commons
 
 **An independent, deterministic verifier for agentic commerce: it checks what delivery platforms and AI-agent surfaces *say* about a merchant against the merchant's own system of record, and audits fee statements against codified law. The truth layer for agentic commerce.**
 
@@ -39,7 +39,7 @@ Zero network and zero LLM calls on every CLI path — enforced structurally by a
 
 | Surface | Status |
 | --- | --- |
-| Test suite | `npm run verify` green: **743 passed + 6 skipped** (the skips are live-network harnesses, off by default) |
+| Test suite | `npm run verify` green: **947 passed + 6 skipped** (the skips are live-network harnesses, off by default; count re-measured live 2026-07-08) |
 | Listings drift taxonomy (8 classes) | **8/8 injected and caught, measured** by the C6 coverage eval; never an "all edge cases" claim |
 | Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
 | Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |
