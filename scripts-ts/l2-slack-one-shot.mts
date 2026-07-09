@@ -36,17 +36,28 @@ if (!webhook) {
   console.error("L-2: SLACK_WEBHOOK_URL is not set — the demo is NOT armed. Add it to .env (owner act) and re-run.");
   process.exit(2);
 }
-let host = "";
+let url: URL;
 try {
-  host = new URL(webhook).host;
+  url = new URL(webhook);
 } catch {
   console.error("L-2: SLACK_WEBHOOK_URL is not a valid URL — refusing to send.");
   process.exit(2);
 }
-if (host !== "hooks.slack.com") {
-  console.error(`L-2: webhook host "${host}" is not hooks.slack.com — refusing to send (allowlist control #2).`);
+// Allowlist (control #2), hardened per the Codex 2026-07-09 P1: https only, exact
+// Slack webhook host, AND the /services/ webhook path shape — anything else refuses.
+if (url.protocol !== "https:") {
+  console.error(`L-2: webhook protocol "${url.protocol}" is not https: — refusing to send.`);
   process.exit(2);
 }
+if (url.host !== "hooks.slack.com") {
+  console.error(`L-2: webhook host "${url.host}" is not hooks.slack.com — refusing to send (allowlist control #2).`);
+  process.exit(2);
+}
+if (!url.pathname.startsWith("/services/")) {
+  console.error("L-2: webhook path is not a Slack /services/ incoming-webhook path — refusing to send.");
+  process.exit(2);
+}
+const host = url.host;
 
 // The demo payload: the REAL engine's audit of the committed drifted statement —
 // the same canonical → Block Kit path the byte-frozen goldens lock (evals/delivery/).
@@ -60,6 +71,21 @@ const serialized = serializeSlackPayload(payload);
 const payloadSha256 = createHash("sha256").update(serialized).digest("hex");
 
 const startedAt = new Date().toISOString();
+
+// Control #6 hardened per the Codex 2026-07-09 P1: the run record path is PROBED
+// with an ARMED/pending record BEFORE the irreversible send (the 2026-07-05
+// probe-write-before-spend lesson), and the filename carries the full timestamp so
+// a same-day re-arming can never overwrite a prior record.
+const recordPath = join(
+  "docs",
+  "reviews",
+  `l2-slack-one-shot-${startedAt.replace(/[:.]/g, "-")}.md`,
+);
+writeFileSync(
+  recordPath,
+  `# L-2 One-Shot Slack Delivery Demo — ARMED ${startedAt} (send in progress; this probe line is replaced by the outcome record)\n`,
+);
+
 let status = 0;
 let statusText = "";
 let bodyText = "";
@@ -69,6 +95,9 @@ try {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text: payload.text, blocks: payload.blocks }),
+    // One-shot means ONE destination: any redirect (301/302/307/308) aborts the
+    // send rather than replaying the POST elsewhere (Codex 2026-07-09 P1).
+    redirect: "error",
   });
   status = res.status;
   statusText = res.statusText;
@@ -98,8 +127,7 @@ const record = `# L-2 One-Shot Slack Delivery Demo — Run Record (${startedAt})
 
 One message, one send, session over (control #1/#3). No secret appears in this record or any log.
 `;
-const recordPath = join("docs", "reviews", `l2-slack-one-shot-${startedAt.slice(0, 10)}.md`);
-writeFileSync(recordPath, record);
+writeFileSync(recordPath, record); // replaces the pre-send ARMED probe with the outcome
 
 console.log(`L-2 ${ok ? "DELIVERED" : "FAILED"} — HTTP ${failure ? `(transport: ${failure})` : `${status} ${statusText}`}; payload sha256 ${payloadSha256.slice(0, 16)}…; record ${recordPath}`);
 process.exit(ok ? 0 : 1);
