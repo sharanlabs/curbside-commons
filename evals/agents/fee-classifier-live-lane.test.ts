@@ -8,6 +8,7 @@ import {
 } from "@/lib/agents/fee-classifier";
 import { DeterministicBaselineClassifier, TRUE_CATEGORY_LABELS, type ClassifierInput } from "@/lib/packs/fees";
 import { FEE_LINES_GOLD } from "@/evals/gold/fee-lines-gold";
+import { FEE_LINES_GOLD_RETRY } from "@/evals/gold/fee-lines-gold-retry";
 
 /**
  * OFFLINE tests for the live fee-classifier lane (`lib/agents/fee-classifier.ts`,
@@ -54,7 +55,7 @@ describe("fee-classifier live lane — schema drift-lock", () => {
 
 describe("fee-classifier live lane — leak-free prompt (C8) over the whole gold set", () => {
   it("no prompt contains the answer-key field name, the gold rationale, or the §7 stratum name", () => {
-    for (const item of FEE_LINES_GOLD) {
+    for (const item of [...FEE_LINES_GOLD, ...FEE_LINES_GOLD_RETRY]) {
       const prompt = buildFeeClassifierPrompt(item.input);
       // The line's FACE must be present (it is the data under audit)…
       expect(prompt, item.id).toContain(item.input.label);
