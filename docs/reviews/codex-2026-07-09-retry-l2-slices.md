@@ -15,3 +15,7 @@
 **Claims verified by the reviewer (its own recomputation):** (a) no-rigged-exam CONFIRMED — retry split structure + 19/21 baseline + the two analogue misses recomputed independently; (b) pre-registration integrity CONFIRMED via git diff (only below the RESULTS marker changed); (c) lock integrity CONFIRMED (recomputes from records; scored ids ≡ committed split; old snapshot/lock byte-clean across the range); (d) label-flip honesty mostly confirmed (C10 unexecutable in its sandbox — EPERM on Vite temp dirs — but the gate ran green in ours, twice); (f) provenance caveat judged "not disqualifying" with the recorded mitigations — "not an independent blind benchmark," which the status doc already states.
 
 **Post-fix gates:** refusal red-team 4/4 · verify + legacy re-run green (counts in the fix commit).
+
+---
+
+**CONFIRMING PASS (2026-07-09, narrow, mapped): CONFIRM-ALL** — all three findings discharged at `72b5692`; the reviewer additionally spot-checked the state-doc claims against the frozen snapshot (21/21, macro P 1.0, κ 1.0, flip 1/21, 0 degraded — all matched) and the commit ordering (`f5a051c` pre-reg strictly before `90e6fd3` results). Raw: `codex-2026-07-09-retry-l2-slices-confirm-raw.md`. **The Codex gate over the recalibration + L-2-staging slices is CLOSED: SHIP.**
