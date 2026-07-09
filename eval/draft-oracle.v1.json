@@ -1,5 +1,5 @@
 {
-  "_oracle": "Python v1 STUB draft text, extracted from out/model_runs.csv (generator=stub). Locks the TS makeDraft text port byte-for-byte. Regenerate: python3 the extractor in evals/draft-oracle.test.ts header.",
+  "_oracle": "Python v1 STUB draft text, extracted from the Python v1 model_runs.csv (generator=stub; now at legacy/activation/oracle/model_runs.csv — relocated 2026-07-08). Locks the TS makeDraft text port byte-for-byte. Regenerate: python3 the extractor in evals/draft-oracle.test.ts header.",
   "platform": "DoorDash",
   "rows": {
     "M001": {

@@ -2,8 +2,9 @@
  * Draft-text differential — the TS makeDraft must reproduce the Python v1 STUB draft text
  * byte-for-byte. Extends the core differential (which locked the 32 merchant-entity columns) to
  * the draft layer (evals-specialist finding: the draft oracle existed in out/model_runs.csv but
- * was never differentially checked). The oracle JSON was extracted from out/model_runs.csv:
- *   python3 -c "import csv,json; rows={}; [rows.__setitem__(r['merchant_id'], {k:json.loads(r['output_json']).get(k) for k in ['draft_subject','draft_body','risk_explanation','blocker_summary','next_best_action']} | {'guardrail_flags': r['guardrail_flags'].split(';') if r['guardrail_flags'] else []}) for r in csv.DictReader(open('out/model_runs.csv')) if r['generator']=='stub']; json.dump({'rows':rows}, open('eval/draft-oracle.v1.json','w'), indent=2)"
+ * was never differentially checked — it lived at out/model_runs.csv then; relocated to
+ * legacy/activation/oracle/ 2026-07-08). The oracle JSON is regenerated from that CSV with:
+ *   python3 -c "import csv,json; rows={}; [rows.__setitem__(r['merchant_id'], {k:json.loads(r['output_json']).get(k) for k in ['draft_subject','draft_body','risk_explanation','blocker_summary','next_best_action']} | {'guardrail_flags': r['guardrail_flags'].split(';') if r['guardrail_flags'] else []}) for r in csv.DictReader(open('legacy/activation/oracle/model_runs.csv')) if r['generator']=='stub']; json.dump({'rows':rows}, open('eval/draft-oracle.v1.json','w'), indent=2)"
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -27,7 +28,7 @@ interface OracleDraft {
 const oracleRows = (oracle as { rows: Record<string, OracleDraft> }).rows;
 
 // Reconstruct the golden merchants the same way the core differential does.
-const csv = readFileSync(join(process.cwd(), "out", "merchants_v1.csv"), "utf8").trim();
+const csv = readFileSync(join(process.cwd(), "legacy", "activation", "oracle", "merchants_v1.csv"), "utf8").trim();
 const lines = csv.split(/\r?\n/);
 const header = lines[0].split(",");
 const inputs: MerchantInput[] = lines.slice(1).map((line) => {
@@ -45,7 +46,7 @@ const inputs: MerchantInput[] = lines.slice(1).map((line) => {
 });
 const { merchants } = runCore(inputs, {}, REFERENCE_PLATFORM_NAME);
 
-describe("draft-text differential — TS makeDraft vs the Python stub oracle (out/model_runs.csv)", () => {
+describe("draft-text differential — TS makeDraft vs the Python stub oracle (legacy/activation/oracle/model_runs.csv)", () => {
   it("locks 20 oracle draft rows", () => {
     expect(merchants.length).toBe(20);
     expect(Object.keys(oracleRows).length).toBe(20);

@@ -8,7 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_CSV = REPO_ROOT / "legacy" / "activation" / "merchant-directory.dummy.csv"
-DEFAULT_OUT_DIR = REPO_ROOT / "out"
+DEFAULT_OUT_DIR = REPO_ROOT / "legacy" / "activation" / "oracle"
 
 # Fixed reference points (no wall-clock; owner may change the as-of date).
 AS_OF_DATE = "2026-06-01"

@@ -1,6 +1,6 @@
 /**
  * Differential test: the TypeScript deterministic core must reproduce the Python
- * prototype's output byte-for-byte. The oracle is out/merchants_v1.csv (the
+ * prototype's output byte-for-byte. The oracle is legacy/activation/oracle/merchants_v1.csv (the
  * committed canonical run of scripts/pipeline.py). This is the Phase A gate and
  * the slice's deterministic-layer proof.
  */
@@ -19,7 +19,7 @@ function fmt(v: unknown): string {
   return String(v);
 }
 
-const csv = readFileSync(join(process.cwd(), "out", "merchants_v1.csv"), "utf8").trim();
+const csv = readFileSync(join(process.cwd(), "legacy", "activation", "oracle", "merchants_v1.csv"), "utf8").trim();
 // Python's csv module writes \r\n line terminators; split on either so the last
 // field/header doesn't keep a trailing \r.
 const lines = csv.split(/\r?\n/);
@@ -43,7 +43,7 @@ const inputs: MerchantInput[] = oracleRows.map((r) => ({
 // approvals={} and the reference platform name reproduce the canonical Python run.
 const { merchants } = runCore(inputs, {}, REFERENCE_PLATFORM_NAME);
 
-describe("deterministic core — differential vs the Python oracle (out/merchants_v1.csv)", () => {
+describe("deterministic core — differential vs the Python oracle (legacy/activation/oracle/merchants_v1.csv)", () => {
   it("parses 20 oracle rows with the expected header", () => {
     expect(header).toEqual([...MERCHANT_COLUMNS]);
     expect(oracleRows.length).toBe(20);

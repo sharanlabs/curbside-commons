@@ -1,7 +1,9 @@
-# `out/` — frozen Python v1 oracle (internal; NOT the product, NOT served)
+# `legacy/activation/oracle/` — frozen Python v1 oracle (internal; NOT the product, NOT served)
+
+> Relocated from `out/` on 2026-07-08 (content byte-identical, `git mv`): `out/` became the Next.js static-export build output for the deploy lane (`docs/plan-deploy.md`), so the oracle moved into the legacy module it belongs to. `scripts/config.py` `DEFAULT_OUT_DIR` and the three differential tests point here now.
 
 These CSVs are the committed, frozen output of the original **Python v1 prototype** (`scripts/pipeline.py`), kept only as the **differential oracle**: the TypeScript deterministic core is pinned **byte-for-byte** to `merchants_v1.csv` + `model_runs.csv` by `evals/core-differential.test.ts` and `evals/draft-oracle.test.ts`. They are read at **test time only** — never at build or runtime, never web-served (not in `public/`; excluded from the Vercel upload by `.vercelignore`). They cannot be removed without breaking the differential test.
 
 **The "DoorDash" strings here are NOT a claim of affiliation.** "DoorDash" is the Python oracle's reference platform name (`REFERENCE_PLATFORM_NAME`) that the deterministic core is pinned against for the byte-for-byte differential; the **product** renders a de-branded name ("Curbside Commons"). All data here is **synthetic** — invented business names (e.g. "Maria's Tacos"), `@example.com` contacts flagged `contact_is_synthetic=true` — with **no real businesses, no PII, and no real DoorDash data, access, or impact**.
 
-Not affiliated with, endorsed by, or connected to DoorDash or any marketplace. See [`../RULES.md`](../RULES.md) (honesty) and [`../lib/data/PROVENANCE.md`](../lib/data/PROVENANCE.md). For a **public GitHub** push, either keep the repo private or treat this folder as the labeled internal reference bundle it is.
+Not affiliated with, endorsed by, or connected to DoorDash or any marketplace. See [`../../../RULES.md`](../../../RULES.md) (honesty) and [`../lib/data/PROVENANCE.md`](../lib/data/PROVENANCE.md). For a **public GitHub** push, either keep the repo private or treat this folder as the labeled internal reference bundle it is.

@@ -7,7 +7,7 @@
  *   the A1 tool wrappers swapped in (triage_merchant + simulate_send), with core makeDraft /
  *   runGuardrail / validateDraft used as connective tissue in the TEST (the same functions runCore
  *   calls — this does NOT promote the Drafter to an A1 tool). Assert the result equals the Python
- *   oracle out/merchants_v1.csv BYTE-FOR-BYTE across every MERCHANT_COLUMNS column (same fmt() as
+ *   oracle legacy/activation/oracle/merchants_v1.csv BYTE-FOR-BYTE across every MERCHANT_COLUMNS column (same fmt() as
  *   evals/core-differential.test.ts) + the 20 / 8 high / 12 sent / 8 drafted / 0 rejected aggregates.
  *
  *   Class B (wrapper-identity, R-TOOL-6) — for diagnose_blocker / check_faithfulness_forward /
@@ -57,7 +57,7 @@ function fmt(v: unknown): string {
 
 // ----------------------------- oracle parsing (identical to core-differential.test.ts) -----------------------------
 
-const csv = readFileSync(join(process.cwd(), "out", "merchants_v1.csv"), "utf8").trim();
+const csv = readFileSync(join(process.cwd(), "legacy", "activation", "oracle", "merchants_v1.csv"), "utf8").trim();
 const lines = csv.split(/\r?\n/);
 const header = lines[0].split(",");
 const oracleRows = lines.slice(1).map((line) => {
@@ -115,7 +115,7 @@ const toolMerchants = runChainViaTools(inputs);
 
 // ----------------------------- Class A — oracle-differential (R-TOOL-5a) -----------------------------
 
-describe("A1 Class A — tool-composed chain ≡ the Python oracle (out/merchants_v1.csv), byte-for-byte", () => {
+describe("A1 Class A — tool-composed chain ≡ the Python oracle (legacy/activation/oracle/merchants_v1.csv), byte-for-byte", () => {
   it("parses 20 oracle rows with the expected header (sanity, mirrors core-differential)", () => {
     expect(header).toEqual([...MERCHANT_COLUMNS]);
     expect(oracleRows.length).toBe(20);
