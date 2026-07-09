@@ -1,0 +1,1013 @@
+{
+  "_honesty": "SIMULATED gold set (n=21 fresh held-out RETRY split, synthetic) — supports the pre-registered floor decision (docs/fee-classifier-recalibration-status.md, floors verbatim from the 2026-07-05 registration) and NOTHING about real-world platform statements. Prediction of record = rep-0; floors judged verbatim in the status doc; a below-floor run means the label DEFERS AGAIN (no re-run, no floor change). Frozen after the run — regression tests read THIS file, never a live re-run.",
+  "runAt": "2026-07-09T12:14:55.159Z",
+  "model": "openai/gpt-oss-120b",
+  "provider": "groq (free tier, $0)",
+  "K": 3,
+  "callPacingMs": 14000,
+  "harness": "evals/gold/fee-classifier-recalibration.live.test.ts",
+  "baseline": {
+    "pinned": "19/21 retry held-out (evals/gold/fee-baseline-retry-measurement.test.ts — identical to the original split's pin; mirror-construction demonstrated)"
+  },
+  "priorRun": {
+    "note": "2026-07-05 run on the ORIGINAL (now exposed) split: 20/21 but enhanced_service_fee recall 0.75 < 0.80 → label DEFERRED (lib/data/fee-classifier-calibration.snapshot.json — untouched by this retry)."
+  },
+  "tunePhase": {
+    "note": "K=1 prompt-shape sanity ONLY — context, never a claim; moves no floor.",
+    "n": 21,
+    "accuracy": "0.9524",
+    "correct": 20,
+    "items": [
+      {
+        "id": "overcap-tune-1",
+        "stratum": "over-cap",
+        "split": "tune",
+        "trueCategory": "delivery_fee",
+        "reps": [
+          "delivery_fee"
+        ],
+        "predicted": "delivery_fee",
+        "rationaleRep0": "The label explicitly reads \"Delivery fee\", indicating a charge for delivering the order.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "overcap-tune-2",
+        "stratum": "over-cap",
+        "split": "tune",
+        "trueCategory": "basic_service_fee",
+        "reps": [
+          "basic_service_fee"
+        ],
+        "predicted": "basic_service_fee",
+        "rationaleRep0": "The label explicitly reads \"Basic service fee\", which directly denotes the standard marketplace service charge.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "overcap-tune-3",
+        "stratum": "over-cap",
+        "split": "tune",
+        "trueCategory": "enhanced_service_fee",
+        "reps": [
+          "enhanced_service_fee"
+        ],
+        "predicted": "enhanced_service_fee",
+        "rationaleRep0": "The line’s label explicitly reads “Enhanced service fee,” directly indicating it is an optional extra service charge.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "misclass-tune-1",
+        "stratum": "misclassification",
+        "split": "tune",
+        "trueCategory": "enhanced_service_fee",
+        "reps": [
+          "enhanced_service_fee"
+        ],
+        "predicted": "enhanced_service_fee",
+        "rationaleRep0": "The label \"Marketing boost\" describes a promotional/advertising service, which fits the definition of an optional enhanced service fee.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "misclass-tune-2",
+        "stratum": "misclassification",
+        "split": "tune",
+        "trueCategory": "transaction_fee",
+        "reps": [
+          "transaction_fee"
+        ],
+        "predicted": "transaction_fee",
+        "rationaleRep0": "The label explicitly describes a card processing surcharge, which is a payment‑processing charge, fitting the transaction_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "misclass-tune-3",
+        "stratum": "misclassification",
+        "split": "tune",
+        "trueCategory": "enhanced_service_fee",
+        "reps": [
+          "enhanced_service_fee"
+        ],
+        "predicted": "enhanced_service_fee",
+        "rationaleRep0": "The label explicitly describes a photography upgrade, which is an optional premium service, fitting the enhanced_service_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "relabel-tune-1",
+        "stratum": "relabeling",
+        "split": "tune",
+        "trueCategory": "enhanced_service_fee",
+        "reps": [
+          "delivery_fee"
+        ],
+        "predicted": "delivery_fee",
+        "rationaleRep0": "The label explicitly names a delivery-related charge ('Delivery & fulfillment fee'), indicating it is a fee for delivering orders.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "relabel-tune-2",
+        "stratum": "relabeling",
+        "split": "tune",
+        "trueCategory": "delivery_fee",
+        "reps": [
+          "delivery_fee"
+        ],
+        "predicted": "delivery_fee",
+        "rationaleRep0": "The label explicitly says \"Delivery service fee\", which directly denotes a charge for delivering the order, matching the delivery_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "relabel-tune-3",
+        "stratum": "relabeling",
+        "split": "tune",
+        "trueCategory": "enhanced_service_fee",
+        "reps": [
+          "enhanced_service_fee"
+        ],
+        "predicted": "enhanced_service_fee",
+        "rationaleRep0": "The label explicitly describes an 'Enhanced visibility fee', which is an optional premium service for increased visibility, matching the enhanced_service_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "bundle-tune-1",
+        "stratum": "bundling",
+        "split": "tune",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label explicitly says the line combines service and delivery, bundling multiple distinct charges into one amount, which is disallowed as a single permitted fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "bundle-tune-2",
+        "stratum": "bundling",
+        "split": "tune",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label explicitly states it combines delivery and processing fees, bundling multiple distinct charges into one line.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "bundle-tune-3",
+        "stratum": "bundling",
+        "split": "tune",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label \"All-in-one platform fee\" indicates a bundled charge covering multiple services, which cannot be classified as a single permitted fee type.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "promo-tune-1",
+        "stratum": "promotion-deduction-mischaracterization",
+        "split": "tune",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label \"Promo adjustment\" indicates a promotional discount or adjustment, which is a discount recovery and does not fit any permitted fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "promo-tune-2",
+        "stratum": "promotion-deduction-mischaracterization",
+        "split": "tune",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label describes a promotion deduction, which is a discount adjustment rather than any permitted fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "promo-tune-3",
+        "stratum": "promotion-deduction-mischaracterization",
+        "split": "tune",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label describes a fee to recoup a discount, which is a promotion/discount recovery and does not fit any permitted fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "procfee-tune-1",
+        "stratum": "processing-fee-base-inflation",
+        "split": "tune",
+        "trueCategory": "transaction_fee",
+        "reps": [
+          "transaction_fee"
+        ],
+        "predicted": "transaction_fee",
+        "rationaleRep0": "The label explicitly says \"Payment processing fee\", which denotes a credit‑card/payment‑processing charge.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "procfee-tune-2",
+        "stratum": "processing-fee-base-inflation",
+        "split": "tune",
+        "trueCategory": "transaction_fee",
+        "reps": [
+          "transaction_fee"
+        ],
+        "predicted": "transaction_fee",
+        "rationaleRep0": "The label explicitly states \"Card transaction fee\", which directly describes a payment‑processing charge.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "procfee-tune-3",
+        "stratum": "processing-fee-base-inflation",
+        "split": "tune",
+        "trueCategory": "transaction_fee",
+        "reps": [
+          "transaction_fee"
+        ],
+        "predicted": "transaction_fee",
+        "rationaleRep0": "The label explicitly describes a processing and interchange fee, which is a payment‑processing charge, matching the transaction_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "clean-tune-1",
+        "stratum": "clean",
+        "split": "tune",
+        "trueCategory": "delivery_fee",
+        "reps": [
+          "delivery_fee"
+        ],
+        "predicted": "delivery_fee",
+        "rationaleRep0": "The label explicitly reads \"Delivery fee\", indicating a charge for delivering the order.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "clean-tune-2",
+        "stratum": "clean",
+        "split": "tune",
+        "trueCategory": "basic_service_fee",
+        "reps": [
+          "basic_service_fee"
+        ],
+        "predicted": "basic_service_fee",
+        "rationaleRep0": "The label explicitly describes a \"Basic listing fee,\" which corresponds to the platform's basic marketplace service of listing the restaurant.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      },
+      {
+        "id": "clean-tune-3",
+        "stratum": "clean",
+        "split": "tune",
+        "trueCategory": "transaction_fee",
+        "reps": [
+          "transaction_fee"
+        ],
+        "predicted": "transaction_fee",
+        "rationaleRep0": "The line's label explicitly reads \"Transaction fee\", indicating it is a payment‑processing charge regardless of any other context.",
+        "modes": [
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null
+        ]
+      }
+    ]
+  },
+  "heldOut": {
+    "n": 21,
+    "accuracy": "1.0000",
+    "correct": 21,
+    "perClass": {
+      "delivery_fee": {
+        "matrix": {
+          "tp": 4,
+          "fp": 0,
+          "tn": 17,
+          "fn": 0
+        },
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "tpr": 1,
+        "tnr": 1,
+        "recallCi95": [
+          0.5100999795960008,
+          1
+        ],
+        "n": 21
+      },
+      "basic_service_fee": {
+        "matrix": {
+          "tp": 3,
+          "fp": 0,
+          "tn": 18,
+          "fn": 0
+        },
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "tpr": 1,
+        "tnr": 1,
+        "recallCi95": [
+          0.43849391955098227,
+          1
+        ],
+        "n": 21
+      },
+      "transaction_fee": {
+        "matrix": {
+          "tp": 4,
+          "fp": 0,
+          "tn": 17,
+          "fn": 0
+        },
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "tpr": 1,
+        "tnr": 1,
+        "recallCi95": [
+          0.5100999795960008,
+          1
+        ],
+        "n": 21
+      },
+      "enhanced_service_fee": {
+        "matrix": {
+          "tp": 4,
+          "fp": 0,
+          "tn": 17,
+          "fn": 0
+        },
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "tpr": 1,
+        "tnr": 1,
+        "recallCi95": [
+          0.5100999795960008,
+          1
+        ],
+        "n": 21
+      },
+      "not-a-permitted-fee": {
+        "matrix": {
+          "tp": 6,
+          "fp": 0,
+          "tn": 15,
+          "fn": 0
+        },
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "tpr": 1,
+        "tnr": 1,
+        "recallCi95": [
+          0.6096569663469354,
+          0.9999999999999999
+        ],
+        "n": 21
+      }
+    },
+    "macroPrecision": 1,
+    "macroKappa": 1,
+    "flipRate": 0.047619047619047616,
+    "items": [
+      {
+        "id": "overcap-retry-1",
+        "stratum": "over-cap",
+        "split": "test",
+        "trueCategory": "delivery_fee",
+        "reps": [
+          "delivery_fee",
+          "delivery_fee",
+          "delivery_fee"
+        ],
+        "predicted": "delivery_fee",
+        "rationaleRep0": "The label explicitly describes a charge for delivering the order to the doorstep, which matches the delivery_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "overcap-retry-2",
+        "stratum": "over-cap",
+        "split": "test",
+        "trueCategory": "basic_service_fee",
+        "reps": [
+          "basic_service_fee",
+          "basic_service_fee",
+          "basic_service_fee"
+        ],
+        "predicted": "basic_service_fee",
+        "rationaleRep0": "The label \"Listing & catalog fee\" describes the charge for listing the restaurant in the platform's catalog, which is the basic marketplace service.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "overcap-retry-3",
+        "stratum": "over-cap",
+        "split": "test",
+        "trueCategory": "enhanced_service_fee",
+        "reps": [
+          "enhanced_service_fee",
+          "enhanced_service_fee",
+          "enhanced_service_fee"
+        ],
+        "predicted": "enhanced_service_fee",
+        "rationaleRep0": "The label explicitly describes an enhanced advertising service, which matches the definition of an optional extra service beyond the basic tier.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "misclass-retry-1",
+        "stratum": "misclassification",
+        "split": "test",
+        "trueCategory": "enhanced_service_fee",
+        "reps": [
+          "enhanced_service_fee",
+          "enhanced_service_fee",
+          "enhanced_service_fee"
+        ],
+        "predicted": "enhanced_service_fee",
+        "rationaleRep0": "The label explicitly describes a 'Featured placement fee', which is a marketing/advertising service for premium visibility, matching the enhanced_service_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "misclass-retry-2",
+        "stratum": "misclassification",
+        "split": "test",
+        "trueCategory": "transaction_fee",
+        "reps": [
+          "transaction_fee",
+          "transaction_fee",
+          "transaction_fee"
+        ],
+        "predicted": "transaction_fee",
+        "rationaleRep0": "The label \"Card network charge\" directly refers to a credit‑card/network processing fee, which falls under the transaction_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "misclass-retry-3",
+        "stratum": "misclassification",
+        "split": "test",
+        "trueCategory": "delivery_fee",
+        "reps": [
+          "delivery_fee",
+          "delivery_fee",
+          "delivery_fee"
+        ],
+        "predicted": "delivery_fee",
+        "rationaleRep0": "The label explicitly refers to an \"Express courier fee,\" which denotes a charge for the courier delivering the order, i.e., a delivery fee.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "relabel-retry-1",
+        "stratum": "relabeling",
+        "split": "test",
+        "trueCategory": "basic_service_fee",
+        "reps": [
+          "basic_service_fee",
+          "basic_service_fee",
+          "basic_service_fee"
+        ],
+        "predicted": "basic_service_fee",
+        "rationaleRep0": "The label \"Basic listing charge\" directly describes a fee for the platform's basic marketplace listing service, which matches the basic_service_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "relabel-retry-2",
+        "stratum": "relabeling",
+        "split": "test",
+        "trueCategory": "enhanced_service_fee",
+        "reps": [
+          "enhanced_service_fee",
+          "enhanced_service_fee",
+          "not-a-permitted-fee"
+        ],
+        "predicted": "enhanced_service_fee",
+        "rationaleRep0": "The label describes an optional \"upgrade\" combining service and delivery, indicating an extra, premium service rather than a standard delivery or basic marketplace fee.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "relabel-retry-3",
+        "stratum": "relabeling",
+        "split": "test",
+        "trueCategory": "delivery_fee",
+        "reps": [
+          "delivery_fee",
+          "delivery_fee",
+          "delivery_fee"
+        ],
+        "predicted": "delivery_fee",
+        "rationaleRep0": "The label explicitly says \"Regular delivery fee\", which directly identifies the charge as a delivery fee despite the declared category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "bundle-retry-1",
+        "stratum": "bundling",
+        "split": "test",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee",
+          "not-a-permitted-fee",
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label \"Bundled platform charge\" indicates a lumped amount that likely combines multiple distinct fees, which is disallowed as a single permitted category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "bundle-retry-2",
+        "stratum": "bundling",
+        "split": "test",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee",
+          "not-a-permitted-fee",
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label explicitly says the fee combines delivery and advertising, bundling two distinct charge types into one line, which is not allowed as a single permitted category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "bundle-retry-3",
+        "stratum": "bundling",
+        "split": "test",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee",
+          "not-a-permitted-fee",
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label \"All-inclusive bundled fee\" indicates a single charge that combines multiple services, which violates the rule that bundled charges are not a permitted single fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "promo-retry-1",
+        "stratum": "promotion-deduction-mischaracterization",
+        "split": "test",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee",
+          "not-a-permitted-fee",
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label describes a promotional deduction, which is a discount adjustment rather than a specific fee type, making it unclassifiable under the permitted fee categories.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "promo-retry-2",
+        "stratum": "promotion-deduction-mischaracterization",
+        "split": "test",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee",
+          "not-a-permitted-fee",
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label describes a promotional credit adjustment, which is a discount/recovery rather than a specific fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "promo-retry-3",
+        "stratum": "promotion-deduction-mischaracterization",
+        "split": "test",
+        "trueCategory": "not-a-permitted-fee",
+        "reps": [
+          "not-a-permitted-fee",
+          "not-a-permitted-fee",
+          "not-a-permitted-fee"
+        ],
+        "predicted": "not-a-permitted-fee",
+        "rationaleRep0": "The label \"Promo spend recovery\" indicates a charge to recoup promotional discounts, which is a promotion/discount recovery and thus not a permitted fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "procfee-retry-1",
+        "stratum": "processing-fee-base-inflation",
+        "split": "test",
+        "trueCategory": "transaction_fee",
+        "reps": [
+          "transaction_fee",
+          "transaction_fee",
+          "transaction_fee"
+        ],
+        "predicted": "transaction_fee",
+        "rationaleRep0": "The label explicitly says \"Card settlement fee\", which denotes a credit‑card/payment‑processing charge.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "procfee-retry-2",
+        "stratum": "processing-fee-base-inflation",
+        "split": "test",
+        "trueCategory": "transaction_fee",
+        "reps": [
+          "transaction_fee",
+          "transaction_fee",
+          "transaction_fee"
+        ],
+        "predicted": "transaction_fee",
+        "rationaleRep0": "The label explicitly describes a payment authorization fee, which is a credit‑card/payment‑processing charge.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "procfee-retry-3",
+        "stratum": "processing-fee-base-inflation",
+        "split": "test",
+        "trueCategory": "transaction_fee",
+        "reps": [
+          "transaction_fee",
+          "transaction_fee",
+          "transaction_fee"
+        ],
+        "predicted": "transaction_fee",
+        "rationaleRep0": "The label explicitly describes an interchange processing charge, which is a payment‑processing cost, fitting the transaction_fee category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "clean-retry-1",
+        "stratum": "clean",
+        "split": "test",
+        "trueCategory": "enhanced_service_fee",
+        "reps": [
+          "enhanced_service_fee",
+          "enhanced_service_fee",
+          "enhanced_service_fee"
+        ],
+        "predicted": "enhanced_service_fee",
+        "rationaleRep0": "The label explicitly states \"Enhanced tier service fee\", which directly describes an optional extra service beyond the basic tier.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "clean-retry-2",
+        "stratum": "clean",
+        "split": "test",
+        "trueCategory": "basic_service_fee",
+        "reps": [
+          "basic_service_fee",
+          "basic_service_fee",
+          "basic_service_fee"
+        ],
+        "predicted": "basic_service_fee",
+        "rationaleRep0": "The label explicitly states \"Basic platform service fee\", which directly describes the basic marketplace service category.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "id": "clean-retry-3",
+        "stratum": "clean",
+        "split": "test",
+        "trueCategory": "delivery_fee",
+        "reps": [
+          "delivery_fee",
+          "delivery_fee",
+          "delivery_fee"
+        ],
+        "predicted": "delivery_fee",
+        "rationaleRep0": "The label explicitly says \"Local delivery fee\", indicating a charge for delivering the order.",
+        "modes": [
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER",
+          "LIVE_CLASSIFIER"
+        ],
+        "errorClasses": [
+          null,
+          null,
+          null
+        ]
+      }
+    ]
+  },
+  "floors": {
+    "accuracy": {
+      "floor": "≥ 20/21 AND strictly beats the retry-split pinned baseline 19/21 (tie = DEFER)",
+      "value": "21/21 = 1.0000",
+      "pass": true
+    },
+    "macroPrecision": {
+      "floor": "≥ 0.85",
+      "value": "1.0000",
+      "pass": true
+    },
+    "perClassRecallAll": {
+      "floor": "≥ 0.70 every label",
+      "value": {
+        "delivery_fee": "1.0000",
+        "basic_service_fee": "1.0000",
+        "transaction_fee": "1.0000",
+        "enhanced_service_fee": "1.0000",
+        "not-a-permitted-fee": "1.0000"
+      },
+      "pass": true
+    },
+    "perClassRecallBaselineMissed": {
+      "floor": "≥ 0.80 on enhanced_service_fee + not-a-permitted-fee",
+      "value": {
+        "enhanced_service_fee": "1.0000",
+        "not-a-permitted-fee": "1.0000"
+      },
+      "pass": true
+    },
+    "flipRate": {
+      "floor": "≤ 0.15 (K=3, temp 0)",
+      "value": "0.0476",
+      "pass": true
+    },
+    "macroKappa": {
+      "floor": "≥ 0.60",
+      "value": "1.0000",
+      "pass": true
+    }
+  },
+  "floorsCleared": true,
+  "runIntegrity": {
+    "degraded": false,
+    "scoredFallbacks": [],
+    "note": "degraded=true would mean ≥1 scored call fell back — diagnostic only, never label-bearing (bail rule)"
+  },
+  "misses": []
+}

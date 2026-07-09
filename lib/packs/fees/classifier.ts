@@ -18,15 +18,19 @@
  *     (2026-07-05, decision-log) — but it lives in `lib/agents/fee-classifier.ts`,
  *     env-gated, and is NEVER imported by this pack: THIS module and everything the
  *     deterministic audit reaches stay zero-network (a test proves it). Wired ≠
- *     calibrated — the label is decided only by the pre-registered held-out run
- *     (`docs/fee-classifier-calibration-status.md`).
+ *     calibrated — the label is decided only by the pre-registered held-out runs:
+ *     2026-07-05 DEFERRED (`docs/fee-classifier-calibration-status.md`); the
+ *     owner-armed 2026-07-09 RETRY on a fresh pre-registered split cleared every
+ *     floor → the LIVE lane earned the calibrated label
+ *     (`docs/fee-classifier-recalibration-status.md` holds the label decision).
  * No file in THIS pack calls a model or the network. The gold set is SIMULATED.
  *
  * Plain: the piece that reads what a fee REALLY is when the bill mislabels it.
- * The measured floor (dumb keyword rules) lives here; the real AI version is now
- * plugged in — in a separate, owner-gated module that this rulebook never touches —
- * and it isn't allowed to claim it's good until it out-scores the floor on held-out
- * examples in the owner-approved live run.
+ * The measured floor (dumb keyword rules) lives here; the real AI version is
+ * plugged in — in a separate, owner-gated module that this rulebook never touches.
+ * Its first exam missed one bar (no title); its owner-approved retest on brand-new
+ * questions cleared every bar, so the live version now holds the title — for that
+ * small simulated exam only.
  */
 import type { FeeLineClass } from "./index.ts";
 import {
@@ -155,10 +159,13 @@ export interface LineItemClassifier {
   readonly name: string;
   /**
    * Whether this classifier's label is EARNED. `false` for the baseline (it IS the
-   * floor, not a beat-the-floor result) and for the mock (it cheats). Only an
-   * owner-gated live run that beats the baseline on held-out gold could flip this —
-   * and the 2026-07-05 armed run DEFERRED (missed one pre-registered floor; see
-   * docs/fee-classifier-calibration-status.md), so it stays `false` everywhere.
+   * floor, not a beat-the-floor result) and for the mock (it cheats) — FOREVER:
+   * only the async LIVE lane can earn a label, and it is not one of this sync
+   * seam's implementations. (History: the 2026-07-05 armed run DEFERRED; the
+   * owner-armed 2026-07-09 retry on a fresh pre-registered split cleared every
+   * floor, earning the LIVE lane in lib/agents/fee-classifier.ts its calibrated
+   * label — docs/fee-classifier-recalibration-status.md. Nothing injected HERE
+   * inherits that label.)
    */
   readonly earnsLabel: false;
   classify(input: ClassifierInput): ClassifierPrediction;
@@ -273,4 +280,9 @@ export const LIVE_CLASSIFIER_DESIGN = {
   /** WIRED 2026-07-05 (owner GO "all four", decision-log): `lib/agents/fee-classifier.ts`
    *  implements this contract, env-gated (groqLiveEnabled). Wired ≠ calibrated. */
   wired: true,
+  /** CALIBRATED 2026-07-09 (owner-armed retry, fresh pre-registered held-out split,
+   *  ALL six floors cleared 21/21 — docs/fee-classifier-recalibration-status.md;
+   *  the 2026-07-05 DEFER stands as history). Scope: the synthetic n=21 gold exam
+   *  ONLY — never a real-world-statement claim. */
+  calibrated: true,
 } as const;

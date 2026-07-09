@@ -36,10 +36,12 @@
  * that reads `Claim.source`).
  *
  * HONESTY (AM-7 / C8): whichever classifier is injected, its `earnsLabel` is always
- * `false` (the 2026-07-05 owner-armed live run DEFERRED on a pre-registered floor,
- * so no classifier anywhere has earned the label — see classifier.ts and
- * docs/fee-classifier-calibration-status.md; the wired live lane in
- * lib/agents/fee-classifier.ts is async and not injected here at all). An
+ * `false` — the injectable sync implementations are the baseline (the floor) and
+ * the mock (a cheat), and neither can ever earn a label. The LIVE lane in
+ * lib/agents/fee-classifier.ts DID earn "calibrated" on the owner-armed 2026-07-09
+ * retry (fresh pre-registered split; docs/fee-classifier-recalibration-status.md;
+ * the 2026-07-05 DEFER stands as history) — but it is async and not injected here
+ * at all, so nothing on THIS path inherits that label. An
  * advisory finding built from the {@link MockOracleClassifier} PROVES the seam CAN
  * surface a relabeling (deliverable 7's wiring proof); it is never presented as a
  * caught violation, and the C6 coverage eval (unmodified) keeps reporting the

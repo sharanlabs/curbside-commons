@@ -8,12 +8,16 @@
  * The LLM line-item classifier seam (true-vs-declared category) is F1b: the
  * deterministic baseline + mock live here; the wired live lane is
  * `lib/agents/fee-classifier.ts` (owner-armed run 2026-07-05 → label DEFERRED —
- * `docs/fee-classifier-calibration-status.md`).
+ * `docs/fee-classifier-calibration-status.md`; owner-armed RETRY 2026-07-09 on a
+ * fresh pre-registered held-out split → ALL floors cleared, label CALIBRATED —
+ * `docs/fee-classifier-recalibration-status.md`).
  *
  * Plain: the fee-drift rulebook plus the machinery that reads a delivery bill,
  * checks every fee against the real legal caps, and proves each catch with
- * receipts. The AI fee-reader exists and took its one-shot test — it beat the
- * simple-rules benchmark but missed one pre-agreed bar, so it holds no title.
+ * receipts. The AI fee-reader took its first one-shot test and missed one
+ * pre-agreed bar, so it held no title; the owner-approved retest on brand-new
+ * questions (same bars, locked in beforehand) scored 21/21 — the title is earned,
+ * for the small simulated exam and nothing more.
  */
 
 /** Fee-line classes enumerated in plan §7 (fees). */
@@ -32,7 +36,8 @@ export type FeeLineClass = (typeof FEE_LINE_CLASSES)[number];
 export const FEES_PACK = {
   id: "fees",
   useCase: "UC-1",
-  status: "f1b-classifier-layer; live lane wired + run 2026-07-05: label DEFERRED (docs/fee-classifier-calibration-status.md)",
+  status:
+    "f1b-classifier-layer; live lane wired; run 2026-07-05: DEFERRED → owner-armed retry 2026-07-09 (fresh pre-registered split): label CALIBRATED (docs/fee-classifier-recalibration-status.md)",
   classes: FEE_LINE_CLASSES,
 } as const;
 

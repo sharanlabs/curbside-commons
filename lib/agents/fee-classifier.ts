@@ -27,18 +27,25 @@
  * true while making "a live classifier exists, env-gated" also true.
  *
  * HONESTY: wired ≠ calibrated. This lane existing says NOTHING about quality —
- * the "calibrated" label is decided ONLY by the owner-gated held-out run against
- * the pre-registered floors (plan §3; `docs/fee-classifier-calibration-status.md`).
- * RUN OUTCOME (2026-07-05, owner-armed run #2 — authoritative, $0, zero fallbacks):
- * 5 of 6 floors cleared (held-out 20/21, strictly beating the 19/21 baseline;
- * flip 0.000; κ 0.944) but enhanced_service_fee recall 3/4 = 0.75 missed its ≥0.80
- * floor → **the label DEFERS** (conjunctive rule, as pre-registered). This lane
- * remains "wired, env-gated, NOT calibrated"; the frozen record is eval-locked.
+ * the "calibrated" label is decided ONLY by owner-gated held-out runs against
+ * pre-registered floors (plan §3).
+ * RUN OUTCOME #1 (2026-07-05, owner-armed run #2 — authoritative, $0, zero
+ * fallbacks): 5 of 6 floors cleared (held-out 20/21, strictly beating the 19/21
+ * baseline; flip 0.000; κ 0.944) but enhanced_service_fee recall 3/4 = 0.75 missed
+ * its ≥0.80 floor → the label DEFERRED (conjunctive rule, as pre-registered;
+ * `docs/fee-classifier-calibration-status.md`, eval-locked).
+ * RUN OUTCOME #2 (2026-07-09, owner-armed RETRY on a FRESH pre-registered held-out
+ * split — the exposed split was never re-scored; authoritative, $0, zero
+ * fallbacks): **ALL SIX floors cleared — 21/21, macro precision 1.0, κ 1.0, flip
+ * 0.048 → the label is CALIBRATED (fresh held-out, pre-registered floors, one
+ * pass)** (`docs/fee-classifier-recalibration-status.md`, eval-locked). Scope: the
+ * synthetic n=21 gold exam only; the lane stays env-gated either way.
  *
- * Plain: this is the real AI version of the fee-line reader, now actually
- * plugged in — but switched off unless the owner's live flags are set, free to
- * run, and not allowed to call itself good until it beats the dumb-rules floor
- * on examples it has never seen.
+ * Plain: this is the real AI version of the fee-line reader, actually plugged
+ * in — but switched off unless the owner's live flags are set, free to run. Its
+ * first exam missed one pre-agreed bar (recorded, no title). Its owner-approved
+ * retest on brand-new questions cleared every bar, 21 out of 21 — so it now
+ * holds the "calibrated" title for that small simulated exam, and nothing more.
  */
 import { z } from "zod";
 import { groqLiveEnabled } from "@/lib/server/env-flags";

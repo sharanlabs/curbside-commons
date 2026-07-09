@@ -54,7 +54,7 @@ A committed n8n workflow (manual trigger only, `active:false`, no send node): au
 | Surface | May claim | May NOT claim (until its gate) |
 |---|---|---|
 | Crew (A2) | orchestration harness passed; **Intake + Reviewer: "agent (live-run floors cleared)" — L-1 ran 2026-07-07, 20/20 on the committed held-out split** | "agent" for Audit/Evidence (deterministic workflows by classification); any robustness claim beyond the pre-registered N=5-per-member floors |
-| Classifier tool | advisory candidates, `earnsLabel: false` | "calibrated" (its live exam missed one pre-registered floor — label DEFERS, on record) |
+| Classifier tool | advisory candidates, `earnsLabel: false` (the injected sync classifiers never earn); **the LIVE lane: "calibrated (fresh held-out, pre-registered floors, one pass)" — the owner-armed 2026-07-09 retry cleared all six floors 21/21 on a fresh pre-registered split** (the 2026-07-05 near-miss DEFER stands on record) | any real-world-statement performance claim (the exam is a synthetic n=21 gold set); any label for the injected baseline/mock |
 | Delivery (A3) | builds payloads | sending anything (L-2: owner word, allowlist, one-shot) |
 | n8n (A4) | workflow spec + dry run + **one recorded episodic runtime run (L-3, 2026-07-07, byte-verified)** | a standing/scheduled automation (manual trigger only, forever) |
 | run_demo | scripted walkthrough | an audit result (typed `demo_only`, refused everywhere downstream) |

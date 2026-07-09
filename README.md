@@ -43,10 +43,10 @@ Zero network and zero LLM calls on every CLI path — enforced structurally by a
 | Listings drift taxonomy (8 classes) | **8/8 injected and caught, measured** by the C6 coverage eval; never an "all edge cases" claim |
 | Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
 | Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |
-| LLM line-item classifier | Live-calibrated on a held-out split: **20/21 accuracy, beating the pinned deterministic baseline (19/21)** — and still **honestly DEFERRED**, because one per-class recall floor (0.75 vs a pre-registered ≥ 0.80) was missed. The floors were committed before the run and did not move after it. |
+| LLM line-item classifier | **Calibrated — earned 2026-07-09** on an owner-armed retry: a **fresh pre-registered held-out split** (the first split was exposed and never re-scored), floors identical to the first registration, **21/21 accuracy with every floor cleared**. The first run (2026-07-05) scored 20/21 and was **honestly DEFERRED** for missing one per-class recall floor (0.75 vs a pre-registered ≥ 0.80) — that record stands. The floors never moved in either run. |
 | Corpus | Seeded, deterministic, freeze-locked (regenerate ⇒ bytes must match); every fixture taxonomy-keyed; publishable under this repo's license |
 
-That DEFER is the project's character: **the bar never moves after the run.** A near-miss is reported as a near-miss.
+That sequence is the project's character: **the bar never moves after the run.** The first attempt's near-miss was reported as a near-miss and stayed a DEFER; earning the label took a second owner-authorized exam on brand-new questions under the same bars — not a re-grade of the old one.
 
 ## Where AI is used, and where it is not
 

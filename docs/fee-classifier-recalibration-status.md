@@ -93,4 +93,31 @@ record it; wired-not-calibrated remains the honest shipped state.
 
 ## RESULTS (appended after the run — nothing above this line changes)
 
-*(pending — the run executes after this pre-registration is committed)*
+**RUN AUTHORITATIVE (2026-07-09T12:14:55Z; one paced pass, 84 calls, $0 Groq
+`openai/gpt-oss-120b`, temp 0, K=3; 0 degraded calls, 0 fallbacks; frozen snapshot
+`lib/data/fee-classifier-recalibration.snapshot.json`; eval-lock
+`evals/gold/fee-classifier-recalibration.lock.test.ts`).**
+
+| Floor (pre-registered, verbatim 2026-07-05 registration) | Result | Pass |
+| --- | --- | --- |
+| Accuracy ≥ 20/21 AND strictly > the 19/21 retry-split pin | **21/21 = 1.0000** | ✅ |
+| Macro precision ≥ 0.85 | 1.0000 | ✅ |
+| Per-class recall ≥ 0.70 (all five) | 1.0000 × 5 | ✅ |
+| Recall ≥ 0.80 on `enhanced_service_fee` + `not-a-permitted-fee` | 1.0000 / 1.0000 | ✅ |
+| Flip-rate ≤ 0.15 (K=3, temp 0) | 0.0476 (1/21 non-unanimous; its rep-0 correct) | ✅ |
+| Macro one-vs-rest Cohen's κ ≥ 0.60 | 1.0000 | ✅ |
+
+Tune-phase context (K=1, decides nothing): 20/21.
+
+**VERDICT — ALL SIX FLOORS CLEARED → per the pre-registered decision rule the
+label is EARNED: "calibrated (fresh held-out, pre-registered floors, one pass —
+2026-07-09)".** The 2026-07-05 run's DEFER stands untouched as history (its
+snapshot + eval-lock are byte-identical); the retry split is now EXPOSED and never
+re-scorable. What this claims — and all it claims: on a synthetic, simulated,
+n=21 fresh held-out gold set, under floors committed before the run, the live lane
+beat the deterministic baseline with a perfect score. It says NOTHING about
+real-world platform statements (plan §4 bounds unchanged).
+
+▸ *Plain: the AI took a second one-shot exam on brand-new questions with the same
+pass bars as before, locked in beforehand. It scored 21/21. The "calibrated" title
+is now earned and on record — for this small practice test, not for the real world.*
