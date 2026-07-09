@@ -24,7 +24,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Commerce Truth Audit",
+  title: {
+    default: "Curbside Commons — deterministic commerce-truth verifier (simulated prototype)",
+    template: "%s · Curbside Commons",
+  },
   description:
     "The truth layer for agentic commerce — a deterministic verifier of platform/AI-agent serving copies vs the merchant system-of-record, UCP conformance, and NYC fee-cap audit. Simulated corpus; company-agnostic prototype.",
 };
@@ -44,22 +47,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div id="main-content" tabIndex={-1}>
           {children}
         </div>
-        <footer
-          style={{
-            background: "var(--bg-2)",
-            borderTop: "1px solid var(--rule-2)",
-          }}
-        >
-          <div
-            className="ds-wrap"
-            style={{
-              padding: "40px 32px 72px",
-              fontSize: "13px",
-              lineHeight: 1.62,
-              color: "var(--body)",
-              maxWidth: "var(--maxw)",
-            }}
-          >
+        <footer className="site-footer">
+          <div className="site-footer-in">
             <span style={{ fontWeight: 600, color: "var(--ink)" }}>
               Demo / portfolio prototype.
             </span>{" "}

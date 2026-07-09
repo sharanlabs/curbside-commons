@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PLATFORM_NAME } from "@/lib/product";
 
 const LINKS = [
   { href: "/console", label: "Console" },
@@ -16,14 +17,27 @@ const LINKS = [
 export function Nav() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Primary" className="border-b border-neutral-200 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-6 py-2.5 text-sm">
+    <nav aria-label="Primary" className="site-nav">
+      <div className="site-nav-in">
         <Link
           href="/"
           aria-current={pathname === "/" ? "page" : undefined}
-          className="mr-3 font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="site-brand"
         >
-          Commerce Truth Audit
+          <svg
+            className="site-brand-mark"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M10 2.2l6.4 2.4v4.2c0 4.2-2.7 6.7-6.4 8.4-3.7-1.7-6.4-4.2-6.4-8.4V4.6z" />
+            <path d="M6.8 10.2l2.2 2.2 4.4-4.6" />
+          </svg>
+          {PLATFORM_NAME}
         </Link>
         {LINKS.map((l) => {
           const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
@@ -32,15 +46,14 @@ export function Nav() {
               key={l.href}
               href={l.href}
               aria-current={active ? "page" : undefined}
-              className={`rounded-md px-2.5 py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                active ? "bg-neutral-900 text-white" : "text-neutral-600 hover:bg-neutral-100"
-              }`}
+              className="site-navlink"
             >
               {l.label}
             </Link>
           );
         })}
-        <span className="ml-auto rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-500">
+        <span className="site-status">
+          <span className="site-status-pip" aria-hidden="true" />
           Prototype · REPLAY · $0.00
         </span>
       </div>

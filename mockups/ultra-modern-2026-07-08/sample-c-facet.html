@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listings Verifier — Facet (ultra-modern filterable canvas)</title>
+<style>
+  :root{
+    --paper:#F7F7F5;
+    --card:#FFFFFF;
+    --ink:#111311;
+    --ink-2:#3E423E;
+    --muted:#74786F;
+    --line:#E6E6E1;
+    --line-2:#DEDED8;
+    --accent:#6D28D9;       /* the ONE accent — violet */
+    --accent-soft:rgba(109,40,217,.10);
+    --error:#C81E4A;
+    --warn:#B45309;
+    --mono:"SFMono-Regular",ui-monospace,"JetBrains Mono","Menlo",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;font-feature-settings:"tnum","ss01";
+    background:
+      radial-gradient(circle at 1px 1px, rgba(17,19,17,.022) 1px, transparent 0) 0 0/22px 22px,
+      var(--paper);}
+  .wrap{max-width:1120px;margin:0 auto;padding:clamp(28px,5vw,56px) clamp(16px,4vw,36px) 110px}
+
+  .sim{display:flex;gap:12px;align-items:flex-start;background:var(--card);
+    border:1px solid var(--line-2);border-radius:14px;padding:13px 15px;margin-bottom:40px;
+    box-shadow:0 1px 0 rgba(17,19,17,.02)}
+  .sim-tag{flex:none;font:600 11px/1 var(--mono);letter-spacing:.13em;color:#fff;background:var(--ink);
+    padding:5px 9px;border-radius:6px}
+  .sim-text{font-size:12.5px;color:var(--ink-2);line-height:1.5}
+
+  .eyebrow{font:600 12px var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  h1{font-size:clamp(30px,5vw,52px);line-height:1.05;letter-spacing:-.028em;font-weight:670;margin:0 0 18px;
+    max-width:16ch;text-wrap:balance}
+  .intro{font-size:clamp(15px,2vw,17px);color:var(--ink-2);max-width:60ch;margin:0;text-wrap:pretty}
+
+  /* verdict meter */
+  .meter{margin:44px 0 0;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .meter .flag{font:700 13px var(--mono);letter-spacing:.13em;color:#fff;background:var(--error);
+    padding:8px 14px;border-radius:9px}
+  .meter .big{font-size:clamp(38px,7vw,60px);font-weight:730;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+  .meter .big small{font-size:15px;font-weight:550;color:var(--muted);margin-left:8px;letter-spacing:0}
+  .bar-track{flex:1;min-width:200px;height:10px;border-radius:6px;background:#EDEDE8;overflow:hidden;display:flex}
+  .bar-track .e{background:var(--error);width:0;transition:width .8s cubic-bezier(.22,.61,.36,1)}
+  .bar-track .w{background:var(--warn);width:0;transition:width .8s cubic-bezier(.22,.61,.36,1) .1s}
+
+  /* meta strip */
+  .metastrip{display:flex;flex-wrap:wrap;gap:8px 26px;margin:26px 0 0;padding:16px 0 0;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted)}
+  .metastrip b{color:var(--ink-2);font-weight:600}
+  .metastrip .mono{font-family:var(--mono);color:var(--ink-2)}
+
+  /* filters */
+  .filters{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+    margin:48px 0 22px;padding:14px 0;background:linear-gradient(var(--paper) 76%, transparent)}
+  .filters .grp{display:inline-flex;gap:6px;flex-wrap:wrap}
+  .filters .lab{font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+  .chipf{font:550 12.5px var(--sans);color:var(--ink-2);background:var(--card);border:1px solid var(--line-2);
+    border-radius:999px;padding:7px 14px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px}
+  .chipf:hover{border-color:var(--ink-2)}
+  .chipf[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chipf .n{font:600 11px var(--mono);opacity:.7}
+  .chipf.err[aria-pressed="true"]{background:var(--error);border-color:var(--error)}
+  .chipf.wrn[aria-pressed="true"]{background:var(--warn);border-color:var(--warn)}
+  .chipf:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .filters .spacer{margin-left:auto;font:550 12px var(--mono);color:var(--muted)}
+
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0;overflow:hidden;
+    display:flex;flex-direction:column;transition:transform .18s ease,box-shadow .18s ease,opacity .25s ease;
+    animation:pop .4s cubic-bezier(.22,.61,.36,1) both}
+  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:none}}
+  .card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(17,19,17,.07)}
+  .card.hide{display:none}
+  .tick{height:3px;width:100%}
+  .tick.error{background:var(--error)} .tick.warn{background:var(--warn)}
+  .card-body{padding:18px 18px 6px}
+  .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .idx{font:600 12px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+  .sev{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:6px}
+  .sev.error{color:var(--error);background:rgba(200,30,74,.10)} .sev.warn{color:var(--warn);background:rgba(180,83,9,.11)}
+  .plain{font-size:15.5px;line-height:1.42;letter-spacing:-.008em;margin:0 0 4px;text-wrap:pretty}
+  .card-foot{margin-top:auto;border-top:1px solid var(--line);background:#FCFCFB}
+  .rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  .rc{background:#FCFCFB;padding:11px 14px}
+  .rc.full{grid-column:1/-1}
+  .rc dt{font:600 9.5px var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+  .rc dd{margin:0;font:500 11.5px var(--mono);color:var(--ink);word-break:break-word;line-height:1.4}
+  .rc dd .sub{display:block;color:var(--muted);margin-top:2px;font-size:10.5px}
+  .catpill{display:inline-block;font:500 11px var(--mono);color:var(--accent);background:var(--accent-soft);
+    padding:3px 9px;border-radius:999px}
+
+  .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 0;font-size:14px}
+
+  footer{margin-top:52px;padding-top:26px;border-top:1px solid var(--line);
+    font-size:13px;color:var(--muted);line-height:1.6;max-width:70ch}
+
+  @media (max-width:520px){.rc-grid{grid-template-columns:1fr}.meter .big{width:100%}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
+    .bar-track .e,.bar-track .w{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sim" role="note">
+    <span class="sim-tag">SIMULATED</span>
+    <span class="sim-text">Synthetic test data — an invented restaurant, invented menu, invented prices. Not real DoorDash / Square / Uber&nbsp;Eats / Grubhub data, access, or business impact. The verification rules and the pinned data-format standard are real; the restaurant, its menu, and its records are invented.</span>
+  </div>
+
+  <header>
+    <p class="eyebrow">Verifier report · listings truth check</p>
+    <h1>What the copy says vs. what the records say</h1>
+    <p class="intro">A serving copy of a menu (what an AI shopping assistant would read) checked, line by line, against the restaurant&rsquo;s own system-of-record &mdash; each catch in plain words first, then the exact receipts. Deterministic and $0, with no AI calls in this verifier runtime.</p>
+  </header>
+
+  <div class="meter">
+    <span class="flag">FAIL</span>
+    <span class="big">16<small>findings</small></span>
+    <div class="bar-track" aria-hidden="true"><div class="e" id="barE"></div><div class="w" id="barW"></div></div>
+  </div>
+  <div class="metastrip">
+    <span><b>surface</b> ACP static feed <span class="mono">(OpenAI/Stripe product-feed shape)</span></span>
+    <span><b>spec</b> <span class="mono">taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08</span></span>
+    <span><b>mode</b> <span class="mono">synthetic-controlled</span></span>
+    <span><b>data</b> <span class="mono">simulated: true</span></span>
+  </div>
+
+  <div class="filters">
+    <div class="grp"><span class="lab">severity</span>
+      <button class="chipf" data-type="sev" data-val="all" aria-pressed="true">All <span class="n">16</span></button>
+      <button class="chipf err" data-type="sev" data-val="error" aria-pressed="false">Errors <span class="n">11</span></button>
+      <button class="chipf wrn" data-type="sev" data-val="warn" aria-pressed="false">Warnings <span class="n">5</span></button>
+    </div>
+    <div class="grp" id="classGrp"><span class="lab">class</span></div>
+    <span class="spacer" id="showing">showing 16</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>Every card carries its four receipts &mdash; the claim, the catalog row it was checked against, the rule it broke, and how severe it is. No language model runs in this verifier &mdash; the comparison is exact, deterministic logic. Simulated prototype, run on demand &mdash; not a live service. Human-led, AI-assisted, professionally reviewed.</footer>
+</div>
+
+<script id="data" type="application/json">
+[
+{"plain":"This item is hidden in the merchant's own catalog but is being served to customers.","sev":"error","claimId":"item-002-v2#existence","src":"acp-feed","field":"existence","val":"true","ref":"item-002-v2","rule":"LST-AVAIL-HIDDEN-SHOWN","cls":"availability"},
+{"plain":"The copy says \"pre_order\" but the catalog state is in stock (expected \"in_stock\").","sev":"error","claimId":"item-004-v1#availability","src":"acp-feed","field":"availability","val":"pre_order","ref":"item-004-v1","rule":"LST-AVAIL-STATE","cls":"availability"},
+{"plain":"The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\").","sev":"error","claimId":"item-008-v1#availability","src":"acp-feed","field":"availability","val":"in_stock","ref":"item-008-v1","rule":"LST-AVAIL-STATE","cls":"availability"},
+{"plain":"The row is checkout-eligible but not search-eligible — the extracted invariant requires checkout ⇒ search.","sev":"error","claimId":"item-002-v1#invariants","src":"acp-feed","field":"invariants","val":"price 22.00 · search=false · checkout=true","ref":"item-002-v1","rule":"LST-XF-CHECKOUT-SEARCH","cls":"cross-field-invariant"},
+{"plain":"The name is cut off on the serving copy: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\".","sev":"warn","claimId":"item-005-v2#title","src":"acp-feed","field":"title","val":"Margherita…","ref":"item-005-v2","rule":"LST-ENC-TRUNC","cls":"encoding"},
+{"plain":"The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the real \"Jalapeño Poppers (Large)\".","sev":"warn","claimId":"item-004-v3#title","src":"acp-feed","field":"title","val":"JalapeÃ±o Poppers (Large)","ref":"item-004-v3","rule":"LST-ENC-UTF8","cls":"encoding"},
+{"plain":"The copy serves \"Phantom Platter (simulated ghost item)\" but no such item exists in the merchant's catalog.","sev":"error","claimId":"ghost-001#existence","src":"acp-feed","field":"existence","val":"true","ref":"catalog-meta","rule":"LST-EXIST-GHOST","cls":"existence"},
+{"plain":"\"Café Latte (Small)\" exists in the merchant's catalog but is missing from the serving copy.","sev":"error","claimId":"item-003-v1#existence","src":"acp-feed","field":"existence","val":"false","ref":"item-003-v1","rule":"LST-EXIST-MISSING","cls":"existence"},
+{"plain":"The copy keys this row as \"legacy-pos-4471\" but the catalog row is \"item-003-v2\" — same item, mismatched identity (resolved by exact name).","sev":"error","claimId":"legacy-pos-4471#existence","src":"acp-feed","field":"existence","val":"true","ref":"item-003-v2","rule":"LST-IDENT-ID-MISMATCH","cls":"identity"},
+{"plain":"The variant label says \"Small\" but this row is the \"Medium\" variation — variants of this item can no longer be told apart.","sev":"error","claimId":"item-004-v2#variant_dict","src":"acp-feed","field":"variant_dict","val":"group item-004 · variation=Small","ref":"item-004-v2","rule":"LST-IDENT-MODIFIER-AMBIG","cls":"identity"},
+{"plain":"The price is serialized in cents (2150) where dollars are expected (21.50) — a 100× overstatement.","sev":"error","claimId":"item-001-v1#price.amount","src":"acp-feed","field":"price.amount","val":"2150","ref":"item-001-v1","rule":"LST-PRICE-CENTS-AS-DECIMAL","cls":"price"},
+{"plain":"The currency code is malformed: \"usd\" instead of ISO-4217 \"USD\".","sev":"warn","claimId":"item-001-v2#price.currency","src":"acp-feed","field":"price.currency","val":"usd","ref":"item-001-v2","rule":"LST-PRICE-CURRENCY-FORM","cls":"price"},
+{"plain":"The sale price 28.50 is higher than the regular price 27.50 — a \"sale\" that costs more.","sev":"error","claimId":"item-001-v3#invariants","src":"acp-feed","field":"invariants","val":"price 27.50 · sale 28.50","ref":"item-001-v3","rule":"LST-PRICE-SALE-GT","cls":"price"},
+{"plain":"The served price 12.00 does not match the catalog price 10.00.","sev":"error","claimId":"item-006-v1#price.amount","src":"acp-feed","field":"price.amount","val":"12.00","ref":"item-006-v1","rule":"LST-PRICE-VALUE","cls":"price"},
+{"plain":"The pre-order availability date 2026-02-01T00:00:00Z already passed (catalog as-of 2026-07-03T00:00:00Z) — the promise is stale.","sev":"warn","claimId":"item-004-v1#availability_date","src":"acp-feed","field":"availability_date","val":"2026-02-01T00:00:00Z","ref":"item-004-v1","rule":"LST-STALE-AVAILDATE","cls":"staleness"},
+{"plain":"This row expired 2026-01-01T00:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z).","sev":"warn","claimId":"item-003-v3#expiration_date","src":"acp-feed","field":"expiration_date","val":"2026-01-01T00:00:00Z","ref":"item-003-v3","rule":"LST-STALE-EXPIRED","cls":"staleness"}
+]
+</script>
+<script>
+(function(){
+  var data = JSON.parse(document.getElementById('data').textContent);
+  var esc = function(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;};
+
+  // build class filter chips from real data (no invented categories)
+  var classes = [];
+  data.forEach(function(f){ if(classes.indexOf(f.cls)<0) classes.push(f.cls); });
+  var classGrp = document.getElementById('classGrp');
+  classGrp.insertAdjacentHTML('beforeend',
+    '<button class="chipf" data-type="cls" data-val="all" aria-pressed="true">All</button>' +
+    classes.map(function(c){
+      var n = data.filter(function(f){return f.cls===c;}).length;
+      return '<button class="chipf" data-type="cls" data-val="'+esc(c)+'" aria-pressed="false">'+esc(c)+' <span class="n">'+n+'</span></button>';
+    }).join(''));
+
+  var grid = document.getElementById('grid');
+  grid.innerHTML = data.map(function(f,i){
+    var idx = String(i+1).padStart(2,'0');
+    return '<article class="card" data-sev="'+f.sev+'" data-cls="'+esc(f.cls)+'" style="animation-delay:'+(i*24)+'ms">'
+      + '<div class="tick '+f.sev+'"></div>'
+      + '<div class="card-body">'
+        + '<div class="card-top"><span class="idx">'+idx+'</span><span class="sev '+f.sev+'">'+f.sev+'</span></div>'
+        + '<p class="plain">'+esc(f.plain)+'</p>'
+        + '<p style="margin:10px 0 14px"><span class="catpill">'+esc(f.cls)+'</span></p>'
+      + '</div>'
+      + '<div class="card-foot"><dl class="rc-grid">'
+        + '<div class="rc full"><dt>claim</dt><dd>'+esc(f.claimId)+'<span class="sub">'+esc(f.src+' · '+f.field+' = '+f.val)+'</span></dd></div>'
+        + '<div class="rc"><dt>reference row</dt><dd>'+esc(f.ref)+'</dd></div>'
+        + '<div class="rc"><dt>rule / spec-clause</dt><dd>'+esc(f.rule)+'</dd></div>'
+      + '</dl></div>'
+    + '</article>';
+  }).join('') + '<p class="empty" id="empty" style="display:none">No findings match this filter.</p>';
+
+  var state = {sev:'all', cls:'all'};
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.card'));
+  var showing = document.getElementById('showing');
+  var empty = document.getElementById('empty');
+
+  function apply(){
+    var n=0;
+    cards.forEach(function(c){
+      var ok = (state.sev==='all'||c.dataset.sev===state.sev) && (state.cls==='all'||c.dataset.cls===state.cls);
+      c.classList.toggle('hide', !ok);
+      if(ok) n++;
+    });
+    showing.textContent = 'showing '+n;
+    empty.style.display = n?'none':'block';
+  }
+  document.querySelectorAll('.chipf').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var type=btn.dataset.type, val=btn.dataset.val;
+      state[type]=val;
+      document.querySelectorAll('.chipf[data-type="'+type+'"]').forEach(function(b){
+        b.setAttribute('aria-pressed', b.dataset.val===val?'true':'false');
+      });
+      apply();
+    });
+  });
+
+  // animate the verdict bar after paint
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    document.getElementById('barE').style.width = (11/16*100)+'%';
+    document.getElementById('barW').style.width = (5/16*100)+'%';
+  });});
+})();
+</script>
+</body>
+</html>

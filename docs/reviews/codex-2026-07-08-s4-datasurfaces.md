@@ -1,0 +1,10 @@
+# Codex changed-files review — Whole-site redesign S4 (data surfaces), 2026-07-08
+
+- **Scope:** the S4 portion of the uncommitted diff — `app/{console,eval,metrics,audit,cost}/page.tsx`, `app/merchant/[id]/page.tsx`, new `components/data-surfaces/Mark.tsx`, the appended OXBLOOD DATA SURFACES section of `app/globals.css`.
+- **Route:** codex-guarded, read-only, xhigh, `< /dev/null`, background; maker=judge briefed with the five orchestrator-accepted escalations offered for attack.
+- **Verdict: BLOCK → reconciled primary-model-final to PROCEED.**
+- **Confirmed by Codex (8/8 constraint checks):** data wiring semantically unchanged vs HEAD (no computed value replaced by a literal; no mockup figure hardcoded) · honesty/provenance copy present (HONEST_DATA_LABEL, advisory clause, approval gate, simulated callouts) · identity clean + metadata composes · e2e-bound H1s/headings intact · S1/S2/S3 undisturbed · Mark.tsx decorative aria-hidden with mark+word pairing · no new deps/requests. All five escalation rulings stood unchallenged.
+- **P2 (severity text on tinted fills < 4.5:1) — CONFIRMED by independent recomputation (error-on-error-soft 4.16:1 · warn-on-warn-soft 4.48:1; the orchestrator's spot-check had measured raw ground only — a real catch), ACCEPTED-FIXED:** new on-tint inks `--error-ink #b71f13` / `--warn-ink #9c3d06` (5.62:1 on their tints, 6.31/6.59 on bare ground) now used by `.ds-note.warn` and the warn/error chip families; ok-tint passes as-was (4.85:1); raw `--error/--warn` retained for marks/borders on plain ground (4.76/5.35).
+- **P3 (999px pill radius vs the ≤12px rule) — ACCEPTED-DOCUMENTED as the sanctioned exception:** element-height pills on `.ds-chip`/`.ds-tag` match the owner-picked mockup's own `.status` pill and the S1 `.site-status` precedent (which passed the S1 gate unflagged); ruling recorded in a CSS comment at the `.ds-chip` rule.
+- **Post-fix gates:** verify exit 0 = **947+6** · test:legacy **306+5** (independent re-runs on the final state).
+- **Raw:** `codex-2026-07-08-s4-datasurfaces-raw.md`.

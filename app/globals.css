@@ -1,40 +1,55 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   ActivationOps — "Ledger Enterprise" design system (Stage 1 foundation)
-   Ported from mockups/v3-ledger-enterprise.html. Premium white ground, a single
-   vermilion accent (two lightnesses of one hue), cool-neutral ink/graphite, and
-   one signature primitive: the hairline-ruled ledger row (field · value · verdict).
-   Fonts are self-hosted via next/font/google (see app/layout.tsx) and reach this
-   file as CSS variables (--font-sans / --font-mono / --font-geist-mono).
+   Curbside Commons — "Oxblood" site design system (S1 foundation, 2026-07-08)
+   Spec: mockups/ultra-modern-2026-07-08/whole-site-gallery-v2.html (owner-picked).
+
+   RETHEME-IN-PLACE: every :root token NAME below is preserved (layout.tsx, Nav,
+   and the landing consume them) but the VALUES are remapped to Oxblood — a premium
+   off-white ground (#FBFBFD), a warm near-black ink ramp (harmonizing with the
+   accent, not cool-gray), wine-tinted hairlines, and ONE burgundy accent (#8A2233,
+   two lightnesses of one hue). An ADDITIVE "OXBLOOD SITE LAYER (S1)" section holds
+   the site-scoped tokens (wine ramp / severity / serif / ease) and the shared shell
+   primitives (nav + footer). Fonts still self-host via next/font/google (see
+   app/layout.tsx) as --font-sans / --font-mono / --font-geist-mono.
+
+   INTENTIONALLY UNTOUCHED (byte-for-byte, superseded by later slices):
+   • the entire `.rpt-wrap` report/demo Ledger block (line ~1105 → its print block)
+     — it redefines --paper/--ink/--body/--graphite/--hairline/--um/--sev-* locally,
+     so it is insulated from these :root remaps (S3 re-skins it to Oxblood);
+   • all `.ds-*` / `.cp-*` / `.lp-*` landing rule blocks — they inherit the new token
+     VALUES (new colors, old layout = the expected hybrid until S2 supersedes them).
    ========================================================================== */
 
 :root {
   color-scheme: light;
 
-  /* ground — true premium white, no warmth */
-  --bg: #ffffff;
-  --bg-2: #fcfcfd;
-  --bg-3: #f7f7f9;
+  /* ground — premium off-white (NOT pure #fff; pure white+black is an AI-median
+     tell). Warm-neutral steps down. */
+  --bg: #fbfbfd;
+  --bg-2: #f8f7f8;
+  --bg-3: #f5f3f4;
 
-  /* ink + graphite structure (cool neutrals, AA+ on white) */
-  --ink: #0a0a0c;
-  --ink-2: #16161a;
-  --body: #34343c; /* 11.6:1 — body text */
-  --graphite: #52525c; /* 7.72:1 — labels, values */
-  --muted: #5d5d68; /* 6.50:1 — secondary mono */
-  --faint: #6c6c78; /* 5.16:1 — non-essential ≥13px */
+  /* ink + graphite structure — a WARM near-black ramp (R>G>B), harmonizing with
+     the wine accent. Contrast recomputed on the #fbfbfd ground; every step clears
+     the prior cool-gray token's documented ratio. */
+  --ink: #1a1712; /* 17.29:1 — headings, hard marks */
+  --ink-2: #2e2825; /* 14.05:1 — strong text */
+  --body: #423b38; /* 10.61:1 — body text (spec #463f3c was 9.98:1, darkened to clear ≥10:1) */
+  --graphite: #564d48; /* 7.97:1 — labels, values (≥ old 7.72) */
+  --muted: #615750; /* 6.80:1 — secondary mono (≥ old 6.50) */
+  --faint: #6d635b; /* 5.67:1 — non-essential ≥13px (≥ old 5.16) */
 
-  /* hairlines */
-  --rule: #ececef;
-  --rule-2: #e0e0e4;
-  --rule-3: #d2d2d8;
+  /* hairlines — wine-tinted (rgba of the wine-900 hue), darkening steps */
+  --rule: rgba(74, 14, 26, 0.1);
+  --rule-2: rgba(74, 14, 26, 0.17);
+  --rule-3: rgba(74, 14, 26, 0.26);
 
-  /* THE single accent — vermilion, two lightnesses of one hue */
-  --signal: #e2402a; /* fills, dots, rules, marks */
-  --signal-text: #c0301b; /* 5.71:1 on white — small labels / verdicts */
-  --signal-tint: #fbedea; /* faint held-row ground */
-  --signal-rule: #f0d6cf; /* hairline at signal hue */
+  /* THE single accent — burgundy / oxblood, two lightnesses of one hue */
+  --signal: #8a2233; /* fills, dots, rules, marks */
+  --signal-text: #8a2233; /* 8.62:1 on #fbfbfd — small labels / verdicts (≥4.5) */
+  --signal-tint: rgba(138, 34, 51, 0.07); /* faint held-row ground */
+  --signal-rule: rgba(138, 34, 51, 0.24); /* hairline at signal hue */
 
   /* spacing — 4px base */
   --s1: 4px;
@@ -52,6 +67,38 @@
   /* type — font stacks resolve to the next/font CSS vars, with safe fallbacks */
   --ff-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
   --ff-mono: var(--font-mono), var(--font-geist-mono), ui-monospace, monospace;
+
+  /* ==== OXBLOOD SITE LAYER (S1, 2026-07-08) — additive site-scoped tokens ==== */
+  /* wine ramp — the ONE brand hue, wine-900 (darkest) → wine-500 */
+  --wine-900: #3e0a13;
+  --wine-800: #55101d;
+  --wine-700: #6e1423;
+  --wine-600: #8a2233;
+  --wine-500: #9e3143;
+  /* accent aliases (the site layer reads these; = the wine ramp) */
+  --accent: #8a2233;
+  --accent-hi: #6e1423; /* hover / pressed */
+  --accent-soft: rgba(138, 34, 51, 0.07);
+  --accent-line: rgba(138, 34, 51, 0.24);
+  /* severity — kept perceptually FAR from the wine brand (always paired with a
+     shape + word by consuming surfaces, never colour alone) */
+  --error: #d92d20;
+  --error-soft: rgba(217, 45, 32, 0.08);
+  --warn: #b54708;
+  --warn-soft: rgba(181, 71, 8, 0.11);
+  --ok: #067647;
+  --ok-soft: rgba(6, 118, 71, 0.09);
+  /* on-TINT severity inks (Codex S4 P2): raw --error/--warn compound below 4.5:1
+     on their own soft fills (4.16/4.48 over #fbfbfd) — text on a *-soft ground
+     uses these darker inks (5.62:1 on tint; 6.31/6.59 on bare ground) */
+  --error-ink: #b71f13;
+  --warn-ink: #9c3d06;
+  /* serif display stack (brand wordmark + headlines) — no new dependency */
+  --serif: ui-serif, "New York", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+    "Times New Roman", serif;
+  /* shared easing */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /* ==== end OXBLOOD SITE LAYER tokens ==== */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -76,6 +123,121 @@ body {
   line-height: 1.6;
   letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================================
+   OXBLOOD SITE LAYER (S1, 2026-07-08) — shared shell primitives (Nav + footer).
+   Only what the global shell needs; landing/report/demo surfaces keep their own
+   blocks. Consumed by components/Nav.tsx and app/layout.tsx. Element selectors
+   `nav` / `footer` are hidden in the report @media print block (unchanged).
+   ========================================================================== */
+
+/* ----- Nav: sticky, hairline-ruled, serif wordmark, sans links (mockup spec) - */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  /* rgba(255,255,255,.88) IS the no-support fallback; blur is progressive */
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: saturate(1.4) blur(10px);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--rule);
+}
+.site-nav-in {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 11px clamp(18px, 4vw, 36px);
+}
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-right: 18px;
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-size: 16px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.site-brand-mark {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: var(--accent);
+}
+.site-navlink {
+  /* mockup spec: sans 13px (E-3 reviewer fix — the dispatch brief's "mono" was
+     the orchestrator's error; the mockup .navlink inherits the sans body font) */
+  font-family: var(--ff-sans);
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 11px;
+  border-radius: 7px;
+  white-space: nowrap;
+  transition:
+    background 0.16s var(--ease),
+    color 0.16s ease;
+}
+.site-navlink:hover {
+  background: var(--bg-3);
+  color: var(--ink);
+}
+.site-navlink[aria-current="page"] {
+  background: var(--accent);
+  color: #fff;
+}
+.site-navlink:focus-visible,
+.site-brand:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.site-status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  background: var(--bg-3);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 5px 11px;
+}
+.site-status-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+
+/* ----- global footer: honesty paragraph on a hairline-ruled panel ----------- */
+.site-footer {
+  margin-top: 20px;
+  border-top: 1px solid var(--rule);
+  background: var(--bg-3);
+}
+.site-footer-in {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 40px clamp(18px, 4vw, 36px) 72px;
+  font-size: 13px;
+  line-height: 1.62;
+  color: var(--body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-navlink {
+    transition: none;
+  }
 }
 
 /* ----- type primitives ------------------------------------------------------ */
@@ -432,7 +594,7 @@ body {
   border-bottom: 1px solid var(--rule);
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 18px;
+  gap: 8px;
   align-items: baseline;
 }
 .cp-rlbl {
@@ -441,13 +603,18 @@ body {
   color: var(--graphite);
   letter-spacing: 0.005em;
   width: 100%;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
+/* record fields as hairline chips (Oxblood v2 catch — matches the mockup .rf .f) */
 .cp-rf {
   font-family: var(--ff-mono);
   font-size: 11.5px;
   color: var(--ink);
   white-space: nowrap;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 3px 8px;
 }
 .cp-rf .cp-rk {
   color: var(--graphite);
@@ -633,489 +800,392 @@ body {
 }
 
 /* ============================================================================
-   Landing-page section primitives (Layer 1 surfaces) — ported from the v3 mockup
+   OXBLOOD LANDING (S2, 2026-07-08) — the editorial scroll-story on the S1 tokens.
+   Spec: the #/ Landing view of whole-site-gallery-v2.html (owner-picked v2). Serif
+   display headlines (scoped to .lp-main), ONE wine accent, hairline-ruled sections,
+   the five-stage flow as a hairline-CONNECTED strip (gate stages emphasised, never
+   numbered 01/02/03). No gradients, no glass, no icon-in-square tiles, radii <= 12px.
+   Replaces the interim lp-* / ds-tech landing block (both were app/page.tsx-only).
+   The CatchPanel keeps its own cp-* block above (SSR-settled + reduced-motion contract).
    ========================================================================== */
 
-/* ----- HERO ----------------------------------------------------------------- */
-.lp-hero {
-  padding: 78px 0 70px;
-}
-@media (max-width: 720px) {
-  .lp-hero {
-    padding: 48px 0 44px;
-  }
-}
-.lp-hero-grid {
-  display: grid;
-  grid-template-columns: 1.04fr 0.96fr;
-  gap: 56px;
-  align-items: center;
-}
-@media (max-width: 960px) {
-  .lp-hero-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
-    align-items: start;
-  }
-}
-.lp-hero h1 {
-  font-size: clamp(36px, 5.2vw, 56px);
-  max-width: 16ch;
-  letter-spacing: -0.034em;
-  margin: 22px 0 0;
-  font-weight: 800;
-  line-height: 1.04;
+/* serif display headlines — scoped to the landing (matches the v2 spec register) */
+.lp-main h1,
+.lp-main h2,
+.lp-main h3,
+.lp-main h4 {
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -0.012em;
   color: var(--ink);
+  margin: 0;
   text-wrap: balance;
 }
-.lp-hero h1 .mark-word {
+
+/* ----- shared landing atoms ------------------------------------------------- */
+.lp-ic {
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+  vertical-align: -2px;
+}
+.lp-si {
+  display: block;
+  width: 26px;
+  height: 26px;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.lp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.lp-h2 {
+  font-size: clamp(25px, 3.8vw, 40px);
+  line-height: 1.08;
+  max-width: 20ch;
+}
+.lp-h3 {
+  font-size: 18px;
+  line-height: 1.25;
+}
+.lp-h4 {
+  font-size: 15px;
+  line-height: 1.3;
+}
+.lp-lede {
+  margin: 16px 0 0;
+  font-size: clamp(15.5px, 1.7vw, 17px);
+  line-height: 1.55;
+  color: var(--body);
+  max-width: 56ch;
+  text-wrap: pretty;
+}
+.lp-lede-wide {
+  max-width: 64ch;
+}
+.lp-lede em,
+.lp-foot em,
+.lp-ptext em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink);
+}
+.lp-ptext {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--body);
+}
+.lp-foot {
+  margin: 20px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--body);
+  max-width: 70ch;
+}
+.lp-mark {
   color: var(--signal-text);
   white-space: nowrap;
 }
-.lp-hero .sub {
-  margin-top: 22px;
-  font-size: 19px;
-  line-height: 1.5;
-  color: var(--body);
-  max-width: 50ch;
-  letter-spacing: -0.01em;
-}
-.lp-hero .sub em {
-  font-style: normal;
-  color: var(--ink);
-  font-weight: 600;
-}
-.lp-hero-cta {
-  margin-top: 30px;
+
+/* ----- buttons (wine primary — the ONE accent doing the primary action) ----- */
+.lp-cta-row {
   display: flex;
-  align-items: center;
-  gap: 18px;
   flex-wrap: wrap;
-}
-.lp-howlink {
-  font-family: var(--ff-mono);
-  font-size: 12.5px;
-  color: var(--graphite);
-  text-decoration: none;
-  display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 2px;
-  min-height: 24px;
-  border-bottom: 1px solid transparent;
-  transition:
-    color 0.15s ease,
-    border-color 0.15s ease;
+  gap: 14px;
+  margin-top: 28px;
 }
-.lp-howlink:hover {
-  color: var(--ink);
-  border-color: var(--rule-3);
-}
-.lp-howlink svg {
-  color: var(--signal-text);
-}
-.lp-hero-aside {
-  position: relative;
-}
-@media (max-width: 960px) {
-  .lp-hero-aside {
-    max-width: 520px;
-  }
-}
-
-/* ----- TRUST ANCHOR — three honest steps as a ruled strip ------------------- */
-.lp-anchor {
-  margin-top: var(--s7);
-  border-top: 1px solid var(--rule-3);
-  border-bottom: 1px solid var(--rule-3);
-}
-.lp-anchor-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
-@media (max-width: 760px) {
-  .lp-anchor-grid {
-    grid-template-columns: 1fr;
-  }
-}
-.lp-astep {
-  padding: 26px 28px 26px 24px;
-  border-left: 1px solid var(--rule);
-}
-.lp-astep:first-child {
-  border-left: none;
-  padding-left: 0;
-}
-@media (max-width: 760px) {
-  .lp-astep {
-    border-left: none;
-    border-top: 1px solid var(--rule);
-    padding: 22px 0;
-  }
-  .lp-astep:first-child {
-    border-top: none;
-  }
-}
-.lp-astep .an {
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  color: var(--graphite);
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-}
-.lp-astep .an .dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--ink);
-  flex: none;
-}
-.lp-astep .an.signal .dot {
-  background: var(--signal);
-}
-.lp-astep h3 {
-  font-size: 16px;
-  margin-top: 12px;
-}
-.lp-astep p {
-  margin: 8px 0 0;
-  font-size: 14.5px;
-  line-height: 1.5;
-  color: var(--body);
-}
-.lp-anchor-foot {
-  margin: 16px 0 0;
-  font-size: 14.5px;
-  color: var(--body);
-  line-height: 1.55;
-  max-width: 70ch;
-}
-.lp-anchor-foot em {
-  font-style: normal;
-  color: var(--ink);
-  font-weight: 600;
-}
-
-/* ----- HOW IT WORKS — pipeline ledger rows (not a 1-2-3 band) --------------- */
-.lp-pipe {
-  margin-top: var(--s6);
-  border-top: 1px solid var(--rule-3);
-}
-.lp-prow {
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  gap: 0;
-  border-bottom: 1px solid var(--rule);
-  transition: background 0.15s ease;
-}
-.lp-prow:hover {
-  background: var(--bg-2);
-}
-.lp-prow .pn {
-  grid-column: 1;
-  padding: 22px 0 22px 2px;
-  font-family: var(--ff-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 13px;
-  color: var(--graphite);
-  font-weight: 500;
-}
-.lp-prow.gate .pn {
-  color: var(--signal-text);
-}
-.lp-prow .pmain {
-  grid-column: 2;
-  padding: 20px 0 20px 24px;
-  border-left: 1px solid var(--rule);
-}
-.lp-prow .ptop {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.lp-prow h3 {
-  font-size: 17px;
-}
-.lp-prow .check-tag {
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  letter-spacing: 0.02em;
-  color: var(--signal-text);
-  border: 1px solid var(--signal-rule);
-  border-radius: 4px;
-  padding: 2px 7px;
-  background: var(--signal-tint);
-}
-.lp-prow .pl {
-  margin: 9px 0 0;
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--body);
-  max-width: 64ch;
-}
-@media (max-width: 560px) {
-  .lp-prow {
-    grid-template-columns: 40px 1fr;
-  }
-  .lp-prow .pmain {
-    padding-left: 16px;
-  }
-}
-
-/* ----- DIFFERENTIATION — two ledger columns --------------------------------- */
-.lp-compare {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  margin-top: var(--s6);
-  border: 1px solid var(--rule-2);
-  border-radius: 6px;
-  overflow: hidden;
-}
-@media (max-width: 760px) {
-  .lp-compare {
-    grid-template-columns: 1fr;
-  }
-}
-.lp-ccol {
-  padding: 28px;
-  background: #fff;
-}
-.lp-ccol.them {
-  border-right: 1px solid var(--rule-2);
-}
-@media (max-width: 760px) {
-  .lp-ccol.them {
-    border-right: none;
-    border-bottom: 1px solid var(--rule-2);
-  }
-}
-.lp-ccol .crole {
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.005em;
-  color: var(--graphite);
-  margin-bottom: 8px;
-}
-.lp-ccol.ours .crole {
-  color: var(--signal-text);
-}
-.lp-ccol h3 {
-  font-size: 19px;
-  letter-spacing: -0.022em;
-}
-.lp-ccol ul {
-  margin: 20px 0 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.lp-ccol li {
-  display: flex;
-  gap: 13px;
-  font-size: 14.5px;
-  line-height: 1.45;
-  color: var(--body);
-  padding: 13px 0;
-  border-top: 1px solid var(--rule);
-}
-.lp-ccol li:first-child {
-  border-top: none;
-}
-.lp-ccol li .gl {
-  flex: none;
-  margin-top: 1px;
-}
-.lp-ccol .cq {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--rule-2);
-  font-size: 14.5px;
-  color: var(--ink);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-.lp-ccol .cq em {
-  font-style: normal;
-  color: var(--signal-text);
-}
-
-/* ----- OBJECTION — method only, no figures ---------------------------------- */
-.lp-qa {
-  margin-top: var(--s6);
-  border-top: 1px solid var(--rule-3);
-}
-.lp-qrow {
-  display: grid;
-  grid-template-columns: 0.42fr 1fr;
-  gap: 32px;
-  padding: 26px 0;
-  border-bottom: 1px solid var(--rule);
-}
-@media (max-width: 760px) {
-  .lp-qrow {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-.lp-qrow .qh {
-  font-weight: 600;
-  color: var(--ink);
-  font-size: 16px;
-  line-height: 1.4;
-  letter-spacing: -0.018em;
-}
-.lp-qrow .qb {
-  color: var(--body);
-  font-size: 15.5px;
-  line-height: 1.55;
-  max-width: 62ch;
-}
-.lp-qrow .qb em {
-  font-style: normal;
-  color: var(--ink);
-  font-weight: 600;
-}
-.lp-pending {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 11px;
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  color: var(--signal-text);
-  border: 1px solid var(--signal-rule);
-  background: var(--signal-tint);
-  border-radius: 5px;
-  padding: 4px 9px;
-}
-.lp-pending .ring {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  border: 1.5px solid var(--signal);
-  flex: none;
-}
-
-/* ----- CTA close ------------------------------------------------------------ */
-.lp-cta-wrap {
-  margin-top: var(--s7);
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
+.lp-cta-close {
+  margin-top: 24px;
 }
 .lp-cta-note {
   font-family: var(--ff-mono);
   font-size: 12px;
   color: var(--muted);
 }
-
-/* ----- LAYER 2 = opt-in technical reveal (the only home for deep ML jargon) -- */
-.ds-tech {
-  margin-top: var(--s5);
-  border-top: 1px solid var(--rule-2);
-  border-bottom: 1px solid var(--rule-2);
-}
-.ds-tech > summary {
-  cursor: pointer;
-  list-style: none;
-  padding: 15px 2px;
-  min-height: 24px;
-  font-family: var(--ff-mono);
-  font-size: 12.5px;
-  letter-spacing: 0.005em;
-  color: var(--graphite);
-  display: flex;
+.lp-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 11px;
-  user-select: none;
-  transition: color 0.15s ease;
+  gap: 8px;
+  font-family: var(--ff-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.006em;
+  text-decoration: none;
+  padding: 11px 18px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  min-height: 44px;
+  cursor: pointer;
+  transition:
+    transform 0.16s var(--ease),
+    background 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
-.ds-tech > summary:hover {
+.lp-btn.primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(74, 14, 26, 0.12);
+}
+.lp-btn.primary:hover {
+  background: var(--accent-hi);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(74, 14, 26, 0.16);
+}
+.lp-btn.ghost {
+  background: transparent;
+  border-color: var(--rule-2);
   color: var(--ink);
 }
-.ds-tech > summary::-webkit-details-marker {
-  display: none;
+.lp-btn.ghost:hover {
+  background: var(--bg-3);
+  border-color: var(--accent-line);
 }
-.ds-tech > summary .chev {
-  width: 13px;
-  height: 13px;
-  flex: none;
+.lp-btn .lp-ic {
+  transition: transform 0.16s var(--ease);
+}
+.lp-btn:hover .lp-ic {
+  transform: translateX(2px);
+}
+
+/* ----- HERO ----------------------------------------------------------------- */
+.lp-hero {
+  padding: clamp(48px, 8vw, 92px) 0 clamp(40px, 6vw, 72px);
+}
+.lp-hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: clamp(32px, 5vw, 56px);
+  align-items: center;
+}
+@media (max-width: 920px) {
+  .lp-hero-grid {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+}
+.lp-hero h1 {
+  font-size: clamp(33px, 5.4vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 0 0 20px;
+  max-width: 18ch;
+}
+.lp-hero .lp-lede {
+  font-size: clamp(16px, 2vw, 19px);
+  max-width: 52ch;
+}
+.lp-hero-aside {
+  position: relative;
+}
+@media (max-width: 920px) {
+  .lp-hero-aside {
+    max-width: 520px;
+  }
+}
+
+/* ----- panels + grids (restrained cards: hairline, tinted hover, no glow) ---- */
+.lp-grid3 {
+  display: grid;
+  gap: 14px;
+  margin-top: 26px;
+}
+.lp-grid2 {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+@media (min-width: 720px) {
+  .lp-grid3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .lp-grid2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.lp-panel {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 22px;
+  background: var(--bg);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s var(--ease);
+}
+.lp-panel:hover {
+  border-color: var(--accent-line);
+  box-shadow: 0 12px 30px -20px rgba(74, 14, 26, 0.2);
+  transform: translateY(-2px);
+}
+.lp-panel.ours {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+.lp-role {
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+  color: var(--graphite);
+  margin-bottom: 10px;
+}
+.lp-panel.ours .lp-role {
   color: var(--signal-text);
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.ds-tech[open] > summary .chev {
-  transform: rotate(90deg);
-}
-.ds-tech .tech-body {
-  padding: 2px 2px 22px 24px;
-}
-.ds-tech .tech-body p {
-  font-size: 15px;
-  line-height: 1.62;
-  color: var(--body);
-  max-width: 72ch;
-  margin: 0;
-}
-.ds-tech .tech-body p + p {
-  margin-top: 12px;
-}
-.ds-tech .tech-body em {
-  font-style: normal;
-  color: var(--ink);
   font-weight: 600;
 }
-.ds-tech .tech-body .mono-line {
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.7;
-  margin-top: 12px;
-  letter-spacing: -0.002em;
+.lp-panel .lp-h3 {
+  margin-bottom: 6px;
 }
-.ds-tech .tech-body .mono-line .k {
-  color: var(--graphite);
+.lp-qh {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.32;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+/* ----- HOW IT WORKS — five stages as a hairline-connected strip -------------- */
+.lp-flow {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--rule-2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.lp-step {
+  padding: 20px 18px;
+  border-left: 1px solid var(--rule);
+  background: var(--bg);
+  transition: background 0.16s ease;
+}
+.lp-step:first-child {
+  border-left: none;
+}
+.lp-step.gate {
+  background: var(--accent-soft);
+}
+.lp-sk {
+  display: block;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.lp-step.gate .lp-sk {
+  color: var(--signal-text);
+}
+.lp-step .lp-h4 {
+  margin-bottom: 6px;
+}
+@media (max-width: 760px) {
+  .lp-flow {
+    grid-template-columns: 1fr;
+  }
+  .lp-step {
+    border-left: none;
+    border-top: 1px solid var(--rule);
+  }
+  .lp-step:first-child {
+    border-top: none;
+  }
+}
+
+/* ----- CLOSE — honesty note + mono strip ------------------------------------ */
+.lp-note {
+  margin: 26px 0 0;
+  border: 1px solid var(--rule);
+  background: var(--bg-3);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--body);
+  max-width: 82ch;
+}
+.lp-strip {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 11px;
+  line-height: 1.8;
+  letter-spacing: 0.005em;
+  color: var(--faint);
+  max-width: 82ch;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-tech > summary .chev {
+  .lp-btn,
+  .lp-btn .lp-ic,
+  .lp-panel,
+  .lp-step {
     transition: none;
+  }
+  /* Codex S2 P3: transitions alone weren't enough — without this the hover
+     transforms still MOVE (instantly) under reduced motion. */
+  .lp-btn.primary:hover,
+  .lp-btn:hover .lp-ic,
+  .lp-panel:hover {
+    transform: none;
   }
 }
 
 /* ============================================================================
-   THE "LEDGER" DESIGN SYSTEM (owner-picked 2026-07-08) — a Swiss / International-
-   Typographic audit certificate on a gallery-white ground. Scoped to the two real
-   verifier surfaces (/report + /demo, both mount .rpt-wrap); the landing keeps its
-   own system untouched. Reference (adapted, never copied):
-   mockups/design-samples-2026-07-08/sample-1-ledger.html.
+   THE REPORT / DEMO DOCUMENT SYSTEM — re-tokened to "Oxblood" in S3 (2026-07-08).
+   Scoped to the two real verifier surfaces (/report + /demo, both mount .rpt-wrap);
+   the landing keeps its own system. Spec: mockups/ultra-modern-2026-07-08/
+   whole-site-gallery-v2.html (owner-picked). Lineage: the owner-picked "Ledger"
+   audit-certificate STRUCTURE (Swiss / International-Typographic; flat, no radii /
+   shadows / gradients; the precision of the hairline rules and the spacing IS the
+   design) is RETAINED; every token VALUE is remapped to the site Oxblood system.
 
-   Ultramarine is the ONE accent — SIMULATED tag block · masthead rule · finding
-   index numerals — NEVER on severity. Severity carries its own three marks
-   (error / warn / info), kept apart from the accent. No radii, no shadows, no
-   gradients: the precision of the hairline rules and the spacing IS the design.
+   S3 re-token: gallery-white ground #FFFFFF → premium off-white #FBFBFD; the cool
+   near-black ink ramp → a warm one; the ONE accent ultramarine → burgundy #8A2233
+   (the token NAME --um is kept so every consumer follows) — SIMULATED tag block ·
+   masthead rule · finding index numerals — NEVER on severity. Severity carries its
+   own three marks (error / warn / info) in warm hues kept perceptually FAR from the
+   burgundy brand, always paired with a square shape + word. Display headings adopt
+   the site serif (var(--serif)) per the mockup's report register; body stays a
+   system sans, receipts stay mono. The SIMULATED banner keeps its unmissable ink
+   band, re-grounded on the warm ink, print-color-adjust intact (test-locked).
+   Contrast recomputed on #FBFBFD (ratios in the token comments below).
    Desktop web + printable (see the @media print block below). rpt-* / dmo-*.
    ========================================================================== */
 .rpt-wrap {
-  /* Ledger tokens — pre-decided; #ffffff is the owner gallery-white modification
-     (the sample used #f9f9f6). Kept as ONE --paper token so text-on-ink surfaces
-     (the banner text, the FAIL flag) follow to #ffffff automatically. */
-  --paper: #ffffff; /* ground + every text-on-ink surface (banner text, verdict flag) */
-  --ink: #101014; /* near-black ink: headline, banner ground, verdict stamp, hard marks */
-  --body: #33333b; /* long-form body text */
-  --graphite: #50505a; /* rail captions, labels, secondary mono */
-  --hairline: #dcdcd4; /* the modular-grid rules (1px, warm-on-white by intent) */
-  --um: #1b3eb8; /* ultramarine — the ONE accent */
-  --sev-err: #a8231b;
-  --sev-warn: #8a5a06;
-  --sev-info: #55555e;
-  /* system font stacks only — no new dependency. Grotesk display + a tabular mono. */
+  /* S3 Oxblood re-token (2026-07-08): the Ledger STRUCTURE is retained; every token
+     VALUE is remapped to the site Oxblood system. Kept as ONE --paper token so every
+     text-on-ink surface (banner text, verdict flag) follows automatically. Contrast
+     recomputed on #fbfbfd — floors: body ≥10:1, graphite ≥7:1, all others ≥4.5:1. */
+  --paper: #fbfbfd; /* premium off-white ground + every text-on-ink surface (banner text, verdict flag) */
+  --ink: #1a1712; /* warm near-black: headline, banner ground, verdict stamp, hard marks — 17.29:1 */
+  --body: #423b38; /* long-form body text — 10.61:1 (sitewide Oxblood body ramp) */
+  --graphite: #564d48; /* rail captions, labels, secondary mono — 7.97:1 */
+  --hairline: rgba(74, 14, 26, 0.14); /* wine-tinted modular-grid rules (site --rule family; visual weight of the old #dcdcd4) */
+  --um: #8a2233; /* the ONE accent — burgundy/oxblood (token NAME kept from ultramarine) — 8.62:1 */
+  --sev-err: #d92d20; /* 4.67:1 — bright/warm, kept perceptually far from the burgundy brand */
+  --sev-warn: #b54708; /* 5.25:1 — amber, far from the brand */
+  --sev-info: #615750; /* warm neutral — 6.80:1 (no info in the fixture; never a brand/alarm hue) */
+  /* system font stacks match the mockup's report register (system sans + system mono);
+     display headings adopt the site serif (var(--serif)). No new dependency. */
+  /* serif display — local alias of the site --serif so the block stays fully
+     self-defined (Codex S3 P3: no var consumed here falls through to :root) */
+  --serif: ui-serif, "New York", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+    "Times New Roman", serif;
   --ledger-sans: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
   --ledger-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono",
     monospace;
@@ -1132,7 +1202,7 @@ body {
 }
 
 /* ---- SIMULATED banner — solid ink band, unmissable, first thing on the page.
-   Text uses --paper (#ffffff) on the ink ground; survives print exact. ---- */
+   Text uses --paper (#fbfbfd) on the ink ground; survives print exact. ---- */
 .rpt-sim {
   display: flex;
   align-items: flex-start;
@@ -1166,7 +1236,7 @@ body {
   max-width: 92ch;
 }
 
-/* ---- masthead — flush-left, closed by the single 4px ultramarine rule ---- */
+/* ---- masthead — flush-left, closed by the single 4px burgundy accent rule ---- */
 .rpt-head {
   margin-top: 0;
   padding: 44px 0 30px;
@@ -1183,11 +1253,12 @@ body {
 }
 .rpt-title {
   margin: 16px 0 0;
-  font-family: var(--ledger-sans);
+  /* S3: masthead adopts the site serif per the mockup's report register. */
+  font-family: var(--serif);
   font-size: clamp(34px, 4.4vw, 52px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.02;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.05;
   color: var(--ink);
   max-width: 24ch;
   text-wrap: balance;
@@ -1201,7 +1272,7 @@ body {
 }
 
 /* ---- surface toggle — a flush mono tab strip on a hairline; ink underline for
-   the active surface (ultramarine is reserved for its three sanctioned roles) -- */
+   the active surface (the burgundy accent is reserved for its three sanctioned roles) -- */
 .rpt-toolbar {
   display: flex;
   gap: 0;
@@ -1342,7 +1413,7 @@ body {
 }
 
 /* ---- findings — numbered rows: the plain line leads, four ruled mono receipt
-   columns follow; index numerals wear the ultramarine accent ---- */
+   columns follow; index numerals wear the burgundy accent ---- */
 .rpt-findings {
   list-style: none;
   margin: 0;
@@ -1640,11 +1711,12 @@ body {
 }
 .dmo-beat-title {
   margin: 0;
-  font-family: var(--ledger-sans);
+  /* S3: beat titles (mockup h3) adopt the site serif per the report register. */
+  font-family: var(--serif);
   font-size: 18px;
   line-height: 1.25;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.012em;
   color: var(--ink);
 }
 .dmo-beat-plain {
@@ -1717,4 +1789,758 @@ body {
 .dmo-findings {
   margin-top: 16px;
   border-top: 1px solid var(--hairline);
+}
+
+/* ============================================================================
+   OXBLOOD DATA SURFACES (S4, 2026-07-08) — compact-density primitives for the
+   six data/working surfaces: /console · /eval · /metrics · /audit · /cost ·
+   /merchant/[id]. Spec: the #/console…#/merchant views of
+   mockups/ultra-modern-2026-07-08/whole-site-gallery-v2.html (owner-picked).
+
+   Extends the S1 shared ds-* type/layout primitives (ds-wrap, ds-mono, ds-num)
+   and ADDS the compact data register: serif display headings, a stat rail,
+   hairline data tables, severity/status chips + verdict marks (the
+   --error/--warn/--ok triad, ALWAYS paired with a shape mark + the word — never
+   colour alone), metric bars, cards, and callouts. No gradients / glass /
+   numbered cards / icon-tiles; radii <= 12px; motion is structural + hover-only
+   (reduced-motion-gated below). Desktop web; server-rendered (no entrance
+   motion — the surfaces render settled). EVERYTHING is scoped under .ds-data so
+   nothing leaks to the landing (.lp-main) or report/demo (.rpt-wrap) systems.
+   ========================================================================== */
+
+/* ----- page shell ----------------------------------------------------------- */
+.ds-view {
+  padding: clamp(44px, 6vw, 72px) 0 96px;
+}
+.ds-wrap.ds-narrow {
+  max-width: 880px;
+}
+
+/* serif display headings — the Oxblood register, scoped to data surfaces */
+.ds-data h1,
+.ds-data h2,
+.ds-data h3,
+.ds-data h4 {
+  font-family: var(--serif);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.012em;
+  margin: 0;
+  text-wrap: balance;
+}
+.ds-data h1 {
+  font-size: clamp(27px, 3.6vw, 40px);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  max-width: 24ch;
+}
+.ds-data h2 {
+  font-size: 19px;
+  line-height: 1.25;
+}
+.ds-data h3 {
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+/* ----- eyebrow / kicker (console) ------------------------------------------- */
+.ds-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.ds-kicker svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+/* ----- ledes ---------------------------------------------------------------- */
+.ds-lead {
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 66ch;
+  text-wrap: pretty;
+}
+.ds-lead.plain {
+  color: var(--ink);
+}
+.ds-lead.tech {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.ds-lead b,
+.ds-lead strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.ds-lead.tech b,
+.ds-lead.tech strong {
+  color: var(--ink-2);
+}
+.ds-runline {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 72ch;
+}
+
+/* ----- callouts ------------------------------------------------------------- */
+.ds-note {
+  margin-top: 16px;
+  border: 1px solid var(--rule);
+  background: var(--bg-3);
+  border-radius: 10px;
+  padding: 12px 15px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 88ch;
+}
+.ds-note b,
+.ds-note strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.ds-note.warn {
+  border-color: rgba(181, 71, 8, 0.28);
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+.ds-note.warn b,
+.ds-note.warn strong {
+  color: var(--warn-ink);
+}
+
+/* ----- stat rail ------------------------------------------------------------ */
+.ds-stats {
+  display: grid;
+  gap: 12px;
+  margin-top: 28px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 560px) {
+  .ds-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 900px) {
+  .ds-stats.c4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .ds-stats.c5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .ds-stats.c6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+.ds-stat {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 15px 16px;
+  background: var(--bg);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+.ds-stat:hover {
+  border-color: var(--accent-line);
+  box-shadow: 0 1px 2px rgba(74, 14, 26, 0.06);
+}
+.ds-stat .v {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.ds-stat .l {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.ds-stat .s {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--faint);
+}
+.ds-stat.accent {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+.ds-stat.accent .v {
+  color: var(--accent);
+}
+
+/* ----- data tables ---------------------------------------------------------- */
+.ds-tbl {
+  margin-top: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  overflow: hidden;
+  overflow-x: auto;
+}
+.ds-data table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.ds-data thead th {
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 11px 16px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--rule);
+}
+.ds-data tbody td {
+  padding: 11px 16px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-2);
+  vertical-align: middle;
+}
+.ds-data tbody tr {
+  transition: background 0.14s ease;
+}
+.ds-data tbody tr:hover {
+  background: var(--bg-2);
+}
+.ds-mlink {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-line);
+  transition: border-color 0.14s ease;
+}
+.ds-mlink:hover {
+  border-color: var(--accent);
+}
+
+/* ----- chips (word-labelled status/risk pills) ------------------------------ */
+.ds-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 4px 9px;
+  /* element-height pill — the sanctioned exception to the ≤12px radius rule,
+     matching the mockup's own .status pill + the S1 .site-status precedent */
+  border-radius: 999px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.ds-chip svg {
+  width: 11px;
+  height: 11px;
+  flex: none;
+}
+.ds-chip.ok,
+.ds-chip.low,
+.ds-chip.sent,
+.ds-chip.pass {
+  color: var(--ok);
+  background: var(--ok-soft);
+}
+.ds-chip.warn,
+.ds-chip.medium,
+.ds-chip.held,
+.ds-chip.flagged {
+  color: var(--warn-ink);
+  background: var(--warn-soft);
+}
+.ds-chip.error,
+.ds-chip.high,
+.ds-chip.rejected,
+.ds-chip.blocked,
+.ds-chip.fail {
+  color: var(--error-ink);
+  background: var(--error-soft);
+}
+.ds-chip.neutral {
+  color: var(--graphite);
+  background: var(--bg-3);
+}
+
+/* ----- verdict marks (inline shape + word: PASS/FAIL etc.) ------------------ */
+.ds-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.ds-verdict svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+.ds-verdict.ok {
+  color: var(--ok);
+}
+.ds-verdict.no {
+  color: var(--error);
+}
+.ds-verdict.warn {
+  color: var(--warn);
+}
+
+/* ----- cards + grids (pipeline steps, chart panels, merchant sections) ------ */
+.ds-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+@media (min-width: 640px) {
+  .ds-grid.g2 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ds-grid.g3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ds-grid.g4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 900px) {
+  .ds-grid.g3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .ds-grid.g4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.ds-card {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 18px;
+  background: var(--bg);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s var(--ease);
+}
+.ds-card:hover {
+  border-color: var(--accent-line);
+  box-shadow: 0 12px 30px -20px rgba(74, 14, 26, 0.2);
+  transform: translateY(-2px);
+}
+.ds-card.flush {
+  padding: 20px;
+}
+.ds-card-t {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.ds-card-p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.ds-card-tech {
+  margin: 6px 0 0;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.ds-stack > * + * {
+  margin-top: 14px;
+}
+.ds-sec-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.ds-h2-row {
+  margin-top: 44px;
+  margin-bottom: 4px;
+}
+
+/* ----- metric bars ---------------------------------------------------------- */
+.ds-bar-row + .ds-bar-row {
+  margin-top: 12px;
+}
+.ds-bar-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  margin-bottom: 5px;
+  color: var(--ink-2);
+}
+.ds-bar-top .bv {
+  font-family: var(--ff-mono);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.ds-bar {
+  height: 8px;
+  border-radius: 5px;
+  background: var(--bg-3);
+  overflow: hidden;
+}
+.ds-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--ink);
+}
+.ds-bar.acc > i {
+  background: var(--accent);
+}
+.ds-ratefacts {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 16px;
+  margin: 16px 0 0;
+  font-size: 13px;
+}
+.ds-ratefacts dt {
+  color: var(--muted);
+  margin: 0;
+}
+.ds-ratefacts dd {
+  margin: 0;
+  font-family: var(--ff-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  text-align: right;
+}
+
+/* ----- merchant detail specifics -------------------------------------------- */
+.ds-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.ds-back span {
+  border-bottom: 1px solid var(--accent-line);
+  transition: border-color 0.14s ease;
+}
+.ds-back:hover span {
+  border-color: var(--accent);
+}
+.ds-back svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+.ds-mhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0 6px;
+}
+.ds-msub {
+  margin: 4px 0 0;
+  font-family: var(--ff-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.ds-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+  margin: 0;
+}
+@media (min-width: 640px) {
+  .ds-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.ds-field dt {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+.ds-field dd {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.ds-formula {
+  margin: 12px 0 0;
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  background: var(--bg-2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--ink-2);
+}
+.ds-formula .dim {
+  color: var(--muted);
+}
+.ds-sub {
+  margin-top: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg-2);
+  padding: 13px 14px;
+}
+.ds-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ds-tag {
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  color: var(--graphite);
+  background: var(--bg-3);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+.ds-tag.role {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ds-draft {
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.ds-draft-sub {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ds-draft-body {
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.ds-claims {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.ds-claims li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.ds-code {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 2px 6px;
+  color: var(--ink-2);
+}
+.ds-flaglist {
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+.ds-flaglist .fl-l {
+  font-weight: 600;
+  color: var(--graphite);
+}
+.ds-flaglist ul {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.ds-flaglist li {
+  position: relative;
+  padding-left: 15px;
+  line-height: 1.5;
+}
+.ds-flaglist li::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 8px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.ds-flaglist.err {
+  color: var(--error);
+}
+.ds-flaglist.warn {
+  color: var(--warn);
+}
+.ds-meta-line {
+  margin: 12px 0 0;
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.ds-judge-h {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+.ds-judge-count {
+  font-size: 13px;
+  color: var(--muted);
+}
+.ds-judge-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+.ds-judge-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.ds-judge-list li > svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  margin-top: 3px;
+}
+.ds-judge-list .ev {
+  color: var(--muted);
+}
+.ds-judge-list .un {
+  color: var(--error);
+}
+.ds-held {
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.ds-held .h {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent);
+}
+.ds-held .h svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+.ds-held .p {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.ds-gate-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.ds-gate-note {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.ds-audit {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ds-audit li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rule);
+  font-size: 12.5px;
+}
+.ds-audit li:first-child {
+  border-top: none;
+}
+.ds-audit .a-actor {
+  width: 92px;
+  flex: none;
+  font-family: var(--ff-mono);
+  color: var(--muted);
+}
+.ds-audit .a-action {
+  width: 132px;
+  flex: none;
+  font-family: var(--ff-mono);
+  color: var(--ink-2);
+}
+.ds-audit .a-detail {
+  flex: 1;
+  min-width: 180px;
+  color: var(--ink-2);
+}
+.ds-good {
+  color: var(--ok);
+}
+
+/* reduced motion — hover transforms/transitions off (data surfaces have no
+   entrance motion; these are the only moving parts) */
+@media (prefers-reduced-motion: reduce) {
+  .ds-stat,
+  .ds-card,
+  .ds-mlink,
+  .ds-back span,
+  .ds-data tbody tr {
+    transition: none;
+  }
+  .ds-card:hover {
+    transform: none;
+  }
 }

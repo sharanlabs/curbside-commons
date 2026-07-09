@@ -1,0 +1,10 @@
+# Codex changed-files review — Whole-site redesign S1 (shell), 2026-07-08
+
+- **Scope:** uncommitted working-tree diff on `app/globals.css` (+185/−29 & E-3 fix), `components/Nav.tsx` (+21/−8), `app/layout.tsx` (+6/−17) vs HEAD `b72993a`.
+- **Route:** `~/claude-os/bin/codex-guarded` exec, read-only sandbox, `model_reasoning_effort=xhigh`; seat smoke-tested `SEAT_OK` first. Maker=judge briefed (the orchestrator's own E-3 fix declared in-scope for attack).
+- **Verdict: BLOCK → reconciled primary-model-final to PROCEED** (no P1s; both findings dispositioned below).
+- **Constraint checks: ALL NINE CONFIRMED** — C1 `.rpt-wrap` byte-identical (sha256 + 13,857 bytes both sides) · C2 no engine/lib/evals/fixtures changes · C3 footer text nodes unchanged · C4 pill byte-identical · C5 zero external requests · C6 reduced-motion honored (new + existing blocks) · C7 rendered surfaces use `PLATFORM_NAME` (the literal also sits in a CSS comment + `lib/product.ts` itself — benign, the source constant) · C8 contrast recomputed independently (8.62:1 / 5.67:1 — matches ours) · C9 no new deps.
+- **P2 — mixed identity mid-lane** (`app/page.tsx:5` title + `:386` crole still "ActivationOps"): TRUE; = builder escalation E-1, already routed to **S2 (landing)** which rewrites `app/page.tsx` under the same owner GO in this session. ACCEPTED-DEFERRED with named discharge point S2 (not refuted). The root-layout template mechanics Codex traced (child string titles wrap into `%s · Curbside Commons`) are correct and desirable.
+- **P3 — stale "mono links" comment** (`globals.css` shell-primitives header vs the sans E-3 fix): ACCEPTED-FIXED same session (comment now reads "sans links (mockup spec)" and names E-3).
+- **Codex validation env note:** its sandbox ran typecheck/lint clean; vitest/build EPERM'd read-only — covered by the orchestrator's independent live runs: `npm run verify` exit 0 = **947 passed + 6 skipped**, `npm run test:legacy` exit 0 = **306+5** (post-E-3-fix state).
+- **Raw:** `codex-2026-07-08-s1-shell-raw.md`.
