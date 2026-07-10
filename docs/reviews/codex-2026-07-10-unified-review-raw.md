@@ -338,3 +338,48 @@ Blocking findings: identity must move to `/legacy/**`; protected paths must be c
 
 VERDICT: REVISE
 ```
+
+---
+
+# S0 round-2 verdict (2026-07-10): VERDICT: REVISE — 7 blocking defects, raw verbatim below (all accepted → v3.2)
+```
+3,80,802
+Plan v3.1 still has seven blocking defects at committed HEAD `46006f0`.
+
+1. **Identity instructions contradict the accepted disposition.**  
+   Line 5 fixes `/legacy/**`, but lines 16–17 still prescribe “**Label-as-legacy + dashboard replacement**” on root `/console`, `/audit`, and `/merchant/*`, treating `/legacy/` as merely an alternative. Line 4 says decisions are fixed before S1, while line 5 delays owner ratification until before S5 even though E1a consumes `/legacy/**` at line 26.
+
+   Fix: replace lines 16–17 with the accepted `/legacy/**` architecture and require owner ratification before S1/E1a.
+
+2. **CI claim sequencing is impossible.**  
+   Line 23 puts workflow creation and the README CI claim in S3. Line 43 says the claim publishes only after the first green run, but line 41 prevents pushing until batch A review. The workflow cannot run before it is pushed.
+
+   Fix: S3a = workflow-only, review, push, observe green. S3b = add the CI claim, review, push.
+
+3. **Emil content can still be consumed before its dedicated review closes.**  
+   Line 28 mentions a dedicated review leg but proceeds directly from VET to brief/build; line 42 reviews all of S6 only afterward in batch C.
+
+   Fix: create an explicit S6a hard gate: VET/pin/license/security review → reconcile/close → only then brief and sample.
+
+4. **S7 and batch D are circular.**  
+   Line 33 says S7 executes “**AFTER batch D reconciles**”; line 42 includes S7 inside batch D. Additionally, a record “generated from the final release-candidate SHA” cannot be committed without changing that SHA.
+
+   Fix: batch D reviews E2/E3/E4/E1b; after reconciliation, generate S7 against a named source-under-test SHA; review S7 in a separate batch E; establish the final release SHA afterward.
+
+5. **The release-gated artifact is rebuilt and changed in S8.**  
+   Line 34 builds and hashes exact `out/`. Line 35 then decides header policy, may add `_headers`, and builds again. Even without source changes, the injected UTC build timestamp guarantees a different artifact.
+
+   Fix: perform Pages/header preflight and create the sole timestamped build before the release gate. The gate tests and hashes that immutable `out/`; S8 only preview-deploys, promotes, and smokes the same directory. Gate evidence must attest to the source SHA/artifact hash without triggering a rebuild.
+
+6. **Dynamic mockup honesty coverage still misses the S6 artifact.**  
+   Line 39 covers mockups classified current/new in the earlier S4 inventory. S6 creates a later mockup, while line 28 still specifies only a manual regex sweep.
+
+   Fix: S6 must update the inventory and prove the new artifact is automatically included in C10’s dynamic scan.
+
+7. **The accepted S6 accessibility fold remains incomplete.**  
+   Line 28 covers reduced motion, contrast and anchors, but still omits the required no-JS fallback and keyboard/focus/semantic validation for the hold-and-release interaction.
+
+   Fix: add explicit no-JS readability, keyboard-equivalent operation, focus behavior and semantic checks to S6 acceptance.
+
+VERDICT: REVISE
+```
