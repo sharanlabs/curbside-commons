@@ -383,3 +383,28 @@ Plan v3.1 still has seven blocking defects at committed HEAD `46006f0`.
 
 VERDICT: REVISE
 ```
+
+---
+
+# S0 round-3 verdict (2026-07-10): VERDICT: REVISE — 3 blocking defects, raw verbatim below (all accepted → v3.3)
+```
+4,11,311
+Three blocking defects remain in v3.2:
+
+1. **The release gate still performs a second build.**  
+   Line 36 declares “**the SOLE timestamped build**” and makes `out/` immutable. Line 37 then runs “**full verify**” while claiming to attest “**WITHOUT rebuilding**.” At HEAD, `package.json:18` defines `verify` as typecheck + lint + tests + `npm run build`. The second build receives a different UTC timestamp and cannot match the accepted artifact.
+
+   Fix: create the sole artifact from a clean isolated checkout at the candidate SHA, with `npm ci`, recorded tool versions and one fixed timestamp. The release gate must run explicit no-build checks afterward and only rehash/inspect that artifact.
+
+2. **The exact exported artifact still lacks E2E coverage.**  
+   Line 37 runs both contracts on a “fresh server,” but the current `playwright.config.ts:21-25` starts `next dev`, not a static server over immutable `out/`. Preview smoke is narrower than the full canonical and legacy contracts.
+
+   Fix: add an artifact-mode Playwright configuration that serves the recorded `out/` without building and run both E2E contracts against it before SHIP attestation.
+
+3. **Preflight can change source after the final Codex batch.**  
+   Line 36 permits adding source-controlled `_headers` after batch E, but line 45 defines no review batch covering PRE-GATE BUILD+PREFLIGHT. A header-policy change could therefore enter the supposedly final candidate without changed-files review.
+
+   Fix: decide and commit header policy before batch E, or add batch F for any preflight-induced source/configuration change. Only then declare the candidate final and perform the sole build.
+
+VERDICT: REVISE
+```
