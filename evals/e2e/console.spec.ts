@@ -15,6 +15,14 @@ test("Landing renders the arc: honest H1, the shown catch, and the honesty foote
   await expect(page.getByText("Held for a person to approve.").first()).toBeVisible();
   // honesty disclosure present (text also appears in the layout footer → .first())
   await expect(page.getByText("Not affiliated with").first()).toBeVisible();
+  // S2 semantic disclosure contract (decision-log 2026-07-10 freeze-reversal row):
+  // the footer must state the truthful send posture and the one recorded send.
+  await expect(
+    page.getByText("This site initiates no sends and makes no live calls").first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("exactly one recorded, owner-armed send exists", { exact: false }).first(),
+  ).toBeVisible();
 });
 
 test("Console renders the queue with both human-in-the-loop outcomes visible", async ({ page }) => {

@@ -45,7 +45,7 @@ In a field where "our AI is calibrated" is usually an adjective, this repo treat
 
 ## Numbers at a glance
 
-961 tests passing (+7 skipped live harnesses; re-measured live 2026-07-10) · 8/8 listings drift classes injected and caught (measured) · 33/35 agreement with the official Rust validator with the 2 divergences documented to their root cause (the JSON Schema 2020-12 format-assertion fork) · 17 fee rules codified, 11 implemented + 6 registered non-checkable · classifier **calibrated 2026-07-09**: 21/21 on a fresh pre-registered held-out split (first run 20/21 vs the 19/21 baseline, honestly deferred — record stands) · crew live run 20/20, Intake + Reviewer labeled agents · one recorded owner-armed Slack send (2026-07-09), everything else structurally unable to send · $0 of LLM spend on every CLI path, enforced by an import-graph eval.
+1001 tests passing (+7 skipped live harnesses; re-measured live 2026-07-10) · 8/8 listings drift classes injected and caught (measured) · 33/35 agreement with the official Rust validator with the 2 divergences documented to their root cause (the JSON Schema 2020-12 format-assertion fork) · 17 fee rules codified, 11 implemented + 6 registered non-checkable · classifier **calibrated 2026-07-09**: 21/21 on a fresh pre-registered held-out split (first run 20/21 vs the 19/21 baseline, honestly deferred — record stands) · crew live run 20/20, Intake + Reviewer labeled agents · one recorded owner-armed Slack send (2026-07-09), everything else structurally unable to send · $0 of LLM spend on every CLI path, enforced by an import-graph eval.
 
 ## Where to look first
 

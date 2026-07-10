@@ -49,7 +49,7 @@ A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the or
 
 | Surface | Status |
 | --- | --- |
-| Test suite | `npm run verify` green: **961 passed + 7 skipped** (the skips are live-network harnesses, off by default; count re-measured live 2026-07-10) |
+| Test suite | `npm run verify` green: **1001 passed + 7 skipped** (the skips are live-network harnesses, off by default; count re-measured live 2026-07-10 after the S2 honesty-contract tests landed) |
 | Listings drift taxonomy (8 classes) | **8/8 injected and caught, measured** by the C6 coverage eval; never an "all edge cases" claim |
 | Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
 | Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |

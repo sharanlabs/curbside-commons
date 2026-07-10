@@ -9,7 +9,7 @@ import {
   generateCatalog,
 } from "@/lib/packs/listings";
 import { runUcpConformance } from "@/lib/packs/listings/conformance";
-import { DEMO_CLAIM } from "@/lib/packs/listings/demo/copy";
+import { DEMO_CLAIM, DEMO_SIMULATED_BANNER } from "@/lib/packs/listings/demo/copy";
 
 /**
  * C10 honesty surface (plan §4 C10; P3-6 W1 gate advisory) — machine-checked:
@@ -59,9 +59,18 @@ const publicProse = [
   join(root, "docs", "PUBLICATION.md"),
 ];
 
+// S2 (plan v3.3, F-04): the site SHELL joins the same honesty gates — the landing
+// page and the global layout (whose footer carries the semantic disclosure
+// contract) are viewer-facing prose surfaces exactly like the report/demo views.
+const siteShell = [
+  join(root, "app", "page.tsx"),
+  join(root, "app", "layout.tsx"),
+];
+
 const scannedFiles = [
   ...packSources(),
   ...publicProse,
+  ...siteShell,
   join(root, "bin", "check.mjs"),
   join(root, "fixtures", "README.md"),
   join(root, "fixtures", "synthetic-restaurant", "README.md"),
@@ -148,7 +157,7 @@ describe("D1 demo honesty surface (plan §5 D1, C7/C10)", () => {
     expect(readme).toContain(DEMO_CLAIM);
   });
 
-  it.each([...demoScanned, ...publicProse])("%s never frames the agent as 'caught' (banned headline)", (file) => {
+  it.each([...demoScanned, ...publicProse, ...siteShell])("%s never frames the agent as 'caught' (banned headline)", (file) => {
     const text = readFileSync(file, "utf8");
     for (const pattern of BANNED_FRAMING) {
       const m = text.match(pattern);
@@ -173,5 +182,94 @@ describe("D1 demo honesty surface (plan §5 D1, C7/C10)", () => {
     expect(/simulated/i.test(transcript)).toBe(true);
     const view = readFileSync(join(root, "components", "demo", "DemoView.tsx"), "utf8");
     expect(/SIMULATED/.test(view)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// S2 (plan v3.3) — the footer semantic disclosure contract, the banner parity
+// lock, and the mockup claim scan. Decision-log 2026-07-10 (freeze-reversal
+// row): the layout footer's byte-freeze is replaced by SEMANTIC teeth — the
+// wording may change, these five disclosures may not.
+// ---------------------------------------------------------------------------
+
+describe("S2 footer semantic disclosure contract (app/layout.tsx)", () => {
+  const layoutSrc = readFileSync(join(root, "app", "layout.tsx"), "utf8");
+  // JSX splits sentences across lines/spans; judge the contract on a
+  // whitespace-normalized, markup-stripped view of the source.
+  const normalized = layoutSrc
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\{["'` ]*\}/g, " ")
+    .replace(/&ldquo;|&rdquo;/g, '"')
+    .replace(/&rsquo;/g, "'")
+    .replace(/\s+/g, " ");
+
+  const CONTRACT: ReadonlyArray<[name: string, pattern: RegExp]> = [
+    ["prototype/simulated status", /Demo \/ portfolio prototype — simulated data throughout/],
+    ["replay provenance", /static replay of committed,? labeled fixtures/],
+    ["recorded-fixture provenance", /recorded static fixture/],
+    ["truthful send posture", /initiates no sends and makes no live calls/],
+    ["the one recorded send disclosed", /exactly one recorded, owner-armed send exists/],
+    ["non-affiliation sentence (verbatim; e2e asserts it too)", /Not affiliated with, endorsed by, or connected to/],
+    ["human-led line", /Human-led, AI-assisted, professionally reviewed/],
+  ];
+
+  it.each(CONTRACT)("the footer carries: %s", (_name, pattern) => {
+    expect(pattern.test(normalized), `missing footer disclosure: ${pattern}`).toBe(true);
+  });
+
+  it("the contract bites: the OLD (pre-reversal) footer text would FAIL the send-posture check", () => {
+    const oldFooter =
+      "REPLAY over fictional display names + synthetic activation state — not production logs, real sends, real marketplace access, or real-impact data.";
+    expect(/initiates no sends and makes no live calls/.test(oldFooter)).toBe(false);
+    expect(/exactly one recorded, owner-armed send exists/.test(oldFooter)).toBe(false);
+  });
+});
+
+describe("S2 banner parity — ReportView's SIMULATED banner ≡ the single-sourced demo banner", () => {
+  // The banner itself stays BYTE-FROZEN (decision-log 2026-07-10: the reversal is
+  // scoped to the footer). This parity test removes the F-04 risk of the two
+  // independently-maintained copies drifting: ReportView's hardcoded JSX text
+  // must normalize to exactly DEMO_SIMULATED_BANNER (which DemoView imports).
+  it("the report banner text (normalized) equals DEMO_SIMULATED_BANNER (normalized)", () => {
+    const src = readFileSync(join(root, "components", "report", "ReportView.tsx"), "utf8");
+    const m = src.match(/<span className="rpt-sim-text">([\s\S]*?)<\/span>/);
+    expect(m, "ReportView must contain the rpt-sim-text banner span").not.toBeNull();
+    const normalize = (s: string) =>
+      s.replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+    expect(normalize(m![1])).toBe(normalize(DEMO_SIMULATED_BANNER));
+  });
+});
+
+describe("S2 mockup claim scan (every committed mockup HTML, recursive)", () => {
+  // F-04: mockups sat outside every honesty scan. Scan them all for the same
+  // affirmative overclaims. The one sanctioned HONEST sentence — the
+  // non-affiliation disclaimer — is stripped first (in plain HTML its
+  // "…or connected to <brand>" tail would false-positive the connected-to
+  // pattern that markup happens to break in JSX/markdown sources).
+  const NON_AFFILIATION_SENTENCE =
+    /not affiliated\s+with,?\s*endorsed\s+by,?\s*or\s+connected\s+to[^.<]*/gi;
+
+  const mockupFiles = readdirSync(join(root, "mockups"), { recursive: true })
+    .map(String)
+    .filter((f) => f.endsWith(".html"))
+    .map((f) => join(root, "mockups", f));
+
+  it("the mockup set is non-empty (the scan actually covers something)", () => {
+    expect(mockupFiles.length).toBeGreaterThan(0);
+  });
+
+  it.each(mockupFiles)("%s makes no affirmative real-platform/no-AI claim", (file) => {
+    const text = readFileSync(file, "utf8").replace(NON_AFFILIATION_SENTENCE, " ");
+    for (const pattern of BANNED_CLAIMS) {
+      const m = text.match(pattern);
+      expect(m === null, `banned claim ${pattern} in ${file}: ${m?.[0]}`).toBe(true);
+    }
+  });
+
+  it("the mockup scan bites: a planted overclaim survives the non-affiliation strip and is caught", () => {
+    const planted =
+      "Not affiliated with, endorsed by, or connected to DoorDash. This dashboard shows actual DoorDash data live.";
+    const stripped = planted.replace(NON_AFFILIATION_SENTENCE, " ");
+    expect(BANNED_CLAIMS.some((p) => p.test(stripped))).toBe(true);
   });
 });
