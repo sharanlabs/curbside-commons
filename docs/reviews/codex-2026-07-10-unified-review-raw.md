@@ -408,3 +408,25 @@ Three blocking defects remain in v3.2:
 
 VERDICT: REVISE
 ```
+
+---
+
+# S0 round-4 verdict (2026-07-10): **VERDICT: APPROVED** — raw closing statement below. The loop converged 24→7→3→0 across four rounds; plan v3.3 is the approved execution plan.
+```
+-- **Codex batches (each ONE sol@high run, probe-first): A = S1+S2+S3a · B = S4+S4b (dedicated freeze-boundary review, closed before S5) · C = E1a+S5+S6a-gated-S6b + the E2/E4 PRE-REGISTRATIONS (reviewed before scoring; S6a's dedicated vet review closes INSIDE the slice, before S6b) · D = E2+E3+E4 results + E1b · E = S7 + S3b + any batch-D residuals.** Then PRE-GATE BUILD+PREFLIGHT → RELEASE GATE → S8.
++- **Codex batches (each ONE sol@high run, probe-first): A = S1+S2+S3a · B = S4+S4b (dedicated freeze-boundary review, closed before S5) · C = E1a+S5+S6a-gated-S6b + the E2/E4 PRE-REGISTRATIONS (reviewed before scoring; S6a's dedicated vet review closes INSIDE the slice, before S6b) · D = E2+E3+E4 results + E1b · E = S7 + S3b + the HEADER POLICY files + any batch-D residuals.** Then PRE-GATE BUILD+PREFLIGHT (no source changes) → RELEASE GATE (no-build) → S8.
+ - **CI (S3a/S3b) hardening:** Node 24 pinned + immutable action pins + least permissions + concurrency/timeout; e2e added to CI when the dual contracts land (S5); the claim flip is S3b, strictly after S3a's observed green run.
+ - Seat events: raw verbatim + one owner-confirmed retry + NO-WAIT inline conversion (standing precedent). Acceptance-gate: post-batch-B identity milestone check + the RELEASE GATE before S8.
+ 
+## main...origin/main
+
+codex
+No blocking inadequate folds or new restructuring defects found in Plan v3.3. The candidate SHA, clean-room build, immutable artifact, artifact-mode testing, reviewed header policy, no-build release gate, and same-artifact deployment chain are coherent as written.
+
+VERDICT: APPROVED
+tokens used
+4,68,700
+No blocking inadequate folds or new restructuring defects found in Plan v3.3. The candidate SHA, clean-room build, immutable artifact, artifact-mode testing, reviewed header policy, no-build release gate, and same-artifact deployment chain are coherent as written.
+
+VERDICT: APPROVED
+```
