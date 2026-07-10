@@ -1,18 +1,20 @@
 # Why — the decision rationale (the why-chain)
 
-This product is built to **answer every load-bearing "why" to first principles**, and the test for each is concrete: **name the alternative it rejected and the cost of that choice.** A confident rationale that doesn't name what it gave up is just rationalization. Plain-English first, the technical reason alongside.
+**Module scope:** this why-chain covers the **legacy activation module** — the repo's first life (ActivationOps AI, archived runnable under `legacy/activation/`), whose verification spine the current truth-audit engine grew from. The truth-audit engine's own rationale lives in `README.md` and `docs/PUBLICATION.md`. Kept because the decisions below are the lineage of the current design.
 
-> Status note: this describes the prototype as built. The live Gemini run is **done and recorded** (a frozen fixture; the public demo stays REPLAY-only — no live calls); the public **deploy** is the remaining owner-gated step. Honesty is itself a why (last section).
+This module was built to **answer every load-bearing "why" to first principles**, and the test for each is concrete: **name the alternative it rejected and the cost of that choice.** A confident rationale that doesn't name what it gave up is just rationalization. Plain-English first, the technical reason alongside.
+
+> Status note (updated 2026-07-10): this describes the legacy prototype as built. The live Gemini run is **done and recorded** (a frozen fixture; the public demo stays REPLAY-only — no live calls). The **deploy happened** (2026-07-08, static site, run-on-demand) and the repo is public (2026-07-09); the deployed site currently still serves this legacy module's console surfaces alongside the truth-audit report/demo, with an explicit identity separation planned. Honesty is itself a why (last section).
 
 ---
 
 ## The problem & the solution
 
-**Why this problem — stalled / pre-live, long-tail merchant activation.** A delivery marketplace's signed-up-but-never-live merchants are real lost GMV, and the long tail is too large to work by hand. *Rejected:* generic "AI for merchants" / churn-prevention for *live* merchants. *Cost of that choice:* it's commodity (Gainsight, ChurnZero, DoorDash's own AI Marketer all do outreach) and doesn't fit the pre-live cohort, where the job is *diagnosis*, not retention.
+**Why this problem — stalled / pre-live, long-tail merchant activation.** A delivery marketplace's signed-up-but-never-live merchants are real lost GMV, and the long tail is too large to work by hand. *Rejected:* generic "AI for merchants" / churn-prevention for *live* merchants. *Cost of that choice:* it's commodity — established customer-success vendors and the marketplaces' own AI outreach suites all do outreach (named, dated citations in `docs/research/market-validation-2026-06-22.md`) — and doesn't fit the pre-live cohort, where the job is *diagnosis*, not retention.
 
 **Why this solution — diagnose *why* a merchant is stuck, then draft the right next outreach, safely.** The defensible value is the *combination* applied to this vertical, with auditability. *Rejected:* a pure outreach-drafting tool. *Cost:* the research's #1 reactivation-failure cause is **generic outreach not matched to the actual blocker** — a drafter without diagnosis ships the exact failure mode. So the diagnosis layer, not the generator, is where the value concentrates.
 
-**Why not just use the incumbents.** DoorDash's May-2026 AI suite auto-fills menu/photos/hours at the source. *Rejected:* competing on photo-fixing. *Cost:* that's being commoditized away. Our edge is **cross-blocker diagnosis + routing + the platform-side cases auto-fill can't touch** — and being safe enough to adopt.
+**Why not just use the incumbents.** A major marketplace's May-2026 AI suite auto-fills menu/photos/hours at the source (named, dated citation in the research digest). *Rejected:* competing on photo-fixing. *Cost:* that's being commoditized away. Our edge is **cross-blocker diagnosis + routing + the platform-side cases auto-fill can't touch** — and being safe enough to adopt.
 
 ---
 

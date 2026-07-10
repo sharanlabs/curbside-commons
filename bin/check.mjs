@@ -34,8 +34,11 @@ Usage:
   fees <statement.json> [--json]
       FEE-AUDIT leg (F1a, UC-1): audit a monthly delivery fee statement against
       the codified NYC §20-563.3 caps (deterministic, $0, no LLM). Classification
-      is AS-DECLARED by the platform; the LLM line-item classifier is DEFERRED to
-      F1b. Prints a two-register text report, or the machine report with --json.
+      is AS-DECLARED by the platform — this CLI path is the deterministic
+      baseline and never invokes the separately-evaluated live LLM classifier
+      lane (calibrated 2026-07-09 on a pre-registered held-out split; advisory,
+      key-gated, reachable only through the tool-registry surface, never here).
+      Prints a two-register text report, or the machine report with --json.
       Exit 0 = no violations, 1 = at least one violation, 2 = usage / bad input.
   demo [--json]
       DEMO leg (D1): play the scripted walkthrough on the shipped corpus — a
