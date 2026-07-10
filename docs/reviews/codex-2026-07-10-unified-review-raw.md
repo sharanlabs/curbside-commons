@@ -159,3 +159,182 @@ Current totals: **17 STANDS/STANDS-MODIFIED, 3 MOOTED, 0 WRONG** across AP-01..2
 **VERDICT: REVISE**
 CODEX_EXIT=0
 ```
+
+---
+
+# S0 round-1 verdict (gpt-5.6-sol @ high, thread 019f4d89, 2026-07-10): VERDICT: REVISE — raw verbatim below
+```
+
+The review used committed HEAD `99e8c78`. Concurrent owner/orchestrator changes to `CURRENT_TASK.md`, `HANDOFF.md`, and `PROJECT_STATE.md` were left untouched.
+
+## 1. Finding-discharge audit
+
+Adequately discharged in principle:
+
+- AP/F stale public records and positioning: S1.
+- Footer/send wording and freeze reversal: S2.
+- Missing CI: S3, subject to the CI qualifications below.
+- Broad de-brand inventory: S4, subject to the taxonomy clarification below.
+- S-11 terminology and named demo record: S7.
+- Cloudflare preview-first production deployment: S8.
+- Font/source matrix/design-reference handling: S6.
+- F-14 hold-and-release uncertainty: S6 explicitly confirms the reference or creates an original interaction.
+- NEW-02/04/05/06/09/13/15: S1/S3.
+- AP-05/19/20 remain correctly mooted.
+
+Findings not adequately discharged:
+
+1. **NEW-01 / NEW-07 — identity remains unresolved.**  
+   Plan lines 11–12 and 20 retain `/console`, `/audit`, and 20 `/merchant/*` pages at canonical root URLs with labels. Labels do not repair primary navigation, metadata ownership, route hierarchy, or the fact that most exported product routes remain ActivationOps. The plan also builds the canonical E2E contract in S5 before E1 replaces the remaining legacy `/eval`, `/metrics`, and `/cost` surfaces.
+
+   Fix: adopt a genuine `/legacy/**` namespace; build E1 before freezing canonical navigation/E2E; maintain separate canonical and legacy E2E contracts.
+
+2. **AP-11 / F-05 — protected-path proof is ineffective.**  
+   Plan line 31 checks `evals/goldens-frozen` and `fixtures-frozen`, neither of which exists. The repo contains 130 tracked `evals/**` files and 139 `fixtures/**` files, so only `legacy/` is actually protected.
+
+   Fix: use real pathspecs—at minimum `legacy/`, `evals/`, and `fixtures/`—plus an exact per-slice allowlist for intentional additions. Existing frozen-file modifications or deletions must fail unless separately authorized and reviewed.
+
+3. **AP-09 / F-03 — S4 contradicts its own golden policy.**  
+   S4 says never touch eval goldens, then defaults AP-09 to current output and permits golden regeneration. Batch B subsequently lets S5 and E1 consume those changes before reviewing the freeze-boundary migration.
+
+   Fix: resolve historical-versus-current at S0. Recommended decision: current generated outputs use Curbside Commons through a versioned template/golden migration; the historical send record remains immutable. Give that migration a dedicated review and explicit frozen-file allowlist before S5.
+
+4. **AP-10 / F-04 — mockup honesty coverage remains partial.**  
+   S2 proposes “a mockup claim test,” while S6 creates a later mockup checked only by a manual regex sweep.
+
+   Fix: the automated honesty gate must dynamically cover every claim-bearing mockup classified current/new by the mockup inventory, with explicit historical exclusions.
+
+5. **Gate-P2 / F-13 — the dated-market-claim class is not executable.**  
+   S1 names the “third class,” but S4’s inventory taxonomy only says factual attribution may be kept. An executor could preserve the same named public claims that triggered the finding.
+
+   Fix: state the rule verbatim: dated public-market prose is genericized; its named, dated citation is preserved and linked in the research digest.
+
+6. **NEW-08 — deployed provenance is designed but not implemented.**  
+   E1 designs a SHA/date line; S8 expects it to be correct. No slice defines how SHA and time enter the static artifact. A literal deployment date is unknown when the single build is hashed.
+
+   Fix: inject and test source SHA plus UTC build timestamp before the exact-artifact build, labeling them accurately. Record Cloudflare deployment ID/time separately after deployment.
+
+7. **NEW-10 — the actual ReportView tabs are not fixed.**  
+   E1 only promises correct tabs where the dashboard reuses them. The cited defect remains in `components/report/ReportView.tsx:132-146`.
+
+   Fix: explicitly repair ReportView or replace its ARIA tab roles with ordinary toggle-button semantics; add keyboard coverage.
+
+8. **NEW-11 — package identity remains an execution-time fork.**  
+   “Rename or record” in S5 is not a decision.
+
+   Fix: resolve at S0. Renaming to a Curbside Commons-aligned package name is preferable unless a concrete compatibility reason requires the old internal identifier.
+
+9. **NEW-12 — mockup inventory remains incomplete.**  
+   S4 inventories brand hits, not all 54 artifacts by shipped/current/superseded/historical status.
+
+   Fix: add a root `mockups/README.md` inventory covering every artifact and its publication status.
+
+10. **AP-15 / F-12 — interaction acceptance is incomplete.**  
+    S6 covers reduced motion, contrast and anchors but omits no-JS readability and general keyboard/focus/semantic behavior.
+
+    Fix: add those checks, including a non-pointer equivalent for hold-and-release.
+
+11. **NEW-14 — header policy is evaluated too late.**  
+    S8 checks header posture during/after production deployment. Any required `_headers` or equivalent change would invalidate the already reviewed and hashed candidate.
+
+    Fix: decide the policy during preflight, test it on preview, then promote and reconfirm in production.
+
+12. **NEW-03 — CI is only partially complete.**  
+    S3 makes the central CI claim true for `verify` and legacy tests, but canonical E2E added later is not run by CI. The claim and workflow are also proposed in the same push, before the first green result exists.
+
+    Fix: run E2E in CI, pin Node 24 and actions, use least permissions and concurrency, and publish the claim only after the workflow’s first green run.
+
+## 2. Identity pressure-test
+
+### Strongest case against label-as-legacy
+
+The recommendation fixes wording but not information architecture. Today primary navigation grants `/console` and `/audit` equal status with `/report` and `/demo` (`components/Nav.tsx:7-15`). The landing’s two main CTAs point to `/console` (`app/page.tsx:183-185,348-350`). Under the plan, 22 legacy routes remain at root—console, audit and 20 merchants—while the smaller truth-engine surface is declared canonical.
+
+That means a hiring reviewer enters a truth-verifier site and is immediately routed into merchant-activation outreach. Global truth-engine metadata/footer then wraps legacy pages, while page-level labels must carry the entire semantic boundary. This is brittle, SEO-ambiguous and difficult to test. The proposed “legacy link” for the old eval/metrics/cost records also has no defined destination.
+
+Full removal makes the cleanest public product. It does not destroy the work: `legacy/activation`, tests, records and documentation remain runnable. Its drawback is losing a browsable visual lineage.
+
+A `/legacy/` path split is the strongest balance:
+
+- Canonical nav contains only truth-engine surfaces.
+- One secondary “Legacy activation module” link leads to `/legacy/console`.
+- All activation pages use their own route-group layout, metadata, footer and provenance.
+- Merchant breadcrumbs return to `/legacy/console`, not `/`.
+- Old root URLs receive an explicit tested policy: static redirects or 404.
+- E2E retains both the canonical contract and the legacy why-chain.
+- Exported-route manifest classifies canonical, legacy and error routes.
+
+Final position: **use `/legacy/` separation**. Full removal ranks second; label-only root routes rank last.
+
+## 3. Slice-order and review-batch defects
+
+1. **Slices are pushed before review.**  
+   Line 14 authorizes per-slice commit and push; line 31 delays review to batches. Public S1/S2 changes, S4 frozen-output changes and S5 identity changes can therefore be pushed before review.
+
+   Fix: local checkpoint commits are acceptable, but push only after the corresponding batch is reconciled and gates rerun. Freeze/identity migrations should receive dedicated reviews.
+
+2. **Batch B crosses a frozen-golden boundary.**  
+   S4 may regenerate frozen output, then S5/E1 consume it before review.
+
+   Fix: review and close the migration before S5.
+
+3. **Pre-registration boundaries are reviewed after scoring.**  
+   E2 and E4 commit floors before results, but their Codex batch runs after both. The independent reviewer sees the floors only after results exist.
+
+   Fix: add a pre-run review of corpus composition, leakage, metrics and floors before scoring; review results separately afterward.
+
+4. **The release acceptance gate runs too early.**  
+   Line 31 places it after batch B, but S6, E2, E3, E4 and S7 subsequently change the deployed commit. Wrap acceptance occurs after deployment.
+
+   Fix: retain post-B as an identity milestone, then require the release acceptance gate after final batch reconciliation and before S8.
+
+5. **E1 is built before E2–E4 evidence and never refreshed.**  
+   The plan then parks a second deployment to add those rows even though S8 has not happened yet.
+
+   Fix: add an E1b/dashboard-and-SHOWCASE reconciliation after E4 and before final review/S8; deploy once.
+
+6. **S5 freezes identity before E1 completes identity replacement.**
+
+   Fix order: decide namespace and route skeleton → build E1 current evidence → finalize canonical/legacy navigation, metadata and E2E.
+
+7. **The legacy-record link has no produced destination.**
+
+   Fix: define the `/legacy/**` destination and route manifest before E1 emits links.
+
+8. **S6’s dedicated Emil review occurs after consumption unless made intra-slice.**
+
+   Fix: VET/pin/license/security review must be a hard stop before the brief or sample uses the source; the later batch reviews only the resulting work.
+
+9. **S8 hard-codes “28 routes” despite route changes.**
+
+   Fix: generate the manifest from the exact export and compare it with an explicit expected route set; test unknown-path 404 separately.
+
+10. **S1 writes 961+7 before later slices raise the count.**
+
+    Fix: use a dated, commit-scoped count or avoid volatile totals; run a final public-claim reconciliation after E4.
+
+11. **S7 records transcripts before batch-D fixes.**
+
+    Fix: reconcile E3/E4 first, rerun gates, then generate the record from the final candidate SHA and review it separately.
+
+12. **Identity, AP-09 treatment and freeze reversal lack an explicit S0 owner-disposition checkpoint.**
+
+    Fix: record all three decisions before S1; Codex approval is advice, not owner disposition.
+
+## 4. “Well built, covered in all aspects” gaps
+
+- **RAG provenance:** pin embedding model ID, revision/hash, license and storage dependency; prove a clean network-denied run with no runtime download.
+- **RAG integration contract:** specify whether the new tool is exposed through MCP; update registry schemas, tool envelopes, MCP transcript/tool count, SHOWCASE and relevant crew allowlists deliberately.
+- **RAG evaluation:** include chunking/version metadata, citation precision, unsupported-answer rate, abstention calibration, retrieval-injection tests and deterministic BM25 baseline comparison.
+- **Approval simulator threat model:** define signer identity, authorization, nonce, clock injection, tamper/forgery/wrong-actor tests, key handling, and prove it cannot send or mutate live state.
+- **Entity resolution architecture:** state whether it is advisory or gating, how exact matching remains protected, tune/test separation, ambiguity abstention and false-merge cost.
+- **Public discoverability:** E2–E4 must update the dashboard, SHOWCASE, glossary and limitations before the single deployment.
+- **Exposed-split FAQ:** add the prepared answer that neither classifier split may be rerun; new claims require fresh pre-registration.
+- **History disclosure:** state that current surfaces are de-branded while git history is intentionally preserved for provenance.
+- **CI robustness:** add E2E, timeout/concurrency, minimal permissions, immutable action pins and artifact/build evidence where useful.
+- **Final clean-room gate:** `npm ci` from a clean checkout, full verify/legacy/E2E, protected-file manifest, offline tests, exact-export hash, preview smoke, release acceptance, then production.
+
+Blocking findings: identity must move to `/legacy/**`; protected paths must be corrected; AP-09 must be decided and reviewed before consumption; pushes must follow review; pre-registration and external-source gates must precede use; E1 must be refreshed after E2–E4; final acceptance must move immediately before deployment; provenance/header/route validation must occur before promotion.
+
+VERDICT: REVISE
+```
