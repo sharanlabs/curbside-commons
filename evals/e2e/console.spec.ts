@@ -65,11 +65,15 @@ test("console nav reaches every surface; active link carries aria-current", asyn
     "page",
   );
 
+  // E1a (plan v3.3): /eval /metrics /cost now carry the truth-engine dashboard;
+  // the legacy content moved under /legacy/** (asserted below). Nav labels are
+  // reworked at S5 — this binds today's labels to today's H1s (conscious update,
+  // red-green run 2026-07-11).
   const surfaces: Array<[string, string]> = [
-    ["Eval / Quality", "Eval / Quality"],
-    ["Metrics", "Workflow metrics (simulated)"],
+    ["Eval / Quality", "Eval evidence"],
+    ["Metrics", "Engine measurables"],
     ["Audit", "Audit Trail"],
-    ["Cost", "Cost ledger"],
+    ["Cost", "Cost & $0 enforcement"],
   ];
   for (const [navLabel, heading] of surfaces) {
     await page.getByRole("link", { name: navLabel, exact: true }).click();
@@ -79,7 +83,43 @@ test("console nav reaches every surface; active link carries aria-current", asyn
       "page",
     );
   }
-  // cost surface shows the honest $0.00 + the fail-closed cap
-  await page.getByRole("link", { name: "Cost", exact: true }).click();
+});
+
+test("the /legacy/ skeleton serves the moved surfaces under the provenance banner", async ({
+  page,
+}) => {
+  // The dashboard hands off to the moved legacy surface…
+  await page.goto("/eval");
+  await page.getByRole("link", { name: "/legacy/eval" }).click();
+  await expect(page).toHaveURL(/\/legacy\/eval/);
+  // …which renders the route-group provenance banner + the ORIGINAL legacy content.
+  await expect(page.getByText("Legacy activation module", { exact: false }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Eval / Quality" })).toBeVisible();
+  // The banner is not a footer (the root footer stays the site's only footer).
+  await expect(page.locator("footer")).toHaveCount(1);
+  // The other two moved surfaces resolve with their original H1s.
+  await page.goto("/legacy/metrics");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Workflow metrics (simulated)" }),
+  ).toBeVisible();
+  await page.goto("/legacy/cost");
+  await expect(page.getByRole("heading", { level: 1, name: "Cost ledger" })).toBeVisible();
+  // legacy cost still shows the honest $0.00 replay ledger
   await expect(page.getByText("$0.00").first()).toBeVisible();
+});
+
+test("report surface toggle is keyboard-operable honest buttons (NEW-10)", async ({ page }) => {
+  await page.goto("/report");
+  const group = page.getByRole("group", { name: "Serving surface" });
+  await expect(group).toBeVisible();
+  // No faked tablist remains.
+  await expect(page.locator('[role="tablist"], [role="tab"]')).toHaveCount(0);
+  const buttons = group.getByRole("button");
+  await expect(buttons.first()).toHaveAttribute("aria-pressed", "true");
+  await expect(buttons.nth(1)).toHaveAttribute("aria-pressed", "false");
+  // Keyboard: focus the second toggle and press it with the keyboard only.
+  await buttons.nth(1).focus();
+  await page.keyboard.press("Enter");
+  await expect(buttons.nth(1)).toHaveAttribute("aria-pressed", "true");
+  await expect(buttons.first()).toHaveAttribute("aria-pressed", "false");
 });

@@ -129,14 +129,15 @@ export function ReportView() {
         </p>
       </header>
 
-      {/* Surface toggle — the same SOR, two serving surfaces (C3). */}
-      <div className="rpt-toolbar" role="tablist" aria-label="serving surface">
+      {/* Surface toggle — the same SOR, two serving surfaces (C3). Honest toggle
+          buttons (NEW-10): a role="group" of native buttons using aria-pressed —
+          not a faked tablist (no tabpanels/ids/arrow-key model exists here). */}
+      <div className="rpt-toolbar" role="group" aria-label="Serving surface">
         {(Object.keys(SURFACES) as SurfaceKey[]).map((key) => (
           <button
             key={key}
-            role="tab"
             type="button"
-            aria-selected={surface === key}
+            aria-pressed={surface === key}
             className={`rpt-tab ${surface === key ? "active" : ""}`}
             onClick={() => setSurface(key)}
           >

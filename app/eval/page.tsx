@@ -1,166 +1,186 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getReplaySnapshot } from "@/legacy/activation/lib/replay/run";
-import { liveSamples } from "@/legacy/activation/lib/replay/live-samples";
-import { PLATFORM_NAME } from "@/lib/product";
+import { CALIBRATION, L1, type Provenance } from "@/lib/dashboard/evidence";
 import { Mark } from "@/components/data-surfaces/Mark";
 
-export const metadata: Metadata = { title: "Eval / Quality" };
+export const metadata: Metadata = { title: "Eval evidence" };
 
-const DIMS = ["structure", "state-consistency", "policy", "no-leakage"] as const;
+/** Per-block provenance line — file + freeze SHA + event date, all from the module. */
+function Prov({ of }: { of: Provenance }) {
+  return (
+    <p className="ds-prov">
+      source: <span className="ds-mono">{of.file}</span> @ <span className="ds-mono">{of.frozenAt}</span>{" "}
+      ({of.date})
+    </p>
+  );
+}
 
-export default function EvalPage() {
-  const snap = getReplaySnapshot(PLATFORM_NAME);
-  const dimStats = DIMS.map((dim) => ({
-    dim,
-    passed: snap.merchants.filter((m) => m.evalScore.results.find((r) => r.grader === dim)?.pass).length,
-    total: snap.merchants.length,
-  }));
+export default function EvalEvidencePage() {
+  const defer = CALIBRATION.deferRun;
+  const retry = CALIBRATION.retryRun;
 
   return (
     <main className="ds-data ds-wrap ds-view">
-      <h1>Eval / Quality</h1>
+      <h1>Eval evidence</h1>
       <p className="ds-lead plain">
-        <b>In plain terms:</b> every drafted message is scored before a human ever sees it — is it
-        well-formed, do its declared claims all check out against this merchant&apos;s data, and does
-        it avoid forbidden promises?
+        <b>In plain terms:</b> every quality label on this site was earned by a test written down before
+        the run — or it isn&rsquo;t claimed. This page shows the runs behind the labels, including the
+        one that fell short and was held back rather than dressed up.
       </p>
       <p className="ds-lead tech">
-        <b>Technically:</b> deterministic graders over the draft contract (structure ·
-        state-consistency · policy · no-leakage). They share the gate&apos;s rule definitions; their
-        teeth are proven by paired corrupted-record tests (a grader that can&apos;t fail is theater) —
-        including on the recorded real-Gemini drafts, where no-leakage catches a raw enum / risk-level
-        leak the other dimensions missed.
+        <b>Technically:</b> each figure is traced to a committed evaluation record — the recalibration
+        status doc and the frozen L-1 live matrix — and imported from a single evidence module bound to
+        those artifacts by a committed anti-fabrication test. No score is asserted from memory.
       </p>
-      <div className="ds-note warn">
-        These corpus scores grade the <b>deterministic stub</b> output. The same graders also scored a{" "}
-        <b>recorded real Gemini run</b> — shown below (key-gated, $0.0042 spent) — so this stays honest
-        about real output. The public <b>demo itself makes no live calls</b>.
+
+      {/* b. fee-line classifier calibration — the honest two-run arc */}
+      <h2 className="ds-h2-row">Fee-line classifier — calibration</h2>
+      <p className="ds-lead tech" style={{ marginTop: "8px" }}>
+        A first run missed one pre-registered floor and was <b>deferred</b>; a retry on a fresh,
+        pre-registered held-out split cleared every floor on one pass. Both are kept on the record.
+      </p>
+
+      <div className="ds-grid g2">
+        <section className="ds-card flush">
+          <div className="ds-tags">
+            <span className="ds-tag role">first run · {defer.date}</span>
+          </div>
+          <h3 style={{ marginTop: "10px" }}>{defer.score}</h3>
+          <p className="ds-card-p">{defer.reason}</p>
+          <div style={{ marginTop: "12px" }}>
+            <span className="ds-verdict warn">
+              <Mark name="alert" />
+              {defer.outcome.toUpperCase()}
+            </span>
+          </div>
+          <Prov of={defer.provenance} />
+        </section>
+
+        <section className="ds-card flush">
+          <div className="ds-tags">
+            <span className="ds-tag role">retry · fresh held-out · {retry.ranAt}</span>
+          </div>
+          <h3 style={{ marginTop: "10px" }}>{retry.score} — every pre-registered floor cleared</h3>
+          <dl className="ds-ratefacts">
+            <dt>accuracy</dt>
+            <dd>{retry.accuracy}</dd>
+            <dt>macro precision</dt>
+            <dd>{retry.macroPrecision}</dd>
+            <dt>Cohen&rsquo;s kappa</dt>
+            <dd>{retry.cohensKappa}</dd>
+            <dt>flip rate</dt>
+            <dd>{retry.flipRate}</dd>
+            <dt>deterministic baseline</dt>
+            <dd>{retry.baseline}</dd>
+            <dt>calls</dt>
+            <dd>{retry.calls}</dd>
+            <dt>cost</dt>
+            <dd>{retry.cost}</dd>
+            <dt>model</dt>
+            <dd>{retry.model}</dd>
+          </dl>
+          <div style={{ marginTop: "12px" }}>
+            <span className="ds-verdict ok">
+              <Mark name="check" />
+              beat baseline {retry.baseline} &rarr; {retry.score}
+            </span>
+          </div>
+          <Prov of={retry.provenance} />
+        </section>
       </div>
 
-      <section className="ds-stats c5">
+      <div className="ds-held" style={{ marginTop: "16px" }}>
+        <div className="h">
+          <Mark name="flag" />
+          Earned label
+        </div>
+        <p className="p">{CALIBRATION.earnedLabel}</p>
+      </div>
+      <div className="ds-note">{CALIBRATION.scopeNote}</div>
+      <p className="ds-meta-line">
+        Durable teeth: snapshot <span className="ds-mono">{CALIBRATION.snapshotFile}</span> · lock test{" "}
+        <span className="ds-mono">{CALIBRATION.lockTestFile}</span>.
+      </p>
+
+      {/* c. L-1 agent crew live run — COMPUTED from the committed matrix */}
+      <h2 className="ds-h2-row">L-1 agent crew — live run</h2>
+      <p className="ds-lead tech" style={{ marginTop: "8px" }}>
+        A recorded live run of the four-member crew. The per-member labels below are classification
+        outcomes computed from the committed matrix, not marketing — only the two model-directed members
+        earned &ldquo;agent&rdquo;; the other two are deterministic workflows by design.
+      </p>
+
+      <section className="ds-stats">
         <div className="ds-stat accent">
-          <div className="v">
-            {snap.summary.evalPassed}/{snap.summary.evalTotal}
-          </div>
-          <div className="l">drafts pass all dimensions</div>
+          <div className="v">{L1.cases}</div>
+          <div className="l">cases scored</div>
         </div>
-        {dimStats.map((d) => (
-          <div key={d.dim} className="ds-stat">
-            <div className="v">
-              {d.passed}/{d.total}
-            </div>
-            <div className="l">{d.dim}</div>
-          </div>
-        ))}
+        <div className="ds-stat">
+          <div className="v">{L1.degraded}</div>
+          <div className="l">degraded</div>
+        </div>
+        <div className="ds-stat">
+          <div className="v">{L1.perMember.length}</div>
+          <div className="l">crew members</div>
+        </div>
       </section>
 
-      <section style={{ marginTop: "26px" }}>
-        <div className="ds-tbl" style={{ marginTop: 0 }}>
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Merchant</th>
-                {DIMS.map((d) => (
-                  <th key={d} scope="col">
-                    {d}
-                  </th>
-                ))}
-                <th scope="col">Overall</th>
+      <p className="ds-runline">
+        Model: <span className="ds-mono">{L1.model}</span> · started{" "}
+        <span className="ds-mono">{L1.startedAt}</span>
+      </p>
+      <div className="ds-tags" style={{ marginTop: "10px" }}>
+        <span className={L1.allSafetyPass ? "ds-verdict ok" : "ds-verdict no"}>
+          <Mark name={L1.allSafetyPass ? "check" : "x"} />
+          {L1.allSafetyPass ? "every case passed its safety controls" : "safety failure on the matrix"}
+        </span>
+        <span className={L1.allClassMatch ? "ds-verdict ok" : "ds-verdict no"}>
+          <Mark name={L1.allClassMatch ? "check" : "x"} />
+          {L1.allClassMatch ? "every terminal class matched" : "class mismatch on the matrix"}
+        </span>
+      </div>
+
+      <div className="ds-tbl">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Member</th>
+              <th scope="col">Cases</th>
+              <th scope="col">Safety</th>
+              <th scope="col">Class match</th>
+              <th scope="col">Label</th>
+            </tr>
+          </thead>
+          <tbody>
+            {L1.perMember.map((m) => (
+              <tr key={m.member}>
+                <td className="ds-mono">{m.member}</td>
+                <td className="ds-mono">{m.cases}</td>
+                <td className="ds-mono">
+                  {m.safetyPass}/{m.cases}
+                </td>
+                <td className="ds-mono">
+                  {m.classMatch}/{m.cases}
+                </td>
+                <td>{L1.memberLabels[m.member]}</td>
               </tr>
-            </thead>
-            <tbody>
-              {snap.merchants.map((m) => (
-                <tr key={m.merchant.merchant_id}>
-                  <td>
-                    <Link href={`/merchant/${m.merchant.merchant_id}`} className="ds-mlink">
-                      {m.merchant.merchant_name}
-                    </Link>
-                  </td>
-                  {DIMS.map((d) => {
-                    const r = m.evalScore.results.find((x) => x.grader === d);
-                    return (
-                      <td key={d}>
-                        <span className={r?.pass ? "ds-verdict ok" : "ds-verdict no"}>
-                          <Mark name={r?.pass ? "check" : "x"} />
-                          {r?.pass ? "PASS" : "FAIL"}
-                        </span>
-                      </td>
-                    );
-                  })}
-                  <td className="ds-mono">
-                    {m.evalScore.passed}/{m.evalScore.total}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section>
-        <h2 className="ds-h2-row">
-          Recorded Gemini run — static fixture{" "}
-          <span style={{ fontWeight: 400, color: "var(--muted)", fontFamily: "var(--ff-sans)", fontSize: "14px" }}>
-            ({liveSamples.provenance.model}, {liveSamples.provenance.recorded_at})
-          </span>
-        </h2>
-        <p className="ds-runline" style={{ maxWidth: "78ch" }}>
-          A <b style={{ color: "var(--ink-2)" }}>frozen recording</b> of a local Gemini API run (one
-          merchant per blocker). The public demo does <b style={{ color: "var(--ink-2)" }}>not</b>{" "}
-          re-run or independently verify it (REPLAY-only, zero spend) — reproduce it yourself with your
-          own key:{" "}
-          <code className="ds-code">
-            node --env-file=.env node_modules/.bin/vitest run evals/live-smoke.test.ts
-          </code>
-          . Total cost:{" "}
-          <span className="ds-num">${liveSamples.provenance.total_cost_usd.toFixed(4)}</span> (cap $5).
-          Modes: {Object.entries(liveSamples.provenance.modes).map(([k, v]) => `${v} ${k}`).join(" · ")}.
-          Gate: {Object.entries(liveSamples.provenance.gate).map(([k, v]) => `${v} ${k}`).join(" · ")}.
-        </p>
-
-        <div className="ds-note" style={{ marginTop: "14px" }}>
-          <div className="ds-tag role" style={{ background: "none", border: "none", padding: 0, marginBottom: "8px" }}>
-            What the live run showed (honest)
-          </div>
-          <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "12.5px", lineHeight: 1.7 }}>
-            {liveSamples.provenance.honest_findings.map((f, i) => (
-              <li key={i}>{f}</li>
             ))}
-          </ul>
-        </div>
+          </tbody>
+        </table>
+      </div>
+      <p className="ds-meta-line">
+        Locked by <span className="ds-mono">{L1.lockTestFile}</span>.
+      </p>
+      <Prov of={L1.provenance} />
 
-        <div className="ds-tbl">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Blocker</th>
-                <th scope="col">Mode</th>
-                <th scope="col">Gate</th>
-                <th scope="col">Eval</th>
-                <th scope="col">Cost</th>
-              </tr>
-            </thead>
-            <tbody>
-              {liveSamples.rows.map((r, i) => (
-                <tr key={i}>
-                  <td className="ds-mono" style={{ fontSize: "12px" }}>
-                    {r.blocker}
-                  </td>
-                  <td className="ds-mono" style={{ fontSize: "12px", color: "var(--muted)" }}>
-                    {r.mode}
-                  </td>
-                  <td>{r.gatekeeper}</td>
-                  <td className="ds-mono">{r.eval}</td>
-                  <td className="ds-mono" style={{ color: "var(--muted)" }}>
-                    ${r.costUsd.toFixed(6)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      {/* d. link to the moved legacy surface */}
+      <p className="ds-note" style={{ marginTop: "24px" }}>
+        The legacy activation eval records formerly on this page now live at{" "}
+        <Link href="/legacy/eval" className="ds-mlink">
+          /legacy/eval
+        </Link>
+        .
+      </p>
     </main>
   );
 }

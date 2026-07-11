@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
+import { BUILD_INFO } from "@/lib/build-info";
 import "./globals.css";
 
 // Self-hosted via next/font/google (no render-blocking <link>). Geist = UI/display,
@@ -69,6 +70,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               Not affiliated with, endorsed by, or connected to
             </span>{" "}
             DoorDash, Uber Eats, Grubhub, DataSF, or any named business.
+            {/* E1a build-provenance line (plan v3.3; injected by next.config.ts,
+                consumed at S8). Carries no S2 contract phrase — the semantic
+                disclosure contract above stays the only bearer of those. */}
+            <span className="site-footer-build"> {BUILD_INFO.label}.</span>
           </div>
         </footer>
       </body>

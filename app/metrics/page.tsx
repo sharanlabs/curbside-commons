@@ -1,86 +1,95 @@
 import type { Metadata } from "next";
-import { getReplaySnapshot } from "@/legacy/activation/lib/replay/run";
-import { PLATFORM_NAME } from "@/lib/product";
+import Link from "next/link";
+import { ENGINE, type Provenance } from "@/lib/dashboard/evidence";
 
-export const metadata: Metadata = { title: "Metrics" };
+export const metadata: Metadata = { title: "Engine measurables" };
 
-function Bar({ label, value, total, accent }: { label: string; value: number; total: number; accent?: boolean }) {
-  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+/** Per-block provenance line — file + freeze SHA + event date, all from the module. */
+function Prov({ of }: { of: Provenance }) {
   return (
-    <div className="ds-bar-row">
-      <div className="ds-bar-top">
-        <span>{label}</span>
-        <span className="bv">
-          {value} · {pct}%
-        </span>
-      </div>
-      <div className={accent ? "ds-bar acc" : "ds-bar"}>
-        <i style={{ width: `${pct}%` }} />
-      </div>
-    </div>
+    <p className="ds-prov">
+      source: <span className="ds-mono">{of.file}</span> @ <span className="ds-mono">{of.frozenAt}</span>{" "}
+      ({of.date})
+    </p>
   );
 }
 
-export default function MetricsPage() {
-  const snap = getReplaySnapshot(PLATFORM_NAME);
-  const s = snap.summary;
-  const blockers = Object.entries(s.blockers).sort((a, b) => b[1] - a[1]);
-
+export default function EngineMeasurablesPage() {
   return (
     <main className="ds-data ds-wrap ds-view">
-      <h1>Workflow metrics (simulated)</h1>
+      <h1>Engine measurables</h1>
       <p className="ds-lead plain">
-        <b>In plain terms:</b> what the demo routes and tracks for an activation team — how many
-        stalled merchants get a claim-checked nudge, how many are held for a human, and what&apos;s
-        blocking them.
+        <b>In plain terms:</b> the checker&rsquo;s substance in numbers — how many codified fee rules
+        it enforces, how many official protocol schemas it validates against, and exactly what the
+        public demo report contains. Each number is recomputed from the committed file it lives in.
       </p>
-      <div className="ds-note warn">
-        Figures are <b>simulated</b> over the hybrid demo set (fictional names, synthetic activation
-        state) — illustrative of the workflow, <b>not activation, revenue, or reactivation outcomes</b>.
-      </div>
+      <p className="ds-lead tech">
+        <b>Technically:</b> these figures are computed at build time from imports of the committed
+        artifacts (rule table, pinned schema set, golden report) — they cannot drift from the repo. A
+        committed anti-fabrication test re-derives every figure from the same sources.
+      </p>
 
       <section className="ds-stats c4">
-        {[
-          { label: "Stalled merchants", value: s.merchants },
-          { label: "Simulated sent", value: s.sent },
-          { label: "Held for review", value: s.held },
-          { label: "Auto-rejected", value: s.rejected },
-        ].map((c) => (
-          <div key={c.label} className="ds-stat">
-            <div className="v">{c.value}</div>
-            <div className="l">{c.label}</div>
+        <div className="ds-stat accent">
+          <div className="v">{ENGINE.feeRulesTotal}</div>
+          <div className="l">codified fee-cap rules (NYC &sect;20-563.3)</div>
+        </div>
+        <div className="ds-stat">
+          <div className="v">{ENGINE.ucpSchemaCount}</div>
+          <div className="l">pinned official UCP schemas</div>
+        </div>
+        <div className="ds-stat">
+          <div className="v">{ENGINE.demoFindings}</div>
+          <div className="l">findings in the demo golden report</div>
+        </div>
+        <div className="ds-stat">
+          <div className="v">
+            {ENGINE.demoErrors}/{ENGINE.demoWarns}
           </div>
-        ))}
+          <div className="l">error / warn split</div>
+        </div>
       </section>
 
-      <div className="ds-grid g2" style={{ marginTop: "26px" }}>
-        <section className="ds-card flush">
-          <h2>Blocker mix</h2>
-          <p className="ds-card-p" style={{ color: "var(--muted)", marginBottom: "14px" }}>
-            Where merchants are stuck (the work to do).
-          </p>
-          {blockers.map(([blocker, count]) => (
-            <Bar key={blocker} label={blocker} value={count} total={s.merchants} />
-          ))}
-        </section>
+      <section>
+        <h2 className="ds-h2-row">Fee-rule accounting</h2>
+        <p className="ds-runline" style={{ maxWidth: "78ch" }}>
+          {ENGINE.feeRulePredicates} statement predicates the checker executes directly +{" "}
+          {ENGINE.feeRulesNonCheckable} clauses registered as non-checkable from a statement alone
+          (each carries its reason in the rule table) = {ENGINE.feeRulesTotal} rules, transcribed 1:1
+          from the codified clause text and held by a drift-lock test.
+        </p>
+        <Prov of={ENGINE.feeRulesProvenance} />
+      </section>
 
-        <section className="ds-card flush">
-          <h2>Risk distribution</h2>
-          <p className="ds-card-p" style={{ color: "var(--muted)", marginBottom: "14px" }}>
-            High-risk merchants are held for human approval; lower-risk eligible ones can
-            simulate-send.
-          </p>
-          {(["High", "Medium", "Low"] as const).map((level) => (
-            <Bar key={level} label={level} value={s.riskLevels[level] ?? 0} total={s.merchants} accent />
-          ))}
-          <dl className="ds-ratefacts">
-            <dt>Simulated send rate (of total)</dt>
-            <dd>{Math.round((s.sent / s.merchants) * 100)}%</dd>
-            <dt>Held-for-review rate</dt>
-            <dd>{Math.round((s.held / s.merchants) * 100)}%</dd>
-          </dl>
-        </section>
-      </div>
+      <section>
+        <h2 className="ds-h2-row">Protocol conformance surface</h2>
+        <p className="ds-runline" style={{ maxWidth: "78ch" }}>
+          {ENGINE.ucpSchemaCount} official UCP JSON Schemas (spec version{" "}
+          <span className="ds-mono">{ENGINE.ucpSpecVersion}</span>), fetched verbatim, hash-pinned, and
+          validated against — never edited. The headline the engine demonstrates: a feed can be
+          schema-conformant and still false against the merchant&rsquo;s own records.
+        </p>
+        <Prov of={ENGINE.ucpProvenance} />
+      </section>
+
+      <section>
+        <h2 className="ds-h2-row">The demo golden report</h2>
+        <p className="ds-runline" style={{ maxWidth: "78ch" }}>
+          The public <Link href="/report" className="ds-mlink">/report</Link> and{" "}
+          <Link href="/demo" className="ds-mlink">/demo</Link> pages render exactly this committed
+          golden: {ENGINE.demoFindings} findings — {ENGINE.demoErrors} error / {ENGINE.demoWarns} warn
+          — from the synthetic-restaurant corpus. Simulated data throughout; the rules are real.
+        </p>
+        <Prov of={ENGINE.demoReportProvenance} />
+      </section>
+
+      <p className="ds-note" style={{ marginTop: "24px" }}>
+        The legacy activation workflow metrics formerly on this page now live at{" "}
+        <Link href="/legacy/metrics" className="ds-mlink">
+          /legacy/metrics
+        </Link>
+        .
+      </p>
     </main>
   );
 }
