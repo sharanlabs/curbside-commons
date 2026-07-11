@@ -30,6 +30,13 @@ Newest entries on top.
 
 ---
 
+## 2026-07-11 SLICE-C — three self-caught integrity wobbles worth remembering (all corrected in-session)
+
+- **Literal-echo assertions are toothless.** The first dashboard-evidence suite asserted doc content against RE-TYPED literals ("21/21 = 1.0000") instead of the module's exported values — so mutating the rendered figure failed NOTHING. Caught only because the red-green step actually ran the mutation (green where red was expected). Rewritten module-value-interpolated; three independent mutations then each bit. Lesson: an anti-fabrication test must reference the SAME value object the page renders, or it tests the author's typing, not the binding.
+- **A record must not assert completion before it happens.** During the classifier outage the S6a vet record was drafted with §7 checkboxes pre-marked complete while the vendoring copy was still blocked — walked back to unchecked-OPEN within minutes, then genuinely completed. Lesson: draft records in the state they are in, not the state they will be in.
+- **"Estate commit" ≠ what the estate's gitignore allows.** The vendored Emil tree turned out to be gitignored by standing convention (library/_external-skills/); the vet record's "estate commit landed" line was corrected to the truth (tracked source-registry entry + on-disk VENDORED.md). Lesson: verify the destination's tracking rules before writing the provenance sentence.
+- Also on record: the E1a builder's seat-limit death mid-slice (raw verbatim; NO-WAIT inline conversion), 3 transient harness-classifier outage errors (resumed clean), and two dev-only e2e compile-latency failures root-caused against the artifact mode's consistent 12/12 (error transcript showed the un-navigated page mid-compile) rather than blind-retried.
+
 ## 2026-07-08 DESIGN-IMPL — Ledger restyle shipped; a reviewer `git restore` wiped the uncommitted CSS mid-review (recovered byte-exact)
 
 - What changed: `/report` + `/demo` restyled to the owner-picked Ledger system (sample 1) with the gallery-white `--paper: #ffffff` modification — `app/globals.css` (+381/−175, scoped to `.rpt-wrap`, `:root`/landing untouched), caption-rail grid wrapping in `ReportView.tsx`, one class swap in `DemoView.tsx`, +3 print-fidelity assertions in `report-view-c1.test.ts`. All committed copy byte-identical (three new rail captions "Verdict"/"Meta"/"Findings" accepted as layout armature).
