@@ -386,3 +386,11 @@ Newest entries on top.
 - Files changed: see the OS-SETUP entry in `docs/task-log.md`.
 - Reviewer notes (Codex / human): Codex review of these files is optional and may be deferred (docs-only, no product code).
 - Human decision: Pending — the human owner decides GO / NO-GO on the build (`docs/plan-reconciliation.md`).
+
+## 2026-07-10 — Plan v3.3 execution, slice group A (S1 doc honesty · S2 disclosure contract · S3a CI)
+
+- What was done: the first three slices of the approved full-quality plan. S1 reconciled every public doc to the earned records (calibrated 21/21, agent labels, the recorded send, deploy done) and rewrote all exclusivity claims to the 2026-06-22 mechanism+rigor rule, with a 27-row old→new→evidence claim ledger as the review input. S2 lifted the footer byte-freeze via a recorded reversal row (its own commit, git-provably first) and replaced it with a tested semantic disclosure contract; added a banner parity lock and a recursive mockup claim scan. S3a added the real GitHub-Actions CI workflow with live-resolved immutable action pins.
+- The tradeoff that mattered: bytes-frozen honesty had become the dishonest state (the old footer said "not … real sends" after a real recorded send existed) — the freeze moved from bytes to tested semantics rather than being silently edited.
+- Failure/correction on the record: the batch-A Codex review (REVISE, 2P1+5P2, all accepted) caught the S1 author reintroducing a blanket-coverage claim ("Everything asserted here is measured") in the very section built to remove such claims, plus a sentence-wide strip in the new mockup scan that could have masked a same-sentence overclaim. Both were the exact "new overclaim while fixing old ones" risk the frontier-advisor named at pre-approach; the claim-ledger + cross-model review pairing is what caught them.
+- How it was verified: per-slice and post-fix — verify exit 0 (961+7 → 1005+7 as the new teeth landed; doc counts re-measured and dated), test:legacy 306+5, C10 pack 101/101, e2e 4/4 footer-scoped, protected-path EMPTY diffs with the two plan-specified eval files as the recorded allowlist.
+- Reviewer notes: docs/reviews/codex-2026-07-10-batchA.md (+ raw log). Push executed after reconciliation per the plan's push policy; first CI run observed live (S3b's claim flip waits on it, batch E).
