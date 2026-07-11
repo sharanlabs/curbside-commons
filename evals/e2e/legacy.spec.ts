@@ -19,8 +19,9 @@ test("legacy console renders the queue with both human-in-the-loop outcomes", as
 test("a merchant opens its full why-chain end to end under /legacy/", async ({ page }) => {
   await page.goto("/legacy/console");
   await page.locator("tbody a").first().click();
-  // 15s: dev mode compiles /legacy/merchant/[id] on first hit (artifact mode is instant).
-  await expect(page).toHaveURL(/\/legacy\/merchant\/M\d{3}/, { timeout: 15_000 });
+  // 30s: dev mode compiles /legacy/merchant/[id] on first hit (artifact mode is
+  // instant); 15s was measured insufficient under load on 2026-07-11.
+  await expect(page).toHaveURL(/\/legacy\/merchant\/M\d{3}/, { timeout: 30_000 });
   for (const section of [
     "Triage & diagnosis",
     "Drafted outreach",
@@ -41,7 +42,7 @@ test("the /legacy/ skeleton serves every moved surface under the provenance bann
   // Handoff from the truth-engine dashboard into the moved surface
   await page.goto("/eval");
   await page.getByRole("link", { name: "/legacy/eval" }).click();
-  await expect(page).toHaveURL(/\/legacy\/eval/);
+  await expect(page).toHaveURL(/\/legacy\/eval/, { timeout: 15_000 });
   await expect(page.getByText("Legacy activation module", { exact: false }).first()).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "Eval / Quality" })).toBeVisible();
   // The provenance banner is not a footer — the root footer stays the only one.
