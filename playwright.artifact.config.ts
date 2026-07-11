@@ -24,7 +24,9 @@ export default defineConfig({
   webServer: {
     command: "node scripts-ts/serve-artifact.mts 3200 out",
     url: "http://localhost:3200",
-    reuseExistingServer: !process.env.CI,
+    // NEVER reuse a listener: a stale server on this port would silently swap the
+    // artifact under test (batch-C P1). Fail loud if the port is occupied.
+    reuseExistingServer: false,
     timeout: 30_000,
   },
 });

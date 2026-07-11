@@ -205,6 +205,14 @@ export const ZERO_COST_PROOFS: ReadonlyArray<{
 
 export const RUN_RECORDS: ReadonlyArray<PinnedFigure> = [
   {
+    // Derived from the deferRun record above — the first attempt is a first-class
+    // ledger row, not a hidden footnote (its run-#1 ENOENT incident is recorded
+    // inside the same linked status doc).
+    value: `${CALIBRATION.deferRun.score} · one floor missed · ${CALIBRATION.deferRun.outcome}`,
+    label: "Fee-line classifier calibration, first attempt — the DEFER record stands public",
+    provenance: CALIBRATION_DEFER_PROVENANCE,
+  },
+  {
     value: "20/20 scored · 0 degraded · $0 (Groq)",
     label: "L-1 crew live run — pre-registered floors, one pass",
     provenance: L1_PROVENANCE,

@@ -548,7 +548,7 @@
         </div>
 
         <div class="hold-zone" id="hold-zone">
-          <p class="hold-instr js-only" id="hold-instr">Press and <strong>hold</strong> to weigh the serving copy against the merchant&rsquo;s record &mdash; the check is deliberate. Release completes it and the verdict appears below. Prefer not to hold? Use <em>Reveal without holding</em>.</p>
+          <p class="hold-instr js-only" id="hold-instr">Press and <strong>hold</strong> to weigh the serving copy against the merchant&rsquo;s record &mdash; the check is deliberate. Hold until it completes and the verdict appears below; releasing early cancels the check. Prefer not to hold? Use <em>Reveal without holding</em>.</p>
 
           <div class="hold-controls">
             <button class="hold-btn js-only" id="hold-btn" type="button"
@@ -556,7 +556,7 @@
               <span class="hold-base">Hold to verify</span>
               <span class="hold-fill" aria-hidden="true"><span class="hold-fill-inner">Hold to verify</span></span>
             </button>
-            <button class="reveal-plain js-only" id="reveal-plain" type="button" aria-controls="verdict-fallback">
+            <button class="reveal-plain js-only" id="reveal-plain" type="button" aria-controls="verdict-fallback" aria-expanded="false">
               Reveal without holding
             </button>
           </div>
@@ -776,6 +776,7 @@
       zone.classList.remove("holding");
       zone.classList.add("done");
       btn.setAttribute("aria-expanded", "true");
+      revealPlain.setAttribute("aria-expanded", "true");
       details.open = true;
       // 320ms ease-out entrance (opacity-only under reduced motion, via CSS)
       requestAnimationFrame(function () { card.classList.add("revealed"); });

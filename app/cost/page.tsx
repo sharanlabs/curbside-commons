@@ -61,11 +61,13 @@ export default function CostEnforcementPage() {
       </section>
 
       <section>
-        <h2 className="ds-h2-row">Recorded live legs (the complete ledger)</h2>
+        <h2 className="ds-h2-row">Recorded live legs</h2>
         <p className="ds-runline" style={{ maxWidth: "78ch" }}>
-          Every live run in this project&rsquo;s history was owner-armed, pre-registered where it
-          earned a label, and committed as a frozen record. This is the whole list — there are no
-          unrecorded runs.
+          Each leg below was owner-armed, pre-registered where it earned a label, and committed as
+          a frozen record — including the first calibration attempt, which deferred its label and
+          stands unedited. First-attempt incidents and raw transcripts live inside the linked
+          records; the legacy module&rsquo;s one recorded Gemini spend is itemized in the section
+          above.
         </p>
         <div className="ds-grid g2" style={{ marginTop: "12px" }}>
           {RUN_RECORDS.map((r) => (

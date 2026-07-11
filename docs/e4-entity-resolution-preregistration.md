@@ -94,6 +94,23 @@ floors not met (see results) — experimental, advisory only."
 
 ---
 
+## AMENDMENTS (2026-07-11, batch-C review — TIGHTENING ONLY, recorded BEFORE corpus
+## generation or scoring; each traces to a batch-C finding; no floor above moved)
+
+- **A1 — denominator minimums + label exclusivity (batch-C P1):** the TEST split
+  must contain, machine-checked by the composition test BEFORE scoring: **≥30
+  truly-SAME pairs · ≥30 general DIFFERENT pairs · ≥8 trap near-miss DIFFERENT
+  pairs · ≥8 AMBIGUOUS pairs**, on top of the ≥6-per-variant-class rule already
+  registered. Every pair carries EXACTLY ONE ground-truth label (mutual exclusivity
+  machine-checked; label × variant-class counts reported in the composition test's
+  output). **Any floor metric whose denominator is zero = the floors are UNMET**
+  (hard fail — never skipped, never N/A'd, never "vacuously passed").
+- **A2 — normalized-exact baseline frozen (batch-C P2):** the baseline's
+  normalization chain is EXACTLY: NFKC → casefold → collapse whitespace → strip
+  punctuation → strip the enumerated legal-suffix list `{llc, inc, corp, co, ltd,
+  dba, d.b.a.}` — frozen here, committed with the matcher BEFORE scoring; **no
+  post-hoc changes** (any change = a new pre-registration).
+
 ## RESULTS (appended after the one scoring pass — nothing above this line changes)
 
 *(empty at registration — batch C reviews this document with this section empty)*

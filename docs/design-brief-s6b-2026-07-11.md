@@ -203,24 +203,38 @@ leads the tab order.
    "calibrated" claims beyond the earned label wording.
 4. Brand names appear ONLY inside the banner/disclaimer mirrors above (S4 inventory rule).
 
-## 12. Build gates (S6b(b) — the builder's checklist; Fable re-verifies each)
+## 12. Build gates — ADJUDICATED (2026-07-11, Fable-equivalence review + batch-C
+## reconciliation; each item passed with the evidence noted — the batch-C P3
+## against the unchecked list is discharged here)
 
-- [ ] Single self-contained HTML at `mockups/meridian-2026-07-11.html`; renders headless
-      without throw; `node --check`-clean inline JS.
-- [ ] **Zero external requests** (no external fonts/scripts/imgs/fetch; grep-proven).
-- [ ] `prefers-reduced-motion` honored (§4 semantics: gentler, not zero).
-- [ ] Contrast ≥4.5:1 on every text/ground pair (recompute on #FFFFFF; on-tint inks where
-      tinted panels are used).
-- [ ] **No-JS readability:** all content (incl. the verdict card via `<details>`) present
-      and readable with JS disabled.
-- [ ] **Keyboard:** every interactive element reachable + operable (hold path per §7;
-      visible `:focus-visible`); skip-link first in the tab order.
-- [ ] Semantic markup: landmarks (`header/main/footer/nav`), one `<h1>`, ordered heading
-      levels, `role="list"` where styled lists lose semantics, `aria-pressed`/`aria-expanded`
-      where state exists, icons `aria-hidden` with text labels beside them.
-- [ ] Anchor matrix per §9 (parity with the live landing's ids).
-- [ ] Figures + finding rows id/rule-exact vs the golden (§5).
-- [ ] Banner + honesty fragments per §11.
-- [ ] `mockups/README.md` inventory updated (this sample = **current/new**; brief +
-      README rows) and **C10 dynamic-scan pickup proven red-green** (plant a banned claim
-      in the new file → scan fails → remove → green; run record kept).
+- [x] Single self-contained HTML at `mockups/meridian-2026-07-11.html`; inline JS
+      `node --check`-clean (extracted script, exit 0).
+- [x] **Zero external requests** — grep over `src=|href=http|url(|@import|<link`:
+      zero loaded-resource hits.
+- [x] `prefers-reduced-motion` honored — seal fully drawn/no pulse; hold = instant
+      opacity-only confirmation; reveals static; smooth-scroll gated to `auto`
+      (elevation fix applied in review).
+- [x] Contrast — every pair recomputed incl. composited tints: minimum **5.80:1**
+      (`--error-ink` on its tint); ink 18.1:1, body 11.0:1, wine 8.9:1.
+- [x] **No-JS readability** — `.js` hook is script-added only; the verdict card ships
+      as a native `<details>` in markup; all stations visible statically.
+- [x] **Keyboard** — hold path: Space/Enter keydown starts / keyup releases,
+      key-repeat guarded, blur = release; no-hold reveal control; skip-link first;
+      visible `:focus-visible` rings.
+- [x] Semantic markup — landmarks, one `<h1>`, ordered headings, `role="list"` on
+      styled lists, `aria-pressed`-free toggle design w/ `aria-expanded` synced on
+      BOTH reveal controls (batch-C P2 fix), icons `aria-hidden` beside text.
+- [x] Anchor matrix per §9 — all 7 ids present; the 5 shared ids parity-match
+      `app/page.tsx` (batch-C confirmed).
+- [x] Figures + finding rows — machine-verified claim.id + ruleId + plainLine EXACT
+      vs the committed golden (3 rows incl. values `"2150"`/`in_stock`); tally
+      16 · 11/5 · 0 info · `ok:false`.
+- [x] Banner + honesty fragments — SIMULATED banner rendered-text machine-EQUAL to
+      ReportView (entity-decoded compare); non-affiliation + not-a-live-service in
+      the footer fragment; zero BANNED_CLAIMS.
+- [x] `mockups/README.md` inventory updated (both 2026-07-11 artifacts = current/new,
+      count 54→56) and **C10 pickup proven red-green** (planted overclaim → the scan
+      FAILED naming this file → restored → 103/103 green).
+- **Copy correction (batch-C P2, fixed):** the hold instruction originally said
+  "Release completes it" while the code completes at the 1.4s mark and cancels on
+  early release — reworded to "Hold until it completes … releasing early cancels."

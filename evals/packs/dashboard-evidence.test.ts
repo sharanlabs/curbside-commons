@@ -254,3 +254,64 @@ describe("E1a build-info — injected provenance is honest by construction", () 
     expect(BUILD_SHA_PATTERN.test("HEAD")).toBe(false);
   });
 });
+
+describe("batch-C reconciliation — every RUN_RECORDS rendered value is source-bound (mutation-bitten)", () => {
+  // The /cost page renders r.value/r.label directly; a value string nothing
+  // re-derives is a fabrication channel (batch-C P1). Each row below binds its
+  // rendered tokens to the committed artifact its own provenance names.
+
+  it("the L-1 row's value is DERIVED from the committed matrix (scored count + degraded count)", () => {
+    const rec = RUN_RECORDS.find((r) => r.provenance.file.includes("l1-live-matrix"))!;
+    const matrix = JSON.parse(read(rec.provenance.file)) as {
+      matrix: unknown[];
+      degradedCount: number;
+    };
+    const scored = matrix.matrix.length;
+    expect(rec.value).toBe(`${scored}/${scored} scored · ${matrix.degradedCount} degraded · $0 (Groq)`);
+  });
+
+  it("the calibration-retry row interpolates the bound retry score and cost", () => {
+    const rec = RUN_RECORDS.find((r) => r.provenance.file.includes("recalibration-status"))!;
+    expect(rec.value).toBe(`${CALIBRATION.retryRun.score} · all six floors · ${CALIBRATION.retryRun.cost} (Groq)`);
+  });
+
+  it("the DEFER row derives from deferRun and its source doc actually records the DEFER", () => {
+    const rec = RUN_RECORDS.find((r) => r.provenance === CALIBRATION_DEFER_PROVENANCE)!;
+    expect(rec.value).toBe(
+      `${CALIBRATION.deferRun.score} · one floor missed · ${CALIBRATION.deferRun.outcome}`,
+    );
+    const src = read(rec.provenance.file);
+    expect(src).toContain(CALIBRATION.deferRun.score);
+    expect(src.toUpperCase()).toContain("DEFER");
+  });
+
+  it("the L-2 row's 'eight safety controls' is supported verbatim by the send record", () => {
+    const rec = RUN_RECORDS.find((r) => r.provenance.file.includes("l2-slack-one-shot"))!;
+    expect(rec.value).toContain("eight safety controls");
+    expect(read(rec.provenance.file)).toMatch(/all eight held/);
+  });
+
+  it("the n8n row's 'episodic' + 'sha256-identical' wording is supported by its record", () => {
+    const rec = RUN_RECORDS.find((r) => r.provenance.file.includes("l3-n8n"))!;
+    expect(rec.value).toContain("episodic");
+    expect(rec.value).toContain("sha256-identical");
+    const src = read(rec.provenance.file).toLowerCase();
+    expect(src).toContain("episodic");
+    expect(src).toContain("byte-identical");
+  });
+
+  it("each ZERO_COST_PROOFS row's NOTE tokens exist in its enforcing test (not just the file)", () => {
+    for (const proof of ZERO_COST_PROOFS) {
+      const src = read(proof.enforcedBy);
+      if (proof.note.includes("lib/tools")) {
+        expect(src, proof.claim).toContain("lib/tools");
+      }
+      if (proof.note.includes("import-graph walk")) {
+        expect(src, proof.claim).toContain("banned LLM/network pattern");
+      }
+      if (proof.note.includes("cannot send")) {
+        expect(src, proof.claim).toContain("must import nothing at all (pure builders)");
+      }
+    }
+  });
+});
