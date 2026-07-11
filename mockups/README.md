@@ -1,8 +1,15 @@
 # Mockups — root inventory (plan v3.3 §S4 / NEW-12, 2026-07-10)
 
-Every committed mockup artifact, classified by status. **None of these is served by the site** (only `app/` routes export to `out/`); they are design-process records. All claim-bearing mockup HTML is covered by the C10 recursive mockup claim scan (`evals/packs/honesty-c10.test.ts`, dynamic — a new mockup is picked up automatically; green as of 2026-07-10, no historical exclusions needed). Brand names inside mockups appear only in non-affiliation disclaimer blocks and mirrors of the byte-frozen SIMULATED banner (plus one identity-register line in the superseded `story-flow.html:878`) — all keep-class per `docs/reviews/s4-debrand-inventory-2026-07-10.md`. **S6b will add one new sample and must update this inventory with `status: current/new` and prove C10 scan pickup red-green (plan v3.3 §S6b).**
+Every committed mockup artifact, classified by status. **None of these is served by the site** (only `app/` routes export to `out/`); they are design-process records. All claim-bearing mockup HTML is covered by the C10 recursive mockup claim scan (`evals/packs/honesty-c10.test.ts`, dynamic — a new mockup is picked up automatically; green as of 2026-07-11 over 56 artifacts incl. the two new ones below, no historical exclusions needed). Brand names inside mockups appear only in non-affiliation disclaimer blocks and mirrors of the byte-frozen SIMULATED banner (plus one identity-register line in the superseded `story-flow.html:878`) — all keep-class per `docs/reviews/s4-debrand-inventory-2026-07-10.md`. The S6b inventory obligation (plan v3.3 §S6b) is discharged by the section below.
 
-**Statuses:** `shipped` = adopted as spec and implemented on the live surfaces · `superseded` = a candidate/spec generation that was replaced · `historical` = earlier exploration generations + screenshots.
+**Statuses:** `shipped` = adopted as spec and implemented on the live surfaces · `superseded` = a candidate/spec generation that was replaced · `historical` = earlier exploration generations + screenshots · `current/new` = an active proposal awaiting the owner's reaction.
+
+## S6b design lane + RV2 prototype (2026-07-11 — current generation)
+
+| Artifact | Status | Note |
+|---|---|---|
+| `meridian-2026-07-11.html` | **current/new** | S6b design-lane sample "Meridian" (vertical meridian spine · pure-white gallery ground · self-drawing Verifier Seal · hold-and-release "Hold to verify" with keyboard/no-hold/no-JS paths). Brief: `docs/design-brief-s6b-2026-07-11.md`. Sample only — site adoption is a later owner word. C10 pickup proven red-green 2026-07-11 |
+| `playground-prototype-2026-07-11.html` | **current/new** | RV2 playground PROTOTYPE (owner pick "Prototype first"): paste-a-feed UX spike replaying the committed golden for the committed sample feed; the real engine is deliberately NOT wired (that full slice is what this spike evaluates, stated on its face). C10 pickup proven red-green 2026-07-11 |
 
 ## ultra-modern-2026-07-08/ (the adopted whole-site generation)
 
@@ -44,4 +51,4 @@ Every committed mockup artifact, classified by status. **None of these is served
 
 `app-console.png` · `app-landing-settled.png` · `app-landing.png` · `editorial.png` · `premium.png` · `saas.png` · `swiss.png` · `technical.png` · `v2-ledger.png` · `v2-letterpress.png` · `v2-manifesto-catch.png` · `v2-manifesto.png` · `v2-reportage.png` · `v2-terminal-swiss-catch.png` · `v2-terminal-swiss.png` · `v3-390.png` · `v3-768.png` · `v3-audit.png` · `v3-ledger-enterprise.png` · `v3-surface.png` · `verification-story-catch.png` · `verification-story-hero.png` · `verification-story-pipeline.png` — renders of the explorations above.
 
-**Count: 54 artifacts** (9 ultra-modern + 8 design-samples + 14 root HTML + 23 shots), matching the plan's inventory scope.
+**Count: 56 artifacts** (2 current-generation [S6b Meridian + RV2 playground] + 9 ultra-modern + 8 design-samples + 14 root HTML + 23 shots). The original S4 inventory scope was 54; the two additions are the recorded S6b/RV2 artifacts above.
