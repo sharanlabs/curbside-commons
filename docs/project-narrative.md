@@ -1,6 +1,6 @@
 # ActivationOps AI — Project Narrative
 
-A human-led, AI-assisted, professionally reviewed workflow automation project for a DoorDash-style merchant onboarding simulation, built on dummy data.
+A human-led, AI-assisted, professionally reviewed workflow automation project for a delivery-marketplace-style merchant onboarding simulation, built on dummy data.
 
 This is not an official DoorDash system. It uses no real merchant data and makes no real business-impact claims. Every metric in it is simulated.
 

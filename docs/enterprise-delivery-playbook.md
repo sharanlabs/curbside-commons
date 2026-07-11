@@ -25,7 +25,7 @@ Apply it *proportional to risk* (see Lightweight vs Full). The chain is the spin
 
 ## ActivationOps AI Application
 
-ActivationOps AI is currently an **offline, AI-assisted operational workflow-automation thin slice** for a DoorDash-style merchant-onboarding simulation on **dummy data**. T-001 normalizes 20 dummy merchants, scores risk deterministically, diagnoses blockers, queues high-risk merchants for human review, generates one stubbed guardrailed outreach draft, gates simulated sends behind approval, and writes audit logs — with tests T1–T18 + P2 coverage.
+ActivationOps AI is currently an **offline, AI-assisted operational workflow-automation thin slice** for a delivery-marketplace-style merchant-onboarding simulation on **dummy data**. T-001 normalizes 20 dummy merchants, scores risk deterministically, diagnoses blockers, queues high-risk merchants for human review, generates one stubbed guardrailed outreach draft, gates simulated sends behind approval, and writes audit logs — with tests T1–T18 + P2 coverage.
 
 It **may** later become a human-in-the-loop *agentic* workflow automation system, but **V1 must not overclaim agentic behavior** — V1 is deterministic logic + a bounded, stubbed AI draft step. "Agentic" is a roadmap label only.
 

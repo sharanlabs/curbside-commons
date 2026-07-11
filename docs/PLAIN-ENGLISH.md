@@ -16,7 +16,7 @@
 
 ## The problem, in plain words
 
-When you order food through an app — or, starting now, when you just tell an AI assistant "order me a pizza" — the menu you see is **not the restaurant's actual menu**. It's a **copy**. The real menu lives in the restaurant's till system (their cash-register software). That copy gets passed along a chain: till → sync software → DoorDash / Uber Eats / Grubhub → and now → AI assistants like ChatGPT, Claude, and Gemini.
+When you order food through an app — or, starting now, when you just tell an AI assistant "order me a pizza" — the menu you see is **not the restaurant's actual menu**. It's a **copy**. The real menu lives in the restaurant's till system (their cash-register software). That copy gets passed along a chain: till → sync software → the delivery marketplaces → and now → AI assistants like ChatGPT, Claude, and Gemini.
 
 Copies go stale:
 

@@ -32,7 +32,7 @@ Everything else that greps is a KEEP, accounted below. **Post-sweep gate:** re-r
 
 - **Sanctioned non-affiliation disclaimers** (nominative fair use under the predicate "not affiliated with, endorsed by, or connected to" or equivalent; the S2 footer is e2e-locked verbatim): `README.md:7` · `app/layout.tsx:71` (S2 contract) · `app/page.tsx:355` · `docs/PLAIN-ENGLISH.md:70` · `docs/project-narrative.md:5,95` · `docs/enterprise-delivery-playbook.md:163` · `AGENTS.md:19` · mockup disclaimer blocks (see `mockups/README.md`).
 - **Governance/honesty rules naming brands to PROHIBIT claims:** `RULES.md:44`, `CLAUDE.md:72` ("Never claim real DoorDash access…"). Protective naming; constitution edits are out of S4 scope (owner-gated) — surfaced at wrap.
-- **Protocol authorship (genericizing would be FALSE):** `docs/GLOSSARY.md:11` (ACP = OpenAI's published spec) · `docs/GLOSSARY.md:75` (UCP = Google-led; food vertical co-developed by DoorDash, Square, Toast, Uber Eats) · `components/report/ReportView.tsx:28` ("OpenAI/Stripe product-feed shape" plain label) · `docs/PLAIN-ENGLISH.md:92` (OpenAI-style feed / Google-UCP answer).
+- **Protocol authorship (genericizing would be FALSE):** `docs/GLOSSARY.md:11` (ACP = OpenAI's published spec) · `docs/GLOSSARY.md:75` (UCP = Google-led; food vertical co-developed by DoorDash, Square, Toast, Uber Eats) · `components/report/ReportView.tsx:28` ("OpenAI/Stripe product-feed shape" plain label) · `components/report/ReportView.tsx:33` ("Google-led live-catalog shape" UCP plain label) · `docs/PLAIN-ENGLISH.md:92` (OpenAI-style feed / Google-UCP answer).
 - **Data provenance (license/honesty-bearing):** DataSF attributions in `app/console/page.tsx:105`, `lib/product.ts:17` (HONEST_DATA_LABEL), `docs/WHY.md:43`, `docs/ENTERPRISE-READINESS.md:18`, `scripts-ts/build-hybrid-snapshot.mjs` (the fetch tool itself), `README.md:96`.
 - **Dev-tool attribution:** "OpenAI Codex" as adversarial reviewer in `README.md:100`, `docs/PUBLICATION.md:61` (factual; RULES §8 development-workflow note).
 - **Lineage facts:** `README.md:94`, `docs/PUBLICATION.md:59`, `package.json:6` ("the ActivationOps AI activation module is archived…" — the repo's first life; S5 renames the package itself).
@@ -63,9 +63,10 @@ Everything else that greps is a KEEP, accounted below. **Post-sweep gate:** re-r
 Expected (sanctioned) hits in the built site — anything outside this list fails the gate:
 1. The S2 footer non-affiliation sentence (every page; `app/layout.tsx:71`).
 2. The SIMULATED banner text incl. `Uber&nbsp;Eats` (report/demo surfaces; `copy.ts:54`/`ReportView.tsx:115`).
-3. "OpenAI/Stripe product-feed shape" plain label (report surfaces; `ReportView.tsx:28`).
+3. The protocol-attribution plain labels (report surfaces): "OpenAI/Stripe product-feed shape" (`ReportView.tsx:28`) and "Google-led live-catalog shape" (`ReportView.tsx:33`). (A third "Google" hit in `out/` is Next.js's own vendored bot-detection regex in the framework bundle — not repo content.)
 4. The landing non-affiliation sentence (`app/page.tsx:355`).
 5. DataSF provenance lines (console surface; `app/console/page.tsx:105` + HONEST_DATA_LABEL from `lib/product.ts:17`).
+6. **[Added by the live scan itself, 2026-07-10 — the gate caught a rendered-content path no source grep of `app/` flags]** Legacy diagnosis copy rendered onto the merchant data surfaces: "IRS/Stripe mismatch vs not-yet-submitted" and "escalate to ops if it's a Stripe fraud hold" from `legacy/activation/lib/domain/diagnosis.ts:77,104` (frozen-archive class — `legacy/` is a protected path; the strings are factual domain examples in the frozen v1 diagnosis rules). These surfaces move under `/legacy/**` at S5 with their own provenance layout; content stays frozen.
 
 ## 7. Out-of-scope-by-directive (recorded so the accounting is total)
 

@@ -1,6 +1,6 @@
 # ActivationOps AI Roadmap
 
-> ActivationOps AI is a **simulation on dummy merchant data** — a **human-led, AI-assisted, professionally reviewed** build. It models a merchant-onboarding "nudge" workflow for a **fictional** marketplace (**"Curbside Commons"**); real marketplaces (DoorDash/Uber Eats/Instacart) are referenced only as **comparisons**, never as the project's identity. No real systems, merchants, or outreach; every metric is **simulated**.
+> ActivationOps AI is a **simulation on dummy merchant data** — a **human-led, AI-assisted, professionally reviewed** build. It models a merchant-onboarding "nudge" workflow for a **fictional** marketplace (**"Curbside Commons"**); real marketplaces are referenced only as **comparisons**, never as the project's identity. No real systems, merchants, or outreach; every metric is **simulated**.
 >
 > **North-star (set 2026-06-09):** a **bounded, human-in-the-loop *agentic* system** — agentic where it earns it, deterministic where safety/correctness demand it, human-gated for every consequential action. Architecture detail: [`docs/architecture/agentic-architecture-blueprint.md`](architecture/agentic-architecture-blueprint.md). The ladder below is how authority would be earned **safely**, one rung at a time — and it is the **designed ceiling, not the completion bar**.
 >

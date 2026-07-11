@@ -34,7 +34,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // fileURLToPath (not URL.pathname) so the alias decodes correctly even
-      // though this project's absolute path contains spaces ("AI DoorDash ...").
+      // though this project's absolute path contains spaces.
       "@": fileURLToPath(new URL(".", import.meta.url)),
     },
   },

@@ -2,7 +2,7 @@
 
 ## Product
 
-ActivationOps AI is a dummy-data merchant onboarding automation system for a DoorDash-style activation workflow.
+ActivationOps AI is a dummy-data merchant onboarding automation system for a delivery-marketplace-style activation workflow.
 
 ## Intended Jobs
 
