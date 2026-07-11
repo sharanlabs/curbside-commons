@@ -21,6 +21,10 @@ npm run verify                                                   # typecheck + l
 
 The demo plays one scripted scene: "a spec-faithful simulated agent follows a spec-valid but false surface; the verifier catches the surface/SOR mismatch." Every verdict in the transcript is computed by the real verifier, never narrated — labeled *spec-faithful demonstration actor — simulated* throughout.
 
+<img src="docs/assets/demo.svg" alt="Captured terminal run of node bin/check.mjs demo: the agent trusts a spec-valid feed, the verifier flags the price drift with claim/rule receipts. Simulated data." width="100%">
+
+*The image above is the demo's real captured output — rendered line-for-line by [`scripts-ts/render-demo-svg.mts`](scripts-ts/render-demo-svg.mts) from a live `node bin/check.mjs demo` run, never staged. Regenerate any time: `node scripts-ts/render-demo-svg.mts`.*
+
 Zero network and zero LLM calls on every CLI path — enforced structurally by an import-graph eval, not by promise. A desktop web console (`npm run dev`: `/report`, `/demo`) renders the same machine reports in two registers, plain words first.
 
 ## The evals harness is the product's character

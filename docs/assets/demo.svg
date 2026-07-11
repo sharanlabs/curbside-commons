@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1183" height="1327" viewBox="0 0 1183 1327" role="img" aria-label="Captured terminal run of: node bin/check.mjs demo — a simulated agent trusts a spec-valid feed; the deterministic verifier flags the price drift with receipts. Simulated data.">
+<title>node bin/check.mjs demo — real captured output (simulated data)</title>
+<style>
+  .card{fill:#ffffff;stroke:#d9d4cc;stroke-width:1}
+  .bar{fill:#f6f4f0}
+  .dot{fill:#c9c2b8}
+  .cmd{font:600 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#5c5648}
+  .ln{font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#2b2620;opacity:0;animation:in 0.5s cubic-bezier(0.23,1,0.32,1) forwards}
+  .rule{fill:#b3aca0}
+  .beat{fill:#1a1712;font-weight:700}
+  .note{fill:#5c5648;font-style:italic}
+  .receipt{fill:#6e675c}
+  .err{fill:#a01f14;font-weight:600}
+  .flag{fill:#8a2233;font-weight:700}
+  .ok{fill:#1f6b45;font-weight:600}
+  .b0{animation-delay:0.00s}.b1{animation-delay:0.55s}.b2{animation-delay:1.10s}.b3{animation-delay:1.65s}.b4{animation-delay:2.20s}.b5{animation-delay:2.75s}.b6{animation-delay:3.30s}.b7{animation-delay:3.85s}
+  @keyframes in{to{opacity:1}}
+  @media (prefers-reduced-motion: reduce){.ln{animation:none;opacity:1}}
+</style>
+<rect class="card" x="0.5" y="0.5" width="1182" height="1326" rx="10"/>
+<rect class="bar" x="1" y="1" width="1181" height="36" rx="9"/>
+<rect class="bar" x="1" y="20" width="1181" height="17"/>
+<circle class="dot" cx="20" cy="19" r="5"/><circle class="dot" cx="38" cy="19" r="5"/><circle class="dot" cx="56" cy="19" r="5"/>
+<text class="cmd" x="76" y="23.5">$ node bin/check.mjs demo</text>
+<text x="28" y="77" class="ln b0 rule" xml:space="preserve">============================================================================</text>
+<text x="28" y="96" class="ln b0 body" xml:space="preserve">Curbside Commons — verifier demo (SIMULATED)</text>
+<text x="28" y="115" class="ln b1 rule" xml:space="preserve">============================================================================</text>
+<text x="28" y="134" class="ln b1 body" xml:space="preserve"></text>
+<text x="28" y="153" class="ln b1 body" xml:space="preserve">Demo claim: a spec-faithful simulated agent follows a spec-valid but false surface; the verifier catches the surface/SOR mismatch</text>
+<text x="28" y="172" class="ln b1 body" xml:space="preserve">Actor:      spec-faithful demonstration actor — simulated</text>
+<text x="28" y="191" class="ln b1 body" xml:space="preserve">Spec pin:   taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08</text>
+<text x="28" y="210" class="ln b1 body" xml:space="preserve">Simulated:  true</text>
+<text x="28" y="229" class="ln b1 body" xml:space="preserve"></text>
+<text x="28" y="248" class="ln b2 rule" xml:space="preserve">----------------------------------------------------------------------------</text>
+<text x="28" y="267" class="ln b2 beat" xml:space="preserve">BEAT 1 · The agent reads the published serving copy — spec-faithful demonstration actor — simulated</text>
+<text x="28" y="286" class="ln b2 body" xml:space="preserve"></text>
+<text x="28" y="305" class="ln b2 note" xml:space="preserve">  ▸ A shopping agent reads the published menu feed — the same data any AI assistant would consume — and never sees the restaurant's own records.</text>
+<text x="28" y="324" class="ln b2 body" xml:space="preserve"></text>
+<text x="28" y="343" class="ln b2 body" xml:space="preserve">  intent: Order the "Smoked Brisket Plate" if the published feed lists it as available.</text>
+<text x="28" y="362" class="ln b2 body" xml:space="preserve">  source read: the published ACP serving copy only (no system-of-record access)</text>
+<text x="28" y="381" class="ln b2 body" xml:space="preserve"></text>
+<text x="28" y="400" class="ln b3 rule" xml:space="preserve">----------------------------------------------------------------------------</text>
+<text x="28" y="419" class="ln b3 beat" xml:space="preserve">BEAT 2 · The agent selects an item, trusting the surface</text>
+<text x="28" y="438" class="ln b3 body" xml:space="preserve"></text>
+<text x="28" y="457" class="ln b3 note" xml:space="preserve">  ▸ Trusting the feed at face value, the agent picks its target item and is ready to order it at the price the surface shows.</text>
+<text x="28" y="476" class="ln b3 body" xml:space="preserve"></text>
+<text x="28" y="495" class="ln b3 body" xml:space="preserve">  selected item: "Smoked Brisket Plate" (row id item-006-v1)</text>
+<text x="28" y="514" class="ln b3 body" xml:space="preserve">  read off the surface: price 12.00 USD · availability in_stock</text>
+<text x="28" y="533" class="ln b3 body" xml:space="preserve">  the agent is now ready to order at that price — the demo stops here (no checkout).</text>
+<text x="28" y="552" class="ln b3 body" xml:space="preserve"></text>
+<text x="28" y="571" class="ln b3 ok" xml:space="preserve">  verdict: [OK] SELECTED (from the surface)</text>
+<text x="28" y="590" class="ln b3 body" xml:space="preserve"></text>
+<text x="28" y="609" class="ln b4 rule" xml:space="preserve">----------------------------------------------------------------------------</text>
+<text x="28" y="628" class="ln b4 beat" xml:space="preserve">BEAT 3 · The verifier checks that same copy against the records</text>
+<text x="28" y="647" class="ln b4 body" xml:space="preserve"></text>
+<text x="28" y="666" class="ln b4 note" xml:space="preserve">  ▸ The verifier checks the exact same feed against the restaurant's system-of-record and flags what the agent had no way to see.</text>
+<text x="28" y="685" class="ln b4 body" xml:space="preserve"></text>
+<text x="28" y="704" class="ln b4 body" xml:space="preserve">  1 finding for the selected item ("Smoked Brisket Plate"); full report: 16 findings across the whole copy.</text>
+<text x="28" y="723" class="ln b4 body" xml:space="preserve"></text>
+<text x="28" y="742" class="ln b4 flag" xml:space="preserve">  verdict: [FLAG] DRIFT ON THE SELECTED ITEM — the agent could not have seen it</text>
+<text x="28" y="761" class="ln b4 body" xml:space="preserve"></text>
+<text x="28" y="780" class="ln b4 body" xml:space="preserve">  evidence (each catch carries its four receipts):</text>
+<text x="28" y="799" class="ln b4 err" xml:space="preserve">    01. [ERROR] The served price 12.00 does not match the catalog price 10.00.</text>
+<text x="28" y="818" class="ln b4 receipt" xml:space="preserve">        claim:      item-006-v1#price.amount  (acp-feed · price.amount = 12.00)</text>
+<text x="28" y="837" class="ln b4 receipt" xml:space="preserve">        reference:  item-006-v1</text>
+<text x="28" y="856" class="ln b4 receipt" xml:space="preserve">        rule:       LST-PRICE-VALUE</text>
+<text x="28" y="875" class="ln b4 receipt" xml:space="preserve">        class:      price</text>
+<text x="28" y="894" class="ln b4 body" xml:space="preserve"></text>
+<text x="28" y="913" class="ln b5 rule" xml:space="preserve">----------------------------------------------------------------------------</text>
+<text x="28" y="932" class="ln b5 beat" xml:space="preserve">BEAT 4 · Conformance-foil: spec-valid is not the same as true</text>
+<text x="28" y="951" class="ln b5 body" xml:space="preserve"></text>
+<text x="28" y="970" class="ln b5 note" xml:space="preserve">  ▸ The same document passes the official schema check — it is correctly shaped — and still misstates the price versus the records.</text>
+<text x="28" y="989" class="ln b5 body" xml:space="preserve"></text>
+<text x="28" y="1008" class="ln b5 body" xml:space="preserve">  passes the official schema check; still lies — conformance: PASS (spec-shape); truth: 1 finding(s) vs the system-of-record.</text>
+<text x="28" y="1027" class="ln b5 body" xml:space="preserve"></text>
+<text x="28" y="1046" class="ln b5 ok" xml:space="preserve">  verdict: [OK] CONFORMANT (spec-valid)</text>
+<text x="28" y="1065" class="ln b5 flag" xml:space="preserve">  verdict: [FLAG] FALSE vs SOR (still lies)</text>
+<text x="28" y="1084" class="ln b5 body" xml:space="preserve"></text>
+<text x="28" y="1103" class="ln b5 body" xml:space="preserve">  evidence (each catch carries its four receipts):</text>
+<text x="28" y="1122" class="ln b5 err" xml:space="preserve">    01. [ERROR] The served price 23.50 does not match the catalog price 21.50.</text>
+<text x="28" y="1141" class="ln b5 receipt" xml:space="preserve">        claim:      item-001-v1#price.amount  (ucp-catalog · price.amount = 23.50)</text>
+<text x="28" y="1160" class="ln b5 receipt" xml:space="preserve">        reference:  item-001-v1</text>
+<text x="28" y="1179" class="ln b5 receipt" xml:space="preserve">        rule:       LST-PRICE-VALUE</text>
+<text x="28" y="1198" class="ln b5 receipt" xml:space="preserve">        class:      price</text>
+<text x="28" y="1217" class="ln b5 body" xml:space="preserve"></text>
+<text x="28" y="1236" class="ln b6 rule" xml:space="preserve">============================================================================</text>
+<text x="28" y="1255" class="ln b6 body" xml:space="preserve">No language model runs in this demo; the comparison is exact, deterministic</text>
+<text x="28" y="1274" class="ln b6 body" xml:space="preserve">logic. Simulated data, run on demand — not a live service, no platform access.</text>
+<text x="28" y="1293" class="ln b7 rule" xml:space="preserve">============================================================================</text>
+</svg>
