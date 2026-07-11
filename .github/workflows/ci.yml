@@ -4,7 +4,10 @@
 # 2026-07-10), least permissions, per-ref concurrency, explicit timeout.
 # NO claim edits ride this slice — the README's CI wording flips at S3b, strictly
 # after this workflow's first green run is observed (plan order).
-# e2e joins this workflow when the dual contracts land (S5, per plan).
+# e2e joined at S5 (per plan): BOTH contracts (canonical + legacy why-chain) run in
+# ARTIFACT MODE against the exact out/ that `npm run verify` just built — the same
+# static-serving path the release gate and the host use. Dev-mode e2e stays a local
+# + release-gate check (the release gate runs both modes).
 name: CI
 
 # Batch-A Codex P2 (accepted-fixed): unqualified push trigger per the plan's
@@ -33,3 +36,5 @@ jobs:
       - run: npm ci
       - run: npm run verify        # typecheck + lint + vitest suites + build
       - run: npm run test:legacy   # the archived legacy module's 306-test suite
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e:artifact   # dual e2e contracts over the verify-built out/ (S5)
