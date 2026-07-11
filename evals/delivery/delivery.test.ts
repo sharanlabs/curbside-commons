@@ -107,7 +107,7 @@ describe("A3 email builder — goldens + invariants", () => {
   it("subject and body lead with SIMULATED; addresses are RFC 2606 .example placeholders ONLY", () => {
     const msg = buildEmailReportMessage(feesCanonical, { tool: "audit_statement", subject: "s", date: FIXED_DATE });
     expect(msg).toContain("Subject: [SIMULATED]");
-    expect(msg).toContain("SIMULATED DATA - Commerce Truth Audit");
+    expect(msg).toContain("SIMULATED DATA - Curbside Commons"); // template v2 (S4b identity migration, allowlisted)
     expect(msg).toContain(EMAIL_FROM_PLACEHOLDER);
     expect(msg).toContain(EMAIL_TO_PLACEHOLDER);
     const addresses = msg.match(/[\w.+-]+@[\w.-]+/g) ?? [];

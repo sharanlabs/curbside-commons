@@ -44,7 +44,9 @@ function beatBlock(beat: DemoBeat, ordinal: number): string[] {
 export function renderDemoText(t: DemoTranscript): string {
   const lines: string[] = [
     RULE,
-    "Commerce Truth Audit — verifier demo (SIMULATED)",
+    // Template v2 (2026-07-10, plan v3.3 S4b): name migrated → "Curbside Commons"
+    // (decision-log row precedes this edit; expected-demo goldens regenerated).
+    "Curbside Commons — verifier demo (SIMULATED)",
     RULE,
     "",
     `Demo claim: ${t.claim}`,

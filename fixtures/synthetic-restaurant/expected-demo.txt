@@ -1,5 +1,5 @@
 ============================================================================
-Commerce Truth Audit — verifier demo (SIMULATED)
+Curbside Commons — verifier demo (SIMULATED)
 ============================================================================
 
 Demo claim: a spec-faithful simulated agent follows a spec-valid but false surface; the verifier catches the surface/SOR mismatch

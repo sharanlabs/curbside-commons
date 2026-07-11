@@ -46,7 +46,11 @@ const SECTION_TEXT_CAP = 3000; // conservative self-enforced cap
 const HEADER_TEXT_CAP = 150; // conservative self-enforced cap
 const FINDINGS_RENDER_CAP = 20; // fixed render cap; the truncation block names the remainder
 
-export const SIMULATED_BANNER = "🧪 SIMULATED DATA — Commerce Truth Audit demonstration output. Not real merchant data, not legal advice.";
+// Template v2 (2026-07-10, plan v3.3 S4b): product name migrated "Commerce Truth
+// Audit" → "Curbside Commons" (decision-log row precedes this edit; goldens
+// regenerated under the recorded allowlist; the historical L-2 send record keeps
+// the v1 name it actually sent). Literal by contract — this module imports nothing.
+export const SIMULATED_BANNER = "🧪 SIMULATED DATA — Curbside Commons demonstration output. Not real merchant data, not legal advice.";
 
 interface ParsedForDelivery {
   readonly ok: boolean;
@@ -129,7 +133,7 @@ export function buildSlackReportPayload(canonical: string, meta: SlackReportMeta
   }
   blocks.push({
     type: "context",
-    elements: [{ type: "mrkdwn", text: "SIMULATED · Commerce Truth Audit · recommendations only — the engine decides, humans approve." }],
+    elements: [{ type: "mrkdwn", text: "SIMULATED · Curbside Commons · recommendations only — the engine decides, humans approve." }],
   });
 
   if (blocks.length > SLACK_MAX_BLOCKS) {

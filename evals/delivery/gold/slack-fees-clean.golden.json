@@ -1,11 +1,11 @@
 {
-  "text": "🧪 SIMULATED DATA — Commerce Truth Audit demonstration output. Not real merchant data, not legal advice. ✅ PASS — no violations (0 non-gating finding(s))",
+  "text": "🧪 SIMULATED DATA — Curbside Commons demonstration output. Not real merchant data, not legal advice. ✅ PASS — no violations (0 non-gating finding(s))",
   "blocks": [
     {
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*🧪 SIMULATED DATA — Commerce Truth Audit demonstration output. Not real merchant data, not legal advice.*"
+        "text": "*🧪 SIMULATED DATA — Curbside Commons demonstration output. Not real merchant data, not legal advice.*"
       }
     },
     {
@@ -31,7 +31,7 @@
       "elements": [
         {
           "type": "mrkdwn",
-          "text": "SIMULATED · Commerce Truth Audit · recommendations only — the engine decides, humans approve."
+          "text": "SIMULATED · Curbside Commons · recommendations only — the engine decides, humans approve."
         }
       ]
     }

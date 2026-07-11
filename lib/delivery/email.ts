@@ -126,7 +126,9 @@ export function buildEmailReportMessage(canonical: string, meta: EmailReportMeta
     : `FAIL - violations present (${report.findings.length} finding(s))`;
 
   const bodyText = [
-    "SIMULATED DATA - Commerce Truth Audit demonstration output.",
+    // Template v2 (2026-07-10, plan v3.3 S4b): name migrated → "Curbside Commons"
+    // (decision-log row precedes this edit; goldens regenerated under the allowlist).
+    "SIMULATED DATA - Curbside Commons demonstration output.",
     "Not real merchant data, not legal advice. Recommendations only - the engine decides, humans approve.",
     "",
     `Result: ${verdictLine}`,
@@ -140,7 +142,7 @@ export function buildEmailReportMessage(canonical: string, meta: EmailReportMeta
 
   const lines = [
     `Date: ${date}`,
-    `From: Commerce Truth Audit (simulated) <${EMAIL_FROM_PLACEHOLDER}>`,
+    `From: Curbside Commons (simulated) <${EMAIL_FROM_PLACEHOLDER}>`,
     `To: <${EMAIL_TO_PLACEHOLDER}>`,
     `Subject: [SIMULATED] Truth-audit result: ${subject}`,
     "MIME-Version: 1.0",
