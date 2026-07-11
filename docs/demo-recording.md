@@ -1,11 +1,15 @@
 # Demo recording (Pub slice) — the scripted walkthrough, executed
 
 *Recorded 2026-07-06 on Node v24.15.0 with `node bin/check.mjs demo` (exit 0, $0, zero-config,
-no network). The output below is BYTE-IDENTICAL to the committed golden
-`fixtures/synthetic-restaurant/expected-demo.txt`, which a test byte-locks to the live engine —
-so this recording provably cannot drift from what the verifier actually computes. Every verdict
-in it is computed by the real verifier/conformance entry points, never narrated. Simulated
-corpus; spec-faithful demonstration actor — simulated.*
+no network). The output below is BYTE-IDENTICAL to the golden as committed AT RECORDING TIME —
+git blob `49410ece1b8bcbcf93d95ef9c4166dddc96e733b` (view it with `git cat-file -p 49410ece1b`),
+which a test byte-locked to the live engine. **Template v2 (2026-07-10, plan v3.3 S4b identity
+migration) later renamed the transcript header "Commerce Truth Audit" → "Curbside Commons" in the
+current golden, so this HISTORICAL recording intentionally differs from today's
+`fixtures/synthetic-restaurant/expected-demo.txt` on that line only; the recording itself is
+preserved verbatim as what was actually executed.** Every verdict in it is computed by the real
+verifier/conformance entry points, never narrated. Simulated corpus; spec-faithful demonstration
+actor — simulated.*
 
 ```text
 ============================================================================

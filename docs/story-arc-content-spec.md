@@ -1,6 +1,6 @@
-# Story Arc + Content Spec (LOCKED) — the ActivationOps verification story
+# Story Arc + Content Spec [SUPERSEDED] — the ActivationOps verification story
 
-**Status:** locked direction, 2026‑06‑23. Drives the storytelling site + the product surfaces. Grounded, not from memory.
+**Status: SUPERSEDED (marked 2026-07-10, batch-B reconciliation).** This spec was the locked direction of 2026‑06‑23 and drove the site of that era. The current landing/site is governed by the 2026-07-08 Oxblood whole-site specs (`mockups/ultra-modern-2026-07-08/whole-site-copy-deck.md` + `whole-site-story-arc.md`, implemented as the four-slice redesign) — nothing current consumes this document. It is kept verbatim as a dated historical record; the incumbent research it cites lived in its authoring session and was not committed as a repo digest, so its brand-register comparisons are preserved here as historical prose, not as a currently-governing register. *(Original status line: "locked direction, 2026‑06‑23. Drives the storytelling site + the product surfaces. Grounded, not from memory.")*
 
 **Basis (every line traces to one of these — no training memory):**
 - **Repo truth** — the site may claim only what the system genuinely does: the deterministic claims‑gatekeeper (`lib/agents/gatekeeper.ts`), the cross‑family semantic judge (`lib/agents/semantic-judge.ts`), calibration against a labeled gold set, the data model, the recorded live run. Bounded by `RULES.md` (label "simulated", mark **UNVERIFIED**, no affiliation).
