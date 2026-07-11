@@ -1,9 +1,9 @@
 {
-  "name": "commerce-truth-audit",
+  "name": "curbside-commons",
   "version": "0.1.0",
   "private": true,
   "license": "Apache-2.0",
-  "description": "The truth layer for agentic commerce: a deterministic verifier of what platforms and AI-agent surfaces claim (menus, prices, availability) vs the merchant system-of-record, UCP/ACP conformance checking, and an NYC §20-563.3 fee-cap audit. Simulated corpus; prototype. Lineage: the ActivationOps AI activation module is archived runnable under legacy/.",
+  "description": "The truth layer for agentic commerce: a deterministic verifier of what platforms and AI-agent surfaces claim (menus, prices, availability) vs the merchant system-of-record, UCP/ACP conformance checking, and an NYC \u00a720-563.3 fee-cap audit. Simulated corpus; prototype. Lineage: the ActivationOps AI activation module is archived runnable under legacy/.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,6 +14,7 @@
     "test:legacy": "vitest run legacy/activation/evals",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:artifact": "playwright test --config playwright.artifact.config.ts",
     "coverage": "vitest run --coverage",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run build",
     "verify:full": "npm run verify && npm run test:e2e",

@@ -1,18 +1,20 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { PLATFORM_NAME } from "@/lib/product";
-import { CatchPanel } from "@/components/landing/CatchPanel";
 import { Reveal } from "@/components/landing/Reveal";
+import { TruthCatch } from "@/components/landing/TruthCatch";
+import { ENGINE, CALIBRATION, L1 } from "@/lib/dashboard/evidence";
 
-// Short, honest headline. The root layout title template appends the product name,
-// so no brand token is hardcoded here (identity renders via PLATFORM_NAME in prose).
+// S5 landing retell (plan v3.3, owner-ratified /legacy/ split): the landing now
+// tells the CANONICAL product — the deterministic commerce-truth verifier — and
+// hands the legacy activation story to /legacy/**. The root layout title template
+// appends the product name; identity renders via the layout, not hardcoded here.
 export const metadata = {
-  title: "Merchant activation, with every claim checked",
+  title: "The truth layer for agentic commerce",
   description:
-    "AI drafts your merchant outreach; every claim is checked against that merchant's own record, and nothing false reaches a merchant without a person signing off. A simulated prototype — not affiliated with any marketplace.",
+    "A deterministic verifier for agentic commerce: the serving copy an AI shopping agent reads, checked line by line against the merchant's own system-of-record — schema conformance, listings truth, and NYC fee-cap audit. Simulated corpus; $0 runtime; not affiliated with any marketplace.",
 };
 
-/* ---- monoline icon set (ported from the Oxblood v2 mockup; currentColor, no fills) ---- */
+/* ---- monoline icon set (Oxblood system; currentColor, no fills) ---- */
 const ICON_PATHS: Record<string, ReactNode> = {
   shield: (
     <>
@@ -33,17 +35,22 @@ const ICON_PATHS: Record<string, ReactNode> = {
       <path d="M4.2 16.8c0-3.2 2.6-5.4 5.8-5.4s5.8 2.2 5.8 5.4" />
     </>
   ),
-  filter: <path d="M3 4h14l-5.2 6.2v5.4l-3.6-1.9v-3.5z" />,
   record: (
     <>
       <rect x="3.2" y="2.5" width="13.6" height="15" rx="1.6" />
       <path d="M6.2 6.2h7.6M6.2 9.6h7.6M6.2 13h4.6" />
     </>
   ),
-  pen: (
+  copies: (
     <>
-      <path d="M13.2 3.4l3.4 3.4L7.4 16H4v-3.4z" />
-      <path d="M11.6 5l3.4 3.4" />
+      <rect x="2.8" y="5.4" width="11" height="12" rx="1.4" />
+      <path d="M6.4 2.6h9.2a1.4 1.4 0 011.4 1.4v9.6" />
+    </>
+  ),
+  scale: (
+    <>
+      <path d="M10 3v13M5 16h10M6.5 6l-3 5a2.5 2.5 0 005 0zM13.5 6l-3 5a2.5 2.5 0 005 0z" />
+      <path d="M4 6h12" />
     </>
   ),
   alert: (
@@ -53,14 +60,8 @@ const ICON_PATHS: Record<string, ReactNode> = {
       <circle cx="10" cy="14.2" r=".5" />
     </>
   ),
-  scale: (
-    <>
-      <path d="M10 3v13M5 16h10M6.5 6l-3 5a2.5 2.5 0 005 0zM13.5 6l-3 5a2.5 2.5 0 005 0z" />
-      <path d="M4 6h12" />
-    </>
-  ),
-  spark: <path d="M6 8.5l3.4 3.4M4 4l1.2 3M16 4l-3.6 9.2L9 15z" />,
   arrow: <path d="M3.8 10h11M10.6 5.8l4.2 4.2-4.2 4.2" />,
+  spark: <path d="M6 8.5l3.4 3.4M4 4l1.2 3M16 4l-3.6 9.2L9 15z" />,
 };
 
 function Icon({ name, className = "lp-ic" }: { name: keyof typeof ICON_PATHS; className?: string }) {
@@ -81,9 +82,8 @@ function Icon({ name, className = "lp-ic" }: { name: keyof typeof ICON_PATHS; cl
 }
 
 /**
- * The five-stage flow — a hairline-connected strip, NOT numbered 01/02/03 cards.
- * The two `gate` stages (the exact check + the independent reviewer) are the emphasised
- * checks; they carry the wine accent. Copy from the landing copy deck (Beat 5).
+ * The five-stage flow — hairline-connected strip (Oxblood system). The two
+ * `gate` stages are the deterministic checks; they carry the wine accent.
  */
 const FLOW: Array<{
   icon: keyof typeof ICON_PATHS;
@@ -94,184 +94,145 @@ const FLOW: Array<{
 }> = [
   {
     icon: "record",
-    kicker: "Your data",
-    title: "The record",
-    desc: "The merchant’s own record is the only thing a message is allowed to be true against.",
+    kicker: "Ground truth",
+    title: "The merchant's own record",
+    desc: "The system-of-record — the catalog, prices, and availability the restaurant itself maintains — is the only thing a listing is allowed to be true against.",
   },
   {
-    icon: "pen",
-    kicker: "Draft",
-    title: "AI drafts from it",
-    desc: "The AI writes the outreach from that record — not the open web, not typed-in text.",
+    icon: "copies",
+    kicker: "What agents read",
+    title: "The serving copies",
+    desc: "Platforms serve agent-readable copies of that record (ACP- and UCP-shaped feeds). This is what an AI shopping agent actually reads — and where drift lives.",
   },
   {
-    icon: "filter",
-    kicker: "Gate · check",
-    title: "Exact automatic check",
-    desc: "Every fact must match a field in the record, exactly. Anything that doesn’t is flagged.",
+    icon: "scale",
+    kicker: "Gate · truth",
+    title: "Line-by-line comparison",
+    desc: "A deterministic comparator checks every claim in the copy against the record, exactly. No AI calls, $0, same input → same report.",
     gate: true,
   },
   {
     icon: "eye",
-    kicker: "Judge · check",
-    title: "Independent reviewer",
-    desc: "A separate AI reviewer flags anything the data can’t back — including facts slipped in casually.",
+    kicker: "Gate · receipts",
+    title: "Evidence, not vibes",
+    desc: "Every finding carries its receipts: the claim id, the rule that caught it, and the record row it failed against — auditable end to end.",
     gate: true,
   },
   {
     icon: "person",
-    kicker: "Approve",
-    title: "A person approves",
-    desc: "Your reviewer approves, edits, or holds. Nothing sends itself; every decision lands on the trail.",
+    kicker: "Act",
+    title: "Humans stay in the loop",
+    desc: "Findings become recommendations — reports, drafts, deliveries — behind explicit human gates. Nothing sends itself.",
   },
 ];
 
-const CHECKS: Array<{ icon: keyof typeof ICON_PATHS; title: string; desc: string }> = [
+const MODULES: Array<{ icon: keyof typeof ICON_PATHS; title: string; desc: ReactNode }> = [
   {
     icon: "check",
-    title: "An exact, automatic check",
-    desc: "Every fact the message states is matched, exactly, against the merchant’s record. No match, no pass.",
+    title: "Listings truth check",
+    desc: "The serving copy vs the system-of-record, line by line — availability, price, existence, encoding. The committed demo report catches a sold-out item still being served.",
   },
   {
-    icon: "eye",
-    title: "An independent second reviewer",
-    desc: "A separate AI reviewer re-reads the message for anything the record can’t back. It doesn’t grade its own work.",
+    icon: "copies",
+    title: "Protocol conformance",
+    desc: (
+      <>
+        Validation against {ENGINE.ucpSchemaCount} pinned official UCP schemas (spec{" "}
+        {ENGINE.ucpSpecVersion}) — and the headline it exists to prove: a feed can be
+        schema-conformant and still false against the merchant&rsquo;s records. Both legs are
+        machine-checked.
+      </>
+    ),
   },
   {
-    icon: "person",
-    title: "A person signs off",
-    desc: "Anything in question is held for your team. Approve, edit, or hold. Nothing sends itself.",
-  },
-];
-
-const QUESTIONS: Array<{ head: string; body: ReactNode }> = [
-  {
-    head: "We measure it against human judgment.",
-    body: "A calibration run has cleared its pre-registered bar on a held-out set · figures stay unpublished until a larger validation run confirms them.",
-  },
-  {
-    head: "It’s tuned to hold, not to over-block.",
-    body: "A false hold costs a glance; a shipped falsehood costs trust.",
-  },
-  {
-    head: "The exact check underneath is locked.",
-    body: "The deterministic comparison is fixed and auditable — it can’t drift.",
+    icon: "scale",
+    title: "Fee-cap audit",
+    desc: (
+      <>
+        NYC &sect;20-563.3 codified as {ENGINE.feeRulesTotal} rules ({ENGINE.feeRulePredicates}{" "}
+        executable predicates + {ENGINE.feeRulesNonCheckable} registered non-checkable clauses) over
+        hostile, relabeled statement lines — with a calibrated classifier in front and the
+        deterministic table deciding.
+      </>
+    ),
   },
 ];
 
 export default function Landing() {
   return (
     <main className="lp-main">
-      {/* ===== HERO — the fixed honest headline + the shown catch ===== */}
+      {/* ===== HERO — the canonical product + the shown catch ===== */}
       <section className="ds-wrap lp-hero" aria-labelledby="hero-h1">
         <div className="lp-hero-grid">
           <div className="lp-hero-copy">
             <p className="lp-eyebrow">
-              <Icon name="shield" /> Merchant activation &middot; review &amp; approval
+              <Icon name="shield" /> Commerce truth verification &middot; simulated prototype
             </p>
             <h1 id="hero-h1">
-              AI writes your merchant outreach &mdash; and nothing reaches a merchant until every
-              claim is checked against <span className="lp-mark">their own data</span>.
+              AI agents are starting to buy what platforms serve them. This engine checks the
+              serving copy, line by line, against{" "}
+              <span className="lp-mark">the merchant&rsquo;s own records</span>.
             </h1>
             <p className="lp-lede">
-              Each message is checked against <em>that merchant&rsquo;s own record</em>
-              {" "}
-              before it can send. A confident-sounding claim the data can&rsquo;t back is held for a
-              person &mdash; never sent on its own.
+              A menu copy can pass every schema check and still sell you a dish the restaurant
+              86&rsquo;d hours ago. The verifier is deterministic — no AI calls, $0 to run — and
+              every finding ships with its receipts.
             </p>
             <div className="lp-cta-row">
-              <Link className="lp-btn primary" href="/console">
-                See it run on the console <Icon name="arrow" />
+              <Link className="lp-btn primary" href="/report">
+                Read the verifier report <Icon name="arrow" />
               </Link>
-              <a className="lp-btn ghost" href="#how">
-                How the checking works
-              </a>
+              <Link className="lp-btn ghost" href="/demo">
+                Watch an agent get caught
+              </Link>
             </div>
           </div>
 
-          {/* the SHOWN catch — settled in SSR, replays only when motion is on */}
-          <aside
-            className="lp-hero-aside"
-            aria-label="A recorded outreach draft, checked and held for approval"
-          >
-            <CatchPanel />
+          {/* the SHOWN catch — imported from the committed golden, settled in SSR */}
+          <aside className="lp-hero-aside" aria-label="Two findings from the committed demo report">
+            <TruthCatch />
           </aside>
         </div>
       </section>
 
-      {/* ===== TRUST ANCHOR — three checks ===== */}
-      <section className="ds-wrap ds-section" id="checks" aria-labelledby="checks-h2">
+      {/* ===== THE PROBLEM — conformant is not true ===== */}
+      <section className="ds-wrap ds-section" id="problem" aria-labelledby="problem-h2">
         <Reveal>
           <p className="lp-eyebrow">
-            <Icon name="shield" /> How a message earns the right to send
+            <Icon name="alert" /> The gap this engine exists for
           </p>
-          <h2 id="checks-h2" className="lp-h2">
-            Three checks stand between the AI and a merchant.
+          <h2 id="problem-h2" className="lp-h2">
+            Schema-conformant is not the same as true.
           </h2>
         </Reveal>
-        <Reveal stagger>
-          <div className="lp-grid3">
-            {CHECKS.map((c) => (
-              <div className="lp-panel" key={c.title}>
-                <Icon name={c.icon} className="lp-si" />
-                <h3 className="lp-h3">{c.title}</h3>
-                <p className="lp-ptext">{c.desc}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
         <Reveal>
-          <p className="lp-foot">
-            And we don&rsquo;t ask you to take it on faith: we measure{" "}
-            <em>how often the AI reviewer agrees with human reviewers</em>, and tune it to err
-            toward holding rather than letting something slip through.
+          <p className="lp-foot" style={{ maxWidth: "72ch" }}>
+            Agentic-commerce protocols standardize the <em>shape</em> of what agents read; nothing
+            in the shape guarantees the <em>content</em> matches the merchant&rsquo;s reality. The
+            repo commits a spec-valid feed that passes every pinned schema while lying about the
+            catalog — the conformance leg passes it, the truth leg catches it. That pair is the
+            product in one sentence.
           </p>
         </Reveal>
       </section>
 
-      {/* ===== THE GAP — hallucination ===== */}
-      <section className="ds-wrap ds-section" id="gap" aria-labelledby="gap-h2">
-        <Reveal>
-          <p className="lp-eyebrow">
-            <Icon name="alert" /> Why an ordinary safety check isn&rsquo;t enough
-          </p>
-          <h2 id="gap-h2" className="lp-h2">
-            An AI hallucination sounds just as confident as the truth.
-          </h2>
-          <p className="lp-lede lp-lede-wide">
-            When AI states something that isn&rsquo;t true for a merchant, the industry calls it a{" "}
-            <em>hallucination</em> &mdash; a fabrication that reads exactly as confident as a fact.
-            Most AI safety checks read the <em>tone</em>
-            {" "}
-            of a message: is it rude, off-policy, leaking personal data? They don&rsquo;t check
-            whether what it said is{" "}
-            <em>true for this merchant</em>. So &ldquo;you&rsquo;ll be live by Friday,&rdquo; written
-            for an account with no go-live date, sails straight through.
-          </p>
-        </Reveal>
-      </section>
-
-      {/* ===== HOW IT WORKS — the 5-stage hairline-connected flow (not numbered) ===== */}
+      {/* ===== HOW — the five-stage flow ===== */}
       <section className="ds-wrap ds-section" id="how" aria-labelledby="how-h2">
         <Reveal>
           <p className="lp-eyebrow">
-            <Icon name="filter" /> How it works
+            <Icon name="scale" /> How a listing gets checked
           </p>
           <h2 id="how-h2" className="lp-h2">
-            The AI is checked, not trusted.
+            From the merchant&rsquo;s record to an evidence-cited verdict.
           </h2>
-          <p className="lp-lede lp-lede-wide">
-            Five stages. Cheap, exact checks run before the slower ones; an independent reviewer
-            runs near the end; a person always has the last word.
-          </p>
         </Reveal>
         <Reveal stagger>
-          <div className="lp-flow" role="list" aria-label="The five-stage checking flow">
+          <div className="lp-flow" role="list">
             {FLOW.map((s) => (
               <div className={`lp-step${s.gate ? " gate" : ""}`} role="listitem" key={s.title}>
                 <Icon name={s.icon} className="lp-si" />
                 <span className="lp-sk">{s.kicker}</span>
-                <h3 className="lp-h4">{s.title}</h3>
+                <h3 className="lp-h3">{s.title}</h3>
                 <p className="lp-ptext">{s.desc}</p>
               </div>
             ))}
@@ -279,88 +240,75 @@ export default function Landing() {
         </Reveal>
       </section>
 
-      {/* ===== DIFFERENTIATION — a safety filter vs the facts ===== */}
-      <section className="ds-wrap ds-section" id="vs" aria-labelledby="vs-h2">
+      {/* ===== MODULES ===== */}
+      <section className="ds-wrap ds-section" id="modules" aria-labelledby="modules-h2">
         <Reveal>
           <p className="lp-eyebrow">
-            <Icon name="scale" /> What makes it different
+            <Icon name="check" /> Three verification modules, one spine
           </p>
-          <h2 id="vs-h2" className="lp-h2">
-            A safety filter checks the message. We check the facts.
+          <h2 id="modules-h2" className="lp-h2">
+            Listings truth &middot; protocol conformance &middot; fee-cap audit.
           </h2>
-        </Reveal>
-        <Reveal>
-          <div className="lp-grid2">
-            <div className="lp-panel">
-              <div className="lp-role">an ordinary AI safety filter (&ldquo;guardrail&rdquo;)</div>
-              <h3 className="lp-h3">&ldquo;Is this message appropriate?&rdquo;</h3>
-              <p className="lp-ptext">Reads the message on its own.</p>
-            </div>
-            <div className="lp-panel ours">
-              <div className="lp-role">{PLATFORM_NAME}</div>
-              <h3 className="lp-h3">&ldquo;Is this message true for this merchant?&rdquo;</h3>
-              <p className="lp-ptext">
-                Every claim checked against the data row; an exact check, then an independent
-                reviewer; evidence on every line, held for a person. Reads the message{" "}
-                <em>against the record</em>.
-              </p>
-            </div>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* ===== THE OBVIOUS QUESTION — method only, no figures ===== */}
-      <section className="ds-wrap ds-section" id="reviewer" aria-labelledby="rev-h2">
-        <Reveal>
-          <p className="lp-eyebrow">
-            <Icon name="spark" /> The obvious question
-          </p>
-          <h2 id="rev-h2" className="lp-h2">
-            &ldquo;How do you know the AI reviewer is right?&rdquo;
-          </h2>
-          <p className="lp-lede lp-lede-wide">
-            Fair question &mdash; so we don&rsquo;t ask you to assume it.{" "}
-            <em>We check the reviewer against people.</em>
-          </p>
         </Reveal>
         <Reveal stagger>
           <div className="lp-grid3">
-            {QUESTIONS.map((q) => (
-              <div className="lp-panel" key={q.head}>
-                <div className="lp-qh">{q.head}</div>
-                <p className="lp-ptext">{q.body}</p>
+            {MODULES.map((m) => (
+              <div className="lp-panel" key={m.title}>
+                <Icon name={m.icon} className="lp-si" />
+                <h3 className="lp-h3">{m.title}</h3>
+                <p className="lp-ptext">{m.desc}</p>
               </div>
             ))}
           </div>
         </Reveal>
       </section>
 
-      {/* ===== CLOSE — see it run + the honesty disclosure ===== */}
-      <section className="ds-wrap ds-section" id="run" aria-labelledby="run-h2">
+      {/* ===== EVIDENCE DISCIPLINE ===== */}
+      <section className="ds-wrap ds-section" id="evidence" aria-labelledby="evidence-h2">
         <Reveal>
           <p className="lp-eyebrow">
-            <Icon name="arrow" /> See it run
+            <Icon name="spark" /> Labels are earned here, or not claimed
           </p>
-          <h2 id="run-h2" className="lp-h2">
-            Watch one draft get checked, line by line.
+          <h2 id="evidence-h2" className="lp-h2">
+            Every quality label traces to a pre-registered run.
           </h2>
-          <div className="lp-cta-row lp-cta-close">
-            <Link className="lp-btn primary" href="/console">
-              See it run on the console <Icon name="arrow" />
-            </Link>
-            <span className="lp-cta-note">a recorded, replayable run &mdash; not a sign-up.</span>
-          </div>
-          <p className="lp-note">
-            A simulated prototype on de-identified, public open data. Merchant and reviewer names are
-            fictional. Not affiliated with DoorDash, Uber Eats, Grubhub, or any marketplace. The
-            walkthrough is a recorded, replayable run &mdash; labeled, not live &mdash; and accuracy
-            figures are held until a larger validation run confirms them. Human-led, AI-assisted,
-            professionally reviewed.
+        </Reveal>
+        <Reveal>
+          <p className="lp-foot" style={{ maxWidth: "72ch" }}>
+            The fee-line classifier&rsquo;s first calibration run missed one floor and the label
+            was <em>deferred</em> — that record stays public. A fresh pre-registered retry then
+            cleared every floor ({CALIBRATION.retryRun.score}) and earned it. The live agent-crew
+            run scored {L1.cases}/{L1.cases} against floors committed before the run — and only
+            the two model-directed members carry the &ldquo;agent&rdquo; label, because that is
+            what the pre-registration says the result licenses.{" "}
+            <Link href="/eval" className="ds-mlink">
+              The eval evidence dashboard
+            </Link>{" "}
+            traces every figure to its committed record.
           </p>
-          <p className="ds-mono lp-strip">
-            SIMULATED &middot; FICTIONAL NAMES &middot; NO REAL MERCHANT DATA &middot; NOT AFFILIATED
-            WITH ANY MARKETPLACE &middot; REPLAY / RECORDED &middot; FIGURES PENDING VALIDATION
-            &middot; HUMAN-LED, AI-ASSISTED, PROFESSIONALLY REVIEWED
+        </Reveal>
+      </section>
+
+      {/* ===== HONESTY + LINEAGE ===== */}
+      <section className="ds-wrap ds-section" id="honesty" aria-labelledby="honesty-h2">
+        <Reveal>
+          <p className="lp-eyebrow">
+            <Icon name="person" /> What this is — and what it is not
+          </p>
+          <h2 id="honesty-h2" className="lp-h2">
+            A simulated prototype, honest about its own edges.
+          </h2>
+        </Reveal>
+        <Reveal>
+          <p className="lp-foot" style={{ maxWidth: "72ch" }}>
+            The restaurant, its menu, and its records are invented; the verification rules, the
+            pinned data-format standard, and the codified fee caps are real. The site is a static
+            replay of committed fixtures — it initiates nothing. This project began as a merchant
+            activation prototype; that first product is preserved, working, as{" "}
+            <Link href="/legacy/console" className="ds-mlink">
+              the legacy activation module
+            </Link>
+            .
           </p>
         </Reveal>
       </section>

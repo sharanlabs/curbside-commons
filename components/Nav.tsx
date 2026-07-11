@@ -4,15 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PLATFORM_NAME } from "@/lib/product";
 
+// S5 canonical nav (owner-ratified /legacy/ split): truth-engine surfaces only,
+// plus ONE secondary link into the preserved legacy activation module.
 const LINKS = [
-  { href: "/console", label: "Console" },
   { href: "/report", label: "Report" },
   { href: "/demo", label: "Demo" },
-  { href: "/eval", label: "Eval / Quality" },
-  { href: "/metrics", label: "Metrics" },
-  { href: "/audit", label: "Audit" },
+  { href: "/eval", label: "Eval evidence" },
+  { href: "/metrics", label: "Measurables" },
   { href: "/cost", label: "Cost" },
 ];
+
+const LEGACY_LINK = { href: "/legacy/console", label: "Legacy activation" };
 
 export function Nav() {
   const pathname = usePathname();
@@ -52,6 +54,13 @@ export function Nav() {
             </Link>
           );
         })}
+        <Link
+          href={LEGACY_LINK.href}
+          aria-current={pathname.startsWith("/legacy") ? "page" : undefined}
+          className="site-navlink site-navlink-legacy"
+        >
+          {LEGACY_LINK.label}
+        </Link>
         <span className="site-status">
           <span className="site-status-pip" aria-hidden="true" />
           Prototype · REPLAY · $0.00

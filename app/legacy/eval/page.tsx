@@ -77,7 +77,7 @@ export default function EvalPage() {
               {snap.merchants.map((m) => (
                 <tr key={m.merchant.merchant_id}>
                   <td>
-                    <Link href={`/merchant/${m.merchant.merchant_id}`} className="ds-mlink">
+                    <Link href={`/legacy/merchant/${m.merchant.merchant_id}`} className="ds-mlink">
                       {m.merchant.merchant_name}
                     </Link>
                   </td>

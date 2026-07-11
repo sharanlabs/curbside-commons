@@ -2561,3 +2561,67 @@ body {
   margin-top: 18px;
   margin-bottom: -6px;
 }
+
+/* === S5 landing retell (append-only): the TruthCatch hero aside === */
+.lp-catch {
+  border: 1px solid var(--line);
+  background: var(--paper, #fff);
+  padding: 18px 20px;
+}
+.lp-catch-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.lp-catch-sim {
+  font-family: var(--ff-mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border: 1px solid currentColor;
+  color: var(--error-ink, #b71f13);
+}
+.lp-catch-src {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.lp-catch-verdict {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.lp-catch-fail {
+  font-family: var(--ff-mono, monospace);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--error-ink, #b71f13);
+}
+.lp-catch-tally {
+  font-family: var(--ff-mono, monospace);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.lp-catch-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.lp-catch-plain {
+  margin: 0 0 6px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.lp-catch-receipt {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.lp-catch-foot {
+  margin: 12px 0 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
