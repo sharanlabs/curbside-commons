@@ -23,11 +23,11 @@ Zero network and zero LLM calls on every CLI path — enforced structurally by a
 
 ## The evals harness is the product's character
 
-Everything asserted here is measured under committed, tamper-locked evaluation:
+These are the measurement rules the repo's labels live under — every labeled claim in the status table below earned its wording through them:
 
 - **Pre-registered floors, in git, before any live run.** The LLM classifier's pass bars were committed before its exam; floors only ever tighten pre-run and never move after results. The first run (2026-07-05) scored 20/21 and missed one per-class recall floor — so its label honestly read **DEFERRED**, and that record stands unedited. Earning the label took a second owner-authorized exam on a **fresh pre-registered held-out split** (the first split was exposed and never re-scored): **21/21, every floor cleared (2026-07-09)**. The bar never moved in either run.
 - **Eval-locks.** Every live run's raw results are frozen into the repo, and committed lock tests recompute the headline numbers from the per-item records forever — the grade cannot be quietly edited, and "just run it again" cannot replace what happened.
-- **Anti-theater baselines.** An LLM component must beat a pinned deterministic baseline on held-out gold before its label counts; ties lose.
+- **Anti-theater floors.** The fee classifier's label required **beating** a pinned deterministic keyword baseline on held-out gold (ties lose); the agent labels required clearing pre-registered per-member safety and class-match floors on an owner-armed live run. Each label names the exact bar it cleared — none is earned by adjective.
 - **Structural $0 enforcement.** Import-graph evals prove the CLI, demo, delivery builders, and web views cannot reach an LLM or the network — not a promise, a failing test.
 - **Frozen corpus and goldens.** Fixtures are seeded and freeze-locked (regenerate ⇒ bytes must match); reports byte-compare against goldens.
 
@@ -49,7 +49,7 @@ A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the or
 
 | Surface | Status |
 | --- | --- |
-| Test suite | `npm run verify` green: **1001 passed + 7 skipped** (the skips are live-network harnesses, off by default; count re-measured live 2026-07-10 after the S2 honesty-contract tests landed) |
+| Test suite | `npm run verify` green: **1005 passed + 7 skipped** (the skips are live-network harnesses, off by default; count re-measured live 2026-07-10 after the S2 honesty-contract tests + batch-A review fixes landed) |
 | Listings drift taxonomy (8 classes) | **8/8 injected and caught, measured** by the C6 coverage eval; never an "all edge cases" claim |
 | Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
 | Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |

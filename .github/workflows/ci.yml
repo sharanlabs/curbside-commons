@@ -7,9 +7,10 @@
 # e2e joins this workflow when the dual contracts land (S5, per plan).
 name: CI
 
+# Batch-A Codex P2 (accepted-fixed): unqualified push trigger per the plan's
+# "on push/PR" — no branch filter; per-ref concurrency below de-duplicates.
 on:
   push:
-    branches: [main]
   pull_request:
 
 permissions:

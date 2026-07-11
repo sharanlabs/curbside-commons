@@ -38,14 +38,14 @@ In a field where "our AI is calibrated" is usually an adjective, this repo treat
 
 ## What's real and what isn't (the honesty box)
 
-- **Synthetic corpus, labeled on every surface.** No real merchant data, accounts, or platform access anywhere; no real business-impact claims. The generators are seeded and the committed fixtures are freeze-locked (regenerate ⇒ bytes must match).
+- **Synthetic corpus, labeled on every surface (truth-audit engine).** No real merchant data, accounts, or platform access in the truth-audit engine, and no real business-impact claims anywhere. The generators are seeded and the committed fixtures are freeze-locked (regenerate ⇒ bytes must match). The archived legacy module is the scoped exception: it demonstrates a real-data *adapter* over public-domain business records with a synthetic overlay and fictional display names (provenance detailed in the README's Lineage section).
 - **A prototype run on demand, not an operated service.** The enterprise expansion path is documented, not built.
 - **Real law, real schemas.** The NYC rule table is codified from primary text; the 78 UCP JSON Schemas are pinned verbatim from the official spec repo (Apache-2.0, sha256-locked provenance) at `v2026-04-08`, still the current release as of 2026-07-06.
 - **Open questions stay open.** Fee verdicts depending on the statutory "purchase price" base are type-enforced provisional; operator demand is unvalidated; real-world entity matching is harder than the synthetic-controlled matching demonstrated.
 
 ## Numbers at a glance
 
-1001 tests passing (+7 skipped live harnesses; re-measured live 2026-07-10) · 8/8 listings drift classes injected and caught (measured) · 33/35 agreement with the official Rust validator with the 2 divergences documented to their root cause (the JSON Schema 2020-12 format-assertion fork) · 17 fee rules codified, 11 implemented + 6 registered non-checkable · classifier **calibrated 2026-07-09**: 21/21 on a fresh pre-registered held-out split (first run 20/21 vs the 19/21 baseline, honestly deferred — record stands) · crew live run 20/20, Intake + Reviewer labeled agents · one recorded owner-armed Slack send (2026-07-09), everything else structurally unable to send · $0 of LLM spend on every CLI path, enforced by an import-graph eval.
+1005 tests passing (+7 skipped live harnesses; re-measured live 2026-07-10) · 8/8 listings drift classes injected and caught (measured) · 33/35 agreement with the official Rust validator with the 2 divergences documented to their root cause (the JSON Schema 2020-12 format-assertion fork) · 17 fee rules codified, 11 implemented + 6 registered non-checkable · classifier **calibrated 2026-07-09**: 21/21 on a fresh pre-registered held-out split (first run 20/21 vs the 19/21 baseline, honestly deferred — record stands) · crew live run 20/20, Intake + Reviewer labeled agents · one recorded owner-armed Slack send (2026-07-09), everything else structurally unable to send · $0 of LLM spend on every CLI path, enforced by an import-graph eval.
 
 ## Where to look first
 

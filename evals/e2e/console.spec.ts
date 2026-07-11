@@ -13,16 +13,16 @@ test("Landing renders the arc: honest H1, the shown catch, and the honesty foote
   // the shown catch / verification is visible and settled (verdict + the held banner)
   await expect(page.getByText("not in the data").first()).toBeVisible();
   await expect(page.getByText("Held for a person to approve.").first()).toBeVisible();
-  // honesty disclosure present (text also appears in the layout footer → .first())
-  await expect(page.getByText("Not affiliated with").first()).toBeVisible();
   // S2 semantic disclosure contract (decision-log 2026-07-10 freeze-reversal row):
-  // the footer must state the truthful send posture and the one recorded send.
-  await expect(
-    page.getByText("This site initiates no sends and makes no live calls").first(),
-  ).toBeVisible();
-  await expect(
-    page.getByText("exactly one recorded, owner-armed send exists", { exact: false }).first(),
-  ).toBeVisible();
+  // scoped to the RENDERED FOOTER (batch-A Codex P2 — a page-global match could
+  // be satisfied from outside the footer), asserting the complete sentences.
+  const footer = page.locator("footer.site-footer");
+  await expect(footer).toBeVisible();
+  await expect(footer).toContainText(
+    "Not affiliated with, endorsed by, or connected to DoorDash, Uber Eats, Grubhub, DataSF, or any named business.",
+  );
+  await expect(footer).toContainText("This site initiates no sends and makes no live calls");
+  await expect(footer).toContainText("exactly one recorded, owner-armed send exists");
 });
 
 test("Console renders the queue with both human-in-the-loop outcomes visible", async ({ page }) => {

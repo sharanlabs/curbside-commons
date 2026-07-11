@@ -42,7 +42,7 @@ A restaurant owner (or a platform, or a sync vendor) asks:
 
 > **"Is what the apps and AI agents are showing about my restaurant actually true right now?"**
 
-Right prices. Right items. Right availability. And later (module two): **are the fees taken out of my payouts actually what my contract and the law say?** Answering either question today means checking by hand, line by line. The one time regulators did check fees by hand (New York City, April 2026), they found a delivery app had overcharged 380+ restaurants and made it pay $875,000 back.
+Right prices. Right items. Right availability. And later (module two): **are the fees taken out of my payouts actually what my contract and the law say?** For a merchant without reconciliation tooling, answering either question means checking by hand, line by line. The one time regulators did check fees by hand (New York City, April 2026), they found a delivery app had overcharged 380+ restaurants and made it pay $875,000 back.
 
 ## The solution: build the referee
 
@@ -51,7 +51,7 @@ An independent checker that compares the copies against the truth. In plain step
 1. **Take the truth** — the restaurant's own till/catalog data (with their permission).
 2. **Take the copies** — what the delivery apps and AI-assistant feeds are showing.
 3. **Compare, line by line.** Price vs price, item vs item, available vs available. Boring, exact, mechanical — like a spellchecker for menus. No AI needed for this part, so it can't hallucinate.
-4. **Where it's genuinely fuzzy, AI judges carefully.** Is "Lg Pepp Pizza" the same item as "Large Pepperoni Pizza"? That's the only place AI is used — and we measure how accurate the AI judge is, and publish the measurement.
+4. **Where it's genuinely fuzzy, AI judges carefully.** Is "Lg Pepp Pizza" the same item as "Large Pepperoni Pizza"? That's the only place AI is used *inside the checker itself* — and we measure how accurate the AI judge is, and publish the measurement. (The wider repo also has a separately-measured AI helper team and an archived AI drafting module; the README's "Where AI is used" inventory lists all of it.)
 5. **Report with receipts.** Every mismatch shown with evidence: *here's your system saying $18.99, here's the app saying $16.99, since Tuesday.*
 6. **A human approves any fix.** The tool never changes anything on its own. It recommends; a person decides.
 

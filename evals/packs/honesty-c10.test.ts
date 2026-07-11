@@ -194,14 +194,29 @@ describe("D1 demo honesty surface (plan §5 D1, C7/C10)", () => {
 
 describe("S2 footer semantic disclosure contract (app/layout.tsx)", () => {
   const layoutSrc = readFileSync(join(root, "app", "layout.tsx"), "utf8");
+
+  // Batch-A Codex P2 (accepted-fixed): the contract binds to the FOOTER BLOCK
+  // specifically — not the whole file — with JSX comments stripped first, so a
+  // disclosure cannot satisfy the gate from a comment or from anywhere outside
+  // the rendered footer.
+  const footerMatch = layoutSrc.match(/<footer[\s\S]*?<\/footer>/);
+
   // JSX splits sentences across lines/spans; judge the contract on a
-  // whitespace-normalized, markup-stripped view of the source.
-  const normalized = layoutSrc
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\{["'` ]*\}/g, " ")
-    .replace(/&ldquo;|&rdquo;/g, '"')
-    .replace(/&rsquo;/g, "'")
-    .replace(/\s+/g, " ");
+  // comment-stripped, whitespace-normalized, markup-stripped view.
+  const normalizeJsx = (s: string) =>
+    s
+      .replace(/\{\/\*[\s\S]*?\*\/\}/g, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\{["'` ]*\}/g, " ")
+      .replace(/&ldquo;|&rdquo;/g, '"')
+      .replace(/&rsquo;/g, "'")
+      .replace(/\s+/g, " ");
+
+  it("the layout renders exactly one footer block", () => {
+    expect(footerMatch, "app/layout.tsx must contain a <footer> block").not.toBeNull();
+  });
+
+  const normalized = footerMatch ? normalizeJsx(footerMatch[0]) : "";
 
   const CONTRACT: ReadonlyArray<[name: string, pattern: RegExp]> = [
     ["prototype/simulated status", /Demo \/ portfolio prototype — simulated data throughout/],
@@ -223,6 +238,16 @@ describe("S2 footer semantic disclosure contract (app/layout.tsx)", () => {
     expect(/initiates no sends and makes no live calls/.test(oldFooter)).toBe(false);
     expect(/exactly one recorded, owner-armed send exists/.test(oldFooter)).toBe(false);
   });
+
+  it("the contract binds to the footer: the layout WITHOUT its footer fails every disclosure", () => {
+    // Outside-footer mutation test (batch-A Codex P2): moving a disclosure out
+    // of the footer (metadata, a comment, another element) must not satisfy
+    // the gate — the rest of the file carries none of the contract phrases.
+    const withoutFooter = normalizeJsx(layoutSrc.replace(/<footer[\s\S]*?<\/footer>/, " "));
+    for (const [, pattern] of CONTRACT) {
+      expect(pattern.test(withoutFooter), `${pattern} must live in the footer, found outside`).toBe(false);
+    }
+  });
 });
 
 describe("S2 banner parity — ReportView's SIMULATED banner ≡ the single-sourced demo banner", () => {
@@ -242,12 +267,16 @@ describe("S2 banner parity — ReportView's SIMULATED banner ≡ the single-sour
 
 describe("S2 mockup claim scan (every committed mockup HTML, recursive)", () => {
   // F-04: mockups sat outside every honesty scan. Scan them all for the same
-  // affirmative overclaims. The one sanctioned HONEST sentence — the
-  // non-affiliation disclaimer — is stripped first (in plain HTML its
-  // "…or connected to <brand>" tail would false-positive the connected-to
-  // pattern that markup happens to break in JSX/markdown sources).
-  const NON_AFFILIATION_SENTENCE =
-    /not affiliated\s+with,?\s*endorsed\s+by,?\s*or\s+connected\s+to[^.<]*/gi;
+  // affirmative overclaims. Only the sanctioned honest PREDICATE — "not
+  // affiliated with, endorsed by, or connected to" — is removed before the
+  // scan (in plain HTML its "connected to <brand>" tail would false-positive
+  // the connected-to pattern that markup happens to break in JSX/markdown).
+  // Batch-A Codex P2 (accepted-fixed): strip ONLY the predicate words, never
+  // the rest of the sentence, so an overclaim sharing the sentence still gets
+  // scanned — the brand list that follows the predicate matches no banned
+  // pattern on its own.
+  const NON_AFFILIATION_PREDICATE =
+    /not affiliated\s+with,?\s*endorsed\s+by,?\s*or\s+connected\s+to\b/gi;
 
   const mockupFiles = readdirSync(join(root, "mockups"), { recursive: true })
     .map(String)
@@ -259,17 +288,33 @@ describe("S2 mockup claim scan (every committed mockup HTML, recursive)", () => 
   });
 
   it.each(mockupFiles)("%s makes no affirmative real-platform/no-AI claim", (file) => {
-    const text = readFileSync(file, "utf8").replace(NON_AFFILIATION_SENTENCE, " ");
+    const text = readFileSync(file, "utf8").replace(NON_AFFILIATION_PREDICATE, " ");
     for (const pattern of BANNED_CLAIMS) {
       const m = text.match(pattern);
       expect(m === null, `banned claim ${pattern} in ${file}: ${m?.[0]}`).toBe(true);
     }
   });
 
-  it("the mockup scan bites: a planted overclaim survives the non-affiliation strip and is caught", () => {
+  it("the mockup scan bites: a planted overclaim in its OWN sentence is caught", () => {
     const planted =
       "Not affiliated with, endorsed by, or connected to DoorDash. This dashboard shows actual DoorDash data live.";
-    const stripped = planted.replace(NON_AFFILIATION_SENTENCE, " ");
+    const stripped = planted.replace(NON_AFFILIATION_PREDICATE, " ");
     expect(BANNED_CLAIMS.some((p) => p.test(stripped))).toBe(true);
+  });
+
+  it("the mockup scan bites: an overclaim sharing the DISCLAIMER'S OWN sentence is caught (predicate-only strip)", () => {
+    // Batch-A Codex P2 adversarial case: the old sentence-wide strip would have
+    // erased this whole line; the predicate-only strip must leave the overclaim.
+    const planted =
+      "Not affiliated with, endorsed by, or connected to DoorDash — this dashboard shows actual DoorDash data live.";
+    const stripped = planted.replace(NON_AFFILIATION_PREDICATE, " ");
+    expect(BANNED_CLAIMS.some((p) => p.test(stripped))).toBe(true);
+  });
+
+  it("the strip removes only the predicate: the honest disclaimer still passes clean", () => {
+    const honest =
+      "Not affiliated with, endorsed by, or connected to DoorDash, Uber Eats, Grubhub, DataSF, or any business.";
+    const stripped = honest.replace(NON_AFFILIATION_PREDICATE, " ");
+    expect(BANNED_CLAIMS.some((p) => p.test(stripped))).toBe(false);
   });
 });
