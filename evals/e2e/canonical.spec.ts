@@ -56,7 +56,10 @@ test("canonical nav = truth-engine surfaces + exactly one legacy link; every sur
   ];
   for (const [label, h1] of surfaces) {
     await nav.getByRole("link", { name: label, exact: true }).click();
-    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(h1);
+    // 15s: dev mode compiles each surface on first hit (artifact mode is instant).
+    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(h1, {
+      timeout: 15_000,
+    });
     await expect(nav.getByRole("link", { name: label, exact: true })).toHaveAttribute(
       "aria-current",
       "page",

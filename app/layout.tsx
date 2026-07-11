@@ -73,7 +73,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {/* E1a build-provenance line (plan v3.3; injected by next.config.ts,
                 consumed at S8). Carries no S2 contract phrase — the semantic
                 disclosure contract above stays the only bearer of those. */}
-            <span className="site-footer-build"> {BUILD_INFO.label}.</span>
+            <span className="site-footer-build"> {BUILD_INFO.label}.</span>{" "}
+            {/* RV1 identity/contact line (owner review pick 2026-07-11). */}
+            <span className="site-footer-build">
+              Built and directed by Sharan Kumar (
+              <a href="https://github.com/sharanlabs" rel="author">
+                github.com/sharanlabs
+              </a>
+              ).
+            </span>
           </div>
         </footer>
       </body>

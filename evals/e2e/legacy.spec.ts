@@ -19,7 +19,8 @@ test("legacy console renders the queue with both human-in-the-loop outcomes", as
 test("a merchant opens its full why-chain end to end under /legacy/", async ({ page }) => {
   await page.goto("/legacy/console");
   await page.locator("tbody a").first().click();
-  await expect(page).toHaveURL(/\/legacy\/merchant\/M\d{3}/);
+  // 15s: dev mode compiles /legacy/merchant/[id] on first hit (artifact mode is instant).
+  await expect(page).toHaveURL(/\/legacy\/merchant\/M\d{3}/, { timeout: 15_000 });
   for (const section of [
     "Triage & diagnosis",
     "Drafted outreach",

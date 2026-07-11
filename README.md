@@ -4,6 +4,8 @@
 
 A **human-led, AI-assisted** prototype, built and reviewed under a dual-model engineering process. The load-bearing claims in this file are backed by committed tests or records in this repo, each stated with its measure and date — declared claims, individually evidenced; this is not a blanket claim that every sentence of prose has machine coverage.
 
+Built and directed by **Sharan Kumar** ([github.com/sharanlabs](https://github.com/sharanlabs)) — how the two-model process actually worked, in plain language: [docs/HOW-THIS-WAS-BUILT.md](docs/HOW-THIS-WAS-BUILT.md). Security posture: [SECURITY.md](SECURITY.md).
+
 > **Not affiliated with, endorsed by, or connected to** DoorDash, Uber Eats, Grubhub, Square, Toast, OpenAI, Stripe, Google, or any named business or protocol body. This is an independent, company-agnostic prototype. **The truth-audit engine runs entirely on a labeled synthetic corpus** — no real merchant relationship, account, data, or PII anywhere, and no real business-impact claims. All metrics are simulated or measured on synthetic fixtures, and every artifact says so on its face. (The archived legacy module's data provenance is scoped separately — see [Lineage](#lineage).)
 
 ## Try it in 60 seconds
@@ -28,6 +30,7 @@ These are the measurement rules the repo's labels live under — every labeled c
 - **Pre-registered floors, in git, before any live run.** The LLM classifier's pass bars were committed before its exam; floors only ever tighten pre-run and never move after results. The first run (2026-07-05) scored 20/21 and missed one per-class recall floor — so its label honestly read **DEFERRED**, and that record stands unedited. Earning the label took a second owner-authorized exam on a **fresh pre-registered held-out split** (the first split was exposed and never re-scored): **21/21, every floor cleared (2026-07-09)**. The bar never moved in either run.
 - **Eval-locks.** Every live run's raw results are frozen into the repo, and committed lock tests recompute the headline numbers from the per-item records forever — the grade cannot be quietly edited, and "just run it again" cannot replace what happened.
 - **Anti-theater floors.** The fee classifier's label required **beating** a pinned deterministic keyword baseline on held-out gold (ties lose); the agent labels required clearing pre-registered per-member safety and class-match floors on an owner-armed live run. Each label names the exact bar it cleared — none is earned by adjective.
+- **Scale, stated plainly.** These gold sets are deliberately small (n=21 statement lines, n=20 crew scenarios, n=35 conformance-corpus documents) — smoke-scale instruments a solo prototype can hold to a pre-registered standard, not statistical power over real-world distributions. What the discipline buys at this scale is integrity, not generality: bars fixed before the run, splits burned after one scoring pass, misses kept on the record. Every label's wording is scoped to its own n, and none claims field performance.
 - **Structural $0 enforcement.** Import-graph evals prove the CLI, demo, delivery builders, and web views cannot reach an LLM or the network — not a promise, a failing test.
 - **Frozen corpus and goldens.** Fixtures are seeded and freeze-locked (regenerate ⇒ bytes must match); reports byte-compare against goldens.
 

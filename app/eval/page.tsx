@@ -32,6 +32,13 @@ export default function EvalEvidencePage() {
         status doc and the frozen L-1 live matrix — and imported from a single evidence module bound to
         those artifacts by a committed anti-fabrication test. No score is asserted from memory.
       </p>
+      <div className="ds-note">
+        <b>Scale, stated plainly:</b> these gold sets are deliberately small (n=21 statement lines,
+        n=20 crew scenarios) — smoke-scale instruments held to a pre-registered standard, not
+        statistical power over real-world distributions. The discipline buys integrity, not
+        generality: bars fixed before each run, splits burned after one scoring pass, misses kept on
+        the record.
+      </div>
 
       {/* b. fee-line classifier calibration — the honest two-run arc */}
       <h2 className="ds-h2-row">Fee-line classifier — calibration</h2>

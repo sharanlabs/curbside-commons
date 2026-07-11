@@ -2625,3 +2625,12 @@ body {
   line-height: 1.6;
   color: var(--muted);
 }
+
+/* === RV1 (append-only): legacy sub-nav strip === */
+.legacy-subnav {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
