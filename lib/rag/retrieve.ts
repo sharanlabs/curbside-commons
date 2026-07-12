@@ -35,14 +35,20 @@ function segments(text: string): { start: number; end: number }[] {
   return out;
 }
 
-/** Best 1–3-segment window by unique-query-token overlap (earlier, then shorter, wins ties). */
+/**
+ * Best 1–3-segment window by query-token overlap DENSITY (shared unique
+ * tokens ÷ window unique tokens), tie-broken by absolute shared count desc,
+ * then earlier, then shorter — all deterministic. Density (not raw overlap)
+ * is a general injection defense decided BEFORE the scoring pass: expanding
+ * a window into adjacent instruction-bearing text costs density, so planted
+ * directives that merely echo query vocabulary cannot buy their way into the
+ * answer span.
+ */
 export function bestWindow(chunkText: string, query: string): string {
   const qTokens = new Set(tokenize(query));
   const segs = segments(chunkText);
   if (segs.length === 0) return chunkText;
-  // Strictly-better overlap wins; on equal overlap the SHORTER window wins
-  // (the tight answer, not padding), then the EARLIER one (deterministic).
-  let best = { overlap: -1, start: 0, end: segs[0].end, size: 4 };
+  let best = { density: -1, shared: -1, start: 0, end: segs[0].end, size: 4 };
   for (let i = 0; i < segs.length; i += 1) {
     for (let size = 1; size <= 3 && i + size <= segs.length; size += 1) {
       const start = segs[i].start;
@@ -50,10 +56,13 @@ export function bestWindow(chunkText: string, query: string): string {
       const windowTokens = new Set(tokenize(chunkText.slice(start, end)));
       let shared = 0;
       for (const t of windowTokens) if (qTokens.has(t)) shared += 1;
+      const density = windowTokens.size === 0 ? 0 : shared / windowTokens.size;
       const better =
-        shared > best.overlap ||
-        (shared === best.overlap && (size < best.size || (size === best.size && start < best.start)));
-      if (better) best = { overlap: shared, start, end, size };
+        density > best.density ||
+        (density === best.density &&
+          (shared > best.shared ||
+            (shared === best.shared && (start < best.start || (start === best.start && size < best.size)))));
+      if (better) best = { density, shared, start, end, size };
     }
   }
   return chunkText.slice(best.start, best.end).trim();
