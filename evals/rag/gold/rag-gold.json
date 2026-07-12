@@ -1,0 +1,186 @@
+{
+  "_doc": "E2 gold set — 30 items per docs/e2-rag-preregistration.md §4 (24 in-corpus: 8 fee-rule + 8 ucp-schema + 6 glossary + 2 cross-source; 6 out-of-corpus whose correct outcome is ABSTAIN). Fable-designed (plan §E2 route tag), committed AFTER the index commit and BEFORE any scoring; queried ONLY in the one scoring pass, EXPOSED afterward, never re-scorable. Leakage screens per AMENDMENT A3 are machine-checked by evals/rag/rag-gold-composition.test.ts. m1Rule: 'any' = at least one expectedFile in top-5 counts as an M1 hit; 'all' (cross-source) = every expectedFile must appear. M2 support = a cited span contains at least one expectedSpan verbatim.",
+  "registration": { "doc": "docs/e2-rag-preregistration.md", "commit": "31bd66d", "indexCommit": "d97fa90" },
+  "items": [
+    {
+      "id": "F1", "stratum": "fee-rule", "m1Rule": "any",
+      "question": "How large can the charge for bringing an order to the customer be, as a share of what the order cost?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/research/uc1-rule-table.draft.json"],
+      "expectedSpans": ["delivery fee ≤ 15% × purchase price, per order"]
+    },
+    {
+      "id": "F2", "stratum": "fee-rule", "m1Rule": "any",
+      "question": "When can a platform bill more than three percent for payment handling?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/research/uc1-rule-table.draft.json"],
+      "expectedSpans": ["transaction fee > 3% allowed ONLY if = actual processor charge AND proof available to dept + establishment"]
+    },
+    {
+      "id": "F3", "stratum": "fee-rule", "m1Rule": "any",
+      "question": "What happens if a platform overcharges on a capped fee but returns the money a few weeks later?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/research/uc1-rule-table.draft.json"],
+      "expectedSpans": ["over-cap on a/b/d is not a violation if refunded within 30 days of the month-end"]
+    },
+    {
+      "id": "F4", "stratum": "fee-rule", "m1Rule": "any",
+      "question": "How many kinds of charges may appear on a restaurant's bill, and what happens to anything outside them?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/research/uc1-rule-table.draft.json"],
+      "expectedSpans": ["fee category ∈ {delivery, basic service, transaction, enhanced}; any other fee is unlawful"]
+    },
+    {
+      "id": "F5", "stratum": "fee-rule", "m1Rule": "any",
+      "question": "Under what condition may a platform charge for premium extras such as marketing placement?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/research/uc1-rule-table.draft.json"],
+      "expectedSpans": ["charging an enhanced fee ⇒ platform also offers (and charges a basic service fee for) the basic service"]
+    },
+    {
+      "id": "F6", "stratum": "fee-rule", "m1Rule": "any",
+      "question": "How much advance warning must a restaurant get before its rates change?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/research/uc1-rule-table.draft.json"],
+      "expectedSpans": ["a fee change takes effect ≥ 30 days after notice to the establishment"]
+    },
+    {
+      "id": "F7", "stratum": "fee-rule", "m1Rule": "any",
+      "question": "What monthly paperwork about charges does the law require platforms to give restaurants?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/research/uc1-rule-table.draft.json"],
+      "expectedSpans": ["monthly itemized list of each transaction incl. every fee charged, for the prior month"]
+    },
+    {
+      "id": "F8", "stratum": "fee-rule", "m1Rule": "any",
+      "question": "What protection against being buried in search results does a restaurant get when it pays the listing charge?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/research/uc1-rule-table.draft.json"],
+      "expectedSpans": ["paying a basic service fee ⇒ searchable on all platforms, not omitted from relevant results"]
+    },
+    {
+      "id": "S1", "stratum": "ucp-schema", "m1Rule": "any",
+      "question": "What three pieces of information are mandatory for a product entry in the shopping formats?",
+      "expectedFiles": ["fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/item.json"],
+      "expectedSpans": ["\"id\",\n    \"title\",\n    \"price\""]
+    },
+    {
+      "id": "S2", "stratum": "ucp-schema", "m1Rule": "any",
+      "question": "Which named kinds of cost line does the totals structure recognize as standard?",
+      "expectedFiles": ["fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/total.json"],
+      "expectedSpans": ["Cost category. Well-known values: subtotal, items_discount, discount, fulfillment, tax, fee, total."]
+    },
+    {
+      "id": "S3", "stratum": "ucp-schema", "m1Rule": "any",
+      "question": "Must a price reduction line carry a positive or negative amount in the cost breakdown?",
+      "expectedFiles": ["fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/total.json"],
+      "expectedSpans": ["\"amount\": { \"exclusiveMaximum\": 0 }"]
+    },
+    {
+      "id": "S4", "stratum": "ucp-schema", "m1Rule": "any",
+      "question": "What standard reasons can a business give when it cannot fulfill a requested product?",
+      "expectedFiles": ["fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/error_code.json"],
+      "expectedSpans": ["\"not_found\",\n    \"out_of_stock\",\n    \"item_unavailable\""]
+    },
+    {
+      "id": "S5", "stratum": "ucp-schema", "m1Rule": "any",
+      "question": "What identifier lets a browsing session's basket be converted into a purchase flow?",
+      "expectedFiles": ["fixtures/ucp-schemas/2026-04-08/schemas/shopping/cart.json"],
+      "expectedSpans": ["Cart ID to convert to checkout. Business MUST use cart contents (line_items, context, buyer) and MUST ignore overlapping fields in checkout payload."]
+    },
+    {
+      "id": "S6", "stratum": "ucp-schema", "m1Rule": "any",
+      "question": "If the buyer's locale signals are missing, how does the merchant decide location-based pricing?",
+      "expectedFiles": ["fixtures/ucp-schemas/2026-04-08/schemas/shopping/cart.json"],
+      "expectedSpans": ["Falls back to geo-IP if omitted."]
+    },
+    {
+      "id": "S7", "stratum": "ucp-schema", "m1Rule": "any",
+      "question": "In what units are product prices expressed?",
+      "expectedFiles": ["fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/item.json"],
+      "expectedSpans": ["Unit price in ISO 4217 minor units."]
+    },
+    {
+      "id": "S8", "stratum": "ucp-schema", "m1Rule": "any",
+      "question": "Which top-level parts must a shopping basket object always include?",
+      "expectedFiles": ["fixtures/ucp-schemas/2026-04-08/schemas/shopping/cart.json"],
+      "expectedSpans": ["\"ucp\",\n    \"id\",\n    \"line_items\",\n    \"currency\",\n    \"totals\""]
+    },
+    {
+      "id": "G1", "stratum": "glossary", "m1Rule": "any",
+      "question": "What is the difference between following the spec and telling the truth, in this project's terms?",
+      "expectedFiles": ["docs/GLOSSARY.md"],
+      "expectedSpans": ["Conformance = the feed matches the SPEC (fields, types, schema). Truth = the feed matches REALITY (the SOR)."]
+    },
+    {
+      "id": "G2", "stratum": "glossary", "m1Rule": "any",
+      "question": "Before an AI referee's rulings are relied on, what has to be measured and published?",
+      "expectedFiles": ["docs/GLOSSARY.md"],
+      "expectedSpans": ["Measuring an LLM judge's precision/recall/agreement against a labeled gold set before trusting its verdicts; the measurement is frozen and cited."]
+    },
+    {
+      "id": "G3", "stratum": "glossary", "m1Rule": "any",
+      "question": "What does the principle about never checking your own work mean in this system?",
+      "expectedFiles": ["docs/GLOSSARY.md"],
+      "expectedSpans": ["the party producing an artifact must not be the party verifying it"]
+    },
+    {
+      "id": "G4", "stratum": "glossary", "m1Rule": "any",
+      "question": "Where does the true value of a fact officially live, and what is that source called?",
+      "expectedFiles": ["docs/GLOSSARY.md"],
+      "expectedSpans": ["The authoritative data source for a fact domain"]
+    },
+    {
+      "id": "G5", "stratum": "glossary", "m1Rule": "any",
+      "question": "What is it called when a published copy of prices or availability stops matching the source?",
+      "expectedFiles": ["docs/GLOSSARY.md"],
+      "expectedSpans": ["Any divergence between a serving copy (feed, listing, agent-visible catalog response, fee statement line) and the SOR"]
+    },
+    {
+      "id": "G6", "stratum": "glossary", "m1Rule": "any",
+      "question": "What must a reported mismatch carry with it before it counts as a finding?",
+      "expectedFiles": ["docs/GLOSSARY.md"],
+      "expectedSpans": ["A reported discrepancy that carries machine-checkable pointers to both sources"]
+    },
+    {
+      "id": "X1", "stratum": "cross-source", "m1Rule": "all",
+      "question": "Which charge type has no monthly-average fallback and no refund grace period, and how does the glossary describe what it covers?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/GLOSSARY.md"],
+      "expectedSpans": [
+        "| Transaction fee | **3%** | purchase price / order | **No** | **No** |",
+        "the card-processing-type fee; capped at 3% of the purchase price per order"
+      ]
+    },
+    {
+      "id": "X2", "stratum": "cross-source", "m1Rule": "all",
+      "question": "The rulebook says one fee tier is only allowed alongside the plain tier — which two tiers are those and what are their caps?",
+      "expectedFiles": ["docs/research/uc1-rule-table.md", "docs/GLOSSARY.md"],
+      "expectedSpans": [
+        "charging an enhanced fee ⇒ platform also offers (and charges a basic service fee for) the basic service",
+        "a fee for services beyond the basic service, chargeable only if the platform also offers the basic-service tier; capped at 20%"
+      ]
+    },
+    {
+      "id": "O1", "stratum": "out-of-corpus", "m1Rule": "any",
+      "question": "What dollar penalty does the city charge a platform that violates the caps?",
+      "expectedFiles": [], "expectedSpans": []
+    },
+    {
+      "id": "O2", "stratum": "out-of-corpus", "m1Rule": "any",
+      "question": "How do California's delivery fee limits compare with New York's?",
+      "expectedFiles": [], "expectedSpans": []
+    },
+    {
+      "id": "O3", "stratum": "out-of-corpus", "m1Rule": "any",
+      "question": "What commission rate does the largest delivery platform actually charge merchants today?",
+      "expectedFiles": [], "expectedSpans": []
+    },
+    {
+      "id": "O4", "stratum": "out-of-corpus", "m1Rule": "any",
+      "question": "Which version of the checkout capability added support for recurring subscription billing?",
+      "expectedFiles": [], "expectedSpans": []
+    },
+    {
+      "id": "O5", "stratum": "out-of-corpus", "m1Rule": "any",
+      "question": "What are the tax withholding requirements on platform payouts to restaurants?",
+      "expectedFiles": [], "expectedSpans": []
+    },
+    {
+      "id": "O6", "stratum": "out-of-corpus", "m1Rule": "any",
+      "question": "How many businesses have been fined under the fee-cap law so far?",
+      "expectedFiles": [], "expectedSpans": []
+    }
+  ]
+}
