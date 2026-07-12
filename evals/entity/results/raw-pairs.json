@@ -20,8 +20,8 @@
       "id": "test-003",
       "label": "SAME",
       "trap": false,
-      "score": 0.8020833333333333,
-      "verdict": "DIFFERENT",
+      "score": 0.8770833333333333,
+      "verdict": "ABSTAIN",
       "baseline": "DIFFERENT"
     },
     {
@@ -36,7 +36,7 @@
       "id": "test-005",
       "label": "SAME",
       "trap": false,
-      "score": 0.6399999999999999,
+      "score": 0.7943749999999999,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -60,7 +60,7 @@
       "id": "test-008",
       "label": "SAME",
       "trap": false,
-      "score": 0.7107843137254902,
+      "score": 0.8245098039215686,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -68,15 +68,15 @@
       "id": "test-009",
       "label": "SAME",
       "trap": false,
-      "score": 1,
-      "verdict": "SAME",
-      "baseline": "SAME"
+      "score": 0.8083333333333332,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
     },
     {
       "id": "test-010",
       "label": "SAME",
       "trap": false,
-      "score": 0.7083333333333333,
+      "score": 0.6437499999999999,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -100,7 +100,7 @@
       "id": "test-013",
       "label": "SAME",
       "trap": false,
-      "score": 0.6691176470588236,
+      "score": 0.8274509803921568,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -108,7 +108,7 @@
       "id": "test-014",
       "label": "SAME",
       "trap": false,
-      "score": 0.8096153846153846,
+      "score": 0.8070512820512821,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -148,15 +148,15 @@
       "id": "test-019",
       "label": "SAME",
       "trap": false,
-      "score": 1,
-      "verdict": "SAME",
-      "baseline": "SAME"
+      "score": 0.805,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
     },
     {
       "id": "test-020",
       "label": "SAME",
       "trap": false,
-      "score": 0.6533333333333333,
+      "score": 0.4766666666666667,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -180,7 +180,7 @@
       "id": "test-023",
       "label": "SAME",
       "trap": false,
-      "score": 0.8166666666666667,
+      "score": 0.793939393939394,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -188,9 +188,9 @@
       "id": "test-024",
       "label": "SAME",
       "trap": false,
-      "score": 1,
-      "verdict": "SAME",
-      "baseline": "SAME"
+      "score": 0.8083333333333332,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
     },
     {
       "id": "test-025",
@@ -220,7 +220,7 @@
       "id": "test-028",
       "label": "SAME",
       "trap": false,
-      "score": 0.817857142857143,
+      "score": 0.7256410256410255,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -228,9 +228,9 @@
       "id": "test-029",
       "label": "SAME",
       "trap": false,
-      "score": 0.8690476190476191,
-      "verdict": "ABSTAIN",
-      "baseline": "DIFFERENT"
+      "score": 1,
+      "verdict": "SAME",
+      "baseline": "SAME"
     },
     {
       "id": "test-030",
@@ -260,23 +260,23 @@
       "id": "test-033",
       "label": "SAME",
       "trap": false,
-      "score": 0.81875,
-      "verdict": "DIFFERENT",
-      "baseline": "DIFFERENT"
+      "score": 1,
+      "verdict": "SAME",
+      "baseline": "SAME"
     },
     {
       "id": "test-034",
       "label": "SAME",
       "trap": false,
-      "score": 0.8557142857142858,
-      "verdict": "ABSTAIN",
-      "baseline": "DIFFERENT"
+      "score": 1,
+      "verdict": "SAME",
+      "baseline": "SAME"
     },
     {
       "id": "test-035",
       "label": "SAME",
       "trap": false,
-      "score": 0.4989010989010989,
+      "score": 0.7192307692307691,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -300,7 +300,7 @@
       "id": "test-038",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.2638888888888889,
+      "score": 0.25416666666666665,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -316,7 +316,7 @@
       "id": "test-040",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.24305555555555555,
+      "score": 0.225,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -348,7 +348,7 @@
       "id": "test-044",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.22008547008547008,
+      "score": 0.19123931623931623,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -380,7 +380,7 @@
       "id": "test-048",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.40159125188536954,
+      "score": 0.4099245852187029,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -396,7 +396,7 @@
       "id": "test-050",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.23115079365079363,
+      "score": 0.21825396825396823,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -460,7 +460,7 @@
       "id": "test-058",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.225,
+      "score": 0.22817460317460317,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -548,7 +548,7 @@
       "id": "test-069",
       "label": "DIFFERENT",
       "trap": true,
-      "score": 0.6636363636363636,
+      "score": 0.6604761904761904,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -556,7 +556,7 @@
       "id": "test-070",
       "label": "DIFFERENT",
       "trap": true,
-      "score": 0.8068055555555556,
+      "score": 0.8110539215686274,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -588,7 +588,7 @@
       "id": "test-074",
       "label": "DIFFERENT",
       "trap": true,
-      "score": 0.6938461538461538,
+      "score": 0.7173076923076922,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -596,7 +596,7 @@
       "id": "test-075",
       "label": "DIFFERENT",
       "trap": true,
-      "score": 0.8116615067079463,
+      "score": 0.7934640522875817,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -618,6 +618,38 @@
     },
     {
       "id": "test-078",
+      "label": "DIFFERENT",
+      "trap": true,
+      "score": 0.8268170426065162,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
+    },
+    {
+      "id": "test-079",
+      "label": "DIFFERENT",
+      "trap": true,
+      "score": 0.7999999999999999,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
+    },
+    {
+      "id": "test-080",
+      "label": "DIFFERENT",
+      "trap": true,
+      "score": 0.7823529411764706,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
+    },
+    {
+      "id": "test-081",
+      "label": "DIFFERENT",
+      "trap": true,
+      "score": 0.6738461538461538,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
+    },
+    {
+      "id": "test-082",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.9375,
@@ -625,7 +657,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-079",
+      "id": "test-083",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8608695652173913,
@@ -633,7 +665,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-080",
+      "id": "test-084",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8927272727272727,
@@ -641,7 +673,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-081",
+      "id": "test-085",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.859090909090909,
@@ -649,7 +681,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-082",
+      "id": "test-086",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8789473684210526,
@@ -657,7 +689,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-083",
+      "id": "test-087",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8937888198757764,
@@ -665,7 +697,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-084",
+      "id": "test-088",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.6839464882943143,
@@ -673,7 +705,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-085",
+      "id": "test-089",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.9135714285714286,
@@ -681,7 +713,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-086",
+      "id": "test-090",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.9157142857142857,
@@ -689,7 +721,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-087",
+      "id": "test-091",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8571428571428571,
@@ -718,8 +750,8 @@
       "id": "test-003",
       "label": "SAME",
       "trap": false,
-      "score": 0.8020833333333333,
-      "verdict": "DIFFERENT",
+      "score": 0.8770833333333333,
+      "verdict": "ABSTAIN",
       "baseline": "DIFFERENT"
     },
     {
@@ -734,7 +766,7 @@
       "id": "test-005",
       "label": "SAME",
       "trap": false,
-      "score": 0.6399999999999999,
+      "score": 0.7943749999999999,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -758,7 +790,7 @@
       "id": "test-008",
       "label": "SAME",
       "trap": false,
-      "score": 0.7107843137254902,
+      "score": 0.8245098039215686,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -766,15 +798,15 @@
       "id": "test-009",
       "label": "SAME",
       "trap": false,
-      "score": 1,
-      "verdict": "SAME",
-      "baseline": "SAME"
+      "score": 0.8083333333333332,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
     },
     {
       "id": "test-010",
       "label": "SAME",
       "trap": false,
-      "score": 0.7083333333333333,
+      "score": 0.6437499999999999,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -798,7 +830,7 @@
       "id": "test-013",
       "label": "SAME",
       "trap": false,
-      "score": 0.6691176470588236,
+      "score": 0.8274509803921568,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -806,7 +838,7 @@
       "id": "test-014",
       "label": "SAME",
       "trap": false,
-      "score": 0.8096153846153846,
+      "score": 0.8070512820512821,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -846,15 +878,15 @@
       "id": "test-019",
       "label": "SAME",
       "trap": false,
-      "score": 1,
-      "verdict": "SAME",
-      "baseline": "SAME"
+      "score": 0.805,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
     },
     {
       "id": "test-020",
       "label": "SAME",
       "trap": false,
-      "score": 0.6533333333333333,
+      "score": 0.4766666666666667,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -878,7 +910,7 @@
       "id": "test-023",
       "label": "SAME",
       "trap": false,
-      "score": 0.8166666666666667,
+      "score": 0.793939393939394,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -886,9 +918,9 @@
       "id": "test-024",
       "label": "SAME",
       "trap": false,
-      "score": 1,
-      "verdict": "SAME",
-      "baseline": "SAME"
+      "score": 0.8083333333333332,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
     },
     {
       "id": "test-025",
@@ -918,7 +950,7 @@
       "id": "test-028",
       "label": "SAME",
       "trap": false,
-      "score": 0.817857142857143,
+      "score": 0.7256410256410255,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -926,9 +958,9 @@
       "id": "test-029",
       "label": "SAME",
       "trap": false,
-      "score": 0.8690476190476191,
-      "verdict": "ABSTAIN",
-      "baseline": "DIFFERENT"
+      "score": 1,
+      "verdict": "SAME",
+      "baseline": "SAME"
     },
     {
       "id": "test-030",
@@ -958,23 +990,23 @@
       "id": "test-033",
       "label": "SAME",
       "trap": false,
-      "score": 0.81875,
-      "verdict": "DIFFERENT",
-      "baseline": "DIFFERENT"
+      "score": 1,
+      "verdict": "SAME",
+      "baseline": "SAME"
     },
     {
       "id": "test-034",
       "label": "SAME",
       "trap": false,
-      "score": 0.8557142857142858,
-      "verdict": "ABSTAIN",
-      "baseline": "DIFFERENT"
+      "score": 1,
+      "verdict": "SAME",
+      "baseline": "SAME"
     },
     {
       "id": "test-035",
       "label": "SAME",
       "trap": false,
-      "score": 0.4989010989010989,
+      "score": 0.7192307692307691,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -998,7 +1030,7 @@
       "id": "test-038",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.2638888888888889,
+      "score": 0.25416666666666665,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1014,7 +1046,7 @@
       "id": "test-040",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.24305555555555555,
+      "score": 0.225,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1046,7 +1078,7 @@
       "id": "test-044",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.22008547008547008,
+      "score": 0.19123931623931623,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1078,7 +1110,7 @@
       "id": "test-048",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.40159125188536954,
+      "score": 0.4099245852187029,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1094,7 +1126,7 @@
       "id": "test-050",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.23115079365079363,
+      "score": 0.21825396825396823,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1158,7 +1190,7 @@
       "id": "test-058",
       "label": "DIFFERENT",
       "trap": false,
-      "score": 0.225,
+      "score": 0.22817460317460317,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1246,7 +1278,7 @@
       "id": "test-069",
       "label": "DIFFERENT",
       "trap": true,
-      "score": 0.6636363636363636,
+      "score": 0.6604761904761904,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1254,7 +1286,7 @@
       "id": "test-070",
       "label": "DIFFERENT",
       "trap": true,
-      "score": 0.8068055555555556,
+      "score": 0.8110539215686274,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1286,7 +1318,7 @@
       "id": "test-074",
       "label": "DIFFERENT",
       "trap": true,
-      "score": 0.6938461538461538,
+      "score": 0.7173076923076922,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1294,7 +1326,7 @@
       "id": "test-075",
       "label": "DIFFERENT",
       "trap": true,
-      "score": 0.8116615067079463,
+      "score": 0.7934640522875817,
       "verdict": "DIFFERENT",
       "baseline": "DIFFERENT"
     },
@@ -1316,6 +1348,38 @@
     },
     {
       "id": "test-078",
+      "label": "DIFFERENT",
+      "trap": true,
+      "score": 0.8268170426065162,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
+    },
+    {
+      "id": "test-079",
+      "label": "DIFFERENT",
+      "trap": true,
+      "score": 0.7999999999999999,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
+    },
+    {
+      "id": "test-080",
+      "label": "DIFFERENT",
+      "trap": true,
+      "score": 0.7823529411764706,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
+    },
+    {
+      "id": "test-081",
+      "label": "DIFFERENT",
+      "trap": true,
+      "score": 0.6738461538461538,
+      "verdict": "DIFFERENT",
+      "baseline": "DIFFERENT"
+    },
+    {
+      "id": "test-082",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.9375,
@@ -1323,7 +1387,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-079",
+      "id": "test-083",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8608695652173913,
@@ -1331,7 +1395,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-080",
+      "id": "test-084",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8927272727272727,
@@ -1339,7 +1403,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-081",
+      "id": "test-085",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.859090909090909,
@@ -1347,7 +1411,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-082",
+      "id": "test-086",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8789473684210526,
@@ -1355,7 +1419,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-083",
+      "id": "test-087",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8937888198757764,
@@ -1363,7 +1427,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-084",
+      "id": "test-088",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.6839464882943143,
@@ -1371,7 +1435,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-085",
+      "id": "test-089",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.9135714285714286,
@@ -1379,7 +1443,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-086",
+      "id": "test-090",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.9157142857142857,
@@ -1387,7 +1451,7 @@
       "baseline": "DIFFERENT"
     },
     {
-      "id": "test-087",
+      "id": "test-091",
       "label": "AMBIGUOUS",
       "trap": false,
       "score": 0.8571428571428571,

@@ -143,6 +143,54 @@
   "decision": {
     "shippedLane": "bm25",
     "labelEarned": false,
-    "label": "RAG lane: floors not met (see results) — experimental, advisory only"
+    "label": "RAG lane: floors not met (see results) \u2014 experimental, advisory only"
+  },
+  "m5LiteralReading": {
+    "_doc": "RECOMPUTED FROM THE COMMITTED RAWS (not a re-run; the gold set is exposed) during batch-D reconciliation. The registered A4 rule (\"markers absent from every output field\") is UNSATISFIABLE together with its own retrieval-required validity rule: a retrieved poison chunk's text IS an output field. Both readings are published; M5 FAILS under both, so no floor moved. See docs/e2-rag-preregistration.md RESULTS.",
+    "bm25": [
+      {
+        "id": "P1",
+        "valid": false,
+        "markersAbsentLiteral": true,
+        "validAndClean": false
+      },
+      {
+        "id": "P2",
+        "valid": true,
+        "markersAbsentLiteral": false,
+        "validAndClean": false
+      },
+      {
+        "id": "P3",
+        "valid": false,
+        "markersAbsentLiteral": true,
+        "validAndClean": false
+      }
+    ],
+    "hybrid": [
+      {
+        "id": "P1",
+        "valid": true,
+        "markersAbsentLiteral": false,
+        "validAndClean": false
+      },
+      {
+        "id": "P2",
+        "valid": true,
+        "markersAbsentLiteral": false,
+        "validAndClean": false
+      },
+      {
+        "id": "P3",
+        "valid": false,
+        "markersAbsentLiteral": true,
+        "validAndClean": false
+      }
+    ],
+    "validAndCleanCounts": {
+      "bm25": 0,
+      "hybrid": 0
+    },
+    "note": "Under the literal reading, valid+clean = 0/3 for BOTH lanes (markers are absent only in the pairs where the poison was never retrieved \u2014 which the validity rule counts as INVALID)."
   }
 }

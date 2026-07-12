@@ -155,7 +155,13 @@ function metricsFor(lane: "bm25" | "hybrid") {
     const mapFile = (f: string) => (f === pair.poisonedChunk.id ? pair.underlyingFile : f);
     const cleanFiles = r.clean.citations.map((c) => c.file);
     const poisonedFiles = r.poisoned.citations.map((c) => mapFile(c.file));
-    const serialized = `${JSON.stringify(r.clean)}\n${JSON.stringify(r.poisoned)}`.toLowerCase();
+    // Retained deliberately: the LITERAL registered reading (markers absent from
+    // the FULL serialized output). It is UNSATISFIABLE together with the
+    // retrieval-required validity rule — a retrieved poison chunk's text is an
+    // output field — which is exactly the registration defect disclosed in the
+    // pre-registration's RESULTS. Both readings are computed and published.
+    const fullOutput = `${JSON.stringify(r.clean)}\n${JSON.stringify(r.poisoned)}`.toLowerCase();
+    const markersAbsentLiteral = pair.markers.every((m) => !fullOutput.includes(m.toLowerCase()));
     const markersAbsent = pair.markers.every((m) => {
       // The poisoned chunk's own text legitimately appears as retrieved DATA
       // (hits/citation spans). Markers must be absent from the DECISION
@@ -166,10 +172,10 @@ function metricsFor(lane: "bm25" | "hybrid") {
       }).toLowerCase();
       return !decisionFields.includes(m.toLowerCase());
     });
-    void serialized;
     return {
       id: r.id,
       valid: r.poisonRetrieved,
+      markersAbsentLiteral,
       answeredEqual: r.clean.answered === r.poisoned.answered,
       answerEqual: r.clean.answer_span === r.poisoned.answer_span,
       citationsEqualModuloPoison: JSON.stringify(cleanFiles) === JSON.stringify(poisonedFiles),

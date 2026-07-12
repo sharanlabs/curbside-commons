@@ -11,7 +11,7 @@
  * Plain: these tests prove the tripwire around the frozen source documents
  * is armed — touch one byte and everything refuses to run.
  */
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, cpSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, cpSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -117,5 +117,81 @@ describe("E2 manifest freeze (A2 + pre-gold abstention)", () => {
   it("scratch set is recorded and within the §4 budget (≤10)", () => {
     expect(manifest.scratchSet?.probes.length).toBeLessThanOrEqual(10);
     expect(manifest.scratchSet?.probes.length).toBeGreaterThan(0);
+  });
+});
+
+/**
+ * BATCH-D P1 #4 — the INDEPENDENT ANCHOR. Without this, the A1 "hard block" was
+ * self-referential: `assertCorpusPins` trusts the hashes the manifest hands it,
+ * and the manifest is mutable — so snapshot bytes and manifest hashes could be
+ * changed TOGETHER and every gate would stay green. These tests anchor the
+ * manifest to two things it cannot edit itself into agreement with:
+ *
+ *   (a) the five hash literals quoted in the FROZEN pre-registration (A1, above
+ *       the RESULTS marker — that text is itself gated), parsed out of the doc;
+ *   (b) the schema tree's own git TREE hash, recomputed from the snapshot bytes
+ *       in pure TS (tree object encoding) — the one pin that covers all 78
+ *       schema files at once, so no file may be swapped even if its per-file
+ *       manifest entry were edited to match.
+ */
+import { createHash } from "node:crypto";
+
+/** git tree-object hash of a directory (sorted entries, mode + name + raw sha1). */
+function gitTreeSha1(dir: string): string {
+  const entries = readdirSync(dir, { withFileTypes: true })
+    .map((e) => ({
+      name: e.name,
+      isDir: e.isDirectory(),
+      // git sorts tree entries by name, with directories compared as "name/"
+      sortKey: e.isDirectory() ? `${e.name}/` : e.name,
+    }))
+    .sort((a, b) => (a.sortKey < b.sortKey ? -1 : 1));
+  const parts: Buffer[] = [];
+  for (const e of entries) {
+    const full = join(dir, e.name);
+    const sha = e.isDir ? gitTreeSha1(full) : gitBlobSha1(readFileSync(full));
+    const mode = e.isDir ? "40000" : "100644";
+    parts.push(Buffer.from(`${mode} ${e.name}\0`, "utf8"), Buffer.from(sha, "hex"));
+  }
+  const body = Buffer.concat(parts);
+  const header = Buffer.from(`tree ${body.byteLength}\0`, "utf8");
+  return createHash("sha1").update(Buffer.concat([header, body])).digest("hex");
+}
+
+describe("E2 A1 INDEPENDENT ANCHOR (batch-D P1 #4 — the gate is no longer self-referential)", () => {
+  const prereg = readFileSync(join(REPO, "docs/e2-rag-preregistration.md"), "utf8");
+
+  it("the manifest's pins match the hash literals quoted in the FROZEN pre-registration (A1)", () => {
+    // Parsed out of the registration text, never re-typed here: if someone edits
+    // the manifest, they must also edit a gated pre-registration section to match.
+    const quoted: Record<string, string> = {
+      "lib/packs/fees/rules.ts": /`lib\/packs\/fees\/rules\.ts` @ blob `([0-9a-f]{7,40})`/.exec(prereg)![1],
+      "docs/research/uc1-rule-table.md": /`docs\/research\/uc1-rule-table\.md`\s*\n?\s*@ `([0-9a-f]{7,40})`/.exec(prereg)![1],
+      "docs/research/uc1-rule-table.draft.json": /`docs\/research\/uc1-rule-table\.draft\.json` @ `([0-9a-f]{7,40})`/.exec(prereg)![1],
+      "docs/GLOSSARY.md": /`docs\/GLOSSARY\.md` @ `([0-9a-f]{7,40})`/.exec(prereg)![1],
+    };
+    for (const [path, shortSha] of Object.entries(quoted)) {
+      const pin = manifest.sources.find((s) => s.path === path);
+      expect(pin, `no manifest pin for ${path}`).toBeDefined();
+      expect(pin!.blobSha1.startsWith(shortSha), `${path}: manifest ${pin!.blobSha1} vs registration ${shortSha}`).toBe(true);
+    }
+  });
+
+  it("the schema TREE hash recomputed from the snapshot equals the registration's tree pin (covers all 78 files at once)", () => {
+    const treePin = /`fixtures\/ucp-schemas\/2026-04-08\/schemas\/\*\*`\s*\n?\s*@ tree `([0-9a-f]{7,40})`/.exec(prereg)![1];
+    const recomputed = gitTreeSha1(join(SNAPSHOT, "fixtures/ucp-schemas/2026-04-08/schemas"));
+    expect(recomputed.startsWith(treePin), `recomputed tree ${recomputed} vs registration ${treePin}`).toBe(true);
+  });
+
+  it("BITES: swapping one schema file's bytes AND its manifest entry still fails the tree anchor", () => {
+    const dir = "fixtures/ucp-schemas/2026-04-08/schemas";
+    const root = mkdtempSync(join(tmpdir(), "e2-anchor-"));
+    cpSync(join(SNAPSHOT, dir), join(root, dir), { recursive: true });
+    // The co-ordinated tamper the old gate could not see: change bytes, then
+    // "fix" the per-file hash. The TREE hash still moves.
+    writeFileSync(join(root, dir, "ucp.json"), '{"tampered":true}');
+    const recomputed = gitTreeSha1(join(root, dir));
+    const treePin = /@ tree `([0-9a-f]{7,40})`/.exec(prereg)![1];
+    expect(recomputed.startsWith(treePin)).toBe(false);
   });
 });

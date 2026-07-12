@@ -12,10 +12,10 @@
       "tMatch": 0.999,
       "tAbstain": 0.849,
       "precision": 1,
-      "recall": 0.6,
+      "recall": 0.55,
       "trapOk": true,
       "ambigAbstain": 0.75,
-      "abstainVol": 0.1
+      "abstainVol": 0.11904761904761904
     },
     "ensembleWeights": {
       "jaroWinkler": 0.5,
@@ -38,13 +38,13 @@
     },
     "m3": {
       "trapMerges": 0,
-      "trapTotal": 10
+      "trapTotal": 14
     },
     "m4": {
       "ambigAbstained": 9,
       "ambigTotal": 10,
       "rate": 0.9,
-      "abstainVolume": 0.12643678160919541
+      "abstainVolume": 0.10989010989010989
     },
     "zeroDenominator": false
   },
@@ -61,7 +61,7 @@
     },
     "m3": {
       "trapMerges": 0,
-      "trapTotal": 10
+      "trapTotal": 14
     },
     "m4": {
       "ambigAbstained": 0,

@@ -52,16 +52,16 @@ function rederive(verdictOf: (r: Row) => string) {
 }
 
 describe("E4 results lock — re-derived from committed raws", () => {
-  it("covers the full frozen test split (87 pairs, both determinism runs)", () => {
-    expect(run1.length).toBe(87);
-    expect(run2.length).toBe(87);
+  it("covers the full frozen test split (91 pairs — the COMPLIANT fresh split, ≥12 traps; both determinism runs)", () => {
+    expect(run1.length).toBe(91);
+    expect(run2.length).toBe(91);
   });
 
   it("M5: the two runs are byte-identical (determinism held)", () => {
     expect(JSON.stringify(run1)).toBe(JSON.stringify(run2));
   });
 
-  it("ensemble: M1 18/18 · M2 18/35 (0.514 < 0.80 -> the registered MISS) · M3 0/10 · M4 9/10 + volume 11/87", () => {
+  it("ensemble: M1 18/18 · M2 18/35 (0.514 < 0.80 -> the registered MISS) · M3 0/14 · M4 9/10 + volume 10/91", () => {
     const m = rederive((r) => r.verdict);
     expect(m.truly).toBe(18);
     expect(m.proposed).toBe(18);
@@ -69,10 +69,10 @@ describe("E4 results lock — re-derived from committed raws", () => {
     expect(m.sameTotal).toBe(35);
     expect(m.caught / m.sameTotal).toBeLessThan(0.8);
     expect(m.trapMerges).toBe(0);
-    expect(m.trapTotal).toBe(10);
+    expect(m.trapTotal).toBe(14); // §3 binding floor ≥12 (the voided first split had 10)
     expect(m.ambigAbst).toBe(9);
     expect(m.ambigTotal).toBe(10);
-    expect(m.abstains).toBe(11);
+    expect(m.abstains).toBe(10);
     expect(m.abstains / run1.length).toBeLessThanOrEqual(0.3);
   });
 
