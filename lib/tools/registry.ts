@@ -2,9 +2,11 @@
  * A0 TOOL REGISTRY — the ONE seam over the gated engine's existing entry
  * points (plan `docs/plan-agentic-extension.md` §3–§6, §5 row A0).
  *
- * Six typed JSON-in/JSON-out tools, each wrapping an UNCHANGED engine entry
- * point (`lib/packs/listings/cli.ts`, `lib/packs/fees/*`) with a committed
- * input/output JSON Schema and a named canonical serializer. `callTool` is
+ * Seven typed JSON-in/JSON-out tools: six wrapping UNCHANGED engine entry
+ * points (`lib/packs/listings/cli.ts`, `lib/packs/fees/*`) plus the E2
+ * advisory retrieval lane (`lookup_reference`, added 2026-07-12 post-scoring
+ * per its pre-registration §6) — each with a committed input/output JSON
+ * Schema and a named canonical serializer. `callTool` is
  * the ONE call surface every later consumer (A1 MCP server, A2 agent crew,
  * A4 n8n lane) is meant to use: it validates `params` against the tool's
  * committed input schema via ajv BEFORE running the tool, and never swallows
@@ -37,6 +39,7 @@ import { runCheckConformanceTool, type CheckConformanceParams } from "./tools/ch
 import { runAuditStatementTool, type AuditStatementParams } from "./tools/audit-statement.ts";
 import { runClassifyAndAuditTool, type ClassifyAndAuditParams } from "./tools/classify-and-audit.ts";
 import { runGetRuleTool, type GetRuleParams } from "./tools/get-rule.ts";
+import { runLookupReferenceTool, type LookupReferenceParams } from "./tools/lookup-reference.ts";
 import { runRunDemoTool, type RunDemoParams } from "./tools/run-demo.ts";
 
 // Re-export every tool's params type — the one place a consumer imports them from.
@@ -46,6 +49,7 @@ export type {
   AuditStatementParams,
   ClassifyAndAuditParams,
   GetRuleParams,
+  LookupReferenceParams,
   RunDemoParams,
 };
 export type { ToolResult, ToolMetadata } from "./types.ts";
@@ -86,6 +90,15 @@ const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     inputSchema: loadSchema("get_rule.input.schema.json"),
     outputSchema: loadSchema("get_rule.output.schema.json"),
     run: runGetRuleTool,
+  },
+  {
+    // E2 (pre-reg §6, wired post-scoring): advisory extractive retrieval over
+    // the pin-verified corpus — BM25 lane (the floors' pick), permanently
+    // advisory, label deferred (floors not met, RESULTS section).
+    name: "lookup_reference",
+    inputSchema: loadSchema("lookup_reference.input.schema.json"),
+    outputSchema: loadSchema("lookup_reference.output.schema.json"),
+    run: runLookupReferenceTool,
   },
   {
     name: "run_demo",

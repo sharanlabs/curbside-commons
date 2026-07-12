@@ -47,3 +47,20 @@ export type RuleLookupPayload =
 export function serializeRuleLookup(payload: RuleLookupPayload): string {
   return `${JSON.stringify(payload, null, 2)}\n`;
 }
+
+/** The `lookup_reference` canonical payload (E2 pre-reg §6: answer_span + citations + score + abstained, plus the honest lane/label/registration fields). */
+export interface ReferenceLookupPayload {
+  readonly question: string;
+  readonly lane: "bm25";
+  readonly label: string;
+  readonly abstained: boolean;
+  readonly answer_span: string | null;
+  readonly citations: readonly { readonly file: string; readonly anchor: string }[];
+  readonly score: number;
+  readonly registration: string;
+}
+
+/** Canonical serializer for `lookup_reference` — same stable-JSON convention as every other canonical serializer here. */
+export function serializeReferenceLookup(payload: ReferenceLookupPayload): string {
+  return `${JSON.stringify(payload, null, 2)}\n`;
+}

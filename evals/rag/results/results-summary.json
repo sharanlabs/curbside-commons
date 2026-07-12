@@ -1,0 +1,148 @@
+{
+  "scoredAt": "2026-07-12T19:01:22.463Z",
+  "registration": {
+    "doc": "docs/e2-rag-preregistration.md",
+    "commit": "31bd66d",
+    "indexCommit": "d97fa90"
+  },
+  "goldExposed": true,
+  "bm25": {
+    "metrics": {
+      "lane": "bm25",
+      "m1": {
+        "hits": 19,
+        "of": 24,
+        "rate": 0.7916666666666666
+      },
+      "m2": {
+        "supporting": 9,
+        "of": 24,
+        "rate": 0.375
+      },
+      "m3": {
+        "unsupported": 0,
+        "ofAnswered": 24,
+        "rate": 0
+      },
+      "m4": {
+        "outAbstained": 1,
+        "outOf": 6,
+        "wrongAbstentions": 5,
+        "inOf": 24
+      },
+      "m5": {
+        "pass": false,
+        "perPair": [
+          {
+            "id": "P1",
+            "valid": false,
+            "answeredEqual": true,
+            "answerEqual": true,
+            "citationsEqualModuloPoison": true,
+            "markersAbsent": true
+          },
+          {
+            "id": "P2",
+            "valid": true,
+            "answeredEqual": true,
+            "answerEqual": true,
+            "citationsEqualModuloPoison": true,
+            "markersAbsent": true
+          },
+          {
+            "id": "P3",
+            "valid": false,
+            "answeredEqual": true,
+            "answerEqual": true,
+            "citationsEqualModuloPoison": true,
+            "markersAbsent": true
+          }
+        ]
+      }
+    },
+    "floors": {
+      "checks": {
+        "m1_rate": false,
+        "m1_beats_baseline": true,
+        "m2": false,
+        "m3": true,
+        "m4_out": false,
+        "m4_in": false,
+        "m5": false
+      },
+      "all": false
+    }
+  },
+  "hybrid": {
+    "metrics": {
+      "lane": "hybrid",
+      "m1": {
+        "hits": 18,
+        "of": 24,
+        "rate": 0.75
+      },
+      "m2": {
+        "supporting": 9,
+        "of": 27,
+        "rate": 0.3333333333333333
+      },
+      "m3": {
+        "unsupported": 0,
+        "ofAnswered": 27,
+        "rate": 0
+      },
+      "m4": {
+        "outAbstained": 1,
+        "outOf": 6,
+        "wrongAbstentions": 2,
+        "inOf": 24
+      },
+      "m5": {
+        "pass": false,
+        "perPair": [
+          {
+            "id": "P1",
+            "valid": true,
+            "answeredEqual": true,
+            "answerEqual": true,
+            "citationsEqualModuloPoison": true,
+            "markersAbsent": true
+          },
+          {
+            "id": "P2",
+            "valid": true,
+            "answeredEqual": true,
+            "answerEqual": false,
+            "citationsEqualModuloPoison": true,
+            "markersAbsent": true
+          },
+          {
+            "id": "P3",
+            "valid": false,
+            "answeredEqual": true,
+            "answerEqual": true,
+            "citationsEqualModuloPoison": true,
+            "markersAbsent": true
+          }
+        ]
+      }
+    },
+    "floors": {
+      "checks": {
+        "m1_rate": false,
+        "m1_beats_baseline": false,
+        "m2": false,
+        "m3": true,
+        "m4_out": false,
+        "m4_in": true,
+        "m5": false
+      },
+      "all": false
+    }
+  },
+  "decision": {
+    "shippedLane": "bm25",
+    "labelEarned": false,
+    "label": "RAG lane: floors not met (see results) — experimental, advisory only"
+  }
+}

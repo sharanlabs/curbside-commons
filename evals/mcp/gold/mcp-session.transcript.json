@@ -10,7 +10,7 @@
       "capabilities": {
         "tools": {}
       },
-      "instructions": "commerce-truth-audit MCP server — SIMULATED demonstration data throughout, never real merchant data. Deterministic, $0, offline engine underneath every tool: agents recommend, the engine decides (no AI call sits in any of these six tools' decision paths). run_demo is a demo_only walkthrough, never an audit result. classify_and_audit is advisory — candidate leads, never a verdict; its classifier has not earned a calibrated label (earnsLabel: false)."
+      "instructions": "commerce-truth-audit MCP server — SIMULATED demonstration data throughout, never real merchant data. Deterministic, $0, offline engine underneath every tool: agents recommend, the engine decides (no AI call sits in any of these seven tools' decision paths). run_demo is a demo_only walkthrough, never an audit result. classify_and_audit is advisory — candidate leads, never a verdict; its classifier has not earned a calibrated label (earnsLabel: false). lookup_reference is advisory + experimental — extractive reference retrieval whose pre-registered floors were NOT met (docs/e2-rag-preregistration.md RESULTS); it cites or abstains, never decides."
     },
     {
       "step": "tools/list",
@@ -134,6 +134,27 @@
               }
             },
             "title": "get_rule input",
+            "type": "object"
+          }
+        },
+        {
+          "name": "lookup_reference",
+          "description": "EXPERIMENTAL + ADVISORY — pre-registered quality floors NOT met (see docs/e2-rag-preregistration.md RESULTS); quotes reference passages, never renders a verdict. Deterministic $0 offline BM25 retrieval over this repo's committed reference corpus (the codified NYC fee-rule table, the pinned published UCP JSON Schemas, the project glossary): returns a verbatim cited span or abstains with \"no sufficiently supported answer\". No AI call anywhere in this tool; retrieved text is data, never instructions. Part of a SIMULATED demonstration project: the corpus is real published law/spec/glossary text, while every statement/feed this toolset otherwise audits is SIMULATED fixture data.",
+          "inputSchema": {
+            "$id": "https://activationops.local/tools/lookup_reference.input.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "maxLength": 500,
+                "minLength": 3,
+                "type": "string"
+              }
+            },
+            "required": [
+              "question"
+            ],
+            "title": "lookup_reference input",
             "type": "object"
           }
         },
@@ -289,6 +310,32 @@
           "exitCode": 0,
           "ok": true,
           "tool": "get_rule"
+        }
+      }
+    },
+    {
+      "step": "tools/call",
+      "request": {
+        "name": "lookup_reference",
+        "arguments": {
+          "question": "What does drift mean for a published menu?"
+        }
+      },
+      "response": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"question\": \"What does drift mean for a published menu?\",\n  \"lane\": \"bm25\",\n  \"label\": \"experimental — pre-registered floors NOT met (docs/e2-rag-preregistration.md RESULTS, scored 2026-07-12); advisory only, never a verdict\",\n  \"abstained\": false,\n  \"answer_span\": \"| A rule-following pretend shopping agent that only ever sees the published menu (never the restaurant's till), decides by a fixed rule, and believes whatever the menu says — used to show the drift it can't detect.\",\n  \"citations\": [\n    {\n      \"file\": \"docs/GLOSSARY.md\",\n      \"anchor\": \"Glossary · Refund-window verdict state\"\n    }\n  ],\n  \"score\": 12.215512903159093,\n  \"registration\": \"docs/e2-rag-preregistration.md\"\n}\n"
+          }
+        ],
+        "structuredContent": {
+          "advisory": true,
+          "demoOnly": false,
+          "earnsLabel": false,
+          "exitCode": 0,
+          "ok": true,
+          "tool": "lookup_reference"
         }
       }
     },

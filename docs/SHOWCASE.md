@@ -11,12 +11,16 @@ node bin/check.mjs fees fixtures/synthetic-restaurant/fees/statement.drifted.jso
 ```
 A deliberately-drifted fee statement audited against the codified NYC §20-563.3 rule table — every catch carries its receipts (claim · reference · rule id · severity). Exit 1 = violations found (CI-usable). Also: `node bin/check.mjs --feed fixtures/synthetic-restaurant/acp-feed.drifted.json --against fixtures/synthetic-restaurant/sor.catalog.json --surface acp` (menu truth) and `node bin/check.mjs demo` (the scripted walkthrough).
 
-## 1 · The tool registry (A0) — one validated seam, six tools
+## 1 · The tool registry (A0) — one validated seam, seven tools
 
 ```bash
 npx vitest run evals/tools
 ```
-Six JSON-schema-validated tools (`check_feed` · `check_conformance` · `audit_statement` · `classify_and_audit` · `get_rule` · `run_demo`) wrap the engine; `callTool` is the ONLY execution path. The differential suite proves every tool's output is byte-identical to a direct engine call; an import-graph proof shows the whole layer makes zero AI/network calls. Honesty is typed into the envelope: `run_demo` is flagged demo-only, the classifier tool is flagged advisory with `earnsLabel: false`.
+Seven JSON-schema-validated tools (`check_feed` · `check_conformance` · `audit_statement` · `classify_and_audit` · `get_rule` · `lookup_reference` · `run_demo`) wrap the engine; `callTool` is the ONLY execution path. The differential suite proves every engine tool's output is byte-identical to a direct engine call; an import-graph proof shows the whole layer makes zero AI/network calls. Honesty is typed into the envelope: `run_demo` is flagged demo-only; the classifier tool and `lookup_reference` are flagged advisory with `earnsLabel: false`. `lookup_reference` (added 2026-07-12) is the E2 extractive reference-retrieval lane, permanently labeled **experimental** because its pre-registered quality floors were NOT met — the full scoreboard, misses included, is published in `docs/e2-rag-preregistration.md` RESULTS (the simpler BM25 lane shipped: the embedding lane failed to beat it, so the anti-theater rule kept the simpler one).
+
+```bash
+npx vitest run evals/rag         # E2: corpus-pin hard-block gate + gold composition/leakage screens + the results eval-lock
+```
 
 ## 2 · The MCP server (A1) — the standard plug
 

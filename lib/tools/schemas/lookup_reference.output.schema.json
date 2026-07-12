@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activationops.local/tools/lookup_reference.output.schema.json",
+  "title": "lookup_reference output envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tool", "ok", "exitCode", "advisory", "earnsLabel", "canonical"],
+  "properties": {
+    "tool": { "const": "lookup_reference" },
+    "ok": { "type": "boolean", "const": true },
+    "exitCode": { "type": "integer", "const": 0 },
+    "demoOnly": { "type": "boolean", "const": false },
+    "advisory": { "type": "boolean", "const": true },
+    "earnsLabel": { "type": "boolean", "const": false },
+    "canonical": { "type": "string", "minLength": 1 }
+  }
+}

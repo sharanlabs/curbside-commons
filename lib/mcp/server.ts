@@ -1,6 +1,6 @@
 /**
  * A1 MCP SERVER — the stdio Model Context Protocol server exposing the A0
- * tool registry's six tools (plan `docs/plan-agentic-extension.md` §3–§6,
+ * tool registry's tools — six engine tools + the E2 lookup_reference lane (plan `docs/plan-agentic-extension.md` §3–§6,
  * §5 row A1) via the official TypeScript SDK
  * (`@modelcontextprotocol/sdk@1.29.0`, exact-pinned in `package.json`, MIT,
  * freshness-checked live 2026-07-07).
@@ -34,7 +34,7 @@
  * only, wired by the launcher (`bin/mcp-server.mjs`).
  *
  * Plain: this is the "plug adapter" that lets an MCP client (Claude Desktop,
- * an agent framework, an eval harness) press the same six clearly-labeled
+ * an agent framework, an eval harness) press the same seven clearly-labeled
  * buttons the A0 registry already built — over stdin/stdout, never a network
  * socket — using the EXACT rulebook the checker itself validates input
  * against, not a hand-copied one. A bad input still gets refused loudly; a
@@ -69,11 +69,14 @@ function readPackageVersion(): string {
 const SERVER_INSTRUCTIONS =
   "commerce-truth-audit MCP server — SIMULATED demonstration data throughout, never real " +
   "merchant data. Deterministic, $0, offline engine underneath every tool: agents recommend, " +
-  "the engine decides (no AI call sits in any of these six tools' decision paths). run_demo is " +
+  "the engine decides (no AI call sits in any of these seven tools' decision paths). run_demo is " +
   "a demo_only walkthrough, never an audit result. classify_and_audit is advisory — candidate " +
-  "leads, never a verdict; its classifier has not earned a calibrated label (earnsLabel: false).";
+  "leads, never a verdict; its classifier has not earned a calibrated label (earnsLabel: false). " +
+  "lookup_reference is advisory + experimental — extractive reference retrieval whose " +
+  "pre-registered floors were NOT met (docs/e2-rag-preregistration.md RESULTS); it cites or " +
+  "abstains, never decides.";
 
-/** The six tool names, in the A0 registry's own definition order (never hand-duplicated). */
+/** The tool names (six engine tools + lookup_reference), in the A0 registry's own definition order (never hand-duplicated). */
 const TOOL_ORDER: readonly string[] = Object.freeze([...TOOLS.keys()]);
 
 /** One `tools/list` entry: name + committed description + the VERBATIM committed input schema. */
@@ -177,8 +180,8 @@ function toolCallResult(name: string, rawArgs: unknown): CallToolResult {
 }
 
 /**
- * Build a fresh, UNCONNECTED `Server` instance exposing the A0 registry's six
- * tools over MCP. The caller (`bin/mcp-server.mjs`) attaches the stdio
+ * Build a fresh, UNCONNECTED `Server` instance exposing all of the A0
+ * registry's tools over MCP. The caller (`bin/mcp-server.mjs`) attaches the stdio
  * transport and calls `connect`.
  */
 export function createMcpServer(): Server {

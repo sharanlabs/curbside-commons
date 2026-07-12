@@ -51,14 +51,16 @@ describe("MCP scripted-client transcript is byte-frozen", () => {
     expect(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(committed)).toBe(false);
   });
 
-  it("the committed transcript's session shape matches the packet: initialize -> tools/list -> 6 happy calls -> 2 invalid calls", () => {
+  // 7 happy calls since 2026-07-12: the E2 lookup_reference tool joined the
+  // registry (pre-reg §6) and the scripted session exercises every tool once.
+  it("the committed transcript's session shape matches the packet: initialize -> tools/list -> 7 happy calls -> 2 invalid calls", () => {
     const transcript = JSON.parse(readFileSync(golden, "utf8")) as {
       steps: ReadonlyArray<{ step: string }>;
     };
     const stepNames = transcript.steps.map((s) => s.step);
     expect(stepNames[0]).toBe("initialize");
     expect(stepNames[1]).toBe("tools/list");
-    expect(stepNames.filter((s) => s === "tools/call")).toHaveLength(6);
+    expect(stepNames.filter((s) => s === "tools/call")).toHaveLength(7);
     expect(stepNames.filter((s) => s === "tools/call (invalid)")).toHaveLength(2);
   });
 });

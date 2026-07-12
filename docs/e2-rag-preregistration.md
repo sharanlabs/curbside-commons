@@ -163,4 +163,67 @@ only" — the lane may still ship as clearly-labeled experimental, per the hones
 
 ## RESULTS (appended after the one scoring pass — nothing above this line changes)
 
-*(empty at registration — batch C reviews this document with this section empty)*
+**Scored 2026-07-12 (one pass, network-denied; the gold set is now EXPOSED and never
+re-scorable).** Chain (git-provable, §7.1): registration `31bd66d` → index `d97fa90` →
+gold `c4396f0` → harness `fe6100c` → this results commit. Composition + leakage tests
+were green BEFORE scoring (§7.2; 12/12 at `c4396f0`). Raws flushed BEFORE metrics
+(§7.3): `evals/rag/results/raw-items.jsonl` (66 records: 30 items × 2 lanes + 3 pairs
+× 2 lanes). Network-denied clean run (§7.5):
+`node --import ./evals/rag/net-blocker.mjs scripts-ts/rag-score.mts` → **exit 0**
+(every network API replaced with a throwing stub for the whole process).
+
+### Floors, applied mechanically (conjunctive — §5 + amendments)
+
+| Metric | BM25 baseline | Hybrid | Floor | Verdict |
+| --- | --- | --- | --- | --- |
+| M1 hit-rate@5 | **19/24 (0.792)** | 18/24 (0.750) | ≥ 0.85 AND hybrid strictly > BM25 | **BOTH MISS**; hybrid ≤ BM25 → the simpler lane ships |
+| M2 citation precision | 9/24 (0.375) | 9/27 (0.333) | ≥ 0.90 | **MISS** |
+| M3 unsupported-answer rate | 0.000 | 0.000 | ≤ 0.05 | met (structural guarantee held) |
+| M4 abstention | 1/6 out abstained · 5 wrong in-abstentions | 1/6 · 2 | ≥ 5/6 AND ≤ 4 | **MISS (both sides for BM25; out-side for hybrid)** |
+| M5 injection resistance | 1/3 pairs valid+clean | 2/3 | 100% | **MISS** (see below) |
+
+**LABEL (per §5): "RAG lane: floors not met (see results) — experimental, advisory
+only."** The shipped lane is **BM25** (hybrid failed to strictly beat it on M1 — the
+anti-theater clause fired: the embedding lane did NOT earn its complexity). The lane
+ships as clearly-labeled experimental, advisory-only, per the registration.
+
+▸ *Plain: we built it, graded it against the bars we locked in advance, and it missed
+them. So it does NOT get the "validated" label — it ships marked "experimental," the
+scoreboard is published, and the simpler of the two search methods is the one kept,
+because the fancier one didn't beat it.*
+
+### What actually failed (from the committed raws)
+
+- **M1** — every miss is a UCP-schema item (BM25: S1/S2/S4/S5/S8; hybrid also S3/S6):
+  paraphrased questions vs 78 lexically-similar JSON files is a genuine vocabulary-gap
+  retrieval problem; neither word-matching nor MiniLM-class embeddings closed it.
+- **M4 (the biggest honest finding)** — 5 of 6 out-of-corpus questions were ANSWERED
+  by both lanes. The gold out-items are deliberately domain-ADJACENT (penalties,
+  California caps, live commission rates); the scratch probes that froze the
+  thresholds were more distant (weather/VAT/lawsuit). The frozen thresholds did not
+  transfer: abstention calibration on near-domain unanswerables is genuinely weak.
+- **M5** — behavioral inertness held everywhere it was exercised: markers absent from
+  all decision fields 6/6 lane-pairs, citations stable 6/6, answers byte-equal 5/6.
+  The failures are: P1+P3 (BM25) and P3 (hybrid) never pulled the poisoned chunk into
+  top-5 (the registered validity rule counts an unexercised counterfactual as INVALID,
+  not as a pass), and P2 (hybrid) shifted its answer span under poisoning (a real
+  behavioral deviation, caught exactly as registered).
+- **M2 disclosure (gold-design artifact, numbers stand)** — the support check binds a
+  citation to the item's REGISTERED span(s); several cited chunks contain equivalent
+  answering content from a DIFFERENT corpus location (e.g. the summary table row
+  instead of the registered rule-table row) and score "unsupported" as registered.
+  The metric is kept as-registered (no post-hoc regrade); the artifact is named here
+  and the per-item audit list lives in the raws.
+
+### Consequences (registered §6 contract, applied)
+
+- `lookup_reference` ships over the **BM25** lane (deterministic, zero runtime
+  embedding dependency), envelope-labeled **experimental / floors-not-met / advisory**
+  with a pointer to this section. Registry + MCP exposure per §6; the eval-lock test
+  (`evals/rag/rag-results-lock.test.ts`) re-derives every number above from the
+  committed raws forever.
+- **Crew consumption: DEFERRED** (deliberate §6 "MAY" decision) — an experimental
+  lane does not enter the crew's allowlist; revisiting requires the floors met on a
+  fresh registration.
+- A re-attempt requires a FRESH pre-registered gold set and a new registration row —
+  this split is exposed and dead for scoring.

@@ -9,7 +9,8 @@ import { connectMcpClient, MCP_TEST_TIMEOUT_MS } from "./harness.ts";
 
 /**
  * AC-4 — MCP conformance (plan §4 AC-4, §5 row A1): `tools/list` over a REAL
- * spawned server returns exactly the six A0 tools, in registry order, each
+ * spawned server returns exactly the registry's tools (six engine tools + the
+ * E2 lookup_reference), in registry order, each
  * with its committed input schema (canonicalized — see `canonical-json.mjs`
  * for why a raw byte comparison would spuriously fail on SDK key reordering)
  * and its committed honesty-labeled description.
@@ -24,6 +25,7 @@ const EXPECTED_TOOL_ORDER = [
   "audit_statement",
   "classify_and_audit",
   "get_rule",
+  "lookup_reference", // E2 advisory retrieval (pre-reg §6, added 2026-07-12 post-scoring)
   "run_demo",
 ] as const;
 
@@ -42,7 +44,7 @@ describe("AC-4 MCP conformance — tools/list (real spawned server)", () => {
   }, MCP_TEST_TIMEOUT_MS);
 
   it(
-    "returns EXACTLY the six A0 tools, in the registry's own definition order",
+    "returns EXACTLY the registry's seven tools, in its own definition order",
     async () => {
       const { tools } = await client.listTools();
       expect(tools.map((t) => t.name)).toEqual([...EXPECTED_TOOL_ORDER]);
@@ -97,7 +99,7 @@ describe("AC-4 MCP conformance — tools/list (real spawned server)", () => {
   );
 
   it(
-    "every one of the six descriptions states the data is SIMULATED (or, for get_rule, precisely scopes the real-law exception)",
+    "every description states the data is SIMULATED (or, for get_rule/lookup_reference, precisely scopes the real-published-text exception)",
     async () => {
       const { tools } = await client.listTools();
       for (const tool of tools) {

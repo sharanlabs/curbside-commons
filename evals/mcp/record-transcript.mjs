@@ -84,6 +84,10 @@ const HAPPY_CALLS = [
     arguments: { statementPath: "fixtures/synthetic-restaurant/fees/statement.faithful.json" },
   },
   { name: "get_rule", arguments: { ruleId: "NYC-563.3-a-1" } },
+  // E2 (pre-reg §6): a question whose top BM25 hit clears the frozen
+  // threshold deterministically — the transcript shows an answered, cited,
+  // advisory/experimental-labeled lookup.
+  { name: "lookup_reference", arguments: { question: "What does drift mean for a published menu?" } },
   { name: "run_demo", arguments: { format: "json" } },
 ];
 
