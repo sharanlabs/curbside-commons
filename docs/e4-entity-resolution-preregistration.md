@@ -113,4 +113,54 @@ floors not met (see results) — experimental, advisory only."
 
 ## RESULTS (appended after the one scoring pass — nothing above this line changes)
 
-*(empty at registration — batch C reviews this document with this section empty)*
+**Scored 2026-07-12 (one pass; the test split is now EXPOSED and never re-scorable).**
+Chain (git-provable, §6.1): registration `31bd66d` → corpus freeze + composition tests
+green (`e5f42c1`, 8/8 incl. the A1 minimums: 35 SAME · 32 general DIFFERENT · 10 trap ·
+10 AMBIGUOUS, disjoint bases, generator freeze-integrity) → threshold freeze
+(`705e54a`, tune-split-only: T_match 0.999 · T_abstain 0.849, with the honest
+pre-scoring read RECORDED BEFORE the pass: best feasible tune recall was 0.60, so an
+M2 miss was expected) → harness commit → this results commit. Raws:
+`evals/entity/results/raw-pairs.json` (both determinism runs, 87 pairs each).
+
+### Floors, applied mechanically (conjunctive)
+
+| Metric | Ensemble | Baseline (A2 normalized-exact) | Floor | Verdict |
+| --- | --- | --- | --- | --- |
+| M1 merge precision | **18/18 = 1.000** | 18/18 = 1.000 | ≥ 0.98 | met |
+| M2 merge recall | **18/35 = 0.514** | 18/35 = 0.514 | ≥ 0.80 | **MISS** |
+| M3 trap resistance | **0/10 false merges** | 0/10 | 100% | met |
+| M4 fail-to-human | **9/10 ambiguous abstained (0.90) · abstain volume 0.126** | (never abstains) | ≥ 0.75 AND ≤ 0.30 | met |
+| M5 determinism | **two runs byte-identical** | — | 100% | met |
+| A1 denominators | all four non-zero (18 / 35 / 10 / 10) | — | non-zero | met |
+
+**Baseline comparison (anti-theater):** the ensemble TIES the protected
+normalized-exact default on M1, M2, and M3 — it does not strictly beat it on M2, so
+**the protected default is also the shipped default, and this writeup says so.**
+Under the hard 100% trap floor, the ensemble's usable match region collapses to
+scores ≈ 1.0 (i.e. exactly the normalized-equal pairs the baseline already catches);
+its one genuinely added behavior is SAFE ROUTING — 11 of 87 pairs abstained to the
+human, including 9 of the 10 deliberately-ambiguous branch/expansion pairs, which the
+baseline (which never abstains) force-labels.
+
+**LABEL (per §5): "entity resolution: floors not met (see results) — experimental,
+advisory only."** Exact matching remains the system default everywhere (it always
+was — §1); no advisory surface consumes this lane pending floors met on a fresh
+registration. Lock: `evals/entity/entity-results-lock.test.ts` re-derives every
+number above from the committed raws forever.
+
+▸ *Plain: the fuzzy name-matcher turned out to be no better than careful exact
+matching once we required it to NEVER confuse two similar-but-different businesses —
+so the careful exact matching stays, the fuzzy layer is labeled "experimental, not
+validated," and the one thing it demonstrably does well (sending genuinely uncertain
+cases to a human instead of guessing) is documented with the scoreboard. The bars
+didn't move after the fact; the miss is published.*
+
+### What the misses teach (named, not spun)
+
+- The trap class works as designed: "Fog City Tacos" vs "Fog City Taqueria"-shaped
+  pairs score as high as genuine typo variants, so ANY threshold that guarantees
+  zero false merges also rejects most typo/word-order true matches. Closing that gap
+  needs evidence beyond the name string (address, registry id) — out of scope for
+  this synthetic-corpus lane and named here rather than simulated away.
+- A re-attempt requires a fresh registered split and a new registration row; this
+  split is exposed and dead for scoring.

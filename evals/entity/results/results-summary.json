@@ -1,0 +1,89 @@
+{
+  "scoredAt": "2026-07-12",
+  "registration": {
+    "doc": "docs/e4-entity-resolution-preregistration.md",
+    "commit": "31bd66d"
+  },
+  "thresholds": {
+    "_doc": "E4 thresholds — tuned on the TUNE split ONLY (scripts-ts/tune-entity-thresholds.mts; corpus.test never read), FROZEN before scoring per docs/e4-entity-resolution-preregistration.md §4. No post-hoc changes.",
+    "tMatch": 0.999,
+    "tAbstain": 0.849,
+    "tuneMetricsAtPick": {
+      "tMatch": 0.999,
+      "tAbstain": 0.849,
+      "precision": 1,
+      "recall": 0.6,
+      "trapOk": true,
+      "ambigAbstain": 0.75,
+      "abstainVol": 0.1
+    },
+    "ensembleWeights": {
+      "jaroWinkler": 0.5,
+      "tokenSet": 0.35,
+      "phonetic": 0.15
+    },
+    "frozenAt": "2026-07-12 (pre-scoring)"
+  },
+  "testExposed": true,
+  "ensemble": {
+    "m1": {
+      "truly": 18,
+      "proposedSame": 18,
+      "precision": 1
+    },
+    "m2": {
+      "sameCaught": 18,
+      "sameTotal": 35,
+      "recall": 0.5142857142857142
+    },
+    "m3": {
+      "trapMerges": 0,
+      "trapTotal": 10
+    },
+    "m4": {
+      "ambigAbstained": 9,
+      "ambigTotal": 10,
+      "rate": 0.9,
+      "abstainVolume": 0.12643678160919541
+    },
+    "zeroDenominator": false
+  },
+  "baseline": {
+    "m1": {
+      "truly": 18,
+      "proposedSame": 18,
+      "precision": 1
+    },
+    "m2": {
+      "sameCaught": 18,
+      "sameTotal": 35,
+      "recall": 0.5142857142857142
+    },
+    "m3": {
+      "trapMerges": 0,
+      "trapTotal": 10
+    },
+    "m4": {
+      "ambigAbstained": 0,
+      "ambigTotal": 10,
+      "rate": 0,
+      "abstainVolume": 0
+    },
+    "zeroDenominator": false
+  },
+  "floors": {
+    "m1": true,
+    "m2": false,
+    "m3": true,
+    "m4": true,
+    "m5": true,
+    "denominators": true
+  },
+  "allFloors": false,
+  "beatsBaseline": false,
+  "decision": {
+    "shippedDefault": "normalized-exact (the protected default)",
+    "labelEarned": false,
+    "label": "entity resolution: floors not met (see results) — experimental, advisory only"
+  }
+}
