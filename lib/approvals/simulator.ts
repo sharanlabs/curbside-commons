@@ -19,6 +19,13 @@
  * nonce), signature verified over bytes THIS module rebuilds — never bytes
  * the wire supplied.
  *
+ * The step-6 payload now covers the REQUEST's `caseId`, `action`, and
+ * `expiresAtMs` as well (batch-D P1): those fields were previously unsigned,
+ * so a request tampered after signing could redirect the case, change the
+ * action, or extend a dead approval's expiry and still verify. They are
+ * signature-bound now, which is what makes step 2's expiry check and the
+ * execution record's case/action fields trustworthy rather than decorative.
+ *
  * Plain: seven locked doors in a fixed order between "someone sent a signed
  * yes" and "the simulator records it as done" — wrong paperwork, stale
  * paperwork, reused paperwork, unknown signer, under-powered signer, fake
@@ -62,6 +69,15 @@ export function subjectDigestOf(record: CrewRecordForApproval): string {
   return sha256Hex(canonicalContentJson(record));
 }
 
+/**
+ * Identifier charset for `caseId` and `nonce` (batch-D P3 fix): the audit line
+ * is contractually ONE line, and it interpolates both raw. Unconstrained
+ * identifiers let a newline-bearing caseId forge extra audit lines, so the
+ * constructor rejects anything outside `[A-Za-z0-9._:-]` — no whitespace, no
+ * control characters, no separators.
+ */
+const SAFE_ID = /^[A-Za-z0-9._:-]+$/;
+
 /** Create an approval request bound to one crew record. Pure given its inputs. */
 export function createApprovalRequest(
   record: CrewRecordForApproval,
@@ -69,6 +85,12 @@ export function createApprovalRequest(
 ): ApprovalRequest {
   if (opts.ttlMs <= 0) throw new Error(`createApprovalRequest: ttlMs must be positive, got ${opts.ttlMs}`);
   if (opts.nonce.length === 0) throw new Error("createApprovalRequest: nonce must be non-empty");
+  if (!SAFE_ID.test(opts.nonce)) {
+    throw new Error(`createApprovalRequest: nonce must match ${SAFE_ID} (audit-line integrity), got ${JSON.stringify(opts.nonce)}`);
+  }
+  if (!SAFE_ID.test(record.caseId)) {
+    throw new Error(`createApprovalRequest: caseId must match ${SAFE_ID} (audit-line integrity), got ${JSON.stringify(record.caseId)}`);
+  }
   const requestedAtMs = opts.clock.nowMs();
   return Object.freeze({
     requestId: `apr-${record.caseId}-${opts.nonce}`,
@@ -96,9 +118,12 @@ export function signDecision(
   const decidedAtMs = clock.nowMs();
   const payload = canonicalSigningBytes({
     requestId: request.requestId,
+    caseId: request.caseId,
+    action: request.action,
     decision,
     signerKeyId,
     decidedAtMs,
+    expiresAtMs: request.expiresAtMs,
     subjectDigest: request.subjectDigest,
     nonce: request.nonce,
   });
@@ -153,11 +178,17 @@ export function verifyAndExecute(
   }
   // 6 — signature over the RECOMPUTED canonical payload (nonce from the
   // REQUEST; digest as attested by the decision — cross-checked in step 7).
+  // caseId / action / expiresAtMs come from the REQUEST — so a request tampered
+  // after signing (swapped case, swapped action, EXTENDED EXPIRY) changes these
+  // bytes and the signature fails. That is the batch-D P1 fix.
   const payload = canonicalSigningBytes({
     requestId: decision.requestId,
+    caseId: request.caseId,
+    action: request.action,
     decision: decision.decision,
     signerKeyId: decision.signerKeyId,
     decidedAtMs: decision.decidedAtMs,
+    expiresAtMs: request.expiresAtMs,
     subjectDigest: decision.subjectDigest,
     nonce: request.nonce,
   });

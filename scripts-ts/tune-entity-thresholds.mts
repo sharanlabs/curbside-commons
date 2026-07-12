@@ -15,10 +15,22 @@ import { join } from "node:path";
 import { ensembleScore } from "../lib/entity/matcher.ts";
 
 interface Pair { id: string; a: string; b: string; label: string; trap: boolean; }
-const corpus = JSON.parse(readFileSync(join(process.cwd(), "evals/entity/gold/entity-pairs.json"), "utf8")) as {
-  tune: Pair[];
-};
-const tune = corpus.tune; // the ONLY split this script touches
+
+/**
+ * PHYSICAL test-split isolation (batch-D P2): the corpus file holds BOTH
+ * splits, so this loader parses it, lifts ONLY `.tune`, and lets the rest go
+ * out of scope immediately — no `.test` value is ever bound to a name in this
+ * program. (The honest limitation, stated: the bytes of both splits do pass
+ * through the JSON parser; what is enforced here is that no test-derived value
+ * can reach any computation below.)
+ */
+function loadTuneSplitOnly(): Pair[] {
+  const parsed = JSON.parse(readFileSync(join(process.cwd(), "evals/entity/gold/entity-pairs.json"), "utf8")) as {
+    tune: Pair[];
+  };
+  return parsed.tune;
+}
+const tune = loadTuneSplitOnly(); // the ONLY split this script touches
 
 const scored = tune.map((p) => ({ ...p, score: ensembleScore(p.a, p.b) }));
 

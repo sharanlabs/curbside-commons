@@ -48,10 +48,17 @@ describe("E4 corpus composition (A1 minimums, checked BEFORE scoring)", () => {
   const traps = test.filter((p) => p.trap);
   const ambig = test.filter((p) => p.label === "AMBIGUOUS");
 
-  it("A1 denominator minimums: ≥30 SAME · ≥30 general DIFFERENT · ≥8 trap · ≥8 AMBIGUOUS", () => {
+  it("§3 + A1 minimums, CONJUNCTIVE: ≥60 pairs · ≥30 SAME · ≥30 general DIFFERENT · ≥12 traps (§3 binds over A1's ≥8) · ≥8 AMBIGUOUS", () => {
+    // BATCH-D P1: the first corpus had 10 traps — it satisfied AMENDMENT A1's
+    // ≥8 but VIOLATED §3's ≥12, and this gate only checked A1. An amendment may
+    // only tighten, so the binding floor is max(12, 8) = 12. That run was VOID;
+    // this asserts both registrations at once so the weaker one can never again
+    // be mistaken for the whole contract.
+    expect(test.length).toBeGreaterThanOrEqual(60);
     expect(same.length).toBeGreaterThanOrEqual(30);
     expect(generalDiff.length).toBeGreaterThanOrEqual(30);
-    expect(traps.length).toBeGreaterThanOrEqual(8);
+    expect(traps.length, "§3 requires ≥12 near-miss traps").toBeGreaterThanOrEqual(12);
+    expect(traps.length, "AMENDMENT A1 requires ≥8 traps").toBeGreaterThanOrEqual(8);
     expect(ambig.length).toBeGreaterThanOrEqual(8);
   });
 

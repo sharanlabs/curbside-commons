@@ -21,12 +21,20 @@ import type { SigningPayloadFields } from "./types.ts";
 
 /** Canonical bytes the Ed25519 signature covers (sorted keys, compact JSON). */
 export function canonicalSigningBytes(fields: SigningPayloadFields): Buffer {
-  if (!Number.isFinite(fields.decidedAtMs)) {
-    throw new Error(`canonicalSigningBytes: decidedAtMs must be finite, got ${fields.decidedAtMs}`);
+  for (const [name, value] of [
+    ["decidedAtMs", fields.decidedAtMs],
+    ["expiresAtMs", fields.expiresAtMs],
+  ] as const) {
+    if (!Number.isFinite(value)) {
+      throw new Error(`canonicalSigningBytes: ${name} must be finite, got ${value}`);
+    }
   }
   const sorted = {
+    action: fields.action,
+    caseId: fields.caseId,
     decidedAtMs: fields.decidedAtMs,
     decision: fields.decision,
+    expiresAtMs: fields.expiresAtMs,
     nonce: fields.nonce,
     requestId: fields.requestId,
     signerKeyId: fields.signerKeyId,

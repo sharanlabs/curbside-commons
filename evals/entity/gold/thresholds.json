@@ -6,10 +6,10 @@
     "tMatch": 0.999,
     "tAbstain": 0.849,
     "precision": 1,
-    "recall": 0.6,
+    "recall": 0.55,
     "trapOk": true,
     "ambigAbstain": 0.75,
-    "abstainVol": 0.1
+    "abstainVol": 0.11904761904761904
   },
   "ensembleWeights": {
     "jaroWinkler": 0.5,

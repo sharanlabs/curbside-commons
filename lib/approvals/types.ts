@@ -81,15 +81,29 @@ export interface ApprovalRequest {
 }
 
 /**
- * The six fields the Ed25519 signature covers. The ONE canonical serialization
- * of exactly these keys (sorted, no whitespace) is documented in `canonical.ts`
- * — a key-order or type-confusion variance would be signature malleability.
+ * The NINE fields the Ed25519 signature covers. The ONE canonical
+ * serialization of exactly these keys (sorted, no whitespace) is documented in
+ * `canonical.ts` — a key-order or type-confusion variance would be signature
+ * malleability.
+ *
+ * BATCH-D P1 FIX (2026-07-12): `caseId`, `action`, and `expiresAtMs` are now
+ * SIGNED. Before this, the request object was unsigned and unbound: an
+ * attacker who could alter a request after signing could swap the case, swap
+ * the action, or EXTEND THE EXPIRY, and all seven checks still passed (the
+ * reviewer demonstrated exactly that with a read-only exploit probe). These
+ * three fields are sourced from the REQUEST at both signing and verification,
+ * so any post-signature tamper of them changes the recomputed payload and the
+ * signature fails — the expiry, the case, and the action are now part of what
+ * the human actually signed.
  */
 export interface SigningPayloadFields {
   readonly requestId: string;
+  readonly caseId: string;
+  readonly action: ApprovalAction;
   readonly decision: ApprovalVerdict;
   readonly signerKeyId: string;
   readonly decidedAtMs: number;
+  readonly expiresAtMs: number;
   readonly subjectDigest: string;
   readonly nonce: string;
 }

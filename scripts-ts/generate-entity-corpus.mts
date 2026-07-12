@@ -14,9 +14,11 @@
  * hand-templated branch/expansion cases where even a careful human would
  * need more evidence.
  *
- * A1 minimums (machine-checked by the composition test BEFORE scoring):
- * test split ≥30 SAME · ≥30 general DIFFERENT · ≥8 trap · ≥8 AMBIGUOUS ·
- * ≥6 per variant class · exactly one label per pair.
+ * Floors machine-checked by the composition test BEFORE scoring: §3 test-split
+ * minimums (≥60 pairs · ≥6 per variant class · **≥12 near-miss traps** · ≥8
+ * ambiguous) CONJUNCTIVE with AMENDMENT A1's denominator minimums (≥30 SAME ·
+ * ≥30 general DIFFERENT · ≥8 trap · ≥8 AMBIGUOUS) — the BINDING trap floor is
+ * max(12, 8) = 12. Exactly one label per pair.
  *
  * Run: node scripts-ts/generate-entity-corpus.mts
  */
@@ -24,7 +26,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 // ── deterministic PRNG (mulberry32, fixed registered seed) ──────────────────
-const SEED = 20260712;
+const SEED = 20260712_02; // batch-D: FRESH seed — the 20260712 split was VOID (10 traps < the §3 ≥12 minimum) and is exposed; this is a new registered split
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -206,8 +208,11 @@ const corpus = {
   registration: { doc: "docs/e4-entity-resolution-preregistration.md", commit: "31bd66d" },
   tuneBases: TUNE_BASES,
   testBases: TEST_BASES,
-  tune: generateSplit(TUNE_BASES, "tune", { same: 20, diff: 12, trap: 4, ambig: 4 }),
-  test: generateSplit(TEST_BASES, "test", { same: 35, diff: 32, trap: 10, ambig: 10 }),
+  tune: generateSplit(TUNE_BASES, "tune", { same: 20, diff: 12, trap: 6, ambig: 4 }),
+  // trap: 14 — §3 binds at >=12 near-miss traps (AMENDMENT A1's >=8 is an
+  // ADDITIONAL denominator floor, never a relaxation). The first run used 10
+  // and was VOID; this split satisfies max(12, 8) = 12 with headroom.
+  test: generateSplit(TEST_BASES, "test", { same: 35, diff: 32, trap: 14, ambig: 10 }),
 };
 
 const out = join(process.cwd(), "evals/entity/gold/entity-pairs.json");

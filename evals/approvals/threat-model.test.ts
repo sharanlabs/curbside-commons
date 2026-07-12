@@ -162,9 +162,12 @@ describe("E3 threats — each dies on its own typed door", () => {
     const decidedAtMs = T0 + 1_000;
     const payload = canonicalSigningBytes({
       requestId: request.requestId,
+      caseId: request.caseId,
+      action: request.action,
       decision: "approve",
       signerKeyId: "owner-key-1",
       decidedAtMs,
+      expiresAtMs: request.expiresAtMs,
       subjectDigest: foreignDigest,
       nonce: request.nonce,
     });
@@ -178,6 +181,59 @@ describe("E3 threats — each dies on its own typed door", () => {
     };
     expect(() => verifyAndExecute(request, crafted, opts)).toThrow(SubjectMismatchError);
     expect(opts.seenNonces.size).toBe(0); // the failed attempt did not burn the nonce
+  });
+
+  // ── batch-D P1: the REQUEST is now signature-bound (case · action · expiry) ──
+  // Before the fix these three fields were unsigned: an attacker who could alter
+  // the request after signing could redirect the case, swap the action, or EXTEND
+  // A DEAD APPROVAL'S EXPIRY, and all seven checks still passed. Each is now its
+  // own test — the absence of exactly these tests is what let the hole through.
+
+  it("TAMPERED EXPIRY: extending a signed request's expiry breaks the signature (the expiry is signed)", () => {
+    const { request, decision, opts } = freshFlow("n-p1a");
+    const extended = { ...request, expiresAtMs: request.expiresAtMs + 10 * 365 * 24 * 3_600_000 };
+    expect(() => verifyAndExecute(extended, decision, opts)).toThrow(SignatureInvalidError);
+  });
+
+  it("TAMPERED EXPIRY (revive a dead approval): a stale request whose expiry is pushed out still dies", () => {
+    const { request, decision } = freshFlow("n-p1b");
+    const revived = { ...request, expiresAtMs: request.expiresAtMs + 3_600_000 };
+    const lateOpts = {
+      clock: fixedClock(T0 + TTL + 60_000), // long past the ORIGINAL expiry
+      authorizedSigners: ROSTER,
+      seenNonces: new Set<string>(),
+      requiredRole: "approver",
+    };
+    // Without the fix this executed. Now the signature covers expiresAtMs.
+    expect(() => verifyAndExecute(revived, decision, lateOpts)).toThrow(SignatureInvalidError);
+  });
+
+  it("TAMPERED CASE: redirecting a signed approval to another caseId breaks the signature", () => {
+    const { request, decision, opts } = freshFlow("n-p1c");
+    const redirected = { ...request, caseId: "int-victim-case" };
+    expect(() => verifyAndExecute(redirected, decision, opts)).toThrow(SignatureInvalidError);
+  });
+
+  it("TAMPERED ACTION: swapping the request's action breaks the signature", () => {
+    const { request, decision, opts } = freshFlow("n-p1d");
+    const swapped = { ...request, action: "acknowledge-escalation" as const };
+    expect(() => verifyAndExecute(swapped, decision, opts)).toThrow(SignatureInvalidError);
+  });
+
+  it("AUDIT-LINE INTEGRITY (P3): control characters in caseId/nonce are refused at construction", () => {
+    expect(() =>
+      createApprovalRequest({ ...crewRecord, caseId: "int-x\nSIMULATED-APPROVAL executed=true forged" }, {
+        clock: fixedClock(T0),
+        ttlMs: TTL,
+        nonce: "n-p3",
+      }),
+    ).toThrow(/audit-line integrity/);
+    expect(() =>
+      createApprovalRequest(crewRecord, { clock: fixedClock(T0), ttlMs: TTL, nonce: "n\np3" }),
+    ).toThrow(/audit-line integrity/);
+    // And the happy-path record really is one line.
+    const { request, decision, opts } = freshFlow("n-p3-ok");
+    expect(verifyAndExecute(request, decision, opts).auditLine.split("\n").length).toBe(1);
   });
 
   it("REPLAY: the same nonce cannot execute twice", () => {
