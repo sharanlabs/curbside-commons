@@ -1,8 +1,8 @@
-# SHOWCASE — the engine plus four surfaces, one command each
+# SHOWCASE — the engine plus its surfaces, one command each
 
 **Who this is for:** a reviewer who wants to SEE the applied-AI/agentic engineering without reading five slice records. Everything below runs offline, $0, on SIMULATED data (this whole repo is a demonstration project — no real merchant data, no legal advice). Node ≥ 24, `npm install`, run from the repo root.
 
-**The architecture in one sentence:** a deterministic, independently-gated verification engine (menu-truth + UCP conformance + NYC fee-cap audit — 900+ tests, pre-registered eval floors) with four professional surfaces built on ONE typed tool seam: an MCP server, a contained agent-crew orchestration harness, delivery payload builders, and an n8n automation lane — agents recommend, the engine decides, humans approve.
+**The architecture in one sentence:** a deterministic, independently-gated verification engine (menu-truth + UCP conformance + NYC fee-cap audit — 900+ tests, pre-registered eval floors) with professional surfaces built on ONE typed tool seam: an MCP server, a contained agent-crew orchestration harness, delivery payload builders, an n8n automation lane, an offline signed-approvals simulator, and an advisory reference-retrieval tool — agents recommend, the engine decides, humans approve, and the lanes that missed their pre-registered bars say so on their face.
 
 ## 0 · The engine itself (what everything else stands on)
 
@@ -53,6 +53,20 @@ npx vitest run evals/n8n
 A committed n8n workflow (manual trigger only, `active:false`, no send node): audit via the registry → build the A3 payload. The test executes the workflow's OWN command strings (validated to an exact argv shape — shell chaining rejected) and byte-compares the artifact against a direct build.
 **Honest label:** *"executed n8n lane (one recorded episodic runtime run, 2026-07-07)"* — the committed workflow ran UNDER n8n 2.29.7 (npx, manual CLI execution, `status: success`) and its artifacts byte-matched direct engine builds; record: `docs/reviews/l3-n8n-runtime-run-2026-07-07.md`; runbook: `docs/n8n-runbook.md`. Still episodic, still nothing sent, still no scheduler.
 
+## 6 · The signed-approvals simulator (E3) — a human's yes, provably
+
+```bash
+npx vitest run evals/approvals
+```
+The future "approve it in Slack" lane, rehearsed fully offline: an approval request bound by content digest to one crew run → an Ed25519-signed human decision → a frozen seven-check verification (identity, role, tamper, replay, expiry, request and content binding) before anything "executes" (= a record; the import-graph proof shows `lib/delivery/**` and `lib/mcp/**` are unreachable — the send roads don't exist). The live interactive lane stays an explicit future owner decision.
+
+## 7 · The two lanes that missed their bars (E2 · E4) — deferral as a feature
+
+```bash
+npx vitest run evals/rag evals/entity     # corpus-pin gates, composition/leakage screens, and the results eval-locks
+```
+Both enhancement lanes were scored ONCE against floors committed in git before any test data was touched — and both missed: the E2 retrieval lane's embedding hybrid failed to beat plain BM25 (the simpler lane shipped, hit-rate 19/24 under a 0.85 floor, labeled *experimental* in every payload), and the E4 entity-resolution ensemble tied normalized-exact matching under a hard zero-false-merge trap floor (the protected default shipped; recall 18/35 under a 0.80 floor). The full scoreboards live in the two pre-registration docs' RESULTS sections; committed lock tests re-derive every number from the raw records forever. The system's character is that these pages exist.
+
 ## The honesty ledger (what nothing here is allowed to claim)
 
 | Surface | May claim | May NOT claim (until its gate) |
@@ -62,5 +76,8 @@ A committed n8n workflow (manual trigger only, `active:false`, no send node): au
 | Delivery (A3) | builds payloads; **one recorded one-shot Slack send (L-2, owner-armed 2026-07-09 — HTTP 200 to the owner's own allowlisted channel, all eight safety controls held, redacted record in docs/reviews/)** | any standing/repeat sending (every send = a fresh owner word; no retry path exists in the sender) |
 | n8n (A4) | workflow spec + dry run + **one recorded episodic runtime run (L-3, 2026-07-07, byte-verified)** | a standing/scheduled automation (manual trigger only, forever) |
 | run_demo | scripted walkthrough | an audit result (typed `demo_only`, refused everywhere downstream) |
+| Retrieval (E2) | extractive quotes with citations, or an explicit abstention — **"floors not met (2026-07-12) — experimental, advisory only"** carried in every payload | "validated" anything; any answer not verbatim from a cited chunk; any re-score of the exposed gold set |
+| Approvals (E3) | an OFFLINE simulator of the signed-approval flow, threat-model tested | that any live approval lane exists (it doesn't — future owner word); that anything can be sent (structurally cannot) |
+| Entity resolution (E4) | advisory candidate matches on a SYNTHETIC corpus — **"floors not met (2026-07-12) — experimental, advisory only"**; exact matching remains the system default | any real-world registry matching claim; any merge authority (it proposes; it cannot merge) |
 
 Everything above was adversarially reviewed per slice by a second model (Codex), with every accepted finding fixed red-green — records in `docs/reviews/`. The full engineering story: `docs/plan-agentic-extension.md` + `docs/PLAIN-ENGLISH.md` (the layman register).

@@ -17,14 +17,16 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { assertCorpusPins, gitBlobSha1 } from "@/lib/rag/blob-hash.ts";
+import { CORPUS_SNAPSHOT_DIR } from "@/lib/rag/corpus.ts";
 import manifest from "@/lib/rag/corpus-manifest.json" with { type: "json" };
 
 const REPO = process.cwd();
+const SNAPSHOT = join(REPO, CORPUS_SNAPSHOT_DIR);
 
 describe("E2 corpus manifest gate (A1)", () => {
   it("passes at HEAD: all 82 pinned sources hash to their frozen blobs", () => {
     expect(manifest.sources.length).toBe(82);
-    const verified = assertCorpusPins(REPO, {
+    const verified = assertCorpusPins(SNAPSHOT, {
       sources: manifest.sources,
       exhaustiveDir: manifest.exhaustiveDir,
     });
@@ -32,14 +34,14 @@ describe("E2 corpus manifest gate (A1)", () => {
   });
 
   it("recomputes real git blob hashes (spot-check against the A1 pin)", () => {
-    const bytes = readFileSync(join(REPO, "lib/packs/fees/rules.ts"));
+    const bytes = readFileSync(join(SNAPSHOT, "lib/packs/fees/rules.ts"));
     expect(gitBlobSha1(bytes)).toBe("bced3341bc554c34164f07b14317808dc0e327ce");
   });
 
   it("BITES on content drift: one mutated byte -> HARD BLOCK", () => {
     const root = mkdtempSync(join(tmpdir(), "e2-gate-"));
     mkdirSync(join(root, "lib/packs/fees"), { recursive: true });
-    const original = readFileSync(join(REPO, "lib/packs/fees/rules.ts"), "utf8");
+    const original = readFileSync(join(SNAPSHOT, "lib/packs/fees/rules.ts"), "utf8");
     writeFileSync(join(root, "lib/packs/fees/rules.ts"), `${original} `); // one appended byte
     mkdirSync(join(root, "fixtures/ucp-schemas/2026-04-08/schemas"), { recursive: true });
     expect(() =>
@@ -64,14 +66,14 @@ describe("E2 corpus manifest gate (A1)", () => {
   it("BITES on a silent addition inside the pinned schema tree", () => {
     const root = mkdtempSync(join(tmpdir(), "e2-gate-"));
     const dir = "fixtures/ucp-schemas/2026-04-08/schemas";
-    cpSync(join(REPO, dir), join(root, dir), { recursive: true });
+    cpSync(join(SNAPSHOT, dir), join(root, dir), { recursive: true });
     writeFileSync(join(root, dir, "smuggled.json"), "{}");
     const schemaPins = manifest.sources.filter((s) => s.path.startsWith(dir));
     // Copy the four non-tree sources too so their pin checks pass first.
     for (const s of manifest.sources) {
       if (!s.path.startsWith(dir)) {
         mkdirSync(join(root, s.path, ".."), { recursive: true });
-        cpSync(join(REPO, s.path), join(root, s.path));
+        cpSync(join(SNAPSHOT, s.path), join(root, s.path));
       }
     }
     expect(() =>

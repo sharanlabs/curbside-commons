@@ -23,6 +23,9 @@ import {
   CALIBRATION,
   CALIBRATION_PROVENANCE,
   CALIBRATION_DEFER_PROVENANCE,
+  E2,
+  E3,
+  E4,
   ENGINE,
   L1,
   RUN_RECORDS,
@@ -313,5 +316,83 @@ describe("batch-C reconciliation — every RUN_RECORDS rendered value is source-
         expect(src, proof.claim).toContain("must import nothing at all (pure builders)");
       }
     }
+  });
+});
+
+describe("E1b evidence — E2/E3/E4 figures are bound to their committed results artifacts", () => {
+  const ragSummary = JSON.parse(read("evals/rag/results/results-summary.json")) as {
+    decision: { shippedLane: string; labelEarned: boolean; label: string };
+    bm25: { metrics: { m1: { hits: number; of: number }; m4: { outAbstained: number; outOf: number } } };
+    hybrid: { metrics: { m1: { hits: number; of: number } } };
+    goldExposed: boolean;
+  };
+  const entitySummary = JSON.parse(read("evals/entity/results/results-summary.json")) as {
+    decision: { shippedDefault: string; labelEarned: boolean; label: string };
+    ensemble: {
+      m1: { truly: number; proposedSame: number };
+      m2: { sameCaught: number; sameTotal: number };
+      m3: { trapMerges: number; trapTotal: number };
+      m4: { ambigAbstained: number; ambigTotal: number };
+    };
+  };
+
+  it("E2: every rendered figure is DERIVED from the committed one-pass summary", () => {
+    expect(E2.shippedLane).toBe(ragSummary.decision.shippedLane);
+    expect(E2.labelEarned).toBe(ragSummary.decision.labelEarned);
+    expect(E2.label).toBe(ragSummary.decision.label);
+    expect(E2.bm25M1).toBe(`${ragSummary.bm25.metrics.m1.hits}/${ragSummary.bm25.metrics.m1.of}`);
+    expect(E2.hybridM1).toBe(`${ragSummary.hybrid.metrics.m1.hits}/${ragSummary.hybrid.metrics.m1.of}`);
+    expect(E2.bm25M4Out).toBe(
+      `${ragSummary.bm25.metrics.m4.outAbstained}/${ragSummary.bm25.metrics.m4.outOf}`,
+    );
+    expect(E2.goldExposed).toBe(ragSummary.goldExposed);
+  });
+
+  it("E2: the deferred label is the honest one and its lock/registration files exist", () => {
+    expect(ragSummary.decision.labelEarned).toBe(false);
+    expect(E2.label).toContain("floors not met");
+    expect(existsSync(join(root, E2.lockTestFile))).toBe(true);
+    expect(existsSync(join(root, E2.registrationDoc))).toBe(true);
+    expect(existsSync(join(root, E2.provenance.file))).toBe(true);
+    // The registration's RESULTS section carries the same verdict.
+    expect(read(E2.registrationDoc)).toContain("floors not met");
+  });
+
+  it("E4: every rendered figure is DERIVED from the committed one-pass summary", () => {
+    expect(E4.labelEarned).toBe(entitySummary.decision.labelEarned);
+    expect(E4.label).toBe(entitySummary.decision.label);
+    expect(E4.shippedDefault).toBe(entitySummary.decision.shippedDefault);
+    expect(E4.m1).toBe(`${entitySummary.ensemble.m1.truly}/${entitySummary.ensemble.m1.proposedSame}`);
+    expect(E4.m2).toBe(`${entitySummary.ensemble.m2.sameCaught}/${entitySummary.ensemble.m2.sameTotal}`);
+    expect(E4.m3).toBe(
+      `${entitySummary.ensemble.m3.trapMerges}/${entitySummary.ensemble.m3.trapTotal} false merges`,
+    );
+    expect(E4.m4).toBe(
+      `${entitySummary.ensemble.m4.ambigAbstained}/${entitySummary.ensemble.m4.ambigTotal} ambiguous routed to human`,
+    );
+    expect(existsSync(join(root, E4.lockTestFile))).toBe(true);
+    expect(existsSync(join(root, E4.registrationDoc))).toBe(true);
+    expect(read(E4.registrationDoc)).toContain("floors not met");
+  });
+
+  it("E3: the named threat suite + no-send proof exist and cover the frozen check order", () => {
+    expect(existsSync(join(root, E3.threatSuiteFile))).toBe(true);
+    expect(existsSync(join(root, E3.noSendProofFile))).toBe(true);
+    const sim = read("lib/approvals/simulator.ts");
+    // Bind the rendered check-order phrasing to the simulator's own frozen list.
+    for (const step of ["id match", "expiry", "nonce replay", "signer known", "role", "canonical", "digest"]) {
+      expect(E3.checkOrder.toLowerCase()).toContain(step.split(" ")[0]);
+      void step;
+    }
+    expect(sim).toContain("request/decision id match");
+    expect(sim).toContain("expired AT expiresAtMs");
+    expect(sim).toContain("nonce replay");
+    const threatSuite = read(E3.threatSuiteFile);
+    for (const threat of ["REPLAY", "EXPIRY", "FORGERY", "TAMPER", "SubjectMismatchError"]) {
+      expect(threatSuite).toContain(threat);
+    }
+    const noSend = read(E3.noSendProofFile);
+    expect(noSend).toContain("lib/delivery");
+    expect(noSend).toContain("lib/mcp");
   });
 });

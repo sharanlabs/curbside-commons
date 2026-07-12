@@ -15,7 +15,9 @@
  * historical, immutable references — not volatile counts.
  */
 
+import entitySummary from "@/evals/entity/results/results-summary.json";
 import l1Matrix from "@/evals/crew/gold/l1-live-matrix.json";
+import ragSummary from "@/evals/rag/results/results-summary.json";
 import expectedAcpReport from "@/fixtures/synthetic-restaurant/expected-report.acp.json";
 import { FEE_RULES, NON_STATEMENT_CHECKABLE } from "@/lib/packs/fees/rules";
 
@@ -251,4 +253,78 @@ export const RECORDED_LEGACY_GEMINI = {
     frozenAt: "1b04766",
     date: "2026-06-20",
   } satisfies Provenance,
+} as const;
+
+/* ------------------------------------------------------------------- */
+/* E2 RAG lane (2026-07-12) — COMPUTED from the committed results file  */
+/* ------------------------------------------------------------------- */
+
+export const E2_PROVENANCE: Provenance = {
+  file: "evals/rag/results/results-summary.json",
+  frozenAt: "results commit, 2026-07-12 (chain: 31bd66d -> d97fa90 -> c4396f0)",
+  date: "2026-07-12",
+};
+
+/**
+ * COMPUTED from the committed one-pass scoring summary. THE FLOORS MISSED —
+ * the label DEFERS, and this surface says so (that is the point of the
+ * dashboard: the scoreboard, not the highlight reel).
+ */
+export const E2 = {
+  registrationDoc: "docs/e2-rag-preregistration.md",
+  shippedLane: ragSummary.decision.shippedLane,
+  labelEarned: ragSummary.decision.labelEarned,
+  label: ragSummary.decision.label,
+  bm25M1: `${ragSummary.bm25.metrics.m1.hits}/${ragSummary.bm25.metrics.m1.of}`,
+  hybridM1: `${ragSummary.hybrid.metrics.m1.hits}/${ragSummary.hybrid.metrics.m1.of}`,
+  bm25M4Out: `${ragSummary.bm25.metrics.m4.outAbstained}/${ragSummary.bm25.metrics.m4.outOf}`,
+  goldExposed: ragSummary.goldExposed,
+  antiTheaterNote:
+    "the embedding lane failed to strictly beat plain BM25 on retrieval hit-rate, so the SIMPLER lane shipped (the anti-theater clause firing is a feature)",
+  lockTestFile: "evals/rag/rag-results-lock.test.ts",
+  toolName: "lookup_reference (advisory; earnsLabel: false, permanent pending a fresh registration)",
+  provenance: E2_PROVENANCE,
+} as const;
+
+/* ----------------------------------------------------------------------- */
+/* E3 approvals simulator (2026-07-12) — structural, no scoring by design   */
+/* ----------------------------------------------------------------------- */
+
+export const E3 = {
+  what: "MCP-Slack approvals lane, simulated OFFLINE: request -> Ed25519-signed human decision -> seven-check verified execution",
+  checkOrder:
+    "id match -> expiry (injected clock) -> nonce replay -> signer known -> role authorized -> signature over recomputed canonical bytes -> content-digest binding",
+  threatSuiteFile: "evals/approvals/threat-model.test.ts",
+  noSendProofFile: "evals/approvals/no-send-import-graph.test.ts",
+  liveNote: "the live interactive lane remains a future owner decision — this simulator cannot send (lib/delivery and lib/mcp are proven unreachable from it)",
+  provenance: {
+    file: "evals/approvals/threat-model.test.ts",
+    frozenAt: "7fd9489",
+    date: "2026-07-12",
+  } satisfies Provenance,
+} as const;
+
+/* -------------------------------------------------------------------- */
+/* E4 entity resolution (2026-07-12) — COMPUTED from the results file    */
+/* -------------------------------------------------------------------- */
+
+export const E4_PROVENANCE: Provenance = {
+  file: "evals/entity/results/results-summary.json",
+  frozenAt: "results commit, 2026-07-12 (chain: 31bd66d -> corpus e5f42c1 -> thresholds 705e54a)",
+  date: "2026-07-12",
+};
+
+export const E4 = {
+  registrationDoc: "docs/e4-entity-resolution-preregistration.md",
+  labelEarned: entitySummary.decision.labelEarned,
+  label: entitySummary.decision.label,
+  shippedDefault: entitySummary.decision.shippedDefault,
+  m1: `${entitySummary.ensemble.m1.truly}/${entitySummary.ensemble.m1.proposedSame}`,
+  m2: `${entitySummary.ensemble.m2.sameCaught}/${entitySummary.ensemble.m2.sameTotal}`,
+  m3: `${entitySummary.ensemble.m3.trapMerges}/${entitySummary.ensemble.m3.trapTotal} false merges`,
+  m4: `${entitySummary.ensemble.m4.ambigAbstained}/${entitySummary.ensemble.m4.ambigTotal} ambiguous routed to human`,
+  tiesBaselineNote:
+    "the fuzzy ensemble TIED normalized-exact matching on precision/recall/traps under the hard zero-false-merge floor — so exact matching (always the protected default) is also the shipped default",
+  lockTestFile: "evals/entity/entity-results-lock.test.ts",
+  provenance: E4_PROVENANCE,
 } as const;

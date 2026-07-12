@@ -56,13 +56,16 @@ A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the or
 
 | Surface | Status |
 | --- | --- |
-| Test suite | `npm run verify` green: **1005 passed + 7 skipped** (the skips are live-network harnesses, off by default; count re-measured live 2026-07-10 after the S2 honesty-contract tests + batch-A review fixes landed) |
+| Test suite | `npm run verify` green: **1130 passed + 7 skipped** (the skips are live-network harnesses, off by default; count re-measured live 2026-07-12 after the E2/E3/E4 lanes and their eval-locks landed) |
 | Listings drift taxonomy (8 classes) | **8/8 injected and caught, measured** by the C6 coverage eval; never an "all edge cases" claim |
 | Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
 | Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |
 | LLM line-item classifier | **Calibrated — earned 2026-07-09** on an owner-armed retry: a **fresh pre-registered held-out split** (the first split was exposed and never re-scored), floors identical to the first registration, **21/21 accuracy with every floor cleared**. The first run (2026-07-05) scored 20/21 and was **honestly DEFERRED** for missing one per-class recall floor (0.75 vs a pre-registered ≥ 0.80) — that record stands. The floors never moved in either run. |
 | Agent extension | Two of the four crew roles (**Intake** and **Reviewer**) earned the label **"agent (live-run floors cleared)"** on an owner-armed live run (2026-07-07): 20/20 pre-registered held-out scenarios, 0 degraded, including planted in-document injection the live model visibly resisted. The other two roles are deterministic workflows by design and are labeled exactly that. Agents recommend; the engine decides; a human owns anything irreversible. |
 | Delivery | The system can **write** Slack/email payloads but the site, CLI, and tools structurally cannot send. Exactly **one** recorded delivery exists: a single owner-armed Slack send to the owner's own channel (2026-07-09), executed under eight written safety controls, with a redacted run record committed (`docs/reviews/`). |
+| Reference-retrieval lane (E2) | **Floors NOT met — label deferred (2026-07-12), and the scoreboard is published.** An extractive, offline, $0 retrieval tool over the committed rule/schema/glossary corpus was scored once against pre-registered floors: retrieval hit-rate 19/24 (< the 0.85 floor), and the embedding hybrid failed to beat plain BM25 — so the **simpler lane shipped**, labeled *experimental, advisory only* in every payload (`docs/e2-rag-preregistration.md` RESULTS). |
+| Signed-approvals simulator (E3) | The "human signs, then it runs" flow exists as a fully **offline simulator**: Ed25519-signed decisions verified through a frozen seven-check order (identity, role, tamper, replay, expiry, content binding), attacked by a committed threat-model suite, with an import-graph proof it **cannot send**. The live interactive lane remains a future owner decision. |
+| Entity-resolution lane (E4) | **Floors NOT met — label deferred (2026-07-12).** Under a hard zero-false-merge floor on near-miss traps (10/10 held), the fuzzy ensemble **tied** normalized-exact matching (precision 18/18; recall 18/35 < the 0.80 floor) — so exact matching, always the protected default, is also the shipped default; the writeup says so (`docs/e4-entity-resolution-preregistration.md` RESULTS). Its one demonstrated added value: routing 9/10 genuinely-ambiguous pairs to a human instead of guessing. |
 | Corpus | Seeded, deterministic, freeze-locked (regenerate ⇒ bytes must match); every fixture taxonomy-keyed; publishable under this repo's license |
 
 That sequence is the project's character: **the bar never moves after the run.** The first attempt's near-miss was reported as a near-miss and stayed a DEFER; earning the label took a second owner-authorized exam on brand-new questions under the same bars — not a re-grade of the old one.
@@ -90,7 +93,8 @@ Dated source records for these claims live in `docs/research/` (source lockfile 
 - The truth-audit corpus is **synthetic by design** (labeled on every surface); real-world entity matching is harder than the synthetic-controlled matching here, and reports label which mode was used.
 - Fee verdicts that depend on the statutory "purchase price" base are marked **provisional** pending that open legal question; the marker is enforced by the type system, not a footnote.
 - Operator demand is **not validated** (no first-person merchant research yet); this repo demonstrates capability, not market proof.
-- The web console is desktop-only, and its deployed build **currently still serves the legacy module's console surfaces** (`/console`, `/eval`, `/metrics`, `/audit`, `/cost`, merchant pages) alongside the truth-audit report/demo — those pages present the legacy activation prototype, not the truth-audit engine. An explicit identity separation is planned and tracked in `docs/`.
+- The web console is desktop-only. The identity separation is **implemented in this repo** (the legacy activation surfaces live under `/legacy/**` with their own provenance; the canonical pages present the truth-audit engine) — but the **deployed site is several review-gated slices behind this repo** until the next owner-approved deploy, so the live URLs may still show the pre-split surfaces.
+- Two enhancement lanes currently wear **"floors not met — experimental"** labels (reference retrieval E2, entity resolution E4): their pre-registered quality bars were missed on the one permitted scoring pass, the misses are published in full, and re-attempts require fresh registered splits. Deferred is a result here, not a failure mode to hide.
 
 ## The corpus
 
@@ -101,6 +105,8 @@ Dated source records for these claims live in `docs/research/` (source lockfile 
 This repo's first life was **ActivationOps AI**, a merchant-activation prototype (deterministic triage → bounded LLM drafting → claims-gatekeeper → human-in-the-loop gate). It is archived **runnable** under `legacy/activation/` (`npm run test:legacy`, 306 tests green) and its verification spine is what the truth-audit engine grew from. Its own README and honesty labels stand unchanged.
 
 **Legacy data provenance (scoped honestly):** unlike the truth-audit engine's all-synthetic corpus, the legacy module demonstrates a real-data *adapter* over public-domain business records (DataSF) with a synthetic activation-state overlay — license-clean, no PII retained, and its public display uses fictional names only (synthetic states are never attached to real businesses on any public page).
+
+**History disclosure:** current public surfaces were de-branded to a generic "delivery-marketplace" register (tracked inventory in `docs/reviews/`), but the **git history is intentionally preserved unrewritten** — earlier commits, names, and records remain visible by design, because the history *is* the provenance this project's claims rest on. Anything you find there is lineage, not a current claim.
 
 ## Development workflow (note)
 

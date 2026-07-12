@@ -29,7 +29,9 @@ import gold from "./gold/rag-gold.json" with { type: "json" };
 
 const REPO = process.cwd();
 const corpusPaths = manifest.sources.map((s) => s.path);
-const corpusText = new Map(corpusPaths.map((p) => [p, readFileSync(join(REPO, p), "utf8")]));
+// Corpus bytes come from the FROZEN SNAPSHOT (the E1b decoupling) — the
+// screens must bind to the corpus as scored, not the living originals.
+const corpusText = new Map(corpusPaths.map((p) => [p, readFileSync(join(REPO, "evals/rag/corpus-snapshot", p), "utf8")]));
 
 const normalizeWords = (s: string): string[] =>
   s

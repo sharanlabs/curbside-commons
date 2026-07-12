@@ -14,6 +14,7 @@ export default defineConfig([
     ".agents/**",
     ".claude/**",
     "reference/**",
+    "evals/rag/corpus-snapshot/**",
     "screenshots/**",
   ]),
 ]);

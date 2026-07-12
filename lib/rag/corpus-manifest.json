@@ -1,5 +1,5 @@
 {
-  "_doc": "E2 RAG corpus manifest — frozen per docs/e2-rag-preregistration.md (incl. 2026-07-11 AMENDMENTS). Pins are the A1 blob hashes at 31bd66d; drift = HARD BLOCK (lib/rag/blob-hash.ts assertCorpusPins). Nothing here may change after the gold set is queried (A2).",
+  "_doc": "E2 RAG corpus manifest \u2014 frozen per docs/e2-rag-preregistration.md (incl. 2026-07-11 AMENDMENTS). Pins are the A1 blob hashes at 31bd66d; drift = HARD BLOCK (lib/rag/blob-hash.ts assertCorpusPins). Nothing here may change after the gold set is queried (A2).",
   "registration": {
     "doc": "docs/e2-rag-preregistration.md",
     "commit": "31bd66d"
@@ -387,14 +387,14 @@
         "sha256": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3"
       }
     ],
-    "offlinePolicy": "allowRemoteModels=false at inference; scoring runs under evals/rag/net-blocker.mjs; absent cache = BLOCK, never fetch (pre-reg §3)"
+    "offlinePolicy": "allowRemoteModels=false at inference; scoring runs under evals/rag/net-blocker.mjs; absent cache = BLOCK, never fetch (pre-reg \u00a73)"
   },
   "abstention": {
-    "frozen": "2026-07-12, BEFORE the gold set was committed or queried; tuned on the scratch probes below only (pre-reg §4 discipline)",
+    "frozen": "2026-07-12, BEFORE the gold set was committed or queried; tuned on the scratch probes below only (pre-reg \u00a74 discipline)",
     "bm25": {
       "signal": "top BM25 score of the query over all chunks",
       "threshold": 10.4,
-      "honestNote": "raw BM25 scores scale with query specificity; scratch showed in/out overlap (in 7.1-19.4 vs out 6.9-10.3) — a known weakness of the baseline's abstention, reported rather than papered"
+      "honestNote": "raw BM25 scores scale with query specificity; scratch showed in/out overlap (in 7.1-19.4 vs out 6.9-10.3) \u2014 a known weakness of the baseline's abstention, reported rather than papered"
     },
     "hybrid": {
       "signal": "top raw cosine similarity of the query over all chunks (NOT the rank-derived RRF fusion score)",
@@ -402,7 +402,7 @@
     }
   },
   "scratchSet": {
-    "note": "<=10 probes used while building (pre-reg §4). NOT gold, never scored; recorded verbatim with the observed top signals that set the thresholds.",
+    "note": "<=10 probes used while building (pre-reg \u00a74). NOT gold, never scored; recorded verbatim with the observed top signals that set the thresholds.",
     "probes": [
       {
         "kind": "in",
@@ -466,5 +466,9 @@
       }
     ]
   },
-  "adversarialInserts": "see evals/rag/gold/adversarial-inserts.json (corpus-EXTERNAL per A1; committed with the gold set)"
+  "adversarialInserts": "see evals/rag/gold/adversarial-inserts.json (corpus-EXTERNAL per A1; committed with the gold set)",
+  "snapshot": {
+    "root": "evals/rag/corpus-snapshot",
+    "note": "E1b decoupling (2026-07-12): the corpus identity is the five sources AS FROZEN AT 31bd66d; those bytes are committed as a snapshot under this root and the A1 gate verifies the SNAPSHOT against the same blob pins, so the living originals (docs/GLOSSARY.md etc.) may evolve. Snapshot tampering still HARD-BLOCKS; corpus changes still require a NEW pre-registration. Logical source paths (used by chunks, citations, gold expectedFiles, and the committed raws) are unchanged."
+  }
 }

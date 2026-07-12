@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CALIBRATION, L1, type Provenance } from "@/lib/dashboard/evidence";
+import { CALIBRATION, E2, E3, E4, L1, type Provenance } from "@/lib/dashboard/evidence";
 import { Mark } from "@/components/data-surfaces/Mark";
 
 export const metadata: Metadata = { title: "Eval evidence" };
@@ -179,6 +179,129 @@ export default function EvalEvidencePage() {
         Locked by <span className="ds-mono">{L1.lockTestFile}</span>.
       </p>
       <Prov of={L1.provenance} />
+
+      {/* e. E2 RAG lane — scored 2026-07-12, floors MISSED, label deferred */}
+      <h2 className="ds-h2-row">Reference-retrieval lane (E2) — floors not met, and it says so</h2>
+      <p className="ds-lead plain" style={{ marginTop: "8px" }}>
+        <b>In plain terms:</b> we built a &ldquo;look it up and quote the rulebook&rdquo; feature, wrote
+        the passing bars in git before testing it, and it missed them. So it ships marked{" "}
+        <b>experimental</b>, the scoreboard is published, and the simpler of the two search methods was
+        kept — the fancier one didn&rsquo;t beat it.
+      </p>
+      <div className="ds-grid g2">
+        <section className="ds-card flush">
+          <div className="ds-tags">
+            <span className="ds-tag role">retrieval hit-rate@5 · one pass</span>
+          </div>
+          <dl className="ds-ratefacts">
+            <dt>BM25 baseline</dt>
+            <dd>{E2.bm25M1}</dd>
+            <dt>embedding hybrid</dt>
+            <dd>{E2.hybridM1}</dd>
+            <dt>out-of-corpus abstained (shipped lane)</dt>
+            <dd>{E2.bm25M4Out}</dd>
+            <dt>shipped lane</dt>
+            <dd className="ds-mono">{E2.shippedLane}</dd>
+          </dl>
+          <div style={{ marginTop: "12px" }}>
+            <span className="ds-verdict warn">
+              <Mark name="alert" />
+              LABEL DEFERRED — {E2.labelEarned ? "" : "floors not met"}
+            </span>
+          </div>
+          <Prov of={E2.provenance} />
+        </section>
+        <section className="ds-card flush">
+          <div className="ds-tags">
+            <span className="ds-tag role">what stands</span>
+          </div>
+          <p className="ds-card-p">{E2.antiTheaterNote}.</p>
+          <p className="ds-card-p">
+            The lane still ships as the advisory tool <span className="ds-mono">{E2.toolName}</span> —
+            extractive (verbatim quotes with citations, or an explicit abstention), offline, $0, and
+            labeled with its deferred status in every payload.
+          </p>
+          <p className="ds-meta-line">
+            Pre-registration: <span className="ds-mono">{E2.registrationDoc}</span> · locked by{" "}
+            <span className="ds-mono">{E2.lockTestFile}</span>.
+          </p>
+        </section>
+      </div>
+
+      {/* f. E4 entity resolution — scored 2026-07-12, one floor missed, ties baseline */}
+      <h2 className="ds-h2-row">Entity-resolution lane (E4) — the exact-match default won</h2>
+      <p className="ds-lead plain" style={{ marginTop: "8px" }}>
+        <b>In plain terms:</b> a fuzzy name-matcher (&ldquo;FOG CITY TACOS LLC&rdquo; vs &ldquo;Fog City
+        Tacos&rdquo;) was graded against bars fixed in advance. Required to <b>never</b> confuse two
+        similar-but-different businesses, it ended up no better than careful exact matching — so exact
+        matching stays the default, and the fuzzy layer is labeled experimental.
+      </p>
+      <section className="ds-stats">
+        <div className="ds-stat accent">
+          <div className="v">{E4.m1}</div>
+          <div className="l">merge precision (floor met)</div>
+        </div>
+        <div className="ds-stat">
+          <div className="v">{E4.m2}</div>
+          <div className="l">recall — the missed floor</div>
+        </div>
+        <div className="ds-stat">
+          <div className="v">{E4.m3}</div>
+          <div className="l">on the near-miss trap class</div>
+        </div>
+        <div className="ds-stat">
+          <div className="v">{E4.m4}</div>
+          <div className="l">uncertain cases sent to a human</div>
+        </div>
+      </section>
+      <div className="ds-tags" style={{ marginTop: "10px" }}>
+        <span className="ds-verdict warn">
+          <Mark name="alert" />
+          LABEL DEFERRED — shipped default: {E4.shippedDefault}
+        </span>
+      </div>
+      <p className="ds-card-p" style={{ marginTop: "10px" }}>
+        {E4.tiesBaselineNote}.
+      </p>
+      <p className="ds-meta-line">
+        Pre-registration: <span className="ds-mono">{E4.registrationDoc}</span> · locked by{" "}
+        <span className="ds-mono">{E4.lockTestFile}</span>.
+      </p>
+      <Prov of={E4.provenance} />
+
+      {/* g. E3 approvals simulator — structural evidence, no scoring by design */}
+      <h2 className="ds-h2-row">Signed-approvals simulator (E3) — threat-model evidence</h2>
+      <p className="ds-lead plain" style={{ marginTop: "8px" }}>
+        <b>In plain terms:</b> the &ldquo;a human signs off before anything runs&rdquo; flow exists as a
+        fully offline rehearsal: every approval is cryptographically tied to one exact case, one
+        authorized person, a short validity window, and single use — and a test suite attacks each of
+        those properties directly. Nothing in it can send a message anywhere.
+      </p>
+      <section className="ds-card flush">
+        <p className="ds-card-p">{E3.what}.</p>
+        <dl className="ds-ratefacts">
+          <dt>verification order (frozen)</dt>
+          <dd>{E3.checkOrder}</dd>
+          <dt>threat suite</dt>
+          <dd className="ds-mono">{E3.threatSuiteFile}</dd>
+          <dt>cannot-send proof</dt>
+          <dd className="ds-mono">{E3.noSendProofFile}</dd>
+        </dl>
+        <p className="ds-card-p">{E3.liveNote}.</p>
+        <Prov of={E3.provenance} />
+      </section>
+
+      {/* h. the exposed-splits FAQ — the prepared honest answer */}
+      <h2 className="ds-h2-row">&ldquo;Why not just run it again?&rdquo; — the exposed-splits rule</h2>
+      <div className="ds-note">
+        Four evaluation splits are now <b>exposed</b>: the 2026-07-05 classifier split, the 2026-07-09
+        classifier retry split, the E2 retrieval gold set, and the E4 entity test split. An exposed
+        split can never be re-scored — once a result has been seen, a re-run stops measuring the system
+        and starts measuring our persistence. Every score above is therefore a <b>one-pass</b> result
+        against bars committed in advance, misses included; any new claim requires a fresh,
+        pre-registered split and a fresh registration row. That is also why two of the three lanes on
+        this page currently wear a &ldquo;floors not met&rdquo; label instead of a better-sounding one.
+      </div>
 
       {/* d. link to the moved legacy surface */}
       <p className="ds-note" style={{ marginTop: "24px" }}>
