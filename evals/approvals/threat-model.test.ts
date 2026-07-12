@@ -17,9 +17,10 @@
  * the right person with the wrong powers, paperwork swapped between cases —
  * and prove each attack dies on its own specific locked door.
  */
-import { generateKeyPairSync } from "node:crypto";
+import { generateKeyPairSync, sign as cryptoSign } from "node:crypto";
 import { describe, expect, it } from "vitest";
 
+import { canonicalSigningBytes } from "@/lib/approvals/canonical.ts";
 import {
   createApprovalRequest,
   resolveAction,
@@ -150,6 +151,33 @@ describe("E3 threats — each dies on its own typed door", () => {
     // a decision whose payload uses THIS request's id but the other digest:
     expect(() => verifyAndExecute(request, rebound, opts)).toThrow(SignatureInvalidError);
     expect(subjectDigestOf(otherRecord)).not.toBe(request.subjectDigest);
+  });
+
+  it("DIGEST DOOR (step 7): a signature crafted over THIS request's id+nonce but a FOREIGN content digest dies on SubjectMismatchError", () => {
+    const { request, opts } = freshFlow("n-t5b");
+    const foreignDigest = subjectDigestOf({ ...crewRecord, caseId: "int-a-different-case" });
+    expect(foreignDigest).not.toBe(request.subjectDigest);
+    // Hand-craft the signed payload (a malicious-but-key-holding signer):
+    // valid id, valid nonce, valid key — but attesting different content.
+    const decidedAtMs = T0 + 1_000;
+    const payload = canonicalSigningBytes({
+      requestId: request.requestId,
+      decision: "approve",
+      signerKeyId: "owner-key-1",
+      decidedAtMs,
+      subjectDigest: foreignDigest,
+      nonce: request.nonce,
+    });
+    const crafted = {
+      requestId: request.requestId,
+      decision: "approve" as const,
+      signerKeyId: "owner-key-1",
+      decidedAtMs,
+      subjectDigest: foreignDigest,
+      signatureBase64: cryptoSign(null, payload, owner.privateKey).toString("base64"),
+    };
+    expect(() => verifyAndExecute(request, crafted, opts)).toThrow(SubjectMismatchError);
+    expect(opts.seenNonces.size).toBe(0); // the failed attempt did not burn the nonce
   });
 
   it("REPLAY: the same nonce cannot execute twice", () => {
