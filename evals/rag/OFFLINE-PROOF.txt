@@ -1,0 +1,5 @@
+E2 network-denied offline-inference proof
+date: 2026-07-12T18:48:43Z
+command: node --import ./evals/rag/net-blocker.mjs scripts-ts/rag-offline-proof.mts
+{"ok":true,"chunks":128,"bm25":{"answered":true,"signal":12.215512903159093,"top":"docs/GLOSSARY.md#20"},"hybrid":{"answered":true,"signal":0.4283792758069029,"top":"docs/GLOSSARY.md#8"}}
+exit code: 0

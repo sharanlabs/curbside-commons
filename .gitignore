@@ -46,3 +46,4 @@ mockups/shots/
 screenshots/
 skills-lock.json
 .n8n-artifacts/
+.hf-cache/

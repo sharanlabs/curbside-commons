@@ -1,0 +1,470 @@
+{
+  "_doc": "E2 RAG corpus manifest — frozen per docs/e2-rag-preregistration.md (incl. 2026-07-11 AMENDMENTS). Pins are the A1 blob hashes at 31bd66d; drift = HARD BLOCK (lib/rag/blob-hash.ts assertCorpusPins). Nothing here may change after the gold set is queried (A2).",
+  "registration": {
+    "doc": "docs/e2-rag-preregistration.md",
+    "commit": "31bd66d"
+  },
+  "sources": [
+    {
+      "path": "lib/packs/fees/rules.ts",
+      "blobSha1": "bced3341bc554c34164f07b14317808dc0e327ce"
+    },
+    {
+      "path": "docs/research/uc1-rule-table.md",
+      "blobSha1": "a5140f5b2cb27523d38e5e57697f1c44b54a0c4d"
+    },
+    {
+      "path": "docs/research/uc1-rule-table.draft.json",
+      "blobSha1": "945db3804147de433578e42d8314a96e1f101bc5"
+    },
+    {
+      "path": "docs/GLOSSARY.md",
+      "blobSha1": "7752b6f68bc9686e3b7a712ba807238eaeb5e6f7"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/capability.json",
+      "blobSha1": "9eb2eb33f55e6efc6e569c9cbaf792cc8fc3e116"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/common/identity_linking.json",
+      "blobSha1": "c3d8a6d7ebbdb61f1f3564570b377c4ef3f424a9"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/payment_handler.json",
+      "blobSha1": "205a8ef76fe0ff958455bac0b85d78a3f0207c56"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/service.json",
+      "blobSha1": "88f6456985e7a0966b00c58ec3eceb6b5359d363"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/ap2_mandate.json",
+      "blobSha1": "4d8b7d071af8662d8023f36073d36a8a193e7647"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/buyer_consent.json",
+      "blobSha1": "2edf9028bc4c92ec877c78a4b4d51fc7cf717db6"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/cart.json",
+      "blobSha1": "0c0fc90372de2f9adfe0d650a453101d18f7a98b"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/catalog_lookup.json",
+      "blobSha1": "2f48d391342bde68565f598a9980eefde94948c1"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/catalog_search.json",
+      "blobSha1": "8013c51fdfc6feca4bace19a5b040b97fedf1246"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/checkout.json",
+      "blobSha1": "302e822740933cf1d31f204e912afd1913a241f2"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/discount.json",
+      "blobSha1": "85c3a2287f8bb992bbe2737ba9d600d6d99f3d10"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/fulfillment.json",
+      "blobSha1": "7fe611907bb55790ab4cbbc2337bf4f017c66cde"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/order.json",
+      "blobSha1": "d6611a7e5521e98d2ae3349d503930491d122303"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/payment.json",
+      "blobSha1": "e572e0646d7486e9a03f9021a3d21c2596b97bbd"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/account_info.json",
+      "blobSha1": "bcda6a247977b04b24ff8d73a9bd753f60c35807"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/adjustment.json",
+      "blobSha1": "c4fa91fbd8d529aa91e7df171e8be1c5161df67b"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/amount.json",
+      "blobSha1": "3464f3f25f9c6562fa7fa10d6c10dbc7a7dc6738"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/attribution.json",
+      "blobSha1": "fc752d703d60ea1e8bdf24d2bfa4a12d34c6a37e"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/available_payment_instrument.json",
+      "blobSha1": "cf847b355ead8938e35ef414479418fe93ad9644"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/binding.json",
+      "blobSha1": "e73ef7b09a6a3e201e1a35e59464e27244b4ecb3"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/business_fulfillment_config.json",
+      "blobSha1": "d84deb96054b876519398f524d66f35c9be6bfd3"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/buyer.json",
+      "blobSha1": "507bcf39357e26ca0ff6633aa6a872689ea239bc"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/card_credential.json",
+      "blobSha1": "0d08cc79069fd386583116291266dca9df3cc826"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/card_payment_instrument.json",
+      "blobSha1": "2704308bc218811822a75ac1137f0704ecdc14cf"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/category.json",
+      "blobSha1": "f6f4ff9c62751aef3fb70eff02da8c106a0ef394"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/context.json",
+      "blobSha1": "c5f1162a20e4d5f799326dd0ccad0839e9cc1c13"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/description.json",
+      "blobSha1": "8de81df17da7db0985e7d0073bed05f7144cea0d"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/detail_option_value.json",
+      "blobSha1": "9e11c74c9f3ce8f47e9eb97f4b4585be1fdc59c3"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/error_code.json",
+      "blobSha1": "48c5fec7abbf1da9d88749abedb9f795038b7b07"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/error_response.json",
+      "blobSha1": "fb5ac3d748cd05151a06399ebfb8ce471aec54ca"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/expectation.json",
+      "blobSha1": "40ceb9da002e370f7de7bba979c46385640eb3fe"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/fulfillment.json",
+      "blobSha1": "6aa8c0589d9e580ce79b0b09bb8dbd5409601e99"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/fulfillment_available_method.json",
+      "blobSha1": "ca4af01d830c8a8ea4288c53dc4bb2dca1122b23"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/fulfillment_destination.json",
+      "blobSha1": "cc6708dc902e0ba09e0b56c2a79dfe0406c75b40"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/fulfillment_event.json",
+      "blobSha1": "5d0ba7e7f5edf39213106403c8afbbbdc491117d"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/fulfillment_group.json",
+      "blobSha1": "6f0529ef8e28dcc449c741172bc08f3e0f40021d"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/fulfillment_method.json",
+      "blobSha1": "92e02e40a415802e4748b846a03ec65a664c30aa"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/fulfillment_option.json",
+      "blobSha1": "ad87908564615254ff5c91f74cfcd50b4162e4a5"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/info_code.json",
+      "blobSha1": "3c6c3db052695ca51878bced9e3caf89cf0cfae2"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/input_correlation.json",
+      "blobSha1": "d9734fd3ec514836fc9ca0513a4a6a6733d70f38"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/item.json",
+      "blobSha1": "cde81e1a909b92bcac974daf85b414ba556b0245"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/line_item.json",
+      "blobSha1": "0eba9ed053401dcae823623804c65cc354519db7"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/link.json",
+      "blobSha1": "b377b4a024ac69b9fcf2b2170197adb87f5e6c34"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/media.json",
+      "blobSha1": "cbcaa07139fd0e834213cd7f9ca209230fa3f803"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/merchant_fulfillment_config.json",
+      "blobSha1": "5f049e48ebf76eaea71ff71725b450510f9e6d5a"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/message.json",
+      "blobSha1": "c0bbbe905a194bf084fb1d8d8ee197e79d1359e1"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/message_error.json",
+      "blobSha1": "2b157a98a79d5d49709d961529d52f38f88b3e7e"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/message_info.json",
+      "blobSha1": "a782df92d8bb4f5f3aeb66c98227c76b76363e08"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/message_warning.json",
+      "blobSha1": "18aedbefacd086cd55403d48ce72deddbd5a3cb1"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/option_value.json",
+      "blobSha1": "1ce5f70229f5c82a59bfcca28320b73d4c90c1b0"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/order_confirmation.json",
+      "blobSha1": "bfb4ab281013d2ce37a4aa7409da5825f9e0ba78"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/order_line_item.json",
+      "blobSha1": "5f639dcff75a05799c14adb82aaddf03d8d13eba"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/pagination.json",
+      "blobSha1": "89b9751201ae202a3ac9c5feb369094a4224b464"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/payment_credential.json",
+      "blobSha1": "d7be3a0a8710e7953fbe744c70c77c0509cfb73f"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/payment_identity.json",
+      "blobSha1": "01c3ed387ac368bb256bdcbfb09bc767f35e1bc9"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/payment_instrument.json",
+      "blobSha1": "aed227306202cba382c86b87564631b5beaab820"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/platform_fulfillment_config.json",
+      "blobSha1": "ff4278f3c2a27a27a2f92bf3ff539580fc99c8fa"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/postal_address.json",
+      "blobSha1": "3cf69437be84bfe12214991ee40b666a7094d042"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/price.json",
+      "blobSha1": "8d39b9cbcfa66852783bceb8bc48b3e8e7b7e601"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/price_filter.json",
+      "blobSha1": "5d92e3066fdb73dc18822deca2e131a58231b34e"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/price_range.json",
+      "blobSha1": "cd574d3a77baf40abb0a3a5225460b050d04ce8a"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/product.json",
+      "blobSha1": "7a3e60654cb78ea667ac406cc2f8939e931cbba6"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/product_option.json",
+      "blobSha1": "32663ae9aecbb653892fd18df9d12a58d98187cf"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/rating.json",
+      "blobSha1": "6b0b3b5fb517f6fdb28f5fca89067e1a59f48b53"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/retail_location.json",
+      "blobSha1": "8ec9c6768802f13e21faa0698e00664f3e65a8be"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/reverse_domain_name.json",
+      "blobSha1": "6ecbfd9d1a37983fb38a6dd3ea9d3ca5554f8c98"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/search_filters.json",
+      "blobSha1": "8380be58b4c8dd1a2cf02f6a2611b0be6dc9b185"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/selected_option.json",
+      "blobSha1": "e35f03adae4d380d8af5fd5733a8ebe4c007375b"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/shipping_destination.json",
+      "blobSha1": "a452a6b2d3b7bfec35dc9201fac5d6e7b1a26318"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/signals.json",
+      "blobSha1": "874823290243099336155a0cdb234825e2eb287e"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/signed_amount.json",
+      "blobSha1": "b68d57789af0ff65a0fb84ce865f77c03a8bf351"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/token_credential.json",
+      "blobSha1": "aa0cde381d9a9d38d9d891213c73dc47c07338d0"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/total.json",
+      "blobSha1": "a6361a88bd20126b455411ec2aee80d531e9f43c"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/totals.json",
+      "blobSha1": "c2574e8f8dd77166beab8b5c09b299b12644e64b"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/variant.json",
+      "blobSha1": "2673553946b54d4d24313312e17d224a62909a0d"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/shopping/types/warning_code.json",
+      "blobSha1": "67f7afc02b2c10c97ae560bc0c531ea71f52adea"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/transports/embedded_config.json",
+      "blobSha1": "3a07530bdda6d61ff74939f70dba52549c585934"
+    },
+    {
+      "path": "fixtures/ucp-schemas/2026-04-08/schemas/ucp.json",
+      "blobSha1": "4d80342c3efb9781954db10417e71792fff60766"
+    }
+  ],
+  "exhaustiveDir": "fixtures/ucp-schemas/2026-04-08/schemas",
+  "chunking": {
+    "targetTokensMin": 200,
+    "targetTokensMax": 400,
+    "hardCap": 600,
+    "approxTokenFormula": "ceil(whitespace-word-count * 1.3)",
+    "boundaries": "md: blank-line blocks + per-table-row; ts: /** doc-comment blocks; json: whole-file else line groups",
+    "chunkCount": 128
+  },
+  "bm25": {
+    "variant": "Okapi",
+    "k1": 1.2,
+    "b": 0.75,
+    "tokenization": "NFKC -> lowercase -> split on non-alphanumerics (empties dropped)",
+    "stemming": "none",
+    "stopwords": "none",
+    "topK": 5
+  },
+  "hybrid": {
+    "fusion": "RRF",
+    "rrfK": 60,
+    "topK": 5,
+    "note": "RRF over full BM25 ranking + full cosine ranking of the SAME chunks (identical chunking, A2)"
+  },
+  "embedding": {
+    "package": "@huggingface/transformers",
+    "packageVersion": "4.2.0 (exact-pinned devDependency)",
+    "modelId": "Xenova/all-MiniLM-L6-v2",
+    "hfRevisionSha": "751bff37182d3f1213fa05d7196b954e230abad9",
+    "license": "apache-2.0",
+    "dtype": "q8",
+    "embeddingDim": 384,
+    "pooling": "mean",
+    "normalize": true,
+    "cacheDir": ".hf-cache/",
+    "files": [
+      {
+        "path": "Xenova/all-MiniLM-L6-v2/config.json",
+        "sha256": "7135149f7cffa1a573466c6e4d8423ed73b62fd2332c575bf738a0d033f70df7"
+      },
+      {
+        "path": "Xenova/all-MiniLM-L6-v2/onnx/model_quantized.onnx",
+        "sha256": "afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1"
+      },
+      {
+        "path": "Xenova/all-MiniLM-L6-v2/tokenizer.json",
+        "sha256": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0"
+      },
+      {
+        "path": "Xenova/all-MiniLM-L6-v2/tokenizer_config.json",
+        "sha256": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3"
+      }
+    ],
+    "offlinePolicy": "allowRemoteModels=false at inference; scoring runs under evals/rag/net-blocker.mjs; absent cache = BLOCK, never fetch (pre-reg §3)"
+  },
+  "abstention": {
+    "frozen": "2026-07-12, BEFORE the gold set was committed or queried; tuned on the scratch probes below only (pre-reg §4 discipline)",
+    "bm25": {
+      "signal": "top BM25 score of the query over all chunks",
+      "threshold": 10.4,
+      "honestNote": "raw BM25 scores scale with query specificity; scratch showed in/out overlap (in 7.1-19.4 vs out 6.9-10.3) — a known weakness of the baseline's abstention, reported rather than papered"
+    },
+    "hybrid": {
+      "signal": "top raw cosine similarity of the query over all chunks (NOT the rank-derived RRF fusion score)",
+      "threshold": 0.33
+    }
+  },
+  "scratchSet": {
+    "note": "<=10 probes used while building (pre-reg §4). NOT gold, never scored; recorded verbatim with the observed top signals that set the thresholds.",
+    "probes": [
+      {
+        "kind": "in",
+        "q": "What is the maximum percentage for the fee charged when an order is delivered?",
+        "bm25Top": 13.243,
+        "cosineTop": 0.5522
+      },
+      {
+        "kind": "in",
+        "q": "Can the three percent processing charge be averaged over a month?",
+        "bm25Top": 16.983,
+        "cosineTop": 0.5214
+      },
+      {
+        "kind": "in",
+        "q": "What is the system of record and why does it matter?",
+        "bm25Top": 16.207,
+        "cosineTop": 0.342
+      },
+      {
+        "kind": "in",
+        "q": "Which fields are required in a checkout object?",
+        "bm25Top": 7.532,
+        "cosineTop": 0.4668
+      },
+      {
+        "kind": "in",
+        "q": "What does drift mean for a published menu?",
+        "bm25Top": 12.216,
+        "cosineTop": 0.4284
+      },
+      {
+        "kind": "out",
+        "q": "What is the weather in New York today?",
+        "bm25Top": 6.936,
+        "cosineTop": 0.1248
+      },
+      {
+        "kind": "out",
+        "q": "How do I file a lawsuit against a delivery platform?",
+        "bm25Top": 10.332,
+        "cosineTop": 0.3265
+      },
+      {
+        "kind": "out",
+        "q": "What is the VAT rate on restaurant meals in France?",
+        "bm25Top": 9.778,
+        "cosineTop": 0.2684
+      },
+      {
+        "kind": "in",
+        "q": "What does the fulfillment part of the shopping spec describe?",
+        "bm25Top": 10.492,
+        "cosineTop": 0.4659
+      },
+      {
+        "kind": "in",
+        "q": "When did the tiered caps replace the old flat scheme?",
+        "bm25Top": 19.403,
+        "cosineTop": 0.2115
+      }
+    ]
+  },
+  "adversarialInserts": "see evals/rag/gold/adversarial-inserts.json (corpus-EXTERNAL per A1; committed with the gold set)"
+}
