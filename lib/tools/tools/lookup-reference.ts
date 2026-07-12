@@ -30,8 +30,17 @@ export interface LookupReferenceParams {
   readonly question: string;
 }
 
+/**
+ * The label the pre-registration itself specifies for a missed floor, VERBATIM
+ * (§5: "Label on any miss"), plus the pointer a reader needs. Batch-D P2 #10:
+ * the earlier string paraphrased the registered label while the comments
+ * claimed it was carried verbatim — a small dishonesty about honesty, which is
+ * the worst kind here.
+ */
+export const LOOKUP_REFERENCE_REGISTERED_LABEL =
+  "RAG lane: floors not met (see results) — experimental, advisory only";
 export const LOOKUP_REFERENCE_LABEL =
-  "experimental — pre-registered floors NOT met (docs/e2-rag-preregistration.md RESULTS, scored 2026-07-12); advisory only, never a verdict";
+  `${LOOKUP_REFERENCE_REGISTERED_LABEL} (scored 2026-07-12; docs/e2-rag-preregistration.md RESULTS)`;
 
 // Lazy singleton: the corpus gate + index build run once, on first call —
 // and the A1 HARD BLOCK throws here if any pinned source drifted.

@@ -41,8 +41,15 @@ export interface MatchResult {
   readonly scopeLabel: string;
 }
 
+/**
+ * The scope label rendered on EVERY match result. Batch-D P2 #10: this said
+ * "validated on a SYNTHETIC adversarial corpus" — but the pre-registered floors
+ * were MISSED, so the registered label is the floors-not-met one (§5, "On any
+ * miss"). A label that says "validated" on a lane that failed its own bars is
+ * exactly the overclaim this project exists to refuse.
+ */
 export const E4_SCOPE_LABEL =
-  "entity resolution validated on a SYNTHETIC adversarial name corpus — advisory only; exact matching remains the system default";
+  "entity resolution: floors not met (see docs/e4-entity-resolution-preregistration.md RESULTS) — experimental, advisory only; exact matching remains the system default";
 
 /** The blended similarity score in [0, 1]. */
 export function ensembleScore(a: string, b: string): number {

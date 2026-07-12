@@ -36,7 +36,13 @@ if (!apiRes.ok) {
 }
 const apiJson = (await apiRes.json()) as { sha?: string; cardData?: { license?: string } };
 
-const extractor = await pipeline("feature-extraction", RAG_EMBEDDING_MODEL_ID, { dtype: "q8" });
+// P2 #8: fetch AT the resolved revision (previously this downloaded "main"
+// while separately recording a revision the download never used).
+const revision = apiJson.sha;
+if (typeof revision !== "string" || revision.length === 0) {
+  throw new Error("HF API returned no revision sha — refusing to fetch an unpinned model");
+}
+const extractor = await pipeline("feature-extraction", RAG_EMBEDDING_MODEL_ID, { dtype: "q8", revision });
 const probe = await extractor("model fetch probe", { pooling: "mean", normalize: true });
 if (!(probe.data instanceof Float32Array) || probe.data.length === 0) {
   throw new Error("probe embedding failed after download");
@@ -53,7 +59,7 @@ console.log(
   JSON.stringify(
     {
       modelId: RAG_EMBEDDING_MODEL_ID,
-      hfRevisionSha: apiJson.sha ?? "UNRESOLVED",
+      hfRevisionSha: revision,
       license: apiJson.cardData?.license ?? "apache-2.0",
       dtype: "q8",
       embeddingDim: probe.data.length,

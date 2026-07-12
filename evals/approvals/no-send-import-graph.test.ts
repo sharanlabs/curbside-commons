@@ -51,7 +51,16 @@ function reachableFrom(startFile: string): Set<string> {
   return seen;
 }
 
-// The AC-3 ban list, EXTENDED per the E3 packet: + node:child_process.
+// The AC-3 ban list, EXTENDED per the E3 packet (+ node:child_process) and
+// BROADENED at batch-D P2 #9: the promised threat class is "cannot send OR
+// mutate live state", so filesystem/database/mail/queue clients are banned too,
+// not just the HTTP surface.
+//
+// HONEST BOUNDARY (stated, not implied): this walker follows repo-relative
+// imports only — it does not traverse into node_modules, so it proves what the
+// FIRST-PARTY graph imports, and the ban list is what stops a third-party
+// client from being pulled in at the boundary. A transitive dependency of an
+// ALLOWED package is out of this test's reach by construction.
 const banned = [
   /lib\/agents\//,
   /@ai-sdk/,
@@ -62,6 +71,12 @@ const banned = [
   /node:net|node:tls|node:dgram/,
   /^node-fetch|^axios|^got$|^ws$/,
   /node:child_process/,
+  // batch-D P2 #9: mutation + transport surfaces beyond plain HTTP
+  /node:fs|^fs-extra$/,
+  /node:worker_threads|node:cluster|node:vm/,
+  /^nodemailer|^@slack\/|^@sendgrid|^resend$|^postmark/i,
+  /^pg$|^mysql|^mongodb|^redis|^ioredis|^sqlite|^better-sqlite3|@supabase/i,
+  /^amqplib|^kafkajs|^bull$|^bullmq/i,
 ];
 
 describe("E3 no-send structural proof", () => {
@@ -85,6 +100,24 @@ describe("E3 no-send structural proof", () => {
 
   it("lib/mcp/** is UNREACHABLE (the simulator is not a transport surface)", () => {
     expect(rel.some((f) => /^\/lib\/mcp\//.test(f))).toBe(false);
+  });
+
+  it("no reachable source writes to the filesystem or spawns a process (source-text scan)", () => {
+    // Complements the import ban: catches a mutation path that slipped in via an
+    // allowed module's re-export rather than a direct import specifier.
+    for (const file of reached) {
+      if (file.endsWith(".json")) continue;
+      const text = readFileSync(file, "utf8");
+      // Named APIs only — an earlier draft matched any word starting with
+      // "exec", which fired on the PROSE "execute (" in a comment. A scan that
+      // cries wolf on English gets muted; this one names the real surfaces.
+      for (const re of [
+        /\b(writeFileSync|appendFileSync|createWriteStream|rmSync|unlinkSync|mkdirSync|renameSync)\s*\(/,
+        /\b(spawn|spawnSync|exec|execSync|execFile|execFileSync|fork)\s*\(/,
+      ]) {
+        expect(re.test(text), `mutation/exec surface reachable in ${file}: ${re}`).toBe(false);
+      }
+    }
   });
 
   it("no reachable source performs a bare fetch()", () => {
