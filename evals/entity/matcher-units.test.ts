@@ -64,7 +64,10 @@ describe("E4 matcher invariants", () => {
     const r = proposeMatch("Fog City Tacos", "FOG CITY TACOS", 0.999, 0.849);
     expect(r.advisory).toBe(true);
     expect(r.scopeLabel).toBe(E4_SCOPE_LABEL);
-    expect(r.scopeLabel).toContain("SYNTHETIC");
+    // batch-D P2 #10c: the label must NOT say "validated" (the floors were missed)
+    // and must carry the registered floors-not-met wording + the protected default.
+    expect(r.scopeLabel).toContain("floors not met");
+    expect(r.scopeLabel.toLowerCase()).not.toContain("validated");
     expect(r.scopeLabel).toContain("exact matching remains the system default");
     expect(r.verdict).toBe("SAME"); // normalized-equal scores 1.0
     expect(ensembleScore("Fog City Tacos", "FOG CITY TACOS")).toBeCloseTo(1.0, 6);

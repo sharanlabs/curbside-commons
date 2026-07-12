@@ -326,7 +326,7 @@
         "content": [
           {
             "type": "text",
-            "text": "{\n  \"question\": \"What does drift mean for a published menu?\",\n  \"lane\": \"bm25\",\n  \"label\": \"experimental — pre-registered floors NOT met (docs/e2-rag-preregistration.md RESULTS, scored 2026-07-12); advisory only, never a verdict\",\n  \"abstained\": false,\n  \"answer_span\": \"| A rule-following pretend shopping agent that only ever sees the published menu (never the restaurant's till), decides by a fixed rule, and believes whatever the menu says — used to show the drift it can't detect.\",\n  \"citations\": [\n    {\n      \"file\": \"docs/GLOSSARY.md\",\n      \"anchor\": \"Glossary · Refund-window verdict state\"\n    }\n  ],\n  \"score\": 12.215512903159093,\n  \"registration\": \"docs/e2-rag-preregistration.md\"\n}\n"
+            "text": "{\n  \"question\": \"What does drift mean for a published menu?\",\n  \"lane\": \"bm25\",\n  \"label\": \"RAG lane: floors not met (see results) — experimental, advisory only (scored 2026-07-12; docs/e2-rag-preregistration.md RESULTS)\",\n  \"abstained\": false,\n  \"answer_span\": \"| A rule-following pretend shopping agent that only ever sees the published menu (never the restaurant's till), decides by a fixed rule, and believes whatever the menu says — used to show the drift it can't detect.\",\n  \"citations\": [\n    {\n      \"file\": \"docs/GLOSSARY.md\",\n      \"anchor\": \"Glossary · Refund-window verdict state\"\n    }\n  ],\n  \"score\": 12.215512903159093,\n  \"registration\": \"docs/e2-rag-preregistration.md\"\n}\n"
           }
         ],
         "structuredContent": {

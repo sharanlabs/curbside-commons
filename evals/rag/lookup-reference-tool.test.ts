@@ -17,7 +17,7 @@ import {
   outputValidatorFor,
   ToolInputError,
 } from "@/lib/tools/registry.ts";
-import { LOOKUP_REFERENCE_LABEL } from "@/lib/tools/tools/lookup-reference.ts";
+import { LOOKUP_REFERENCE_LABEL, LOOKUP_REFERENCE_REGISTERED_LABEL } from "@/lib/tools/tools/lookup-reference.ts";
 
 describe("E2 lookup_reference tool contract", () => {
   it("answers with a verbatim cited span and the deferred label, envelope schema-valid", () => {
@@ -35,7 +35,8 @@ describe("E2 lookup_reference tool contract", () => {
       lane: string;
     };
     expect(payload.label).toBe(LOOKUP_REFERENCE_LABEL);
-    expect(payload.label).toContain("floors NOT met");
+    expect(payload.label).toContain(LOOKUP_REFERENCE_REGISTERED_LABEL); // pre-registration §5, verbatim
+    expect(payload.label).toContain("floors not met"); // the registered wording, verbatim
     expect(payload.lane).toBe("bm25");
     expect(payload.abstained).toBe(false);
     expect(payload.answer_span).toBeTruthy();

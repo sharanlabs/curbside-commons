@@ -164,8 +164,12 @@ only" — the lane may still ship as clearly-labeled experimental, per the hones
 ## RESULTS (appended after the one scoring pass — nothing above this line changes)
 
 **Scored 2026-07-12 (one pass, network-denied; the gold set is now EXPOSED and never
-re-scorable).** Chain (git-provable, §7.1): registration `31bd66d` → index `d97fa90` →
-gold `c4396f0` → harness `fe6100c` → this results commit. Composition + leakage tests
+re-scorable).** Chain (git-provable, §7.1): registration `31bd66d` → **amendments `ff4181e`** (batch C,
+BEFORE any index or gold work — the operative frozen text is this one; batch-D P2 #6
+corrected an earlier claim that the doc was "byte-unchanged vs 31bd66d", which was
+false: the amendments legitimately landed at `ff4181e`, and it is `ff4181e..HEAD` that
+is unchanged above the RESULTS marker) → index `d97fa90` → gold `c4396f0` → harness
+`fe6100c` → this results commit. Composition + leakage tests
 were green BEFORE scoring (§7.2; 12/12 at `c4396f0`). Raws flushed BEFORE metrics
 (§7.3): `evals/rag/results/raw-items.jsonl` (66 records: 30 items × 2 lanes + 3 pairs
 × 2 lanes). Network-denied clean run (§7.5):

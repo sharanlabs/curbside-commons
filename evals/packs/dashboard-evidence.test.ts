@@ -33,6 +33,11 @@ import {
   ZERO_COST_PROOFS,
 } from "@/lib/dashboard/evidence";
 import { deriveBuildInfo, BUILD_SHA_PATTERN } from "@/lib/build-info";
+import { E4_SCOPE_LABEL } from "@/lib/entity/matcher.ts";
+import {
+  LOOKUP_REFERENCE_LABEL,
+  LOOKUP_REFERENCE_REGISTERED_LABEL,
+} from "@/lib/tools/tools/lookup-reference.ts";
 import { FEE_RULES, NON_STATEMENT_CHECKABLE } from "@/lib/packs/fees/rules";
 
 const root = process.cwd();
@@ -346,6 +351,32 @@ describe("E1b evidence — E2/E3/E4 figures are bound to their committed results
       `${ragSummary.bm25.metrics.m4.outAbstained}/${ragSummary.bm25.metrics.m4.outOf}`,
     );
     expect(E2.goldExposed).toBe(ragSummary.goldExposed);
+  });
+
+  it("E2/E4/E3 provenance carries a real SHA-shaped freeze ref pointing at a real file (batch-D P2 #10d)", () => {
+    for (const prov of [E2.provenance, E4.provenance, E3.provenance]) {
+      expect(prov.frozenAt, `${prov.file}: frozenAt must be a SHA, not prose`).toMatch(/^[0-9a-f]{7,40}$/);
+      expect(existsSync(join(root, prov.file)), `${prov.file} does not exist`).toBe(true);
+      expect(prov.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+  });
+
+  it("the rendered labels are the PRE-REGISTERED ones, verbatim (batch-D P2 #10a/#10c)", () => {
+    // The tool payload's label must contain the registration's own wording, and
+    // the E4 scope label rendered on every result must NOT claim "validated".
+    expect(LOOKUP_REFERENCE_LABEL).toContain(LOOKUP_REFERENCE_REGISTERED_LABEL);
+    // The registration hard-wraps prose at ~80 chars; judge on a normalized view
+    // (same convention as the calibration-label binding above).
+    expect(read(E2.registrationDoc).replace(/\s+/g, " ")).toContain(LOOKUP_REFERENCE_REGISTERED_LABEL);
+    expect(E4_SCOPE_LABEL).toContain("floors not met");
+    expect(E4_SCOPE_LABEL.toLowerCase()).not.toContain("validated");
+    expect(E4_SCOPE_LABEL).toContain("exact matching remains the system default");
+  });
+
+  it("E4: the VOIDED first run is disclosed on the surface, not buried (batch-D P1 #1)", () => {
+    expect(E4.voidedFirstRunNote).toContain("VOIDED");
+    expect(E4.voidedFirstRunNote).toContain("10 near-miss traps");
+    expect(read(E4.registrationDoc)).toContain("VOIDED FIRST ATTEMPT");
   });
 
   it("E2: the deferred label is the honest one and its lock/registration files exist", () => {

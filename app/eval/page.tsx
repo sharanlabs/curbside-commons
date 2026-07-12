@@ -263,6 +263,11 @@ export default function EvalEvidencePage() {
       <p className="ds-card-p" style={{ marginTop: "10px" }}>
         {E4.tiesBaselineNote}.
       </p>
+      <div className="ds-note">
+        <b>The first exam was thrown out — by us, on the record.</b> {E4.voidedFirstRunNote}. A
+        cross-model review caught that our own corpus broke our own registered minimum; keeping the
+        convenient number and calling the difference immaterial was the one option not available.
+      </div>
       <p className="ds-meta-line">
         Pre-registration: <span className="ds-mono">{E4.registrationDoc}</span> · locked by{" "}
         <span className="ds-mono">{E4.lockTestFile}</span>.

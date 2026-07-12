@@ -261,7 +261,7 @@ export const RECORDED_LEGACY_GEMINI = {
 
 export const E2_PROVENANCE: Provenance = {
   file: "evals/rag/results/results-summary.json",
-  frozenAt: "results commit, 2026-07-12 (chain: 31bd66d -> d97fa90 -> c4396f0)",
+  frozenAt: "2403fa8",
   date: "2026-07-12",
 };
 
@@ -299,7 +299,7 @@ export const E3 = {
   liveNote: "the live interactive lane remains a future owner decision — this simulator cannot send (lib/delivery and lib/mcp are proven unreachable from it)",
   provenance: {
     file: "evals/approvals/threat-model.test.ts",
-    frozenAt: "7fd9489",
+    frozenAt: "7fd40c9",
     date: "2026-07-12",
   } satisfies Provenance,
 } as const;
@@ -310,7 +310,7 @@ export const E3 = {
 
 export const E4_PROVENANCE: Provenance = {
   file: "evals/entity/results/results-summary.json",
-  frozenAt: "results commit, 2026-07-12 (chain: 31bd66d -> corpus e5f42c1 -> thresholds 705e54a)",
+  frozenAt: "2403fa8",
   date: "2026-07-12",
 };
 
@@ -325,6 +325,8 @@ export const E4 = {
   m4: `${entitySummary.ensemble.m4.ambigAbstained}/${entitySummary.ensemble.m4.ambigTotal} ambiguous routed to human`,
   tiesBaselineNote:
     "the fuzzy ensemble TIED normalized-exact matching on precision/recall/traps under the hard zero-false-merge floor — so exact matching (always the protected default) is also the shipped default",
+  voidedFirstRunNote:
+    "a first scoring run was VOIDED on cross-model review: its corpus carried 10 near-miss traps, violating the registration's ≥12 minimum. A non-compliant exam is not an exam — a fresh registered split (14 traps, 91 pairs) was generated and re-scored once, reaching the same conclusion",
   lockTestFile: "evals/entity/entity-results-lock.test.ts",
   provenance: E4_PROVENANCE,
 } as const;
