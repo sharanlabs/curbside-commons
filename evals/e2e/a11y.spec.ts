@@ -10,7 +10,7 @@ import AxeBuilder from "@axe-core/playwright";
  * hand-written checks (keyboard toggles, reduced-motion, contrast recomputes).
  */
 
-const SURFACES = ["/", "/report", "/eval", "/legacy/console"] as const;
+const SURFACES = ["/", "/report", "/eval", "/legacy/console", "/playground"] as const;
 
 for (const path of SURFACES) {
   test(`axe: ${path} has zero WCAG A/AA violations`, async ({ page }) => {

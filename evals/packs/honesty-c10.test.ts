@@ -65,6 +65,11 @@ const publicProse = [
 const siteShell = [
   join(root, "app", "page.tsx"),
   join(root, "app", "layout.tsx"),
+  // Playground slice (owner commission 2026-07-13): the in-browser verifier's
+  // page + client + seam are viewer-facing prose surfaces — same gates.
+  join(root, "app", "playground", "page.tsx"),
+  join(root, "components", "playground", "PlaygroundClient.tsx"),
+  join(root, "components", "playground", "verify-in-browser.ts"),
 ];
 
 const scannedFiles = [

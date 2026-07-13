@@ -9,6 +9,7 @@ import { PLATFORM_NAME } from "@/lib/product";
 const LINKS = [
   { href: "/report", label: "Report" },
   { href: "/demo", label: "Demo" },
+  { href: "/playground", label: "Playground" },
   { href: "/eval", label: "Eval evidence" },
   { href: "/metrics", label: "Measurables" },
   { href: "/cost", label: "Cost" },

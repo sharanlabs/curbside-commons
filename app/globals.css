@@ -2991,3 +2991,57 @@ body {
   padding-bottom: 6px;
   border-bottom: 1px solid var(--line);
 }
+
+/* ============================================================
+   PLAYGROUND LAYER (owner commission 2026-07-13) — the in-browser
+   verifier surface, in the B-2 Gallery Cards register: white ground,
+   hairlines, wine accent, radii <=6px, system fonts, no gradients/
+   glass/shadow decoration. Every transition here is killed under
+   prefers-reduced-motion: reduce (block at the end).
+   ============================================================ */
+.pg-page { padding-bottom: 72px; }
+.pg-sec { max-width: 980px; margin: 0 auto; padding: 40px 24px 0; }
+.pg-h1 { font-size: clamp(30px, 4.4vw, 44px); line-height: 1.1; letter-spacing: -0.015em; margin-top: 10px; }
+.pg-lede { max-width: 68ch; margin-top: 16px; font-size: 16.5px; line-height: 1.62; color: var(--body); }
+.pg-boundary { max-width: 68ch; margin-top: 12px; padding: 12px 14px; border-left: 2px solid var(--signal); background: var(--bg-2); font-size: 14.5px; line-height: 1.6; }
+.pg-noscript { max-width: 68ch; padding: 12px 14px; border: 1px solid var(--rule-2); font-size: 14.5px; line-height: 1.6; }
+
+.pg-wrap { margin-top: 8px; }
+.pg-label { display: block; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.pg-input { width: 100%; min-height: 260px; resize: vertical; font-family: var(--ff-mono); font-size: 12.5px; line-height: 1.55; padding: 12px; border: 1px solid var(--rule-3); border-radius: 6px; background: #fff; color: inherit; }
+.pg-input:focus-visible { outline: 2px solid var(--signal); outline-offset: 1px; }
+.pg-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.pg-hint { max-width: 68ch; margin-top: 10px; font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+
+.pg-error { max-width: 68ch; margin-top: 18px; padding: 12px 14px; border: 1px solid var(--error-ink); border-radius: 6px; color: var(--error-ink); font-size: 14.5px; line-height: 1.6; background: #fff; }
+
+.pg-result { margin-top: 28px; border-top: 1px solid var(--rule-2); padding-top: 20px; }
+.pg-verdict-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.pg-verdict { font-size: 30px; font-weight: 700; letter-spacing: 0.02em; }
+.pg-verdict.fail { color: var(--error-ink); }
+.pg-verdict.ok { color: var(--ink-2); }
+.pg-tally { font-size: 15px; color: var(--ink-2); }
+.pg-prov { max-width: 68ch; margin-top: 12px; font-size: 14px; line-height: 1.6; color: var(--muted); }
+.pg-meta { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 14px; padding: 10px 0; border-top: 1px solid var(--rule-2); border-bottom: 1px solid var(--rule-2); }
+.pg-meta dt { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.pg-meta dd { margin: 2px 0 0; font-size: 12.5px; }
+.pg-mono { font-family: var(--ff-mono); overflow-wrap: anywhere; }
+
+.pg-findings { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
+.pg-finding { border: 1px solid var(--rule-2); border-radius: 6px; padding: 14px 16px; background: #fff; transition: border-color 160ms ease; }
+.pg-finding:hover { border-color: var(--rule-3); }
+.pg-plain { font-size: 14.5px; line-height: 1.55; }
+.pg-sev { display: inline-block; min-width: 44px; margin-right: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+.pg-sev.error { color: var(--error-ink); }
+.pg-sev.warn { color: var(--warn-ink); }
+.pg-sev.info { color: var(--muted); }
+.pg-receipts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 20px; margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--rule-2); }
+.pg-receipts dt { font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.pg-receipts dd { margin: 2px 0 0; font-size: 12px; }
+.pg-clean { margin-top: 16px; font-size: 14.5px; }
+.pg-foot-sec { margin-top: 8px; }
+.pg-foot { max-width: 68ch; font-size: 13px; line-height: 1.65; color: var(--muted); border-top: 1px solid var(--rule-2); padding-top: 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pg-finding { transition: none; }
+}

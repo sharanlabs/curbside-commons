@@ -50,6 +50,7 @@ test("canonical nav = truth-engine surfaces + exactly one legacy link; every sur
   const surfaces: Array<[string, RegExp]> = [
     ["Report", /What the copy says/],
     ["Demo", /.+/],
+    ["Playground", /^Verify a serving copy in your browser$/],
     ["Eval evidence", /^Eval evidence$/],
     ["Measurables", /^Engine measurables$/],
     ["Cost", /^Cost & \$0 enforcement$/],
