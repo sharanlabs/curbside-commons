@@ -1,0 +1,15 @@
+# Cloudflare Pages custom headers (HEADER POLICY, plan v3.3 — decided 2026-07-12).
+# Source-controlled here (public/ is copied verbatim into out/ by the static
+# export) so the policy rides batch E's review and no preflight-induced change
+# can enter the candidate post-review. Policy record:
+# docs/header-policy-2026-07-12.md. Syntax per the Cloudflare Pages docs
+# (developers.cloudflare.com/pages/configuration/headers/, checked 2026-07-12).
+#
+# Deliberately ABSENT: Content-Security-Policy — deferred with a named reason
+# (see the policy record §3); adding one later is a new reviewed decision.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
