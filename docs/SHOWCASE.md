@@ -9,7 +9,7 @@
 ```bash
 node bin/check.mjs fees fixtures/synthetic-restaurant/fees/statement.drifted.json
 ```
-A deliberately-drifted fee statement audited against the codified NYC §20-563.3 rule table — every catch carries its receipts (claim · reference · rule id · severity). Exit 1 = violations found (CI-usable). Also: `node bin/check.mjs --feed fixtures/synthetic-restaurant/acp-feed.drifted.json --against fixtures/synthetic-restaurant/sor.catalog.json --surface acp` (menu truth) and `node bin/check.mjs demo` (the scripted walkthrough).
+A deliberately-drifted fee statement audited against the codified NYC §20-563.3 rule table — every catch carries its receipts (claim · reference · rule id · severity). Exit 1 = violations found (CI-usable). Also: `node bin/check.mjs check fixtures/synthetic-restaurant/acp-feed.drifted.json --against fixtures/synthetic-restaurant/sor.catalog.json --surface acp` (menu truth; exit 1 = drift found) and `node bin/check.mjs demo` (the scripted walkthrough). *(Command corrected 2026-07-12: the previous text omitted the `check` subcommand and used a nonexistent `--feed` flag — caught by the S7 demo record, which runs every command verbatim.)*
 
 ## 1 · The tool registry (A0) — one validated seam, seven tools
 
@@ -81,3 +81,5 @@ Both enhancement lanes were scored ONCE against floors committed in git before a
 | Entity resolution (E4) | advisory candidate matches on a SYNTHETIC corpus — **"floors not met (2026-07-12) — experimental, advisory only"**; exact matching remains the system default | any real-world registry matching claim; any merge authority (it proposes; it cannot merge) |
 
 Everything above was adversarially reviewed per slice by a second model (Codex), with every accepted finding fixed red-green — records in `docs/reviews/`. The full engineering story: `docs/plan-agentic-extension.md` + `docs/PLAIN-ENGLISH.md` (the layman register).
+
+**Ran, on record:** every command on this page was executed verbatim on 2026-07-12 against a named commit, transcripts + exit codes committed — `docs/demo-record-2026-07.md` (that run is also what caught and fixed the §0 command typo above).

@@ -20,6 +20,12 @@ Collision-sweep sources: [Crunchbase (Curbside)](https://www.crunchbase.com/orga
 **Diligence CLEAN on every check that could be run authoritatively.** Materially cleaner than the prior candidate Plumbline (whose exact-match domains were ALL registered, 2026-07-07 screen). S-11 closes as: **adoption ratified** (the complete-all directive + the name already being the shipped identity), with two open tails that are the owner's own acts:
 
 1. **Register `curbsidecommons.com`** (a payment — never automated; ~$10–12/yr at any registrar). Availability can change any day; register promptly if wanted.
-2. **Manual TESS confirmation** at tmsearch.uspto.gov before making any trademark claim (we make none today; the site/README claim only the name, which is honest).
+2. **Manual confirmation in USPTO Trademark Search** (<https://tmsearch.uspto.gov/> — the current system; wording updated 2026-07-12, see addendum) before making any trademark claim (we make none today; the site/README claim only the name, which is honest).
 
 No trademark is claimed anywhere in the repo or site; nothing in this diligence licenses a ® or ™ marking.
+
+## Addendum — S7 wording sync (2026-07-12)
+
+- **Brand posture (final, plan v3.3 §S7):** "Curbside Commons" is the **final non-commercial display brand — no clearance claimed.** The project is free/non-commercial (domain purchase declined, owner tail answer 2026-07-09); the name is a display identity for the repo and site, not an asserted trademark, and no clearance search is claimed to have been completed.
+- **Terminology correction (live-checked 2026-07-12 at <https://www.uspto.gov/trademarks/search>):** the USPTO's current system is **"Trademark Search"** at tmsearch.uspto.gov; TESS is the retired predecessor (the USPTO page links a "Transitioning from TESS" handout). The 2026-07-08 table above says "TESS" — that stands as the historical record of what was written then; the operative instruction is: any future trademark claim requires a manual **USPTO Trademark Search** query first. None is made or planned.
+- The two owner tails (domain registration · manual trademark search) remain **open owner acts**, unchanged in substance.
