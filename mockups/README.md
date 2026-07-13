@@ -4,11 +4,21 @@ Every committed mockup artifact, classified by status. **None of these is served
 
 **Statuses:** `shipped` = adopted as spec and implemented on the live surfaces · `superseded` = a candidate/spec generation that was replaced · `historical` = earlier exploration generations + screenshots · `current/new` = an active proposal awaiting the owner's reaction.
 
+## Design variations ×3 (2026-07-12 — current generation; owner iterate word on the Meridian sample)
+
+Ordered under the owner's 2026-07-12 word (decision-log row, verbatim there): 3 ultra-modern variations on the Meridian content — hero/side animations, UI cards, micro-animations/transitions, vertical scroll, clean horizontal space, prominent icon treatment (owner's mid-session addendum). All three: SIMULATED banner byte-verbatim · the committed golden's findings EXACT · zero external requests · system fonts (AP-14) · reduced-motion gated · no-JS `<details>` path · keyboard hold + no-hold control · pure-white ground. Builders A/C = frontend-specialist@opus (both seats died on the shared session limit AFTER writing their complete files — raw errors in the session record); B = built inline on the primary seat (NO-WAIT precedent). Samples only — site adoption is a later owner word.
+
+| Artifact | Status | Note |
+|---|---|---|
+| `variation-a-meridian-ascent-2026-07-12.html` | **current/new** | "Meridian Ascent" — the ENHANCE-the-existing variation: meridian spine + icon stations kept, elevated with a scroll-progress spine fill, ambient hairline longitude field, card-ized evidence, reveal staggers. C10 pickup 2026-07-12 (dynamic scan; red-green proven on variation B same run) |
+| `variation-b-gallery-cards-2026-07-12.html` | **current/new** | "Gallery Cards" — the REORIENT variation: sticky mini-nav, self-drawing cartographic hero line-work, the content re-flowed into card grids (5 flow cards · 3 module cards · 3 evidence stat cards incl. the floors-not-met card) with icon-tile medallions, staggered reveals, hold-to-verify kept with all four paths. C10 pickup proven RED-GREEN 2026-07-12 (planted overclaim bit exactly 1, restore green 106/106) |
+| `variation-c-split-stage-2026-07-12.html` | **current/new** | "Split Stage" — the SIDE-ANIMATION-led variation: persistent sticky left rail (scroll-advancing seal + section index + honesty pill), right vertical story column with evidence cards, rail collapses gracefully <1100px. C10 pickup 2026-07-12 (same dynamic scan) |
+
 ## S6b design lane + RV2 prototype (2026-07-11 — current generation)
 
 | Artifact | Status | Note |
 |---|---|---|
-| `meridian-2026-07-11.html` | **current/new** | S6b design-lane sample "Meridian" (vertical meridian spine · pure-white gallery ground · self-drawing Verifier Seal · hold-and-release "Hold to verify" with keyboard/no-hold/no-JS paths). Brief: `docs/design-brief-s6b-2026-07-11.md`. Sample only — site adoption is a later owner word. C10 pickup proven red-green 2026-07-11 |
+| `meridian-2026-07-11.html` | **current/new** | S6b design-lane sample "Meridian" (vertical meridian spine · pure-white gallery ground · self-drawing Verifier Seal · hold-and-release "Hold to verify" with keyboard/no-hold/no-JS paths). Brief: `docs/design-brief-s6b-2026-07-11.md`. Sample only — site adoption is a later owner word; the 2026-07-12 variations above iterate on this sample's content (it stays a live candidate). C10 pickup proven red-green 2026-07-11 |
 | `playground-prototype-2026-07-11.html` | **current/new** | RV2 playground PROTOTYPE (owner pick "Prototype first"): paste-a-feed UX spike replaying the committed golden for the committed sample feed; the real engine is deliberately NOT wired (that full slice is what this spike evaluates, stated on its face). C10 pickup proven red-green 2026-07-11 |
 
 ## ultra-modern-2026-07-08/ (the adopted whole-site generation)
@@ -51,4 +61,4 @@ Every committed mockup artifact, classified by status. **None of these is served
 
 `app-console.png` · `app-landing-settled.png` · `app-landing.png` · `editorial.png` · `premium.png` · `saas.png` · `swiss.png` · `technical.png` · `v2-ledger.png` · `v2-letterpress.png` · `v2-manifesto-catch.png` · `v2-manifesto.png` · `v2-reportage.png` · `v2-terminal-swiss-catch.png` · `v2-terminal-swiss.png` · `v3-390.png` · `v3-768.png` · `v3-audit.png` · `v3-ledger-enterprise.png` · `v3-surface.png` · `verification-story-catch.png` · `verification-story-hero.png` · `verification-story-pipeline.png` — renders of the explorations above.
 
-**Count: 56 artifacts** (2 current-generation [S6b Meridian + RV2 playground] + 9 ultra-modern + 8 design-samples + 14 root HTML + 23 shots). The original S4 inventory scope was 54; the two additions are the recorded S6b/RV2 artifacts above.
+**Count: 59 artifacts** (5 current-generation [3 design variations 2026-07-12 + S6b Meridian + RV2 playground] + 9 ultra-modern + 8 design-samples + 14 root HTML + 23 shots). The original S4 inventory scope was 54; additions since are the recorded S6b/RV2 artifacts (2026-07-11) and the three variation samples (2026-07-12), each row above.

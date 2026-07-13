@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en" data-variation="c-split-stage">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Split Stage — Curbside Commons design sample C (simulated prototype)</title>
+<meta name="robots" content="noindex" />
+<meta name="description" content="Design-lane sample C (Split Stage, 2026-07-12) for Curbside Commons — the deterministic commerce-truth verifier. Simulated prototype; zero external requests; not a live service." />
+<script>
+  /* Sync JS hook before paint so progressively-enhanced controls and the reveal
+     pre-states apply from first render. No-JS never gets .js, so every piece of
+     content stays visible and operable without JavaScript. */
+  document.documentElement.className += " js";
+</script>
+<style>
+  /* =========================================================================
+     Curbside Commons — Variation C, "Split Stage" (2026-07-12).
+     Side-animation-led asymmetric split on pure white. LEFT RAIL (sticky, full
+     viewport) hosts the living Verifier Seal whose progress ring ADVANCES with
+     scroll, a live section index, and the honesty pill. RIGHT COLUMN is the
+     vertical scroll story with a <=680px prose measure and generous whitespace.
+     Design language inherited from the Meridian sample: pure-white ground, one
+     wine/oxblood accent, warm near-black ink ramp (every text/ground pair
+     recomputed >= 4.5:1 on #FFFFFF), serif display + sans body + mono receipts,
+     the committed 20x20 monoline icon set, severity = shape + word. Zero
+     external requests: system fonts, inline SVG only.
+     ========================================================================= */
+
+  :root {
+    --ground: #ffffff;
+    --panel: #fcfbfc;             /* barely-there wine-neutral panel */
+    --ink: #1a1712;              /* headings / hard marks — 18.1:1 on #fff */
+    --ink-2: #2e2825;            /* strong text — 14.7:1 */
+    --body: #423b38;            /* body — 11.1:1 */
+    --muted: #5c534d;           /* labels / mono — 7.6:1 */
+    --faint: #6d635b;           /* least-essential >=13px — 5.9:1 */
+    --wine: #8a2233;            /* the single accent — 8.9:1 on #fff */
+    --wine-deep: #6e1423;       /* hover / pressed — 11.4:1 */
+    --wine-soft: rgba(138, 34, 51, 0.055);
+    --wine-line: rgba(138, 34, 51, 0.22);
+    --rule: rgba(62, 10, 19, 0.12);
+    --rule-2: rgba(62, 10, 19, 0.2);
+    --error-ink: #b71f13;       /* severity ink (paired with a shape + word) — 6.5:1 */
+    --warn-ink: #9c3d06;        /* — 6.8:1 */
+
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Menlo", Consolas, "Liberation Mono", monospace;
+
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-inout: cubic-bezier(0.77, 0, 0.175, 1);
+
+    --measure: 680px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--body);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection { background: var(--wine-soft); }
+
+  .vh {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  /* skip link — first in tab order */
+  .skip {
+    position: absolute; left: 12px; top: -48px; z-index: 60;
+    background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 6px;
+    font-weight: 600; text-decoration: none; transition: top 140ms var(--ease-out);
+  }
+  .skip:focus { top: 12px; color: #fff; }
+
+  :focus-visible {
+    outline: 3px solid var(--wine);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  /* ---- icon system (the committed 20x20 monoline currentColor set) ---- */
+  .ic {
+    width: 20px; height: 20px; flex: 0 0 auto;
+    fill: none; stroke: currentColor; stroke-width: 1.5;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* ============================ THE SPLIT STAGE ======================== */
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(320px, 38%) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  /* ------------------------------ LEFT RAIL -------------------------------- */
+  .rail {
+    position: sticky; top: 0;
+    align-self: start;
+    height: 100dvh;
+    border-right: 1px solid var(--rule);
+    background: var(--ground);
+    z-index: 10;
+  }
+  .rail-in {
+    height: 100%;
+    display: flex; flex-direction: column;
+    padding: clamp(28px, 4vh, 44px) clamp(26px, 3vw, 44px);
+    gap: 20px;
+  }
+
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--serif); font-size: 20px; font-weight: 600; letter-spacing: -0.01em;
+    color: var(--ink); text-decoration: none;
+  }
+  .brand .ic { width: 19px; height: 19px; color: var(--wine); }
+  .brand-sub {
+    display: block;
+    font-family: var(--sans); font-size: 10.5px; font-weight: 600; letter-spacing: 0.11em;
+    text-transform: uppercase; color: var(--muted); margin-top: 3px; padding-left: 29px;
+  }
+
+  /* the living mark — centered stage of the rail */
+  .seal-stage {
+    flex: 1 1 auto;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; min-height: 0;
+  }
+  .seal {
+    width: clamp(150px, 19vw, 210px); height: auto; overflow: visible; color: var(--wine);
+    display: block;
+  }
+  .seal .ring-ghost { fill: none; stroke: var(--rule-2); stroke-width: 2; }
+  .seal .ring-prog {
+    fill: none; stroke: var(--wine); stroke-width: 3; stroke-linecap: round;
+    stroke-dasharray: 1; stroke-dashoffset: 0;      /* default: complete (no-JS + reduced motion) */
+  }
+  .seal .shield { fill: none; stroke: var(--ink); stroke-width: 2; }
+  .seal .check  { fill: none; stroke: var(--wine); stroke-width: 2.6; }
+  .seal .ringtext {
+    font-family: var(--sans); font-size: 6px; font-weight: 600; letter-spacing: 1.4px;
+    fill: var(--muted);
+  }
+  .seal-cap {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; color: var(--faint);
+    text-align: center; margin: 0; max-width: 22ch;
+  }
+
+  /* honesty pill */
+  .pill {
+    align-self: center;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    color: var(--wine); background: var(--wine-soft);
+    border: 1px solid var(--wine-line); border-radius: 999px;
+    padding: 6px 13px;
+  }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--wine); flex: 0 0 auto; }
+
+  /* section index */
+  .idx { margin: 0; }
+  .idx-label {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--faint); margin: 0 0 8px;
+  }
+  .idx ol { list-style: none; margin: 0; padding: 0; }
+  .idx li { margin: 0; }
+  .idx a {
+    position: relative;
+    display: grid; grid-template-columns: 26px 1fr; align-items: baseline; gap: 8px;
+    text-decoration: none; color: var(--muted);
+    padding: 6px 10px; border-radius: 6px; border-left: 2px solid transparent;
+    transition: color 180ms var(--ease-out), background 180ms var(--ease-out),
+                border-color 180ms var(--ease-out);
+  }
+  .idx-num { font-family: var(--mono); font-size: 11px; color: var(--faint); transition: color 180ms var(--ease-out); }
+  .idx-name {
+    font-size: 13.5px; font-weight: 500; position: relative; width: fit-content;
+  }
+  /* underline that slides in from the left on hover */
+  .idx-name::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1.5px;
+    background: var(--wine); transform: scaleX(0); transform-origin: left center;
+  }
+  .idx a[aria-current="true"] {
+    color: var(--wine-deep); background: var(--wine-soft); border-left-color: var(--wine);
+  }
+  .idx a[aria-current="true"] .idx-num { color: var(--wine); }
+  @media (hover: hover) and (pointer: fine) {
+    .idx a:hover { color: var(--wine-deep); background: var(--wine-soft); }
+    .idx a:hover .idx-num { color: var(--wine); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .idx-name::after { transition: transform 200ms var(--ease-out); }
+    @media (hover: hover) and (pointer: fine) {
+      .idx a:hover .idx-name::after { transform: scaleX(1); }
+    }
+    .idx a[aria-current="true"] .idx-name::after { transform: scaleX(1); }
+  }
+
+  /* ----------------------------- RIGHT STORY ------------------------------- */
+  .story {
+    padding-block: clamp(64px, 9vh, 118px) 92px;
+    padding-inline: clamp(32px, 6vw, 104px) clamp(24px, 5vw, 84px);
+  }
+  .story-inner { max-width: var(--measure); }
+
+  .beat { padding-top: clamp(48px, 7vh, 92px); }
+  .beat:first-child { padding-top: 0; }
+  .beat + .beat { border-top: 1px solid var(--rule); margin-top: clamp(48px, 7vh, 92px); }
+  .beat > * + * { margin-top: 18px; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; margin: 0;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--wine);
+  }
+  .eyebrow .ic { width: 16px; height: 16px; }
+
+  h1.h1 {
+    font-family: var(--serif); color: var(--ink);
+    font-size: clamp(33px, 5.2vw, 52px); line-height: 1.07; letter-spacing: -0.02em;
+    font-weight: 600; margin: 22px 0 0; max-width: 18ch;
+  }
+  h1 .mark { color: var(--wine); font-style: italic; box-shadow: inset 0 -0.14em 0 var(--wine-soft); }
+  h2.h2 {
+    font-family: var(--serif); color: var(--ink);
+    font-size: clamp(26px, 3.6vw, 36px); line-height: 1.13; letter-spacing: -0.015em;
+    font-weight: 600; margin: 10px 0 0; max-width: 20ch;
+  }
+  h3.h3 {
+    font-family: var(--serif); color: var(--ink-2);
+    font-size: 20px; line-height: 1.2; letter-spacing: -0.01em; font-weight: 600; margin: 0;
+  }
+  .lede { font-size: clamp(17px, 1.7vw, 20px); color: var(--body); max-width: 58ch; margin: 22px 0 0; line-height: 1.55; }
+  .prose { color: var(--body); max-width: 64ch; margin: 0; }
+  .prose em { font-style: italic; color: var(--ink-2); }
+  .kicker {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); margin: 0;
+  }
+
+  /* CTA */
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+    padding: 12px 20px; border-radius: 999px; text-decoration: none;
+    transition: background 160ms var(--ease-out), color 160ms var(--ease-out),
+                border-color 160ms var(--ease-out);
+  }
+  .btn .ic { width: 17px; height: 17px; }
+  .btn.primary { background: var(--wine); color: #fff; border: 2px solid var(--wine); }
+  .btn.ghost { background: transparent; color: var(--ink); border: 2px solid var(--rule-2); }
+  @media (hover: hover) and (pointer: fine) {
+    .btn.primary:hover { background: var(--wine-deep); border-color: var(--wine-deep); }
+    .btn.ghost:hover { border-color: var(--wine); color: var(--wine-deep); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .btn { transition: transform 160ms var(--ease-out), background 160ms var(--ease-out),
+                       color 160ms var(--ease-out), border-color 160ms var(--ease-out); }
+    .btn:active { transform: scale(0.97); }
+  }
+
+  /* ============================ SIMULATED banner ======================= */
+  .sim {
+    display: flex; gap: 12px; align-items: flex-start;
+    border: 1px solid var(--wine-line); background: var(--wine-soft);
+    border-left: 4px solid var(--wine); border-radius: 8px;
+    padding: 14px 16px; margin-top: 26px; max-width: var(--measure);
+  }
+  .sim-tag {
+    flex: 0 0 auto; font-family: var(--mono); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; color: #fff; background: var(--wine);
+    padding: 3px 8px; border-radius: 4px; margin-top: 2px;
+  }
+  .sim-text { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+
+  /* ============================= FLOW (how) ============================= */
+  .flow { list-style: none; margin: 26px 0 0; padding: 0; }
+  .flow-step {
+    display: grid; grid-template-columns: 40px 1fr; gap: 16px;
+    padding: 18px 0; border-top: 1px dashed var(--rule);
+  }
+  .flow-step:first-child { border-top: 0; }
+  .flow-node {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--ground);
+    border: 1.5px solid var(--rule-2); color: var(--ink-2);
+    display: flex; align-items: center; justify-content: center; align-self: start;
+  }
+  .flow-step.gate .flow-node { border-color: var(--wine); color: var(--wine); background: var(--wine-soft); }
+  .flow-node .ic { width: 18px; height: 18px; }
+  .flow-body > * + * { margin-top: 6px; }
+  .flow-body .kicker.gate { color: var(--wine); }
+  .flow-desc { font-size: 14.5px; color: var(--body); margin: 4px 0 0; max-width: 60ch; }
+
+  /* ======================== HOLD-TO-VERIFY + verdict =================== */
+  .hold-zone { margin-top: 30px; }
+  .hold-instr { font-size: 14.5px; color: var(--body); max-width: 60ch; margin: 0 0 16px; }
+  .hold-controls { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+
+  /* resting: wine text on white with a wine border. The rising fill is solid
+     wine carrying a WHITE copy of the label, so the label reads wine-on-white
+     where unfilled and white-on-wine where filled — both pairs clear 4.5:1
+     across the whole fill sweep. */
+  .hold-btn {
+    position: relative; overflow: hidden; isolation: isolate;
+    font: inherit; font-size: 15px; font-weight: 700; letter-spacing: 0.01em;
+    cursor: pointer; -webkit-user-select: none; user-select: none; touch-action: none;
+    padding: 14px 30px; min-width: 220px; text-align: center;
+    background: var(--ground); color: var(--wine);
+    border: 2px solid var(--wine); border-radius: 999px;
+  }
+  .hold-btn .hold-base { position: relative; z-index: 1; }
+  .hold-fill {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--wine); color: #fff;
+    clip-path: inset(100% 0 0 0);
+  }
+  .hold-fill-inner { font-weight: 700; }
+  .done .hold-fill { clip-path: inset(0 0 0 0); }
+  @media (prefers-reduced-motion: no-preference) {
+    .hold-btn { transition: transform 160ms var(--ease-out); }
+    .hold-fill { transition: clip-path 200ms var(--ease-out); }  /* fast ease-out retreat */
+    .holding .hold-fill { clip-path: inset(0 0 0 0); transition: clip-path 1400ms linear; }  /* slow, deliberate fill */
+    .hold-btn:active { transform: scale(0.97); }
+  }
+
+  .reveal-plain {
+    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    background: transparent; color: var(--ink); border: 0;
+    padding: 10px 6px; border-bottom: 2px solid var(--rule-2); border-radius: 2px;
+    transition: color 140ms var(--ease-out), border-color 140ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .reveal-plain:hover { color: var(--wine-deep); border-color: var(--wine); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal-plain { transition: color 140ms var(--ease-out), border-color 140ms var(--ease-out), transform 160ms var(--ease-out); }
+    .reveal-plain:active { transform: scale(0.97); }
+  }
+
+  .hold-cue {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--wine);
+    margin: 12px 0 0; opacity: 0; transition: opacity 180ms var(--ease-out);
+  }
+  .holding .hold-cue { opacity: 1; }
+
+  /* progressive enhancement: hide js-only controls without JS; hide native
+     <summary> when JS is present (hold / reveal buttons drive the disclosure). */
+  .js-only { display: none; }
+  .js .js-only { display: inline-flex; }
+  .js .reveal-plain.js-only { display: inline-block; }
+  .js .hold-instr.js-only, .js .hold-cue.js-only { display: block; }
+  .js .verdict-summary { display: none; }
+
+  .verdict-details { margin-top: 24px; }
+  .verdict-summary {
+    display: inline-block; cursor: pointer; font-weight: 600; color: var(--wine);
+    padding: 10px 16px; border: 2px solid var(--wine); border-radius: 999px;
+    list-style: none;
+  }
+  .verdict-summary::-webkit-details-marker { display: none; }
+
+  .verdict-card {
+    margin-top: 8px; border: 1px solid var(--rule-2); border-radius: 12px;
+    background: var(--panel); padding: 22px; max-width: var(--measure);
+  }
+  .verdict-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .verdict-flag {
+    font-family: var(--mono); font-weight: 700; font-size: 13px; letter-spacing: 0.14em;
+    color: #fff; background: var(--wine); padding: 4px 12px; border-radius: 5px;
+  }
+  .verdict-count { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
+  .verdict-tally { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .verdict-sub { font-size: 14px; color: var(--body); margin: 12px 0 0; max-width: 58ch; }
+  .mono { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); word-break: break-word; }
+  .mono-sub { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--faint); margin-top: 2px; }
+
+  /* findings as UI cards, each carrying its four receipts */
+  .finding-cards { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
+  .finding-card {
+    border: 1px solid var(--rule); border-radius: 10px; background: var(--ground);
+    padding: 16px 16px 14px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .finding-card:hover { border-color: var(--wine-line); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .finding-card { transition: border-color 180ms var(--ease-out), transform 180ms var(--ease-out); }
+    @media (hover: hover) and (pointer: fine) {
+      .finding-card:hover { transform: translateY(-2px); }
+    }
+  }
+  .finding-lead { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; }
+  .finding-idx { font-family: var(--mono); font-size: 12px; color: var(--muted); padding-top: 2px; }
+  .finding-plain { margin: 0; font-size: 15px; color: var(--ink-2); line-height: 1.45; }
+  .sev {
+    display: inline-flex; align-items: center; gap: 5px; flex: 0 0 auto;
+    font-family: var(--mono); font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 2px 8px 2px 6px; border-radius: 5px; border: 1px solid;
+  }
+  .sev .ic { width: 14px; height: 14px; }
+  .sev.error { color: var(--error-ink); border-color: rgba(183, 31, 19, 0.4); background: rgba(217, 45, 32, 0.06); }
+  .receipts {
+    margin: 12px 0 0 34px; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 20px;
+  }
+  .receipts > div { display: flex; flex-direction: column; gap: 2px; }
+  .receipts dt {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .receipts dd { margin: 0; }
+  .findings-more { font-size: 13px; color: var(--faint); margin: 16px 0 0; }
+
+  /* ============================== MODULES ============================== */
+  .modules { list-style: none; margin: 26px 0 0; padding: 0; }
+  .module {
+    display: grid; grid-template-columns: 44px 1fr; gap: 16px;
+    padding: 22px 0; border-top: 1px solid var(--rule);
+  }
+  .module:first-child { border-top: 0; }
+  .module-ic {
+    width: 40px; height: 40px; border-radius: 10px; background: var(--wine-soft);
+    color: var(--wine); display: flex; align-items: center; justify-content: center; align-self: start;
+  }
+  .module-ic .ic { width: 22px; height: 22px; }
+  .module-body > * + * { margin-top: 6px; }
+  .module-desc { font-size: 14.5px; color: var(--body); margin: 4px 0 0; max-width: 62ch; }
+
+  /* =============================== FOOTER ============================== */
+  .foot {
+    margin-top: 30px; padding: 22px; border-radius: 12px; max-width: var(--measure);
+    background: var(--panel); border: 1px solid var(--rule);
+    font-size: 13px; line-height: 1.6; color: var(--body);
+  }
+  .foot strong { color: var(--ink); font-weight: 700; }
+  .foot .foot-status { font-weight: 700; color: var(--ink); }
+  .site-end {
+    padding: 26px clamp(32px, 6vw, 104px) 56px;
+    font-size: 12px; color: var(--faint); max-width: 78ch;
+  }
+
+  /* ===================== reveal-on-scroll (progressive) ================ */
+  @media (prefers-reduced-motion: no-preference) {
+    .js .reveal { opacity: 0; transform: translateY(12px); }
+    .js .reveal.in {
+      opacity: 1; transform: none;
+      transition: opacity 360ms var(--ease-out), transform 360ms var(--ease-out);
+    }
+  }
+
+  /* ===================== the living mark: draw + scroll ================ */
+  /* shield + check draw once on load (identity); the outer ring is the scroll
+     progress indicator that advances as you descend. */
+  @media (prefers-reduced-motion: no-preference) {
+    .seal .shield, .seal .check {
+      stroke-dasharray: 1; stroke-dashoffset: 1; animation: sealdraw 1100ms var(--ease-out) forwards;
+    }
+    .seal .check { animation-delay: 520ms; }
+    .seal .ringtext { opacity: 0; animation: sealfade 700ms var(--ease-out) 900ms forwards; }
+  }
+  @keyframes sealdraw { to { stroke-dashoffset: 0; } }
+  @keyframes sealfade { to { opacity: 1; } }
+
+  /* CSS scroll-driven progress ring — no JS required where supported */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .seal .ring-prog {
+        stroke-dashoffset: 1;
+        animation: sealprog linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0% 100%;
+      }
+    }
+  }
+  @keyframes sealprog { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+  /* JS fallback (only added when scroll-timeline is unsupported + motion allowed) */
+  .seal-fallback .ring-prog { stroke-dashoffset: calc(1 - var(--sp, 1)); }
+
+  /* reduced motion: fewer + gentler, not zero. Seal fully drawn, no load-draw,
+     no scroll ring; hold confirmation is instant; reveals fade without moving. */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .seal .shield, .seal .check { stroke-dashoffset: 0; }
+    .seal .ring-prog { stroke-dashoffset: 0; }
+    .seal .ringtext { opacity: 1; }
+    .hold-fill { transition: opacity 140ms linear; clip-path: none; opacity: 0; }
+    .holding .hold-fill, .done .hold-fill { opacity: 1; }
+  }
+
+  /* ============================ responsive ============================ */
+  /* below 1100px the rail collapses to a slim, sticky top band */
+  @media (max-width: 1100px) {
+    .stage { grid-template-columns: 1fr; }
+    .rail {
+      height: auto; border-right: 0; border-bottom: 1px solid var(--rule);
+      top: 0;
+    }
+    .rail-in {
+      height: auto; flex-direction: row; align-items: center; flex-wrap: wrap;
+      gap: 14px 20px; padding: 12px clamp(20px, 5vw, 40px);
+    }
+    .brand-sub { display: none; }
+    .seal-stage { flex: 0 0 auto; flex-direction: row; gap: 12px; min-height: 0; }
+    .seal { width: 44px; }
+    .seal-cap { display: none; }
+    .pill { order: 3; }
+    .idx { order: 4; flex: 1 1 100%; }
+    .idx-label { display: none; }
+    .idx ol { display: flex; flex-wrap: wrap; gap: 2px 4px; }
+    .idx a {
+      grid-template-columns: auto auto; gap: 6px; border-left: 0; padding: 5px 9px;
+    }
+    .idx a[aria-current="true"] { border-left: 0; }
+    .idx-num { font-size: 10px; }
+  }
+  @media (max-width: 680px) {
+    body { font-size: 16px; }
+    .story { padding-inline: 18px; }
+    .receipts { margin-left: 0; }
+    .idx ol { overflow-x: auto; flex-wrap: nowrap; }
+    .idx a { white-space: nowrap; }
+  }
+</style>
+</head>
+<body>
+  <a class="skip" href="#top">Skip to content</a>
+
+  <!-- sprite: the committed 20x20 monoline currentColor icon set (from app/page.tsx),
+       reused so this sample extends the same icon language. -->
+  <svg class="vh" aria-hidden="true" focusable="false"><defs>
+    <symbol id="ic-shield" viewBox="0 0 20 20"><path d="M10 2.2l6.4 2.4v4.2c0 4.2-2.7 6.7-6.4 8.4-3.7-1.7-6.4-4.2-6.4-8.4V4.6z"/><path d="M6.8 10.2l2.2 2.2 4.4-4.6"/></symbol>
+    <symbol id="ic-check" viewBox="0 0 20 20"><path d="M3.8 10.4l3.6 3.6L16.2 5.6"/></symbol>
+    <symbol id="ic-eye" viewBox="0 0 20 20"><path d="M2.5 10S5.5 4.8 10 4.8 17.5 10 17.5 10 14.5 15.2 10 15.2 2.5 10 2.5 10z"/><circle cx="10" cy="10" r="2.4"/></symbol>
+    <symbol id="ic-person" viewBox="0 0 20 20"><circle cx="10" cy="6.6" r="3"/><path d="M4.2 16.8c0-3.2 2.6-5.4 5.8-5.4s5.8 2.2 5.8 5.4"/></symbol>
+    <symbol id="ic-record" viewBox="0 0 20 20"><rect x="3.2" y="2.5" width="13.6" height="15" rx="1.6"/><path d="M6.2 6.2h7.6M6.2 9.6h7.6M6.2 13h4.6"/></symbol>
+    <symbol id="ic-copies" viewBox="0 0 20 20"><rect x="2.8" y="5.4" width="11" height="12" rx="1.4"/><path d="M6.4 2.6h9.2a1.4 1.4 0 011.4 1.4v9.6"/></symbol>
+    <symbol id="ic-scale" viewBox="0 0 20 20"><path d="M10 3v13M5 16h10M6.5 6l-3 5a2.5 2.5 0 005 0zM13.5 6l-3 5a2.5 2.5 0 005 0z"/><path d="M4 6h12"/></symbol>
+    <symbol id="ic-alert" viewBox="0 0 20 20"><path d="M10 2.6l7.6 13.4H2.4z"/><path d="M10 8v3.6"/><circle cx="10" cy="14.2" r=".5"/></symbol>
+    <symbol id="ic-spark" viewBox="0 0 20 20"><path d="M6 8.5l3.4 3.4M4 4l1.2 3M16 4l-3.6 9.2L9 15z"/></symbol>
+    <symbol id="ic-arrow" viewBox="0 0 20 20"><path d="M3.8 10h11M10.6 5.8l4.2 4.2-4.2 4.2"/></symbol>
+  </defs></svg>
+
+  <div class="stage">
+
+    <!-- ============================= LEFT RAIL ============================= -->
+    <aside class="rail" aria-label="Verifier seal and section index">
+      <div class="rail-in">
+        <a class="brand" href="#top">
+          <svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-shield"/></svg>
+          Curbside&nbsp;Commons
+          <span class="brand-sub">Split Stage · sample C</span>
+        </a>
+
+        <div class="seal-stage">
+          <svg class="seal" id="seal-svg" viewBox="0 0 120 120" role="img"
+               aria-label="Verifier seal — the outer ring advances with scroll progress; the shield and check draw in on load.">
+            <defs>
+              <path id="sealring" d="M60 12 A48 48 0 1 1 59.9 12"/>
+            </defs>
+            <circle class="ring-ghost" cx="60" cy="60" r="54"/>
+            <circle class="ring-prog" cx="60" cy="60" r="54" pathLength="1" transform="rotate(-90 60 60)"/>
+            <text class="ringtext"><textPath href="#sealring" startOffset="1%">CURBSIDE COMMONS &#183; VERIFIED AGAINST THE RECORD &#183; </textPath></text>
+            <path class="shield" d="M60 40 L80 47 V64 C80 77 71 85 60 90 C49 85 40 77 40 64 V47 Z" pathLength="1"/>
+            <path class="check" d="M50 63 L57 70 L71 55" pathLength="1"/>
+          </svg>
+          <p class="seal-cap">The seal completes as you read.</p>
+        </div>
+
+        <span class="pill"><span class="dot" aria-hidden="true"></span>PROTOTYPE &middot; REPLAY &middot; $0.00</span>
+
+        <nav class="idx" aria-label="Sections">
+          <p class="idx-label">The stage</p>
+          <ol>
+            <li><a href="#top"><span class="idx-num">01</span><span class="idx-name">Overview</span></a></li>
+            <li><a href="#problem"><span class="idx-num">02</span><span class="idx-name">The gap</span></a></li>
+            <li><a href="#how"><span class="idx-num">03</span><span class="idx-name">The check</span></a></li>
+            <li><a href="#catch"><span class="idx-num">04</span><span class="idx-name">Evidence</span></a></li>
+            <li><a href="#modules"><span class="idx-num">05</span><span class="idx-name">Modules</span></a></li>
+            <li><a href="#evidence"><span class="idx-num">06</span><span class="idx-name">Discipline</span></a></li>
+            <li><a href="#honesty"><span class="idx-num">07</span><span class="idx-name">Honesty</span></a></li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- ============================= RIGHT STORY ============================ -->
+    <main class="story" id="top" tabindex="-1">
+      <div class="story-inner">
+
+        <!-- ------------------------------ hero ----------------------------- -->
+        <section class="beat" aria-labelledby="hero-h1">
+          <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-shield"/></svg> Commerce truth verification &middot; simulated prototype</p>
+          <h1 class="h1" id="hero-h1">AI agents are starting to buy what platforms serve them. This engine checks the serving copy, line by line, against <span class="mark">the merchant&rsquo;s own records</span>.</h1>
+          <p class="lede">A menu copy can pass every schema check and still sell you a dish the restaurant 86&rsquo;d hours ago. The verifier is deterministic &mdash; no AI calls, $0 to run &mdash; and every finding ships with its receipts.</p>
+          <div class="cta">
+            <a class="btn primary" href="#catch">Reveal the demo verdict <svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-arrow"/></svg></a>
+            <a class="btn ghost" href="#how">See how a listing gets checked</a>
+          </div>
+        </section>
+
+        <!-- ---------------------------- the gap ---------------------------- -->
+        <section class="beat" id="problem" aria-labelledby="problem-h2">
+          <div class="reveal">
+            <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-alert"/></svg> The gap this engine exists for</p>
+            <h2 class="h2" id="problem-h2">Schema-conformant is not the same as true.</h2>
+            <p class="prose">Agentic-commerce protocols standardize the <em>shape</em> of what agents read; nothing in the shape guarantees the <em>content</em> matches the merchant&rsquo;s reality. The repo commits a spec-valid feed that passes every pinned schema while lying about the catalog &mdash; the conformance leg passes it, the truth leg catches it. That pair is the product in one sentence.</p>
+          </div>
+        </section>
+
+        <!-- ---------------------------- the check -------------------------- -->
+        <section class="beat" id="how" aria-labelledby="how-h2">
+          <div class="reveal">
+            <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-scale"/></svg> How a listing gets checked</p>
+            <h2 class="h2" id="how-h2">From the merchant&rsquo;s record to an evidence-cited verdict.</h2>
+          </div>
+          <ol class="flow" role="list">
+            <li class="flow-step reveal" data-stagger="0">
+              <div class="flow-node" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-record"/></svg></div>
+              <div class="flow-body">
+                <p class="kicker">Ground truth</p>
+                <h3 class="h3">The merchant&rsquo;s own record</h3>
+                <p class="flow-desc">The system-of-record &mdash; the catalog, prices, and availability the restaurant itself maintains &mdash; is the only thing a listing is allowed to be true against.</p>
+              </div>
+            </li>
+            <li class="flow-step reveal" data-stagger="50">
+              <div class="flow-node" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-copies"/></svg></div>
+              <div class="flow-body">
+                <p class="kicker">What agents read</p>
+                <h3 class="h3">The serving copies</h3>
+                <p class="flow-desc">Platforms serve agent-readable copies of that record (ACP- and UCP-shaped feeds). This is what an AI shopping agent actually reads &mdash; and where drift lives.</p>
+              </div>
+            </li>
+            <li class="flow-step gate reveal" data-stagger="100">
+              <div class="flow-node" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-scale"/></svg></div>
+              <div class="flow-body">
+                <p class="kicker gate">Gate &middot; truth</p>
+                <h3 class="h3">Line-by-line comparison</h3>
+                <p class="flow-desc">A deterministic comparator checks every claim in the copy against the record, exactly. No AI calls, $0, same input &rarr; same report.</p>
+              </div>
+            </li>
+            <li class="flow-step gate reveal" data-stagger="150">
+              <div class="flow-node" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-eye"/></svg></div>
+              <div class="flow-body">
+                <p class="kicker gate">Gate &middot; receipts</p>
+                <h3 class="h3">Evidence, not vibes</h3>
+                <p class="flow-desc">Every finding carries its receipts: the claim id, the rule that caught it, and the record row it failed against &mdash; auditable end to end.</p>
+              </div>
+            </li>
+            <li class="flow-step reveal" data-stagger="200">
+              <div class="flow-node" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-person"/></svg></div>
+              <div class="flow-body">
+                <p class="kicker">Act</p>
+                <h3 class="h3">Humans stay in the loop</h3>
+                <p class="flow-desc">Findings become recommendations &mdash; reports, drafts, deliveries &mdash; behind explicit human gates. Nothing sends itself.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <!-- ---------------------------- evidence --------------------------- -->
+        <section class="beat" id="catch" aria-labelledby="catch-h2">
+          <div class="reveal">
+            <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-check"/></svg> The shown catch &middot; hold to verify</p>
+            <h2 class="h2" id="catch-h2">What the copy says vs. what the restaurant&rsquo;s records say.</h2>
+            <p class="prose">A serving copy of a menu (what an AI shopping assistant would read) checked, line by line, against the restaurant&rsquo;s own system-of-record. Below is every difference the checker caught &mdash; each in plain words first, then the exact receipts. Deterministic and $0, with no AI calls in this verifier runtime: the same input always gives this same report.</p>
+          </div>
+
+          <!-- C10: the SIMULATED banner — byte-verbatim with components/report/ReportView.tsx -->
+          <div class="sim" role="note">
+            <span class="sim-tag">SIMULATED</span>
+            <span class="sim-text">Synthetic test data &mdash; an invented restaurant, invented menu, invented prices. Not real DoorDash / Square / Uber&nbsp;Eats / Grubhub data, access, or business impact. The verification rules and the pinned data-format standard are real; the restaurant, its menu, and its records are invented.</span>
+          </div>
+
+          <div class="hold-zone" id="hold-zone">
+            <p class="hold-instr js-only" id="hold-instr">Press and <strong>hold</strong> to weigh the serving copy against the merchant&rsquo;s record &mdash; the check is deliberate. Hold until it completes and the verdict appears below; releasing early cancels the check. Prefer not to hold? Use <em>Reveal without holding</em>.</p>
+
+            <div class="hold-controls">
+              <button class="hold-btn js-only" id="hold-btn" type="button"
+                      aria-describedby="hold-instr" aria-controls="verdict-fallback" aria-expanded="false">
+                <span class="hold-base">Hold to verify</span>
+                <span class="hold-fill" aria-hidden="true"><span class="hold-fill-inner">Hold to verify</span></span>
+              </button>
+              <button class="reveal-plain js-only" id="reveal-plain" type="button" aria-controls="verdict-fallback" aria-expanded="false">
+                Reveal without holding
+              </button>
+            </div>
+            <p class="hold-cue js-only" id="hold-cue" aria-hidden="true">weighing the copy against the record&hellip;</p>
+            <span class="vh" id="hold-status" role="status" aria-live="polite"></span>
+
+            <details id="verdict-fallback" class="verdict-details">
+              <summary class="verdict-summary">Reveal the verdict</summary>
+              <div class="verdict-card" id="verdict-card">
+                <div class="verdict-head">
+                  <span class="verdict-flag">FAIL</span>
+                  <span class="verdict-count">16 findings</span>
+                  <span class="verdict-tally">11 error &middot; 5 warn &middot; 0 info</span>
+                </div>
+                <p class="verdict-sub">The serving copy does not match the merchant&rsquo;s system-of-record. Verdict, tally, and findings mirror the committed golden report (<span class="mono">ok: false</span>).</p>
+
+                <ol class="finding-cards" role="list">
+                  <li class="finding-card">
+                    <div class="finding-lead">
+                      <span class="finding-idx">01</span>
+                      <p class="finding-plain">This item is hidden in the merchant's own catalog but is being served to customers.</p>
+                      <span class="sev error"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-alert"/></svg> error</span>
+                    </div>
+                    <dl class="receipts" aria-label="evidence">
+                      <div><dt>claim</dt><dd><span class="mono">item-002-v2#existence</span><span class="mono-sub">acp-feed &middot; existence = true</span></dd></div>
+                      <div><dt>reference row</dt><dd class="mono">item-002-v2</dd></div>
+                      <div><dt>rule / spec-clause</dt><dd class="mono">LST-AVAIL-HIDDEN-SHOWN</dd></div>
+                      <div><dt>class</dt><dd class="mono">availability</dd></div>
+                    </dl>
+                  </li>
+
+                  <li class="finding-card">
+                    <div class="finding-lead">
+                      <span class="finding-idx">02</span>
+                      <p class="finding-plain">The copy says "in_stock" but the catalog state is 86'd/sold out (expected "out_of_stock").</p>
+                      <span class="sev error"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-alert"/></svg> error</span>
+                    </div>
+                    <dl class="receipts" aria-label="evidence">
+                      <div><dt>claim</dt><dd><span class="mono">item-008-v1#availability</span><span class="mono-sub">acp-feed &middot; availability = "in_stock"</span></dd></div>
+                      <div><dt>reference row</dt><dd class="mono">item-008-v1</dd></div>
+                      <div><dt>rule / spec-clause</dt><dd class="mono">LST-AVAIL-STATE</dd></div>
+                      <div><dt>class</dt><dd class="mono">availability</dd></div>
+                    </dl>
+                  </li>
+
+                  <li class="finding-card">
+                    <div class="finding-lead">
+                      <span class="finding-idx">03</span>
+                      <p class="finding-plain">The price is serialized in cents (2150) where dollars are expected (21.50) &mdash; a 100&times; overstatement.</p>
+                      <span class="sev error"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-alert"/></svg> error</span>
+                    </div>
+                    <dl class="receipts" aria-label="evidence">
+                      <div><dt>claim</dt><dd><span class="mono">item-001-v1#price.amount</span><span class="mono-sub">acp-feed &middot; price.amount = "2150"</span></dd></div>
+                      <div><dt>reference row</dt><dd class="mono">item-001-v1</dd></div>
+                      <div><dt>rule / spec-clause</dt><dd class="mono">LST-PRICE-CENTS-AS-DECIMAL</dd></div>
+                      <div><dt>class</dt><dd class="mono">price</dd></div>
+                    </dl>
+                  </li>
+                </ol>
+                <p class="findings-more">Showing 3 of 16 findings &mdash; the committed report renders every one with its full receipts.</p>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <!-- ---------------------------- modules ---------------------------- -->
+        <section class="beat" id="modules" aria-labelledby="modules-h2">
+          <div class="reveal">
+            <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-check"/></svg> Three verification modules, one spine</p>
+            <h2 class="h2" id="modules-h2">Listings truth &middot; protocol conformance &middot; fee-cap audit.</h2>
+          </div>
+          <ol class="modules" role="list">
+            <li class="module reveal" data-stagger="0">
+              <div class="module-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-check"/></svg></div>
+              <div class="module-body">
+                <h3 class="h3">Listings truth check</h3>
+                <p class="module-desc">The serving copy vs the system-of-record, line by line &mdash; availability, price, existence, encoding. The committed demo report catches a sold-out item still being served.</p>
+              </div>
+            </li>
+            <li class="module reveal" data-stagger="50">
+              <div class="module-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-copies"/></svg></div>
+              <div class="module-body">
+                <h3 class="h3">Protocol conformance</h3>
+                <p class="module-desc">Validation against 78 pinned official UCP schemas (spec 2026-04-08) &mdash; and the headline it exists to prove: a feed can be schema-conformant and still false against the merchant&rsquo;s records. Both legs are machine-checked.</p>
+              </div>
+            </li>
+            <li class="module reveal" data-stagger="100">
+              <div class="module-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-scale"/></svg></div>
+              <div class="module-body">
+                <h3 class="h3">Fee-cap audit</h3>
+                <p class="module-desc">NYC &sect;20-563.3 codified as 17 rules (11 executable predicates + 6 registered non-checkable clauses) over hostile, relabeled statement lines &mdash; with a calibrated classifier in front and the deterministic table deciding.</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <!-- --------------------------- discipline -------------------------- -->
+        <section class="beat" id="evidence" aria-labelledby="evidence-h2">
+          <div class="reveal">
+            <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-spark"/></svg> Labels are earned here, or not claimed</p>
+            <h2 class="h2" id="evidence-h2">Every quality label traces to a pre-registered run.</h2>
+            <p class="prose">The fee-line classifier&rsquo;s first calibration run missed one floor and the label was <em>deferred</em> &mdash; that record stays public. A fresh pre-registered retry then cleared every floor (21/21) and earned it. The live agent-crew run scored 20/20 against floors committed before the run &mdash; and only the two model-directed members carry the &ldquo;agent&rdquo; label, because that is what the pre-registration says the result licenses. The eval evidence dashboard traces every figure to its committed record.</p>
+          </div>
+        </section>
+
+        <!-- ---------------------------- honesty ---------------------------- -->
+        <section class="beat" id="honesty" aria-labelledby="honesty-h2">
+          <div class="reveal">
+            <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-person"/></svg> What this is &mdash; and what it is not</p>
+            <h2 class="h2" id="honesty-h2">A simulated prototype, honest about its own edges.</h2>
+            <p class="prose">The restaurant, its menu, and its records are invented; the verification rules, the pinned data-format standard, and the codified fee caps are real. The site is a static replay of committed fixtures &mdash; it initiates nothing. This project began as a merchant activation prototype; that first product is preserved, working, as the legacy activation module.</p>
+
+            <footer class="foot">
+              <span class="foot-status">Simulated prototype, run on demand &mdash; not a live service.</span>
+              Every page is a <strong>static replay of committed, labeled fixtures</strong> from a synthetic corpus; this sample <strong>initiates no sends and makes no live calls</strong>. Human-led, AI-assisted, professionally reviewed.
+              <strong>Not affiliated with, endorsed by, or connected to</strong> DoorDash, Uber Eats, Grubhub, DataSF, or any named business. Built and directed by Sharan Kumar (github.com/sharanlabs).
+            </footer>
+          </div>
+        </section>
+
+        <p class="site-end">Design-lane sample &mdash; &ldquo;Split Stage&rdquo; (Variation C, 2026-07-12). Not served by the live site; a design-process record for owner reaction. Brief: docs/design-brief-s6b-2026-07-11.md.</p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+    var reduceMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    /* --------------------------- hold-to-verify --------------------------- */
+    var zone = document.getElementById("hold-zone");
+    var btn = document.getElementById("hold-btn");
+    var revealPlain = document.getElementById("reveal-plain");
+    var details = document.getElementById("verdict-fallback");
+    var card = document.getElementById("verdict-card");
+    var status = document.getElementById("hold-status");
+    var HOLD_MS = 1400;
+    var timer = null;
+    var holding = false;
+    var revealed = false;
+
+    function setStatus(msg) { if (status) { status.textContent = msg; } }
+
+    function reveal() {
+      if (revealed) { return; }
+      revealed = true;
+      holding = false;
+      if (timer) { clearTimeout(timer); timer = null; }
+      zone.classList.remove("holding");
+      zone.classList.add("done");
+      btn.setAttribute("aria-expanded", "true");
+      revealPlain.setAttribute("aria-expanded", "true");
+      details.open = true;
+      setStatus("Verified against the record. FAIL — 16 findings (11 error, 5 warn). Verdict shown below.");
+    }
+
+    function startHold() {
+      if (revealed || holding) { return; }
+      if (reduceMq.matches) { reveal(); return; }   // reduced motion: instant, no timed fill
+      holding = true;
+      zone.classList.add("holding");
+      setStatus("Verifying — hold to weigh the serving copy against the record.");
+      timer = setTimeout(reveal, HOLD_MS);
+    }
+
+    function cancelHold() {
+      if (!holding) { return; }
+      holding = false;
+      if (timer) { clearTimeout(timer); timer = null; }
+      zone.classList.remove("holding");
+      setStatus("Released early — the check did not complete. Hold again, or reveal without holding.");
+    }
+
+    if (btn && revealPlain && details && card) {
+      // pointer: capture so move/up/cancel resolve to this button
+      btn.addEventListener("pointerdown", function (e) {
+        if (typeof e.button === "number" && e.button !== 0) { return; }
+        try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+        e.preventDefault();
+        startHold();
+      });
+      btn.addEventListener("pointerup", function (e) {
+        try { btn.releasePointerCapture(e.pointerId); } catch (err) {}
+        cancelHold();
+      });
+      btn.addEventListener("pointercancel", cancelHold);
+      btn.addEventListener("pointerleave", cancelHold);
+
+      // keyboard: Space / Enter — keydown starts, keyup releases, key-repeat guarded
+      function isActivateKey(e) {
+        return e.key === " " || e.key === "Spacebar" || e.code === "Space" || e.key === "Enter";
+      }
+      btn.addEventListener("keydown", function (e) {
+        if (!isActivateKey(e)) { return; }
+        e.preventDefault();            // stop scroll + native click-activation
+        if (e.repeat) { return; }      // guard auto-repeat
+        startHold();
+      });
+      btn.addEventListener("keyup", function (e) {
+        if (!isActivateKey(e)) { return; }
+        e.preventDefault();
+        cancelHold();
+      });
+      btn.addEventListener("blur", cancelHold);   // losing focus mid-hold = release
+
+      revealPlain.addEventListener("click", function () { reveal(); });  // no-hold path
+
+      // JS present: start closed (buttons drive disclosure; native <summary> hidden via CSS)
+      details.open = false;
+    }
+
+    /* --------------- seal progress ring: JS scroll fallback --------------- */
+    /* CSS scroll-driven animation handles this where supported (no JS). Only
+       when unsupported AND motion is allowed do we drive it from scroll. */
+    var supportsST = (typeof CSS !== "undefined" && CSS.supports && CSS.supports("animation-timeline: scroll()"));
+    if (!reduceMq.matches && !supportsST) {
+      var seal = document.getElementById("seal-svg");
+      if (seal) {
+        seal.classList.add("seal-fallback");
+        var docEl = document.documentElement;
+        var sealTicking = false;
+        var updateSeal = function () {
+          sealTicking = false;
+          var max = docEl.scrollHeight - docEl.clientHeight;
+          var y = window.pageYOffset || docEl.scrollTop || 0;
+          var p = max > 0 ? Math.min(1, Math.max(0, y / max)) : 1;
+          docEl.style.setProperty("--sp", String(p));
+        };
+        var onSeal = function () {
+          if (!sealTicking) { sealTicking = true; requestAnimationFrame(updateSeal); }
+        };
+        window.addEventListener("scroll", onSeal, { passive: true });
+        window.addEventListener("resize", onSeal, { passive: true });
+        updateSeal();
+      }
+    }
+
+    /* ---------------------- station reveal on scroll ---------------------- */
+    var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+    if ("IntersectionObserver" in window && !reduceMq.matches) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) { return; }
+          var el = entry.target;
+          var delay = parseInt(el.getAttribute("data-stagger") || "0", 10) || 0;
+          setTimeout(function () { el.classList.add("in"); }, delay);
+          io.unobserve(el);
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+      reveals.forEach(function (el) { io.observe(el); });
+    } else {
+      reveals.forEach(function (el) { el.classList.add("in"); });  // no IO / reduced motion: show all
+    }
+
+    /* ------------------- section index scroll-spy (state) ----------------- */
+    var idxLinks = {};
+    Array.prototype.slice.call(document.querySelectorAll(".idx a")).forEach(function (a) {
+      var href = a.getAttribute("href") || "";
+      if (href.charAt(0) === "#") { idxLinks[href.slice(1)] = a; }
+    });
+    var sections = Array.prototype.slice.call(document.querySelectorAll(".story section[id], .story[id]"));
+    if ("IntersectionObserver" in window) {
+      var current = "top";
+      var setActive = function (id) {
+        if (id === current) { return; }
+        current = id;
+        Object.keys(idxLinks).forEach(function (key) {
+          if (key === id) { idxLinks[key].setAttribute("aria-current", "true"); }
+          else { idxLinks[key].removeAttribute("aria-current"); }
+        });
+      };
+      var spy = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && idxLinks[entry.target.id]) { setActive(entry.target.id); }
+        });
+      }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+      sections.forEach(function (s) { if (s.id) { spy.observe(s); } });
+      if (idxLinks.top) { idxLinks.top.setAttribute("aria-current", "true"); }
+    }
+  })();
+  </script>
+</body>
+</html>

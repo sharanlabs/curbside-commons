@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gallery Cards — Curbside Commons design sample (simulated prototype)</title>
+<!--
+  VARIATION B — "Gallery Cards" (owner iterate word, 2026-07-12; decision-log row).
+  The Meridian sample's content re-flowed into a card system on a pure-white
+  gallery ground. Built inline on the Fable seat (NO-WAIT conversion after the
+  subagent seat death — raw error in the session record).
+
+  Contract (S6b regime):
+  - CONTENT: from mockups/meridian-2026-07-11.html only — reorganized, never
+    re-claimed. The three rendered findings are the committed golden's rows
+    (expected-report.acp.json), claim id + rule + plain line EXACT.
+  - SIMULATED banner byte-verbatim with components/report/ReportView.tsx.
+  - ZERO external requests: system fonts only (AP-14), inline SVG only,
+    no <link>/<script src>/@import/url(http).
+  - ALL motion gated by prefers-reduced-motion: no-preference; the reduce
+    path is fully static with every piece of content visible.
+  - No-JS: complete content via native <details>; JS is enhancement only.
+  - Keyboard: hold-to-verify has keydown/keyup hold + a no-hold control +
+    the native <details> path; all focus states visible.
+  - Pure white #FFFFFF ground; radii <=6px; no glassmorphism, no decorative
+    gradients, no shadow decoration; hairlines + spacing carry the design.
+-->
+<style>
+  :root {
+    --paper: #FFFFFF;
+    --ink: #211D18;        /* ~14.6:1 on white */
+    --sub: #5C564E;        /* ~6.8:1 on white */
+    --accent: #8A2233;     /* oxblood, ~7.0:1 — the shipped site accent */
+    --accent-deep: #6E1423;
+    --hairline: #E8E4DE;
+    --hairline-strong: #D9D3CB;
+    --card: #FFFFFF;
+    --tint: #FAF8F5;       /* card wells; ink on tint stays >=6:1 */
+    --error-ink: #B71F13;  /* ~5.6:1 on white and on --tint */
+    --warn-ink: #9C3D06;   /* ~5.6:1 */
+    --ok-ink: #1E6A45;     /* ~5.5:1 */
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --r: 6px;
+    --measure: 68ch;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--hairline-strong); }
+  a:hover { border-bottom-color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  /* progressive enhancement switches */
+  html:not(.js) .js-only { display: none; }
+  html.js .verdict-summary { display: none; }
+
+  /* ------------------------------- mini-nav ------------------------------ */
+  .mininav {
+    position: sticky; top: 0; z-index: 40;
+    background: var(--paper);
+    border-bottom: 1px solid transparent;
+  }
+  .mininav.scrolled { border-bottom-color: var(--hairline); }
+  html:not(.js) .mininav { border-bottom-color: var(--hairline); }
+  .mininav-inner {
+    max-width: 1240px; margin: 0 auto; padding: 14px 48px;
+    display: flex; align-items: center; gap: 28px;
+  }
+  .wordmark { font-family: var(--serif); font-size: 17px; letter-spacing: 0.01em; color: var(--ink); border-bottom: none; }
+  .wordmark .wm-dot { color: var(--accent); }
+  .mininav nav { display: flex; gap: 22px; margin-left: auto; }
+  .mininav nav a {
+    font-size: 13.5px; color: var(--sub); border-bottom: none;
+    padding: 2px 0; position: relative;
+  }
+  .mininav nav a::after {
+    content: ""; position: absolute; left: 0; right: 100%; bottom: -2px;
+    border-bottom: 1px solid var(--accent);
+  }
+  .mininav nav a:hover { color: var(--ink); }
+  .honesty-pill {
+    font-family: var(--mono); font-size: 11.5px; color: var(--sub);
+    border: 1px solid var(--hairline); border-radius: var(--r);
+    padding: 4px 10px; white-space: nowrap;
+  }
+
+  /* -------------------------------- hero --------------------------------- */
+  .hero { position: relative; overflow: hidden; }
+  .hero-lines {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .hero-lines path {
+    fill: none; stroke: var(--ink); stroke-width: 1; opacity: 0.05;
+    stroke-dasharray: 1; stroke-dashoffset: 0; /* drawn by default (reduce + no-JS) */
+  }
+  .hero-inner {
+    position: relative;
+    max-width: 1240px; margin: 0 auto;
+    padding: 108px 48px 96px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .ic { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .hero h1 {
+    font-family: var(--serif); font-weight: 500;
+    font-size: clamp(38px, 4.6vw, 58px); line-height: 1.14;
+    letter-spacing: -0.01em; max-width: 21ch; margin-top: 22px;
+  }
+  .hero h1 .mark {
+    color: var(--accent);
+    box-shadow: inset 0 -2px 0 0 var(--accent); /* underline-weight emphasis, not decoration */
+  }
+  .hero-lede { max-width: var(--measure); color: var(--sub); font-size: 19px; margin-top: 24px; }
+  .hero-cta { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 15px; border-radius: var(--r); padding: 12px 20px;
+    border: 1px solid var(--hairline-strong); color: var(--ink);
+    background: var(--paper); cursor: pointer;
+    transition: border-color 160ms ease-out, background-color 160ms ease-out, transform 160ms ease-out;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #FFFFFF; }
+  .btn.primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+  .btn.ghost:hover { border-color: var(--ink); }
+  .btn:active { transform: translateY(1px); }
+  .hero-seal { position: absolute; right: 48px; top: 96px; width: 132px; height: 132px; }
+  .seal circle, .seal path { fill: none; stroke: var(--accent); stroke-width: 1.6; }
+  .seal .ringtext { font-family: var(--mono); font-size: 7.5px; letter-spacing: 0.22em; fill: var(--sub); }
+  .seal .draw { stroke-dasharray: 1; stroke-dashoffset: 0; } /* complete by default */
+
+  /* ------------------------------ sections ------------------------------- */
+  section { border-top: 1px solid var(--hairline); }
+  .sec-inner { max-width: 1240px; margin: 0 auto; padding: 88px 48px; }
+  .sec-head { max-width: var(--measure); }
+  .h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(27px, 2.6vw, 36px); line-height: 1.22; margin-top: 16px; }
+  .prose { color: var(--sub); margin-top: 18px; max-width: var(--measure); }
+  .prose em { color: var(--ink); font-style: italic; }
+
+  /* -------------------------------- cards -------------------------------- */
+  .cards { display: grid; gap: 20px; margin-top: 44px; }
+  .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+  .cards.c5 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 1100px) { .cards.c3, .cards.c5 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 760px)  { .cards.c3, .cards.c5 { grid-template-columns: 1fr; } .sec-inner, .hero-inner, .mininav-inner { padding-left: 24px; padding-right: 24px; } .hero-seal { display: none; } }
+
+  .card {
+    border: 1px solid var(--hairline); border-radius: var(--r);
+    background: var(--card); padding: 26px 24px;
+    transition: border-color 180ms ease-out, transform 180ms ease-out;
+  }
+  .card:hover { border-color: var(--hairline-strong); transform: translateY(-2px); }
+  @media (prefers-reduced-motion: reduce) { .card:hover { transform: none; } .btn:active { transform: none; } }
+  .card .kicker {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--sub);
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  /* icon tile — the ultra-modern icon treatment (owner word 2026-07-12):
+     each card leads with its monoline glyph in a hairline medallion; the
+     tile ink shifts to the accent on card hover (micro-transition). */
+  .card-ic {
+    width: 44px; height: 44px; border: 1px solid var(--hairline);
+    border-radius: var(--r); display: flex; align-items: center; justify-content: center;
+    color: var(--ink); margin-bottom: 16px;
+    transition: color 180ms ease-out, border-color 180ms ease-out;
+  }
+  .card-ic .ic { width: 22px; height: 22px; }
+  .card:hover .card-ic { color: var(--accent); border-color: var(--hairline-strong); }
+  .card .kicker.gate { color: var(--accent); }
+  .card h3 { font-family: var(--serif); font-weight: 500; font-size: 20px; margin-top: 10px; }
+  .card p.desc { color: var(--sub); font-size: 15.5px; margin-top: 10px; line-height: 1.6; }
+  .card .step-idx {
+    float: right; font-family: var(--mono); font-size: 12px; color: var(--sub);
+    border: 1px solid var(--hairline); border-radius: var(--r); padding: 2px 8px;
+  }
+
+  /* stat cards */
+  .stat-figure { font-family: var(--serif); font-size: 40px; line-height: 1; margin-top: 12px; }
+  .stat-figure.deferred { color: var(--warn-ink); font-size: 26px; line-height: 1.2; }
+  .stat-note { color: var(--sub); font-size: 14.5px; margin-top: 10px; }
+
+  /* ----------------------------- SIMULATED ------------------------------- */
+  .sim {
+    display: flex; gap: 14px; align-items: flex-start;
+    border: 1px solid var(--hairline-strong); border-left: 3px solid var(--warn-ink);
+    border-radius: var(--r); background: var(--tint);
+    padding: 16px 18px; margin-top: 40px; max-width: 980px;
+  }
+  .sim-tag {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.1em;
+    color: #FFFFFF; background: var(--warn-ink);
+    border-radius: 3px; padding: 3px 8px; flex: none; margin-top: 2px;
+  }
+  .sim-text { font-size: 14.5px; color: var(--ink); line-height: 1.6; }
+
+  /* --------------------------- hold-to-verify ---------------------------- */
+  .hold-zone { margin-top: 28px; max-width: 980px; }
+  .hold-instr { color: var(--sub); font-size: 15px; max-width: var(--measure); }
+  .hold-controls { display: flex; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
+  .hold-btn {
+    position: relative; overflow: hidden;
+    font-size: 15px; border-radius: var(--r); padding: 13px 22px;
+    border: 1px solid var(--accent); color: var(--accent); background: var(--paper);
+    cursor: pointer;
+  }
+  .hold-base { position: relative; z-index: 1; }
+  .hold-fill {
+    position: absolute; inset: 0; z-index: 2;
+    background: var(--accent); color: #FFFFFF;
+    clip-path: inset(0 100% 0 0);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hold-fill-inner { padding: 13px 22px; white-space: nowrap; }
+  @media (prefers-reduced-motion: no-preference) {
+    .holding .hold-fill { transition: clip-path 1.4s linear; clip-path: inset(0 0 0 0); }
+    .hold-zone:not(.holding) .hold-fill { transition: clip-path 200ms ease-out; }
+  }
+  .done .hold-btn { border-color: var(--ok-ink); color: var(--ok-ink); }
+  .reveal-plain {
+    font-size: 14.5px; color: var(--sub); background: none;
+    border: 1px solid var(--hairline); border-radius: var(--r);
+    padding: 13px 18px; cursor: pointer;
+    transition: border-color 160ms ease-out, color 160ms ease-out;
+  }
+  .reveal-plain:hover { color: var(--ink); border-color: var(--hairline-strong); }
+  .hold-cue { font-family: var(--mono); font-size: 12.5px; color: var(--sub); margin-top: 12px; visibility: hidden; }
+  .holding .hold-cue { visibility: visible; }
+
+  /* ---------------------------- verdict cards ---------------------------- */
+  .verdict-details { margin-top: 26px; }
+  .verdict-summary {
+    cursor: pointer; font-size: 15px; color: var(--accent);
+    border: 1px solid var(--hairline); border-radius: var(--r);
+    padding: 12px 18px; display: inline-block; list-style: none;
+  }
+  .verdict-summary::-webkit-details-marker { display: none; }
+  .verdict-summary::before { content: "▸ "; }
+  details[open] .verdict-summary::before { content: "▾ "; }
+
+  .verdict-card { margin-top: 22px; }
+  html.js .verdict-card { opacity: 0; }
+  html.js .verdict-card.revealed { opacity: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .verdict-card { transform: translateY(10px); }
+    html.js .verdict-card.revealed { transform: none; transition: opacity 320ms ease-out, transform 320ms ease-out; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .verdict-card.revealed { transition: none; }
+  }
+  .verdict-head {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    border: 1px solid var(--hairline); border-radius: var(--r);
+    background: var(--tint); padding: 14px 18px;
+  }
+  .verdict-flag {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em;
+    color: #FFFFFF; background: var(--error-ink); border-radius: 3px; padding: 4px 10px;
+  }
+  .verdict-count { font-family: var(--serif); font-size: 19px; }
+  .verdict-tally { font-family: var(--mono); font-size: 13px; color: var(--sub); }
+  .verdict-sub { color: var(--sub); font-size: 14.5px; margin-top: 12px; max-width: var(--measure); }
+  .mono { font-family: var(--mono); font-size: 0.92em; }
+  .mono-sub { font-family: var(--mono); font-size: 12px; color: var(--sub); display: block; margin-top: 2px; }
+
+  .findings { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 22px; }
+  @media (max-width: 1100px) { .findings { grid-template-columns: 1fr; } }
+  .finding {
+    border: 1px solid var(--hairline); border-radius: var(--r); padding: 22px 20px;
+    display: flex; flex-direction: column; gap: 14px;
+    transition: border-color 180ms ease-out, transform 180ms ease-out;
+  }
+  .finding:hover { border-color: var(--hairline-strong); transform: translateY(-2px); }
+  @media (prefers-reduced-motion: reduce) { .finding:hover { transform: none; } }
+  .finding-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .finding-idx { font-family: var(--mono); font-size: 12px; color: var(--sub); }
+  .sev {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em;
+  }
+  .sev.error { color: var(--error-ink); }
+  .finding-plain { font-size: 15.5px; line-height: 1.55; }
+  .receipts { display: grid; gap: 8px; border-top: 1px solid var(--hairline); padding-top: 14px; }
+  .receipts > div { display: grid; grid-template-columns: 110px 1fr; gap: 10px; align-items: baseline; }
+  .receipts dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sub); }
+  .receipts dd { font-size: 13.5px; }
+  .findings-more { color: var(--sub); font-size: 14px; margin-top: 18px; }
+
+  /* ------------------------------ honesty -------------------------------- */
+  .foot {
+    border: 1px solid var(--hairline); border-radius: var(--r);
+    background: var(--tint); padding: 24px 26px;
+    color: var(--sub); font-size: 14.5px; line-height: 1.7;
+    max-width: 980px; margin-top: 40px; display: block;
+  }
+  .foot strong { color: var(--ink); font-weight: 600; }
+  .foot-status { display: block; font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.04em; color: var(--ink); margin-bottom: 10px; }
+
+  .site-end {
+    max-width: 1240px; margin: 0 auto; padding: 28px 48px 48px;
+    color: var(--sub); font-size: 13px; border-top: 1px solid var(--hairline); margin-top: 0;
+  }
+
+  /* --------------------------- scroll reveals ---------------------------- */
+  .reveal { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .reveal { opacity: 0; transform: translateY(14px); }
+    html.js .reveal.in { opacity: 1; transform: none; transition: opacity 380ms ease-out, transform 380ms ease-out; }
+  }
+
+  /* hero line draw (motion-gated; drawn/static otherwise) */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .hero-lines path { stroke-dashoffset: 1; animation: drawline 5.5s ease-out forwards; }
+    html.js .hero-lines path.l2 { animation-delay: 400ms; }
+    html.js .hero-lines path.l3 { animation-delay: 800ms; }
+    html.js .hero-lines path.l4 { animation-delay: 1200ms; }
+    html.js .seal .draw { stroke-dashoffset: 1; animation: drawline 1.6s ease-out forwards; }
+    html.js .seal .d2 { animation-delay: 500ms; }
+    html.js .seal .d3 { animation-delay: 1100ms; }
+    @keyframes drawline { to { stroke-dashoffset: 0; } }
+  }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add("js");</script>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="ic-shield"><path d="M10 2 L17 4.5 V10 C17 14.5 13.8 17.2 10 18.5 C6.2 17.2 3 14.5 3 10 V4.5 Z"/></g>
+    <g id="ic-check"><path d="M4 10.5 L8.5 15 L16 6"/></g>
+    <g id="ic-alert"><path d="M10 3 L18 17 H2 Z"/><path d="M10 8.5 V12.5"/><path d="M10 14.8 V15"/></g>
+    <g id="ic-scale"><path d="M10 3 V17"/><path d="M4 6 H16"/><path d="M4 6 L2.5 11 a2.6 2.6 0 0 0 5 0 Z"/><path d="M16 6 L14.5 11 a2.6 2.6 0 0 0 5 0 Z" transform="translate(-2 0)"/></g>
+    <g id="ic-record"><path d="M4 3.5 H16 V16.5 H4 Z"/><path d="M7 7.5 H13"/><path d="M7 10.5 H13"/><path d="M7 13.5 H10.5"/></g>
+    <g id="ic-copies"><path d="M6.5 6.5 H17 V17 H6.5 Z"/><path d="M3 13.5 V3 H13.5"/></g>
+    <g id="ic-eye"><path d="M2.5 10 C5 5.8 8 4 10 4 C12 4 15 5.8 17.5 10 C15 14.2 12 16 10 16 C8 16 5 14.2 2.5 10 Z"/><circle cx="10" cy="10" r="2.6"/></g>
+    <g id="ic-person"><circle cx="10" cy="6.5" r="3"/><path d="M4 17 C4.7 13.4 7 11.6 10 11.6 C13 11.6 15.3 13.4 16 17"/></g>
+    <g id="ic-spark"><path d="M10 2.5 V7"/><path d="M10 13 V17.5"/><path d="M2.5 10 H7"/><path d="M13 10 H17.5"/><path d="M5 5 L7.8 7.8"/><path d="M12.2 12.2 L15 15"/><path d="M15 5 L12.2 7.8"/><path d="M7.8 12.2 L5 15"/></g>
+    <g id="ic-arrow"><path d="M4 10 H16"/><path d="M11 5 L16 10 L11 15"/></g>
+  </defs>
+</svg>
+
+<header class="mininav" id="mininav">
+  <div class="mininav-inner">
+    <a class="wordmark" href="#top">Curbside Commons<span class="wm-dot">.</span></a>
+    <nav aria-label="Sections">
+      <a href="#catch">The catch</a>
+      <a href="#problem">The gap</a>
+      <a href="#how">How it checks</a>
+      <a href="#modules">Modules</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#honesty">Honesty</a>
+    </nav>
+    <span class="honesty-pill">Prototype &middot; REPLAY &middot; $0.00</span>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ================================ HERO ================================ -->
+  <section class="hero" aria-labelledby="hero-h1" style="border-top:none">
+    <svg class="hero-lines" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <path pathLength="1" d="M-40 520 C 240 430, 520 610, 780 500 S 1240 380, 1480 460"/>
+      <path pathLength="1" class="l2" d="M-40 420 C 300 330, 560 500, 860 400 S 1280 300, 1480 360"/>
+      <path pathLength="1" class="l3" d="M-40 610 C 360 540, 640 690, 980 590 S 1320 500, 1480 560"/>
+      <path pathLength="1" class="l4" d="M1480 120 C 1180 200, 900 60, 640 150 S 200 260, -40 190"/>
+    </svg>
+
+    <svg class="hero-seal" viewBox="0 0 120 120" role="img" aria-label="Verifier seal — verified against the record">
+      <defs><path id="sealring-b" d="M60 12 A48 48 0 1 1 59.9 12"/></defs>
+      <circle class="draw" cx="60" cy="60" r="54" pathLength="1"/>
+      <text class="ringtext"><textPath href="#sealring-b" startOffset="1%">VERIFIED AGAINST THE RECORD &#183; CURBSIDE COMMONS &#183; </textPath></text>
+      <path class="draw d2" d="M60 40 L80 47 V64 C80 77 71 85 60 90 C49 85 40 77 40 64 V47 Z" pathLength="1"/>
+      <path class="draw d3" d="M50 63 L57 70 L71 55" pathLength="1"/>
+    </svg>
+
+    <div class="hero-inner">
+      <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-shield"/></svg> Commerce truth verification &middot; simulated prototype</p>
+      <h1 id="hero-h1">AI agents are starting to buy what platforms serve them. This engine checks the serving copy, line by line, against <span class="mark">the merchant&rsquo;s own records</span>.</h1>
+      <p class="hero-lede">A menu copy can pass every schema check and still sell you a dish the restaurant 86&rsquo;d hours ago. The verifier is deterministic &mdash; no AI calls, $0 to run &mdash; and every finding ships with its receipts.</p>
+      <div class="hero-cta">
+        <a class="btn primary" href="#catch">Hold to verify the demo report <svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-arrow"/></svg></a>
+        <a class="btn ghost" href="#how">See how a listing gets checked</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================== #catch =============================== -->
+  <section id="catch" aria-labelledby="catch-h2">
+    <div class="sec-inner">
+      <div class="sec-head reveal">
+        <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-scale"/></svg> The shown catch &middot; hold to verify</p>
+        <h2 class="h2" id="catch-h2">What the copy says vs. what the restaurant&rsquo;s records say.</h2>
+        <p class="prose">A serving copy of a menu (what an AI shopping assistant would read) checked, line by line, against the restaurant&rsquo;s own system-of-record. Below is every difference the checker caught &mdash; each in plain words first, then the exact receipts. Deterministic and $0, with no AI calls in this verifier runtime: the same input always gives this same report.</p>
+      </div>
+
+      <!-- C10: the SIMULATED banner — byte-verbatim with components/report/ReportView.tsx
+           (the sample renders golden findings, so the banner is required). -->
+      <div class="sim" role="note">
+        <span class="sim-tag">SIMULATED</span>
+        <span class="sim-text">Synthetic test data &mdash; an invented restaurant, invented menu, invented prices. Not real DoorDash / Square / Uber&nbsp;Eats / Grubhub data, access, or business impact. The verification rules and the pinned data-format standard are real; the restaurant, its menu, and its records are invented.</span>
+      </div>
+
+      <div class="hold-zone" id="hold-zone">
+        <p class="hold-instr js-only" id="hold-instr">Press and <strong>hold</strong> to weigh the serving copy against the merchant&rsquo;s record &mdash; the check is deliberate. Hold until it completes and the verdict appears below; releasing early cancels the check. Prefer not to hold? Use <em>Reveal without holding</em>.</p>
+
+        <div class="hold-controls">
+          <button class="hold-btn js-only" id="hold-btn" type="button"
+                  aria-describedby="hold-instr" aria-controls="verdict-fallback" aria-expanded="false">
+            <span class="hold-base">Hold to verify</span>
+            <span class="hold-fill" aria-hidden="true"><span class="hold-fill-inner">Hold to verify</span></span>
+          </button>
+          <button class="reveal-plain js-only" id="reveal-plain" type="button" aria-controls="verdict-fallback" aria-expanded="false">
+            Reveal without holding
+          </button>
+        </div>
+        <p class="hold-cue js-only" id="hold-cue" aria-hidden="true">weighing the copy against the record&hellip;</p>
+        <span class="vh" id="hold-status" role="status" aria-live="polite"></span>
+
+        <details id="verdict-fallback" class="verdict-details">
+          <summary class="verdict-summary">Reveal the verdict</summary>
+          <div class="verdict-card" id="verdict-card">
+            <div class="verdict-head">
+              <span class="verdict-flag">FAIL</span>
+              <span class="verdict-count">16 findings</span>
+              <span class="verdict-tally">11 error &middot; 5 warn &middot; 0 info</span>
+            </div>
+            <p class="verdict-sub">The serving copy does not match the merchant&rsquo;s system-of-record. Verdict, tally, and findings mirror the committed golden report (<span class="mono">ok: false</span>).</p>
+
+            <ol class="findings" role="list">
+              <li class="finding">
+                <div class="finding-top">
+                  <span class="finding-idx">01</span>
+                  <span class="sev error"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-alert"/></svg> error</span>
+                </div>
+                <p class="finding-plain">This item is hidden in the merchant's own catalog but is being served to customers.</p>
+                <dl class="receipts" aria-label="evidence">
+                  <div><dt>claim</dt><dd><span class="mono">item-002-v2#existence</span><span class="mono-sub">acp-feed &middot; existence = true</span></dd></div>
+                  <div><dt>reference row</dt><dd class="mono">item-002-v2</dd></div>
+                  <div><dt>rule / spec-clause</dt><dd class="mono">LST-AVAIL-HIDDEN-SHOWN</dd></div>
+                  <div><dt>class</dt><dd class="mono">availability</dd></div>
+                </dl>
+              </li>
+
+              <li class="finding">
+                <div class="finding-top">
+                  <span class="finding-idx">02</span>
+                  <span class="sev error"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-alert"/></svg> error</span>
+                </div>
+                <p class="finding-plain">The copy says "in_stock" but the catalog state is 86'd/sold out (expected "out_of_stock").</p>
+                <dl class="receipts" aria-label="evidence">
+                  <div><dt>claim</dt><dd><span class="mono">item-008-v1#availability</span><span class="mono-sub">acp-feed &middot; availability = "in_stock"</span></dd></div>
+                  <div><dt>reference row</dt><dd class="mono">item-008-v1</dd></div>
+                  <div><dt>rule / spec-clause</dt><dd class="mono">LST-AVAIL-STATE</dd></div>
+                  <div><dt>class</dt><dd class="mono">availability</dd></div>
+                </dl>
+              </li>
+
+              <li class="finding">
+                <div class="finding-top">
+                  <span class="finding-idx">03</span>
+                  <span class="sev error"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-alert"/></svg> error</span>
+                </div>
+                <p class="finding-plain">The price is serialized in cents (2150) where dollars are expected (21.50) &mdash; a 100&times; overstatement.</p>
+                <dl class="receipts" aria-label="evidence">
+                  <div><dt>claim</dt><dd><span class="mono">item-001-v1#price.amount</span><span class="mono-sub">acp-feed &middot; price.amount = "2150"</span></dd></div>
+                  <div><dt>reference row</dt><dd class="mono">item-001-v1</dd></div>
+                  <div><dt>rule / spec-clause</dt><dd class="mono">LST-PRICE-CENTS-AS-DECIMAL</dd></div>
+                  <div><dt>class</dt><dd class="mono">price</dd></div>
+                </dl>
+              </li>
+            </ol>
+            <p class="findings-more">Showing 3 of 16 findings &mdash; the committed report renders every one with its full receipts.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== #problem ============================== -->
+  <section id="problem" aria-labelledby="problem-h2">
+    <div class="sec-inner">
+      <div class="sec-head reveal">
+        <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-alert"/></svg> The gap this engine exists for</p>
+        <h2 class="h2" id="problem-h2">Schema-conformant is not the same as true.</h2>
+        <p class="prose">Agentic-commerce protocols standardize the <em>shape</em> of what agents read; nothing in the shape guarantees the <em>content</em> matches the merchant&rsquo;s reality. The repo commits a spec-valid feed that passes every pinned schema while lying about the catalog &mdash; the conformance leg passes it, the truth leg catches it. That pair is the product in one sentence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================ #how ================================ -->
+  <section id="how" aria-labelledby="how-h2">
+    <div class="sec-inner">
+      <div class="sec-head reveal">
+        <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-scale"/></svg> How a listing gets checked</p>
+        <h2 class="h2" id="how-h2">From the merchant&rsquo;s record to an evidence-cited verdict.</h2>
+      </div>
+      <ol class="cards c5" role="list">
+        <li class="card reveal" data-stagger="0">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-record"/></svg></div>
+          <span class="step-idx">1</span>
+          <p class="kicker">Ground truth</p>
+          <h3>The merchant&rsquo;s own record</h3>
+          <p class="desc">The system-of-record &mdash; the catalog, prices, and availability the restaurant itself maintains &mdash; is the only thing a listing is allowed to be true against.</p>
+        </li>
+        <li class="card reveal" data-stagger="60">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-copies"/></svg></div>
+          <span class="step-idx">2</span>
+          <p class="kicker">What agents read</p>
+          <h3>The serving copies</h3>
+          <p class="desc">Platforms serve agent-readable copies of that record (ACP- and UCP-shaped feeds). This is what an AI shopping agent actually reads &mdash; and where drift lives.</p>
+        </li>
+        <li class="card reveal" data-stagger="120">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-scale"/></svg></div>
+          <span class="step-idx">3</span>
+          <p class="kicker gate">Gate &middot; truth</p>
+          <h3>Line-by-line comparison</h3>
+          <p class="desc">A deterministic comparator checks every claim in the copy against the record, exactly. No AI calls, $0, same input &rarr; same report.</p>
+        </li>
+        <li class="card reveal" data-stagger="180">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-eye"/></svg></div>
+          <span class="step-idx">4</span>
+          <p class="kicker gate">Gate &middot; receipts</p>
+          <h3>Evidence, not vibes</h3>
+          <p class="desc">Every finding carries its receipts: the claim id, the rule that caught it, and the record row it failed against &mdash; auditable end to end.</p>
+        </li>
+        <li class="card reveal" data-stagger="240">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-person"/></svg></div>
+          <span class="step-idx">5</span>
+          <p class="kicker">Act</p>
+          <h3>Humans stay in the loop</h3>
+          <p class="desc">Findings become recommendations &mdash; reports, drafts, deliveries &mdash; behind explicit human gates. Nothing sends itself.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================== #modules ============================== -->
+  <section id="modules" aria-labelledby="modules-h2">
+    <div class="sec-inner">
+      <div class="sec-head reveal">
+        <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-check"/></svg> Three verification modules, one spine</p>
+        <h2 class="h2" id="modules-h2">Listings truth &middot; protocol conformance &middot; fee-cap audit.</h2>
+      </div>
+      <ul class="cards c3" role="list">
+        <li class="card reveal" data-stagger="0">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-check"/></svg></div>
+          <p class="kicker">Module</p>
+          <h3>Listings truth check</h3>
+          <p class="desc">The serving copy vs the system-of-record, line by line &mdash; availability, price, existence, encoding. The committed demo report catches a sold-out item still being served.</p>
+        </li>
+        <li class="card reveal" data-stagger="60">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-copies"/></svg></div>
+          <p class="kicker">Module</p>
+          <h3>Protocol conformance</h3>
+          <p class="desc">Validation against 78 pinned official UCP schemas (spec 2026-04-08) &mdash; and the headline it exists to prove: a feed can be schema-conformant and still false against the merchant&rsquo;s records. Both legs are machine-checked.</p>
+        </li>
+        <li class="card reveal" data-stagger="120">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-scale"/></svg></div>
+          <p class="kicker">Module</p>
+          <h3>Fee-cap audit</h3>
+          <p class="desc">NYC &sect;20-563.3 codified as 17 rules (11 executable predicates + 6 registered non-checkable clauses) over hostile, relabeled statement lines &mdash; with a calibrated classifier in front and the deterministic table deciding.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================== #evidence ============================= -->
+  <section id="evidence" aria-labelledby="evidence-h2">
+    <div class="sec-inner">
+      <div class="sec-head reveal">
+        <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-spark"/></svg> Labels are earned here, or not claimed</p>
+        <h2 class="h2" id="evidence-h2">Every quality label traces to a pre-registered run.</h2>
+        <p class="prose">Floors are committed in git before any run; splits are burned after one scoring pass; misses stay on the record. The eval evidence dashboard traces every figure to its committed record.</p>
+      </div>
+      <ul class="cards c3" role="list">
+        <li class="card reveal" data-stagger="0">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-check"/></svg></div>
+          <p class="kicker">Fee-line classifier</p>
+          <p class="stat-figure">21/21</p>
+          <p class="stat-note">The first calibration run missed one floor and the label was <em>deferred</em> &mdash; that record stays public. A fresh pre-registered retry then cleared every floor and earned it.</p>
+        </li>
+        <li class="card reveal" data-stagger="60">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-person"/></svg></div>
+          <p class="kicker">Agent-crew live run</p>
+          <p class="stat-figure">20/20</p>
+          <p class="stat-note">Scored against floors committed before the run &mdash; and only the two model-directed members carry the &ldquo;agent&rdquo; label, because that is what the pre-registration licenses.</p>
+        </li>
+        <li class="card reveal" data-stagger="120">
+          <div class="card-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 20 20"><use href="#ic-alert"/></svg></div>
+          <p class="kicker">The lanes that missed</p>
+          <p class="stat-figure deferred">Floors not met &mdash; and it says so</p>
+          <p class="stat-note">Two enhancement lanes (retrieval, entity resolution) missed their pre-registered floors: both labels defer, on every payload, and the full scoreboards stay published. Deferral is a feature.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================== #honesty ============================== -->
+  <section id="honesty" aria-labelledby="honesty-h2">
+    <div class="sec-inner">
+      <div class="sec-head reveal">
+        <p class="eyebrow"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><use href="#ic-person"/></svg> What this is &mdash; and what it is not</p>
+        <h2 class="h2" id="honesty-h2">A simulated prototype, honest about its own edges.</h2>
+        <p class="prose">The restaurant, its menu, and its records are invented; the verification rules, the pinned data-format standard, and the codified fee caps are real. The site is a static replay of committed fixtures &mdash; it initiates nothing. This project began as a merchant activation prototype; that first product is preserved, working, as the legacy activation module.</p>
+      </div>
+
+      <footer class="foot">
+        <span class="foot-status">Simulated prototype, run on demand &mdash; not a live service.</span>
+        Every page is a <strong>static replay of committed, labeled fixtures</strong> from a synthetic corpus; this sample <strong>initiates no sends and makes no live calls</strong>. Human-led, AI-assisted, professionally reviewed.
+        <strong>Not affiliated with, endorsed by, or connected to</strong> DoorDash, Uber Eats, Grubhub, DataSF, or any named business. Built and directed by Sharan Kumar (github.com/sharanlabs).
+      </footer>
+    </div>
+  </section>
+</main>
+
+<p class="site-end">Design-lane sample &mdash; Variation B &ldquo;Gallery Cards&rdquo; (owner iterate word, 2026-07-12). Not served by the live site; a design-process record for owner reaction. Base content: mockups/meridian-2026-07-11.html; brief: docs/design-brief-s6b-2026-07-11.md.</p>
+
+<script>
+(function () {
+  "use strict";
+  var reduceMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  /* ------------------------------ mini-nav ------------------------------- */
+  var nav = document.getElementById("mininav");
+  function onScroll() {
+    if (window.scrollY > 8) { nav.classList.add("scrolled"); }
+    else { nav.classList.remove("scrolled"); }
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  /* --------------------------- hold-to-verify ---------------------------- */
+  var zone = document.getElementById("hold-zone");
+  var btn = document.getElementById("hold-btn");
+  var revealPlain = document.getElementById("reveal-plain");
+  var details = document.getElementById("verdict-fallback");
+  var card = document.getElementById("verdict-card");
+  var status = document.getElementById("hold-status");
+  var HOLD_MS = 1400;
+  var timer = null;
+  var holding = false;
+  var revealed = false;
+
+  function setStatus(msg) { if (status) { status.textContent = msg; } }
+
+  function reveal() {
+    if (revealed) { return; }
+    revealed = true;
+    holding = false;
+    if (timer) { clearTimeout(timer); timer = null; }
+    zone.classList.remove("holding");
+    zone.classList.add("done");
+    btn.setAttribute("aria-expanded", "true");
+    revealPlain.setAttribute("aria-expanded", "true");
+    details.open = true;
+    requestAnimationFrame(function () { card.classList.add("revealed"); });
+    setStatus("Verified against the record. FAIL — 16 findings (11 error, 5 warn). Verdict shown below.");
+  }
+
+  function startHold() {
+    if (revealed || holding) { return; }
+    if (reduceMq.matches) { reveal(); return; }
+    holding = true;
+    zone.classList.add("holding");
+    setStatus("Verifying — hold to weigh the serving copy against the record.");
+    timer = setTimeout(reveal, HOLD_MS);
+  }
+
+  function cancelHold() {
+    if (!holding) { return; }
+    holding = false;
+    if (timer) { clearTimeout(timer); timer = null; }
+    zone.classList.remove("holding");
+    setStatus("Released early — the check did not complete. Hold again, or reveal without holding.");
+  }
+
+  btn.addEventListener("pointerdown", function (e) {
+    if (typeof e.button === "number" && e.button !== 0) { return; }
+    try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+    e.preventDefault();
+    startHold();
+  });
+  btn.addEventListener("pointerup", function (e) {
+    try { btn.releasePointerCapture(e.pointerId); } catch (err) {}
+    cancelHold();
+  });
+  btn.addEventListener("pointercancel", cancelHold);
+  btn.addEventListener("pointerleave", cancelHold);
+
+  function isActivateKey(e) {
+    return e.key === " " || e.key === "Spacebar" || e.code === "Space" || e.key === "Enter";
+  }
+  btn.addEventListener("keydown", function (e) {
+    if (!isActivateKey(e)) { return; }
+    e.preventDefault();
+    if (e.repeat) { return; }
+    startHold();
+  });
+  btn.addEventListener("keyup", function (e) {
+    if (!isActivateKey(e)) { return; }
+    e.preventDefault();
+    cancelHold();
+  });
+  btn.addEventListener("blur", cancelHold);
+
+  revealPlain.addEventListener("click", function () { reveal(); });
+
+  details.open = false;
+
+  /* ------------------------ card reveal on scroll ------------------------ */
+  var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  if ("IntersectionObserver" in window && !reduceMq.matches) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) { return; }
+        var el = entry.target;
+        var delay = parseInt(el.getAttribute("data-stagger") || "0", 10) || 0;
+        setTimeout(function () { el.classList.add("in"); }, delay);
+        io.unobserve(el);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    reveals.forEach(function (el) { io.observe(el); });
+  } else {
+    reveals.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+</body>
+</html>
