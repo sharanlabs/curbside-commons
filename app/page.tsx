@@ -4,10 +4,14 @@ import { Reveal } from "@/components/landing/Reveal";
 import { TruthCatch } from "@/components/landing/TruthCatch";
 import { ENGINE, CALIBRATION, L1 } from "@/lib/dashboard/evidence";
 
-// S5 landing retell (plan v3.3, owner-ratified /legacy/ split): the landing now
-// tells the CANONICAL product — the deterministic commerce-truth verifier — and
-// hands the legacy activation story to /legacy/**. The root layout title template
-// appends the product name; identity renders via the layout, not hardcoded here.
+// S6b landing — the owner-adopted "Gallery Cards B-2" design language
+// (mockups/variation-b2-gallery-cards-2026-07-13.html) translated onto the
+// canonical truth-engine landing. Same Oxblood tokens; B-2 adds the self-drawing
+// logo, the cartographic hero line field + drifting survey line, icon-tile card
+// medallions, section-rule reveals, and hover micro-transitions. Every honesty
+// disclosure stays byte-identical; the shown catch stays imported from the golden
+// (TruthCatch), never hardcoded. The root layout title template appends the
+// product name; identity renders via the layout, not hardcoded here.
 export const metadata = {
   title: "The truth layer for agentic commerce",
   description:
@@ -82,8 +86,64 @@ function Icon({ name, className = "lp-ic" }: { name: keyof typeof ICON_PATHS; cl
 }
 
 /**
- * The five-stage flow — hairline-connected strip (Oxblood system). The two
- * `gate` stages are the deterministic checks; they carry the wine accent.
+ * The hero's cartographic line field (B-2 floor ④) — a layered contour field on
+ * the pure ground. Ink-only line-work: no gradients, no tinted washes. Paths are
+ * drawn by default (fully visible under reduced-motion / no-JS); under allowed
+ * motion they self-draw on load and one dashed survey line drifts slowly. Purely
+ * decorative → aria-hidden.
+ */
+function HeroField() {
+  return (
+    <svg
+      className="lp-hero-field"
+      viewBox="0 0 1440 640"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
+      <path pathLength="1" className="f1" d="M-40 520 C 240 430, 520 610, 780 500 S 1240 380, 1480 460" />
+      <path pathLength="1" className="f2" d="M-40 420 C 300 330, 560 500, 860 400 S 1280 300, 1480 360" />
+      <path pathLength="1" className="f3" d="M-40 610 C 360 540, 640 690, 980 590 S 1320 500, 1480 560" />
+      <path pathLength="1" className="f4" d="M1480 120 C 1180 200, 900 60, 640 150 S 200 260, -40 190" />
+      <path pathLength="1" className="f5" d="M-40 320 C 340 250, 620 400, 940 310 S 1300 220, 1480 270" />
+      <path pathLength="1" className="f6" d="M1480 40 C 1140 110, 860 -10, 560 70 S 160 170, -40 110" />
+      <path className="survey" d="M-40 470 C 280 385, 540 555, 820 450 S 1260 340, 1480 410" />
+      <g className="ticks">
+        <path d="M120 500 V488" />
+        <path d="M320 452 V440" />
+        <path d="M520 512 V500" />
+        <path d="M720 470 V458" />
+        <path d="M920 420 V408" />
+        <path d="M1120 405 V393" />
+        <path d="M1320 398 V386" />
+      </g>
+    </svg>
+  );
+}
+
+/** The verifier seal (B-2 floor ③ companion) — a monoline shield-over-baseline
+ *  medallion in the hero corner. Self-draws under allowed motion; complete and
+ *  static otherwise. Carries a real accessible label. */
+function HeroSeal() {
+  return (
+    <svg className="lp-hero-seal" viewBox="0 0 120 120" role="img" aria-label="Verifier seal — verified against the record">
+      <defs>
+        <path id="lp-sealring" d="M60 12 A48 48 0 1 1 59.9 12" />
+      </defs>
+      <circle className="draw" cx="60" cy="60" r="54" pathLength="1" />
+      <text className="ringtext">
+        <textPath href="#lp-sealring" startOffset="1%">
+          VERIFIED AGAINST THE RECORD &#183; CURBSIDE COMMONS &#183;{" "}
+        </textPath>
+      </text>
+      <path className="draw d2" d="M60 40 L80 47 V64 C80 77 71 85 60 90 C49 85 40 77 40 64 V47 Z" pathLength="1" />
+      <path className="draw d3" d="M50 63 L57 70 L71 55" pathLength="1" />
+    </svg>
+  );
+}
+
+/**
+ * The five-stage flow — B-2 icon-tile cards. The two `gate` stages are the
+ * deterministic checks; their kicker carries the wine accent.
  */
 const FLOW: Array<{
   icon: keyof typeof ICON_PATHS;
@@ -161,51 +221,69 @@ const MODULES: Array<{ icon: keyof typeof ICON_PATHS; title: string; desc: React
 export default function Landing() {
   return (
     <main className="lp-main">
-      {/* ===== HERO — the canonical product + the shown catch ===== */}
-      <section className="ds-wrap lp-hero" aria-labelledby="hero-h1">
-        <div className="lp-hero-grid">
-          <div className="lp-hero-copy">
-            <p className="lp-eyebrow">
-              <Icon name="shield" /> Commerce truth verification &middot; simulated prototype
-            </p>
-            <h1 id="hero-h1">
-              AI agents are starting to buy what platforms serve them. This engine checks the
-              serving copy, line by line, against{" "}
-              <span className="lp-mark">the merchant&rsquo;s own records</span>.
-            </h1>
-            <p className="lp-lede">
-              A menu copy can pass every schema check and still sell you a dish the restaurant
-              86&rsquo;d hours ago. The verifier is deterministic — no AI calls, $0 to run — and
-              every finding ships with its receipts.
-            </p>
-            <div className="lp-cta-row">
-              <Link className="lp-btn primary" href="/report">
-                Read the verifier report <Icon name="arrow" />
-              </Link>
-              <Link className="lp-btn ghost" href="/demo">
-                Watch an agent get caught
-              </Link>
-            </div>
+      {/* ===== HERO — canonical product; cartographic line field + seal (B-2) ===== */}
+      <section className="lp-hero" aria-labelledby="hero-h1">
+        <HeroField />
+        <HeroSeal />
+        <div className="ds-wrap lp-hero-inner">
+          <p className="lp-eyebrow">
+            <Icon name="shield" /> Commerce truth verification &middot; simulated prototype
+          </p>
+          <h1 id="hero-h1">
+            AI agents are starting to buy what platforms serve them. This engine checks the
+            serving copy, line by line, against{" "}
+            <span className="lp-mark">the merchant&rsquo;s own records</span>.
+          </h1>
+          <p className="lp-lede">
+            A menu copy can pass every schema check and still offer a dish the restaurant sold out
+            of. The verifier is deterministic — no AI calls, $0 to run — and every finding ships
+            with its receipts.
+          </p>
+          <div className="lp-cta-row">
+            <Link className="lp-btn primary" href="/report">
+              Read the verifier report <Icon name="arrow" />
+            </Link>
+            <Link className="lp-btn ghost" href="/demo">
+              Watch an agent get caught
+            </Link>
           </div>
-
-          {/* the SHOWN catch — imported from the committed golden, settled in SSR */}
-          <aside className="lp-hero-aside" aria-label="Two findings from the committed demo report">
-            <TruthCatch />
-          </aside>
         </div>
       </section>
 
+      {/* ===== THE SHOWN CATCH — imported golden, styled as a B-2 gallery panel ===== */}
+      <section className="ds-wrap ds-section lp-sec" id="catch" aria-labelledby="catch-h2">
+        <Reveal>
+          <p className="lp-eyebrow">
+            <Icon name="scale" /> Demo report &middot; verified against the record
+          </p>
+          <span className="lp-sec-rule" aria-hidden="true" />
+          <h2 id="catch-h2" className="lp-h2">
+            The serving copy, checked against the merchant&rsquo;s records.
+          </h2>
+          <p className="lp-foot" style={{ maxWidth: "70ch" }}>
+            A condensed excerpt of the committed demo report — the same golden the full report
+            renders, with the verdict, tally, and findings imported straight from the fixture. The
+            verifier is deterministic and makes no AI calls at runtime, so the same input always
+            produces the same report.
+          </p>
+        </Reveal>
+        <Reveal>
+          <aside className="lp-catch-wrap" aria-label="Two findings from the committed demo report">
+            <TruthCatch />
+          </aside>
+        </Reveal>
+      </section>
+
       {/* ===== THE PROBLEM — conformant is not true ===== */}
-      <section className="ds-wrap ds-section" id="problem" aria-labelledby="problem-h2">
+      <section className="ds-wrap ds-section lp-sec" id="problem" aria-labelledby="problem-h2">
         <Reveal>
           <p className="lp-eyebrow">
             <Icon name="alert" /> The gap this engine exists for
           </p>
+          <span className="lp-sec-rule" aria-hidden="true" />
           <h2 id="problem-h2" className="lp-h2">
             Schema-conformant is not the same as true.
           </h2>
-        </Reveal>
-        <Reveal>
           <p className="lp-foot" style={{ maxWidth: "72ch" }}>
             Agentic-commerce protocols standardize the <em>shape</em> of what agents read; nothing
             in the shape guarantees the <em>content</em> matches the merchant&rsquo;s reality. The
@@ -216,59 +294,67 @@ export default function Landing() {
         </Reveal>
       </section>
 
-      {/* ===== HOW — the five-stage flow ===== */}
-      <section className="ds-wrap ds-section" id="how" aria-labelledby="how-h2">
+      {/* ===== HOW — the five-stage flow as icon-tile cards ===== */}
+      <section className="ds-wrap ds-section lp-sec" id="how" aria-labelledby="how-h2">
         <Reveal>
           <p className="lp-eyebrow">
             <Icon name="scale" /> How a listing gets checked
           </p>
+          <span className="lp-sec-rule" aria-hidden="true" />
           <h2 id="how-h2" className="lp-h2">
             From the merchant&rsquo;s record to an evidence-cited verdict.
           </h2>
         </Reveal>
-        <Reveal stagger>
-          <div className="lp-flow" role="list">
-            {FLOW.map((s) => (
-              <div className={`lp-step${s.gate ? " gate" : ""}`} role="listitem" key={s.title}>
-                <Icon name={s.icon} className="lp-si" />
-                <span className="lp-sk">{s.kicker}</span>
-                <h3 className="lp-h3">{s.title}</h3>
-                <p className="lp-ptext">{s.desc}</p>
+        <Reveal stagger className="lp-cardgrid c5">
+          {FLOW.map((s, i) => (
+            <article className={`lp-card${s.gate ? " gate" : ""}`} key={s.title}>
+              <div className="lp-card-ic" aria-hidden="true">
+                <Icon name={s.icon} className="lp-cardglyph" />
               </div>
-            ))}
-          </div>
+              <span className="lp-card-idx" aria-hidden="true">
+                {i + 1}
+              </span>
+              <span className={`lp-kicker${s.gate ? " gate" : ""}`}>{s.kicker}</span>
+              <h3 className="lp-card-h3">{s.title}</h3>
+              <p className="lp-card-desc">{s.desc}</p>
+            </article>
+          ))}
         </Reveal>
       </section>
 
-      {/* ===== MODULES ===== */}
-      <section className="ds-wrap ds-section" id="modules" aria-labelledby="modules-h2">
+      {/* ===== MODULES — three icon-tile cards ===== */}
+      <section className="ds-wrap ds-section lp-sec" id="modules" aria-labelledby="modules-h2">
         <Reveal>
           <p className="lp-eyebrow">
             <Icon name="check" /> Three verification modules, one spine
           </p>
+          <span className="lp-sec-rule" aria-hidden="true" />
           <h2 id="modules-h2" className="lp-h2">
             Listings truth &middot; protocol conformance &middot; fee-cap audit.
           </h2>
         </Reveal>
-        <Reveal stagger>
-          <div className="lp-grid3">
-            {MODULES.map((m) => (
-              <div className="lp-panel" key={m.title}>
-                <Icon name={m.icon} className="lp-si" />
-                <h3 className="lp-h3">{m.title}</h3>
-                <p className="lp-ptext">{m.desc}</p>
+        <Reveal stagger className="lp-cardgrid c3">
+          {MODULES.map((m) => (
+            <article className="lp-card" key={m.title}>
+              <div className="lp-card-ic" aria-hidden="true">
+                <Icon name={m.icon} className="lp-cardglyph" />
               </div>
-            ))}
-          </div>
+              <span className="lp-kicker">Module</span>
+              <h3 className="lp-card-h3">{m.title}</h3>
+              <p className="lp-card-desc">{m.desc}</p>
+            </article>
+          ))}
         </Reveal>
       </section>
 
-      {/* ===== EVIDENCE DISCIPLINE ===== */}
-      <section className="ds-wrap ds-section" id="evidence" aria-labelledby="evidence-h2">
+      {/* ===== EVIDENCE DISCIPLINE — honest prose kept byte-identical (calibration
+              wording is a frozen honesty surface); restyled into the B-2 register ===== */}
+      <section className="ds-wrap ds-section lp-sec" id="evidence" aria-labelledby="evidence-h2">
         <Reveal>
           <p className="lp-eyebrow">
             <Icon name="spark" /> Labels are earned here, or not claimed
           </p>
+          <span className="lp-sec-rule" aria-hidden="true" />
           <h2 id="evidence-h2" className="lp-h2">
             Every quality label traces to a pre-registered run.
           </h2>
@@ -289,12 +375,13 @@ export default function Landing() {
         </Reveal>
       </section>
 
-      {/* ===== HONESTY + LINEAGE ===== */}
-      <section className="ds-wrap ds-section" id="honesty" aria-labelledby="honesty-h2">
+      {/* ===== HONESTY + LINEAGE — frozen honesty prose; restyled register ===== */}
+      <section className="ds-wrap ds-section lp-sec" id="honesty" aria-labelledby="honesty-h2">
         <Reveal>
           <p className="lp-eyebrow">
             <Icon name="person" /> What this is — and what it is not
           </p>
+          <span className="lp-sec-rule" aria-hidden="true" />
           <h2 id="honesty-h2" className="lp-h2">
             A simulated prototype, honest about its own edges.
           </h2>

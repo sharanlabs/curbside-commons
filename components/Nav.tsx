@@ -26,20 +26,35 @@ export function Nav() {
           aria-current={pathname === "/" ? "page" : undefined}
           className="site-brand"
         >
+          {/* B-2 self-drawing monoline mark: verifier shield + check over a
+              meridian baseline. Fully drawn by default (reduced-motion / no-JS);
+              self-draws once on load under allowed motion (pure CSS, gated). */}
           <svg
             className="site-brand-mark"
-            viewBox="0 0 20 20"
+            viewBox="0 0 32 32"
             fill="none"
-            stroke="currentColor"
-            strokeWidth={1.5}
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
           >
-            <path d="M10 2.2l6.4 2.4v4.2c0 4.2-2.7 6.7-6.4 8.4-3.7-1.7-6.4-4.2-6.4-8.4V4.6z" />
-            <path d="M6.8 10.2l2.2 2.2 4.4-4.6" />
+            <path
+              className="lm-base"
+              d="M2 26 C 8 22.5, 14 27.5, 20 24.5 S 28 21, 30 22.5"
+              pathLength="1"
+            />
+            <path
+              className="lm-draw"
+              d="M16 4 L25 7.2 V15 C25 20.6 21 24.2 16 26 C11 24.2 7 20.6 7 15 V7.2 Z"
+              pathLength="1"
+            />
+            <path className="lm-draw lm-d2" d="M12 15.5 L15 18.5 L21 11.5" pathLength="1" />
           </svg>
-          {PLATFORM_NAME}
+          <span className="site-brand-word">
+            {PLATFORM_NAME}
+            <span className="site-brand-dot" aria-hidden="true">
+              .
+            </span>
+          </span>
         </Link>
         {LINKS.map((l) => {
           const active = pathname === l.href || pathname.startsWith(`${l.href}/`);

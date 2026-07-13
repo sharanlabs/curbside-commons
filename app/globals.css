@@ -165,10 +165,46 @@ body {
   text-decoration: none;
 }
 .site-brand-mark {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   flex: none;
   color: var(--accent);
+}
+/* B-2 self-drawing monoline mark (floor ③): shield + check in wine over a faint
+   ink meridian baseline. Paths are drawn by default (offset 0), so the mark is
+   complete under reduced-motion and no-JS. */
+.site-brand-mark path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.site-brand-mark .lm-base {
+  stroke: var(--ink);
+  opacity: 0.5;
+}
+.site-brand-word {
+  display: inline-flex;
+  align-items: baseline;
+}
+.site-brand-dot {
+  color: var(--accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-brand-mark .lm-draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: lm-draw 1.1s var(--ease) forwards;
+  }
+  .site-brand-mark .lm-d2 {
+    animation-delay: 0.35s;
+  }
+  @keyframes lm-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
 }
 .site-navlink {
   /* mockup spec: sans 13px (E-3 reviewer fix — the dispatch brief's "mono" was
@@ -1142,6 +1178,324 @@ body {
   .lp-btn:hover .lp-ic,
   .lp-panel:hover {
     transform: none;
+  }
+}
+
+/* ============================================================================
+   OXBLOOD LANDING — "GALLERY CARDS B-2" LAYER (S6b, 2026-07-13).
+   The owner-adopted design language from
+   mockups/variation-b2-gallery-cards-2026-07-13.html, translated onto the
+   canonical landing. Same tokens; B-2 adds the cartographic hero line field +
+   drifting survey line (floor ④), the verifier seal, icon-tile card medallions
+   (floor ⑤), section-rule reveals, and hover micro-transitions (floors ①/②).
+   Pure-white/off-white ground, radii ≤6px, no gradients/glass. ALL added motion
+   is killed under prefers-reduced-motion: reduce (batch-E pattern) — every
+   draw/drift/scroll animation is defined ONLY inside no-preference, so reduce
+   inherits the fully-drawn, static default.
+   ========================================================================== */
+
+/* ----- HERO: relative frame carrying the line field + seal ------------------ */
+.lp-hero {
+  position: relative;
+  overflow: hidden;
+}
+.lp-hero-inner {
+  position: relative;
+  z-index: 1;
+}
+.lp-hero-inner .lp-eyebrow {
+  margin-bottom: 0;
+}
+.lp-hero-inner h1 {
+  margin-top: 20px;
+  max-width: 20ch;
+}
+/* the accented phrase stays on one line on wide screens; on phones it must be
+   allowed to wrap so it isn't clipped by the hero's overflow:hidden frame */
+@media (max-width: 560px) {
+  .lp-hero-inner h1 .lp-mark {
+    white-space: normal;
+  }
+}
+
+/* the cartographic contour field — ink-only line-work, drawn by default */
+.lp-hero-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.lp-hero-field path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.lp-hero-field .f1 {
+  opacity: 0.055;
+}
+.lp-hero-field .f2 {
+  opacity: 0.045;
+}
+.lp-hero-field .f3 {
+  opacity: 0.06;
+}
+.lp-hero-field .f4 {
+  opacity: 0.04;
+}
+.lp-hero-field .f5 {
+  opacity: 0.05;
+}
+.lp-hero-field .f6 {
+  opacity: 0.035;
+}
+.lp-hero-field .survey {
+  stroke: var(--accent);
+  opacity: 0.12;
+  stroke-dasharray: 6 10;
+  stroke-dashoffset: 0;
+}
+.lp-hero-field .ticks path {
+  opacity: 0.1;
+  stroke-width: 1;
+  stroke-dasharray: none;
+}
+
+/* the verifier seal — monoline medallion in the hero corner */
+.lp-hero-seal {
+  position: absolute;
+  right: clamp(16px, 3.5vw, 40px);
+  top: clamp(40px, 6vw, 84px);
+  width: 128px;
+  height: 128px;
+  z-index: 0;
+  pointer-events: none;
+}
+.lp-hero-seal circle,
+.lp-hero-seal path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+.lp-hero-seal .ringtext {
+  font-family: var(--ff-mono);
+  font-size: 7.5px;
+  letter-spacing: 0.22em;
+  fill: var(--muted);
+  stroke: none;
+}
+.lp-hero-seal .draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+@media (max-width: 1040px) {
+  .lp-hero-seal {
+    display: none;
+  }
+}
+
+/* ----- section-rule: a short accent underline that draws in on reveal -------- */
+.lp-sec-rule {
+  display: block;
+  width: 44px;
+  height: 0;
+  border: 0;
+  border-top: 2px solid var(--accent);
+  margin: 14px 0 2px;
+}
+
+/* ----- icon-tile gallery cards (floor ⑤) ------------------------------------ */
+.lp-cardgrid {
+  display: grid;
+  gap: 18px;
+  margin-top: 34px;
+}
+.lp-cardgrid.c3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.lp-cardgrid.c5 {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 1080px) {
+  .lp-cardgrid.c3,
+  .lp-cardgrid.c5 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 680px) {
+  .lp-cardgrid.c3,
+  .lp-cardgrid.c5 {
+    grid-template-columns: 1fr;
+  }
+}
+.lp-card {
+  position: relative;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--bg);
+  padding: 24px 22px;
+  transition:
+    border-color 0.18s var(--ease),
+    transform 0.18s var(--ease);
+}
+.lp-card:hover {
+  border-color: var(--accent-line);
+  transform: translateY(-2px);
+}
+.lp-card.gate {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+.lp-card-ic {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--rule-2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  margin-bottom: 16px;
+  transition:
+    color 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+}
+.lp-cardglyph {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+.lp-card:hover .lp-card-ic,
+.lp-card.gate .lp-card-ic {
+  color: var(--accent);
+  border-color: var(--accent-line);
+}
+.lp-card-idx {
+  position: absolute;
+  top: 22px;
+  right: 20px;
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 1px 7px;
+}
+.lp-kicker {
+  display: inline-block;
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.lp-kicker.gate {
+  color: var(--signal-text);
+}
+.lp-card-h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.25;
+  margin: 8px 0 0;
+  color: var(--ink);
+}
+.lp-card-desc {
+  margin: 10px 0 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--body);
+}
+
+/* ----- the shown-catch wrapper (holds TruthCatch) --------------------------- */
+.lp-catch-wrap {
+  display: block;
+  margin-top: 30px;
+  max-width: 720px;
+}
+
+/* ----- motion: draws + drift + reveal, ALL gated to allowed motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* contour field self-draws in on load; one survey line drifts slowly */
+  .lp-hero-field path {
+    stroke-dashoffset: 1;
+    animation: lp-drawline 5.5s var(--ease) forwards;
+  }
+  .lp-hero-field .f2 {
+    animation-delay: 0.3s;
+  }
+  .lp-hero-field .f3 {
+    animation-delay: 0.6s;
+  }
+  .lp-hero-field .f4 {
+    animation-delay: 0.9s;
+  }
+  .lp-hero-field .f5 {
+    animation-delay: 1.2s;
+  }
+  .lp-hero-field .f6 {
+    animation-delay: 1.5s;
+  }
+  .lp-hero-field .ticks path {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+  .lp-hero-field .survey {
+    stroke-dashoffset: 0;
+    animation: lp-surveydrift 40s linear infinite;
+  }
+  /* seal self-draws */
+  .lp-hero-seal .draw {
+    stroke-dashoffset: 1;
+    animation: lp-drawline 1.6s var(--ease) forwards;
+  }
+  .lp-hero-seal .d2 {
+    animation-delay: 0.5s;
+  }
+  .lp-hero-seal .d3 {
+    animation-delay: 1.1s;
+  }
+  /* section-rule expands from 0 → 44px as its block reveals */
+  .ds-reveal .lp-sec-rule {
+    width: 0;
+  }
+  .ds-reveal.in .lp-sec-rule {
+    width: 44px;
+    transition: width 0.42s var(--ease) 0.12s;
+  }
+  @keyframes lp-drawline {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes lp-surveydrift {
+    from {
+      stroke-dashoffset: 0;
+    }
+    to {
+      stroke-dashoffset: -160;
+    }
+  }
+}
+
+/* ----- reduced-motion kill for the B-2 hover/transition micro-motions -------
+   (the draw/drift/reveal animations above never apply under reduce; these are
+   the transform/transition-bearing rules that need an explicit stop.) --------- */
+@media (prefers-reduced-motion: reduce) {
+  .lp-card,
+  .lp-card-ic {
+    transition: none;
+  }
+  .lp-card:hover {
+    transform: none;
+  }
+  .lp-sec-rule {
+    width: 44px;
+    transition: none;
   }
 }
 
@@ -2562,11 +2916,14 @@ body {
   margin-bottom: -6px;
 }
 
-/* === S5 landing retell (append-only): the TruthCatch hero aside === */
+/* === S5 landing retell (append-only): the TruthCatch panel === */
+/* S6b: restyled into the B-2 register — real hairline border (var(--line) was
+   undefined and fell back to currentColor), ≤6px radius, tinted well. */
 .lp-catch {
-  border: 1px solid var(--line);
-  background: var(--paper, #fff);
-  padding: 18px 20px;
+  border: 1px solid var(--rule-2);
+  border-radius: 6px;
+  background: var(--bg);
+  padding: 22px 24px;
 }
 .lp-catch-head {
   display: flex;
@@ -2591,7 +2948,7 @@ body {
   align-items: baseline;
   gap: 12px;
   padding-bottom: 10px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--rule);
 }
 .lp-catch-fail {
   font-family: var(--ff-mono, monospace);
@@ -2606,7 +2963,7 @@ body {
 }
 .lp-catch-row {
   padding: 12px 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--rule);
 }
 .lp-catch-plain {
   margin: 0 0 6px;
