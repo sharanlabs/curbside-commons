@@ -56,7 +56,7 @@ A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the or
 
 | Surface | Status |
 | --- | --- |
-| Test suite | `npm run verify` green: **1145 passed + 7 skipped** (the skips are live-network harnesses, off by default; count re-measured live 2026-07-12 after the E2/E3/E4 lanes, their eval-locks, and the batch-D review fixes landed) |
+| Test suite | `npm run verify` green: **1145 passed + 7 skipped** locally, **1144 + 8 in CI** (count re-measured live 2026-07-12 after the E2/E3/E4 lanes, their eval-locks, and the batch-D review fixes landed). The skips are live-network harnesses, off by default; the one-test difference is the embedding-hybrid check, which is cache-gated and therefore *skipped* in CI — the model cache is gitignored and inference never downloads, so a fresh runner honestly reports it as skipped rather than silently passing. |
 | Listings drift taxonomy (8 classes) | **8/8 injected and caught, measured** by the C6 coverage eval; never an "all edge cases" claim |
 | Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
 | Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |
