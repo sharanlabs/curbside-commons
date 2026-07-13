@@ -278,7 +278,7 @@
   .sim {
     display: flex; gap: 12px; align-items: flex-start;
     border: 1px solid var(--wine-line); background: var(--wine-soft);
-    border-left: 4px solid var(--wine); border-radius: 8px;
+    border-left: 4px solid var(--wine); border-radius: 6px;
     padding: 14px 16px; margin-top: 26px; max-width: var(--measure);
   }
   .sim-tag {
@@ -376,7 +376,7 @@
   .verdict-summary::-webkit-details-marker { display: none; }
 
   .verdict-card {
-    margin-top: 8px; border: 1px solid var(--rule-2); border-radius: 12px;
+    margin-top: 8px; border: 1px solid var(--rule-2); border-radius: 6px;
     background: var(--panel); padding: 22px; max-width: var(--measure);
   }
   .verdict-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
@@ -393,7 +393,7 @@
   /* findings as UI cards, each carrying its four receipts */
   .finding-cards { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
   .finding-card {
-    border: 1px solid var(--rule); border-radius: 10px; background: var(--ground);
+    border: 1px solid var(--rule); border-radius: 6px; background: var(--ground);
     padding: 16px 16px 14px;
   }
   @media (hover: hover) and (pointer: fine) {
@@ -435,7 +435,7 @@
   }
   .module:first-child { border-top: 0; }
   .module-ic {
-    width: 40px; height: 40px; border-radius: 10px; background: var(--wine-soft);
+    width: 40px; height: 40px; border-radius: 6px; background: var(--wine-soft);
     color: var(--wine); display: flex; align-items: center; justify-content: center; align-self: start;
   }
   .module-ic .ic { width: 22px; height: 22px; }
@@ -444,7 +444,7 @@
 
   /* =============================== FOOTER ============================== */
   .foot {
-    margin-top: 30px; padding: 22px; border-radius: 12px; max-width: var(--measure);
+    margin-top: 30px; padding: 22px; border-radius: 6px; max-width: var(--measure);
     background: var(--panel); border: 1px solid var(--rule);
     font-size: 13px; line-height: 1.6; color: var(--body);
   }
@@ -496,6 +496,8 @@
   /* reduced motion: fewer + gentler, not zero. Seal fully drawn, no load-draw,
      no scroll ring; hold confirmation is instant; reveals fade without moving. */
   @media (prefers-reduced-motion: reduce) {
+    /* batch-E P2 #3: complete the gate — no transition or animation of any kind under reduce. */
+    *, *::before, *::after { transition: none !important; animation: none !important; }
     html { scroll-behavior: auto; }
     .seal .shield, .seal .check { stroke-dashoffset: 0; }
     .seal .ring-prog { stroke-dashoffset: 0; }

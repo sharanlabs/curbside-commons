@@ -17,8 +17,10 @@
   - SIMULATED banner byte-verbatim with components/report/ReportView.tsx.
   - ZERO external requests: system fonts only (AP-14), inline SVG only,
     no <link>/<script src>/@import/url(http).
-  - ALL motion gated by prefers-reduced-motion: no-preference; the reduce
-    path is fully static with every piece of content visible.
+  - ALL motion disabled under prefers-reduced-motion: reduce (a global
+    transition/animation kill closes the gate over hover/active micro-
+    transitions too — batch-E P2 #3); the reduce path is fully static with
+    every piece of content visible.
   - No-JS: complete content via native <details>; JS is enhancement only.
   - Keyboard: hold-to-verify has keydown/keyup hold + a no-hold control +
     the native <details> path; all focus states visible.
@@ -169,7 +171,13 @@
     transition: border-color 180ms ease-out, transform 180ms ease-out;
   }
   .card:hover { border-color: var(--hairline-strong); transform: translateY(-2px); }
-  @media (prefers-reduced-motion: reduce) { .card:hover { transform: none; } .btn:active { transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    /* batch-E P2 #3: the contract says ALL motion off under reduce — kill every
+       transition/animation globally, not just the transform-bearing ones. */
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+    .card:hover, .finding:hover { transform: none; }
+    .btn:active { transform: none; }
+  }
   .card .kicker {
     font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--sub);

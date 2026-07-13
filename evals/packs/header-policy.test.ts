@@ -48,6 +48,13 @@ describe("header policy — public/_headers is exactly the adopted 2026-07-12 po
 
   it("carries exactly the four adopted headers with exactly the adopted values", () => {
     const { rules } = parse();
+    // Batch-E P2 #2: Object.fromEntries silently collapses duplicate names, so a
+    // smuggled duplicate placed before the canonical value would pass an
+    // object-equality check (and Cloudflare would comma-join both values live).
+    // Assert the raw pair list first: exactly four pairs, all names unique.
+    expect(rules[0].headers).toHaveLength(4);
+    const names = rules[0].headers.map(([n]) => n);
+    expect(new Set(names).size).toBe(4);
     const got = Object.fromEntries(rules[0].headers);
     expect(got).toEqual(ADOPTED);
   });
