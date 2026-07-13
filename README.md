@@ -11,7 +11,7 @@ Built and directed by **Sharan Kumar** ([github.com/sharanlabs](https://github.c
 ## Try it in 60 seconds
 
 ```bash
-npm install
+npm ci
 node bin/check.mjs demo                                          # the scripted walkthrough, $0, zero-config
 node bin/check.mjs check <feed.json> --against <catalog.json>    # truth leg (exit 1 = drift found)
 node bin/check.mjs check <doc.json> --conformance                # conformance leg (pinned UCP schemas)
@@ -47,7 +47,7 @@ A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the or
 1. **Truth leg** — compare a serving copy (an ACP-style feed, or a UCP catalog response) line by line against the merchant's system of record. Deterministic. No LLM anywhere on this path.
 2. **Conformance leg** — validate a UCP catalog response against the **78 pinned official UCP JSON Schemas** (spec `v2026-04-08`). A document can be perfectly spec-shaped and still false, which is the point:
 
-> **The headline exhibit, machine-checked in CI:** `fixtures/ucp-conformance-ci/valid/conformant-but-false.json` **passes** official-schema conformance and **fails** the truth leg on a price lie. Shape-valid is not true.
+> **The headline exhibit, machine-checked in CI:** `fixtures/ucp-conformance-ci/valid/conformant-but-false.json` **passes** official-schema conformance and **fails** the truth leg on a price lie. Shape-valid is not true. *(CI = the real thing, not a figure of speech: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `npm run verify` — which includes this differential — plus the legacy suite on every push and PR; first green run observed 2026-07-11 (run 29133350771), most recent observed green 2026-07-12 (run 29208347657 on `d6c7a4d`).)*
 
 3. **Fee-audit leg** — audit a monthly delivery fee statement against the codified **NYC § 20-563.3** fee caps (17-rule table built from primary legal text, 11 statement-checkable rules implemented, 6 registered as not statement-checkable with written reasons). Deterministic, $0.
 4. **Demo** — the scripted walkthrough above. Scripted, deterministic, labeled *spec-faithful demonstration actor — simulated*; every verdict computed by the real verifier.
