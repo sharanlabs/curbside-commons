@@ -70,6 +70,25 @@ export function parseAcpFeedText(text: string): ParseResult {
         "This does not look like an ACP feed: the top-level `items` array is missing. See the sample feed for the expected shape.",
     };
   }
+  // batch-F P2 fix: a null / non-object / id-less row would throw inside the
+  // engine instead of reaching the honest error path — validate row shape
+  // first. Wrong or missing FIELD VALUES stay verifiable (they surface as
+  // findings); only rows the adapter cannot even read are rejected here.
+  for (let i = 0; i < items.length; i++) {
+    const row = items[i];
+    if (typeof row !== "object" || row === null || Array.isArray(row)) {
+      return {
+        ok: false,
+        error: `items[${i}] is not an object — every feed row must be a JSON object. See the sample feed for the expected shape.`,
+      };
+    }
+    if (typeof (row as { item_id?: unknown }).item_id !== "string") {
+      return {
+        ok: false,
+        error: `items[${i}] has no string \`item_id\` — every feed row needs one so its findings can name the row they belong to.`,
+      };
+    }
+  }
   return { ok: true, feed: raw as AcpFeed };
 }
 

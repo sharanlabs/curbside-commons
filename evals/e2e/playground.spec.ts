@@ -26,26 +26,51 @@ test("playground verifies the committed sample feed to the golden verdict", asyn
   await expect(result.getByText("LST-EXIST-GHOST").first()).toBeVisible();
 });
 
-test("an edited feed changes the verdict — live computation, not a replay", async ({ page }) => {
+test("edited feeds yield engine-derived receipts for the edits — input-sensitivity evidence of live computation", async ({
+  page,
+}) => {
+  // Batch-F P2 reconciliation: this test is input-sensitivity EVIDENCE, not an
+  // impossibility proof — but the receipts it asserts embed values invented
+  // HERE (a price and a title no fixture contains), so a canned replay would
+  // have to contain this spec's own arbitrary inputs to pass. The byte-level
+  // proof that the page runs the real engine is the golden-equality vitest
+  // suite (playground-golden.test.ts).
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/playground");
   await page.getByRole("button", { name: "Load the committed sample feed" }).click();
-  // remove everything but the first item: the completeness sweep must now flag
-  // the catalog rows the copy silently dropped — a tally the golden never shows.
-  const edited = await page.evaluate(() => {
+  const result = page.getByRole("region", { name: "Verification result" });
+
+  // Edit 1: plant an arbitrary price on the first row — the receipts must echo
+  // it back as the asserted value on that row's price finding.
+  const edit1 = await page.evaluate(() => {
+    const ta = document.getElementById("pg-feed") as HTMLTextAreaElement;
+    const feed = JSON.parse(ta.value);
+    feed.items[0].price = "8642.31";
+    return JSON.stringify(feed, null, 2);
+  });
+  await page.getByLabel("ACP feed JSON").fill(edit1);
+  await page.getByRole("button", { name: "Verify this feed" }).click();
+  await expect(result.getByText("FAIL", { exact: true })).toBeVisible();
+  // The planted price replaces an existing price drift, so the TALLY stays the
+  // golden's 16 — the live-computation evidence is the receipt echoing the
+  // value invented in this spec, which no fixture contains.
+  await expect(result.getByText(/8642\.31/).first()).toBeVisible();
+  await expect(result.getByText(/Computed in your browser just now/)).toBeVisible();
+
+  // Edit 2 (distinct shape): drop all rows but the first — the completeness
+  // sweep must flag catalog rows the copy silently dropped, by name.
+  const edit2 = await page.evaluate(() => {
     const ta = document.getElementById("pg-feed") as HTMLTextAreaElement;
     const feed = JSON.parse(ta.value);
     feed.items = feed.items.slice(0, 1);
     return JSON.stringify(feed, null, 2);
   });
-  await page.getByLabel("ACP feed JSON").fill(edited);
+  await page.getByLabel("ACP feed JSON").fill(edit2);
   await page.getByRole("button", { name: "Verify this feed" }).click();
-  const result = page.getByRole("region", { name: "Verification result" });
   await expect(result.getByText("FAIL", { exact: true })).toBeVisible();
+  // Dropping rows DOES change the tally — the golden's exact tally must be gone.
   await expect(result.getByText(/16 findings — 11 error · 5 warn · 0 info/)).toHaveCount(0);
   await expect(result.getByText(/missing from the serving copy/).first()).toBeVisible();
-  // pasted-feed provenance framing (live, synthetic-catalog boundary)
-  await expect(result.getByText(/Computed in your browser just now/)).toBeVisible();
 });
 
 test("garbage input yields an honest error and no verdict", async ({ page }) => {
@@ -57,5 +82,13 @@ test("garbage input yields an honest error and no verdict", async ({ page }) => 
   const alert = page.locator('div.pg-error[role="alert"]');
   await expect(alert).toContainText("No verdict.");
   await expect(alert).toContainText("Not valid JSON");
+  await expect(page.getByRole("region", { name: "Verification result" })).toHaveCount(0);
+
+  // batch-F P2 fix: a structurally broken row (null) must reach the SAME honest
+  // error path, naming the row — never a crash, never a verdict.
+  await page.getByLabel("ACP feed JSON").fill('{"items":[null]}');
+  await page.getByRole("button", { name: "Verify this feed" }).click();
+  await expect(alert).toContainText("No verdict.");
+  await expect(alert).toContainText("items[0]");
   await expect(page.getByRole("region", { name: "Verification result" })).toHaveCount(0);
 });

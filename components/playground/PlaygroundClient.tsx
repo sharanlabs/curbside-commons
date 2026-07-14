@@ -56,8 +56,16 @@ export function PlaygroundClient() {
     setError(null);
     // Determinism note: identical text → identical report, so re-running the
     // untouched sample always reproduces the committed golden verdict.
-    const report = verifyAcpFeed(parsed.feed);
-    setRun({ report, source: textIsSample && text === sampleFeedText() ? "sample" : "pasted" });
+    // batch-F P2 fix: an engine failure must surface as an honest error, never
+    // a crashed page or a fake verdict.
+    try {
+      const report = verifyAcpFeed(parsed.feed);
+      setRun({ report, source: textIsSample && text === sampleFeedText() ? "sample" : "pasted" });
+    } catch (e) {
+      setError(
+        `The verifier could not process this feed: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
   }
 
   const counts = run ? severityCounts(run.report) : null;
