@@ -32,7 +32,7 @@ Before/after: `captures-2026-07-16-designfix/`.
 | # | Sev | Finding | Adjudication |
 |---|-----|---------|--------------|
 | 1 | P2 | The scoped rule's specificity (0-2-0) defeats the later ≤900/≤560 breakpoint folds — /fees would stay 2-col below 560px | **ACCEPTED-FIXED** — both new rules wrapped in `:where(.fee-wrap)`; proven on the rebuilt artifact: receipt grid = 1 track @500px, 2 tracks @1280. |
-| 2 | P2 | Artifact-mode execution of the new tooth not evidenced (dev-only green supplied; the reviewer's own runtime attempt was sandbox-blocked, not an app failure) | **ACCEPTED-FIXED** — the new candidate's clean-room RELEASE GATE runs the full artifact-mode e2e (27/27 expected); recorded in the session-19 gate table below/state docs. |
+| 2 | P2 | Artifact-mode execution of the new tooth not evidenced (dev-only green supplied; the reviewer's own runtime attempt was sandbox-blocked, not an app failure) | **ACCEPTED-FIXED** — RUN GREEN: the new candidate `e2682a1`'s clean-room RELEASE GATE executed the full artifact-mode e2e **27/27** against the immutable `out/` (hash `b2bdf001…97a5`, re-hash identical). |
 
 Reviewer also verified (stated in the raw): /report and /demo are not selected by `.fee-wrap`; DOM
 order statement→clause→rule→arithmetic makes the odd-cell reset correct; no other `.fee-wrap` grid
