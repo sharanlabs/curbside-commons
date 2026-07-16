@@ -2,7 +2,7 @@
 
 Design-process records. **None of these is served by the site** — only `app/` routes export to the deployed build; these are references. All claim-bearing mockup HTML is covered by the dynamic C10 mockup-claim scan (`evals/packs/honesty-c10.test.ts`), which scans every `mockups/**/*.html` on disk — the scan covers exactly what exists in the current tree.
 
-Earlier exploration generations were pruned in two owner-worded deletions: ① the 37 COMMITTED superseded files (design-samples/ultra-modern/root generations, Meridian/RV2, Variations A/B/C/B-2 — deleted 2026-07-15, **recoverable from git history**); ② the UNTRACKED 2026-07-13/14/15 proof-theatre iterations (deleted 2026-07-15 on the owner's "that is my final delete old ones" word — never committed, byte copies archived to the session scratchpad before deletion, path in the task-log).
+Earlier exploration generations were pruned in two owner-worded deletions: ① the 37 COMMITTED superseded files (design-samples/ultra-modern/root generations, Meridian/RV2, Variations A/B/C/B-2 — deleted 2026-07-15, **recoverable from git history**); ② the UNTRACKED 2026-07-13/14/15 proof-theatre iterations (deleted from the working inventory 2026-07-15 on the owner's "that is my final delete old ones" word, then RETAINED as labeled design-history records on the owner's 2026-07-16 word — see `archive-2026-07-15/` and its README; the C10 scan covers them automatically).
 
 ## Current inventory (2026-07-15) — two files
 

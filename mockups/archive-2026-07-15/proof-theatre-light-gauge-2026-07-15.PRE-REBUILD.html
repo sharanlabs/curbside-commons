@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ffffff">
+<title>Curbside Commons — The Light Gauge (futuristic sample, 2026-07-15)</title>
+<!--
+  THE LIGHT GAUGE — Fable-designed futuristic sample (owner word 2026-07-15:
+  "using fable completely give a futurisitic design sample. use own creativity
+  make a copy."). A copy-derived reimagining of the refined Prismatic Passline
+  storyboard in an interferometric-metrology register: the claim is read by a
+  standing light gauge; the ×100 cents-as-decimal mismatch renders as a literal
+  interference beat (one hundred fine graduations against one), and the finding
+  crystallizes as an ember facet. Sample only — no product adoption implied.
+  Zero external references. All figures are the product's real illustrative
+  case: $2,150.00 claimed vs $21.50 recorded (rule LST-PRICE-CENTS-AS-DECIMAL),
+  16 findings (11 error / 5 warn), 78 pinned official schemas, 17 codified NYC
+  fee-cap rules (11 statement-checkable + 6 requiring external evidence).
+-->
+<style>
+/* ============================ tokens ============================ */
+:root{
+  color-scheme:light;
+  --paper:#ffffff;
+  --well:#f7f7fa;
+  --ink:#191721;          /* 17.6:1 */
+  --ink-soft:#54505e;     /* 7.5:1 */
+  --ink-faint:#6e6a78;    /* 5.3:1 */
+  --graphite:#9a97a4;     /* marks only */
+  --hair:rgba(25,23,33,.085);
+  --hair-2:rgba(25,23,33,.16);
+  --iris:#705de7;         /* 4.76:1 — interactive marks */
+  --iris-ink:#5746c5;     /* 6.80:1 — interactive text / focus */
+  --cyan:#43a7ce;         /* material only */
+  --azure:#2f86bd;        /* material only */
+  --saffron:#eda52b;      /* material only */
+  --ember:#c94d35;        /* 4.57:1 — verdict only */
+  --ember-ink:#b04030;    /* 5.80:1 — verdict text */
+  --grad:linear-gradient(104deg,#5746c5,#705de7 46%,#2f86bd);
+  --rounded:ui-rounded,"SF Pro Rounded","Avenir Next Rounded","Segoe UI Rounded",system-ui,-apple-system,sans-serif;
+  --mono:"SF Mono",SFMono-Regular,ui-monospace,"Roboto Mono",Menlo,monospace;
+  --e-standard:cubic-bezier(.2,0,0,1);
+  --e-enter:cubic-bezier(.05,.7,.1,1);
+  --e-spring:cubic-bezier(.34,1.4,.44,1);
+  --d-ctrl:190ms; --d-panel:300ms; --d-reveal:460ms;
+  --elev-1:0 1px 2px rgba(25,23,33,.035),0 8px 24px rgba(25,23,33,.045);
+  --elev-2:0 2px 7px rgba(25,23,33,.045),0 18px 50px rgba(25,23,33,.065);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink-soft);
+  font-family:var(--rounded);font-size:16.5px;line-height:1.56;
+  letter-spacing:-.008em;-webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(112,93,231,.16)}
+a{color:var(--iris-ink)}
+.shell{width:min(100% - 128px,1400px);margin-inline:auto}
+@media (max-width:900px){.shell{width:min(100% - 44px,1400px)}}
+
+/* skip link */
+.skip{position:fixed;top:10px;left:10px;z-index:99;transform:translateY(-220%);
+  background:#fff;border:1px solid var(--hair-2);border-radius:10px;padding:10px 16px;
+  font:600 13px/1 var(--rounded);color:var(--ink);transition:transform var(--d-ctrl) var(--e-enter)}
+.skip:focus-visible{transform:none;outline:2px solid var(--iris-ink);outline-offset:2px}
+
+/* ============================ HUD frame ============================ */
+/* The futuristic register: an instrument margin — fine corner graduations and a
+   mono meta rail pinned to the viewport, never competing with content. */
+.hud{position:fixed;inset:0;pointer-events:none;z-index:1}
+.hud i{position:absolute;background:var(--hair-2)}
+.hud .tl-h{top:18px;left:18px;width:26px;height:1px}
+.hud .tl-v{top:18px;left:18px;width:1px;height:26px}
+.hud .tr-h{top:18px;right:18px;width:26px;height:1px}
+.hud .tr-v{top:18px;right:18px;width:1px;height:26px}
+.hud .bl-h{bottom:18px;left:18px;width:26px;height:1px}
+.hud .bl-v{bottom:18px;left:18px;width:1px;height:26px}
+.hud .br-h{bottom:18px;right:18px;width:26px;height:1px}
+.hud .br-v{bottom:18px;right:18px;width:1px;height:26px}
+.hud-meta{position:absolute;bottom:20px;left:56px;font:500 10.5px/1 var(--mono);
+  letter-spacing:.08em;color:var(--ink-faint);text-transform:uppercase}
+@media (max-width:900px){.hud,.hud-meta{display:none}}
+
+/* ============================ header ============================ */
+.top{position:sticky;top:0;z-index:20;background:transparent;
+  border-bottom:1px solid transparent;
+  transition:background var(--d-panel) var(--e-standard),border-color var(--d-panel) var(--e-standard),box-shadow var(--d-panel) var(--e-standard)}
+.top.is-scrolled{background:rgba(255,255,255,.9);
+  -webkit-backdrop-filter:blur(16px) saturate(1.15);backdrop-filter:blur(16px) saturate(1.15);
+  border-bottom-color:var(--hair);box-shadow:0 8px 30px rgba(25,23,33,.04)}
+.top-in{display:flex;align-items:center;gap:18px;min-height:72px}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand:focus-visible{outline:2px solid var(--iris-ink);outline-offset:4px;border-radius:8px}
+.brand-word{font:610 16px/1 var(--rounded);letter-spacing:-.02em}
+.top-links{margin-left:auto;display:flex;gap:4px}
+.top-links a{position:relative;font:500 13px/1 var(--rounded);color:var(--ink-faint);
+  text-decoration:none;padding:9px 11px;border-radius:8px}
+.top-links a::after{content:"";position:absolute;left:11px;right:11px;bottom:3px;height:1px;
+  background:var(--iris-ink);transform:scaleX(0);transform-origin:left center;
+  transition:transform var(--d-ctrl) var(--e-enter)}
+.top-links a:hover{color:var(--ink)}
+.top-links a:hover::after,.top-links a:focus-visible::after{transform:scaleX(1)}
+.top-links a:focus-visible{outline:2px solid var(--iris-ink);outline-offset:2px}
+@media (max-width:900px){.top-links{display:none}}
+
+/* ============================ hero ============================ */
+.hero{position:relative;min-height:min(880px,94svh);display:grid;place-items:center;
+  border-bottom:1px solid var(--hair);overflow:clip}
+#gauge-canvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;
+  transition:opacity 620ms var(--e-standard)}
+.stage-ready #gauge-canvas{opacity:1}
+.hero-copy{position:relative;z-index:3;text-align:center;width:min(760px,72vw);
+  padding:clamp(96px,13vh,150px) 0 330px}
+/* the scrim protects the TEXT only — the lower 300px stays clear so the gauge
+   scene below the copy corridor is never washed out */
+.hero-copy::before{content:"";position:absolute;inset:-56px -110px 300px;z-index:-1;
+  background:radial-gradient(ellipse at center,rgba(255,255,255,.99) 0 47%,rgba(255,255,255,.9) 63%,rgba(255,255,255,0) 80%)}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font:650 12px/1 var(--mono);
+  letter-spacing:.13em;color:var(--ink-faint);text-transform:uppercase}
+.eyebrow::before{content:"";width:6px;height:6px;transform:rotate(45deg);
+  background:rgba(112,93,231,.5)}
+.hero h1{margin:22px 0 0;font:570 clamp(50px,5.4vw,76px)/1 var(--rounded);
+  letter-spacing:-.046em;color:var(--ink);text-wrap:balance}
+.hero h1 .lit{background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  color:#5746c5;-webkit-text-fill-color:transparent}
+@supports not (-webkit-background-clip:text){.hero h1 .lit{color:#5746c5;-webkit-text-fill-color:currentColor}}
+.hero-lede{margin:22px auto 0;max-width:54ch;font:420 18px/1.6 var(--rounded);
+  letter-spacing:-.012em;color:var(--ink-soft)}
+.hero-cta{margin-top:34px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta{display:inline-flex;align-items:center;gap:9px;min-height:46px;padding:0 22px;
+  border-radius:13px;font:640 14.5px/1 var(--rounded);letter-spacing:-.01em;
+  text-decoration:none;transition:transform var(--d-ctrl) var(--e-enter),box-shadow var(--d-ctrl) var(--e-enter),background var(--d-ctrl) var(--e-standard)}
+.cta:focus-visible{outline:2px solid var(--iris-ink);outline-offset:3px}
+.cta-primary{background:var(--ink);color:#fff}
+.cta-primary:hover{transform:translateY(-2px);box-shadow:var(--elev-2)}
+.cta-ghost{border:1px solid var(--hair-2);color:var(--ink);background:#fff}
+.cta-ghost:hover{transform:translateY(-2px);box-shadow:var(--elev-1)}
+.truth-line{position:absolute;bottom:26px;left:0;right:0;z-index:3;text-align:center;
+  font:500 11px/1.7 var(--mono);letter-spacing:.055em;color:var(--ink-faint);text-transform:uppercase}
+.truth-line b{font-weight:600;color:var(--ink-soft)}
+/* motion control — WCAG 2.2.2; outside the aria-hidden canvas */
+.motion-toggle{position:absolute;right:26px;bottom:24px;z-index:4;display:none;
+  align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;
+  border:1px solid var(--hair-2);background:rgba(255,255,255,.9);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  font:600 11.5px/1 var(--mono);letter-spacing:.06em;color:var(--ink-soft);cursor:pointer;
+  box-shadow:0 8px 28px rgba(25,23,33,.06)}
+.motion-toggle.is-live{display:inline-flex}
+.motion-toggle:hover{color:var(--ink)}
+.motion-toggle:focus-visible{outline:2px solid var(--iris-ink);outline-offset:3px}
+.mt-glyph{width:10px;height:10px;position:relative}
+.mt-glyph::before,.mt-glyph::after{content:"";position:absolute;top:0;bottom:0;width:3px;
+  background:currentColor;border-radius:1px;transition:all var(--d-ctrl) var(--e-standard)}
+.mt-glyph::before{left:1px}.mt-glyph::after{right:1px}
+.motion-toggle.is-paused .mt-glyph::before{left:2px;width:8px;
+  clip-path:polygon(0 0,100% 50%,0 100%);border-radius:0}
+.motion-toggle.is-paused .mt-glyph::after{opacity:0}
+/* no-JS hero fallback */
+.nojs-tableau{position:absolute;inset:auto 0 84px;z-index:2;display:none;text-align:center}
+.nojs-tableau svg{width:min(760px,86vw);height:auto}
+noscript .nojs-note{display:block;margin-top:6px;font:500 11px/1 var(--mono);
+  letter-spacing:.08em;color:var(--ink-faint);text-transform:uppercase}
+
+/* ============================ chapters ============================ */
+.chapter{position:relative;padding:96px 0 100px;border-bottom:1px solid var(--hair)}
+.chapter-grid{display:grid;grid-template-columns:64px 1fr;gap:0 40px}
+@media (max-width:900px){.chapter-grid{grid-template-columns:1fr}}
+/* the vertical index rail — this sample's own rhythm (not the storyboard band) */
+.ch-rail{position:relative}
+.ch-rail .idx{position:sticky;top:96px;display:grid;gap:10px;justify-items:center;
+  font:700 13px/1 var(--mono);letter-spacing:.09em;color:var(--ink)}
+.ch-rail .idx::after{content:"";width:1px;height:74px;background:var(--hair-2)}
+.ch-rail .idx .lbl{writing-mode:vertical-rl;font:600 10.5px/1 var(--mono);
+  letter-spacing:.14em;color:var(--ink-faint);text-transform:uppercase}
+@media (max-width:900px){.ch-rail .idx{position:static;grid-auto-flow:column;justify-items:start;align-items:center}
+  .ch-rail .idx::after{width:56px;height:1px}
+  .ch-rail .idx .lbl{writing-mode:horizontal-tb}}
+.ch-head{max-width:800px;margin-bottom:52px}
+.ch-head h2{margin:14px 0 0;font:545 clamp(36px,3.3vw,50px)/1.08 var(--rounded);
+  letter-spacing:-.04em;color:var(--ink);text-wrap:balance}
+.ch-lede{margin:18px 0 0;max-width:62ch;font:420 17px/1.62 var(--rounded);color:var(--ink-soft)}
+
+/* ============================ 01 gauge bench ============================ */
+.bench{position:relative;border:1px solid var(--hair-2);border-radius:20px;background:#fff;
+  box-shadow:var(--elev-2);padding:30px clamp(20px,3.2vw,44px) 34px;overflow:clip}
+.bench::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(closest-side at 50% 0%,rgba(112,93,231,.05),rgba(47,134,189,.016) 52%,transparent 76%)}
+.bench-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bench-status{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:0 13px;
+  border-radius:999px;border:1px solid var(--hair-2);font:600 11px/1 var(--mono);
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);background:#fff}
+.bench-status::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--graphite)}
+.bench[data-phase="running"] .bench-status{color:var(--iris-ink);border-color:rgba(112,93,231,.4)}
+.bench[data-phase="running"] .bench-status::before{background:var(--iris);animation:pulse 1.05s var(--e-standard) infinite}
+.bench[data-phase="done"] .bench-status{color:var(--ember-ink);border-color:rgba(201,77,53,.35)}
+.bench[data-phase="done"] .bench-status::before{background:var(--ember)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.bench-tally{font:500 11.5px/1 var(--mono);letter-spacing:.05em;color:var(--ink-faint);text-transform:uppercase}
+.bench-run{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 20px;
+  border-radius:12px;border:1px solid var(--hair-2);background:#fff;cursor:pointer;
+  font:640 13.5px/1 var(--rounded);color:var(--ink);
+  transition:transform var(--d-ctrl) var(--e-enter),box-shadow var(--d-ctrl) var(--e-enter)}
+.bench-run:hover{transform:translateY(-1px);box-shadow:var(--elev-1)}
+.bench-run:focus-visible{outline:2px solid var(--iris-ink);outline-offset:3px}
+.bench-run[aria-busy="true"]{opacity:.6;pointer-events:none}
+/* the aperture — matched digits recede; the magnitude difference is framed */
+.aperture{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;
+  margin:34px 0 8px}
+@media (max-width:760px){.aperture{grid-template-columns:1fr;justify-items:center;gap:10px}}
+.ap-side{text-align:center}
+.ap-role{font:600 10.5px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint)}
+.ap-val{margin-top:10px;font:680 clamp(34px,3.8vw,50px)/1 var(--mono);letter-spacing:-.02em;color:var(--ink)}
+.ap-val .m{color:var(--graphite)}
+.ap-val .d{position:relative;color:var(--ember-ink)}
+.ap-val .d::after{content:"";position:absolute;inset:-6px -5px;border:1px solid rgba(201,77,53,.5);
+  border-radius:6px;transform:scale(.88);opacity:0;
+  transition:transform var(--d-panel) var(--e-spring) 90ms,opacity var(--d-panel) var(--e-standard) 90ms}
+.bench[data-phase="done"] .ap-val .d::after,.bench[data-phase="idle"] .ap-val .d::after{transform:scale(1);opacity:1}
+.ap-field{margin-top:8px;font:500 11px/1 var(--mono);letter-spacing:.05em;color:var(--ink-faint)}
+.ap-gate{display:grid;justify-items:center;gap:8px}
+.ap-rule-id{font:600 10.5px/1 var(--mono);letter-spacing:.1em;color:var(--iris-ink);text-transform:uppercase;
+  border:1px solid rgba(112,93,231,.35);border-radius:999px;padding:7px 12px;background:rgba(112,93,231,.05)}
+.ap-x{font:500 13px/1 var(--mono);color:var(--ink-faint)}
+/* the interference strip — one hundred graduations against one */
+.beat{position:relative;height:64px;margin:22px auto 0;max-width:680px}
+.beat svg{width:100%;height:100%;display:block}
+.beat-cap{margin:10px auto 0;max-width:680px;display:flex;justify-content:space-between;
+  font:500 10.5px/1 var(--mono);letter-spacing:.08em;color:var(--ink-faint);text-transform:uppercase}
+/* verdict + receipt (height-stable; low-emphasis during replay, never collapsed) */
+.verdict{margin-top:26px;border:1px solid rgba(201,77,53,.28);border-radius:14px;
+  background:rgba(201,77,53,.025);padding:18px 20px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;
+  transition:opacity var(--d-reveal) var(--e-standard)}
+.verdict-badge{font:700 11.5px/1 var(--mono);letter-spacing:.09em;color:#fff;background:var(--ember);
+  border-radius:7px;padding:8px 11px}
+.verdict-copy{font:520 15.5px/1.45 var(--rounded);color:var(--ink)}
+.receipt{margin-top:18px;display:grid;gap:8px;transition:opacity var(--d-reveal) var(--e-standard)}
+.bench[data-phase="running"] .verdict,.bench[data-phase="running"] .receipt{opacity:.38}
+.r-row{display:grid;grid-template-columns:118px 1fr;gap:16px;align-items:baseline;
+  border:1px solid var(--hair);border-radius:10px;padding:11px 14px;background:#fff;
+  transition:transform var(--d-ctrl) var(--e-enter),box-shadow var(--d-ctrl) var(--e-enter)}
+.r-row:hover{transform:translateY(-2px);box-shadow:var(--elev-1)}
+.r-row dt{font:600 10.5px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.r-row dd{margin:0;font:600 13.5px/1.5 var(--mono);color:var(--ink);overflow-wrap:anywhere}
+@media (max-width:640px){.r-row{grid-template-columns:1fr;gap:4px}}
+.bench-live{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.bench-progress{position:absolute;left:0;right:0;top:0;height:2px;transform-origin:left center;
+  background:linear-gradient(90deg,#5746c5,#705de7 44%,#2f86bd);transform:scaleX(0)}
+.bench[data-phase="running"] .bench-progress{animation:prog 940ms var(--e-standard) forwards}
+@keyframes prog{to{transform:scaleX(1)}}
+
+/* ============================ 02 method ============================ */
+.method-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:72px;align-items:start}
+@media (max-width:980px){.method-grid{grid-template-columns:1fr;gap:36px}}
+.mr-sentence{font:530 clamp(22px,2vw,27px)/1.5 var(--rounded);letter-spacing:-.022em;color:var(--ink)}
+.mr-word{appearance:none;border:0;background:transparent;padding:0 1px 2px;margin:0;cursor:pointer;
+  font:inherit;color:var(--iris-ink);border-bottom:2px solid rgba(112,93,231,.3);
+  transition:border-color var(--d-ctrl) var(--e-standard)}
+.mr-word:hover{border-color:var(--iris)}
+.mr-word[aria-pressed="true"]{border-color:var(--iris-ink);font-weight:640}
+.mr-word:focus-visible{outline:2px solid var(--iris-ink);outline-offset:3px;border-radius:4px}
+.mr-panel{border:1px solid var(--hair-2);border-radius:16px;background:#fff;box-shadow:var(--elev-1);
+  padding:24px 26px;min-height:190px}
+.mr-label{font:600 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+.mr-value{margin-top:12px;font:640 clamp(19px,1.8vw,24px)/1.3 var(--mono);letter-spacing:-.015em;color:var(--ink);overflow-wrap:anywhere}
+.mr-note{margin-top:12px;font:430 15px/1.6 var(--rounded);color:var(--ink-soft)}
+.swap-in{animation:swap var(--d-ctrl) var(--e-enter)}
+@keyframes swap{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* ============================ 03 coverage ============================ */
+.cv{border:1px solid var(--hair-2);border-radius:18px;background:#fff;box-shadow:var(--elev-1);
+  padding:26px clamp(18px,3vw,36px) 30px}
+.cv-tabs{display:flex;gap:4px;border-bottom:1px solid var(--hair);flex-wrap:wrap}
+.cv-tab{position:relative;appearance:none;border:0;background:transparent;cursor:pointer;
+  padding:12px 14px;font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-faint)}
+.cv-tab::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;
+  background:var(--iris-ink);transform:scaleX(.3);opacity:0;
+  transition:transform var(--d-ctrl) var(--e-enter),opacity var(--d-ctrl) var(--e-standard)}
+.cv-tab[aria-selected="true"]{color:var(--ink)}
+.cv-tab[aria-selected="true"]::after{transform:scaleX(1);opacity:1}
+.cv-tab:hover{color:var(--ink)}
+.cv-tab:focus-visible{outline:2px solid var(--iris-ink);outline-offset:-4px;border-radius:6px}
+.cv-panel{padding:22px 2px 2px}
+.cv-panel[hidden]{display:none}
+.cv-panel-q{margin:0 0 10px;font:555 24px/1.2 var(--rounded);letter-spacing:-.028em;color:var(--ink)}
+.cv-panel p{margin:0;max-width:70ch;font:430 15.5px/1.62 var(--rounded);color:var(--ink-soft)}
+.cv-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.cv-chip{font:600 11px/1 var(--mono);letter-spacing:.06em;color:var(--ink-soft);
+  border:1px solid var(--hair-2);border-radius:9px;padding:8px 11px;background:var(--well)}
+
+/* ============================ 04 boundaries ============================ */
+.limits{display:grid;gap:0;border-top:1px solid var(--hair-2)}
+.limit{display:grid;grid-template-columns:minmax(160px,220px) 1fr;gap:24px;padding:22px 4px;
+  border-bottom:1px solid var(--hair-2);transition:background var(--d-ctrl) var(--e-standard)}
+.limit:hover{background:rgba(25,23,33,.016)}
+@media (max-width:760px){.limit{grid-template-columns:1fr;gap:8px}}
+.limit-title{font:600 16.5px/1.35 var(--rounded);letter-spacing:-.015em;color:var(--ink)}
+.limit-tag{display:inline-block;margin-top:8px;font:600 10px/1 var(--mono);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--hair-2);
+  border-radius:999px;padding:6px 10px}
+.limit p{margin:0;max-width:66ch;font:430 15.5px/1.6 var(--rounded);color:var(--ink-soft)}
+
+/* ============================ close + footer ============================ */
+.close{padding:110px 0 120px;text-align:center}
+.close h2{margin:14px 0 0;font:545 clamp(34px,3vw,46px)/1.1 var(--rounded);
+  letter-spacing:-.038em;color:var(--ink)}
+.close .hero-cta{margin-top:30px}
+footer{border-top:1px solid var(--hair);background:var(--well)}
+.foot-in{display:grid;gap:8px;padding:44px 0 52px;font:430 13.5px/1.7 var(--rounded);color:var(--ink-faint)}
+.foot-in b{font-weight:600;color:var(--ink-soft)}
+.provenance{font:500 10.5px/1.8 var(--mono);letter-spacing:.07em;text-transform:uppercase}
+
+/* ============================ reveal + reduced motion ============================ */
+.reveal{opacity:1}
+.js .reveal{opacity:0;transform:translateY(14px);
+  transition:opacity var(--d-reveal) var(--e-standard),transform var(--d-reveal) var(--e-enter)}
+.js .reveal.is-in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important}
+  html{scroll-behavior:auto}
+  .js .reveal{opacity:1;transform:none}
+  .motion-toggle{display:none !important}
+  .motion-toggle.is-live.reduce-optin{display:inline-flex !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="hud" aria-hidden="true">
+  <i class="tl-h"></i><i class="tl-v"></i><i class="tr-h"></i><i class="tr-v"></i>
+  <i class="bl-h"></i><i class="bl-v"></i><i class="br-h"></i><i class="br-v"></i>
+</div>
+<p class="hud-meta" aria-hidden="true">Light gauge · deterministic read · illustrative case</p>
+
+<header class="top" id="top">
+  <div class="shell top-in">
+    <a class="brand" href="#top" aria-label="Curbside Commons home">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <defs><linearGradient id="bm" x1="4" y1="28" x2="28" y2="4" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#191721"/><stop offset=".5" stop-color="#43a7ce"/><stop offset="1" stop-color="#705de7"/>
+        </linearGradient></defs>
+        <path d="M23.5 9.5A9.6 9.6 0 1 0 23.5 22.5" stroke="url(#bm)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M20 16h7" stroke="#705de7" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-word">Curbside Commons</span>
+    </a>
+    <nav class="top-links" aria-label="Sections">
+      <a href="#proof">Proof</a><a href="#method">Method</a>
+      <a href="#coverage">Coverage</a><a href="#boundaries">Boundaries</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <!-- ============================ HERO ============================ -->
+  <section class="hero" aria-labelledby="h1">
+    <canvas id="gauge-canvas" aria-hidden="true"></canvas>
+    <div class="hero-copy reveal is-in">
+      <p class="eyebrow">Proof before trust</p>
+      <h1 id="h1">Every claim, read by <span class="lit">the light gauge</span>.</h1>
+      <p class="hero-lede">
+        Curbside Commons reads a machine-readable claim against the merchant&rsquo;s own record —
+        deterministically, with the rule and the arithmetic attached — so a well-formed listing
+        that misstates its price is caught before anyone trusts it.
+      </p>
+      <div class="hero-cta">
+        <a class="cta cta-primary" href="#proof">Run the gauge</a>
+        <a class="cta cta-ghost" href="#method">See the method</a>
+      </div>
+    </div>
+    <noscript>
+      <div class="nojs-tableau" style="display:block">
+        <svg viewBox="0 0 760 120" role="img" aria-label="A claim chip reading $2,150.00 passes a standing gauge and exits holding an attached finding: HOLD, one hundred times the recorded value.">
+          <line x1="20" y1="84" x2="740" y2="84" stroke="rgba(25,23,33,.16)"/>
+          <rect x="120" y="56" width="120" height="40" rx="8" fill="rgba(112,93,231,.07)" stroke="#705de7"/>
+          <text x="180" y="80" text-anchor="middle" font-family="monospace" font-size="13" fill="#191721">$2,150.00</text>
+          <line x1="380" y1="24" x2="380" y2="104" stroke="#43a7ce" stroke-width="2"/>
+          <rect x="470" y="56" width="150" height="40" rx="8" fill="rgba(201,77,53,.05)" stroke="#c94d35"/>
+          <text x="545" y="80" text-anchor="middle" font-family="monospace" font-size="12" fill="#b04030">HOLD · 100×</text>
+          <text x="380" y="16" text-anchor="middle" font-family="monospace" font-size="10" fill="#6e6a78">RECORD · $21.50</text>
+        </svg>
+        <span class="nojs-note">Static view — the live reading requires scripts, the evidence below does not.</span>
+      </div>
+    </noscript>
+    <p class="truth-line"><b>$0 per verification</b> · no AI inside the verifier · evidence attached to every finding</p>
+    <button class="motion-toggle" id="motion-toggle" type="button">
+      <span class="mt-glyph" aria-hidden="true"></span><span class="mt-label">Pause animation</span>
+    </button>
+  </section>
+
+  <!-- ============================ 01 PROOF ============================ -->
+  <section class="chapter" id="proof" aria-labelledby="proof-h2">
+    <div class="shell chapter-grid">
+      <div class="ch-rail"><div class="idx"><span>01</span><span class="lbl">Proof</span></div></div>
+      <div>
+        <div class="ch-head reveal">
+          <p class="eyebrow">The gauge bench</p>
+          <h2 id="proof-h2">One hundred graduations against one.</h2>
+          <p class="ch-lede">
+            The claim publishes <strong>$2,150.00</strong>. The record states <strong>$21.50</strong>.
+            The structure is valid; the magnitude is wrong by exactly &times;100 — the classic
+            cents-written-as-decimal slip. The gauge reads both, projects them on the same scale,
+            and the mismatch appears as a beat you can count.
+          </p>
+        </div>
+        <div class="bench reveal" id="bench" data-phase="done">
+          <span class="bench-progress" aria-hidden="true"></span>
+          <div class="bench-top">
+            <span class="bench-status" id="bench-status">Evidence locked</span>
+            <span class="bench-tally">16 findings · 11 error · 5 warn</span>
+            <button class="bench-run" id="bench-run" type="button">Replay the reading</button>
+          </div>
+          <div class="aperture">
+            <div class="ap-side">
+              <p class="ap-role">Served claim</p>
+              <p class="ap-val" aria-label="$2,150.00 — the differing magnitude is framed">
+                <span class="d">$2,150</span><span class="m">.00</span></p>
+              <p class="ap-field">offers.price · 2150.00 USD</p>
+            </div>
+            <div class="ap-gate">
+              <span class="ap-rule-id">LST-PRICE-CENTS-AS-DECIMAL</span>
+              <span class="ap-x">decimal &times; 100 = integer cents</span>
+            </div>
+            <div class="ap-side">
+              <p class="ap-role">Merchant record</p>
+              <p class="ap-val"><span class="m">$</span>21.50</p>
+              <p class="ap-field">price_cents · 2150</p>
+            </div>
+          </div>
+          <div class="beat" aria-hidden="true">
+            <svg viewBox="0 0 680 64" preserveAspectRatio="none">
+              <g id="beat-fine" stroke="#705de7" stroke-opacity=".55"></g>
+              <line x1="3.4" y1="8" x2="3.4" y2="56" stroke="#2f86bd" stroke-width="3"/>
+              <text x="14" y="16" font-family="monospace" font-size="9" fill="#6e6a78">RECORD · 2150&cent;</text>
+              <text x="666" y="16" text-anchor="end" font-family="monospace" font-size="9" fill="#6e6a78">CLAIM · 215000&cent;</text>
+            </svg>
+          </div>
+          <p class="beat-cap"><span>one graduation = the recorded amount</span><span>the claim spans one hundred of them</span></p>
+          <div class="verdict" id="verdict">
+            <span class="verdict-badge">ERROR · PRICE_MISMATCH</span>
+            <span class="verdict-copy">Claim is 100&times; the merchant record.</span>
+          </div>
+          <dl class="receipt" id="receipt">
+            <div class="r-row"><dt>Claim</dt><dd>item-001-v1 · offers.price · 2150.00 USD</dd></div>
+            <div class="r-row"><dt>Record</dt><dd>item-001-v1 · price_cents · 2150 ($21.50)</dd></div>
+            <div class="r-row"><dt>Rule</dt><dd>cents-as-decimal · decimal dollars &times; 100 = integer cents</dd></div>
+            <div class="r-row"><dt>Comparison</dt><dd>2150.00 &times; 100 = 215000&cent; &ne; 2150&cent; (&times;100)</dd></div>
+            <div class="r-row"><dt>Finding</dt><dd>finding 01 of 16 · evidence attached</dd></div>
+          </dl>
+          <p class="bench-live" id="bench-live" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 02 METHOD ============================ -->
+  <section class="chapter" id="method" aria-labelledby="method-h2">
+    <div class="shell chapter-grid">
+      <div class="ch-rail"><div class="idx"><span>02</span><span class="lbl">Method</span></div></div>
+      <div>
+        <div class="ch-head reveal">
+          <p class="eyebrow">The relationship</p>
+          <h2 id="method-h2">A verdict is a relationship, not a label.</h2>
+        </div>
+        <div class="method-grid reveal">
+          <p class="mr-sentence">
+            A <button class="mr-word" type="button" data-mr="claim" aria-pressed="false">claim</button> meets a
+            <button class="mr-word" type="button" data-mr="record" aria-pressed="false">record</button> through a
+            <button class="mr-word" type="button" data-mr="rule" aria-pressed="false">rule</button>. The
+            <button class="mr-word" type="button" data-mr="verdict" aria-pressed="true">verdict</button> keeps all
+            three attached, so the conclusion can be checked instead of trusted.
+          </p>
+          <div class="mr-panel" id="mr-swap" aria-live="polite">
+            <p class="mr-label" id="mr-label">Verdict</p>
+            <p class="mr-value" id="mr-value">error · price · 100&times;</p>
+            <p class="mr-note" id="mr-note">The conclusion carries its claim, record, and rule — inspect any of the three and reach it yourself.</p>
+          </div>
+          <noscript>
+            <dl style="grid-column:1/-1">
+              <dt>Claim</dt><dd>item-001-v1 · offers.price · 2150.00 USD</dd>
+              <dt>Record</dt><dd>item-001-v1 · price_cents · 2150 ($21.50)</dd>
+              <dt>Rule</dt><dd>cents-as-decimal · &times;100</dd>
+              <dt>Verdict</dt><dd>error · price · 100&times;</dd>
+            </dl>
+          </noscript>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 03 COVERAGE ============================ -->
+  <section class="chapter" id="coverage" aria-labelledby="coverage-h2">
+    <div class="shell chapter-grid">
+      <div class="ch-rail"><div class="idx"><span>03</span><span class="lbl">Coverage</span></div></div>
+      <div>
+        <div class="ch-head reveal">
+          <p class="eyebrow">Measured, not implied</p>
+          <h2 id="coverage-h2">Coverage is counted, and the count is shown.</h2>
+          <p class="ch-lede">Findings, schemas, and rules — never a broad success score.</p>
+        </div>
+        <div class="cv reveal">
+          <div class="cv-tabs" role="tablist" aria-label="Coverage lanes">
+            <button class="cv-tab" id="tab-listings" role="tab" aria-selected="true" aria-controls="panel-listings" type="button">Listings truth</button>
+            <button class="cv-tab" id="tab-schema" role="tab" aria-selected="false" aria-controls="panel-schema" tabindex="-1" type="button">Schema + protocol</button>
+            <button class="cv-tab" id="tab-fees" role="tab" aria-selected="false" aria-controls="panel-fees" tabindex="-1" type="button">NYC fee-cap</button>
+          </div>
+          <div class="cv-panel" id="panel-listings" role="tabpanel" aria-labelledby="tab-listings">
+            <h3 class="cv-panel-q">Does the serving copy match the record?</h3>
+            <p>Compares item existence, availability, price, and encoding with the merchant record.
+               The supplied catalog closes at FAIL with 16 findings: 11 error and 5 warn.
+               This count does not imply broader platform coverage.</p>
+            <div class="cv-chips"><span class="cv-chip">FAIL · 16 findings</span><span class="cv-chip">11 error</span><span class="cv-chip">5 warn</span></div>
+          </div>
+          <div class="cv-panel" id="panel-schema" role="tabpanel" aria-labelledby="tab-schema" hidden>
+            <h3 class="cv-panel-q">Is the structure itself valid?</h3>
+            <p>Validates machine-readable data against 78 pinned official schemas. A conforming
+               structure does not prove that its claims agree with the merchant record.</p>
+            <div class="cv-chips"><span class="cv-chip">78 pinned schemas</span></div>
+          </div>
+          <div class="cv-panel" id="panel-fees" role="tabpanel" aria-labelledby="tab-fees" hidden>
+            <h3 class="cv-panel-q">Do the fee statements obey the caps?</h3>
+            <p>Evaluates delivery fee statements against 17 codified rules from NYC &sect;20-563.3:
+               11 executable checks and 6 that require evidence beyond the statement.</p>
+            <div class="cv-chips"><span class="cv-chip">17 codified rules</span><span class="cv-chip">11 from the statement</span><span class="cv-chip">6 need outside evidence</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 04 BOUNDARIES ============================ -->
+  <section class="chapter" id="boundaries" aria-labelledby="boundaries-h2">
+    <div class="shell chapter-grid">
+      <div class="ch-rail"><div class="idx"><span>04</span><span class="lbl">Boundaries</span></div></div>
+      <div>
+        <div class="ch-head reveal">
+          <p class="eyebrow">Honest limits</p>
+          <h2 id="boundaries-h2">A useful instrument knows where it stops reading.</h2>
+        </div>
+        <div class="limits reveal">
+          <div class="limit">
+            <div><p class="limit-title">External evidence</p><span class="limit-tag">Unresolved</span></div>
+            <p>Six fee-cap rules depend on evidence beyond the supplied statement. Those cases remain
+               unresolved rather than being forced into pass or fail.</p>
+          </div>
+          <div class="limit">
+            <div><p class="limit-title">Structural boundary</p><span class="limit-tag">Reported apart</span></div>
+            <p>Schema and protocol conformance establish valid structure. They do not establish
+               merchant truth — the two verdicts are reported separately.</p>
+          </div>
+          <div class="limit">
+            <div><p class="limit-title">Input boundary</p><span class="limit-tag">No inference</span></div>
+            <p>The verifier evaluates only the inputs it receives. It does not infer missing facts,
+               completeness, or freshness.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CLOSE ============================ -->
+  <section class="close" aria-labelledby="close-h2">
+    <div class="shell">
+      <p class="eyebrow">The standard</p>
+      <h2 id="close-h2">Make the conclusion as inspectable as the claim.</h2>
+      <div class="hero-cta">
+        <a class="cta cta-primary" href="#proof">Inspect the evidence &uarr;</a>
+        <a class="cta cta-ghost" href="#coverage">Review coverage &rarr;</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell foot-in">
+    <p><b>Curbside Commons</b> — deterministic verification for agentic commerce.</p>
+    <p>Illustrative demonstration: the reading above is a genuine deterministic computation on an
+       invented catalog. No live platform connection; no AI inside the verifier; $0 per verification.</p>
+    <p class="provenance">Design sample · The Light Gauge · Fable seat · 2026-07-15</p>
+  </div>
+</footer>
+
+<script>
+/* ============================ boot ============================ */
+document.documentElement.classList.add("js");
+(function(){
+  "use strict";
+  var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* header glass */
+  var top = document.getElementById("top"), frame = 0;
+  function chrome(){ frame = 0; top.classList.toggle("is-scrolled", scrollY > 18); }
+  addEventListener("scroll", function(){ if(!frame) frame = requestAnimationFrame(chrome); }, {passive:true});
+  chrome();
+
+  /* reveal on scroll (opacity/translate only; killed under reduce by CSS) */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("is-in"); io.unobserve(e.target); } });
+  }, {threshold:.14});
+  document.querySelectorAll(".reveal").forEach(function(el){ io.observe(el); });
+
+  /* ============================ the light gauge (hero canvas) ============================ */
+  var canvas = document.getElementById("gauge-canvas");
+  var hero = canvas.closest(".hero");
+  var toggle = document.getElementById("motion-toggle");
+  var ctx = canvas.getContext("2d");
+  var CYCLE = 10.4, userPaused = false, inView = true, raf = 0, t0 = 0, tPaused = 0, started = false;
+  var W = 0, H = 0, DPR = 1;
+
+  function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function rgb(hex, a){
+    var n = parseInt(hex.slice(1), 16);
+    return "rgba(" + (n>>16&255) + "," + (n>>8&255) + "," + (n&255) + "," + a + ")";
+  }
+  var C = { ink:css("--ink")||"#191721", iris:css("--iris")||"#705de7", cyan:css("--cyan")||"#43a7ce",
+            azure:css("--azure")||"#2f86bd", saffron:css("--saffron")||"#eda52b", ember:css("--ember")||"#c94d35" };
+
+  function size(){
+    var r = hero.getBoundingClientRect();
+    DPR = devicePixelRatio || 1;
+    /* full DPR with a 16MP backing ceiling (4K-crisp) */
+    var px = r.width * r.height * DPR * DPR;
+    if (px > 16e6) DPR = Math.sqrt(16e6 / (r.width * r.height));
+    canvas.width = Math.round(r.width * DPR);
+    canvas.height = Math.round(r.height * DPR);
+    W = r.width; H = r.height;
+  }
+
+  var eases = {
+    outCubic:function(p){ return 1 - Math.pow(1-p,3); },
+    inOut:function(p){ return p<.5 ? 4*p*p*p : 1 - Math.pow(-2*p+2,3)/2; },
+    outBack:function(p){ var c = 1.70158*1.2; return 1 + (c+1)*Math.pow(p-1,3) + c*Math.pow(p-1,2); }
+  };
+  function seg(t, a, b, e){ if(t<=a) return 0; if(t>=b) return 1; return (e||eases.outCubic)((t-a)/(b-a)); }
+
+  /* deterministic scene: rail, gauge, record slab, claim chip, beat, verdict */
+  function render(t){
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,W,H);
+    /* the whole scene lives BELOW the copy corridor (storyboard lesson) */
+    var railY = H*.78, cx = W*.5;
+    var gaugeHalf = Math.max(26, Math.min(44, W*.03));
+    var slabY = railY + 38;
+
+    /* suspension rail */
+    ctx.strokeStyle = rgb("#191721",.10); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(W*.04, railY); ctx.lineTo(W*.96, railY); ctx.stroke();
+    /* rail graduations (fixed, every 48px) */
+    ctx.strokeStyle = rgb("#191721",.06);
+    for (var gx = W*.04; gx < W*.96; gx += 48){
+      ctx.beginPath(); ctx.moveTo(gx, railY-3); ctx.lineTo(gx, railY+3); ctx.stroke();
+    }
+
+    /* merchant record slab (cyan strata) — LEFT-below the gauge: the record
+       feeds the reading from the merchant side */
+    var slabW = Math.min(240, W*.18), slabX = cx - gaugeHalf - 60 - slabW;
+    ctx.strokeStyle = rgb("#191721",.14);
+    ctx.strokeRect(slabX, slabY-1, slabW, 26);
+    for (var li = 0; li < 4; li++){
+      ctx.strokeStyle = li===1 ? rgb(C.cyan,.5) : rgb("#191721",.08);
+      ctx.beginPath(); ctx.moveTo(slabX+10, slabY+6+li*4.5); ctx.lineTo(slabX+slabW-10, slabY+6+li*4.5); ctx.stroke();
+    }
+    ctx.fillStyle = rgb("#191721",.45);
+    ctx.font = "600 9.5px " + "'SF Mono',SFMono-Regular,ui-monospace,Menlo,monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("MERCHANT RECORD · PRICE_CENTS · 2150", slabX + slabW/2, slabY + 42);
+
+    /* the gauge: two pylons + membrane */
+    var pyTop = railY - 88, pyBot = railY + 60;
+    ctx.strokeStyle = rgb("#191721",.22); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(cx-gaugeHalf, pyTop); ctx.lineTo(cx-gaugeHalf, pyBot); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+gaugeHalf, pyTop); ctx.lineTo(cx+gaugeHalf, pyBot); ctx.stroke();
+    ctx.lineWidth = 1;
+    /* membrane: fine vertical interference lines, lit while reading */
+    var reading = seg(t,.36,.44) - seg(t,.62,.70);
+    for (var mi = 0; mi <= 12; mi++){
+      var mx = cx - gaugeHalf + (mi/12) * gaugeHalf * 2;
+      var lit = reading * (1 - Math.abs(mi-6)/7);
+      ctx.strokeStyle = lit > .04 ? rgb(C.saffron, .12 + .38*lit) : rgb("#191721",.05);
+      ctx.beginPath(); ctx.moveTo(mx, pyTop+8); ctx.lineTo(mx, pyBot-8); ctx.stroke();
+    }
+    ctx.fillStyle = rgb("#191721",.45); ctx.textAlign = "center";
+    ctx.fillText("REGISTERED RULE · CENTS-AS-DECIMAL ×100", cx, pyBot + 38);
+
+    /* claim chip: travels the rail; reads in the gauge; exits with the finding */
+    function chip(x, alpha, resolved){
+      var cw = 108, chH = 34;
+      ctx.save(); ctx.globalAlpha = alpha;
+      ctx.fillStyle = rgb(resolved ? C.ember : C.iris, resolved ? .05 : .06);
+      ctx.strokeStyle = rgb(resolved ? C.ember : C.iris, .75);
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x-cw/2, railY-chH-8, cw, chH, 8);
+      else ctx.rect(x-cw/2, railY-chH-8, cw, chH);
+      ctx.fill(); ctx.stroke();
+      /* suspension stem */
+      ctx.strokeStyle = rgb("#191721",.3);
+      ctx.beginPath(); ctx.moveTo(x, railY-8); ctx.lineTo(x, railY); ctx.stroke();
+      ctx.fillStyle = rgb("#191721",.85);
+      ctx.font = "650 11px 'SF Mono',SFMono-Regular,ui-monospace,Menlo,monospace";
+      ctx.fillText("$2,150.00", x, railY - chH + 14);
+      ctx.fillStyle = resolved ? rgb(C.ember,.75) : rgb("#191721",.4);
+      ctx.font = "500 8px 'SF Mono',SFMono-Regular,ui-monospace,Menlo,monospace";
+      ctx.fillText(resolved ? "HOLD · 100×" : "OFFERS.PRICE", x, railY - chH - 16);
+      ctx.restore();
+    }
+    var enterX = -80, exitX = W + 90;
+    var approach = seg(t, .02, .36, eases.inOut);
+    var dwell = seg(t, .62, .70, eases.inOut);
+    var depart = seg(t, .70, .98, eases.inOut);
+    var x = enterX + (cx - enterX) * approach;
+    if (t >= .62) x = cx + (exitX - cx) * (dwell*.06 + depart*.94);
+    var resolved = t >= .66;
+    chip(x, 1, resolved);
+    /* incoming overlap so the loop never empties */
+    if (t >= .86){
+      var inc = seg(t, .86, 1, eases.inOut);
+      chip(enterX + (W*.16 - enterX) * inc, .8, false);
+    }
+
+    /* projection columns while reading: the record feeds up from the slab, the
+       claim beams down through the membrane */
+    if (reading > .02){
+      ctx.strokeStyle = rgb(C.cyan, .4 * reading);
+      ctx.beginPath(); ctx.moveTo(slabX + slabW - 6, slabY); ctx.lineTo(cx - gaugeHalf*.4, railY); ctx.stroke();
+      ctx.strokeStyle = rgb(C.iris, .35 * reading);
+      ctx.beginPath(); ctx.moveTo(cx, railY - 44); ctx.lineTo(cx, railY + 34); ctx.stroke();
+    }
+
+    /* the interference readout: 100 fine ticks vs 1 coarse — draws while reading,
+       RIGHT-below the gauge (the readout side) */
+    var beat = seg(t, .46, .62);
+    if (beat > 0){
+      var bw = Math.min(320, W*.24), bx = cx + gaugeHalf + 56, by = slabY + 12;
+      var count = Math.round(100 * beat);
+      for (var bi = 0; bi < count; bi++){
+        var tx = bx + (bi/99) * bw;
+        ctx.strokeStyle = rgb(C.iris, bi % 10 === 0 ? .5 : .22);
+        ctx.beginPath(); ctx.moveTo(tx, by - (bi%10===0?7:4)); ctx.lineTo(tx, by + (bi%10===0?7:4)); ctx.stroke();
+      }
+      ctx.strokeStyle = rgb(C.azure, .85); ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(bx, by-10); ctx.lineTo(bx, by+10); ctx.stroke();
+      ctx.lineWidth = 1;
+      if (beat > .96){
+        ctx.fillStyle = rgb(C.ember, .9);
+        ctx.font = "700 10px 'SF Mono',SFMono-Regular,ui-monospace,Menlo,monospace";
+        ctx.fillText("×100", bx + bw/2, by + 26);
+      }
+    }
+
+    /* verdict crystallization: ember facet springs in at the gauge exit */
+    var lock = seg(t, .64, .72, eases.outBack);
+    if (lock > 0 && t < .95){
+      var fx = cx + gaugeHalf + 18, fy = railY - 46, fr = 7 * lock;
+      ctx.save();
+      ctx.translate(fx, fy); ctx.rotate(Math.PI/4 * lock);
+      ctx.strokeStyle = rgb(C.ember, .85); ctx.fillStyle = rgb(C.ember, .07);
+      ctx.strokeRect(-fr, -fr, fr*2, fr*2); ctx.fillRect(-fr, -fr, fr*2, fr*2);
+      ctx.restore();
+    }
+  }
+
+  function frameLoop(now){
+    if (!t0) t0 = now;
+    var t = (((now - t0) / 1000) % CYCLE) / CYCLE;
+    render(t);
+    raf = requestAnimationFrame(frameLoop);
+  }
+  function running(){ return started && !userPaused && inView && document.visibilityState === "visible"; }
+  function sync(){
+    if (running()){ if(!raf){ t0 = t0 ? performance.now() - tPaused : 0; raf = requestAnimationFrame(frameLoop); } }
+    else if (raf){ tPaused = performance.now() - t0; cancelAnimationFrame(raf); raf = 0; }
+  }
+
+  function start(){
+    size(); started = true; hero.classList.add("stage-ready");
+    toggle.classList.add("is-live"); sync();
+  }
+  function still(){
+    /* composed still: mid-read resolved frame */
+    size(); hero.classList.add("stage-ready"); render(.68);
+  }
+
+  new ResizeObserver(function(){ size(); if(!running()) render(reduced ? .68 : .5); }).observe(hero);
+  new IntersectionObserver(function(es){
+    inView = es[0].isIntersecting && es[0].intersectionRatio >= .12; sync();
+  }, {threshold:[0,.12]}).observe(hero);
+  document.addEventListener("visibilitychange", sync);
+
+  toggle.addEventListener("click", function(){
+    userPaused = !userPaused;
+    toggle.classList.toggle("is-paused", userPaused);
+    toggle.setAttribute("aria-pressed", String(userPaused));
+    toggle.querySelector(".mt-label").textContent = userPaused ? "Play animation" : "Pause animation";
+    if (reduced && !userPaused && !started){ started = true; }
+    sync();
+    if (!running() && userPaused){ /* keep last frame — non-clearing freeze */ }
+  });
+  toggle.setAttribute("aria-pressed", "false");
+
+  if (reduced){
+    still();
+    /* reduced motion: opt-in control shows as "Play animation" */
+    userPaused = true;
+    toggle.classList.add("is-live", "is-paused", "reduce-optin");
+    toggle.setAttribute("aria-pressed", "true");
+    toggle.querySelector(".mt-label").textContent = "Play animation";
+  } else {
+    start();
+  }
+
+  /* ============================ gauge bench ============================ */
+  var bench = document.getElementById("bench");
+  var run = document.getElementById("bench-run");
+  var status = document.getElementById("bench-status");
+  var live = document.getElementById("bench-live");
+  var timers = [];
+  function setPhase(p){ bench.setAttribute("data-phase", p); }
+  function announceDone(){
+    live.textContent = "Reading complete. ERROR, PRICE MISMATCH: the claim is one hundred times the merchant record. Evidence attached: claim, record, rule, comparison, finding one of sixteen.";
+  }
+  run.addEventListener("click", function(){
+    timers.forEach(clearTimeout); timers = [];
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches){
+      setPhase("done"); status.textContent = "Evidence locked"; announceDone(); return;
+    }
+    setPhase("running"); run.setAttribute("aria-busy","true"); run.disabled = true;
+    status.textContent = "Reading the claim…"; live.textContent = "Reading the claim against the record.";
+    timers.push(setTimeout(function(){ status.textContent = "Projecting both magnitudes…"; }, 330));
+    timers.push(setTimeout(function(){ status.textContent = "Counting the beat…"; }, 650));
+    timers.push(setTimeout(function(){
+      setPhase("done"); status.textContent = "Evidence locked";
+      run.removeAttribute("aria-busy"); run.disabled = false; announceDone();
+    }, 960));
+  });
+
+  /* beat strip fine graduations (static SVG, drawn once) */
+  var fine = document.getElementById("beat-fine");
+  var parts = [];
+  for (var i = 0; i < 100; i++){
+    var x = 3.4 + (i/99) * 673.2;
+    var h = i % 10 === 0 ? 14 : 9;
+    parts.push('<line x1="'+x.toFixed(1)+'" y1="'+(32-h)+'" x2="'+x.toFixed(1)+'" y2="'+(32+h)+'" stroke-width="'+(i%10===0?1.4:.8)+'"/>');
+  }
+  fine.innerHTML = parts.join("");
+
+  /* ============================ method words ============================ */
+  var MR = {
+    claim:{label:"Claim", value:"item-001-v1 · offers.price · 2150.00 USD", note:"What the serving surface published — machine-readable, schema-valid, and still wrong."},
+    record:{label:"Record", value:"item-001-v1 · price_cents · 2150 ($21.50)", note:"The merchant's own system of record — the ground the claim is read against."},
+    rule:{label:"Rule", value:"cents-as-decimal · ×100", note:"The registered arithmetic that binds the two representations of the same price."},
+    verdict:{label:"Verdict", value:"error · price · 100×", note:"The conclusion carries its claim, record, and rule — inspect any of the three and reach it yourself."}
+  };
+  var words = document.querySelectorAll(".mr-word");
+  var panel = document.getElementById("mr-swap");
+  words.forEach(function(w){
+    w.addEventListener("click", function(){
+      words.forEach(function(o){ o.setAttribute("aria-pressed","false"); });
+      w.setAttribute("aria-pressed","true");
+      var d = MR[w.getAttribute("data-mr")];
+      document.getElementById("mr-label").textContent = d.label;
+      document.getElementById("mr-value").textContent = d.value;
+      document.getElementById("mr-note").textContent = d.note;
+      panel.classList.remove("swap-in"); void panel.offsetWidth; panel.classList.add("swap-in");
+    });
+  });
+
+  /* ============================ coverage tablist ============================ */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".cv-tab"));
+  function selectTab(i, focus){
+    tabs.forEach(function(tb, j){
+      var on = i === j;
+      tb.setAttribute("aria-selected", String(on));
+      tb.tabIndex = on ? 0 : -1;
+      var p = document.getElementById(tb.getAttribute("aria-controls"));
+      if (on){ p.hidden = false; p.classList.remove("swap-in"); void p.offsetWidth; p.classList.add("swap-in"); }
+      else p.hidden = true;
+    });
+    if (focus) tabs[i].focus();
+  }
+  tabs.forEach(function(tb, i){
+    tb.addEventListener("click", function(){ selectTab(i, false); });
+    tb.addEventListener("keydown", function(e){
+      var n = null;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") n = (i+1) % tabs.length;
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") n = (i-1+tabs.length) % tabs.length;
+      else if (e.key === "Home") n = 0;
+      else if (e.key === "End") n = tabs.length - 1;
+      if (n !== null){ e.preventDefault(); selectTab(n, true); }
+    });
+  });
+})();
+</script>
+<noscript><style>.cv-panel[hidden]{display:block !important}.cv-tabs{display:none}.motion-toggle{display:none !important}</style></noscript>
+</body>
+</html>

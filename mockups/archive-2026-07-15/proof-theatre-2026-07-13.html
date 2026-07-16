@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Proof Theatre — a fresh Curbside Commons design sample for evidence-first commerce verification.">
+  <title>Proof Theatre · Curbside Commons design sample</title>
+  <script>document.documentElement.classList.replace('no-js', 'js');</script>
+  <style>
+    :root {
+      --paper: #fbfbf8;
+      --paper-solid: #ffffff;
+      --ink: #111310;
+      --muted: #62675f;
+      --faint: #8b9088;
+      --line: #d9ddd6;
+      --line-strong: #aeb5aa;
+      --signal: #0b6654;
+      --signal-strong: #074b3e;
+      --signal-soft: #e8f2ee;
+      --warn: #9a4d0b;
+      --warn-soft: #fbf0e5;
+      --error: #a42620;
+      --error-soft: #faecea;
+      --max: 1440px;
+      --gutter: clamp(20px, 4.6vw, 72px);
+      --sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      --ease-out: cubic-bezier(.22, 1, .36, 1);
+      --ease-move: cubic-bezier(.77, 0, .175, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--paper); color-scheme: light; scroll-behavior: auto; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    button, a { font: inherit; }
+    a { color: inherit; }
+    button { color: inherit; }
+    ::selection { color: var(--paper-solid); background: var(--signal); }
+    :focus-visible { outline: 2px solid var(--signal); outline-offset: 4px; }
+
+    .skip {
+      position: fixed;
+      left: 16px;
+      top: 12px;
+      z-index: 100;
+      padding: 10px 14px;
+      color: #fff;
+      background: var(--signal-strong);
+      transform: translateY(-180%);
+      transition: transform 160ms var(--ease-out);
+    }
+    .skip:focus { transform: translateY(0); }
+
+    .scroll-meter {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 90;
+      height: 2px;
+      background: transparent;
+      pointer-events: none;
+    }
+    .scroll-meter span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--signal);
+      transform: scaleX(0);
+      transform-origin: left center;
+    }
+
+    .frame {
+      width: min(100%, var(--max));
+      margin-inline: auto;
+      padding-inline: var(--gutter);
+    }
+
+    .sample-note {
+      border-bottom: 1px solid var(--line);
+      background: var(--paper-solid);
+    }
+    .sample-note .frame {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: start;
+      padding-block: 13px;
+    }
+    .sample-tag {
+      padding: 2px 8px;
+      border: 1px solid var(--line-strong);
+      color: var(--ink);
+      background: var(--paper);
+      font: 700 10px/1.6 var(--mono);
+      letter-spacing: .1em;
+    }
+    .sample-copy {
+      margin: 0;
+      max-width: 110ch;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .site-head {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--paper) 94%, transparent);
+      backdrop-filter: blur(16px);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      min-height: 70px;
+      gap: 26px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      margin-right: auto;
+      text-decoration: none;
+      font-weight: 650;
+      letter-spacing: -.025em;
+    }
+    .aperture-mark {
+      position: relative;
+      width: 27px;
+      height: 27px;
+      flex: 0 0 auto;
+    }
+    .aperture-mark::before,
+    .aperture-mark::after {
+      content: "";
+      position: absolute;
+      inset: 2px 8px;
+      border: 1.5px solid var(--ink);
+    }
+    .aperture-mark::before { transform: translateX(-4px); }
+    .aperture-mark::after { transform: translateX(4px); border-color: var(--signal); }
+    .aperture-mark i {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--signal);
+      transform: translate(-50%, -50%);
+    }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a {
+      position: relative;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 550;
+    }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 100%;
+      bottom: -7px;
+      border-bottom: 1px solid var(--signal);
+      transition: right 180ms var(--ease-out);
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links a:hover::after { right: 0; }
+    .nav-state {
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font: 600 10px/1 var(--mono);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      background: var(--paper-solid);
+    }
+    .field-lines { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .field-lines i {
+      position: absolute;
+      display: block;
+      height: 1px;
+      width: 42vw;
+      background: var(--line);
+      opacity: .5;
+      transform-origin: left center;
+    }
+    .field-lines i:nth-child(1) { left: 61%; top: 13%; transform: rotate(18deg); }
+    .field-lines i:nth-child(2) { left: 57%; top: 23%; transform: rotate(-9deg); }
+    .field-lines i:nth-child(3) { left: 69%; top: 34%; transform: rotate(28deg); }
+    .field-lines i:nth-child(4) { left: 53%; top: 54%; transform: rotate(6deg); }
+    .field-lines i:nth-child(5) { left: 65%; top: 69%; transform: rotate(-16deg); }
+    .field-lines i:nth-child(6) { left: 59%; top: 82%; transform: rotate(22deg); }
+    .field-lines i:nth-child(7) { left: 77%; top: 8%; width: 1px; height: 80%; transform: none; }
+    .field-lines i:nth-child(8) { left: 89%; top: 22%; width: 1px; height: 70%; transform: none; }
+
+    .hero-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 24px;
+      min-height: 780px;
+      align-items: center;
+      padding-block: clamp(76px, 10vw, 142px) clamp(90px, 11vw, 156px);
+    }
+    .hero-copy { grid-column: 1 / span 8; position: relative; z-index: 2; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      color: var(--signal);
+      font: 700 11px/1.3 var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 28px; border-top: 1px solid currentColor; }
+    h1 {
+      max-width: 950px;
+      margin: 28px 0 0;
+      font-size: clamp(58px, 8.7vw, 132px);
+      font-weight: 600;
+      line-height: .88;
+      letter-spacing: -.072em;
+      text-wrap: balance;
+    }
+    h1 .proof-word {
+      display: inline-block;
+      color: var(--signal);
+      font-style: italic;
+      font-weight: 450;
+    }
+    .hero-lede {
+      max-width: 720px;
+      margin: 34px 0 0;
+      color: var(--muted);
+      font-size: clamp(18px, 1.7vw, 25px);
+      line-height: 1.42;
+      letter-spacing: -.018em;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 38px; }
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      padding: 0 18px;
+      border: 1px solid var(--ink);
+      border-radius: 2px;
+      background: transparent;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 650;
+      cursor: pointer;
+      transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+    .button.primary { color: #fff; border-color: var(--signal); background: var(--signal); }
+    .button.primary:hover { border-color: var(--signal-strong); background: var(--signal-strong); }
+    .button.secondary:hover { color: var(--signal); border-color: var(--signal); }
+    .button .arrow { transition: transform 160ms var(--ease-out); }
+    .button:hover .arrow { transform: translateX(4px); }
+
+    .hero-orbit {
+      position: absolute;
+      right: clamp(18px, 5vw, 76px);
+      top: 50%;
+      width: clamp(170px, 19vw, 290px);
+      aspect-ratio: 1;
+      transform: translateY(-50%);
+      opacity: .92;
+    }
+    .hero-orbit .ring {
+      position: absolute;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+    }
+    .hero-orbit .ring:nth-child(1) { inset: 0; }
+    .hero-orbit .ring:nth-child(2) { inset: 22%; border-color: var(--signal); }
+    .hero-orbit .ring:nth-child(3) { inset: 43%; background: var(--signal); border-color: var(--signal); }
+    .hero-orbit .cross::before,
+    .hero-orbit .cross::after {
+      content: "";
+      position: absolute;
+      background: var(--line-strong);
+    }
+    .hero-orbit .cross::before { left: 50%; top: -12%; width: 1px; height: 124%; }
+    .hero-orbit .cross::after { top: 50%; left: -12%; width: 124%; height: 1px; }
+    .orbit-label {
+      position: absolute;
+      right: 0;
+      bottom: -42px;
+      color: var(--muted);
+      font: 600 10px/1.4 var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .chapter {
+      border-bottom: 1px solid var(--line);
+      background: var(--paper);
+    }
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: clamp(26px, 6vw, 100px);
+      padding-block: clamp(86px, 12vw, 170px);
+    }
+    .chapter-no {
+      padding-top: 10px;
+      color: var(--muted);
+      font: 650 11px/1.4 var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .chapter-no span { display: block; width: 36px; margin-top: 14px; border-top: 1px solid var(--line-strong); }
+    .chapter-copy { max-width: 1080px; }
+    .chapter h2 {
+      margin: 0;
+      max-width: 1000px;
+      font-size: clamp(42px, 6.3vw, 94px);
+      font-weight: 520;
+      line-height: .98;
+      letter-spacing: -.055em;
+      text-wrap: balance;
+    }
+    .chapter-intro {
+      max-width: 720px;
+      margin: 32px 0 0;
+      color: var(--muted);
+      font-size: clamp(18px, 1.6vw, 23px);
+      line-height: 1.5;
+    }
+
+    .theatre-wrap { margin-top: 64px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+    .theatre-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font: 600 11px/1.4 var(--mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); }
+    .theatre-head .head-state { margin-left: auto; color: var(--signal); }
+    .theatre-stage { padding: clamp(28px, 5vw, 64px) 0; }
+    .stage-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin: 0 0 42px;
+      padding: 0;
+      list-style: none;
+      counter-reset: stage;
+    }
+    .stage-steps li {
+      position: relative;
+      padding: 12px 12px 12px 0;
+      border-top: 1px solid var(--line);
+      color: var(--faint);
+      font: 600 11px/1.4 var(--mono);
+      counter-increment: stage;
+      transition: color 220ms ease, border-color 220ms ease;
+    }
+    .stage-steps li::before { content: "0" counter(stage) "  "; }
+    .stage-steps li.active { color: var(--signal); border-top-color: var(--signal); }
+
+    .claim-sheet { display: grid; grid-template-columns: 150px minmax(0, 1fr); border-top: 1px solid var(--line); }
+    .claim-sheet:last-of-type { border-bottom: 1px solid var(--line); }
+    .claim-label {
+      padding: 21px 18px 21px 0;
+      color: var(--muted);
+      font: 650 11px/1.4 var(--mono);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .claim-value {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      padding: 18px 0 18px 26px;
+      border-left: 1px solid var(--line);
+      font-size: clamp(20px, 2.3vw, 34px);
+      letter-spacing: -.035em;
+    }
+    .claim-value code {
+      color: inherit;
+      background: transparent;
+      font: 550 .88em/1.3 var(--mono);
+      letter-spacing: -.02em;
+    }
+    .status-chip {
+      min-width: 84px;
+      padding: 6px 8px;
+      border: 1px solid var(--line-strong);
+      color: var(--muted);
+      background: var(--paper-solid);
+      text-align: center;
+      font: 700 10px/1.2 var(--mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .claim-sheet.mismatch .claim-value { color: var(--error); background: var(--error-soft); }
+    .claim-sheet.mismatch .status-chip { color: var(--error); border-color: var(--error); background: var(--paper-solid); }
+    .js .claim-sheet.mismatch .claim-value { color: inherit; background: transparent; }
+    .js .claim-sheet.mismatch .status-chip { color: var(--muted); border-color: var(--line-strong); }
+    .js .theatre-wrap[data-stage="4"] .claim-sheet.mismatch .claim-value { color: var(--error); background: var(--error-soft); }
+    .js .theatre-wrap[data-stage="4"] .claim-sheet.mismatch .status-chip { color: var(--error); border-color: var(--error); }
+
+    .run-row { display: flex; align-items: center; gap: 12px; margin-top: 26px; }
+    .run-status { margin: 0 0 0 auto; color: var(--muted); font: 600 11px/1.4 var(--mono); }
+    .receipt-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 42px;
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+    }
+    .receipt {
+      min-height: 144px;
+      padding: 18px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: var(--paper-solid);
+    }
+    .receipt dt { color: var(--muted); font: 650 10px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .receipt dd { margin: 18px 0 0; font-size: 15px; line-height: 1.45; }
+    .receipt code { color: var(--signal-strong); font: 600 12px/1.4 var(--mono); overflow-wrap: anywhere; }
+
+    .nojs-proof { margin-top: 26px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .nojs-proof summary { padding: 16px 0; cursor: pointer; font-weight: 650; }
+    .nojs-proof p { max-width: 80ch; margin: 0; padding: 0 0 20px; color: var(--muted); }
+
+    .movements { margin-top: 72px; border-top: 1px solid var(--ink); }
+    .movement {
+      display: grid;
+      grid-template-columns: 72px minmax(160px, .7fr) minmax(260px, 1.3fr) auto;
+      gap: 24px;
+      align-items: center;
+      min-height: 138px;
+      border-bottom: 1px solid var(--line);
+    }
+    .move-no { color: var(--signal); font: 700 13px/1 var(--mono); }
+    .move-title { margin: 0; font-size: clamp(22px, 2.3vw, 34px); font-weight: 580; letter-spacing: -.035em; }
+    .move-copy { max-width: 650px; margin: 0; color: var(--muted); }
+    .glyph {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+    }
+    .glyph::before,
+    .glyph::after { content: ""; position: absolute; background: var(--signal); }
+    .glyph::before { left: 50%; top: 7px; bottom: 7px; width: 1px; }
+    .glyph::after { top: 50%; left: 7px; right: 7px; height: 1px; }
+    .movement:nth-child(even) .glyph { border-radius: 2px; transform: rotate(45deg); }
+
+    .modules { margin-top: 68px; border-top: 1px solid var(--ink); }
+    .module-row {
+      display: grid;
+      grid-template-columns: 130px minmax(240px, .8fr) minmax(300px, 1.2fr);
+      gap: 28px;
+      padding: 38px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .module-code { color: var(--signal); font: 700 11px/1.5 var(--mono); text-transform: uppercase; letter-spacing: .07em; }
+    .module-row h3 { margin: 0; font-size: clamp(25px, 3vw, 42px); font-weight: 560; line-height: 1.05; letter-spacing: -.04em; }
+    .module-row p { max-width: 670px; margin: 0; color: var(--muted); font-size: 17px; }
+    .module-proof { display: block; margin-top: 18px; color: var(--ink); font: 600 11px/1.5 var(--mono); }
+
+    .evidence-wall {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 72px;
+      border-top: 1px solid var(--ink);
+      border-left: 1px solid var(--line);
+    }
+    .evidence-cell {
+      min-height: 310px;
+      padding: clamp(24px, 4vw, 52px);
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: var(--paper-solid);
+    }
+    .evidence-kicker { margin: 0; color: var(--muted); font: 650 10px/1.4 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+    .evidence-number { margin: 36px 0 0; font-size: clamp(62px, 8vw, 118px); line-height: .8; letter-spacing: -.075em; }
+    .evidence-label { max-width: 420px; margin: 30px 0 0; color: var(--muted); font-size: 17px; }
+    .evidence-label strong { color: var(--ink); font-weight: 650; }
+    .evidence-cell.defer .evidence-number { color: var(--warn); font-size: clamp(46px, 6.5vw, 88px); }
+
+    .edges {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 68px;
+      border-top: 1px solid var(--ink);
+    }
+    .edge {
+      padding: 28px 28px 32px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .edge + .edge { padding-left: 28px; border-left: 1px solid var(--line); }
+    .edge-state { color: var(--warn); font: 700 10px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .edge h3 { margin: 20px 0 0; font-size: 25px; line-height: 1.15; letter-spacing: -.035em; }
+    .edge p { margin: 16px 0 0; color: var(--muted); }
+
+    .closing {
+      position: relative;
+      overflow: hidden;
+      min-height: 620px;
+      border-bottom: 1px solid var(--line);
+      background: var(--signal-soft);
+      color: var(--ink);
+    }
+    .closing .frame { display: flex; min-height: inherit; flex-direction: column; justify-content: center; padding-block: 90px; }
+    .closing .eyebrow { color: var(--signal-strong); }
+    .closing h2 {
+      max-width: 1100px;
+      margin: 26px 0 0;
+      font-size: clamp(52px, 8vw, 118px);
+      font-weight: 560;
+      line-height: .9;
+      letter-spacing: -.068em;
+    }
+    .closing p { max-width: 650px; margin: 30px 0 0; color: var(--muted); font-size: 20px; }
+    .closing .button { margin-top: 34px; align-self: flex-start; }
+    .closing-ring {
+      position: absolute;
+      right: -10vw;
+      top: 50%;
+      width: 48vw;
+      aspect-ratio: 1;
+      border: 1px solid color-mix(in srgb, var(--signal) 24%, transparent);
+      border-radius: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .closing-ring::before,
+    .closing-ring::after { content: ""; position: absolute; border: 1px solid color-mix(in srgb, var(--signal) 24%, transparent); border-radius: 50%; }
+    .closing-ring::before { inset: 22%; }
+    .closing-ring::after { inset: 44%; background: var(--signal); border-color: var(--signal); }
+
+    .site-footer { background: var(--paper-solid); }
+    .site-footer .frame { padding-block: 30px 42px; }
+    .footer-grid { display: grid; grid-template-columns: 150px 1fr; gap: 36px; }
+    .footer-label { color: var(--muted); font: 650 10px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .footer-copy { max-width: 108ch; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .footer-copy strong { color: var(--ink); font-weight: 650; }
+
+    .reveal { opacity: 1; transform: none; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .button:active { transform: translateY(1px); }
+      .movement { transition: background-color 180ms ease; }
+      .movement:hover { background: var(--paper-solid); }
+      .module-row { transition: padding-left 220ms var(--ease-out); }
+      .module-row:hover { padding-left: 14px; }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      html.js { scroll-behavior: smooth; }
+      html.js .reveal { opacity: .001; transform: translateY(24px); }
+      html.js .reveal.in { opacity: 1; transform: translateY(0); transition: opacity 620ms var(--ease-out), transform 620ms var(--ease-out); }
+      .hero-orbit .ring:nth-child(2) { animation: breathe 5s ease-in-out infinite alternate; }
+      .hero-orbit .ring:nth-child(3) { animation: pulse 2.8s ease-in-out infinite alternate; }
+      .field-lines i:nth-child(2), .field-lines i:nth-child(5) { animation: drift 12s var(--ease-move) infinite alternate; }
+      .aperture-mark::before { animation: aperture-left 900ms var(--ease-out) both; }
+      .aperture-mark::after { animation: aperture-right 900ms var(--ease-out) both; }
+      @keyframes breathe { to { transform: scale(.9); opacity: .65; } }
+      @keyframes pulse { to { transform: scale(1.45); opacity: .35; } }
+      @keyframes drift { to { translate: -38px 18px; } }
+      @keyframes aperture-left { from { transform: translateX(-12px); opacity: 0; } to { transform: translateX(-4px); opacity: 1; } }
+      @keyframes aperture-right { from { transform: translateX(12px); opacity: 0; } to { transform: translateX(4px); opacity: 1; } }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+      .button:hover .arrow, .module-row:hover { transform: none; }
+    }
+
+    @media (max-width: 980px) {
+      .nav-links { display: none; }
+      .hero-grid { min-height: 720px; }
+      .hero-copy { grid-column: 1 / span 10; }
+      .hero-orbit { right: -6vw; opacity: .42; }
+      .chapter-grid { grid-template-columns: 100px minmax(0, 1fr); }
+      .receipt-strip, .stage-steps { grid-template-columns: repeat(2, 1fr); }
+      .movement { grid-template-columns: 54px minmax(160px, .7fr) minmax(240px, 1.3fr); }
+      .movement .glyph { display: none; }
+      .module-row { grid-template-columns: 90px minmax(220px, .8fr) minmax(260px, 1.2fr); }
+      .edges { grid-template-columns: 1fr; }
+      .edge, .edge + .edge { padding: 28px 0; border-left: 0; }
+    }
+
+    @media (max-width: 700px) {
+      .sample-note .frame { grid-template-columns: 1fr; gap: 7px; }
+      .sample-tag { width: fit-content; }
+      .nav { min-height: 62px; }
+      .nav-state { display: none; }
+      .hero-grid { min-height: auto; padding-block: 76px 92px; }
+      .hero-copy { grid-column: 1 / -1; }
+      h1 { font-size: clamp(50px, 16vw, 82px); line-height: .92; }
+      .hero-lede { font-size: 18px; }
+      .hero-orbit { width: 180px; right: -70px; top: 20%; opacity: .22; }
+      .chapter-grid { grid-template-columns: 1fr; gap: 32px; padding-block: 84px; }
+      .chapter-no { display: flex; align-items: center; gap: 12px; padding: 0; }
+      .chapter-no span { margin: 0; }
+      .chapter h2 { font-size: clamp(40px, 13vw, 64px); }
+      .chapter-intro { font-size: 17px; }
+      .theatre-wrap, .movements, .modules, .evidence-wall, .edges { margin-top: 48px; }
+      .stage-steps { grid-template-columns: 1fr; margin-bottom: 28px; }
+      .stage-steps li { padding-block: 9px; }
+      .claim-sheet { grid-template-columns: 1fr; }
+      .claim-label { padding: 16px 0 8px; }
+      .claim-value { padding: 14px 0; border-left: 0; gap: 10px; font-size: 22px; }
+      .run-row { align-items: stretch; flex-direction: column; }
+      .run-status { margin: 8px 0 0; }
+      .receipt-strip { grid-template-columns: 1fr; }
+      .receipt { min-height: auto; }
+      .movement { grid-template-columns: 44px 1fr; gap: 12px; padding-block: 24px; }
+      .move-copy { grid-column: 2; }
+      .module-row { grid-template-columns: 1fr; gap: 14px; padding-block: 30px; }
+      .evidence-wall { grid-template-columns: 1fr; }
+      .evidence-cell { min-height: 260px; }
+      .closing { min-height: 560px; }
+      .closing h2 { font-size: clamp(48px, 15vw, 78px); }
+      .closing-ring { width: 78vw; right: -44vw; opacity: .55; }
+      .footer-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
+
+    @media print {
+      .site-head, .scroll-meter, .hero-actions, .run-row { display: none !important; }
+      .hero, .chapter, .site-footer { break-inside: avoid; }
+      .closing { min-height: auto; color: var(--ink); background: var(--paper-solid); }
+      .closing .eyebrow, .closing p { color: var(--muted); }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <div class="scroll-meter" aria-hidden="true"><span></span></div>
+
+  <aside class="sample-note" aria-label="Simulation disclosure">
+    <div class="frame">
+      <span class="sample-tag">SIMULATED</span>
+      <p class="sample-copy">Synthetic test data — an invented restaurant, invented menu, invented prices. Not real DoorDash / Square / Uber&nbsp;Eats / Grubhub data, access, or business impact. The verification rules and the pinned data-format standard are real; the restaurant, its menu, and its records are invented.</p>
+    </div>
+  </aside>
+
+  <header class="site-head">
+    <div class="frame nav">
+      <a class="brand" href="#top" aria-label="Curbside Commons, back to top">
+        <span class="aperture-mark" aria-hidden="true"><i></i></span>
+        <span>Curbside Commons</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#proof">The proof</a>
+        <a href="#method">Method</a>
+        <a href="#modules">Modules</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#limits">Limits</a>
+      </nav>
+      <span class="nav-state">Design sample · Static replay</span>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <span class="field-lines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <div class="frame hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Commerce truth verification</p>
+          <h1 id="hero-title">Make every claim <span class="proof-word">prove</span> itself.</h1>
+          <p class="hero-lede">Curbside Commons checks the copy served to an AI shopper against the merchant’s own record, line by line. It separates a feed that is correctly shaped from one that is actually true.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#proof">Enter the proof <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="button secondary" href="#method">See the method</a>
+          </div>
+        </div>
+        <div class="hero-orbit" aria-hidden="true">
+          <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="cross"></i>
+          <span class="orbit-label">claim · record · rule · verdict</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="proof" aria-labelledby="proof-title">
+      <div class="frame chapter-grid">
+        <p class="chapter-no">Act 01 <span></span></p>
+        <div class="chapter-copy">
+          <div class="reveal">
+            <p class="eyebrow">A concrete mismatch</p>
+            <h2 id="proof-title">The format passes. The fact does not.</h2>
+            <p class="chapter-intro">A field can be present, typed, and perfectly valid while carrying the wrong reality. Here, the serving copy serializes cents as dollars. The protocol shape is acceptable; the price is not.</p>
+          </div>
+
+          <div class="theatre-wrap reveal" data-stage="1">
+            <div class="theatre-head">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span>Proof theatre · committed synthetic fixture</span>
+              <span class="head-state">Ready</span>
+            </div>
+            <div class="theatre-stage">
+              <ol class="stage-steps" aria-label="Verification stages">
+                <li class="active">Read claim</li>
+                <li>Find record</li>
+                <li>Apply rule</li>
+                <li>Issue verdict</li>
+              </ol>
+
+              <div class="claim-sheet mismatch">
+                <div class="claim-label">Serving copy</div>
+                <div class="claim-value"><code>price.amount = 2150</code><span class="status-chip">claim</span></div>
+              </div>
+              <div class="claim-sheet">
+                <div class="claim-label">Merchant record</div>
+                <div class="claim-value"><code>price.amount = 21.50</code><span class="status-chip">record</span></div>
+              </div>
+
+              <div class="run-row">
+                <button class="button primary run-proof" type="button">Run the comparison <span class="arrow" aria-hidden="true">→</span></button>
+                <button class="button secondary show-proof" type="button">Show result instantly</button>
+                <p class="run-status" aria-live="polite">Ready to compare.</p>
+              </div>
+
+              <dl class="receipt-strip">
+                <div class="receipt"><dt>Claim</dt><dd><code>item-001-v1#price.amount</code></dd></div>
+                <div class="receipt"><dt>Reference row</dt><dd><code>item-001-v1</code></dd></div>
+                <div class="receipt"><dt>Rule</dt><dd><code>LST-PRICE-CENTS-AS-DECIMAL</code></dd></div>
+                <div class="receipt"><dt>Verdict</dt><dd><strong>Error · price</strong><br>100× overstatement</dd></div>
+              </dl>
+
+              <details class="nojs-proof">
+                <summary>Read the full finding without the animation</summary>
+                <p>The price is serialized in cents (2150) where dollars are expected (21.50) — a 100× overstatement. This wording, claim ID, reference row, and rule ID mirror the committed synthetic golden report.</p>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="method" aria-labelledby="method-title">
+      <div class="frame chapter-grid">
+        <p class="chapter-no">Act 02 <span></span></p>
+        <div class="chapter-copy">
+          <div class="reveal">
+            <p class="eyebrow">How the decision is made</p>
+            <h2 id="method-title">Plain words first. Exact receipts behind them.</h2>
+            <p class="chapter-intro">The system does not ask a viewer to trust a score. It shows what was claimed, which record was consulted, which rule decided the difference, and how severe it is.</p>
+          </div>
+          <div class="movements">
+            <article class="movement reveal">
+              <span class="move-no">01</span><h3 class="move-title">Start with the record</h3><p class="move-copy">The merchant system-of-record defines the price, availability, identity, and other checkable facts.</p><span class="glyph" aria-hidden="true"></span>
+            </article>
+            <article class="movement reveal">
+              <span class="move-no">02</span><h3 class="move-title">Read each serving copy</h3><p class="move-copy">The same underlying catalog may be expressed through multiple agent-facing surfaces. Each copy is examined independently.</p><span class="glyph" aria-hidden="true"></span>
+            </article>
+            <article class="movement reveal">
+              <span class="move-no">03</span><h3 class="move-title">Compare deterministically</h3><p class="move-copy">Explicit rules compare checkable claims with their matching reference rows. The same fixture produces the same report.</p><span class="glyph" aria-hidden="true"></span>
+            </article>
+            <article class="movement reveal">
+              <span class="move-no">04</span><h3 class="move-title">Attach the receipts</h3><p class="move-copy">Every finding carries the claim, reference row, rule or clause, and severity. Technical detail is available without obscuring the plain-language result.</p><span class="glyph" aria-hidden="true"></span>
+            </article>
+            <article class="movement reveal">
+              <span class="move-no">05</span><h3 class="move-title">Keep action human-gated</h3><p class="move-copy">The proof supports review; it does not quietly turn a finding into an external action.</p><span class="glyph" aria-hidden="true"></span>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="modules" aria-labelledby="modules-title">
+      <div class="frame chapter-grid">
+        <p class="chapter-no">Act 03 <span></span></p>
+        <div class="chapter-copy">
+          <div class="reveal">
+            <p class="eyebrow">One evidence spine</p>
+            <h2 id="modules-title">Three ways commerce claims drift.</h2>
+            <p class="chapter-intro">Each module answers a different question. Together they keep data shape, factual truth, and fee rules from being confused with one another.</p>
+          </div>
+          <div class="modules">
+            <article class="module-row reveal">
+              <span class="module-code">Module / 01</span>
+              <h3>Listings truth</h3>
+              <p>Does the serving copy match the merchant’s catalog for existence, identity, price, availability, encoding, and staleness?<span class="module-proof">Shown golden · 16 findings · 11 error / 5 warn</span></p>
+            </article>
+            <article class="module-row reveal">
+              <span class="module-code">Module / 02</span>
+              <h3>Protocol conformance</h3>
+              <p>Does the feed satisfy the pinned data-format requirements? This validates structure, not factual truth.<span class="module-proof">Pinned corpus · 78 schemas</span></p>
+            </article>
+            <article class="module-row reveal">
+              <span class="module-code">Module / 03</span>
+              <h3>Fee-cap audit</h3>
+              <p>Do synthetic statement lines comply with the codified rule table, and where must the result remain provisional?<span class="module-proof">17 registered rules · 11 executable / 6 non-checkable here</span></p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="evidence" aria-labelledby="evidence-title">
+      <div class="frame chapter-grid">
+        <p class="chapter-no">Act 04 <span></span></p>
+        <div class="chapter-copy">
+          <div class="reveal">
+            <p class="eyebrow">Evidence, not theatre</p>
+            <h2 id="evidence-title">A label is earned—or it stays off the page.</h2>
+            <p class="chapter-intro">Runs are judged against floors committed before scoring. When a lane misses, the simpler or safer behavior remains the default and the miss stays visible.</p>
+          </div>
+          <div class="evidence-wall">
+            <article class="evidence-cell reveal">
+              <p class="evidence-kicker">Pinned format coverage</p>
+              <p class="evidence-number">78</p>
+              <p class="evidence-label"><strong>schemas</strong> in the pinned conformance corpus. Shape validation remains separate from truth verification.</p>
+            </article>
+            <article class="evidence-cell reveal">
+              <p class="evidence-kicker">Shown verifier golden</p>
+              <p class="evidence-number">16</p>
+              <p class="evidence-label"><strong>findings</strong> in the committed synthetic report: 11 errors and 5 warnings.</p>
+            </article>
+            <article class="evidence-cell reveal">
+              <p class="evidence-kicker">Fresh held-out retry</p>
+              <p class="evidence-number">21/21</p>
+              <p class="evidence-label">The classifier earned its scoped label only after the first <strong>20/21 run deferred</strong> it.</p>
+            </article>
+            <article class="evidence-cell defer reveal">
+              <p class="evidence-kicker">Anti-theatre outcome</p>
+              <p class="evidence-number">DEFER</p>
+              <p class="evidence-label">The RAG and fuzzy entity-resolution experiments <strong>missed their registered floors</strong>. Their stronger-sounding labels did not ship.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="limits" aria-labelledby="limits-title">
+      <div class="frame chapter-grid">
+        <p class="chapter-no">Act 05 <span></span></p>
+        <div class="chapter-copy">
+          <div class="reveal">
+            <p class="eyebrow">The honest edge</p>
+            <h2 id="limits-title">The limitations belong in the product story.</h2>
+            <p class="chapter-intro">This is a simulated, run-on-demand prototype built to demonstrate verification rigor. It is not evidence of market adoption, production impact, or a continuously operated service.</p>
+          </div>
+          <div class="edges">
+            <article class="edge reveal"><span class="edge-state">Recorded miss</span><h3>The first classifier run did not earn the label.</h3><p>It scored 20/21 but missed one conjunctive recall floor. The result remained public and the label stayed deferred.</p></article>
+            <article class="edge reveal"><span class="edge-state">Simpler lane kept</span><h3>The retrieval experiment did not beat its baseline.</h3><p>The hybrid lane missed its floors, so the simpler BM25 reference lookup remains the advisory path.</p></article>
+            <article class="edge reveal"><span class="edge-state">Protected default kept</span><h3>Fuzzy matching did not outperform exact matching.</h3><p>The ensemble tied the normalized-exact baseline while missing recall. Exact matching stays the default.</p></article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="closing-ring" aria-hidden="true"></div>
+      <div class="frame reveal">
+        <p class="eyebrow">Curbside Commons</p>
+        <h2 id="closing-title">Truth needs a receipt.</h2>
+        <p>See the complete simulated report: every difference in plain language, followed by the exact claim, record, rule, and severity.</p>
+        <a class="button" href="#proof">Return to the proof <span class="arrow" aria-hidden="true">↑</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="frame footer-grid">
+      <span class="footer-label">Provenance</span>
+      <p class="footer-copy"><strong>Demo / portfolio prototype — simulated data throughout.</strong> Every page is a <strong>static replay of committed, labeled fixtures</strong>: the truth-audit report and demo render frozen golden reports from a synthetic corpus; the legacy activation pages replay synthetic activation state over fictional display names, and the “real Gemini” output shown there is a <strong>recorded static fixture</strong> (reproduce it locally with your own key). <strong>This site initiates no sends and makes no live calls</strong>; exactly one recorded, owner-armed send exists in the project’s history — see the repo’s SHOWCASE and its committed run record. Human-led, AI-assisted, professionally reviewed. <strong>Not affiliated with, endorsed by, or connected to</strong> DoorDash, Uber Eats, Grubhub, DataSF, or any named business.</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const meter = document.querySelector('.scroll-meter span');
+      const theatre = document.querySelector('.theatre-wrap');
+      const state = theatre.querySelector('.head-state');
+      const steps = [...theatre.querySelectorAll('.stage-steps li')];
+      const status = theatre.querySelector('.run-status');
+      const run = theatre.querySelector('.run-proof');
+      const instant = theatre.querySelector('.show-proof');
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      let timer = null;
+
+      const labels = [
+        'Reading the served claim.',
+        'Matching the merchant record.',
+        'Applying the registered price rule.',
+        'Error found: 100× price overstatement.'
+      ];
+
+      function setStage(number) {
+        theatre.dataset.stage = String(number);
+        steps.forEach((step, index) => step.classList.toggle('active', index < number));
+        state.textContent = number === 4 ? 'Mismatch found' : `Stage 0${number}`;
+        status.textContent = labels[number - 1];
+        run.textContent = number === 4 ? 'Run the comparison again →' : 'Comparing…';
+        run.disabled = number > 0 && number < 4;
+        if (number === 4) run.disabled = false;
+      }
+
+      function finish() {
+        clearInterval(timer);
+        timer = null;
+        setStage(4);
+      }
+
+      function start() {
+        clearInterval(timer);
+        setStage(1);
+        if (reduce.matches) { finish(); return; }
+        let current = 1;
+        timer = setInterval(() => {
+          current += 1;
+          setStage(current);
+          if (current === 4) finish();
+        }, 620);
+      }
+
+      run.addEventListener('click', start);
+      instant.addEventListener('click', finish);
+      reduce.addEventListener?.('change', event => { if (event.matches && timer) finish(); });
+
+      function onScroll() {
+        const max = root.scrollHeight - innerHeight;
+        meter.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
+      }
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      if ('IntersectionObserver' in window && !reduce.matches) {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: '0px 0px -10% 0px', threshold: .08 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+      } else {
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+      }
+    })();
+  </script>
+</body>
+</html>
