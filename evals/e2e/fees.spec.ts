@@ -57,6 +57,26 @@ test("/fees renders the drifted month's audit end-to-end: verdict, receipts, bou
   await expect(page.getByText(/No real platform statement/).first()).toBeVisible();
 });
 
+test("receipt cells hold a readable measure at the desktop floor — no ribbon collapse", async ({
+  page,
+}) => {
+  // Session-19 design fix: the shared four-track receipt ledger starved "the
+  // arithmetic" (sentence-length evidence) to ~48px ribbons at 1280. The fee
+  // surface now pairs receipts 2×2; this tooth fails if any receipt cell ever
+  // collapses below a readable measure again.
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/fees");
+  const cells = page.locator("#fee-report .rpt-rc dd");
+  const n = await cells.count();
+  expect(n).toBeGreaterThan(0);
+  for (let i = 0; i < n; i++) {
+    const box = await cells.nth(i).boundingBox();
+    expect(box, `receipt cell ${i} has a box`).not.toBeNull();
+    expect(box!.width, `receipt cell ${i} width ≥ 150px (was 48px in the ribbon defect)`).toBeGreaterThanOrEqual(150);
+  }
+});
+
 test("the four example months carry their four legal outcomes (toggle)", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/fees");

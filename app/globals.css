@@ -2120,6 +2120,19 @@ body {
   line-height: 1.55;
   color: var(--graphite);
 }
+/* fees receipts — "the arithmetic" carries sentence-length evidence, which the
+   shared four-track ledger starves into unreadable ribbons at desktop widths;
+   the fee surface folds to the 2×2 pairing (statement+clause / rule+arithmetic)
+   that the narrow breakpoint and print already use. /report and /demo keep the
+   four-track default (their cells are short ids, tuned for it).
+   Scoped with :where() so the narrow-viewport folds below keep winning. */
+:where(.fee-wrap) .rpt-receipts {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+}
+:where(.fee-wrap) .rpt-rc:nth-child(odd) {
+  border-left: none;
+  padding-left: 0;
+}
 /* findings claim-value sub — mono tabular (the technical receipt value) */
 .rpt-mono-sub {
   display: block;
@@ -2235,6 +2248,14 @@ body {
   .rpt-finding,
   .rpt-verdict,
   .rpt-meta {
+    break-inside: avoid;
+  }
+  /* a rail label (VERDICT / BASIS / FINDINGS) never strands at a page foot,
+     and small sections hold together (oversize sections still break naturally) */
+  .rpt-rail {
+    break-after: avoid;
+  }
+  .rpt-sec {
     break-inside: avoid;
   }
   .rpt-head {
