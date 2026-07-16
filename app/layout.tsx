@@ -27,12 +27,22 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  // metadataBase = the Vercel deploy target (blindspot fix 2026-07-16); the
+  // OG image card + indexing posture stay owner picks — none set here.
+  metadataBase: new URL("https://curbside-commons.vercel.app"),
   title: {
     default: "Curbside Commons — deterministic commerce-truth verifier",
     template: "%s · Curbside Commons",
   },
   description:
     "The truth layer for agentic commerce — a deterministic verifier that checks a platform or AI agent's serving copy against a merchant's own records, validates data-format conformance, and audits NYC delivery fee statements, with evidence attached to every finding.",
+  openGraph: {
+    siteName: "Curbside Commons",
+    title: "Curbside Commons — the proof layer for agentic commerce",
+    description:
+      "Menu and catalog claims checked against the merchant's own record; NYC delivery fee statements audited against the codified caps — evidence attached to every finding.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -67,12 +77,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </p>
             </div>
             <nav className="site-footer-nav" aria-label="Footer">
-              <Link href="/report">Report</Link>
-              <Link href="/demo">Demo</Link>
-              <Link href="/playground">Playground</Link>
-              <Link href="/eval">Eval evidence</Link>
+              {/* The full canonical surface set, v8 voice — kept label-identical
+                  to the primary nav (the footer-completeness e2e tooth asserts
+                  every canonical surface appears here; blindspot fix 2026-07-16). */}
+              <Link href="/report">Listings report</Link>
+              <Link href="/demo">Order scene</Link>
+              <Link href="/playground">Check a feed</Link>
+              <Link href="/fees">Fee-cap audit</Link>
+              <Link href="/eval">Evidence</Link>
               <Link href="/metrics">Measurables</Link>
-              <Link href="/cost">Cost</Link>
+              <Link href="/cost">$0 cost</Link>
               <Link href="/legacy/console">Legacy</Link>
             </nav>
             <div className="site-footer-meta">

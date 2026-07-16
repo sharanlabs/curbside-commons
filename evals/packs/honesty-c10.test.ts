@@ -84,6 +84,13 @@ const siteShell = [
   join(root, "app", "playground", "page.tsx"),
   join(root, "components", "playground", "PlaygroundClient.tsx"),
   join(root, "components", "playground", "verify-in-browser.ts"),
+  // Fee surface (NYC showcase N1+N2, 2026-07-16): the /fees page + its view,
+  // paste client, data module, and browser seam — same gates.
+  join(root, "app", "fees", "page.tsx"),
+  join(root, "components", "fees", "FeesView.tsx"),
+  join(root, "components", "fees", "FeePlaygroundClient.tsx"),
+  join(root, "components", "fees", "fee-report-data.ts"),
+  join(root, "components", "fees", "audit-in-browser.ts"),
 ];
 
 const scannedFiles = [

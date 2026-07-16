@@ -16,7 +16,7 @@
  *    fallback exists and cites the committed golden's real tally.
  */
 import { describe, expect, it } from "vitest";
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import {
   SAMPLE_FEED,
@@ -132,8 +132,12 @@ describe("playground browser safety (fail-closed import-graph walk)", () => {
     if (spec.startsWith("@/")) base = join(root, spec.slice(2));
     else if (spec.startsWith(".")) base = resolve(dirname(fromFile), spec);
     else return null;
-    for (const cand of [base, `${base}.ts`, `${base}.tsx`, `${base}.json`, join(base, "index.ts")]) {
-      if (existsSync(cand)) return cand;
+    // FILE candidates only (fee-surface extension 2026-07-16): a bare `base`
+    // hit can be a DIRECTORY (a barrel import like "@/lib/packs/fees"), which
+    // the old order returned and then failed to read — resolve barrels to
+    // their index.ts and never return a directory.
+    for (const cand of [`${base}.ts`, `${base}.tsx`, `${base}.json`, join(base, "index.ts"), base]) {
+      if (existsSync(cand) && statSync(cand).isFile()) return cand;
     }
     return null;
   }
@@ -146,6 +150,21 @@ describe("playground browser safety (fail-closed import-graph walk)", () => {
       seen.add(file);
       if (file.endsWith(".json")) return;
       const src = readFileSync(file, "utf8");
+      // Batch P2 fix (2026-07-16): a dynamic import()/require() whose specifier
+      // is NOT a single quoted literal (template literal, variable, or a
+      // quoted-prefix CONCATENATION like require("node:" + x)) would slip the
+      // extraction regexes — count call sites vs FULL-literal calls and fail
+      // closed on any gap.
+      const dynCalls = (src.match(/\bimport\s*\(/g) ?? []).length;
+      const dynLiterals = (src.match(/\bimport\s*\(\s*["'][^"']*["']\s*\)/g) ?? []).length;
+      if (dynCalls > dynLiterals) {
+        offenders.push(`${file} contains a dynamic import with a non-literal specifier — fail closed`);
+      }
+      const reqCalls = (src.match(/\brequire\s*\(/g) ?? []).length;
+      const reqLiterals = (src.match(/\brequire\s*\(\s*["'][^"']*["']\s*\)/g) ?? []).length;
+      if (reqCalls > reqLiterals) {
+        offenders.push(`${file} contains a require() with a non-literal specifier — fail closed`);
+      }
       for (const spec of extractSpecifiers(src)) {
         if (NODE_BUILTINS.has(spec)) {
           offenders.push(`${file} imports the Node builtin "${spec}"`);
@@ -175,6 +194,12 @@ describe("playground browser safety (fail-closed import-graph walk)", () => {
     const { seen, offenders } = walkClosure([
       join(root, "components", "playground", "verify-in-browser.ts"),
       join(root, "components", "playground", "PlaygroundClient.tsx"),
+      // Fee surface (NYC showcase N1+N2, 2026-07-16): the fee seam + clients
+      // run in the same browser closure — same fail-closed proof.
+      join(root, "components", "fees", "audit-in-browser.ts"),
+      join(root, "components", "fees", "FeePlaygroundClient.tsx"),
+      join(root, "components", "fees", "FeesView.tsx"),
+      join(root, "components", "fees", "fee-report-data.ts"),
     ]);
     expect(offenders, offenders.join("\n")).toEqual([]);
     // Sanity: the walk actually traversed the engine, not just the seam.
@@ -199,6 +224,37 @@ describe("playground browser safety (fail-closed import-graph walk)", () => {
     const bare = extractSpecifiers('import x from "left-pad"');
     expect(bare).toContain("left-pad");
     expect(BARE_ALLOWLIST.has("left-pad")).toBe(false);
+  });
+
+  it("the non-literal-specifier catch bites (template-literal / variable imports)", () => {
+    // Mirrors the walker's FULL decision: a planted non-literal form is caught
+    // either by the call-site counting gap, or by its extracted quoted PREFIX
+    // failing the bare-specifier allowlist (fail-closed both ways).
+    const caughtByWalkRules = (planted: string): boolean => {
+      const dynCalls = (planted.match(/\bimport\s*\(/g) ?? []).length;
+      const dynLiterals = (planted.match(/\bimport\s*\(\s*["'][^"']*["']\s*\)/g) ?? []).length;
+      const reqCalls = (planted.match(/\brequire\s*\(/g) ?? []).length;
+      const reqLiterals = (planted.match(/\brequire\s*\(\s*["'][^"']*["']\s*\)/g) ?? []).length;
+      if (dynCalls > dynLiterals || reqCalls > reqLiterals) return true;
+      return extractSpecifiers(planted).some(
+        (s) =>
+          !s.startsWith("@/") &&
+          !s.startsWith(".") &&
+          !NODE_BUILTINS.has(s) &&
+          !BARE_ALLOWLIST.has(s) &&
+          !BARE_PREFIX_ALLOWLIST.some((p) => s.startsWith(p)),
+      );
+    };
+    for (const planted of [
+      "void import(`./mods/${name}`)",
+      "const m = import(modPath)",
+      'const fs = require("node:" + name)',
+      "const r = require(pathVar)",
+    ]) {
+      expect(caughtByWalkRules(planted), `non-literal specifier slipped the catch: ${planted}`).toBe(
+        true,
+      );
+    }
   });
 });
 

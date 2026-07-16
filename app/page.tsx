@@ -1,21 +1,22 @@
 import Link from "next/link";
 import { Reveal } from "@/components/landing/Reveal";
-import { CorrespondenceHero } from "@/components/landing/CorrespondenceHero";
+import { CommonsScene } from "@/components/landing/CommonsScene";
 import { EvidenceBench } from "@/components/landing/EvidenceBench";
 import { MethodRelation } from "@/components/landing/MethodRelation";
 import { CoverageTabs, type CoverageTab } from "@/components/landing/CoverageTabs";
-import { BENCH, METHOD, COVERAGE } from "@/lib/landing/specimen";
+import { BENCH, METHOD, COVERAGE, PROOF_BAR } from "@/lib/landing/specimen";
 
-// Landing — the approved "Correspondence Field" arc (docs/redesign-blueprint-2026-07-14.md,
-// authored by gpt-5.6-sol, adjudicated primary-model-final). One evidence language across
-// six chapters: Hero → 01 Evidence Bench → 02 Method → 03 Coverage → 04 Limits → Close, each
-// with a chapter accent hue (proof ember · method violet · coverage azure · limits gold). All
-// counts and specimen figures are grounded in the engine measurables via lib/landing/specimen.ts
-// (never hand-typed). Built on the B1 pure-white token system: hairlines, radii ≤6px, near-flat.
+// Landing — the v8 "commons scene" arc (design adoption 2026-07-16: the owner's
+// chosen "Curbside Commons Hero v8" sample; narrative flow drafted by gpt-5.6-sol
+// on the owner's routing word, adjudicated primary-model-final). Seven chapters:
+// Hero scene → 01 The first claim → 02 How the commons proves it (+ proof bar) →
+// 03 The listings audit → 04 The fee-cap audit → 05 The limits stay visible →
+// 06 Evidence, measured → Close. All counts and specimen figures are grounded in
+// the engine measurables via lib/landing/specimen.ts (never hand-typed).
 export const metadata = {
-  title: "Check every claim against the record",
+  title: "Dinner, ready for an agent. Proven in the commons.",
   description:
-    "Curbside Commons deterministically checks machine-readable menu and catalog claims against a merchant's own record, validates schema and protocol conformance, and audits NYC delivery fee-cap statements — with evidence attached to every finding.",
+    "Curbside Commons is a proof layer for agentic commerce: menu and catalog claims checked against the merchant's own record, delivery fee statements audited against NYC's codified caps — evidence attached to every finding.",
 };
 
 const COVERAGE_TABS: CoverageTab[] = [
@@ -32,7 +33,7 @@ const COVERAGE_TABS: CoverageTab[] = [
   {
     id: "fees",
     label: "NYC FEE-CAP",
-    body: `Evaluates delivery fee statements against ${COVERAGE.feeRulesTotal} codified rules from NYC §20-563.3: ${COVERAGE.feeExecutable} executable checks and ${COVERAGE.feeExternal} that require external evidence.`,
+    body: `Evaluates delivery fee statements against ${COVERAGE.feeRulesTotal} codified rules from NYC §20-563.3: ${COVERAGE.feeExecutable} executable checks and ${COVERAGE.feeExternal} that require external evidence. The full audit renders on the fee-cap page.`,
   },
 ];
 
@@ -62,45 +63,42 @@ const LIMITS: Array<{ id: string; title: string; body: string }> = [
 export default function Landing() {
   return (
     <main className="lp-main">
-      {/* ===== HERO — the Prismatic Passline behind centered copy ===== */}
-      <CorrespondenceHero>
-        <p className="cc-eyebrow mono">PROOF BEFORE TRUST</p>
-        <h1 id="hero-h1" className="cc-hero-title">
-          Check every claim <span className="cc-hero-lit">against the record</span>.
-        </h1>
-        <p className="cc-hero-lede">
-          Curbside Commons compares machine-readable menu and catalog claims with a merchant&rsquo;s
-          own records. It also validates data formats and audits NYC delivery fee-cap statements, with
-          evidence attached to every finding.
+      {/* ===== HERO — the commons scene (v8) ===== */}
+      <CommonsScene ctaPrimary="Watch the order scene" ctaSecondary="Inspect a held claim">
+        <p className="cs-eyebrow">
+          <span className="cs-eyebrow-dot" aria-hidden="true" />
+          THE PROOF LAYER FOR AGENTIC COMMERCE
         </p>
-        <div className="cc-hero-cta">
-          <Link className="lp-btn primary" href="#proof">
-            Inspect one claim
-          </Link>
-          <Link className="lp-btn ghost" href="#method">
-            See the method
-          </Link>
-        </div>
-      </CorrespondenceHero>
+        <h1 id="hero-h1" className="cs-h1">
+          Dinner, ready for an agent.
+          <br />
+          <span className="cs-h1-lit">Proven in the commons.</span>
+        </h1>
+        <p className="cs-lede">
+          In this illustrative order, the menu makes its claims and the kitchen keeps its own
+          record. Curbside Commons reads one against the other, forming proof an agent can consult
+          before an order is placed.
+        </p>
+      </CommonsScene>
 
-      {/* ===== 01 / EVIDENCE BENCH — ember ===== */}
+      {/* ===== 01 / THE FIRST CLAIM ===== */}
       <section
         id="proof"
         className="ds-wrap ds-section cc-chapter cc-proof"
         aria-labelledby="proof-h2"
       >
         <Reveal>
-          <p className="lp-eyebrow">01 / EVIDENCE BENCH</p>
+          <p className="lp-eyebrow">01 / THE FIRST CLAIM</p>
           <span className="lp-sec-rule" aria-hidden="true" />
           <h2 id="proof-h2" className="lp-h2">
-            See the mismatch before reading the receipt.
+            A price that cannot pass.
           </h2>
           <p className="lp-foot">
-            The machine-readable claim displays {BENCH.claim.money}. The merchant record states{" "}
-            {BENCH.record.money}. A valid structure does not make a price true — a well-formed listing
-            can still misstate the amount. The completed examination is already on the bench: the
-            value, rule, arithmetic, and record, resolved into one supported finding. Replay the
-            check to watch it resolve again.
+            The menu serves {PROOF_BAR.menuValue}. The kitchen&rsquo;s own record says{" "}
+            {PROOF_BAR.recordValue}. The commons holds the claim because it is {PROOF_BAR.factor}{" "}
+            the record — the completed examination is already on the bench: the value, rule,
+            arithmetic, and record, resolved into one supported finding. Replay the check to watch
+            it resolve again.
           </p>
         </Reveal>
         <Reveal>
@@ -108,46 +106,146 @@ export default function Landing() {
         </Reveal>
       </section>
 
-      {/* ===== 02 / METHOD — violet ===== */}
+      {/* ===== 02 / HOW THE COMMONS PROVES IT — three moves + the proof bar ===== */}
       <section
         id="method"
         className="ds-wrap ds-section cc-chapter cc-method"
         aria-labelledby="method-h2"
       >
         <Reveal>
-          <p className="lp-eyebrow">02 / METHOD</p>
+          <p className="lp-eyebrow">02 / HOW THE COMMONS PROVES IT</p>
           <span className="lp-sec-rule" aria-hidden="true" />
           <h2 id="method-h2" className="lp-h2">
-            A verdict is a relationship, not a label.
+            Three moves. No trust required.
           </h2>
+        </Reveal>
+        <Reveal>
+          <div className="tm-grid">
+            <div className="tm-card">
+              <div className="tm-card-head">
+                <svg width="30" height="30" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <rect x="11" y="6" width="26" height="36" rx="6" stroke="#4a4e5a" strokeWidth="1.9" />
+                  <path d="M17 15h14" stroke="#3d5ceb" strokeWidth="1.9" strokeLinecap="round" />
+                  <path d="M17 22h14M17 29h9" stroke="#8d919c" strokeWidth="1.9" strokeLinecap="round" />
+                </svg>
+                <span className="tm-num">01</span>
+              </div>
+              <h3 className="tm-title">The claim</h3>
+              <p className="tm-body">
+                A menu says what it offers &mdash; dishes, prices, availability. Every line is a
+                claim an agent would otherwise have to take on faith.
+              </p>
+            </div>
+            <div className="tm-card">
+              <div className="tm-card-head">
+                <svg width="30" height="30" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <path d="M10 18l3-8h22l3 8" stroke="#4a4e5a" strokeWidth="1.9" strokeLinejoin="round" />
+                  <path d="M10 18h28" stroke="#4a4e5a" strokeWidth="1.9" strokeLinecap="round" />
+                  <path d="M17 10.5V18M24 10.5V18M31 10.5V18" stroke="#3d5ceb" strokeWidth="1.5" strokeLinecap="round" opacity=".7" />
+                  <path d="M13 18v20h22V18" stroke="#4a4e5a" strokeWidth="1.9" strokeLinejoin="round" />
+                </svg>
+                <span className="tm-num">02</span>
+              </div>
+              <h3 className="tm-title">The record</h3>
+              <p className="tm-body">
+                The kitchen&rsquo;s own log answers: what is actually offered, at what price, in
+                the merchant&rsquo;s own words.
+              </p>
+            </div>
+            <div className="tm-card">
+              <div className="tm-card-head">
+                <svg width="30" height="30" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <circle cx="24" cy="24" r="16" stroke="#4a4e5a" strokeWidth="1.9" />
+                  <path d="M17.5 24.5l4.5 4.5 9-11" stroke="#2438d6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="tm-num">03</span>
+              </div>
+              <h3 className="tm-title">The proof</h3>
+              <p className="tm-body">
+                The commons reads claim against record and preserves the comparison &mdash; and
+                holds what does not agree.
+              </p>
+            </div>
+          </div>
         </Reveal>
         <Reveal>
           <MethodRelation details={METHOD} />
         </Reveal>
+        {/* The proof-object bar — every value is the real held-claim specimen. */}
+        <Reveal>
+          <div className="pb-bar" aria-label="The held claim, as a proof object">
+            <span aria-hidden="true" className="pb-dot" />
+            <code className="pb-line">
+              {PROOF_BAR.verdict} &nbsp;&middot;&nbsp; <b>THE MENU:</b> {PROOF_BAR.menuValue}{" "}
+              &nbsp;&middot;&nbsp; <i>THE KITCHEN RECORD:</i> {PROOF_BAR.recordValue}{" "}
+              &nbsp;&middot;&nbsp; CLAIM: {PROOF_BAR.factor} THE RECORD
+            </code>
+            <span className="pb-flag">{PROOF_BAR.verdict}</span>
+          </div>
+        </Reveal>
       </section>
 
-      {/* ===== 03 / MEASURED COVERAGE — azure ===== */}
+      {/* ===== 03 / THE LISTINGS AUDIT ===== */}
       <section
-        id="coverage"
+        id="listings"
         className="ds-wrap ds-section cc-chapter cc-coverage"
-        aria-labelledby="coverage-h2"
+        aria-labelledby="listings-h2"
       >
         <Reveal>
-          <p className="lp-eyebrow">03 / MEASURED COVERAGE</p>
+          <p className="lp-eyebrow">03 / THE LISTINGS AUDIT</p>
           <span className="lp-sec-rule" aria-hidden="true" />
-          <h2 id="coverage-h2" className="lp-h2">
-            Coverage is measured, not implied.
+          <h2 id="listings-h2" className="lp-h2">
+            One report. Sixteen findings.
           </h2>
           <p className="lp-foot">
-            Coverage is reported as findings, schemas, and rules — not as a broad success score.
+            The worked example ends in {COVERAGE.verdict}: {COVERAGE.errors} errors and{" "}
+            {COVERAGE.warns} warnings across {COVERAGE.findingsTotal} findings. Each finding keeps
+            the claim beside the record that answered it. The order scene follows the same evidence
+            toward an order and shows what happens when a claim is held &mdash; it is an order
+            scene, not a marketplace connection.
           </p>
-        </Reveal>
-        <Reveal>
-          <CoverageTabs tabs={COVERAGE_TABS} />
+          <div className="ch-links">
+            <Link className="lp-btn primary" href="/report">
+              Read the listings report
+            </Link>
+            <Link className="lp-btn ghost" href="/demo">
+              Follow the order scene
+            </Link>
+            <Link className="lp-btn ghost" href="/playground">
+              Check a feed in your browser
+            </Link>
+          </div>
         </Reveal>
       </section>
 
-      {/* ===== 04 / HONEST LIMITS — gold, static sticky thesis + margin notes ===== */}
+      {/* ===== 04 / THE FEE-CAP AUDIT ===== */}
+      <section
+        id="fees"
+        className="ds-wrap ds-section cc-chapter cc-fees"
+        aria-labelledby="fees-h2"
+      >
+        <Reveal>
+          <p className="lp-eyebrow">04 / THE FEE-CAP AUDIT</p>
+          <span className="lp-sec-rule" aria-hidden="true" />
+          <h2 id="fees-h2" className="lp-h2">
+            The statement, read against the law.
+          </h2>
+          <p className="lp-foot">
+            Delivery-fee statements meet {COVERAGE.feeRulesTotal} codified rules from NYC
+            Administrative Code &sect;20-563.3, with four example months showing violations, a
+            clean result, a refund that cures, and a refund window still open.{" "}
+            {COVERAGE.feeExecutable} rules can be checked from the statement itself;{" "}
+            {COVERAGE.feeExternal} require external evidence and stay honestly unresolved.
+          </p>
+          <div className="ch-links">
+            <Link className="lp-btn primary" href="/fees">
+              Open the fee-cap audit
+            </Link>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ===== 05 / THE LIMITS STAY VISIBLE ===== */}
       <section
         id="limits"
         className="ds-wrap ds-section cc-chapter cc-limits cc-limits-sec"
@@ -156,12 +254,15 @@ export default function Landing() {
         <div className="cc-limits-grid">
           <div className="cc-limits-thesis">
             <Reveal>
-              <p className="lp-eyebrow">04 / HONEST LIMITS</p>
+              <p className="lp-eyebrow">05 / THE LIMITS STAY VISIBLE</p>
               <span className="lp-sec-rule" aria-hidden="true" />
               <h2 id="limits-h2" className="lp-h2">
-                Honesty belongs in the interface.
+                Out of focus stays unresolved.
               </h2>
-              <p className="lp-foot">A useful verifier knows when to stop.</p>
+              <p className="lp-foot">
+                The audit names its limits, states its assumed fee basis, and does not claim facts
+                beyond the input. A useful verifier knows when to stop.
+              </p>
             </Reveal>
           </div>
           <Reveal as="section" className="cc-limits-notes-wrap">
@@ -185,28 +286,64 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ===== CLOSE — THE STANDARD ===== */}
+      {/* ===== 06 / EVIDENCE, MEASURED ===== */}
+      <section
+        id="coverage"
+        className="ds-wrap ds-section cc-chapter cc-evidence"
+        aria-labelledby="coverage-h2"
+      >
+        <Reveal>
+          <p className="lp-eyebrow">06 / EVIDENCE, MEASURED</p>
+          <span className="lp-sec-rule" aria-hidden="true" />
+          <h2 id="coverage-h2" className="lp-h2">
+            Every label has to be earned.
+          </h2>
+          <p className="lp-foot">
+            Coverage is reported as findings, schemas, and rules &mdash; not as a broad success
+            score. The evidence pages carry the earned labels, including an honest first-attempt
+            DEFER, beside the enforcement proofs that run for $0.
+          </p>
+        </Reveal>
+        <Reveal>
+          <CoverageTabs tabs={COVERAGE_TABS} />
+        </Reveal>
+        <Reveal>
+          <div className="ch-links">
+            <Link className="lp-btn ghost" href="/eval">
+              Evidence
+            </Link>
+            <Link className="lp-btn ghost" href="/metrics">
+              Measurables
+            </Link>
+            <Link className="lp-btn ghost" href="/cost">
+              $0 cost
+            </Link>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ===== CLOSE — PROOF BEFORE THE ORDER ===== */}
       <section
         id="close"
         className="ds-wrap ds-section cc-close"
         aria-labelledby="close-h2"
       >
         <Reveal>
-          <p className="lp-eyebrow">THE STANDARD</p>
+          <p className="lp-eyebrow">PROOF BEFORE THE ORDER</p>
           <span className="lp-sec-rule" aria-hidden="true" />
           <h2 id="close-h2" className="lp-h2">
-            Make the conclusion as inspectable as the claim.
+            Let the record have the last word.
           </h2>
           <p className="lp-foot">
-            A trustworthy finding should show its work. Read the claim, governing reference, rule,
-            and evidence, then reach the same conclusion yourself.
+            Inspect the report, follow the illustrative order scene, or supply a feed for the
+            browser audit. The result is proof an agent can consult before an order is placed.
           </p>
           <div className="cc-hero-cta cc-close-cta">
-            <Link className="lp-btn primary" href="#proof">
-              Review the proof
+            <Link className="lp-btn primary" href="/report">
+              Read the listings report
             </Link>
-            <Link className="lp-btn ghost" href="/report">
-              Open the verifier report
+            <Link className="lp-btn ghost" href="/fees">
+              Open the fee-cap audit
             </Link>
           </div>
         </Reveal>

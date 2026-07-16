@@ -19,12 +19,22 @@ export default function NotFound() {
         </li>
         <li>
           <Link href="/report" className="ds-mlink">
-            The verifier report — the copy vs the records
+            The listings report — the copy vs the records
+          </Link>
+        </li>
+        <li>
+          <Link href="/fees" className="ds-mlink">
+            The fee-cap audit — a statement read against the law
+          </Link>
+        </li>
+        <li>
+          <Link href="/playground" className="ds-mlink">
+            Check a feed — the verifier in your browser
           </Link>
         </li>
         <li>
           <Link href="/eval" className="ds-mlink">
-            The eval evidence dashboard
+            The evidence dashboard
           </Link>
         </li>
         <li>

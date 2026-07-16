@@ -15,28 +15,58 @@ test("landing tells the truth-audit story: metadata, H1, the chapter arc, the di
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  // redesign slice C-REDO — the new landing metadata title + H1 (non-honesty copy update)
-  await expect(page).toHaveTitle(/Check every claim against the record/i);
-  // the canonical H1 — the claim-vs-record headline
+  // v8 arc (design adoption 2026-07-16) — the commons-scene metadata title + H1
+  await expect(page).toHaveTitle(/Dinner, ready for an agent/i);
+  // the canonical H1 — the commons-scene headline (plain + gradient lines)
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Check every claim against the record",
+    "Dinner, ready for an agent.",
   );
-  // the six-chapter arc renders, in order (each an <h2> headline)
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Proven in the commons.",
+  );
+  // the seven-chapter arc renders, in order (each an <h2> headline)
   await expect(
-    page.getByRole("heading", { level: 2, name: "See the mismatch before reading the receipt." }),
+    page.getByRole("heading", { level: 2, name: "A price that cannot pass." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "A verdict is a relationship, not a label." }),
+    page.getByRole("heading", { level: 2, name: "Three moves. No trust required." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "Coverage is measured, not implied." }),
+    page.getByRole("heading", { level: 2, name: "One report. Sixteen findings." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "Honesty belongs in the interface." }),
+    page.getByRole("heading", { level: 2, name: "The statement, read against the law." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "Make the conclusion as inspectable as the claim." }),
+    page.getByRole("heading", { level: 2, name: "Out of focus stays unresolved." }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Every label has to be earned." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Let the record have the last word." }),
+  ).toBeVisible();
+  // the chapters render IN ORDER (batch P2: independent visibility checks let
+  // any permutation pass — assert the exact h2 sequence)
+  const h2Sequence = await page.locator("main h2").allTextContents();
+  expect(h2Sequence).toEqual([
+    "A price that cannot pass.",
+    "Three moves. No trust required.",
+    "One report. Sixteen findings.",
+    "The statement, read against the law.",
+    "Out of focus stays unresolved.",
+    "Every label has to be earned.",
+    "Let the record have the last word.",
+  ]);
+  // the proof-object bar renders the REAL held-claim specimen (no invented values)
+  const proofBar = page.locator(".pb-bar");
+  await expect(proofBar).toContainText("HOLD");
+  await expect(proofBar).toContainText("THE MENU: 2150");
+  await expect(proofBar).toContainText("THE KITCHEN RECORD: 21.50");
+  // the reduced-motion scene settles complete: order placed, proof attached
+  await expect(page.locator(".cs-status-live")).toContainText(
+    "SCENE SETTLED · ORDER PLACED WITH PROOF",
+  );
   // The Evidence Bench is a genuine deterministic computation on illustrative input.
   // Under reduced motion the examination shows its COMPLETED state immediately: the
   // grounded tally, and the resolved finding. No dev-jargon / "SIMULATED" tag.
@@ -68,6 +98,22 @@ test("landing tells the truth-audit story: metadata, H1, the chapter arc, the di
   }
   for (const banned of ["no ai was used", "actual doordash data", "production platform data"]) {
     expect(footerText, `footer must make no false claim — found "${banned}"`).not.toContain(banned);
+  }
+  // FOOTER COMPLETENESS (blindspot fix 2026-07-16): every canonical surface is
+  // enumerated in the footer nav, label-identical to the primary nav — the site
+  // chrome can never again forget a flagship surface.
+  const footerNav = page.getByRole("navigation", { name: "Footer" });
+  for (const label of [
+    "Listings report",
+    "Order scene",
+    "Check a feed",
+    "Fee-cap audit",
+    "Evidence",
+    "Measurables",
+    "$0 cost",
+    "Legacy",
+  ]) {
+    await expect(footerNav.getByRole("link", { name: label, exact: true })).toHaveCount(1);
   }
 });
 
@@ -129,6 +175,34 @@ test("landing interactions: Evidence Bench replays, Method swaps, Coverage tabs 
   await expect(page.getByRole("tabpanel")).toContainText("78 pinned official schemas");
 });
 
+test("commons scene controls: the pause control is real (WCAG 2.2.2) and zone pills toggle", async ({
+  page,
+}) => {
+  await page.goto("/");
+  // The pause/play control genuinely stops and restarts ALL motion — a
+  // label-swapping action button (no aria-pressed; batch P2 semantics fix).
+  const pause = page.getByRole("button", { name: "Pause motion" });
+  await expect(pause).toBeVisible();
+  await pause.click();
+  const play = page.getByRole("button", { name: "Play motion" });
+  await expect(play).toBeVisible();
+  await expect(page.getByRole("button", { name: "Pause motion" })).toHaveCount(0);
+  // A story CTA fired while paused runs as a pausable one-shot: the control
+  // flips to "Pause motion" during the run and can stop it mid-flight.
+  await page.getByRole("button", { name: "Inspect a held claim" }).click();
+  const pauseAgain = page.getByRole("button", { name: "Pause motion" });
+  await expect(pauseAgain).toBeVisible();
+  await pauseAgain.click();
+  await expect(page.getByRole("button", { name: "Play motion" })).toBeVisible();
+  // Zone pills highlight a part of the scene (honest aria-pressed group).
+  const zones = page.getByRole("group", { name: "Highlight a part of the scene" });
+  const commons = zones.getByRole("button", { name: "The commons" });
+  await commons.click();
+  await expect(commons).toHaveAttribute("aria-pressed", "true");
+  await commons.click();
+  await expect(commons).toHaveAttribute("aria-pressed", "false");
+});
+
 test("Coverage tabs are a keyboard-operable roving tablist (Arrow/Home/End, aria-selected/controls, panel visibility)", async ({
   page,
 }) => {
@@ -185,13 +259,16 @@ test("canonical nav = truth-engine surfaces + exactly one legacy link; every sur
   await expect(nav.getByRole("link", { name: "Console", exact: true })).toHaveCount(0);
   await expect(nav.getByRole("link", { name: "Audit", exact: true })).toHaveCount(0);
   // The canonical surfaces, each reachable with aria-current landing on it
+  // (labels: the v8 narrative voice, sol draft 2026-07-16 Fable-adjudicated;
+  // /fees joins the canonical set — NYC showcase N3).
   const surfaces: Array<[string, RegExp]> = [
-    ["Report", /What the copy says/],
-    ["Demo", /.+/],
-    ["Playground", /^Verify a serving copy in your browser$/],
-    ["Eval evidence", /^Eval evidence$/],
+    ["Listings report", /What the copy says/],
+    ["Order scene", /.+/],
+    ["Check a feed", /^Verify a serving copy in your browser$/],
+    ["Fee-cap audit", /^A fee statement, read against the law\.$/],
+    ["Evidence", /^Eval evidence$/],
     ["Measurables", /^Engine measurables$/],
-    ["Cost", /^Cost & \$0 enforcement$/],
+    ["$0 cost", /^Cost & \$0 enforcement$/],
   ];
   for (const [label, h1] of surfaces) {
     await nav.getByRole("link", { name: label, exact: true }).click();

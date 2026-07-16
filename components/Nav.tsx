@@ -7,13 +7,15 @@ import { PLATFORM_NAME } from "@/lib/product";
 
 // S5 canonical nav (owner-ratified /legacy/ split): truth-engine surfaces only,
 // plus ONE secondary link into the preserved legacy activation module.
+// Labels: the v8 narrative voice (sol draft 2026-07-16, Fable-adjudicated).
 const LINKS = [
-  { href: "/report", label: "Report" },
-  { href: "/demo", label: "Demo" },
-  { href: "/playground", label: "Playground" },
-  { href: "/eval", label: "Eval evidence" },
+  { href: "/report", label: "Listings report" },
+  { href: "/demo", label: "Order scene" },
+  { href: "/playground", label: "Check a feed" },
+  { href: "/fees", label: "Fee-cap audit" },
+  { href: "/eval", label: "Evidence" },
   { href: "/metrics", label: "Measurables" },
-  { href: "/cost", label: "Cost" },
+  { href: "/cost", label: "$0 cost" },
 ];
 
 const LEGACY_LINK = { href: "/legacy/console", label: "Legacy activation" };
@@ -63,13 +65,13 @@ export function Nav() {
           aria-current={pathname === "/" ? "page" : undefined}
           className="site-brand"
         >
-          {/* Storyboard brand mark (adoption 2026-07-15): the open C-mark on the
-              ink→cyan→iris gradient — the same family the hero title phrase
-              clips — with an iris registration bar closing the counter. Static
-              (no self-draw), so reduced-motion / no-JS render identically. */}
+          {/* v8 brand mark (design adoption 2026-07-16): two open C-arcs on the
+              ultramarine→azure→amber gradient with terminal registration dots —
+              the owner's chosen sample's mark. Static (no self-draw), so
+              reduced-motion / no-JS render identically. */}
           <svg
             className="site-brand-mark"
-            viewBox="0 0 32 32"
+            viewBox="0 0 38 32"
             fill="none"
             strokeLinecap="round"
             aria-hidden="true"
@@ -78,24 +80,33 @@ export function Nav() {
               <linearGradient
                 id="cc-brand-grad"
                 x1="4"
-                y1="28"
-                x2="28"
-                y2="4"
+                y1="4"
+                x2="36"
+                y2="28"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stopColor="#17151b" />
-                <stop offset="0.5" stopColor="#43a7ce" />
-                <stop offset="1" stopColor="#705de7" />
+                <stop stopColor="#2438d6" />
+                <stop offset="0.55" stopColor="#1f8fff" />
+                <stop offset="1" stopColor="#ffb020" />
               </linearGradient>
             </defs>
             <path
-              d="M23.5 9.5A9.6 9.6 0 1 0 23.5 22.5"
+              d="M20.8 7.2 A10.4 10.4 0 1 0 20.8 24.8"
               stroke="url(#cc-brand-grad)"
               strokeWidth="2.6"
             />
-            <path d="M20 16h7" stroke="#5746c5" strokeWidth="2.2" />
+            <path
+              d="M32.6 10.4 A8 8 0 1 0 32.6 21.6"
+              stroke="url(#cc-brand-grad)"
+              strokeWidth="2.6"
+              opacity="0.75"
+            />
+            <circle cx="20.8" cy="7.2" r="1.7" fill="#2438d6" />
+            <circle cx="32.6" cy="21.6" r="1.7" fill="#ffb020" />
           </svg>
           <span className="site-brand-word">{PLATFORM_NAME}</span>
+          <span className="site-brand-divider" aria-hidden="true" />
+          <span className="site-brand-tag">PROOF LAYER</span>
         </Link>
 
         {/* Mobile menu toggle — hidden on desktop (the menu is inline), shown

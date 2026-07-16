@@ -548,3 +548,17 @@ The same review showed that the long-form page lost its navigation after the her
 - Sharpest refutation (mine): renaming the ghost item's "simulated" title would have broken the byte-for-byte golden-equality proof that the playground runs the real engine — the title is claim DATA the frozen golden quotes; rendered receipts already reword it. The reviewer's consistency instinct was right at the surface and wrong one level down.
 - How verified: every accepted fix landed with or strengthened a machine tooth (new per-merchant dejargon pack · demo-boundary e2e · whole-run height ResizeObserver · word-boundary leak assertions after my own substring bug bit on "first"); full battery re-run at close (verify exit 0 · 19/19+19/19 · 306+5 · axe desktop zero).
 - Records: `docs/reviews/codex-2026-07-15-phaseF.md` + raw + `captures-2026-07-15-phaseF/`; seven decision-log rows; the DesignSync project "Curbside Commons" on the owner's claude.ai/design.
+
+---
+
+## 2026-07-16 — Session 18: the v8 design adoption + the NYC fee-cap showcase (one slice group)
+
+**What happened.** The owner's finalized design sample arrived mid-session ("Curbside Commons Hero v8", a Claude Design artifact) after an opening word un-gating all non-design work. The slice group landed both halves in one coherent pass: the site realigned to v8 (tokens, nav, a full React port of the hero story band, the landing rebuilt on a sol-drafted, Fable-adjudicated narrative arc) and the fee engine finally got its rendered surface (/fees + an in-browser paste leg), born directly in the final design language — the restyle-twice cost the plan feared never materialized.
+
+**Failures and catches worth keeping:**
+1. **The import-graph walker had a latent fail-crash (not fail-open) on directory barrels.** The fee seam's `@/lib/packs/fees` barrel import made the fail-closed walker return a DIRECTORY path and crash EISDIR. Fixed file-only (barrels resolve to index.ts). The listings-era walker had simply never seen a barrel import — a reminder that "proven" harnesses are proven only over the inputs they've met.
+2. **The owner's design sample failed our own accessibility floor in three places.** Axe caught the v8 quiet grays (#b7bac2 card numerals, #8d919c status text) below 4.5:1, and the CTA gradient's #1f8fff midpoint held white text at 3.27:1. All adapted (values in token comments) — the design language is the owner's; the contrast floor is the product's; both survive.
+3. **The static-capture server needed `fees.html`, not `/fees/`** — Next static export writes flat HTML; python's http.server happily rendered a directory listing into the "capture". The screenshots were re-taken and visually inspected (the standing look-at-it lesson paid again).
+4. **Copy adjudication mattered:** sol's draft used "committed record/example" in rendered copy — repo-true but display-jargon under the de-jargon bar. Reworded without losing the grounding ("the kitchen's own record", "the worked example").
+
+**Design-honesty note.** The v8 sample's proof bar carried invented values ("proof://cc-2381 … match=true"); the shipped bar renders the REAL held-claim specimen (2150 vs 21.50, HOLD, 100×) derived from the same finding the bench uses — the anti-fabrication contract extended to decoration. The hero's order story stays an illustrative scene; the lede says so, and the copy never claims the product places orders.

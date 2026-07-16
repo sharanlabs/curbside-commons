@@ -13,7 +13,8 @@
    • MATERIAL ACCENT FAMILY (storyboard adoption 2026-07-15: iris interactive ·
      ember semantic verdict · cyan/azure/saffron canvas materials) used sparingly —
      BRIGHT values for fills/marks/canvas, darkened *-text pairs (≥4.5:1) for text.
-   • Brand primary = DEEP iris (--accent/--signal #5746C5), white-on-fill 6.80:1 AA.
+   • Brand primary = ULTRAMARINE (--accent/--signal #2438d6, v8 adoption
+     2026-07-16), white-on-fill 8.04:1 AA.
    • SEVERITY triad kept (shape + word), MOTION tokens added, 8px spacing kept.
    • RADII/ELEVATION (storyboard): --r-card/--r-ctrl/--r-chip + --elev-1/2/3.
    Fonts self-host via next/font/google (app/layout.tsx): Onest → --font-sans (one
@@ -38,34 +39,33 @@
      well for hover/status. Every ink/accent ratio below is recomputed on #fff. */
   --bg: #ffffff;
   --bg-2: #fbfbfc; /* panels / cards — near-white */
-  --bg-3: #f4f2f6; /* faint tint well (nav/ghost hover, status chip) */
+  --bg-3: #f3f4f8; /* faint cool well (v8 chip ground; nav/ghost hover, status chip) */
 
-  /* ink ramp — a near-neutral cool near-black, each step VERIFIED on #ffffff
-     (standard WCAG sRGB formula; ratios are exact). Descends cleanly. */
-  --ink: #17151b; /* 18.11:1 — headings, hard marks */
-  --ink-2: #26232c; /* 15.45:1 — strong text */
-  --body: #37343d; /* 12.20:1 — body text (brief target ≈10:1; measured 12.20) */
-  --graphite: #4c4954; /* 8.79:1 — labels, values */
-  --muted: #605c68; /* 6.51:1 — secondary / 13px nav + small labels (≥4.5) */
-  --faint: #6f6b76; /* 5.20:1 — tertiary. Kept AA-safe: the two live consumers
-                       are 11px text; the brief's non-text #8A8690 (~3.56:1)
-                       would regress them, so --faint stays ≥4.5:1. */
+  /* ink ramp — the v8 cool near-black (#12141c family), each step VERIFIED on
+     #ffffff (standard WCAG sRGB formula, recomputed 2026-07-16). Descends cleanly. */
+  --ink: #12141c; /* 18.38:1 — headings, hard marks */
+  --ink-2: #22252f; /* 15.29:1 — strong text */
+  --body: #3b3f4b; /* 10.51:1 — body text */
+  --graphite: #4a4e5a; /* 8.31:1 — labels, values, icon strokes */
+  --muted: #585d69; /* 6.59:1 — secondary / 13px nav + small labels (≥4.5) */
+  --faint: #6a6e7a; /* 5.09:1 — tertiary; stays ≥4.5:1 (11px consumers) */
 
-  /* hairlines — low-alpha ink (rgb of --ink 23,21,27), darkening steps */
-  --rule: rgba(23, 21, 27, 0.09);
-  --rule-2: rgba(23, 21, 27, 0.15);
-  --rule-3: rgba(23, 21, 27, 0.24);
-  --line: rgba(23, 21, 27, 0.12); /* generic hairline (.legacy-subnav / .lp-catch
+  /* hairlines — low-alpha ink (rgb of --ink 18,20,28), darkening steps */
+  --rule: rgba(18, 20, 28, 0.09);
+  --rule-2: rgba(18, 20, 28, 0.15);
+  --rule-3: rgba(18, 20, 28, 0.24);
+  --line: rgba(18, 20, 28, 0.12); /* generic hairline (.legacy-subnav / .lp-catch
                                      consumed this undefined → currentColor before) */
 
-  /* THE brand primary — IRIS (storyboard adoption, decision-log 2026-07-15: one
-     interactive accent everywhere; ember becomes SEMANTIC verdict/finding only).
-     White text sits on --signal/--accent (nav active pill, .lp-btn.primary), so it
-     must be dark: white-on-it and it-on-white share the SAME ratio (6.80:1). */
-  --signal: #5746c5; /* fills, dots, rules, marks — 6.80:1 */
-  --signal-text: #5746c5; /* 6.80:1 on #fff — small labels / interactive text (≥4.5) */
-  --signal-tint: rgba(112, 93, 231, 0.07); /* faint held-row ground (bright-iris hue) */
-  --signal-rule: rgba(112, 93, 231, 0.24); /* hairline at signal hue */
+  /* THE brand primary — ULTRAMARINE (v8 design adoption, decision-log 2026-07-16:
+     the owner's chosen "Curbside Commons Hero v8" palette; one interactive accent
+     everywhere; ember stays SEMANTIC verdict/finding only). White text sits on
+     --signal/--accent (nav active pill, .lp-btn.primary), so it must be dark:
+     white-on-it and it-on-white share the SAME ratio (8.04:1). */
+  --signal: #2438d6; /* fills, dots, rules, marks — 8.04:1 */
+  --signal-text: #2438d6; /* 8.04:1 on #fff — small labels / interactive text (≥4.5) */
+  --signal-tint: rgba(61, 92, 235, 0.055); /* faint held-row ground (v8 accWash) */
+  --signal-rule: rgba(61, 92, 235, 0.22); /* hairline at signal hue (v8 accPillBorder) */
 
   /* spacing — 4px base (Material-adapted 8px grid rides on 8/16/24/32…) */
   --s1: 4px;
@@ -90,41 +90,41 @@
      replacing the retired single-accent Oxblood layer. Token NAMES are preserved
      for the per-surface consumer blocks; VALUES move to the new system. ==== */
 
-  /* iris ramp — the brand hue, deepest → brightest (token names kept from the
-     retired wine ramp; no surface consumes these directly). */
-  --wine-900: #43349b; /* 9.53:1 */
-  --wine-800: #4636a8; /* 8.92:1 */
-  --wine-700: #4f3fb6;
-  --wine-600: #5746c5; /* = brand deep (--accent) — 6.80:1 */
-  --wine-500: #705de7; /* = bright iris — 4.76:1 */
+  /* ultramarine ramp — the v8 brand hue, deepest → brightest (token names kept
+     from the retired wine ramp; no surface consumes these directly). */
+  --wine-900: #1e2b96; /* 11.41:1 */
+  --wine-800: #25329a; /* 10.49:1 — the v8 hover ink */
+  --wine-700: #2c3cc0; /* 8.35:1 */
+  --wine-600: #2438d6; /* = brand deep (--accent) — 8.04:1 */
+  --wine-500: #3d5ceb; /* = bright ultramarine (v8 accMid) — 5.34:1 */
 
-  /* accent aliases (the site shell reads these; = the iris brand primary) */
-  --accent: #5746c5; /* 6.80:1 — carries white text (nav active, primary btn) */
-  --accent-hi: #4636a8; /* 8.92:1 — hover / pressed (darker; white text passes) */
-  --accent-soft: rgba(112, 93, 231, 0.07);
-  --accent-line: rgba(112, 93, 231, 0.24);
+  /* accent aliases (the site shell reads these; = the ultramarine brand primary) */
+  --accent: #2438d6; /* 8.04:1 — carries white text (nav active, primary btn) */
+  --accent-hi: #25329a; /* 10.49:1 — hover / pressed (darker; white text passes) */
+  --accent-soft: rgba(61, 92, 235, 0.055);
+  --accent-line: rgba(61, 92, 235, 0.22);
 
   /* MATERIAL ACCENT FAMILY (storyboard palette, used sparingly). BRIGHT values =
      fills / marks / canvas ONLY (most fail 4.5:1 as text). For TEXT use the *-text
      pairs below. Iris = the ONE interactive accent; ember = semantic verdict/finding
      only; cyan/azure/saffron = moving canvas materials. */
-  --iris: #705de7; /* 4.76:1 — interactive marks (clears text at ≥18px too) */
-  --iris-ink: #5746c5; /* 6.80:1 — interactive text / focus rings */
-  --ember: #c94d35; /* 4.57:1 — verdict/finding fill/mark */
-  --gold: #eda52b; /* 2.10:1 — fill/mark only (saffron evidence trace) */
-  --azure: #2f86bd; /* 3.99:1 — fill/mark only (registered check) */
-  --cyan: #43a7ce; /* 2.74:1 — fill/mark only (merchant-record refraction) */
-  --violet: #705de7; /* = --iris (token name kept; interactive accent) */
-  --ember-soft: rgba(201, 77, 53, 0.07);
-  --gold-soft: rgba(237, 165, 43, 0.1);
-  --azure-soft: rgba(47, 134, 189, 0.1);
-  --violet-soft: rgba(112, 93, 231, 0.09);
-  --iris-soft: rgba(112, 93, 231, 0.06);
+  --iris: #3d5ceb; /* 5.34:1 — interactive marks (v8 accMid; clears text ≥4.5 too) */
+  --iris-ink: #2438d6; /* 8.04:1 — interactive text / focus rings (v8 accDeep) */
+  --ember: #b42318; /* 6.57:1 — verdict/finding fill/mark (the v8 hold red) */
+  --gold: #ffb020; /* 1.83:1 — fill/mark only (the v8 amber second hue) */
+  --azure: #1f8fff; /* 3.27:1 — fill/mark only (the v8 electric azure) */
+  --cyan: #93a8f7; /* 2.29:1 — fill/mark only (v8 accLight) */
+  --violet: #3d5ceb; /* = --iris (token name kept; interactive accent) */
+  --ember-soft: rgba(180, 35, 24, 0.07);
+  --gold-soft: rgba(255, 176, 32, 0.12);
+  --azure-soft: rgba(31, 143, 255, 0.1);
+  --violet-soft: rgba(61, 92, 235, 0.09);
+  --iris-soft: rgba(61, 92, 235, 0.055);
   /* DEEP text variants — contrast-darkened, each VERIFIED ≥4.5:1 on #fff */
-  --ember-text: #c0341c; /* 5.60:1 */
-  --gold-text: #7a5a0f; /* 6.37:1 (bright saffron #eda52b is 2.10:1 — unusable as text) */
-  --azure-text: #1f6e99; /* 5.60:1 (bright azure #2f86bd is 3.99:1 — unusable as text) */
-  --violet-text: #5746c5; /* 6.80:1 (= --iris-ink) */
+  --ember-text: #b42318; /* 6.57:1 */
+  --gold-text: #9c6208; /* 5.04:1 (bright amber #ffb020 is 1.83:1 — unusable as text) */
+  --azure-text: #0a45d6; /* 7.41:1 (bright azure #1f8fff is 3.27:1 — unusable as text) */
+  --violet-text: #2438d6; /* 8.04:1 (= --iris-ink) */
 
   /* severity triad — shape + word by every consuming surface, never colour alone;
      the traffic-light gestalt (red/amber/green) reads as a system distinct from the
@@ -147,16 +147,23 @@
 
   /* radii + elevation (storyboard adoption 2026-07-15) — soft cards over the
      former near-flat 6px system; shadows stay faint-on-white, three tiers. */
-  --r-card: 18px;
+  --r-card: 16px;
   --r-ctrl: 12px;
   --r-chip: 9px;
-  /* the ONE gradient (storyboard rule): the brand mark's ink→cyan→iris family,
-     text-clipped on the hero title phrase; fallback = --iris-ink (6.80:1). */
-  --grad-phrase: linear-gradient(112deg, #4f58c9, #715de7 48%, #2f86bd);
+  --r-pill: 999px; /* v8 control shape — buttons, nav pills, status chips */
+  /* the ONE gradient (v8 rule): ultramarine → electric azure → deep amber,
+     text-clipped on the hero title phrase; fallback = --iris-ink (8.04:1).
+     Display-size text only (≥26px): the azure/amber stops clear the 3:1
+     large-text bar (#1f8fff 3.27:1 · #a5650a ≈4.7:1), not the 4.5 body bar. */
+  --grad-phrase: linear-gradient(100deg, #2438d6, #1f8fff 60%, #a5650a);
+  /* CTA gradient — ADAPTED from the v8 sample: its #1f8fff midpoint holds white
+     14px text at only 3.27:1, so the mid stop deepens to #2c4ae2 (white ≥4.5:1
+     along the whole run; the shimmer read is unchanged). */
+  --grad-cta: linear-gradient(100deg, #2438d6, #2c4ae2 50%, #2438d6);
 
-  --elev-1: 0 1px 2px rgba(23, 21, 27, 0.035), 0 8px 24px rgba(23, 21, 27, 0.045);
-  --elev-2: 0 2px 7px rgba(23, 21, 27, 0.045), 0 18px 50px rgba(23, 21, 27, 0.065);
-  --elev-3: 0 3px 10px rgba(23, 21, 27, 0.045), 0 24px 72px rgba(23, 21, 27, 0.075);
+  --elev-1: 0 1px 2px rgba(18, 20, 28, 0.05), 0 8px 20px rgba(18, 20, 28, 0.05);
+  --elev-2: 0 2px 7px rgba(18, 20, 28, 0.05), 0 14px 34px rgba(18, 20, 28, 0.08);
+  --elev-3: 0 3px 10px rgba(18, 20, 28, 0.05), 0 24px 54px rgba(18, 20, 28, 0.1);
 
   /* motion — one calm Material-adapted family. --ease kept (14 consumers). */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -260,44 +267,65 @@ body {
 .site-brand-word {
   display: inline-flex;
   align-items: baseline;
+  white-space: nowrap; /* the lockup never wraps (batch P3: the 8-link nav squeezed it) */
+}
+/* Below full desktop width the 8 link pills get tighter so the row holds. */
+@media (max-width: 1320px) {
+  .site-navlink {
+    padding: 9px 10px;
+    font-size: 12.5px;
+  }
+}
+/* v8 brand lockup: hairline divider + mono "PROOF LAYER" tag beside the word. */
+.site-brand-divider {
+  width: 1px;
+  height: 15px;
+  background: #ecedf0;
+  margin: 0 2px;
+}
+.site-brand-tag {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  color: var(--faint);
+}
+@media (max-width: 1100px) {
+  .site-brand-divider,
+  .site-brand-tag {
+    display: none; /* keep the widened nav on one row below full desktop */
+  }
 }
 .site-navlink {
-  /* Storyboard nav treatment (adoption 2026-07-15): bare links, iris underline
-     that scales in on hover/focus/current — no pill container. */
+  /* v8 nav treatment (design adoption 2026-07-16): pill links inside a
+     segmented-pill container — the active surface is a raised white pill. */
   position: relative;
   font-family: var(--ff-sans);
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
+  line-height: 1;
   color: var(--muted);
   text-decoration: none;
-  padding: 8px 11px;
-  border-radius: var(--r-chip);
+  padding: 9px 14px;
+  border-radius: var(--r-pill);
   white-space: nowrap;
-  transition: color 160ms var(--ease-arrival);
-}
-.site-navlink::after {
-  content: "";
-  position: absolute;
-  left: 11px;
-  right: 11px;
-  bottom: 4px;
-  height: 1px;
-  background: var(--iris-ink);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 190ms var(--ease-enter);
+  transition:
+    color 200ms var(--ease-arrival),
+    background 200ms var(--ease-arrival),
+    box-shadow 200ms var(--ease-arrival),
+    transform 200ms var(--ease-arrival);
 }
 .site-navlink:hover {
-  color: var(--ink);
-}
-.site-navlink:hover::after,
-.site-navlink:focus-visible::after,
-.site-navlink[aria-current="page"]::after {
-  transform: scaleX(1);
+  color: var(--accent);
+  transform: translateY(-1px);
 }
 .site-navlink[aria-current="page"] {
-  color: var(--ink);
-  font-weight: 640;
+  color: var(--accent);
+  font-weight: 600;
+  background: #ffffff;
+  box-shadow:
+    0 1px 3px rgba(18, 20, 28, 0.08),
+    0 0 0 1px rgba(61, 92, 235, 0.2);
 }
 .site-navlink:focus-visible,
 .site-brand:focus-visible {
@@ -310,10 +338,15 @@ body {
    <900px (below): the hamburger shows and the menu collapses into a dropdown
    (so the nav never wraps to multiple rows on phones). */
 .site-nav-menu {
+  /* v8 segmented pill: a soft glass capsule holds the link pills. */
   display: flex;
   align-items: center;
   gap: 4px;
   margin-left: auto;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid #ecedf0;
+  border-radius: var(--r-pill);
+  padding: 4px;
 }
 .site-nav-toggle {
   display: none;
@@ -357,7 +390,10 @@ body {
     align-items: stretch;
     gap: 2px;
     margin-top: 10px;
-    padding-top: 10px;
+    padding: 10px 4px 4px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     border-top: 1px solid var(--rule);
   }
   .site-nav-menu.open .site-navlink {
@@ -1151,42 +1187,58 @@ body {
   color: var(--muted);
 }
 .lp-btn {
+  /* v8 control shape (design adoption 2026-07-16, supersedes the B-2-era ≤6px /
+     no-shadow contract by the owner's chosen sample): full-pill buttons; the
+     primary is the gradient pill whose background-position glides on hover. */
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-family: var(--ff-sans);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 550;
   letter-spacing: -0.006em;
   text-decoration: none;
-  padding: 11px 18px;
-  /* batch-F P2 fix: 8px + decorative shadows violated the recorded <=6px /
-     no-shadow-decoration contract the B-2 surfaces state — normalized. */
-  border-radius: 6px;
+  padding: 13px 26px;
+  border-radius: var(--r-pill);
   border: 1px solid transparent;
-  min-height: 44px;
+  min-height: 46px;
   cursor: pointer;
   transition:
-    transform 0.16s var(--ease),
-    background 0.16s ease,
-    border-color 0.16s ease;
+    transform 0.2s var(--ease),
+    filter 0.2s var(--ease),
+    background-position 0.5s var(--ease),
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 .lp-btn.primary {
-  background: var(--accent);
+  background: var(--grad-cta);
+  background-size: 220% 100%;
+  background-position: 0% 50%;
   color: #fff;
+  box-shadow:
+    0 1px 2px rgba(18, 20, 28, 0.08),
+    0 10px 26px rgba(61, 92, 235, 0.25);
 }
 .lp-btn.primary:hover {
-  background: var(--accent-hi);
+  background-position: 95% 50%;
+  filter: brightness(0.97);
   transform: translateY(-1px);
 }
+.lp-btn.primary:active {
+  transform: translateY(0) scale(0.985);
+}
 .lp-btn.ghost {
-  background: transparent;
-  border-color: var(--rule-2);
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: #e1e2e7;
+  color: var(--body);
 }
 .lp-btn.ghost:hover {
-  background: var(--bg-3);
-  border-color: var(--accent-line);
+  border-color: rgba(61, 92, 235, 0.45);
+  color: var(--accent);
+}
+.lp-btn.ghost:active {
+  transform: scale(0.985);
 }
 .lp-btn .lp-ic {
   transition: transform 0.16s var(--ease);
@@ -1723,12 +1775,12 @@ body {
      text-on-ink surface (banner text, verdict flag) follows automatically. Contrast
      recomputed on the pure-white #ffffff ground (standard WCAG sRGB). */
   --paper: #ffffff; /* pure-white ground + every text-on-ink surface (banner text, verdict flag) */
-  --ink: #17151b; /* near-black: headline, banner ground, verdict stamp, hard marks — 18.11:1 */
-  --body: #37343d; /* long-form body text — 12.20:1 (sitewide body ramp) */
-  --graphite: #4c4954; /* rail captions, labels, secondary mono — 8.79:1 */
-  --hairline: rgba(23, 21, 27, 0.13); /* low-alpha ink modular-grid rules (site --rule family) */
-  --um: #5746c5; /* the accent — DEEP iris (token NAME kept; storyboard adoption
-     2026-07-15, lockstep with :root --accent); --paper on --um = 6.80:1 */
+  --ink: #12141c; /* near-black: headline, banner ground, verdict stamp, hard marks — 18.38:1 */
+  --body: #3b3f4b; /* long-form body text — 10.51:1 (sitewide body ramp) */
+  --graphite: #4a4e5a; /* rail captions, labels, secondary mono — 8.31:1 */
+  --hairline: rgba(18, 20, 28, 0.13); /* low-alpha ink modular-grid rules (site --rule family) */
+  --um: #2438d6; /* the accent — ULTRAMARINE (token NAME kept; v8 design adoption
+     2026-07-16, lockstep with :root --accent); --paper on --um = 8.04:1 */
   --sev-err: #d92d20; /* 4.83:1 — kept perceptually far from the brand via shape + word */
   --sev-warn: #b54708; /* 5.43:1 — amber */
   --sev-info: #605c68; /* neutral — 6.51:1 (no info in the fixture; never a brand/alarm hue) */
@@ -3185,7 +3237,7 @@ body {
   height: 6px;
   flex: none;
   transform: rotate(45deg);
-  background: rgba(112, 93, 231, 0.5);
+  background: rgba(61, 92, 235, 0.5);
 }
 /* storyboard rule: a neutral hairline, not a chapter-hued bar */
 .cc-chapter .lp-sec-rule {
@@ -3255,7 +3307,7 @@ body {
   height: 6px;
   flex: none;
   transform: rotate(45deg);
-  background: rgba(112, 93, 231, 0.5);
+  background: rgba(61, 92, 235, 0.5);
 }
 .cc-hero-title {
   margin: 0;
@@ -4000,4 +4052,501 @@ body {
   .eb-run:active {
     transform: none;
   }
+}
+
+/* ============================================================================
+   COMMONS SCENE (v8 design adoption, 2026-07-16) — the hero story band.
+   Ported from the owner's chosen "Curbside Commons Hero v8" sample: claim and
+   record chips converge on the proof lens; a proof capsule travels to the agent
+   and the order; every fourth cycle a claim is HELD. Dynamic transforms are
+   driven by the component; this block carries the static shell, entrance
+   animations, control styling, and the reduced-motion / no-JS paths.
+   ========================================================================== */
+@keyframes cs-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cs-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes cs-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.8); }
+}
+.cs-hero {
+  min-height: calc(100vh - 68px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+}
+.cs-copy {
+  text-align: center;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: clamp(32px, 5vh, 60px) 48px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cs-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.26em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--signal-rule);
+  border-radius: var(--r-pill);
+  padding: 9px 18px;
+  animation: cs-up 0.7s var(--ease) 0.05s both;
+}
+.cs-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--iris);
+  animation: cs-pulse 2.6s ease-in-out infinite;
+}
+.cs-h1 {
+  font-size: clamp(40px, 4.2vw, 60px);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 560;
+  margin: 24px 0 0;
+  color: var(--ink);
+  text-wrap: balance;
+  animation: cs-up 0.7s var(--ease) 0.12s both;
+}
+.cs-h1-lit {
+  background: var(--grad-phrase);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@supports not (background-clip: text) {
+  .cs-h1-lit { color: var(--iris-ink); background: none; }
+}
+.cs-lede {
+  font-size: 17px;
+  line-height: 1.7;
+  font-weight: 400;
+  color: var(--muted);
+  max-width: 56ch;
+  margin: 20px 0 0;
+  text-wrap: pretty;
+  animation: cs-up 0.7s var(--ease) 0.2s both;
+}
+.cs-ctas {
+  display: flex;
+  gap: 14px;
+  margin-top: 30px;
+  animation: cs-up 0.7s var(--ease) 0.28s both;
+}
+.cs-zones {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 26px auto 0;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid #ecedf0;
+  border-radius: var(--r-pill);
+  padding: 4px;
+  width: fit-content;
+  animation: cs-fade 0.7s var(--ease) 0.34s both;
+}
+.cs-zone-btn {
+  font-family: var(--ff-sans);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 9px 16px;
+  cursor: pointer;
+  transition:
+    color 0.2s var(--ease),
+    background 0.2s var(--ease),
+    box-shadow 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+.cs-zone-btn:hover {
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+.cs-zone-btn[aria-pressed="true"] {
+  color: var(--accent);
+  background: #ffffff;
+  box-shadow:
+    0 1px 3px rgba(18, 20, 28, 0.08),
+    0 0 0 1px rgba(61, 92, 235, 0.2);
+}
+.cs-zone-btn:focus-visible,
+.cs-pause:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.cs-band {
+  flex: 1;
+  position: relative;
+  min-height: 340px;
+  perspective: 1600px;
+  animation: cs-fade 1s var(--ease) 0.3s both;
+}
+.cs-status {
+  position: absolute;
+  left: 56px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.cs-status-dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 999px;
+  transition: background 0.3s var(--ease);
+}
+.cs-status-text {
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.2em;
+}
+.cs-pause {
+  position: absolute;
+  right: 56px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ff-sans);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #ecedf0;
+  border-radius: var(--r-pill);
+  padding: 0 16px;
+  min-height: 38px;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.cs-pause:hover {
+  border-color: rgba(61, 92, 235, 0.45);
+  color: var(--accent);
+}
+.cs-station-label {
+  white-space: nowrap;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  margin-top: 8px;
+  transition: color 0.3s var(--ease);
+}
+/* Reduced motion: entrance animations settle instantly; the component itself
+   renders the completed scene (its own contract) — CSS only kills motion. */
+@media (prefers-reduced-motion: reduce) {
+  .cs-eyebrow, .cs-h1, .cs-lede, .cs-ctas, .cs-zones, .cs-band {
+    animation: none;
+  }
+  .cs-eyebrow-dot {
+    animation: none;
+  }
+}
+
+/* ----- THREE MOVES cards + PROOF-OBJECT bar (v8 adoption, 2026-07-16) ------- */
+.tm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 8px;
+}
+.tm-card {
+  background: #ffffff;
+  border: 1px solid #e7e8ed;
+  border-radius: var(--r-card);
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.tm-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(18, 20, 28, 0.08);
+}
+.tm-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tm-num {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--faint);
+}
+.tm-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0;
+}
+.tm-body {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--muted);
+  text-wrap: pretty;
+  margin: 0;
+}
+.pb-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: #12141c;
+  border-radius: 14px;
+  padding: 16px 22px;
+  overflow: hidden;
+  margin-top: 28px;
+}
+.pb-dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 999px;
+  background: #ff8f7a;
+  box-shadow: 0 0 10px rgba(255, 143, 122, 0.8);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pb-dot { animation: cs-pulse 2.2s ease-in-out infinite; }
+}
+.pb-line {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+  color: #aeb3c2; /* 8.78:1 on #12141c */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pb-line b {
+  color: #7fb0ff; /* 8.36:1 on #12141c */
+  font-weight: 500;
+}
+.pb-line i {
+  color: #ffd582; /* 13.21:1 on #12141c */
+  font-style: normal;
+}
+.pb-flag {
+  margin-left: auto;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #ff9d8a; /* ≥4.5:1 on #12141c */
+  border: 1px solid rgba(255, 157, 138, 0.35);
+  border-radius: var(--r-pill);
+  padding: 7px 12px;
+}
+/* chapter link rows (listings / fee-cap / evidence chapters) */
+.ch-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+/* ----- FEE SURFACE (NYC showcase N1+N2, 2026-07-16) — v8-language additions
+   over the shared rpt-* / pg-* systems. ------------------------------------- */
+.fee-case-plain {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: 10px 0 0;
+}
+.fee-vtag {
+  display: inline-block;
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  margin: 8px 0 0;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--rule-2);
+  color: var(--graphite);
+  background: #ffffff;
+}
+.fee-vtag.violation {
+  color: var(--ember-text);
+  border-color: rgba(180, 35, 24, 0.35);
+  background: var(--ember-soft);
+}
+.fee-vtag.cured-by-refund {
+  color: var(--ok);
+  border-color: rgba(6, 118, 71, 0.3);
+  background: var(--ok-soft);
+}
+.fee-vtag.conditional-pending-refund-window {
+  color: var(--warn-ink);
+  border-color: rgba(181, 71, 8, 0.3);
+  background: var(--warn-soft);
+}
+.fee-vtag.asserted-passthrough-unverified {
+  color: var(--azure-text);
+  border-color: rgba(31, 143, 255, 0.35);
+  background: var(--azure-soft);
+}
+.fee-provisional {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--gold-text);
+  margin: 8px 0 0;
+}
+.fee-professional {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--graphite);
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+.fee-clean {
+  font-size: 15px;
+  color: var(--ok);
+  font-weight: 550;
+}
+.fee-h2 {
+  font-family: var(--display);
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 560;
+  color: var(--ink);
+  margin: 0 0 12px;
+  text-wrap: balance;
+}
+.fee-lanes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+.fee-lane {
+  background: #ffffff;
+  border: 1px solid #e7e8ed;
+  border-radius: var(--r-card);
+  padding: 24px;
+}
+.fee-lane-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+.fee-lane-count {
+  font-family: var(--ff-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.fee-lane-external .fee-lane-count {
+  color: var(--gold-text);
+}
+.fee-rule-list,
+.fee-ext-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.fee-rule-row {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) 1fr auto;
+  gap: 4px 14px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-top: 1px solid var(--rule);
+  font-size: 13px;
+}
+.fee-rule-id {
+  font-size: 11.5px;
+  color: var(--accent);
+}
+.fee-rule-kind {
+  color: var(--graphite);
+}
+.fee-rule-clause {
+  font-size: 11.5px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+.fee-ext-row {
+  padding: 12px 0;
+  border-top: 1px solid var(--rule);
+}
+.fee-ext-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+.fee-ext-plain {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+.fee-ext-state {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--gold-text);
+  margin: 8px 0 0;
+}
+.fee-boundary-sec {
+  margin-top: 8px;
+}
+@media (max-width: 720px) {
+  .fee-rule-row {
+    grid-template-columns: 1fr;
+  }
+}
+.fee-clean-boundary {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 10px 0 0;
 }

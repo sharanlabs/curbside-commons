@@ -180,3 +180,16 @@ export const HERO_FRAGMENTS = {
   claim: `price.amount · ${raw}`, // price.amount · 2150
   record: `record · ${recordDollars}`, // record · 21.50
 } as const;
+
+/**
+ * The proof-object bar (v8 design adoption 2026-07-16) — every value REAL,
+ * read from the same price finding + SOR row as the bench specimen (the
+ * anti-fabrication contract: the bar renders the record, never invents one).
+ */
+export const PROOF_BAR = {
+  verdict: "HOLD",
+  menuValue: String(raw), // 2150 — the served bare number
+  recordValue: recordDollars, // 21.50 — the merchant's own record
+  factor: BENCH.arithmetic.factor, // 100×
+  line: `THE MENU: ${raw} · THE KITCHEN RECORD: ${recordDollars} · CLAIM: ${BENCH.arithmetic.factor} THE RECORD`,
+} as const;
