@@ -166,12 +166,13 @@ describe("determinism — the transform is pure", () => {
   });
 });
 
-describe("print fidelity — the SIMULATED banner survives print on its ink ground", () => {
-  // The report is a printable one-pager. Chrome/Safari drop background colours
-  // when printing unless color-adjust is forced exact — without it the SIMULATED
-  // banner (paper text on an ink ground) would print as invisible white-on-white,
-  // silently stripping the honesty label from a printed copy. No existing test
-  // guards this; this is the print-checklist assertion for the Ledger restyle.
+describe("print fidelity — the report's coloured marks survive print", () => {
+  // The report is a printable one-pager. Chrome/Safari drop background colours when
+  // printing unless color-adjust is forced exact — without it the verdict flag
+  // (paper text on an ink ground) and the severity marks (colour dots on tinted
+  // grounds) would print as invisible white-on-white, silently stripping meaning
+  // from a printed copy. (Freeze-reversal 2026-07-14: the .rpt-sim SIMULATED banner
+  // and its dedicated print-color-adjust assertion were removed with the banner.)
   const css = readFileSync(join(root, "app", "globals.css"), "utf8");
 
   it("globals.css keeps an @media print block", () => {
@@ -183,15 +184,13 @@ describe("print fidelity — the SIMULATED banner survives print on its ink grou
     expect(css).toMatch(/-webkit-print-color-adjust:\s*exact/);
   });
 
-  it("the .rpt-sim banner rule itself carries both color-adjust forms", () => {
-    // Scope to the banner's own rule block so moving the property OFF the banner
-    // fails the gate — not merely that the string appears somewhere in the file.
-    // Both the -webkit- prefixed form and the standard (un-prefixed) form must be
-    // present; the standard-form regex is anchored to NOT match inside the webkit
-    // string, so dropping either property from the banner turns this red.
-    const simRule = css.match(/\.rpt-sim\s*\{[^}]*\}/);
-    expect(simRule, ".rpt-sim rule block found in globals.css").not.toBeNull();
-    const block = simRule?.[0] ?? "";
+  it("the verdict-flag rule carries both color-adjust forms (its ink ground must print)", () => {
+    // Scope to the verdict flag's own rule block so moving the property OFF it fails
+    // the gate — not merely that the string appears somewhere in the file. Both the
+    // -webkit- prefixed form and the standard (un-prefixed) form must be present.
+    const flagRule = css.match(/\.rpt-verdict-flag\s*\{[^}]*\}/);
+    expect(flagRule, ".rpt-verdict-flag rule block found in globals.css").not.toBeNull();
+    const block = flagRule?.[0] ?? "";
     expect(block).toMatch(/-webkit-print-color-adjust:\s*exact/);
     expect(block).toMatch(/(?:^|[^-])print-color-adjust:\s*exact/m);
   });

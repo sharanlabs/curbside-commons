@@ -14,4 +14,4 @@ export const PLATFORM_NAME = "Curbside Commons";
 
 /** One-line honest data label, reused across surfaces. */
 export const HONEST_DATA_LABEL =
-  "The merchant names shown are FICTIONAL (no real businesses — so synthetic risk states are never attached to real people). The product's adapter ingests real DataSF public-record names (PDDL 1.0, public domain — name + category only, PII-scrubbed; see lib/ingest/sf-adapter.ts). Activation state is synthetic and illustrative. No real merchant relationship or account.";
+  "The merchant names and personas shown are invented — no real businesses, so no state is ever attached to a real person. A separate, tested adapter can ingest name and category fields from a public business registry (personal data removed) when real inputs are supplied. Activation state is illustrative. No real merchant relationship or account.";

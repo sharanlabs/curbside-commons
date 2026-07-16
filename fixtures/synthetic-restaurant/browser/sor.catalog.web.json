@@ -1,0 +1,453 @@
+{
+  "currency": "USD",
+  "asOf": "2026-07-03T00:00:00Z",
+  "items": [
+    {
+      "id": "item-001",
+      "name": "Crispy Calamari",
+      "description": "Illustrative catalog item.",
+      "category": "Appetizers",
+      "variations": [
+        {
+          "id": "item-001-v1",
+          "name": "Small",
+          "priceCents": 2150,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-001-v2",
+          "name": "Medium",
+          "priceCents": 2450,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-001-v3",
+          "name": "Large",
+          "priceCents": 2750,
+          "stock": "in_stock"
+        }
+      ],
+      "modifierLists": []
+    },
+    {
+      "id": "item-002",
+      "name": "Garden Salad",
+      "description": "Illustrative catalog item.",
+      "category": "Mains",
+      "variations": [
+        {
+          "id": "item-002-v1",
+          "name": "Small",
+          "priceCents": 2200,
+          "stock": "soldout_86"
+        },
+        {
+          "id": "item-002-v2",
+          "name": "Large",
+          "priceCents": 2500,
+          "stock": "hidden"
+        }
+      ],
+      "modifierLists": [
+        {
+          "id": "item-002-m1",
+          "name": "Add-ons",
+          "options": [
+            {
+              "id": "item-002-m1-o1",
+              "name": "Extra Cheese",
+              "priceDeltaCents": 0
+            },
+            {
+              "id": "item-002-m1-o2",
+              "name": "Avocado",
+              "priceDeltaCents": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-003",
+      "name": "Café Latte",
+      "description": "Illustrative catalog item.",
+      "category": "Sides",
+      "variations": [
+        {
+          "id": "item-003-v1",
+          "name": "Small",
+          "priceCents": 700,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-003-v2",
+          "name": "Medium",
+          "priceCents": 1000,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-003-v3",
+          "name": "Large",
+          "priceCents": 1300,
+          "stock": "in_stock"
+        }
+      ],
+      "modifierLists": [
+        {
+          "id": "item-003-m1",
+          "name": "Spice Level",
+          "options": [
+            {
+              "id": "item-003-m1-o1",
+              "name": "Mild",
+              "priceDeltaCents": 0
+            },
+            {
+              "id": "item-003-m1-o2",
+              "name": "Medium",
+              "priceDeltaCents": 50
+            },
+            {
+              "id": "item-003-m1-o3",
+              "name": "Hot",
+              "priceDeltaCents": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-004",
+      "name": "Jalapeño Poppers",
+      "description": "Illustrative catalog item.",
+      "category": "Desserts",
+      "variations": [
+        {
+          "id": "item-004-v1",
+          "name": "Small",
+          "priceCents": 2350,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-004-v2",
+          "name": "Medium",
+          "priceCents": 2650,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-004-v3",
+          "name": "Large",
+          "priceCents": 2950,
+          "stock": "in_stock"
+        }
+      ],
+      "modifierLists": [
+        {
+          "id": "item-004-m1",
+          "name": "Spice Level",
+          "options": [
+            {
+              "id": "item-004-m1-o1",
+              "name": "Mild",
+              "priceDeltaCents": 0
+            },
+            {
+              "id": "item-004-m1-o2",
+              "name": "Medium",
+              "priceDeltaCents": 50
+            },
+            {
+              "id": "item-004-m1-o3",
+              "name": "Hot",
+              "priceDeltaCents": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-005",
+      "name": "Margherita Pizza",
+      "description": "Illustrative catalog item.",
+      "category": "Drinks",
+      "variations": [
+        {
+          "id": "item-005-v1",
+          "name": "Small",
+          "priceCents": 1900,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-005-v2",
+          "name": "Medium",
+          "priceCents": 2200,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-005-v3",
+          "name": "Large",
+          "priceCents": 2500,
+          "stock": "in_stock"
+        }
+      ],
+      "modifierLists": [
+        {
+          "id": "item-005-m1",
+          "name": "Add-ons",
+          "options": [
+            {
+              "id": "item-005-m1-o1",
+              "name": "Extra Cheese",
+              "priceDeltaCents": 0
+            },
+            {
+              "id": "item-005-m1-o2",
+              "name": "Avocado",
+              "priceDeltaCents": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-006",
+      "name": "Smoked Brisket Plate",
+      "description": "Illustrative catalog item.",
+      "category": "Appetizers",
+      "variations": [
+        {
+          "id": "item-006-v1",
+          "name": "Regular",
+          "priceCents": 1000,
+          "stock": "in_stock"
+        }
+      ],
+      "modifierLists": []
+    },
+    {
+      "id": "item-007",
+      "name": "Pad Thai",
+      "description": "Illustrative catalog item.",
+      "category": "Mains",
+      "variations": [
+        {
+          "id": "item-007-v1",
+          "name": "Small",
+          "priceCents": 1700,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-007-v2",
+          "name": "Large",
+          "priceCents": 2000,
+          "stock": "hidden"
+        }
+      ],
+      "modifierLists": [
+        {
+          "id": "item-007-m1",
+          "name": "Milk",
+          "options": [
+            {
+              "id": "item-007-m1-o1",
+              "name": "Whole",
+              "priceDeltaCents": 0
+            },
+            {
+              "id": "item-007-m1-o2",
+              "name": "Oat",
+              "priceDeltaCents": 50
+            },
+            {
+              "id": "item-007-m1-o3",
+              "name": "Almond",
+              "priceDeltaCents": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-008",
+      "name": "Crème Brûlée",
+      "description": "Illustrative catalog item.",
+      "category": "Sides",
+      "variations": [
+        {
+          "id": "item-008-v1",
+          "name": "Regular",
+          "priceCents": 2100,
+          "stock": "soldout_86"
+        }
+      ],
+      "modifierLists": []
+    },
+    {
+      "id": "item-009",
+      "name": "Lemonade",
+      "description": "Illustrative catalog item.",
+      "category": "Desserts",
+      "variations": [
+        {
+          "id": "item-009-v1",
+          "name": "Small",
+          "priceCents": 1900,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-009-v2",
+          "name": "Medium",
+          "priceCents": 2200,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-009-v3",
+          "name": "Large",
+          "priceCents": 2500,
+          "stock": "in_stock"
+        }
+      ],
+      "modifierLists": [
+        {
+          "id": "item-009-m1",
+          "name": "Milk",
+          "options": [
+            {
+              "id": "item-009-m1-o1",
+              "name": "Whole",
+              "priceDeltaCents": 0
+            },
+            {
+              "id": "item-009-m1-o2",
+              "name": "Oat",
+              "priceDeltaCents": 50
+            },
+            {
+              "id": "item-009-m1-o3",
+              "name": "Almond",
+              "priceDeltaCents": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-010",
+      "name": "Truffle Fries",
+      "description": "Illustrative catalog item.",
+      "category": "Drinks",
+      "variations": [
+        {
+          "id": "item-010-v1",
+          "name": "Small",
+          "priceCents": 600,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-010-v2",
+          "name": "Large",
+          "priceCents": 900,
+          "stock": "in_stock"
+        }
+      ],
+      "modifierLists": [
+        {
+          "id": "item-010-m1",
+          "name": "Spice Level",
+          "options": [
+            {
+              "id": "item-010-m1-o1",
+              "name": "Mild",
+              "priceDeltaCents": 0
+            },
+            {
+              "id": "item-010-m1-o2",
+              "name": "Medium",
+              "priceDeltaCents": 50
+            },
+            {
+              "id": "item-010-m1-o3",
+              "name": "Hot",
+              "priceDeltaCents": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-011",
+      "name": "Bánh Mì Sandwich",
+      "description": "Illustrative catalog item.",
+      "category": "Appetizers",
+      "variations": [
+        {
+          "id": "item-011-v1",
+          "name": "Small",
+          "priceCents": 2100,
+          "stock": "in_stock"
+        },
+        {
+          "id": "item-011-v2",
+          "name": "Large",
+          "priceCents": 2400,
+          "stock": "in_stock"
+        }
+      ],
+      "modifierLists": [
+        {
+          "id": "item-011-m1",
+          "name": "Add-ons",
+          "options": [
+            {
+              "id": "item-011-m1-o1",
+              "name": "Extra Cheese",
+              "priceDeltaCents": 0
+            },
+            {
+              "id": "item-011-m1-o2",
+              "name": "Avocado",
+              "priceDeltaCents": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "item-012",
+      "name": "Açaí Bowl",
+      "description": "Illustrative catalog item.",
+      "category": "Mains",
+      "variations": [
+        {
+          "id": "item-012-v1",
+          "name": "Regular",
+          "priceCents": 1050,
+          "stock": "in_stock"
+        }
+      ],
+      "modifierLists": [
+        {
+          "id": "item-012-m1",
+          "name": "Milk",
+          "options": [
+            {
+              "id": "item-012-m1-o1",
+              "name": "Whole",
+              "priceDeltaCents": 0
+            },
+            {
+              "id": "item-012-m1-o2",
+              "name": "Oat",
+              "priceDeltaCents": 50
+            },
+            {
+              "id": "item-012-m1-o3",
+              "name": "Almond",
+              "priceDeltaCents": 100
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -202,35 +202,46 @@ describe("playground browser safety (fail-closed import-graph walk)", () => {
   });
 });
 
-describe("playground honesty labels", () => {
+describe("playground honesty labels (de-jargon Slice E — disclaimer-free + honest)", () => {
   const pageSrc = readFileSync(join(root, "app", "playground", "page.tsx"), "utf8");
   const clientSrc = readFileSync(
     join(root, "components", "playground", "PlaygroundClient.tsx"),
     "utf8",
   );
 
-  it("the page carries the simulated framing and the non-affiliation predicate", () => {
-    expect(pageSrc).toMatch(/simulated/i);
-    expect(pageSrc).toMatch(
-      /Not\s+affiliated with, endorsed by, or connected to any marketplace, POS vendor, AI company,\s+or protocol body\./,
-    );
+  // The public copy is disclaimer-free and jargon-free: the honest boundary is
+  // stated in plain product language ("illustrative"), NOT with lab-words or a
+  // non-affiliation disclaimer. These assertions are the red half — they FAIL
+  // against the pre-de-jargon copy.
+  it("the page states the honest boundary in plain, jargon-free language", () => {
+    expect(pageSrc).toMatch(/Honest boundary/);
+    expect(pageSrc).toMatch(/illustrative/i);
+    // No lab-words / removed disclaimer leak onto the public page.
+    expect(pageSrc).not.toMatch(/\bsimulated\b/i);
+    expect(pageSrc).not.toMatch(/\bsynthetic\b/i);
+    expect(pageSrc).not.toMatch(/\bgolden\b/i);
+    expect(pageSrc).not.toMatch(/Not\s+affiliated with/i);
   });
 
-  it("the page states the no-AI / no-network boundary and the synthetic-catalog boundary", () => {
+  it("the page states the no-AI / no-network boundary", () => {
     expect(pageSrc).toMatch(/No AI calls/i);
     expect(pageSrc).toMatch(/no network requests/i);
-    expect(pageSrc).toMatch(/Honest boundary/);
   });
 
-  it("the noscript fallback exists and cites the committed golden's real tally", () => {
+  it("the noscript fallback exists and cites the real tally (jargon-free, no repo path)", () => {
     expect(pageSrc).toMatch(/<noscript>/);
     expect(pageSrc).toMatch(/16 findings \(11 error \/ 5 warn\)/);
-    expect(pageSrc).toMatch(/expected-report\.acp\.json/);
+    // The internal fixture path must NOT be cited on the public page.
+    expect(pageSrc).not.toMatch(/expected-report\.acp\.json/);
+    expect(pageSrc).not.toMatch(/fixtures\//);
   });
 
-  it("the client distinguishes sample (simulated golden) from pasted (live, synthetic-catalog-checked) provenance", () => {
+  it("the client distinguishes the sample run from a pasted run, in plain language", () => {
     expect(clientSrc).toMatch(/recomputed in your browser/);
     expect(clientSrc).toMatch(/Computed in your browser just now/);
-    expect(clientSrc).toMatch(/stays labeled simulated/);
+    // pasted runs are checked against the illustrative catalog — no lab-words.
+    expect(clientSrc).toMatch(/illustrative merchant catalog/);
+    expect(clientSrc).not.toMatch(/\bsimulated\b/i);
+    expect(clientSrc).not.toMatch(/\bsynthetic\b/i);
   });
 });

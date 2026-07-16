@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getReplaySnapshot, getReplayMerchant } from "@/legacy/activation/lib/replay/run";
 import { PLATFORM_NAME, HONEST_DATA_LABEL } from "@/lib/product";
+import { dejargon } from "@/lib/legacy/display";
 import { TOTAL_STEPS } from "@/legacy/activation/lib/core/constants";
 import { DIMENSION_SPECS } from "@/legacy/activation/lib/domain/effective-rubric";
 import { Mark } from "@/components/data-surfaces/Mark";
@@ -98,7 +99,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
               <span className="ds-tag">{diagnosis.blocker_source.replace(/_/g, " ")}</span>
             </div>
             <p className="ds-card-p" style={{ marginTop: "10px" }}>
-              {diagnosis.root_cause_hypothesis}
+              {dejargon(diagnosis.root_cause_hypothesis)}
             </p>
             <div
               style={{
@@ -116,21 +117,21 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
                 {diagnosis.play.touch.replace(/_/g, " ")}
               </span>
               <p className="ds-card-p" style={{ marginTop: "6px" }}>
-                {diagnosis.play.action}
+                {dejargon(diagnosis.play.action)}
               </p>
               <p className="ds-card-tech" style={{ fontFamily: "var(--ff-sans)" }}>
-                {diagnosis.play.rationale}
+                {dejargon(diagnosis.play.rationale)}
               </p>
             </div>
             <p className="ds-gate-note" style={{ marginTop: "8px" }}>
-              {diagnosis.caveat}
+              {dejargon(diagnosis.caveat)}
             </p>
           </div>
         </Section>
 
         <Section
           title="2 · Drafted outreach"
-          plain="A bounded, schema-constrained draft. Here it's the deterministic stub (REPLAY); a recorded real-Gemini run is on the Eval page — the safety machinery around it is identical either way."
+          plain="A bounded, schema-constrained draft. Here it's the rules-based sample (a preview); a recorded model run is on the Eval page — the safety machinery around it is identical either way."
         >
           <div className="ds-draft">
             <div className="ds-draft-sub">{draft.draft_subject}</div>
@@ -153,7 +154,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
             ))}
           </ul>
           <p className="ds-meta-line">
-            mode: {rm.draftMode} · cost: ${rm.costUsd.toFixed(2)} · model: {draft.model_version}
+            mode: {dejargon(rm.draftMode)} · cost: ${rm.costUsd.toFixed(2)}
           </p>
         </Section>
 
@@ -179,7 +180,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
 
         <Section
           title="4 · Faithfulness check (semantic judge)"
-          plain="A second, independent check: an LLM from a DIFFERENT model family reads the finished message and verifies each factual sentence against the merchant's data row — catching an invented number, capability, or timeline the deterministic gatekeeper structurally can't see. Here it's the deterministic stub verdict (REPLAY, $0); the live cross-family judge (Groq gpt-oss-120b) is key-gated."
+          plain="A second, independent check: a model from a DIFFERENT model family reads the finished message and verifies each factual sentence against the merchant's data row — catching an invented number, capability, or timeline the deterministic gatekeeper structurally can't see. Here it's the rules-based sample verdict (a preview, $0); the live cross-family check runs against a hosted open model and is key-gated."
         >
           {judge ? (
             <>
@@ -212,7 +213,8 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
                 ))}
               </ul>
               <p className="ds-meta-line">
-                mode: {judge.mode} · model: {judge.modelId} · cost: ${judge.costUsd.toFixed(2)}
+                mode: {dejargon(judge.mode)} · model: {dejargon(judge.modelId)} · cost: $
+                {judge.costUsd.toFixed(2)}
                 {judge.errorClass ? ` · ${judge.errorClass}` : ""}
               </p>
             </>
@@ -225,7 +227,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
 
         <Section
           title="5 · Domain quality check (domain judge)"
-          plain="A third, independent check — on a different question than faithfulness. Not 'is every fact true?' but 'is this a GOOD activation message?' — scored against a cited rubric: matched to the merchant's real blocker · the right play for their engagement state · no over-promising. It's advisory and recall-favoring: the verdict is surfaced for the reviewer and recorded in the audit trail, but it never changes the send — eligibility and the human approval gate stay deterministic (a low-risk draft can still be simulated-sent even when flagged). Here BOTH the draft and this verdict are deterministic $0 stubs (REPLAY) — a minimal stub nudge often trips the engagement-fit check, which is the tertiary control doing its job, not the product grading its real output down; the live cross-family judge (Groq gpt-oss-120b) and the real drafter are separate and key-gated."
+          plain="A third, independent check — on a different question than faithfulness. Not 'is every fact true?' but 'is this a GOOD activation message?' — scored against a cited rubric: matched to the merchant's real blocker · the right play for their engagement state · no over-promising. It's advisory and recall-favoring: the verdict is surfaced for the reviewer and recorded in the audit trail, but it never changes the send — eligibility and the human approval gate stay deterministic (a low-risk draft can still be marked sent even when flagged). Here BOTH the draft and this verdict are deterministic $0 previews — a minimal sample nudge often trips the engagement-fit check, which is the tertiary control doing its job, not the product grading its real output down; the live cross-family check and the real drafter are separate and key-gated."
         >
           {domainJudge ? (
             <>
@@ -253,7 +255,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
                 ))}
               </ul>
               <p className="ds-meta-line">
-                mode: {domainJudge.mode} · model: {domainJudge.modelId} · cost: $
+                mode: {dejargon(domainJudge.mode)} · model: {dejargon(domainJudge.modelId)} · cost: $
                 {domainJudge.costUsd.toFixed(2)}
                 {domainJudge.errorClass ? ` · ${domainJudge.errorClass}` : ""} · advisory — does not
                 change the send decision
@@ -268,7 +270,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
 
         <Section
           title="6 · Eval / quality"
-          plain="An independent measurement of draft quality across four dimensions — the deep-AI showcase, in human terms."
+          plain="An independent measurement of draft quality across four dimensions — structure, state-consistency, policy, and no-leakage — scored by graders, not a model."
         >
           <div className="ds-grid g4" style={{ marginTop: 0 }}>
             {evalScore.results.map((r) => (
@@ -302,7 +304,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
 
         <Section
           title="7 · Human-in-the-loop gate"
-          plain="A person decides — hold, reject, or send. Low-risk, clean drafts are eligible to send (simulated); high-risk ones are held for approval."
+          plain="A person decides — hold, reject, or send. Low-risk, clean drafts are eligible to send (preview); high-risk ones are held for approval."
         >
           {m.review_required ? (
             <div>
@@ -327,7 +329,7 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
             <div>
               <p className="ds-verdict ok" style={{ fontFamily: "var(--ff-sans)", fontSize: "13px" }}>
                 <Mark name="check" />
-                Eligible by the deterministic core → <span style={{ fontWeight: 600 }}>simulated send</span>{" "}
+                Eligible by the deterministic core → <span style={{ fontWeight: 600 }}>preview send</span>{" "}
                 recorded.
               </p>
               {domainJudge?.verdict.domain_defective ? (
@@ -348,8 +350,8 @@ export default async function MerchantDetail({ params }: { params: Promise<{ id:
             {rm.audit.map((a, i) => (
               <li key={i}>
                 <span className="a-actor">{a.actor}</span>
-                <span className="a-action">{a.action}</span>
-                <span className="a-detail">{a.detail}</span>
+                <span className="a-action">{dejargon(a.action)}</span>
+                <span className="a-detail">{dejargon(a.detail)}</span>
               </li>
             ))}
           </ol>

@@ -1,27 +1,45 @@
 import demoJson from "@/fixtures/synthetic-restaurant/expected-demo.json";
 import type { DemoBeat, DemoFinding, DemoTranscript } from "@/lib/packs/listings/demo/types";
-import { DEMO_SIMULATED_BANNER, DEMO_SUBHEAD } from "@/lib/packs/listings/demo/copy";
+import { DEMO_SUBHEAD } from "@/lib/packs/listings/demo/copy";
 
 /**
- * The one-page demo walkthrough (D1; plan §5 D1, criteria C7/C10).
+ * The one-page demo walkthrough (D1; plan §5 D1, criterion C7).
  *
- * A STATIC, desktop-first page that renders the COMMITTED demo transcript
+ * A STATIC, desktop-first page that renders the bundled demo transcript
  * (fixtures/synthetic-restaurant/expected-demo.json) — exactly as the report page
- * renders committed golden reports. Zero LLM, zero network, $0: the demo-render
- * path imports no provider/LLM/fs module (proven by evals/packs/demo-blindness's
- * web import-graph scan). The honesty-critical copy (the verbatim C7 claim, the
- * actor label, the banner) is single-sourced from the demo copy module.
+ * renders its bundled reports. Zero LLM, zero network, $0: the demo-render path
+ * imports no provider/LLM/fs module (proven by evals/packs/demo-blindness's web
+ * import-graph scan).
  *
  * Two registers throughout: the plain line leads every beat, the technical detail
  * sits under it, the receipts last — legible to a nontechnical viewer with no
  * explanation.
  *
+ * Disclaimer-free (redesign Slice D, decision-log 2026-07-14): the rendered
+ * SIMULATED banner was removed. The walkthrough is a genuine deterministic
+ * computation on illustrative input — never asserted as live/real; no false claim
+ * (C10 BANNED_CLAIMS stays green). The CLI transcript keeps its honest labels.
+ *
  * Plain: shows the scripted demo as a printable one-pager — the agent trusts the
- * menu, the checker catches what the agent could not see — with the "everything
- * here is made-up test data" label impossible to miss.
+ * menu, the checker catches what the agent could not see.
  */
 
 const transcript = demoJson as unknown as DemoTranscript;
+
+// The public /demo headline. The committed transcript's own claim string is kept
+// intact in the repo (and drift-locked to the demo copy module); the WEB page shows
+// this reader-facing headline of the same mechanism — a claim checked against the record.
+const WEB_DEMO_HEADLINE =
+  "A shopping agent trusts the copy; the verifier checks it against the record.";
+
+// Display-layer copy cleanup for text drawn from the committed transcript: keep the
+// meaning, drop the internal actor tag, and render in the site's plain product voice.
+function clean(s: string): string {
+  return s
+    .replace(/\s*[—-]\s*simulated\b/gi, "")
+    .replace(/\bsimulated\b/gi, "example")
+    .replace(/\bsynthetic\b/gi, "illustrative");
+}
 
 function Receipts({ finding, index }: { finding: DemoFinding; index: number }) {
   return (
@@ -29,7 +47,7 @@ function Receipts({ finding, index }: { finding: DemoFinding; index: number }) {
       <div className="rpt-finding-lead">
         <span className="rpt-idx">{String(index + 1).padStart(2, "0")}</span>
         {/* C4: the plain-words line leads. */}
-        <p className="rpt-plain">{finding.plainLine}</p>
+        <p className="rpt-plain">{clean(finding.plainLine)}</p>
         <span className={`rpt-sev ${finding.severity}`}>{finding.severity}</span>
       </div>
       {/* C2: the four evidence fields, always visible. */}
@@ -62,23 +80,23 @@ function Receipts({ finding, index }: { finding: DemoFinding; index: number }) {
 
 function Beat({ beat, ordinal }: { beat: DemoBeat; ordinal: number }) {
   return (
-    <section className="dmo-beat" aria-label={beat.title}>
+    <section className="dmo-beat" aria-label={clean(beat.title)}>
       <div className="dmo-beat-head">
         <span className="dmo-beat-no">Beat {ordinal}</span>
-        <h2 className="dmo-beat-title">{beat.title}</h2>
+        <h2 className="dmo-beat-title">{clean(beat.title)}</h2>
       </div>
       {/* C4: the plain line leads the beat. */}
-      <p className="dmo-beat-plain">{beat.plain}</p>
+      <p className="dmo-beat-plain">{clean(beat.plain)}</p>
       <ul className="dmo-beat-lines">
         {beat.lines.map((line, i) => (
-          <li key={i}>{line}</li>
+          <li key={i}>{clean(line)}</li>
         ))}
       </ul>
       {beat.verdicts && beat.verdicts.length > 0 ? (
         <div className="dmo-verdicts">
           {beat.verdicts.map((v, i) => (
             <span key={i} className={`dmo-verdict ${v.ok ? "ok" : "flag"}`}>
-              {v.label}
+              {clean(v.label)}
             </span>
           ))}
         </div>
@@ -97,29 +115,20 @@ function Beat({ beat, ordinal }: { beat: DemoBeat; ordinal: number }) {
 export function DemoView() {
   return (
     <main className="rpt-wrap dmo-wrap" id="demo">
-      {/* C10: the SIMULATED label — unmissable, survives print. */}
-      <div className="rpt-sim" role="note">
-        <span className="rpt-sim-tag">SIMULATED</span>
-        <span className="rpt-sim-text">{DEMO_SIMULATED_BANNER}</span>
-      </div>
-
       <header className="rpt-head">
         <p className="rpt-eyebrow">Verifier demo · listings truth check</p>
-        {/* C7: the verbatim demo claim is the only headline. */}
-        <h1 className="rpt-title">{transcript.claim}</h1>
+        {/* The public headline of the demo mechanism (the committed transcript claim
+            stays in the repo, drift-locked to the demo copy module). */}
+        <h1 className="rpt-title">{WEB_DEMO_HEADLINE}</h1>
         <p className="rpt-intro">{DEMO_SUBHEAD}</p>
         <dl className="rpt-meta dmo-meta">
           <div className="rpt-mrow">
             <dt>actor</dt>
-            <dd>{transcript.actorLabel}</dd>
+            <dd>{clean(transcript.actorLabel)}</dd>
           </div>
           <div className="rpt-mrow">
             <dt>spec version</dt>
             <dd className="rpt-mono">{transcript.specVersion}</dd>
-          </div>
-          <div className="rpt-mrow">
-            <dt>data</dt>
-            <dd className="rpt-mono">simulated: {String(transcript.simulated)}</dd>
           </div>
         </dl>
       </header>
@@ -134,9 +143,10 @@ export function DemoView() {
         <p>
           The agent read only the published feed and never saw the restaurant&rsquo;s records; the
           verifier checked that same feed against those records and cited every catch with its four
-          receipts. No language model runs in this demo &mdash; the comparison is exact,
-          deterministic logic. Simulated prototype, run on demand &mdash; not a live service, no
-          real platform access. Human-led, AI-assisted, professionally reviewed.
+          receipts. The menu, the restaurant, and every record here are illustrative &mdash;
+          invented for this demonstration; no real merchant&rsquo;s data appears. No language model
+          runs in this demo &mdash; the comparison is exact, deterministic logic, and the same input
+          always produces this same walkthrough.
         </p>
       </footer>
     </main>

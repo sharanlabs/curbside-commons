@@ -44,14 +44,10 @@ export const DEMO_INTENT_TITLE = "Smoked Brisket Plate";
  */
 export const DEMO_FOIL_LINE = "passes the official schema check; still lies";
 
-/**
- * The SIMULATED banner — reused VERBATIM from the report page's honesty note so
- * the two public surfaces make the identical disclaimer (and clear the same
- * platform-claims grep-gate). Everything invented; the rules and the pinned
- * data-format standard are the only real parts.
- */
-export const DEMO_SIMULATED_BANNER =
-  "Synthetic test data — an invented restaurant, invented menu, invented prices. Not real DoorDash / Square / Uber Eats / Grubhub data, access, or business impact. The verification rules and the pinned data-format standard are real; the restaurant, its menu, and its records are invented.";
+// The former DEMO_SIMULATED_BANNER const was removed with the disclaimer-free
+// shell (decision-log 2026-07-14 freeze-reversal; dead-const cleanup 2026-07-15):
+// no surface consumed it after the banner removal, and the honest framing lives
+// in the repo docs rather than rendered copy.
 
 /** Per-beat plain-words leads (C4: the plain line leads every beat). */
 export const DEMO_BEAT = {

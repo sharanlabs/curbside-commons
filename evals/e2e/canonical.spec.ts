@@ -10,32 +10,170 @@ import { test, expect } from "@playwright/test";
  * retell + canonical nav — conscious contract rewrite, red-green 2026-07-11).
  */
 
-test("landing tells the truth-audit story: metadata, H1, the shown catch, the honesty footer", async ({
+test("landing tells the truth-audit story: metadata, H1, the chapter arc, the disclaimer-free footer", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await expect(page).toHaveTitle(/truth layer for agentic commerce/i);
-  // the canonical H1 — the serving-copy-vs-records sentence
+  // redesign slice C-REDO — the new landing metadata title + H1 (non-honesty copy update)
+  await expect(page).toHaveTitle(/Check every claim against the record/i);
+  // the canonical H1 — the claim-vs-record headline
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "checks the serving copy, line by line",
+    "Check every claim against the record",
   );
-  // the shown catch is the COMMITTED golden (verdict + tally + a real finding)
-  const catchPanel = page.getByRole("figure", {
-    name: "Two findings from the committed demo verifier report",
-  });
-  await expect(catchPanel).toBeVisible();
-  await expect(catchPanel).toContainText("FAIL");
-  await expect(catchPanel).toContainText("16 findings · 11 error / 5 warn");
-  await expect(catchPanel).toContainText("SIMULATED");
-  // S2 semantic disclosure contract — scoped to the rendered footer
+  // the six-chapter arc renders, in order (each an <h2> headline)
+  await expect(
+    page.getByRole("heading", { level: 2, name: "See the mismatch before reading the receipt." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "A verdict is a relationship, not a label." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Coverage is measured, not implied." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Honesty belongs in the interface." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Make the conclusion as inspectable as the claim." }),
+  ).toBeVisible();
+  // The Evidence Bench is a genuine deterministic computation on illustrative input.
+  // Under reduced motion the examination shows its COMPLETED state immediately: the
+  // grounded tally, and the resolved finding. No dev-jargon / "SIMULATED" tag.
+  const bench = page.locator(".eb");
+  await expect(bench).toBeVisible();
+  await expect(bench).toContainText("16 findings · 11 error · 5 warn");
+  await expect(bench).toContainText("Claim is 100× the merchant record.");
+  await expect(bench).not.toContainText(/simulated/i);
+  // The Coverage default panel grounds the FAIL verdict + the same 16/11/5 tally.
+  const coverage = page.locator("#coverage");
+  await expect(coverage).toContainText("closes at FAIL with 16 findings: 11 error and 5 warn");
+  // Freeze-reversal footer: disclaimer-free + honest (author credit present), and
+  // NONE of the removed disclaimers / real-brand names / banned false claims render.
   const footer = page.locator("footer.site-footer");
   await expect(footer).toBeVisible();
-  await expect(footer).toContainText(
-    "Not affiliated with, endorsed by, or connected to DoorDash, Uber Eats, Grubhub, DataSF, or any named business.",
-  );
-  await expect(footer).toContainText("This site initiates no sends and makes no live calls");
-  await expect(footer).toContainText("exactly one recorded, owner-armed send exists");
+  await expect(footer).toContainText("Sharan Kumar");
+  const footerText = (await footer.innerText()).toLowerCase();
+  for (const gone of [
+    "doordash",
+    "uber eats",
+    "grubhub",
+    "datasf",
+    "not affiliated",
+    "simulated data throughout",
+    "no sends",
+    "owner-armed send",
+  ]) {
+    expect(footerText, `footer should be disclaimer-free — found "${gone}"`).not.toContain(gone);
+  }
+  for (const banned of ["no ai was used", "actual doordash data", "production platform data"]) {
+    expect(footerText, `footer must make no false claim — found "${banned}"`).not.toContain(banned);
+  }
+});
+
+test("landing interactions: Evidence Bench replays, Method swaps, Coverage tabs switch", async ({
+  page,
+}) => {
+  // motion allowed (default) — the Evidence Bench OPENS COMPLETE (owner pick 2026-07-15,
+  // the storyboard's ships-done lesson: nothing opens empty). "Replay the check" re-runs
+  // the resolve with the footprint kept — zero layout shift.
+  await page.goto("/");
+
+  // 01 Evidence Bench: the settled examination is already on the table on arrival.
+  const bench = page.locator(".eb");
+  const receipt = bench.locator(".eb-receipt-plain");
+  await expect(receipt).toBeVisible();
+  await expect(receipt).toHaveText("Claim is 100× the merchant record.");
+  await expect(bench).toHaveAttribute("data-phase", "done");
+  // Replay: the run resolves again and settles back complete, with no height delta.
+  const replay = bench.getByRole("button", { name: "Replay the check" });
+  await expect(replay).toBeVisible();
+  const heightBefore = (await bench.boundingBox())!.height;
+  // Watch the WHOLE run, not just its endpoints: a ResizeObserver records every
+  // box the bench passes through across all six stage transitions, so a transient
+  // mid-stage shift cannot slip between samples (phase-F batch finding #17).
+  await bench.evaluate((el) => {
+    const w = window as unknown as { __ebHeights: number[]; __ebRO: ResizeObserver };
+    w.__ebHeights = [el.getBoundingClientRect().height];
+    w.__ebRO = new ResizeObserver(() => {
+      w.__ebHeights.push(el.getBoundingClientRect().height);
+    });
+    w.__ebRO.observe(el, { box: "border-box" });
+  });
+  await replay.click();
+  await expect(bench).toHaveAttribute("data-phase", "running");
+  await expect(bench).toHaveAttribute("data-phase", "done", { timeout: 6_000 });
+  await expect(receipt).toBeVisible();
+  const heights = await page.evaluate(() => {
+    const w = window as unknown as { __ebHeights: number[]; __ebRO: ResizeObserver };
+    w.__ebRO.disconnect();
+    return w.__ebHeights;
+  });
+  for (const h of heights) {
+    expect(Math.abs(h - heightBefore), `bench height drifted mid-replay: ${heights}`).toBeLessThanOrEqual(1);
+  }
+  const heightAfter = (await bench.boundingBox())!.height;
+  expect(Math.abs(heightAfter - heightBefore)).toBeLessThanOrEqual(1);
+
+  // 02 Method: the four words are pressable; selecting one swaps the detail panel.
+  const recordWord = page.getByRole("button", { name: "record", exact: true });
+  await recordWord.click();
+  await expect(recordWord).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".mr-panel")).toContainText("21.50");
+
+  // 03 Coverage: a proper tablist — switching tabs changes the visible panel.
+  const tablist = page.getByRole("tablist", { name: "Measured coverage lanes" });
+  const schemaTab = tablist.getByRole("tab", { name: "SCHEMA + PROTOCOL" });
+  await schemaTab.click();
+  await expect(schemaTab).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel")).toContainText("78 pinned official schemas");
+});
+
+test("Coverage tabs are a keyboard-operable roving tablist (Arrow/Home/End, aria-selected/controls, panel visibility)", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const tablist = page.getByRole("tablist", { name: "Measured coverage lanes" });
+  const tabs = tablist.getByRole("tab");
+  await expect(tabs).toHaveCount(3);
+  const first = tabs.nth(0);
+  const second = tabs.nth(1);
+  const third = tabs.nth(2);
+
+  // roving tabindex: only the selected tab is in the tab order
+  await expect(first).toHaveAttribute("aria-selected", "true");
+  await expect(first).toHaveAttribute("tabindex", "0");
+  await expect(second).toHaveAttribute("tabindex", "-1");
+
+  // aria-controls binds each tab to its tabpanel; the selected panel is visible, others hidden
+  const firstPanelId = await first.getAttribute("aria-controls");
+  const secondPanelId = await second.getAttribute("aria-controls");
+  expect(firstPanelId).toBeTruthy();
+  await expect(page.locator(`#${firstPanelId}`)).toBeVisible();
+  await expect(page.locator(`#${secondPanelId}`)).toBeHidden();
+
+  // ArrowRight moves selection AND focus together (automatic activation, roving focus)
+  await first.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(second).toBeFocused();
+  await expect(second).toHaveAttribute("aria-selected", "true");
+  await expect(second).toHaveAttribute("tabindex", "0");
+  await expect(first).toHaveAttribute("aria-selected", "false");
+  await expect(first).toHaveAttribute("tabindex", "-1");
+  await expect(page.locator(`#${secondPanelId}`)).toBeVisible();
+  await expect(page.locator(`#${firstPanelId}`)).toBeHidden();
+
+  // End → last, Home → first, ArrowLeft wraps to last
+  await page.keyboard.press("End");
+  await expect(third).toBeFocused();
+  await expect(third).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("Home");
+  await expect(first).toBeFocused();
+  await expect(first).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("ArrowLeft");
+  await expect(third).toBeFocused();
+  await expect(third).toHaveAttribute("aria-selected", "true");
 });
 
 test("canonical nav = truth-engine surfaces + exactly one legacy link; every surface reachable", async ({
@@ -80,9 +218,10 @@ test("the eval dashboard renders earned labels with visible provenance", async (
   ).toBeVisible();
   // the honest DEFER arc stays on the surface
   await expect(page.getByText("label DEFERRED", { exact: false }).first()).toBeVisible();
-  // per-figure provenance lines render (file @ sha)
+  // per-figure provenance lines render — jargon-free (no repo file paths / SHAs on the
+  // public page): every figure is shown as traced to a committed record.
   await expect(
-    page.getByText("docs/fee-classifier-recalibration-status.md", { exact: false }).first(),
+    page.getByText("Traced to a record kept in the project", { exact: false }).first(),
   ).toBeVisible();
 });
 
@@ -98,6 +237,16 @@ test("report surface toggle is keyboard-operable honest buttons (NEW-10)", async
   await page.keyboard.press("Enter");
   await expect(buttons.nth(1)).toHaveAttribute("aria-pressed", "true");
   await expect(buttons.first()).toHaveAttribute("aria-pressed", "false");
+});
+
+test("the demo states its illustrative-data boundary in rendered copy", async ({ page }) => {
+  // Phase-F batch finding #4: with the SIMULATED banner removed by the recorded
+  // freeze reversal, the demo must still SAY its records are invented — honesty
+  // lives in the rendered interface, not only in the repo.
+  await page.goto("/demo");
+  const foot = page.locator(".rpt-foot");
+  await expect(foot).toContainText("invented for this demonstration");
+  await expect(foot).toContainText("no real merchant");
 });
 
 test("old root URLs carry the tested redirect policy to /legacy/**", async ({ page }) => {

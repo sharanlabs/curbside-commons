@@ -5,14 +5,10 @@ import { Mark } from "@/components/data-surfaces/Mark";
 
 export const metadata: Metadata = { title: "Eval evidence" };
 
-/** Per-block provenance line — file + freeze SHA + event date, all from the module. */
+/** Per-block provenance line — every figure traces to a record kept in the project (the
+ *  record's exact location and freeze reference are kept in the project itself). */
 function Prov({ of }: { of: Provenance }) {
-  return (
-    <p className="ds-prov">
-      source: <span className="ds-mono">{of.file}</span> @ <span className="ds-mono">{of.frozenAt}</span>{" "}
-      ({of.date})
-    </p>
-  );
+  return <p className="ds-prov">Traced to a record kept in the project ({of.date}).</p>;
 }
 
 export default function EvalEvidencePage() {
@@ -23,21 +19,20 @@ export default function EvalEvidencePage() {
     <main className="ds-data ds-wrap ds-view">
       <h1>Eval evidence</h1>
       <p className="ds-lead plain">
-        <b>In plain terms:</b> every quality label on this site was earned by a test written down before
+        <b>In plain terms:</b> every quality label on this site was earned by a check written down before
         the run — or it isn&rsquo;t claimed. This page shows the runs behind the labels, including the
         one that fell short and was held back rather than dressed up.
       </p>
       <p className="ds-lead tech">
-        <b>Technically:</b> each figure is traced to a committed evaluation record — the recalibration
-        status doc and the frozen L-1 live matrix — and imported from a single evidence module bound to
-        those artifacts by a committed anti-fabrication test. No score is asserted from memory.
+        <b>Technically:</b> each figure traces to a record kept in the project and is recomputed from it — never
+        asserted from memory. A standing check re-derives every number from its source, so a figure
+        here cannot drift from the record behind it.
       </p>
       <div className="ds-note">
-        <b>Scale, stated plainly:</b> these gold sets are deliberately small (n=21 statement lines,
-        n=20 crew scenarios) — smoke-scale instruments held to a pre-registered standard, not
-        statistical power over real-world distributions. The discipline buys integrity, not
-        generality: bars fixed before each run, splits burned after one scoring pass, misses kept on
-        the record.
+        <b>Scale, stated plainly:</b> these evaluation sets are deliberately small — a couple dozen
+        items each — held to a standard fixed in advance, not statistical power over real-world
+        distributions. The discipline buys integrity, not generality: the bar is fixed before each
+        run, each set is scored once and then retired, and misses are kept on the record.
       </div>
 
       {/* b. fee-line classifier calibration — the honest two-run arc */}
@@ -83,8 +78,6 @@ export default function EvalEvidencePage() {
             <dd>{retry.calls}</dd>
             <dt>cost</dt>
             <dd>{retry.cost}</dd>
-            <dt>model</dt>
-            <dd>{retry.model}</dd>
           </dl>
           <div style={{ marginTop: "12px" }}>
             <span className="ds-verdict ok">
@@ -105,16 +98,16 @@ export default function EvalEvidencePage() {
       </div>
       <div className="ds-note">{CALIBRATION.scopeNote}</div>
       <p className="ds-meta-line">
-        Durable teeth: snapshot <span className="ds-mono">{CALIBRATION.snapshotFile}</span> · lock test{" "}
-        <span className="ds-mono">{CALIBRATION.lockTestFile}</span>.
+        Durable teeth: a recorded snapshot plus a standing lock hold this result in place.
       </p>
 
-      {/* c. L-1 agent crew live run — COMPUTED from the committed matrix */}
-      <h2 className="ds-h2-row">L-1 agent crew — live run</h2>
+      {/* c. assistant crew live run — COMPUTED from the committed matrix */}
+      <h2 className="ds-h2-row">Assistant crew — recorded run</h2>
       <p className="ds-lead tech" style={{ marginTop: "8px" }}>
-        A recorded live run of the four-member crew. The per-member labels below are classification
-        outcomes computed from the committed matrix, not marketing — only the two model-directed members
-        earned &ldquo;agent&rdquo;; the other two are deterministic workflows by design.
+        A recorded run of the four-member assistant crew. The per-member labels below are
+        classification outcomes computed from the record kept in the project, not marketing — only the two
+        model-directed members earned &ldquo;agent&rdquo;; the other two are deterministic workflows
+        by design.
       </p>
 
       <section className="ds-stats">
@@ -133,8 +126,7 @@ export default function EvalEvidencePage() {
       </section>
 
       <p className="ds-runline">
-        Model: <span className="ds-mono">{L1.model}</span> · started{" "}
-        <span className="ds-mono">{L1.startedAt}</span>
+        Recorded run · started <span className="ds-mono">{L1.startedAt}</span>
       </p>
       <div className="ds-tags" style={{ marginTop: "10px" }}>
         <span className={L1.allSafetyPass ? "ds-verdict ok" : "ds-verdict no"}>
@@ -175,16 +167,14 @@ export default function EvalEvidencePage() {
           </tbody>
         </table>
       </div>
-      <p className="ds-meta-line">
-        Locked by <span className="ds-mono">{L1.lockTestFile}</span>.
-      </p>
+      <p className="ds-meta-line">Locked by a standing check that re-derives this matrix from the record.</p>
       <Prov of={L1.provenance} />
 
-      {/* e. E2 RAG lane — scored 2026-07-12, floors MISSED, label deferred */}
-      <h2 className="ds-h2-row">Reference-retrieval lane (E2) — floors not met, and it says so</h2>
+      {/* e. reference-retrieval lane — scored 2026-07-12, floors MISSED, label deferred */}
+      <h2 className="ds-h2-row">Reference-retrieval lane — floors not met, and it says so</h2>
       <p className="ds-lead plain" style={{ marginTop: "8px" }}>
         <b>In plain terms:</b> we built a &ldquo;look it up and quote the rulebook&rdquo; feature, wrote
-        the passing bars in git before testing it, and it missed them. So it ships marked{" "}
+        the passing bars into the record before the scoring run, and it missed them. So it ships marked{" "}
         <b>experimental</b>, the scoreboard is published, and the simpler of the two search methods was
         kept — the fancier one didn&rsquo;t beat it.
       </p>
@@ -194,14 +184,14 @@ export default function EvalEvidencePage() {
             <span className="ds-tag role">retrieval hit-rate@5 · one pass</span>
           </div>
           <dl className="ds-ratefacts">
-            <dt>BM25 baseline</dt>
+            <dt>keyword-search baseline</dt>
             <dd>{E2.bm25M1}</dd>
-            <dt>embedding hybrid</dt>
+            <dt>richer (embedding) method</dt>
             <dd>{E2.hybridM1}</dd>
-            <dt>out-of-corpus abstained (shipped lane)</dt>
+            <dt>out-of-scope abstained (shipped method)</dt>
             <dd>{E2.bm25M4Out}</dd>
-            <dt>shipped lane</dt>
-            <dd className="ds-mono">{E2.shippedLane}</dd>
+            <dt>shipped method</dt>
+            <dd className="ds-mono">keyword search</dd>
           </dl>
           <div style={{ marginTop: "12px" }}>
             <span className="ds-verdict warn">
@@ -217,19 +207,18 @@ export default function EvalEvidencePage() {
           </div>
           <p className="ds-card-p">{E2.antiTheaterNote}.</p>
           <p className="ds-card-p">
-            The lane still ships as the advisory tool <span className="ds-mono">{E2.toolName}</span> —
-            extractive (verbatim quotes with citations, or an explicit abstention), offline, $0, and
-            labeled with its deferred status in every payload.
+            The lane still ships as {E2.toolName} — it returns verbatim quotes with citations, or an
+            explicit &ldquo;I don&rsquo;t know,&rdquo; offline and at $0, carrying its experimental
+            status in every result.
           </p>
           <p className="ds-meta-line">
-            Pre-registration: <span className="ds-mono">{E2.registrationDoc}</span> · locked by{" "}
-            <span className="ds-mono">{E2.lockTestFile}</span>.
+            The passing bars were recorded in advance, and a standing lock holds this result.
           </p>
         </section>
       </div>
 
-      {/* f. E4 entity resolution — scored 2026-07-12, one floor missed, ties baseline */}
-      <h2 className="ds-h2-row">Entity-resolution lane (E4) — the exact-match default won</h2>
+      {/* f. entity resolution — scored 2026-07-12, one floor missed, ties baseline */}
+      <h2 className="ds-h2-row">Entity-resolution lane — the exact-match default won</h2>
       <p className="ds-lead plain" style={{ marginTop: "8px" }}>
         <b>In plain terms:</b> a fuzzy name-matcher (&ldquo;FOG CITY TACOS LLC&rdquo; vs &ldquo;Fog City
         Tacos&rdquo;) was graded against bars fixed in advance. Required to <b>never</b> confuse two
@@ -251,7 +240,7 @@ export default function EvalEvidencePage() {
         </div>
         <div className="ds-stat">
           <div className="v">{E4.m4}</div>
-          <div className="l">uncertain cases sent to a human</div>
+          <div className="l">ambiguous cases returned ABSTAIN — human review required</div>
         </div>
       </section>
       <div className="ds-tags" style={{ marginTop: "10px" }}>
@@ -265,47 +254,45 @@ export default function EvalEvidencePage() {
       </p>
       <div className="ds-note">
         <b>The first exam was thrown out — by us, on the record.</b> {E4.voidedFirstRunNote}. A
-        cross-model review caught that our own corpus broke our own registered minimum; keeping the
+        cross-model review caught that our own exam set broke our own registered minimum; keeping the
         convenient number and calling the difference immaterial was the one option not available.
       </div>
       <p className="ds-meta-line">
-        Pre-registration: <span className="ds-mono">{E4.registrationDoc}</span> · locked by{" "}
-        <span className="ds-mono">{E4.lockTestFile}</span>.
+        The passing bars were recorded in advance, and a standing lock holds this result.
       </p>
       <Prov of={E4.provenance} />
 
-      {/* g. E3 approvals simulator — structural evidence, no scoring by design */}
-      <h2 className="ds-h2-row">Signed-approvals simulator (E3) — threat-model evidence</h2>
+      {/* g. approvals simulator — structural evidence, no scoring by design */}
+      <h2 className="ds-h2-row">Signed-approvals simulator — threat-model evidence</h2>
       <p className="ds-lead plain" style={{ marginTop: "8px" }}>
         <b>In plain terms:</b> the &ldquo;a human signs off before anything runs&rdquo; flow exists as a
         fully offline rehearsal: every approval is cryptographically tied to one exact case, one
-        authorized person, a short validity window, and single use — and a test suite attacks each of
-        those properties directly. Nothing in it can send a message anywhere.
+        authorized person, a short validity window, and single use — and a battery of recorded attacks
+        challenges each of those properties directly. Nothing in it can send a message anywhere.
       </p>
       <section className="ds-card flush">
         <p className="ds-card-p">{E3.what}.</p>
         <dl className="ds-ratefacts">
           <dt>verification order (frozen)</dt>
           <dd>{E3.checkOrder}</dd>
-          <dt>threat suite</dt>
-          <dd className="ds-mono">{E3.threatSuiteFile}</dd>
+          <dt>attacked directly</dt>
+          <dd>a recorded attack battery tries to forge, reuse, expire, and tamper with each approval</dd>
           <dt>cannot-send proof</dt>
-          <dd className="ds-mono">{E3.noSendProofFile}</dd>
+          <dd>a committed check proves no send path is reachable from it</dd>
         </dl>
         <p className="ds-card-p">{E3.liveNote}.</p>
         <Prov of={E3.provenance} />
       </section>
 
-      {/* h. the exposed-splits FAQ — the prepared honest answer */}
-      <h2 className="ds-h2-row">&ldquo;Why not just run it again?&rdquo; — the exposed-splits rule</h2>
+      {/* h. the one-pass FAQ — the prepared honest answer */}
+      <h2 className="ds-h2-row">&ldquo;Why not just run it again?&rdquo; — the one-pass rule</h2>
       <div className="ds-note">
-        Four evaluation splits are now <b>exposed</b>: the 2026-07-05 classifier split, the 2026-07-09
-        classifier retry split, the E2 retrieval gold set, and the E4 entity test split. An exposed
-        split can never be re-scored — once a result has been seen, a re-run stops measuring the system
-        and starts measuring our persistence. Every score above is therefore a <b>one-pass</b> result
-        against bars committed in advance, misses included; any new claim requires a fresh,
-        pre-registered split and a fresh registration row. That is also why two of the three lanes on
-        this page currently wear a &ldquo;floors not met&rdquo; label instead of a better-sounding one.
+        Four evaluation sets have now been used and their results shown. Once a set&rsquo;s results are
+        public, it is never scored again — a re-run would stop measuring the system and start measuring
+        our persistence. Every score above is therefore a <b>one-pass</b> result against bars fixed in
+        advance, misses included; any new claim requires a fresh set, fixed in advance. That is also
+        why two of the three lanes on this page currently wear a &ldquo;floors not met&rdquo; label
+        instead of a better-sounding one.
       </div>
 
       {/* d. link to the moved legacy surface */}

@@ -100,7 +100,7 @@ export const FEE_RULE_BY_ID: ReadonlyMap<string, FeeRule> = new Map(
  * fake). These need data an itemized fee statement (§20-563.3(h)) does not carry.
  */
 export const NON_STATEMENT_CHECKABLE: ReadonlyMap<string, string> = new Map([
-  ["NYC-563.3-a-3", "Delivery-service obligation (must deliver ≥1 mile). A structural service fact, not a fee number — not machine-checkable from a statement alone."],
+  ["NYC-563.3-a-3", "Delivery-service obligation (must serve customers within at least a 1-mile radius of the establishment). A structural service fact, not a fee number — not machine-checkable from a statement alone."],
   ["NYC-563.3-f-1", "Search/discoverability obligation for a paid basic service fee. A serving-surface fact, not numerically auditable from a statement."],
   ["NYC-563.3-l-1", "Commissioner fee-cap report duty (agency reporting). Context only — a city-agency obligation, never a statement fact."],
   ["NYC-563.3-g-1-iv", "Fee-change 30-day-notice rule. Requires fee-change notice records (notice_date + effective_date) that the §20-563.3(h) per-transaction itemized statement does not carry — register, do not fake."],

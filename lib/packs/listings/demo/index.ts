@@ -13,7 +13,6 @@ export {
   DEMO_CLAIM,
   DEMO_FOIL_LINE,
   DEMO_INTENT_TITLE,
-  DEMO_SIMULATED_BANNER,
   DEMO_SUBHEAD,
   DEMO_BEAT,
 } from "./copy.ts";

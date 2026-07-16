@@ -11,9 +11,9 @@ import { DemoView } from "@/components/demo/DemoView";
  * Plain: the page that plays the scripted demo as a printable one-pager.
  */
 export const metadata: Metadata = {
-  title: "Verifier demo — spec-faithful agent vs a false surface (simulated)",
+  title: "Verifier demo — a claim checked against the record",
   description:
-    "A scripted, deterministic walkthrough: a spec-faithful simulated agent follows a spec-valid but false serving copy; the verifier catches the surface/SOR mismatch. Simulated test data; zero AI calls; ends at item selection (no checkout).",
+    "A scripted, deterministic walkthrough: a shopping agent follows a spec-valid but false serving copy; the verifier checks that same copy against the merchant's records and catches the mismatch. Zero AI calls; ends at item selection (no checkout).",
 };
 
 export default function DemoPage() {

@@ -61,7 +61,8 @@ export const CALIBRATION = {
   deferRun: {
     score: "20/21",
     outcome: "label DEFERRED",
-    reason: "enhanced_service_fee recall 3/4 = 0.75 < the 0.80 floor (conjunctive rule)",
+    reason:
+      "recall for the 'enhanced_service_fee' fee category came in at 3/4 = 0.75, under the pre-registered 0.80 floor — and every floor must pass",
     date: "2026-07-05",
     provenance: CALIBRATION_DEFER_PROVENANCE,
   },
@@ -82,7 +83,7 @@ export const CALIBRATION = {
   snapshotFile: "lib/data/fee-classifier-recalibration.snapshot.json",
   lockTestFile: "evals/gold/fee-classifier-recalibration.lock.test.ts",
   scopeNote:
-    "What this claims — and all it claims: on a synthetic, simulated, n=21 fresh held-out gold set, under floors committed before the run, the live lane beat the deterministic baseline with a perfect score. It says nothing about real-world platform statements.",
+    "What this claims — and all it claims: on a small fresh held-out gold set, under floors committed before the run, the live lane beat the deterministic baseline with a perfect score. It says nothing about real-world platform statements.",
 } as const;
 
 /* --------------------------------------------------- */
@@ -187,17 +188,17 @@ export const ZERO_COST_PROOFS: ReadonlyArray<{
   {
     claim: "The verifier runtime makes no AI calls and no network calls",
     enforcedBy: "evals/crew/crew-import-walk.test.ts",
-    note: "transitive import-graph walk: no module reachable from the orchestrator matches a banned LLM/network pattern",
+    note: "an automated check follows every part the verifier can reach and confirms none can make an AI or network call",
   },
   {
-    claim: "The crew reaches the engine only through the typed tool registry",
+    claim: "The assistant crew reaches the engine only through a typed tool interface",
     enforcedBy: "evals/crew/crew-import-walk.test.ts",
-    note: "every repo-relative import from lib/crew/** targets lib/crew/** or lib/tools/** only",
+    note: "the crew can reach the engine only through the tool interface, and nothing else",
   },
   {
-    claim: "Delivery builders cannot import product modules (zero-import contract)",
+    claim: "The delivery builders cannot connect to anything (zero-connection contract)",
     enforcedBy: "evals/delivery/delivery.test.ts",
-    note: "machine-enforced module-source assertion; builders construct payloads and cannot send",
+    note: "an automated check holds the builders to zero connections — they can assemble a message but never send one",
   },
 ];
 
@@ -280,9 +281,9 @@ export const E2 = {
   bm25M4Out: `${ragSummary.bm25.metrics.m4.outAbstained}/${ragSummary.bm25.metrics.m4.outOf}`,
   goldExposed: ragSummary.goldExposed,
   antiTheaterNote:
-    "the embedding lane failed to strictly beat plain BM25 on retrieval hit-rate, so the SIMPLER lane shipped (the anti-theater clause firing is a feature)",
+    "the richer search method did not beat the simpler keyword search on retrieval accuracy, so the simpler method shipped (choosing the simpler winner is the point)",
   lockTestFile: "evals/rag/rag-results-lock.test.ts",
-  toolName: "lookup_reference (advisory; earnsLabel: false, permanent pending a fresh registration)",
+  toolName: "an advisory reference lookup — experimental, and marked so in every result",
   provenance: E2_PROVENANCE,
 } as const;
 
@@ -291,12 +292,12 @@ export const E2 = {
 /* ----------------------------------------------------------------------- */
 
 export const E3 = {
-  what: "MCP-Slack approvals lane, simulated OFFLINE: request -> Ed25519-signed human decision -> seven-check verified execution",
+  what: "An approvals flow, fully offline: a request, a cryptographically signed human decision, and a seven-check verification before anything runs",
   checkOrder:
-    "id match -> expiry (injected clock) -> nonce replay -> signer known -> role authorized -> signature over recomputed canonical bytes -> content-digest binding",
+    "id match -> expiry (injected clock) -> nonce reuse -> signer known -> role authorized -> signature over recomputed canonical bytes -> content-digest binding",
   threatSuiteFile: "evals/approvals/threat-model.test.ts",
   noSendProofFile: "evals/approvals/no-send-import-graph.test.ts",
-  liveNote: "the live interactive lane remains a future owner decision — this simulator cannot send (lib/delivery and lib/mcp are proven unreachable from it)",
+  liveNote: "a live interactive version is a future decision — this rehearsal cannot send anything, and its send paths are proven unreachable",
   provenance: {
     file: "evals/approvals/threat-model.test.ts",
     frozenAt: "7fd40c9",
@@ -322,11 +323,11 @@ export const E4 = {
   m1: `${entitySummary.ensemble.m1.truly}/${entitySummary.ensemble.m1.proposedSame}`,
   m2: `${entitySummary.ensemble.m2.sameCaught}/${entitySummary.ensemble.m2.sameTotal}`,
   m3: `${entitySummary.ensemble.m3.trapMerges}/${entitySummary.ensemble.m3.trapTotal} false merges`,
-  m4: `${entitySummary.ensemble.m4.ambigAbstained}/${entitySummary.ensemble.m4.ambigTotal} ambiguous routed to human`,
+  m4: `${entitySummary.ensemble.m4.ambigAbstained}/${entitySummary.ensemble.m4.ambigTotal} ambiguous returned ABSTAIN`,
   tiesBaselineNote:
     "the fuzzy ensemble TIED normalized-exact matching on precision/recall/traps under the hard zero-false-merge floor — so exact matching (always the protected default) is also the shipped default",
   voidedFirstRunNote:
-    "a first scoring run was VOIDED on cross-model review: its corpus carried 10 near-miss traps, violating the registration's ≥12 minimum. A non-compliant exam is not an exam — a fresh registered split (14 traps, 91 pairs) was generated and re-scored once, reaching the same conclusion",
+    "a first scoring run was VOIDED on cross-model review: its exam set carried 10 near-miss traps, violating the registration's ≥12 minimum. A non-compliant exam is not an exam — a fresh registered set (14 traps, 91 pairs) was generated and re-scored once, reaching the same conclusion",
   lockTestFile: "evals/entity/entity-results-lock.test.ts",
   provenance: E4_PROVENANCE,
 } as const;

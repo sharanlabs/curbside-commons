@@ -28,7 +28,7 @@ export default function MetricsPage() {
 
   return (
     <main className="ds-data ds-wrap ds-view">
-      <h1>Workflow metrics (simulated)</h1>
+      <h1>Workflow metrics (illustrative)</h1>
       <p className="ds-note">
         This is the legacy activation surface formerly at <span className="ds-mono">/metrics</span>;
         the truth-engine measurables now live there.
@@ -39,14 +39,14 @@ export default function MetricsPage() {
         blocking them.
       </p>
       <div className="ds-note warn">
-        Figures are <b>simulated</b> over the hybrid demo set (fictional names, synthetic activation
+        Figures are <b>illustrative</b> over the hybrid demo set (fictional names, invented activation
         state) — illustrative of the workflow, <b>not activation, revenue, or reactivation outcomes</b>.
       </div>
 
       <section className="ds-stats c4">
         {[
           { label: "Stalled merchants", value: s.merchants },
-          { label: "Simulated sent", value: s.sent },
+          { label: "Marked sent", value: s.sent },
           { label: "Held for review", value: s.held },
           { label: "Auto-rejected", value: s.rejected },
         ].map((c) => (
@@ -72,13 +72,13 @@ export default function MetricsPage() {
           <h2>Risk distribution</h2>
           <p className="ds-card-p" style={{ color: "var(--muted)", marginBottom: "14px" }}>
             High-risk merchants are held for human approval; lower-risk eligible ones can
-            simulate-send.
+            preview-send.
           </p>
           {(["High", "Medium", "Low"] as const).map((level) => (
             <Bar key={level} label={level} value={s.riskLevels[level] ?? 0} total={s.merchants} accent />
           ))}
           <dl className="ds-ratefacts">
-            <dt>Simulated send rate (of total)</dt>
+            <dt>Marked-sent rate (of total)</dt>
             <dd>{Math.round((s.sent / s.merchants) * 100)}%</dd>
             <dt>Held-for-review rate</dt>
             <dd>{Math.round((s.held / s.merchants) * 100)}%</dd>

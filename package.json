@@ -16,7 +16,7 @@
     "test:e2e": "playwright test",
     "test:e2e:artifact": "playwright test --config playwright.artifact.config.ts",
     "coverage": "vitest run --coverage",
-    "verify": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "verify": "npm run typecheck && npm run lint && npm run build && npm run test",
     "verify:full": "npm run verify && npm run test:e2e",
     "check:fixtures": "node bin/check.mjs check fixtures/synthetic-restaurant/acp-feed.drifted.json --against fixtures/synthetic-restaurant/sor.catalog.json",
     "check:fixtures:clean": "node bin/check.mjs check fixtures/synthetic-restaurant/acp-feed.faithful.json --against fixtures/synthetic-restaurant/sor.catalog.json",
@@ -30,6 +30,7 @@
     "fixtures:fees": "node scripts-ts/generate-fee-fixtures.mts",
     "fixtures:ucp": "node scripts-ts/generate-ucp-conformance-corpus.mts",
     "fixtures:demo": "node scripts-ts/generate-demo-transcript.mts",
+    "fixtures:browser": "node scripts-ts/generate-browser-fixtures.mts",
     "test:ucp-oracle": "node scripts-ts/ucp-oracle-diff.mts"
   },
   "engines": {

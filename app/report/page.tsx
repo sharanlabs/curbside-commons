@@ -12,9 +12,9 @@ import { ReportView } from "@/components/report/ReportView";
  * Plain: the page that shows the checker's result as a printable one-pager.
  */
 export const metadata: Metadata = {
-  title: "Verifier report — listings truth check (simulated)",
+  title: "Verifier report — listings truth check",
   description:
-    "A one-page, evidence-cited verifier report: a menu serving-copy checked line by line against the restaurant's own records, every catch in plain words with its receipts. Simulated test data; deterministic; zero AI calls.",
+    "A one-page, evidence-cited verifier report: a menu serving-copy checked line by line against the restaurant's own records, every catch in plain words with its receipts. Deterministic; zero AI calls.",
 };
 
 export default function ReportPage() {

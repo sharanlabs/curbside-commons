@@ -1,0 +1,96 @@
+{
+  "failures": [
+    {
+      "vp": "mobile-360",
+      "motion": "reduce",
+      "path": "/eval",
+      "violations": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": 1,
+          "help": "Scrollable region must have keyboard access",
+          "targets": [
+            [
+              ".ds-tbl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "vp": "mobile-360",
+      "motion": "no-preference",
+      "path": "/eval",
+      "violations": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": 1,
+          "help": "Scrollable region must have keyboard access",
+          "targets": [
+            [
+              ".ds-tbl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "vp": "mobile-390",
+      "motion": "reduce",
+      "path": "/eval",
+      "violations": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": 1,
+          "help": "Scrollable region must have keyboard access",
+          "targets": [
+            [
+              ".ds-tbl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "vp": "desktop-1728",
+      "motion": "no-preference",
+      "path": "/",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 24,
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "targets": [
+            [
+              "#proof-h2"
+            ],
+            [
+              ".eb-tally"
+            ],
+            [
+              ".eb-claim > .eb-money.is-lit.mono"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "overflows": [
+    {
+      "vp": "mobile-360",
+      "motion": "reduce",
+      "path": "/legacy/console",
+      "overflowPx": 29
+    },
+    {
+      "vp": "mobile-360",
+      "motion": "no-preference",
+      "path": "/legacy/console",
+      "overflowPx": 29
+    }
+  ]
+}

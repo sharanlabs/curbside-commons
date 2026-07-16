@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     default: "Legacy activation module · Curbside Commons",
   },
   description:
-    "The project's first product — a merchant onboarding & activation simulation — preserved as working lineage under /legacy/. Synthetic data, fictional merchants, replay-only.",
+    "The project's first product — a merchant onboarding & activation demonstration — preserved as working lineage under /legacy/. Illustrative data, fictional merchants, preview only.",
 };
 
 import Link from "next/link";
@@ -38,8 +38,8 @@ export default function LegacyLayout({ children }: { children: ReactNode }) {
       <div className="ds-wrap">
         <div className="ds-note warn legacy-banner" role="note">
           <b>Legacy activation module</b> — the project&rsquo;s first product (a merchant
-          onboarding &amp; activation simulation), preserved as working lineage. Synthetic
-          data, fictional merchants, replay-only. The canonical product is the{" "}
+          onboarding &amp; activation demonstration), preserved as working lineage. Illustrative
+          data, fictional merchants, preview only. The canonical product is the{" "}
           commerce-truth verifier (see the report and demo surfaces).
         </div>
         <nav aria-label="Legacy module" className="legacy-subnav">

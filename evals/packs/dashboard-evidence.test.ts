@@ -399,7 +399,7 @@ describe("E1b evidence — E2/E3/E4 figures are bound to their committed results
       `${entitySummary.ensemble.m3.trapMerges}/${entitySummary.ensemble.m3.trapTotal} false merges`,
     );
     expect(E4.m4).toBe(
-      `${entitySummary.ensemble.m4.ambigAbstained}/${entitySummary.ensemble.m4.ambigTotal} ambiguous routed to human`,
+      `${entitySummary.ensemble.m4.ambigAbstained}/${entitySummary.ensemble.m4.ambigTotal} ambiguous returned ABSTAIN`,
     );
     expect(existsSync(join(root, E4.lockTestFile))).toBe(true);
     expect(existsSync(join(root, E4.registrationDoc))).toBe(true);

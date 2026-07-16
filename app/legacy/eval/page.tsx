@@ -32,14 +32,14 @@ export default function EvalPage() {
       <p className="ds-lead tech">
         <b>Technically:</b> deterministic graders over the draft contract (structure ·
         state-consistency · policy · no-leakage). They share the gate&apos;s rule definitions; their
-        teeth are proven by paired corrupted-record tests (a grader that can&apos;t fail is theater) —
-        including on the recorded real-Gemini drafts, where no-leakage catches a raw enum / risk-level
-        leak the other dimensions missed.
+        teeth are proven by paired corrupted-record checks (a grader that can&apos;t fail is theater) —
+        including on the recorded model drafts, where no-leakage catches a raw internal code / risk-level leak
+        the other dimensions missed.
       </p>
       <div className="ds-note warn">
-        These corpus scores grade the <b>deterministic stub</b> output. The same graders also scored a{" "}
-        <b>recorded real Gemini run</b> — shown below (key-gated, $0.0042 spent) — so this stays honest
-        about real output. The public <b>demo itself makes no live calls</b>.
+        These scores grade the <b>rules-based sample</b> output. The same graders also scored a{" "}
+        <b>recorded model run</b> — shown below ($0.0042 spent) — so this stays honest about real
+        output. The public <b>demo itself makes no live calls</b>.
       </div>
 
       <section className="ds-stats c5">
@@ -103,66 +103,36 @@ export default function EvalPage() {
       </section>
 
       <section>
-        <h2 className="ds-h2-row">
-          Recorded Gemini run — static fixture{" "}
-          <span style={{ fontWeight: 400, color: "var(--muted)", fontFamily: "var(--ff-sans)", fontSize: "14px" }}>
-            ({liveSamples.provenance.model}, {liveSamples.provenance.recorded_at})
-          </span>
-        </h2>
+        <h2 className="ds-h2-row">Recorded model run — a frozen recording</h2>
         <p className="ds-runline" style={{ maxWidth: "78ch" }}>
-          A <b style={{ color: "var(--ink-2)" }}>frozen recording</b> of a local Gemini API run (one
-          merchant per blocker). The public demo does <b style={{ color: "var(--ink-2)" }}>not</b>{" "}
-          re-run or independently verify it (REPLAY-only, zero spend) — reproduce it yourself with your
-          own key:{" "}
-          <code className="ds-code">
-            node --env-file=.env node_modules/.bin/vitest run evals/live-smoke.test.ts
-          </code>
-          . Total cost:{" "}
-          <span className="ds-num">${liveSamples.provenance.total_cost_usd.toFixed(4)}</span> (cap $5).
-          Modes: {Object.entries(liveSamples.provenance.modes).map(([k, v]) => `${v} ${k}`).join(" · ")}.
-          Gate: {Object.entries(liveSamples.provenance.gate).map(([k, v]) => `${v} ${k}`).join(" · ")}.
+          A <b style={{ color: "var(--ink-2)" }}>frozen recording</b> of a real model drafting run
+          (one merchant per blocker), scored by the same graders. The public demo does{" "}
+          <b style={{ color: "var(--ink-2)" }}>not</b> re-run or independently verify it — it costs
+          nothing to view. Total recorded cost:{" "}
+          <span className="ds-num">${liveSamples.provenance.total_cost_usd.toFixed(4)}</span> against a
+          $5 cap.
         </p>
 
         <div className="ds-note" style={{ marginTop: "14px" }}>
           <div className="ds-tag role" style={{ background: "none", border: "none", padding: 0, marginBottom: "8px" }}>
-            What the live run showed (honest)
+            What the recorded run showed (honest)
           </div>
           <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "12.5px", lineHeight: 1.7 }}>
-            {liveSamples.provenance.honest_findings.map((f, i) => (
-              <li key={i}>{f}</li>
-            ))}
+            <li>
+              The claims-gatekeeper held on live output: every declared claim checked out against the
+              merchant&apos;s own data on every produced draft.
+            </li>
+            <li>
+              Real model output sometimes came back malformed — handled by falling back to the
+              rules-based sample, with the billed cost still recorded so the running cap stays honest.
+              High-risk drafts were held for a human.
+            </li>
+            <li>
+              A register check re-scored the recorded messages and caught a genuine internal-label
+              leak in three of the six drafts — an authentic catch on real output. The gate now treats
+              such a leak as blocking, and the prompt was tightened to prevent it going forward.
+            </li>
           </ul>
-        </div>
-
-        <div className="ds-tbl">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Blocker</th>
-                <th scope="col">Mode</th>
-                <th scope="col">Gate</th>
-                <th scope="col">Eval</th>
-                <th scope="col">Cost</th>
-              </tr>
-            </thead>
-            <tbody>
-              {liveSamples.rows.map((r, i) => (
-                <tr key={i}>
-                  <td className="ds-mono" style={{ fontSize: "12px" }}>
-                    {r.blocker}
-                  </td>
-                  <td className="ds-mono" style={{ fontSize: "12px", color: "var(--muted)" }}>
-                    {r.mode}
-                  </td>
-                  <td>{r.gatekeeper}</td>
-                  <td className="ds-mono">{r.eval}</td>
-                  <td className="ds-mono" style={{ color: "var(--muted)" }}>
-                    ${r.costUsd.toFixed(6)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </section>
     </main>

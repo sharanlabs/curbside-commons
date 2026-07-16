@@ -1,57 +1,73 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   Curbside Commons — "Oxblood" site design system (S1 foundation, 2026-07-08)
-   Spec: mockups/ultra-modern-2026-07-08/whole-site-gallery-v2.html (owner-picked).
+   Curbside Commons — site design system (redesign B1 foundation, 2026-07-14)
+   Spec: docs/design-brief-redesign-2026-07-14.md (owner-directed; Material-3-adapted
+   rigor, bespoke look). Supersedes the retired single-accent "Oxblood" S1 layer.
 
-   RETHEME-IN-PLACE: every :root token NAME below is preserved (layout.tsx, Nav,
-   and the landing consume them) but the VALUES are remapped to Oxblood — a premium
-   off-white ground (#FBFBFD), a warm near-black ink ramp (harmonizing with the
-   accent, not cool-gray), wine-tinted hairlines, and ONE burgundy accent (#8A2233,
-   two lightnesses of one hue). An ADDITIVE "OXBLOOD SITE LAYER (S1)" section holds
-   the site-scoped tokens (wine ramp / severity / serif / ease) and the shared shell
-   primitives (nav + footer). Fonts still self-host via next/font/google (see
-   app/layout.tsx) as --font-sans / --font-mono / --font-geist-mono.
+   RETHEME-IN-PLACE: every :root token NAME is preserved (layout.tsx, Nav, and the
+   per-surface .ds-* / .cp-* / .lp-* / .rpt-* blocks consume them by name and re-skin in
+   place) — only the VALUES change, plus additive new tokens. The new system:
+   • GROUND: pure white #FFFFFF (was off-white #FBFBFD), near-white panels.
+   • INK RAMP verified on #fff (ratios in the token comments; standard WCAG sRGB).
+   • MATERIAL ACCENT FAMILY (storyboard adoption 2026-07-15: iris interactive ·
+     ember semantic verdict · cyan/azure/saffron canvas materials) used sparingly —
+     BRIGHT values for fills/marks/canvas, darkened *-text pairs (≥4.5:1) for text.
+   • Brand primary = DEEP iris (--accent/--signal #5746C5), white-on-fill 6.80:1 AA.
+   • SEVERITY triad kept (shape + word), MOTION tokens added, 8px spacing kept.
+   • RADII/ELEVATION (storyboard): --r-card/--r-ctrl/--r-chip + --elev-1/2/3.
+   Fonts self-host via next/font/google (app/layout.tsx): Onest → --font-sans (one
+   variable rounded-sans carrying display AND body; the storyboard uses no serif —
+   the --serif/--display token NAMES survive and resolve to Onest), JetBrains Mono
+   → --font-mono (kept over the storyboard's system-mono stack for cross-OS
+   consistency; recorded adaptation).
 
-   INTENTIONALLY UNTOUCHED (byte-for-byte, superseded by later slices):
-   • the entire `.rpt-wrap` report/demo Ledger block (line ~1105 → its print block)
-     — it redefines --paper/--ink/--body/--graphite/--hairline/--um/--sev-* locally,
-     so it is insulated from these :root remaps (S3 re-skins it to Oxblood);
-   • all `.ds-*` / `.cp-*` / `.lp-*` landing rule blocks — they inherit the new token
-     VALUES (new colors, old layout = the expected hybrid until S2 supersedes them).
+   IN LOCKSTEP (insulated from :root, kept value-synced by design): the `.rpt-wrap`
+   report/demo Ledger block (~line 1522) redeclares its OWN --paper/--ink/--body/
+   --graphite/--hairline/--um/--sev-* / --serif/--ledger-* — updated to the same new
+   values below. HONESTY FREEZE-REVERSAL (redesign Slice D, decision-log 2026-07-14):
+   the footer disclosure paragraph and the .rpt-sim SIMULATED banner were REMOVED —
+   the public site is disclaimer-free (adds no false claim; C10 BANNED_CLAIMS stays
+   green). print-color-adjust: exact now rides the verdict flag + severity marks.
    ========================================================================== */
 
 :root {
   color-scheme: light;
 
-  /* ground — premium off-white (NOT pure #fff; pure white+black is an AI-median
-     tell). Warm-neutral steps down. */
-  --bg: #fbfbfd;
-  --bg-2: #f8f7f8;
-  --bg-3: #f5f3f4;
+  /* ground — a PURE-WHITE gallery (#fff), near-white panel + one faint neutral
+     well for hover/status. Every ink/accent ratio below is recomputed on #fff. */
+  --bg: #ffffff;
+  --bg-2: #fbfbfc; /* panels / cards — near-white */
+  --bg-3: #f4f2f6; /* faint tint well (nav/ghost hover, status chip) */
 
-  /* ink + graphite structure — a WARM near-black ramp (R>G>B), harmonizing with
-     the wine accent. Contrast recomputed on the #fbfbfd ground; every step clears
-     the prior cool-gray token's documented ratio. */
-  --ink: #1a1712; /* 17.29:1 — headings, hard marks */
-  --ink-2: #2e2825; /* 14.05:1 — strong text */
-  --body: #423b38; /* 10.61:1 — body text (spec #463f3c was 9.98:1, darkened to clear ≥10:1) */
-  --graphite: #564d48; /* 7.97:1 — labels, values (≥ old 7.72) */
-  --muted: #615750; /* 6.80:1 — secondary mono (≥ old 6.50) */
-  --faint: #6d635b; /* 5.67:1 — non-essential ≥13px (≥ old 5.16) */
+  /* ink ramp — a near-neutral cool near-black, each step VERIFIED on #ffffff
+     (standard WCAG sRGB formula; ratios are exact). Descends cleanly. */
+  --ink: #17151b; /* 18.11:1 — headings, hard marks */
+  --ink-2: #26232c; /* 15.45:1 — strong text */
+  --body: #37343d; /* 12.20:1 — body text (brief target ≈10:1; measured 12.20) */
+  --graphite: #4c4954; /* 8.79:1 — labels, values */
+  --muted: #605c68; /* 6.51:1 — secondary / 13px nav + small labels (≥4.5) */
+  --faint: #6f6b76; /* 5.20:1 — tertiary. Kept AA-safe: the two live consumers
+                       are 11px text; the brief's non-text #8A8690 (~3.56:1)
+                       would regress them, so --faint stays ≥4.5:1. */
 
-  /* hairlines — wine-tinted (rgba of the wine-900 hue), darkening steps */
-  --rule: rgba(74, 14, 26, 0.1);
-  --rule-2: rgba(74, 14, 26, 0.17);
-  --rule-3: rgba(74, 14, 26, 0.26);
+  /* hairlines — low-alpha ink (rgb of --ink 23,21,27), darkening steps */
+  --rule: rgba(23, 21, 27, 0.09);
+  --rule-2: rgba(23, 21, 27, 0.15);
+  --rule-3: rgba(23, 21, 27, 0.24);
+  --line: rgba(23, 21, 27, 0.12); /* generic hairline (.legacy-subnav / .lp-catch
+                                     consumed this undefined → currentColor before) */
 
-  /* THE single accent — burgundy / oxblood, two lightnesses of one hue */
-  --signal: #8a2233; /* fills, dots, rules, marks */
-  --signal-text: #8a2233; /* 8.62:1 on #fbfbfd — small labels / verdicts (≥4.5) */
-  --signal-tint: rgba(138, 34, 51, 0.07); /* faint held-row ground */
-  --signal-rule: rgba(138, 34, 51, 0.24); /* hairline at signal hue */
+  /* THE brand primary — IRIS (storyboard adoption, decision-log 2026-07-15: one
+     interactive accent everywhere; ember becomes SEMANTIC verdict/finding only).
+     White text sits on --signal/--accent (nav active pill, .lp-btn.primary), so it
+     must be dark: white-on-it and it-on-white share the SAME ratio (6.80:1). */
+  --signal: #5746c5; /* fills, dots, rules, marks — 6.80:1 */
+  --signal-text: #5746c5; /* 6.80:1 on #fff — small labels / interactive text (≥4.5) */
+  --signal-tint: rgba(112, 93, 231, 0.07); /* faint held-row ground (bright-iris hue) */
+  --signal-rule: rgba(112, 93, 231, 0.24); /* hairline at signal hue */
 
-  /* spacing — 4px base */
+  /* spacing — 4px base (Material-adapted 8px grid rides on 8/16/24/32…) */
   --s1: 4px;
   --s2: 8px;
   --s3: 12px;
@@ -64,41 +80,97 @@
   --s10: 120px;
   --maxw: 1180px;
 
-  /* type — font stacks resolve to the next/font CSS vars, with safe fallbacks */
-  --ff-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
-  --ff-mono: var(--font-mono), var(--font-geist-mono), ui-monospace, monospace;
+  /* type — font stacks resolve to the self-hosted next/font CSS vars (layout.tsx:
+     Onest → --font-sans, JetBrains Mono → --font-mono), each with cross-OS
+     fallbacks. */
+  --ff-sans: var(--font-sans), "Onest", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ff-mono: var(--font-mono), ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
 
-  /* ==== OXBLOOD SITE LAYER (S1, 2026-07-08) — additive site-scoped tokens ==== */
-  /* wine ramp — the ONE brand hue, wine-900 (darkest) → wine-500 */
-  --wine-900: #3e0a13;
-  --wine-800: #55101d;
-  --wine-700: #6e1423;
-  --wine-600: #8a2233;
-  --wine-500: #9e3143;
-  /* accent aliases (the site layer reads these; = the wine ramp) */
-  --accent: #8a2233;
-  --accent-hi: #6e1423; /* hover / pressed */
-  --accent-soft: rgba(138, 34, 51, 0.07);
-  --accent-line: rgba(138, 34, 51, 0.24);
-  /* severity — kept perceptually FAR from the wine brand (always paired with a
-     shape + word by consuming surfaces, never colour alone) */
-  --error: #d92d20;
+  /* ==== SITE DESIGN LAYER (redesign, 2026-07-14) — additive site-scoped tokens
+     replacing the retired single-accent Oxblood layer. Token NAMES are preserved
+     for the per-surface consumer blocks; VALUES move to the new system. ==== */
+
+  /* iris ramp — the brand hue, deepest → brightest (token names kept from the
+     retired wine ramp; no surface consumes these directly). */
+  --wine-900: #43349b; /* 9.53:1 */
+  --wine-800: #4636a8; /* 8.92:1 */
+  --wine-700: #4f3fb6;
+  --wine-600: #5746c5; /* = brand deep (--accent) — 6.80:1 */
+  --wine-500: #705de7; /* = bright iris — 4.76:1 */
+
+  /* accent aliases (the site shell reads these; = the iris brand primary) */
+  --accent: #5746c5; /* 6.80:1 — carries white text (nav active, primary btn) */
+  --accent-hi: #4636a8; /* 8.92:1 — hover / pressed (darker; white text passes) */
+  --accent-soft: rgba(112, 93, 231, 0.07);
+  --accent-line: rgba(112, 93, 231, 0.24);
+
+  /* MATERIAL ACCENT FAMILY (storyboard palette, used sparingly). BRIGHT values =
+     fills / marks / canvas ONLY (most fail 4.5:1 as text). For TEXT use the *-text
+     pairs below. Iris = the ONE interactive accent; ember = semantic verdict/finding
+     only; cyan/azure/saffron = moving canvas materials. */
+  --iris: #705de7; /* 4.76:1 — interactive marks (clears text at ≥18px too) */
+  --iris-ink: #5746c5; /* 6.80:1 — interactive text / focus rings */
+  --ember: #c94d35; /* 4.57:1 — verdict/finding fill/mark */
+  --gold: #eda52b; /* 2.10:1 — fill/mark only (saffron evidence trace) */
+  --azure: #2f86bd; /* 3.99:1 — fill/mark only (registered check) */
+  --cyan: #43a7ce; /* 2.74:1 — fill/mark only (merchant-record refraction) */
+  --violet: #705de7; /* = --iris (token name kept; interactive accent) */
+  --ember-soft: rgba(201, 77, 53, 0.07);
+  --gold-soft: rgba(237, 165, 43, 0.1);
+  --azure-soft: rgba(47, 134, 189, 0.1);
+  --violet-soft: rgba(112, 93, 231, 0.09);
+  --iris-soft: rgba(112, 93, 231, 0.06);
+  /* DEEP text variants — contrast-darkened, each VERIFIED ≥4.5:1 on #fff */
+  --ember-text: #c0341c; /* 5.60:1 */
+  --gold-text: #7a5a0f; /* 6.37:1 (bright saffron #eda52b is 2.10:1 — unusable as text) */
+  --azure-text: #1f6e99; /* 5.60:1 (bright azure #2f86bd is 3.99:1 — unusable as text) */
+  --violet-text: #5746c5; /* 6.80:1 (= --iris-ink) */
+
+  /* severity triad — shape + word by every consuming surface, never colour alone;
+     the traffic-light gestalt (red/amber/green) reads as a system distinct from the
+     four brand hues. Recomputed on #fff. */
+  --error: #d92d20; /* 4.83:1 */
   --error-soft: rgba(217, 45, 32, 0.08);
-  --warn: #b54708;
+  --warn: #b54708; /* 5.43:1 */
   --warn-soft: rgba(181, 71, 8, 0.11);
-  --ok: #067647;
+  --ok: #067647; /* 5.69:1 */
   --ok-soft: rgba(6, 118, 71, 0.09);
-  /* on-TINT severity inks (Codex S4 P2): raw --error/--warn compound below 4.5:1
-     on their own soft fills (4.16/4.48 over #fbfbfd) — text on a *-soft ground
-     uses these darker inks (5.62:1 on tint; 6.31/6.59 on bare ground) */
-  --error-ink: #b71f13;
-  --warn-ink: #9c3d06;
-  /* serif display stack (brand wordmark + headlines) — no new dependency */
-  --serif: ui-serif, "New York", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
-    "Times New Roman", serif;
-  /* shared easing */
+  /* on-TINT severity inks — used for text on the *-soft grounds */
+  --error-ink: #b71f13; /* 6.52:1 */
+  --warn-ink: #9c3d06; /* 6.81:1 */
+
+  /* display stack — the storyboard uses NO serif: token NAMES kept (wordmark +
+     headline consumers), values resolve to Onest (rounded sans display voice).
+     Display headings compensate with heavier weight + tighter tracking. */
+  --serif: var(--font-sans), "Onest", ui-rounded, system-ui, sans-serif;
+  --display: var(--font-sans), "Onest", ui-rounded, system-ui, sans-serif;
+
+  /* radii + elevation (storyboard adoption 2026-07-15) — soft cards over the
+     former near-flat 6px system; shadows stay faint-on-white, three tiers. */
+  --r-card: 18px;
+  --r-ctrl: 12px;
+  --r-chip: 9px;
+  /* the ONE gradient (storyboard rule): the brand mark's ink→cyan→iris family,
+     text-clipped on the hero title phrase; fallback = --iris-ink (6.80:1). */
+  --grad-phrase: linear-gradient(112deg, #4f58c9, #715de7 48%, #2f86bd);
+
+  --elev-1: 0 1px 2px rgba(23, 21, 27, 0.035), 0 8px 24px rgba(23, 21, 27, 0.045);
+  --elev-2: 0 2px 7px rgba(23, 21, 27, 0.045), 0 18px 50px rgba(23, 21, 27, 0.065);
+  --elev-3: 0 3px 10px rgba(23, 21, 27, 0.045), 0 24px 72px rgba(23, 21, 27, 0.075);
+
+  /* motion — one calm Material-adapted family. --ease kept (14 consumers). */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  /* ==== end OXBLOOD SITE LAYER tokens ==== */
+  --ease-arrival: cubic-bezier(0, 0, 0.2, 1); /* enters / arrivals */
+  --ease-field: cubic-bezier(0.4, 0, 0.2, 1); /* in-field movement / exits */
+  --ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1); /* storyboard motion-enter */
+  --ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15); /* storyboard motion-exit */
+  --dur-1: 150ms;
+  --dur-2: 240ms;
+  --dur-3: 350ms;
+  --dur-settle: 600ms;
+  --dur-reveal: 460ms; /* storyboard reveal tier */
+  --dur-hero: 620ms; /* storyboard hero-entrance tier */
+  /* ==== end SITE DESIGN LAYER tokens ==== */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -133,141 +205,266 @@ body {
    ========================================================================== */
 
 /* ----- Nav: sticky, hairline-ruled, serif wordmark, sans links (mockup spec) - */
+/* Storyboard header (adoption 2026-07-15): PURE WHITE at the top of the page,
+   glass once scrolled (.is-scrolled toggled by Nav.tsx at scrollY > 18). The
+   no-JS / SSR default is the solid-white state. */
 .site-nav {
   position: sticky;
   top: 0;
   z-index: 40;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(23, 21, 27, 0.055);
+  transition:
+    background 300ms var(--ease-arrival),
+    border-color 300ms var(--ease-arrival),
+    box-shadow 300ms var(--ease-arrival);
+}
+.site-nav.is-scrolled {
   /* rgba(255,255,255,.88) IS the no-support fallback; blur is progressive */
   background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: saturate(1.4) blur(10px);
-  -webkit-backdrop-filter: saturate(1.4) blur(10px);
-  border-bottom: 1px solid var(--rule);
+  backdrop-filter: blur(18px) saturate(1.16);
+  -webkit-backdrop-filter: blur(18px) saturate(1.16);
+  border-bottom-color: rgba(23, 21, 27, 0.09);
+  box-shadow: 0 8px 30px rgba(23, 21, 27, 0.045);
 }
 .site-nav-in {
   max-width: var(--maxw);
   margin: 0 auto;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* desktop: one row. <900px wraps the collapsed menu below. */
   align-items: center;
   gap: 4px;
-  padding: 11px clamp(18px, 4vw, 36px);
+  min-height: 68px;
+  padding: 10px clamp(18px, 4vw, 36px);
 }
+/* Storyboard brand lockup (adoption 2026-07-15): gradient C-mark + Onest
+   wordmark, matching the hero title's gradient phrase family. Static mark —
+   identical under reduced-motion and no-JS. */
 .site-brand {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   margin-right: 18px;
-  font-family: var(--serif);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  font-size: 16px;
+  font-family: var(--ff-sans);
+  font-weight: 610;
+  letter-spacing: -0.02em;
+  font-size: 16.5px;
   color: var(--ink);
   text-decoration: none;
 }
 .site-brand-mark {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   flex: none;
-  color: var(--accent);
-}
-/* B-2 self-drawing monoline mark (floor ③): shield + check in wine over a faint
-   ink meridian baseline. Paths are drawn by default (offset 0), so the mark is
-   complete under reduced-motion and no-JS. */
-.site-brand-mark path {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.site-brand-mark .lm-base {
-  stroke: var(--ink);
-  opacity: 0.5;
 }
 .site-brand-word {
   display: inline-flex;
   align-items: baseline;
 }
-.site-brand-dot {
-  color: var(--accent);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .site-brand-mark .lm-draw {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    animation: lm-draw 1.1s var(--ease) forwards;
-  }
-  .site-brand-mark .lm-d2 {
-    animation-delay: 0.35s;
-  }
-  @keyframes lm-draw {
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-}
 .site-navlink {
-  /* mockup spec: sans 13px (E-3 reviewer fix — the dispatch brief's "mono" was
-     the orchestrator's error; the mockup .navlink inherits the sans body font) */
+  /* Storyboard nav treatment (adoption 2026-07-15): bare links, iris underline
+     that scales in on hover/focus/current — no pill container. */
+  position: relative;
   font-family: var(--ff-sans);
-  font-size: 13px;
+  font-size: 13.5px;
+  font-weight: 500;
   color: var(--muted);
   text-decoration: none;
-  padding: 6px 11px;
-  border-radius: 7px;
+  padding: 8px 11px;
+  border-radius: var(--r-chip);
   white-space: nowrap;
-  transition:
-    background 0.16s var(--ease),
-    color 0.16s ease;
+  transition: color 160ms var(--ease-arrival);
+}
+.site-navlink::after {
+  content: "";
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  bottom: 4px;
+  height: 1px;
+  background: var(--iris-ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 190ms var(--ease-enter);
 }
 .site-navlink:hover {
-  background: var(--bg-3);
   color: var(--ink);
 }
+.site-navlink:hover::after,
+.site-navlink:focus-visible::after,
+.site-navlink[aria-current="page"]::after {
+  transform: scaleX(1);
+}
 .site-navlink[aria-current="page"] {
-  background: var(--accent);
-  color: #fff;
+  color: var(--ink);
+  font-weight: 640;
 }
 .site-navlink:focus-visible,
 .site-brand:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-.site-status {
-  margin-left: auto;
-  display: inline-flex;
+
+/* ----- link cluster + mobile toggle ---------------------------------------
+   Desktop: the menu is inline, pushed to the right; the hamburger is hidden.
+   <900px (below): the hamburger shows and the menu collapses into a dropdown
+   (so the nav never wraps to multiple rows on phones). */
+.site-nav-menu {
+  display: flex;
   align-items: center;
-  gap: 7px;
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  background: var(--bg-3);
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: 5px 11px;
+  gap: 4px;
+  margin-left: auto;
 }
-.site-status-pip {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  flex: none;
+.site-nav-toggle {
+  display: none;
+  margin-left: auto;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule-2);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.16s ease;
+}
+.site-nav-toggle:hover {
+  background: var(--bg-3);
+}
+.site-nav-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-/* ----- global footer: honesty paragraph on a hairline-ruled panel ----------- */
+@media (max-width: 899px) {
+  .site-nav-in {
+    flex-wrap: wrap;
+  }
+  .site-nav-toggle {
+    display: inline-flex;
+  }
+  .site-nav-menu {
+    display: none;
+    flex-basis: 100%;
+    width: 100%;
+    margin-left: 0;
+  }
+  .site-nav-menu.open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+  .site-nav-menu.open .site-navlink {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+}
+
+/* ----- global footer: disclaimer-free, professional (redesign Slice D,
+   decision-log 2026-07-14). Brand + tagline, a compact link set, and the honest
+   author/build-provenance meta on a hairline-ruled panel. ---------------------- */
 .site-footer {
-  margin-top: 20px;
+  margin-top: 64px;
   border-top: 1px solid var(--rule);
   background: var(--bg-3);
 }
 .site-footer-in {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 40px clamp(18px, 4vw, 36px) 72px;
+  padding: 48px clamp(18px, 4vw, 36px) 56px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px 48px;
+  align-items: start;
+}
+.site-footer-lead {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.site-footer-word {
+  font-family: var(--ff-sans);
+  font-weight: 610;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.site-footer-word:hover {
+  color: var(--accent);
+}
+.site-footer-tagline {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 42ch;
+}
+.site-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  justify-self: end;
+  max-width: 360px;
+}
+.site-footer-nav a {
+  display: inline-block;
+  padding: 4px 0;
   font-size: 13px;
-  line-height: 1.62;
-  color: var(--body);
+  color: var(--graphite);
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+.site-footer-nav a:hover {
+  color: var(--accent);
+}
+.site-footer-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.site-footer-credit a {
+  color: var(--graphite);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.site-footer-credit a:hover {
+  color: var(--accent);
+}
+.site-footer-build {
+  font-family: var(--ff-mono);
+  color: var(--faint);
+}
+.site-footer-nav a:focus-visible,
+.site-footer-word:focus-visible,
+.site-footer-credit a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+@media (max-width: 640px) {
+  .site-footer-in {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .site-footer-nav {
+    justify-self: start;
+    max-width: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -885,9 +1082,13 @@ body {
   color: var(--accent);
 }
 .lp-h2 {
-  font-size: clamp(25px, 3.8vw, 40px);
-  line-height: 1.08;
-  max-width: 20ch;
+  /* storyboard section-heading scale (adoption 2026-07-15) */
+  font-size: clamp(28px, 3.3vw, 48px);
+  font-weight: 545;
+  line-height: 1.07;
+  letter-spacing: -0.038em;
+  max-width: 18ch;
+  text-wrap: balance;
 }
 .lp-h3 {
   font-size: 18px;
@@ -1182,8 +1383,9 @@ body {
 
 /* ============================================================================
    OXBLOOD LANDING — "GALLERY CARDS B-2" LAYER (S6b, 2026-07-13).
-   The owner-adopted design language from
-   mockups/variation-b2-gallery-cards-2026-07-13.html, translated onto the
+   The owner-adopted design language from the B-2 gallery-cards sample
+   (committed at a8f6c5f as mockups/variation-b2-gallery-cards-2026-07-13.html,
+   since pruned from the working tree — recoverable from git history), translated onto the
    canonical landing. Same tokens; B-2 adds the cartographic hero line field +
    drifting survey line (floor ④), the verifier seal, icon-tile card medallions
    (floor ⑤), section-rule reveals, and hover micro-transitions (floors ①/②).
@@ -1410,12 +1612,7 @@ body {
   color: var(--body);
 }
 
-/* ----- the shown-catch wrapper (holds TruthCatch) --------------------------- */
-.lp-catch-wrap {
-  display: block;
-  margin-top: 30px;
-  max-width: 720px;
-}
+/* (the shown-catch wrapper was removed with TruthCatch — superseded by the Evidence Bench) */
 
 /* ----- motion: draws + drift + reveal, ALL gated to allowed motion ---------- */
 @media (prefers-reduced-motion: no-preference) {
@@ -1499,48 +1696,48 @@ body {
 }
 
 /* ============================================================================
-   THE REPORT / DEMO DOCUMENT SYSTEM — re-tokened to "Oxblood" in S3 (2026-07-08).
+   THE REPORT / DEMO DOCUMENT SYSTEM — re-tokened for the redesign B1 (2026-07-14).
    Scoped to the two real verifier surfaces (/report + /demo, both mount .rpt-wrap);
-   the landing keeps its own system. Spec: mockups/ultra-modern-2026-07-08/
-   whole-site-gallery-v2.html (owner-picked). Lineage: the owner-picked "Ledger"
-   audit-certificate STRUCTURE (Swiss / International-Typographic; flat, no radii /
-   shadows / gradients; the precision of the hairline rules and the spacing IS the
-   design) is RETAINED; every token VALUE is remapped to the site Oxblood system.
+   the landing keeps its own system. Spec: docs/design-brief-redesign-2026-07-14.md.
+   Lineage: the "Ledger" audit-certificate STRUCTURE (Swiss / International-
+   Typographic; flat, no radii / shadows / gradients; the precision of the hairline
+   rules and the spacing IS the design) is RETAINED; the token VALUES move in
+   lockstep to the new site system.
 
-   S3 re-token: gallery-white ground #FFFFFF → premium off-white #FBFBFD; the cool
-   near-black ink ramp → a warm one; the ONE accent ultramarine → burgundy #8A2233
-   (the token NAME --um is kept so every consumer follows) — SIMULATED tag block ·
-   masthead rule · finding index numerals — NEVER on severity. Severity carries its
-   own three marks (error / warn / info) in warm hues kept perceptually FAR from the
-   burgundy brand, always paired with a square shape + word. Display headings adopt
-   the site serif (var(--serif)) per the mockup's report register; body stays a
-   system sans, receipts stay mono. The SIMULATED banner keeps its unmissable ink
-   band, re-grounded on the warm ink, print-color-adjust intact (test-locked).
-   Contrast recomputed on #FBFBFD (ratios in the token comments below).
+   B1 re-token: off-white ground #FBFBFD → pure white #FFFFFF; the ink ramp moves to
+   the new near-neutral values; the accent → DEEP ember #C0341C (the token NAME --um
+   is kept so every consumer follows) — used on the masthead rule · finding index
+   numerals, NEVER on severity. Severity carries its own three marks (error / warn /
+   info) kept perceptually far from the brand, always paired with a square shape +
+   word. Display headings adopt the site display voice (Onest, storyboard adoption
+   2026-07-15); body + receipts adopt Onest / JetBrains Mono. Honesty freeze-reversal (Slice D,
+   decision-log 2026-07-14): the SIMULATED banner was removed — the page is
+   disclaimer-free (no false claim; C10 green).
+   Contrast recomputed on #FFFFFF (ratios in the token comments below).
    Desktop web + printable (see the @media print block below). rpt-* / dmo-*.
    ========================================================================== */
 .rpt-wrap {
-  /* S3 Oxblood re-token (2026-07-08): the Ledger STRUCTURE is retained; every token
-     VALUE is remapped to the site Oxblood system. Kept as ONE --paper token so every
+  /* Redesign B1 re-token (2026-07-14): the Ledger STRUCTURE is retained; every local
+     token VALUE is moved IN LOCKSTEP to the new :root system (this block is insulated
+     from :root, so it must mirror by hand). Kept as ONE --paper token so every
      text-on-ink surface (banner text, verdict flag) follows automatically. Contrast
-     recomputed on #fbfbfd — floors: body ≥10:1, graphite ≥7:1, all others ≥4.5:1. */
-  --paper: #fbfbfd; /* premium off-white ground + every text-on-ink surface (banner text, verdict flag) */
-  --ink: #1a1712; /* warm near-black: headline, banner ground, verdict stamp, hard marks — 17.29:1 */
-  --body: #423b38; /* long-form body text — 10.61:1 (sitewide Oxblood body ramp) */
-  --graphite: #564d48; /* rail captions, labels, secondary mono — 7.97:1 */
-  --hairline: rgba(74, 14, 26, 0.14); /* wine-tinted modular-grid rules (site --rule family; visual weight of the old #dcdcd4) */
-  --um: #8a2233; /* the ONE accent — burgundy/oxblood (token NAME kept from ultramarine) — 8.62:1 */
-  --sev-err: #d92d20; /* 4.67:1 — bright/warm, kept perceptually far from the burgundy brand */
-  --sev-warn: #b54708; /* 5.25:1 — amber, far from the brand */
-  --sev-info: #615750; /* warm neutral — 6.80:1 (no info in the fixture; never a brand/alarm hue) */
-  /* system font stacks match the mockup's report register (system sans + system mono);
-     display headings adopt the site serif (var(--serif)). No new dependency. */
-  /* serif display — local alias of the site --serif so the block stays fully
-     self-defined (Codex S3 P3: no var consumed here falls through to :root) */
-  --serif: ui-serif, "New York", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
-    "Times New Roman", serif;
-  --ledger-sans: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
-  --ledger-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+     recomputed on the pure-white #ffffff ground (standard WCAG sRGB). */
+  --paper: #ffffff; /* pure-white ground + every text-on-ink surface (banner text, verdict flag) */
+  --ink: #17151b; /* near-black: headline, banner ground, verdict stamp, hard marks — 18.11:1 */
+  --body: #37343d; /* long-form body text — 12.20:1 (sitewide body ramp) */
+  --graphite: #4c4954; /* rail captions, labels, secondary mono — 8.79:1 */
+  --hairline: rgba(23, 21, 27, 0.13); /* low-alpha ink modular-grid rules (site --rule family) */
+  --um: #5746c5; /* the accent — DEEP iris (token NAME kept; storyboard adoption
+     2026-07-15, lockstep with :root --accent); --paper on --um = 6.80:1 */
+  --sev-err: #d92d20; /* 4.83:1 — kept perceptually far from the brand via shape + word */
+  --sev-warn: #b54708; /* 5.43:1 — amber */
+  --sev-info: #605c68; /* neutral — 6.51:1 (no info in the fixture; never a brand/alarm hue) */
+  /* font stacks now adopt the self-hosted site fonts (Onest display + body,
+     JetBrains mono) so the report matches the site register; kept self-defined
+     so nothing here falls through to :root. */
+  --serif: var(--font-sans), "Onest", ui-rounded, system-ui, sans-serif;
+  --ledger-sans: var(--font-sans), "Onest", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ledger-mono: var(--font-mono), ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo,
     monospace;
 
   max-width: 1180px;
@@ -1554,40 +1751,11 @@ body {
   letter-spacing: 0;
 }
 
-/* ---- SIMULATED banner — solid ink band, unmissable, first thing on the page.
-   Text uses --paper (#fbfbfd) on the ink ground; survives print exact. ---- */
-.rpt-sim {
-  display: flex;
-  align-items: flex-start;
-  gap: 22px;
-  padding: 20px 24px;
-  border: none;
-  border-radius: 0;
-  background: var(--ink);
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-.rpt-sim-tag {
-  flex: none;
-  font-family: var(--ledger-mono);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  color: var(--paper);
-  background: var(--um);
-  padding: 7px 12px;
-  border-radius: 0;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-.rpt-sim-text {
-  min-width: 0;
-  margin: 2px 0 0;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--paper);
-  max-width: 92ch;
-}
+/* NOTE (redesign Slice D, decision-log 2026-07-14): the .rpt-sim SIMULATED banner
+   and its CSS were removed with the honesty freeze-reversal — the public report/demo
+   pages are disclaimer-free. Print-color-adjust: exact is still carried by the
+   verdict flag (.rpt-verdict-flag) and the severity marks (.rpt-sev::before), which
+   legitimately print colour on ink/tinted grounds. */
 
 /* ---- masthead — flush-left, closed by the single 4px burgundy accent rule ---- */
 .rpt-head {
@@ -1970,10 +2138,6 @@ body {
     border-left: none;
     padding-left: 0;
   }
-  .rpt-sim {
-    flex-direction: column;
-    gap: 12px;
-  }
 }
 @media (max-width: 560px) {
   .rpt-wrap {
@@ -1992,9 +2156,8 @@ body {
   }
 }
 
-/* ----- print: one clean report per page, the ink banner preserved on its ground.
-   The SIMULATED banner keeps print-color-adjust: exact (on .rpt-sim above) so it
-   prints on the ink ground, and stays the first thing on the printed page. ----- */
+/* ----- print: one clean report per page. The verdict flag + severity marks keep
+   print-color-adjust: exact so their colour survives the print colour drop. ----- */
 @media print {
   nav,
   footer,
@@ -2018,7 +2181,6 @@ body {
   }
   /* never split a finding (with its receipts) across a page break */
   .rpt-finding,
-  .rpt-sim,
   .rpt-verdict,
   .rpt-meta {
     break-inside: avoid;
@@ -2147,8 +2309,10 @@ body {
 /* ============================================================================
    OXBLOOD DATA SURFACES (S4, 2026-07-08) — compact-density primitives for the
    six data/working surfaces: /console · /eval · /metrics · /audit · /cost ·
-   /merchant/[id]. Spec: the #/console…#/merchant views of
-   mockups/ultra-modern-2026-07-08/whole-site-gallery-v2.html (owner-picked).
+   /merchant/[id]. Spec: the #/console…#/merchant views of the owner-picked
+   whole-site gallery v2 (committed at 8269ab9 as
+   mockups/ultra-modern-2026-07-08/whole-site-gallery-v2.html, since pruned —
+   recoverable from git history).
 
    Extends the S1 shared ds-* type/layout primitives (ds-wrap, ds-mono, ds-num)
    and ADDS the compact data register: serif display headings, a stat rail,
@@ -2915,72 +3079,8 @@ body {
   margin-bottom: -6px;
 }
 
-/* === S5 landing retell (append-only): the TruthCatch panel === */
-/* S6b: restyled into the B-2 register — real hairline border (var(--line) was
-   undefined and fell back to currentColor), ≤6px radius, tinted well. */
-.lp-catch {
-  border: 1px solid var(--rule-2);
-  border-radius: 6px;
-  background: var(--bg);
-  padding: 22px 24px;
-}
-.lp-catch-head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-.lp-catch-sim {
-  font-family: var(--ff-mono, monospace);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  padding: 2px 7px;
-  border: 1px solid currentColor;
-  color: var(--error-ink, #b71f13);
-}
-.lp-catch-src {
-  font-size: 11.5px;
-  color: var(--muted);
-}
-.lp-catch-verdict {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--rule);
-}
-.lp-catch-fail {
-  font-family: var(--ff-mono, monospace);
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--error-ink, #b71f13);
-}
-.lp-catch-tally {
-  font-family: var(--ff-mono, monospace);
-  font-size: 12px;
-  color: var(--ink-2);
-}
-.lp-catch-row {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--rule);
-}
-.lp-catch-plain {
-  margin: 0 0 6px;
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: var(--ink);
-}
-.lp-catch-receipt {
-  margin: 0;
-  font-size: 11px;
-  color: var(--muted);
-}
-.lp-catch-foot {
-  margin: 12px 0 0;
-  font-size: 11.5px;
-  line-height: 1.6;
-  color: var(--muted);
-}
+/* (the TruthCatch panel styles were removed — superseded by the Evidence Bench,
+   whose styles live in the Correspondence landing block at the end of this file) */
 
 /* === RV1 (append-only): legacy sub-nav strip === */
 .legacy-subnav {
@@ -3043,4 +3143,861 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .pg-finding { transition: none; }
+}
+
+
+/* ============================================================================
+   CORRESPONDENCE LANDING (redesign slice C-REDO, 2026-07-14) — the approved
+   "Correspondence Field" arc. Spec: docs/redesign-blueprint-2026-07-14.md
+   (sol-designed, Claude-adjudicated). One evidence language across six chapters:
+   Hero (full-bleed Canvas2D behind centered copy) → 01 Evidence Bench → 02 Method
+   → 03 Coverage → 04 Limits → Close. Built on the B1 pure-white tokens: hairlines,
+   radii ≤6px, tabular mono numerals, NO gradient / glass / shadow decoration.
+   Chapter accent hues: proof ember · method violet · coverage azure · limits gold.
+   All continuous / staged motion lives inside prefers-reduced-motion: no-preference
+   with an explicit reduce-kill at the end of this block.
+   ========================================================================== */
+
+/* ----- shared atoms --------------------------------------------------------- */
+.mono {
+  font-family: var(--ff-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* chapter accent scope — NEUTRALIZED to the storyboard model (adoption
+   2026-07-15): ONE interactive accent (iris) across every chapter; ember stays
+   reserved for the verdict/finding semantics inside the bench. The --chapter
+   indirection is kept so any component-level consumer follows coherently. */
+.cc-chapter {
+  --chapter: var(--iris);
+  --chapter-text: var(--iris-ink);
+  --chapter-soft: var(--iris-soft);
+}
+/* storyboard eyebrow: graphite mono + one rotated iris square */
+.cc-chapter .lp-eyebrow {
+  color: var(--muted);
+  letter-spacing: 0.12em;
+}
+.cc-chapter .lp-eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  transform: rotate(45deg);
+  background: rgba(112, 93, 231, 0.5);
+}
+/* storyboard rule: a neutral hairline, not a chapter-hued bar */
+.cc-chapter .lp-sec-rule {
+  border-top-color: var(--rule-3);
+}
+
+/* ----- HERO: the Prismatic Passline (engine adopted 2026-07-15) -------------
+   Full-bleed aria-hidden Canvas2D behind a top-anchored copy corridor. The copy
+   rides a radial white scrim so it always reads on pure white; the scene rail
+   sits in the lower third, clear of the words. */
+.cc-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg);
+  min-height: min(900px, 96svh);
+  padding: 0 clamp(18px, 4vw, 40px) clamp(48px, 8vh, 96px);
+}
+.cc-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  pointer-events: none;
+}
+.cc-hero-copy {
+  position: relative;
+  z-index: 1;
+  width: min(780px, 68vw);
+  margin: 0 auto;
+  padding-top: clamp(120px, 15vh, 160px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+/* the protected reading corridor — a radial white scrim keeping copy on pure white */
+.cc-hero-copy::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -64px -120px -48px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.99) 0 49%,
+    rgba(255, 255, 255, 0.92) 64%,
+    rgba(255, 255, 255, 0) 82%
+  );
+  pointer-events: none;
+}
+.cc-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 18px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+  color: var(--muted);
+}
+.cc-eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  transform: rotate(45deg);
+  background: rgba(112, 93, 231, 0.5);
+}
+.cc-hero-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 570;
+  font-size: clamp(38px, 5.4vw, 74px);
+  line-height: 1;
+  letter-spacing: -0.046em;
+  color: var(--ink);
+  max-width: 15ch;
+  text-wrap: balance;
+}
+/* the gradient phrase — matches the brand mark's ink→cyan→iris family. The
+   solid fallback color is --iris-ink (6.80:1); the clip only upgrades it. */
+.cc-hero-lit {
+  color: var(--iris-ink);
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .cc-hero-lit {
+    background: var(--grad-phrase);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+.cc-hero-lede {
+  margin: 22px 0 0;
+  font-size: clamp(16px, 1.85vw, 19px);
+  line-height: 1.58;
+  color: var(--body);
+  max-width: 56ch;
+  text-wrap: pretty;
+}
+.cc-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+/* WCAG 2.2 SC 2.2.2 pause/play control — quiet outlined, ≥44px, violet focus ring */
+.cc-pause {
+  position: absolute;
+  right: clamp(16px, 3vw, 32px);
+  bottom: clamp(16px, 3vh, 28px);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--rule-2);
+  border-radius: 6px;
+  padding: 6px 13px;
+  min-height: 44px;
+  min-width: 44px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.cc-pause:hover {
+  color: var(--ink);
+  border-color: var(--graphite);
+}
+.cc-pause:focus-visible {
+  outline: 2px solid var(--iris-ink);
+  outline-offset: 2px;
+}
+.cc-pause-ic {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.cc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.cc-noscript {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.cc-fallback {
+  width: 100%;
+  height: 100%;
+}
+.cc-fb-record {
+  fill: none;
+  stroke: var(--graphite);
+  stroke-opacity: 0.09;
+  stroke-width: 1;
+}
+.cc-fb-claim {
+  fill: none;
+  stroke: var(--graphite);
+  stroke-opacity: 0.08;
+  stroke-width: 1;
+  stroke-dasharray: 5 4;
+}
+.cc-fb-azure {
+  stroke: var(--azure);
+  stroke-opacity: 0.5;
+  stroke-width: 1.4;
+}
+.cc-fb-ember {
+  stroke: var(--ember);
+  stroke-opacity: 0.55;
+  stroke-width: 1.4;
+  stroke-dasharray: 5 4;
+}
+.cc-fb-gold {
+  stroke: var(--gold);
+  stroke-opacity: 0.85;
+  stroke-width: 1.6;
+}
+.cc-fb-bracket {
+  fill: none;
+  stroke: var(--violet);
+  stroke-opacity: 0.7;
+  stroke-width: 1.3;
+}
+.cc-fb-frag {
+  font-family: var(--ff-mono);
+  font-size: 13px;
+  fill: var(--graphite);
+  fill-opacity: 0.34;
+}
+.cc-fb-aperture {
+  fill: var(--bg);
+}
+
+/* hero responsive — widen the corridor + shrink height on smaller viewports */
+@media (max-width: 980px) {
+  .cc-hero-copy {
+    width: min(720px, 84vw);
+  }
+}
+@media (max-width: 768px) {
+  .cc-hero {
+    min-height: clamp(560px, 84vh, 720px);
+    padding-bottom: 56px;
+  }
+  .cc-hero-copy {
+    width: calc(100% - 40px);
+    padding-top: clamp(72px, 12vh, 108px);
+  }
+  .cc-hero-copy::before {
+    inset: -48px -28px -40px;
+  }
+}
+
+/* ----- 01 EVIDENCE BENCH: the conservator's examination table --------------- */
+.eb {
+  margin-top: 34px;
+  border: 1px solid var(--rule-2);
+  border-radius: 6px;
+  background: var(--bg);
+  padding: clamp(20px, 3vw, 34px);
+}
+.eb-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.eb-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--graphite);
+}
+.eb-tally {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.eb-table {
+  display: grid;
+  grid-template-columns: 1fr minmax(180px, 0.9fr) 1fr;
+  gap: clamp(16px, 3vw, 40px);
+  align-items: start;
+  padding: 28px 0;
+}
+.eb-col {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.eb-claim {
+  align-items: flex-end;
+  text-align: right;
+}
+.eb-record {
+  align-items: flex-start;
+  text-align: left;
+}
+.eb-col-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.eb-field {
+  font-size: 12.5px;
+  color: var(--graphite);
+}
+.eb-money {
+  position: relative;
+  font-size: clamp(22px, 3.2vw, 30px);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.eb-claim .eb-money::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 2px;
+  background: var(--ember);
+  transform: scaleX(0);
+  transform-origin: right;
+}
+.eb-claim .eb-money.is-lit::after {
+  transform: scaleX(1);
+}
+.eb-record .eb-money::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 2px;
+  background: var(--azure);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.eb-record .eb-money.is-lit::after {
+  transform: scaleX(1);
+}
+.eb-sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* central rule axis — correspondence spine + gold rule rail + arithmetic + break */
+.eb-axis {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding-top: 22px;
+}
+.eb-corr {
+  align-self: center;
+  width: 1px;
+  height: 22px;
+  background: var(--graphite);
+  opacity: 0.15; /* replay-dim: faint until its stage relights */
+}
+.eb-corr.is-lit {
+  opacity: 0.4;
+}
+.eb-rule {
+  border-left: 2px solid var(--gold);
+  padding: 6px 0 6px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  opacity: 0.3; /* replay-dim */
+}
+.eb-rule.is-lit {
+  opacity: 1;
+  transform: none;
+}
+.eb-rule-name {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--gold-text);
+}
+.eb-rule-plain {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.eb-math {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  opacity: 0.3; /* replay-dim */
+}
+.eb-math.is-lit {
+  opacity: 1;
+  transform: none;
+}
+.eb-break {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--error-ink);
+  opacity: 0.3; /* replay-dim */
+}
+.eb-break.is-lit {
+  opacity: 1;
+  transform: none;
+}
+
+/* the receipt (evidence attached / locked) */
+.eb-receipt {
+  border-top: 1px solid var(--rule);
+  padding-top: 18px;
+}
+.eb-receipt-label {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+.eb-receipt.is-filled .eb-receipt-label {
+  color: var(--ember-text);
+}
+.eb-receipt-body {
+  /* stays in layout during a replay (ships-done contract: zero height delta) —
+     the prior evidence dims to low emphasis while the stages relight */
+  display: block;
+  margin-top: 12px;
+  opacity: 0.35;
+}
+.eb-receipt-body.is-lit {
+  opacity: 1;
+}
+.eb-receipt-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.eb-sev {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--error-ink);
+}
+.eb-receipt-rule {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--graphite);
+}
+.eb-receipt-plain {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.eb-receipt-rows {
+  margin: 14px 0 0;
+  display: grid;
+  gap: 0;
+}
+.eb-receipt-rows > div {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 12px;
+  padding: 7px 0;
+  border-top: 1px solid var(--rule);
+}
+.eb-receipt-rows dt {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.eb-receipt-rows dd {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.eb-receipt-foot {
+  display: block;
+  margin-top: 12px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.eb-actions {
+  margin-top: 20px;
+}
+.eb-run:active {
+  transform: translateY(1px);
+}
+.eb-run:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.eb-run:focus-visible {
+  outline: 2px solid var(--iris-ink);
+  outline-offset: 2px;
+}
+.eb-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ----- 02 METHOD: the relationship ----------------------------------------- */
+.mr {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: clamp(24px, 5vw, 64px);
+  align-items: start;
+}
+.mr-sentence {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(21px, 2.6vw, 30px);
+  line-height: 1.34;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+}
+.mr-word {
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: 0 1px;
+  cursor: pointer;
+  border-bottom: 2px solid var(--rule-2);
+  transition:
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease);
+}
+.mr-word:hover {
+  color: var(--ink);
+  border-bottom-color: var(--violet);
+}
+.mr-word[aria-pressed="true"] {
+  color: var(--violet-text);
+  border-bottom-color: var(--violet);
+}
+.mr-word:focus-visible {
+  outline: 2px solid var(--violet-text);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.mr-panel {
+  border-left: 2px solid var(--violet);
+  padding: 4px 0 4px 18px;
+  align-self: center;
+}
+.mr-panel-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--violet-text);
+}
+.mr-panel-value {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.mr-panel-note {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--body);
+}
+
+/* ----- 03 COVERAGE: the tablist -------------------------------------------- */
+.cv {
+  margin-top: 30px;
+}
+.cv-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--rule-2);
+}
+.cv-tab {
+  position: relative;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: color 0.18s var(--ease);
+}
+.cv-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--iris);
+  transform: scaleX(0);
+  transition: transform 0.22s var(--ease);
+}
+.cv-tab:hover {
+  color: var(--ink-2);
+}
+.cv-tab[aria-selected="true"] {
+  color: var(--iris-ink);
+}
+.cv-tab[aria-selected="true"]::after {
+  transform: scaleX(1);
+}
+.cv-tab:focus-visible {
+  outline: 2px solid var(--iris-ink);
+  outline-offset: -2px;
+  border-radius: 3px;
+}
+.cv-panel {
+  padding: 22px 2px 0;
+}
+.cv-panel:focus-visible {
+  outline: 2px solid var(--iris-ink);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.cv-panel-body {
+  margin: 0;
+  font-size: clamp(16px, 1.8vw, 18.5px);
+  line-height: 1.6;
+  color: var(--body);
+  max-width: 60ch;
+}
+
+/* ----- 04 LIMITS: sticky thesis + numbered margin notes -------------------- */
+.cc-limits-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: clamp(28px, 6vw, 88px);
+  align-items: start;
+}
+.cc-limits-thesis {
+  position: sticky;
+  top: 96px;
+}
+.cc-limits-notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cc-note {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  padding: 22px 0;
+  border-top: 1px solid var(--rule);
+}
+.cc-note:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.cc-note-idx {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--gold-text);
+  padding-top: 3px;
+}
+.cc-note-idx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.cc-note-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.cc-note-body {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--body);
+  max-width: 56ch;
+}
+
+/* ----- CLOSE --------------------------------------------------------------- */
+.cc-close-cta {
+  margin-top: 26px;
+}
+
+/* ----- responsive ---------------------------------------------------------- */
+@media (max-width: 900px) {
+  .eb-table {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .eb-claim,
+  .eb-record {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .eb-claim .eb-money::after {
+    transform-origin: left;
+  }
+  .eb-axis {
+    padding-top: 4px;
+    order: 2;
+  }
+  .eb-record {
+    order: 3;
+  }
+  .eb-corr {
+    align-self: flex-start;
+    width: 22px;
+    height: 1px;
+  }
+  .mr {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .cc-limits-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .cc-limits-thesis {
+    position: static;
+  }
+}
+@media (max-width: 560px) {
+  .cc-pause span {
+    display: none;
+  }
+  .cc-pause {
+    gap: 0;
+    padding: 8px;
+  }
+}
+
+/* ----- motion: staged reveals + hover transitions, gated to allowed motion -- */
+@media (prefers-reduced-motion: no-preference) {
+  .eb-money::after {
+    transition: transform 0.32s var(--ease-arrival);
+  }
+  .eb-corr {
+    transition: opacity 0.3s var(--ease-arrival);
+  }
+  .eb-rule,
+  .eb-math,
+  .eb-break {
+    transition:
+      opacity 0.34s var(--ease-arrival),
+      transform 0.34s var(--ease-arrival);
+  }
+  .eb-receipt-body.is-lit {
+    animation: cc-fade-up 0.42s var(--ease-arrival) both;
+  }
+  .eb-receipt-body.is-lit .eb-receipt-rows > div {
+    animation: cc-fade-up 0.4s var(--ease-arrival) both;
+  }
+  .eb-receipt-body.is-lit .eb-receipt-rows > div:nth-child(1) {
+    animation-delay: 0.06s;
+  }
+  .eb-receipt-body.is-lit .eb-receipt-rows > div:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+  .eb-receipt-body.is-lit .eb-receipt-rows > div:nth-child(3) {
+    animation-delay: 0.18s;
+  }
+  .eb-receipt-body.is-lit .eb-receipt-rows > div:nth-child(4) {
+    animation-delay: 0.24s;
+  }
+  .cv-panel {
+    animation: cc-fade-up 0.28s var(--ease-arrival) both;
+  }
+  @keyframes cc-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* ----- reduced-motion kill: everything settled, no transitions -------------- */
+@media (prefers-reduced-motion: reduce) {
+  .eb-corr,
+  .eb-rule,
+  .eb-math,
+  .eb-break {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .eb-money::after {
+    transition: none;
+  }
+  .mr-word,
+  .cv-tab,
+  .cv-tab::after {
+    transition: none;
+  }
+  .eb-run:active {
+    transform: none;
+  }
 }

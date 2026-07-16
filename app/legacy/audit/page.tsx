@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getReplaySnapshot, type ReplayMerchant } from "@/legacy/activation/lib/replay/run";
 import { PLATFORM_NAME } from "@/lib/product";
+import { dejargon } from "@/lib/legacy/display";
 import { Mark } from "@/components/data-surfaces/Mark";
 
 export const metadata: Metadata = { title: "Audit" };
 
 function finalState(rm: ReplayMerchant): string {
-  if (rm.outreachStatus === "simulated_sent") return "Simulated sent";
+  if (rm.outreachStatus === "simulated_sent") return "Marked sent";
   if (rm.outreachStatus === "draft_rejected") return "Rejected";
   if (rm.merchant.review_required) return "Held for review";
   return "Drafted";
@@ -28,7 +29,7 @@ export default function AuditPage() {
         <span className="ds-mono" style={{ color: "var(--ink-2)" }}>
           {snap.generatedAt}
         </span>{" "}
-        (mode {snap.servedMode}). Open a merchant for its full step-by-step trail.
+        (mode {dejargon(snap.servedMode)}). Open a merchant for its full step-by-step trail.
       </p>
 
       <section style={{ marginTop: "22px" }}>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getReplaySnapshot, type ReplayMerchant } from "@/legacy/activation/lib/replay/run";
 import { PLATFORM_NAME, HONEST_DATA_LABEL } from "@/lib/product";
+import { dejargon } from "@/lib/legacy/display";
 import { Mark } from "@/components/data-surfaces/Mark";
 
 export const metadata: Metadata = { title: "Console" };
@@ -9,7 +10,7 @@ export const metadata: Metadata = { title: "Console" };
 const RISK_CHIP: Record<string, string> = { Low: "low", Medium: "medium", High: "high" };
 
 function statusBadge(rm: ReplayMerchant): { text: string; cls: string } {
-  if (rm.outreachStatus === "simulated_sent") return { text: "Simulated sent", cls: "sent" };
+  if (rm.outreachStatus === "simulated_sent") return { text: "Marked sent", cls: "sent" };
   if (rm.outreachStatus === "draft_rejected") return { text: "Rejected", cls: "rejected" };
   if (rm.merchant.review_required) return { text: "Held for review", cls: "held" };
   return { text: "Drafted", cls: "neutral" };
@@ -38,10 +39,10 @@ function Stat({
 const PIPELINE: Array<{ step: string; plain: string; tech: string }> = [
   { step: "Triage", plain: "Find who's stuck, and how badly.", tech: "Deterministic risk score + level (auditable formula)." },
   { step: "Diagnose", plain: "Pin the exact blocker.", tech: "Onboarding-step → blocker/next-action map." },
-  { step: "Draft", plain: "Write the right next message.", tech: "Bounded, schema-constrained LLM (REPLAY here; a real Gemini run is recorded — see Eval)." },
+  { step: "Draft", plain: "Write the right next message.", tech: "Bounded, schema-constrained model draft (a preview here; a recorded model run is on the Eval page)." },
   { step: "Gate", plain: "Check each declared claim against the data.", tech: "Claims-gatekeeper: each declared claim traces to merchant data + forbidden-claim guardrails (undeclared prose isn't fully semantically verified — a documented boundary)." },
-  { step: "Score", plain: "Measure draft quality.", tech: "Eval graders: structure · state-consistency · policy · no-leakage." },
-  { step: "Approve", plain: "A human decides: hold / reject / send.", tech: "Human-in-the-loop gate; simulated send; full audit trail." },
+  { step: "Score", plain: "Measure draft quality.", tech: "Quality graders: structure · state-consistency · policy · no-leakage." },
+  { step: "Approve", plain: "A human decides: hold / reject / send.", tech: "Human-in-the-loop gate; preview send; full audit trail." },
 ];
 
 export default function Console() {
@@ -64,8 +65,8 @@ export default function Console() {
       <p className="ds-lead tech">
         <b>Technically:</b> deterministic risk + blocker triage → bounded, schema-constrained LLM
         drafting → a claims-gatekeeper that ties every declared claim to the merchant&apos;s own data
-        → an eval harness over the output → a human approval gate with an audit trail. Avoids the
-        false-claim/churn failure the AI-outreach wave is hitting.
+        → an eval harness over the output → a human approval gate with an audit trail. Built to avoid
+        the false-claim and churn failures that unbounded automated outreach produces.
       </p>
 
       <div className="ds-note warn">
@@ -74,16 +75,16 @@ export default function Console() {
 
       <section className="ds-stats c6">
         <Stat label="Merchants" value={String(s.merchants)} sub="hybrid set" />
-        <Stat label="Simulated sent" value={String(s.sent)} sub="eligible + clean" />
+        <Stat label="Marked sent" value={String(s.sent)} sub="eligible + clean" />
         <Stat label="Held for review" value={String(s.held)} sub="human gate" />
-        <Stat label="Eval passing" value={`${s.evalPassed}/${s.evalTotal}`} sub="quality dims" />
+        <Stat label="Quality passing" value={`${s.evalPassed}/${s.evalTotal}`} sub="quality dims" />
         <Stat
-          label="Gemini spend"
+          label="Model spend"
           value="$0.00"
           sub={`≤ $5 cap · ${snap.costLedger.liveCalls} live calls`}
           accent
         />
-        <Stat label="Mode" value="REPLAY" sub="demo makes no live calls" />
+        <Stat label="Mode" value="Preview" sub="makes no live calls" />
       </section>
 
       <section>
@@ -102,9 +103,9 @@ export default function Console() {
       <section>
         <h2 className="ds-h2-row">Activation queue</h2>
         <p className="ds-runline">
-          Fictional businesses with synthetic activation state — the adapter ingests real DataSF
-          public records (fictional display, real-data capability). Open one to see the full
-          why-chain end to end.
+          Fictional businesses with illustrative activation state — the names are invented for this
+          preview; a separate, tested adapter can ingest name and category fields from a public
+          business registry when real inputs are supplied. Open one to see the full why-chain end to end.
         </p>
         <div className="ds-tbl">
           <table>
@@ -135,7 +136,7 @@ export default function Console() {
                       </span>
                     </td>
                     <td className="ds-mono" style={{ fontSize: "12px" }}>
-                      {rm.merchant.current_blocker_code}
+                      {dejargon(rm.merchant.current_blocker_code.replace(/_/g, " "))}
                     </td>
                     <td className="ds-mono">
                       {rm.evalScore.passed}/{rm.evalScore.total}
@@ -156,9 +157,10 @@ export default function Console() {
       >
         <p style={{ fontSize: "12px", lineHeight: 1.6, color: "var(--muted)", maxWidth: "90ch", margin: 0 }}>
           <b style={{ color: "var(--graphite)", fontWeight: 600 }}>Data provenance:</b>{" "}
-          {snap.provenance.source} ({snap.provenance.dataset_id}), {snap.provenance.license}. Real
-          layer = business name + category only; activation state synthetic. Human-led, AI-assisted,
-          professionally reviewed — never a claim of real marketplace access or business impact.
+          business names are invented for this preview (a tested adapter can ingest name and category
+          fields from a public business registry when real inputs are supplied); activation state is
+          illustrative. Human-led, AI-assisted, professionally reviewed — never a claim of real
+          marketplace access or business impact.
         </p>
       </footer>
     </main>

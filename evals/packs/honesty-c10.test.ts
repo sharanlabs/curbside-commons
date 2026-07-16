@@ -1,5 +1,6 @@
-import { readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
+import { join, relative } from "node:path";
+import { execSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import {
   CORPUS_AS_OF,
@@ -9,7 +10,7 @@ import {
   generateCatalog,
 } from "@/lib/packs/listings";
 import { runUcpConformance } from "@/lib/packs/listings/conformance";
-import { DEMO_CLAIM, DEMO_SIMULATED_BANNER } from "@/lib/packs/listings/demo/copy";
+import { DEMO_CLAIM } from "@/lib/packs/listings/demo/copy";
 
 /**
  * C10 honesty surface (plan §4 C10; P3-6 W1 gate advisory) — machine-checked:
@@ -59,12 +60,25 @@ const publicProse = [
   join(root, "docs", "PUBLICATION.md"),
 ];
 
+// Redesign C-REDO (2026-07-14): every landing component is a viewer-facing prose
+// surface — read the whole dir so a NEW landing component can never slip the gate
+// (this closes the F-07 gap where the fixed allowlist excluded them).
+function landingSources(): string[] {
+  const dir = join(root, "components", "landing");
+  return readdirSync(dir)
+    .filter((f) => f.endsWith(".tsx"))
+    .map((f) => join(dir, f));
+}
+
 // S2 (plan v3.3, F-04): the site SHELL joins the same honesty gates — the landing
 // page and the global layout (whose footer carries the semantic disclosure
 // contract) are viewer-facing prose surfaces exactly like the report/demo views.
 const siteShell = [
   join(root, "app", "page.tsx"),
   join(root, "app", "layout.tsx"),
+  // Landing grounding + the landing components (redesign C-REDO).
+  join(root, "lib", "landing", "specimen.ts"),
+  ...landingSources(),
   // Playground slice (owner commission 2026-07-13): the in-browser verifier's
   // page + client + seam are viewer-facing prose surfaces — same gates.
   join(root, "app", "playground", "page.tsx"),
@@ -99,6 +113,20 @@ const BANNED_CLAIMS: readonly RegExp[] = [
   /\bwe have (?:real |live )?(?:platform |marketplace )?access\b/i,
 ];
 
+// F-08: one ISOLATED planted claim per banned pattern (never combined under a
+// single `some()`), so a pattern that silently stopped matching is caught on its
+// own — a combined probe would stay green as long as ANY one pattern still bit.
+const BANNED_PROBES: ReadonlyArray<readonly [RegExp, string]> = [
+  [BANNED_CLAIMS[0], "no AI was used to build this"],
+  [BANNED_CLAIMS[1], "AI built this dashboard"],
+  [BANNED_CLAIMS[2], "this was built entirely by AI"],
+  [BANNED_CLAIMS[3], "the page shows real-time DoorDash data"],
+  [BANNED_CLAIMS[4], "the app is connected to DoorDash"],
+  [BANNED_CLAIMS[5], "displays actual DoorDash orders"],
+  [BANNED_CLAIMS[6], "renders production platform data"],
+  [BANNED_CLAIMS[7], "we have live platform access"],
+];
+
 describe("C10 platform-claims grep-gate (no real-platform-access claims)", () => {
   it.each(scannedFiles)("%s makes no real-platform-access / no-AI claim", (file) => {
     const text = readFileSync(file, "utf8");
@@ -108,9 +136,122 @@ describe("C10 platform-claims grep-gate (no real-platform-access claims)", () =>
     }
   });
 
-  it("the gate actually bites (a planted overclaim would be caught)", () => {
-    const planted = "This prototype uses real DoorDash data and no AI was used.";
-    expect(BANNED_CLAIMS.some((p) => p.test(planted))).toBe(true);
+  it("every banned pattern has exactly one dedicated probe (kept in lockstep)", () => {
+    expect(BANNED_PROBES.length).toBe(BANNED_CLAIMS.length);
+    BANNED_PROBES.forEach(([p], i) => expect(p).toBe(BANNED_CLAIMS[i]));
+  });
+
+  it.each(BANNED_PROBES)(
+    "the gate bites in isolation: %s matches its own planted claim",
+    (pattern, planted) => {
+      expect(pattern.test(planted), `pattern ${pattern} failed to catch "${planted}"`).toBe(true);
+    },
+  );
+});
+
+// ---------------------------------------------------------------------------
+// SITE-WIDE (F-07): the fixed source allowlist above cannot cover every rendered
+// surface (the new landing components, /cost, /eval, /metrics, /legacy/**, the
+// redirect stubs, 404 …). The AUTHORITATIVE site-wide gate scans the NORMALIZED
+// VISIBLE TEXT of every built out/**/*.html — a false claim on ANY route is
+// caught, and a claim split across JSX elements/lines (which a raw-source regex
+// misses, F-08) is rejoined by tag-stripping before the scan. Rendered HTML has
+// no code comments, so this is comprehensive without benign false positives.
+//
+// Freshness: this runs against a built out/ and REFUSES a stale one (phase-F
+// batch finding #9 — accepting any existing out/ made the site-wide gate
+// fail-open: edited source scanned yesterday's HTML). If out/ is absent OR older
+// than the newest page source under app/, components/, or lib/, it rebuilds ONCE
+// (self-sufficient — never a silently-skipped honesty gate). `npm run verify`
+// builds BEFORE the test run for the same reason, so there this is instant.
+// ---------------------------------------------------------------------------
+
+const outDir = join(root, "out");
+
+function newestMtimeMs(dir: string): number {
+  let newest = 0;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) newest = Math.max(newest, newestMtimeMs(full));
+    else newest = Math.max(newest, statSync(full).mtimeMs);
+  }
+  return newest;
+}
+
+function ensureBuilt(): void {
+  if (existsSync(outDir)) {
+    const built = statSync(join(outDir, "index.html")).mtimeMs;
+    const newestSource = Math.max(
+      newestMtimeMs(join(root, "app")),
+      newestMtimeMs(join(root, "components")),
+      newestMtimeMs(join(root, "lib")),
+    );
+    if (built >= newestSource) return;
+  }
+  execSync("npm run build", { cwd: root, stdio: "inherit" });
+}
+
+function htmlFiles(dir: string): string[] {
+  const files: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) files.push(...htmlFiles(full));
+    else if (entry.name.endsWith(".html")) files.push(full);
+  }
+  return files;
+}
+
+/**
+ * Reduce a built HTML page to its normalized VISIBLE text: drop <script>/<style>
+ * blocks (embedded data, not visible copy), strip every tag (rejoining a claim
+ * split across elements/lines), decode a few entities, and collapse whitespace.
+ */
+export function visibleText(html: string): string {
+  return html
+    .replace(/<script\b[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style\b[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&mdash;/g, "—")
+    .replace(/&rsquo;|&#39;|&apos;/g, "'")
+    .replace(/&ldquo;|&rdquo;|&quot;/g, '"')
+    .replace(/&nbsp;/g, " ")
+    .replace(/&sect;/g, "§")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+describe("C10 SITE-WIDE banned-claim scan (normalized visible text of every built out/**/*.html)", () => {
+  it(
+    "no rendered page carries a banned real-platform / no-AI claim",
+    { timeout: 600_000 },
+    () => {
+      ensureBuilt();
+      const pages = htmlFiles(outDir);
+      expect(pages.length, "out/ has no HTML pages — did the build run?").toBeGreaterThan(0);
+
+      const violations: string[] = [];
+      for (const file of pages) {
+        const text = visibleText(readFileSync(file, "utf8"));
+        for (const pattern of BANNED_CLAIMS) {
+          const m = text.match(pattern);
+          if (m) violations.push(`${pattern} in ${relative(root, file)}: "${m[0]}"`);
+        }
+      }
+      expect(violations, `banned claims rendered on the built site:\n${violations.join("\n")}`).toEqual(
+        [],
+      );
+    },
+  );
+
+  it("the visible-text normalizer rejoins a claim split across JSX / lines (F-08)", () => {
+    // A claim broken across elements + newlines in source becomes contiguous in
+    // rendered HTML; tag-stripping + whitespace collapse must rejoin it so the
+    // pattern still matches (a raw per-line source scan would have missed it).
+    const split = '<p>the app is\n  connected\n  to <span class="brand">DoorDash</span>.</p>';
+    const text = visibleText(split);
+    expect(text).toContain("connected to DoorDash");
+    expect(BANNED_CLAIMS.some((p) => p.test(text))).toBe(true);
   });
 });
 
@@ -175,8 +316,11 @@ describe("D1 demo honesty surface (plan §5 D1, C7/C10)", () => {
     expect(BANNED_FRAMING.some((p) => p.test(planted))).toBe(true);
   });
 
-  it("every demo surface carries the simulated label", () => {
-    // engine copy (actor label), the committed transcript, and the web view.
+  it("the CLI demo surfaces keep their honest simulated labels (engine copy + committed transcript)", () => {
+    // Freeze-reversal (decision-log 2026-07-14): the WEB SIMULATED banner was
+    // removed from DemoView, but the CLI/repo stays honest — the engine copy and
+    // the committed transcript golden keep their labels. (The removed DemoView.tsx
+    // assertion is covered by the report/demo view edits + the mockup scan below.)
     const copySrc = readFileSync(join(root, "lib", "packs", "listings", "demo", "copy.ts"), "utf8");
     expect(/simulated/i.test(copySrc)).toBe(true);
     const transcript = readFileSync(
@@ -185,29 +329,26 @@ describe("D1 demo honesty surface (plan §5 D1, C7/C10)", () => {
     );
     expect(transcript).toContain('"simulated": true');
     expect(/simulated/i.test(transcript)).toBe(true);
-    const view = readFileSync(join(root, "components", "demo", "DemoView.tsx"), "utf8");
-    expect(/SIMULATED/.test(view)).toBe(true);
   });
 });
 
 // ---------------------------------------------------------------------------
-// S2 (plan v3.3) — the footer semantic disclosure contract, the banner parity
-// lock, and the mockup claim scan. Decision-log 2026-07-10 (freeze-reversal
-// row): the layout footer's byte-freeze is replaced by SEMANTIC teeth — the
-// wording may change, these five disclosures may not.
+// FOOTER (freeze-reversal, decision-log 2026-07-14, line ~175) — SUPERSEDES the
+// 2026-07-10 S2 semantic-disclosure contract + the SIMULATED banner-parity lock.
+// The public site is DISCLAIMER-FREE: the removed footer/banner contracts are
+// replaced by an HONEST-CONTENT + NO-FALSE-CLAIM contract. The honest technical
+// framing now lives in the repo README, not the site. The C10 BANNED_CLAIMS
+// grep-gate above stays green and keeps its teeth (unchanged).
 // ---------------------------------------------------------------------------
 
-describe("S2 footer semantic disclosure contract (app/layout.tsx)", () => {
+describe("footer is disclaimer-free + honest (app/layout.tsx, freeze-reversal 2026-07-14)", () => {
   const layoutSrc = readFileSync(join(root, "app", "layout.tsx"), "utf8");
 
-  // Batch-A Codex P2 (accepted-fixed): the contract binds to the FOOTER BLOCK
-  // specifically — not the whole file — with JSX comments stripped first, so a
-  // disclosure cannot satisfy the gate from a comment or from anywhere outside
-  // the rendered footer.
+  // Bind to the FOOTER BLOCK specifically (not the whole file), with JSX comments
+  // stripped, so nothing outside the rendered footer satisfies or defeats the gate.
   const footerMatch = layoutSrc.match(/<footer[\s\S]*?<\/footer>/);
+  const footerRaw = footerMatch?.[0] ?? "";
 
-  // JSX splits sentences across lines/spans; judge the contract on a
-  // comment-stripped, whitespace-normalized, markup-stripped view.
   const normalizeJsx = (s: string) =>
     s
       .replace(/\{\/\*[\s\S]*?\*\/\}/g, " ")
@@ -217,60 +358,57 @@ describe("S2 footer semantic disclosure contract (app/layout.tsx)", () => {
       .replace(/&rsquo;/g, "'")
       .replace(/\s+/g, " ");
 
+  const normalized = footerMatch ? normalizeJsx(footerRaw) : "";
+
   it("the layout renders exactly one footer block", () => {
     expect(footerMatch, "app/layout.tsx must contain a <footer> block").not.toBeNull();
   });
 
-  const normalized = footerMatch ? normalizeJsx(footerMatch[0]) : "";
+  // HONEST CONTENT that MUST be present.
+  it("the footer carries the author/credit line to the maintainer's profile", () => {
+    expect(/Built and directed by\s+Sharan Kumar/.test(normalized), "author credit missing").toBe(
+      true,
+    );
+    expect(/github\.com\/sharanlabs/.test(footerRaw), "author profile link missing").toBe(true);
+  });
 
-  const CONTRACT: ReadonlyArray<[name: string, pattern: RegExp]> = [
-    ["prototype/simulated status", /Demo \/ portfolio prototype — simulated data throughout/],
-    ["replay provenance", /static replay of committed,? labeled fixtures/],
-    ["recorded-fixture provenance", /recorded static fixture/],
-    ["truthful send posture", /initiates no sends and makes no live calls/],
-    ["the one recorded send disclosed", /exactly one recorded, owner-armed send exists/],
-    ["non-affiliation sentence (verbatim; e2e asserts it too)", /Not affiliated with, endorsed by, or connected to/],
-    ["human-led line", /Human-led, AI-assisted, professionally reviewed/],
+  it("the footer carries the honest build-provenance line", () => {
+    // BUILD_INFO.label is injected by next.config.ts and rendered in the footer.
+    expect(/BUILD_INFO\.label/.test(footerRaw), "build-provenance line missing from footer").toBe(
+      true,
+    );
+  });
+
+  // DISCLAIMER-FREE — the reversed disclosures/brands are GONE from the footer.
+  // This is the red half: it FAILS against the pre-reversal footer.
+  const REMOVED: ReadonlyArray<[name: string, pattern: RegExp]> = [
+    ["prototype/simulated-data disclaimer", /simulated data throughout/i],
+    ["replay-of-committed-fixtures disclaimer", /static replay of committed/i],
+    ["no-sends posture disclaimer", /initiates no sends/i],
+    ["owner-armed-send disclaimer", /owner-armed send/i],
+    ["non-affiliation disclaimer", /Not affiliated with, endorsed by, or connected to/i],
+    ["real-brand names", /DoorDash|Uber\s?Eats|Grubhub|DataSF/i],
   ];
-
-  it.each(CONTRACT)("the footer carries: %s", (_name, pattern) => {
-    expect(pattern.test(normalized), `missing footer disclosure: ${pattern}`).toBe(true);
+  it.each(REMOVED)("the footer no longer carries: %s", (_name, pattern) => {
+    expect(pattern.test(normalized), `disclaimer/brand should be removed: ${pattern}`).toBe(false);
   });
 
-  it("the contract bites: the OLD (pre-reversal) footer text would FAIL the send-posture check", () => {
-    const oldFooter =
-      "REPLAY over fictional display names + synthetic activation state — not production logs, real sends, real marketplace access, or real-impact data.";
-    expect(/initiates no sends and makes no live calls/.test(oldFooter)).toBe(false);
-    expect(/exactly one recorded, owner-armed send exists/.test(oldFooter)).toBe(false);
-  });
-
-  it("the contract binds to the footer: the layout WITHOUT its footer fails every disclosure", () => {
-    // Outside-footer mutation test (batch-A Codex P2): moving a disclosure out
-    // of the footer (metadata, a comment, another element) must not satisfy
-    // the gate — the rest of the file carries none of the contract phrases.
-    const withoutFooter = normalizeJsx(layoutSrc.replace(/<footer[\s\S]*?<\/footer>/, " "));
-    for (const [, pattern] of CONTRACT) {
-      expect(pattern.test(withoutFooter), `${pattern} must live in the footer, found outside`).toBe(false);
+  // TEETH — the disclaimer-free footer contains NONE of the C10 banned claims.
+  it("the footer contains none of the BANNED_CLAIMS", () => {
+    for (const pattern of BANNED_CLAIMS) {
+      const m = normalized.match(pattern);
+      expect(m === null, `banned claim ${pattern} in footer: ${m?.[0]}`).toBe(true);
     }
   });
-});
 
-describe("S2 banner parity — ReportView's SIMULATED banner ≡ the single-sourced demo banner", () => {
-  // The banner itself stays BYTE-FROZEN (decision-log 2026-07-10: the reversal is
-  // scoped to the footer). This parity test removes the F-04 risk of the two
-  // independently-maintained copies drifting: ReportView's hardcoded JSX text
-  // must normalize to exactly DEMO_SIMULATED_BANNER (which DemoView imports).
-  it("the report banner text (normalized) equals DEMO_SIMULATED_BANNER (normalized)", () => {
-    const src = readFileSync(join(root, "components", "report", "ReportView.tsx"), "utf8");
-    const m = src.match(/<span className="rpt-sim-text">([\s\S]*?)<\/span>/);
-    expect(m, "ReportView must contain the rpt-sim-text banner span").not.toBeNull();
-    const normalize = (s: string) =>
-      s.replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
-    expect(normalize(m![1])).toBe(normalize(DEMO_SIMULATED_BANNER));
+  it("the footer BANNED_CLAIMS check bites (a planted false claim in a footer would be caught)", () => {
+    const plantedFooter =
+      "Curbside Commons is connected to DoorDash and shows production platform data; no AI was used.";
+    expect(BANNED_CLAIMS.some((p) => p.test(plantedFooter))).toBe(true);
   });
 });
 
-describe("S2 mockup claim scan (every committed mockup HTML, recursive)", () => {
+describe("mockup claim scan (every committed mockup HTML, recursive)", () => {
   // F-04: mockups sat outside every honesty scan. Scan them all for the same
   // affirmative overclaims. Only the sanctioned honest PREDICATE — "not
   // affiliated with, endorsed by, or connected to" — is removed before the

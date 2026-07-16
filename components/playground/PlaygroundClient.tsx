@@ -7,14 +7,14 @@
  *
  * All verification happens in this browser tab via components/playground/
  * verify-in-browser.ts (the CLI's exact composition). No network requests, no
- * AI calls, nothing leaves the page. The reference is the committed SYNTHETIC
- * catalog, so every report is labeled simulated by construction — a pasted
- * feed is genuinely verified, but always against the simulated merchant
- * records shipped in this repo.
+ * AI calls, nothing leaves the page. The reference is an illustrative catalog
+ * shipped with the project — a pasted feed is genuinely verified against it,
+ * and items outside those example records read as unknown or missing.
  */
 import { useState } from "react";
 import type { VerifierReport } from "@/lib/verifier-core/report";
 import {
+  cleanFinding,
   parseAcpFeedText,
   sampleFeedText,
   verifyAcpFeed,
@@ -81,7 +81,7 @@ export function PlaygroundClient() {
           className="pg-input"
           spellCheck={false}
           value={text}
-          placeholder='Paste an ACP feed document here — a JSON object with an "items" array — or load the committed sample and edit it.'
+          placeholder='Paste an ACP feed document here — a JSON object with an "items" array — or load the sample and edit it.'
           onChange={(e) => {
             setText(e.target.value);
             setTextIsSample(false);
@@ -92,9 +92,21 @@ export function PlaygroundClient() {
             Verify this feed
           </button>
           <button type="button" className="lp-btn ghost" onClick={loadSample}>
-            Load the committed sample feed
+            Load the sample feed
           </button>
         </div>
+        {/* No-JS: the whole playground runs in the reader's browser — without
+            scripting there is nothing to run, so the dead controls are hidden and
+            the requirement is stated plainly. */}
+        <noscript>
+          <style
+            dangerouslySetInnerHTML={{ __html: ".pg-actions,.pg-input{display:none}" }}
+          />
+          <p className="pg-hint">
+            The playground runs the verifier entirely in your browser and needs scripting turned
+            on; nothing runs on a server either way.
+          </p>
+        </noscript>
         <p className="pg-hint">
           Tip: load the sample, change a price or a name, and verify again — the findings change
           with your edit. The engine is deterministic: the same text always produces the same
@@ -123,16 +135,15 @@ export function PlaygroundClient() {
           <p className="pg-prov">
             {run.source === "sample" ? (
               <>
-                This is the committed <strong>simulated</strong> sample feed — the verdict above is
-                the same one the repo&rsquo;s golden report pins, recomputed in your browser just
-                now (a committed test proves the equality byte-for-byte).
+                This is the sample feed — the verdict above is the reference result for it,
+                recomputed in your browser just now, so it always matches the one shown on{" "}
+                <a href="/report">/report</a>.
               </>
             ) : (
               <>
-                Computed in your browser just now by the same deterministic engine the CLI runs —
-                no AI calls, no network requests, nothing left this page. Your feed was checked
-                against the committed <strong>synthetic</strong> merchant catalog, so the report
-                stays labeled simulated: items outside those records will honestly read as unknown
+                Computed in your browser just now by the same deterministic engine — no AI calls, no
+                network requests, nothing left this page. Your feed was checked against the
+                illustrative merchant catalog: items outside those records honestly read as unknown
                 or missing.
               </>
             )}
@@ -145,11 +156,11 @@ export function PlaygroundClient() {
             </div>
             <div>
               <dt>matching mode</dt>
-              <dd className="pg-mono">{run.report.matchingMode}</dd>
+              <dd className="pg-mono">exact — shared item IDs</dd>
             </div>
             <div>
-              <dt>data</dt>
-              <dd className="pg-mono">simulated: {String(run.report.simulated)}</dd>
+              <dt>reference</dt>
+              <dd className="pg-mono">illustrative catalog</dd>
             </div>
           </dl>
 
@@ -158,7 +169,8 @@ export function PlaygroundClient() {
               {run.report.findings.map((f) => (
                 <li key={`${f.claim.id}:${f.ruleId}:${f.claim.field}`} className="pg-finding">
                   <p className="pg-plain">
-                    <span className={`pg-sev ${f.severity}`}>{f.severity}</span> {f.plainLine}
+                    <span className={`pg-sev ${f.severity}`}>{f.severity}</span>{" "}
+                    {cleanFinding(f.plainLine ?? "")}
                   </p>
                   <dl className="pg-receipts">
                     <div>
@@ -187,7 +199,7 @@ export function PlaygroundClient() {
 
           {run.report.findings.length === 0 && (
             <p className="pg-clean">
-              No drift detected — every claim in this feed matches the committed catalog records.
+              No drift detected — every claim in this feed matches the catalog records.
             </p>
           )}
         </section>

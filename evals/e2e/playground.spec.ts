@@ -15,13 +15,13 @@ test("playground verifies the committed sample feed to the golden verdict", asyn
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Verify a serving copy in your browser",
   );
-  await page.getByRole("button", { name: "Load the committed sample feed" }).click();
+  await page.getByRole("button", { name: "Load the sample feed" }).click();
   await page.getByRole("button", { name: "Verify this feed" }).click();
   const result = page.getByRole("region", { name: "Verification result" });
   await expect(result.getByText("FAIL", { exact: true })).toBeVisible();
   await expect(result.getByText(/16 findings — 11 error · 5 warn · 0 info/)).toBeVisible();
-  // sample provenance framing (simulated + test-proven equality)
-  await expect(result.getByText(/committed/).first()).toBeVisible();
+  // sample provenance framing (jargon-free: the reference result, recomputed live)
+  await expect(result.getByText(/reference result/).first()).toBeVisible();
   // receipts render (rule ids from the golden)
   await expect(result.getByText("LST-EXIST-GHOST").first()).toBeVisible();
 });
@@ -37,7 +37,7 @@ test("edited feeds yield engine-derived receipts for the edits — input-sensiti
   // suite (playground-golden.test.ts).
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/playground");
-  await page.getByRole("button", { name: "Load the committed sample feed" }).click();
+  await page.getByRole("button", { name: "Load the sample feed" }).click();
   const result = page.getByRole("region", { name: "Verification result" });
 
   // Edit 1: plant an arbitrary price on the first row — the receipts must echo

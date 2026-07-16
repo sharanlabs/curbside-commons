@@ -10,7 +10,7 @@
     "supersedes": "Local Law 103 of 2021 baseline of § 20-563.3",
     "cap_base_term": "purchase price of each online order",
     "cap_base_definition_status": "UNVERIFIED",
-    "as_of": "2026-07-03",
+    "as_of": "2026-07-15",
     "source_primary": "Enacted LL79/2025 certified PDF via intro.nyc/local-laws/2025-79 (pdftotext); Legistar Int 0762-2024 action history",
     "quarantine": "All sources treated as untrusted data per Law 11; facts extracted only.",
     "coverage_disclaimer": "Codifies enforceable constraints found in § 20-563.3 as amended. Does NOT claim to cover all edge cases or the full Subchapter 36. Penalty/restitution provisions live outside this section (UNVERIFIED)."
@@ -53,7 +53,7 @@
       "source_clause": "§ 20-563.3(a) (delivery obligation)",
       "category": "delivery_fee",
       "kind": "service_obligation",
-      "predicate": "charges_delivery_fee => provides_delivery_within('>=1 mile') OR exigent_circumstances",
+      "predicate": "charges_delivery_fee => serves_customers_within_radius('>=1 mile of establishment') OR exigent_circumstances",
       "drift_classes": [],
       "note": "Structural obligation, not a fee-numeric check. Not machine-checkable from a statement alone.",
       "status": "VERIFIED_PRIMARY"
@@ -215,6 +215,6 @@
     { "id": "U1", "gap": "'purchase price of each online order' base not defined (tax/tip/discount inclusion)", "impact": "processing-fee base inflation + all cap checks", "resolve_in": "F1" },
     { "id": "U2", "gap": "penalty amounts / enforcement section outside § 20-563.3 not extracted", "impact": "restitution/complaint drafting", "resolve_in": "F1" },
     { "id": "U3", "gap": "pre-LL79 (LL103/2021) verbatim text for statement periods straddling 2025-06-30", "impact": "historical-period audits", "resolve_in": "F1" },
-    { "id": "U4", "gap": "live amlegal-codified text not reconciled (403); no later amendment found as of 2026-07-03", "impact": "freshness", "resolve_in": "F1 re-check" }
+    { "id": "U4", "gap": "live amlegal-codified text not reconciled (403, re-attempted 2026-07-15); no later amendment found as of 2026-07-15", "impact": "freshness", "resolve_in": "F1 re-check" }
   ]
 }

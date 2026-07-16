@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ffffff">
+<title>Curbside Commons — The Light Gauge (design sample)</title>
+<!--
+  THE LIGHT GAUGE — creative rebuild (owner words 2026-07-15, session 16, verbatim in
+  docs/decision-log.md: creative freedom · minimalist modern · premium futuristic ·
+  clean space · all animations micro + macro · no number chrome · register sweet spot).
+  Fable-designed, sample lane only. Zero external references; system font stacks;
+  Canvas2D only; reduced-motion = settled still frame; no-JS = static tableau with
+  dead controls hidden; keyboard operable. Design mockup — not a served page.
+-->
+<style>
+  :root{
+    --ink:#101322; --ink-2:#3c4257; --muted:#6d7284; --faint:#a9adbd;
+    --rule:#e8e9ee; --ground:#ffffff;
+    --iris:#5746c5; --iris-soft:rgba(87,70,197,.09);
+    --gold:#8a6d1f; --ember:#b42318;
+    --ff:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Inter,sans-serif;
+    --fm:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --ease:cubic-bezier(.22,.9,.24,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ground);color:var(--ink);font:16px/1.65 var(--ff);-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--iris-soft)}
+  .mono{font-family:var(--fm)}
+
+  /* ---------- macro rhythm ---------- */
+  .wrap{max-width:1180px;margin:0 auto;padding:0 48px}
+  section{padding:132px 0}
+  .chapter-rule{display:flex;align-items:center;gap:14px;margin-bottom:44px}
+  .chapter-rule .sq{width:8px;height:8px;background:var(--iris);transform:rotate(45deg);flex:none}
+  .chapter-rule .lbl{font:600 11px/1 var(--fm);letter-spacing:.22em;color:var(--muted)}
+  .chapter-rule .ln{flex:1;height:1px;background:var(--rule)}
+
+  h1{font-size:clamp(44px,5.4vw,72px);line-height:1.04;letter-spacing:-.028em;font-weight:700}
+  h2{font-size:clamp(30px,3.4vw,44px);line-height:1.12;letter-spacing:-.022em;font-weight:700;max-width:15ch}
+  .lede{font-size:19px;color:var(--ink-2);max-width:52ch}
+
+  /* ---------- header ---------- */
+  header{position:fixed;inset:0 0 auto 0;z-index:10;transition:background .3s var(--ease),box-shadow .3s var(--ease)}
+  header.is-scrolled{background:rgba(255,255,255,.72);backdrop-filter:blur(14px) saturate(1.4);box-shadow:0 1px 0 var(--rule)}
+  .hd{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:650;font-size:15px}
+  .brand svg{display:block}
+  nav.top{display:flex;gap:26px}
+  nav.top a{font:500 13px/1 var(--ff);color:var(--muted);text-decoration:none;position:relative;padding:6px 0}
+  nav.top a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1.5px;background:var(--iris);transition:right .28s var(--ease)}
+  nav.top a:hover{color:var(--ink)} nav.top a:hover::after{right:0}
+  nav.top a:focus-visible,.brand:focus-visible{outline:2px solid var(--iris);outline-offset:3px;border-radius:2px}
+
+  /* ---------- hero ---------- */
+  .hero{min-height:92vh;display:grid;place-items:center;position:relative;overflow:hidden;padding:120px 0 40px}
+  .hero-copy{position:relative;z-index:2;text-align:center;max-width:760px;margin:0 auto}
+  .hero-eyebrow{font:600 11px/1 var(--fm);letter-spacing:.26em;color:var(--iris);display:inline-flex;align-items:center;gap:10px;margin-bottom:26px}
+  .hero-eyebrow::before,.hero-eyebrow::after{content:"";width:26px;height:1px;background:var(--iris);opacity:.4}
+  .hero h1 .beam-word{background:linear-gradient(92deg,var(--iris) 0%,#7a68e8 55%,var(--iris) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .lede{margin:26px auto 40px}
+  .cta-row{display:flex;gap:14px;justify-content:center}
+  .btn{display:inline-flex;align-items:center;gap:8px;font:600 14px/1 var(--ff);padding:13px 22px;border-radius:6px;text-decoration:none;border:1px solid transparent;transition:transform .22s var(--ease),box-shadow .22s var(--ease),background .22s var(--ease),color .22s var(--ease)}
+  .btn.primary{background:var(--iris);color:#fff}
+  .btn.primary:hover{transform:translateY(-1px);background:#4a3ab0}
+  .btn.ghost{border-color:var(--rule);color:var(--ink)}
+  .btn.ghost:hover{border-color:var(--iris);color:var(--iris)}
+  .btn:focus-visible{outline:2px solid var(--iris);outline-offset:3px}
+  #stage{position:absolute;inset:auto 0 0 0;width:100%;height:46vh;min-height:300px;display:block}
+  .motion-toggle{position:absolute;right:48px;bottom:24px;z-index:3;display:inline-flex;align-items:center;gap:8px;font:600 12px/1 var(--ff);color:var(--ink-2);background:rgba(255,255,255,.8);backdrop-filter:blur(8px);border:1px solid var(--rule);border-radius:999px;padding:10px 16px;cursor:pointer;min-height:44px;transition:border-color .2s var(--ease),color .2s var(--ease)}
+  .motion-toggle:hover{border-color:var(--iris);color:var(--iris)}
+  .motion-toggle:focus-visible{outline:2px solid var(--iris);outline-offset:3px}
+
+  /* ---------- reading (the instrument) ---------- */
+  .reading{display:grid;grid-template-columns:minmax(300px,5fr) minmax(380px,7fr);gap:64px;align-items:center}
+  .scene{position:relative;border:1px solid var(--rule);border-radius:14px;padding:0;overflow:hidden;background:linear-gradient(180deg,#fff 0%,#fcfcfe 100%)}
+  #reading-canvas{display:block;width:100%;height:420px}
+  .scene-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--rule);padding:14px 18px}
+  .scene-state{font:600 11px/1 var(--fm);letter-spacing:.18em;color:var(--muted)}
+  .scene.is-held .scene-state{color:var(--ember)}
+  .replay{font:600 13px/1 var(--ff);color:var(--iris);background:none;border:1px solid var(--rule);border-radius:6px;padding:10px 16px;cursor:pointer;transition:border-color .2s var(--ease),background .2s var(--ease)}
+  .replay:hover{border-color:var(--iris);background:var(--iris-soft)}
+  .replay:focus-visible{outline:2px solid var(--iris);outline-offset:2px}
+  .replay[disabled]{color:var(--faint);border-color:var(--rule);cursor:default;background:none}
+
+  /* ---------- method keys ---------- */
+  .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:56px}
+  .key{border:1px solid var(--rule);border-radius:12px;padding:26px 22px;background:#fff;cursor:pointer;text-align:left;font:inherit;color:inherit;transition:transform .24s var(--ease),border-color .24s var(--ease),box-shadow .24s var(--ease)}
+  .key:hover{transform:translateY(-3px);border-color:#d9d5f2}
+  .key[aria-pressed="true"]{border-color:var(--iris);box-shadow:inset 0 0 0 1px var(--iris)}
+  .key:focus-visible{outline:2px solid var(--iris);outline-offset:3px}
+  .key .k-glyph{width:34px;height:34px;margin-bottom:16px}
+  .key h3{font-size:15px;font-weight:650;letter-spacing:-.01em}
+  .key p{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.55}
+  .key-panel{margin-top:26px;border-left:2px solid var(--iris);padding:6px 0 6px 22px;min-height:86px}
+  .key-panel .kp-title{font:600 11px/1 var(--fm);letter-spacing:.2em;color:var(--iris)}
+  .key-panel p{color:var(--ink-2);max-width:60ch;margin-top:8px}
+
+  /* ---------- boundary ---------- */
+  .bounds{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:52px}
+  .bound{border-top:2px solid var(--rule);padding:22px 4px 0;transition:border-color .3s var(--ease)}
+  .bound:hover{border-color:var(--iris)}
+  .bound h3{font-size:15px;font-weight:650}
+  .bound p{font-size:13.5px;color:var(--muted);margin-top:8px;max-width:44ch}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--rule);padding:56px 0 64px;color:var(--muted);font-size:13px}
+  footer .f-brand{color:var(--ink);font-weight:650;font-size:15px;margin-bottom:6px}
+  footer .prov{margin-top:22px;font-family:var(--fm);font-size:11.5px;color:var(--muted)}
+
+  /* ---------- reveal choreography (macro) ---------- */
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+  .reveal.is-in{opacity:1;transform:none}
+  .chapter-rule .ln{transform:scaleX(0);transform-origin:left;transition:transform .9s var(--ease) .15s}
+  .is-in .chapter-rule .ln,.chapter-rule.is-in .ln{transform:scaleX(1)}
+
+  @media print{
+    .reveal{opacity:1 !important;transform:none !important}
+    .chapter-rule .ln{transform:scaleX(1) !important}
+    .motion-toggle,#stage{display:none !important}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important}
+    html{scroll-behavior:auto}
+    .reveal{opacity:1;transform:none}
+    .chapter-rule .ln{transform:scaleX(1)}
+  }
+  @media (max-width:960px){
+    .reading{grid-template-columns:1fr}
+    .keys{grid-template-columns:repeat(2,1fr)}
+    .bounds{grid-template-columns:1fr}
+    nav.top{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header id="top">
+  <div class="wrap hd">
+    <a class="brand" href="#top" aria-label="Curbside Commons — home">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="20" height="20" rx="5" stroke="#5746C5" stroke-width="2"/>
+        <path d="M8.5 13.5l3 3 6-7" stroke="#5746C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Curbside Commons
+    </a>
+    <nav class="top" aria-label="Sections">
+      <a href="#reading">The reading</a>
+      <a href="#method">The method</a>
+      <a href="#boundary">The boundary</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ============================== HERO ============================== -->
+  <section class="hero" aria-labelledby="hero-h1">
+    <div class="wrap hero-copy">
+      <p class="hero-eyebrow">PROOF BEFORE TRUST</p>
+      <h1 id="hero-h1">Every claim, read<br>against <span class="beam-word">the record</span>.</h1>
+      <p class="lede">A quiet instrument for agentic commerce: it takes what a listing says, holds it
+        to what the merchant&rsquo;s own records say, and attaches the evidence to every call it makes.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#reading">Watch a reading</a>
+        <a class="btn ghost" href="#method">See the method</a>
+      </div>
+    </div>
+    <canvas id="stage" aria-hidden="true"></canvas>
+    <button type="button" class="motion-toggle" id="motion-toggle" aria-label="Pause motion">
+      <span class="mt-icon" aria-hidden="true">❚❚</span><span class="mt-label">Pause motion</span>
+    </button>
+  </section>
+
+  <!-- ============================ 01 READING =========================== -->
+  <section id="reading" aria-labelledby="reading-h2">
+    <div class="wrap">
+      <div class="chapter-rule reveal"><span class="sq"></span><span class="lbl">01 / THE READING</span><span class="ln"></span></div>
+      <div class="reading">
+        <div class="reveal">
+          <h2 id="reading-h2">A mismatch you can see before you read a word.</h2>
+          <p class="lede" style="font-size:16px;margin-top:18px">A claim arrives looking perfectly
+            well-formed. The gauge reads it against the merchant&rsquo;s own record, and where the two
+            disagree, the light itself breaks pattern &mdash; the difference is visible before any
+            receipt is opened. When the reading settles, the result stays on the bench, complete.</p>
+        </div>
+        <div class="scene reveal" id="scene">
+          <canvas id="reading-canvas" aria-hidden="true"></canvas>
+          <div class="scene-foot">
+            <span class="scene-state" id="scene-state" aria-live="polite">READING SETTLED · EVIDENCE ATTACHED</span>
+            <button type="button" class="replay" id="replay">Replay the reading</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 02 METHOD ============================ -->
+  <section id="method" aria-labelledby="method-h2">
+    <div class="wrap">
+      <div class="chapter-rule reveal"><span class="sq"></span><span class="lbl">02 / THE METHOD</span><span class="ln"></span></div>
+      <h2 id="method-h2" class="reveal">Four parts, kept attached.</h2>
+      <div class="keys reveal" role="group" aria-label="The four parts of a verdict">
+        <button type="button" class="key" data-key="claim" aria-pressed="true">
+          <svg class="k-glyph" viewBox="0 0 34 34" fill="none" aria-hidden="true"><rect x="5" y="7" width="24" height="20" rx="4" stroke="#5746C5" stroke-width="1.8"/><path d="M10 13h14M10 18h9" stroke="#5746C5" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <h3>The claim</h3><p>What the listing says, exactly as an automated shopper would read it.</p>
+        </button>
+        <button type="button" class="key" data-key="record" aria-pressed="false">
+          <svg class="k-glyph" viewBox="0 0 34 34" fill="none" aria-hidden="true"><path d="M7 27V9a2 2 0 012-2h16a2 2 0 012 2v18" stroke="#5746C5" stroke-width="1.8"/><path d="M7 27h20M12 12h10M12 17h10M12 22h6" stroke="#5746C5" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <h3>The record</h3><p>What the merchant&rsquo;s own source of truth says about the same thing.</p>
+        </button>
+        <button type="button" class="key" data-key="rule" aria-pressed="false">
+          <svg class="k-glyph" viewBox="0 0 34 34" fill="none" aria-hidden="true"><path d="M17 5v24M8 10l9-5 9 5M10 10v7a7 7 0 0014 0v-7" stroke="#5746C5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>The rule</h3><p>The registered check that says how the two must correspond.</p>
+        </button>
+        <button type="button" class="key" data-key="verdict" aria-pressed="false">
+          <svg class="k-glyph" viewBox="0 0 34 34" fill="none" aria-hidden="true"><rect x="6" y="6" width="22" height="22" rx="11" stroke="#5746C5" stroke-width="1.8"/><path d="M12 17l3.4 3.4L22.5 13" stroke="#5746C5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>The verdict</h3><p>The call, with claim, record, and rule still fastened to it.</p>
+        </button>
+      </div>
+      <div class="key-panel reveal" id="key-panel" aria-live="polite">
+        <span class="kp-title" id="kp-title">THE CLAIM</span>
+        <p id="kp-body">A listing is a set of statements — a price, an availability, a name. The instrument
+          treats each one as a claim to be read, not a fact to be believed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== 03 BOUNDARY =========================== -->
+  <section id="boundary" aria-labelledby="boundary-h2">
+    <div class="wrap">
+      <div class="chapter-rule reveal"><span class="sq"></span><span class="lbl">03 / THE BOUNDARY</span><span class="ln"></span></div>
+      <h2 id="boundary-h2" class="reveal">An instrument that knows its edges.</h2>
+      <div class="bounds reveal">
+        <div class="bound"><h3>It checks what it can see.</h3><p>The gauge reads only the inputs it is
+          given. It does not guess at missing facts, and it says so when a question is outside the
+          record in front of it.</p></div>
+        <div class="bound"><h3>Unresolved stays visible.</h3><p>When the evidence cannot settle a
+          question, the reading is held open — plainly marked — rather than rounded off to a pass
+          or a fail.</p></div>
+        <div class="bound"><h3>Structure is not truth.</h3><p>A perfectly valid document can still
+          misstate the world. Format checks and truth checks are kept apart, and named apart.</p></div>
+        <div class="bound"><h3>Every call shows its work.</h3><p>Any conclusion the instrument draws
+          can be traced back through rule, record, and claim — and re-drawn by the reader.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="f-brand">Curbside Commons</p>
+    <p>Deterministic verification for agentic commerce.</p>
+    <p class="prov">DESIGN SAMPLE · “THE LIGHT GAUGE” · illustrative interface study — not a served
+      page; the demonstration is invented for design review and claims nothing about live data.</p>
+  </div>
+</footer>
+
+<noscript>
+  <style>
+    /* Without scripting the canvases never run and the controls are dead —
+       hide them; the settled copy carries the page. */
+    .motion-toggle,.replay,#stage,#reading-canvas{display:none !important}
+    .reveal{opacity:1 !important;transform:none !important}
+    .chapter-rule .ln{transform:scaleX(1) !important}
+    .scene{min-height:0}
+  </style>
+</noscript>
+
+<script>
+(function(){
+  "use strict";
+  var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* header glass */
+  var top = document.getElementById("top"), hframe = 0;
+  function chrome(){ hframe = 0; top.classList.toggle("is-scrolled", scrollY > 18); }
+  addEventListener("scroll", function(){ if(!hframe) hframe = requestAnimationFrame(chrome); }, {passive:true});
+  chrome();
+
+  /* macro reveals (opacity/translate only; killed under reduce by CSS) */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("is-in"); io.unobserve(e.target); } });
+  }, {threshold:.16});
+  document.querySelectorAll(".reveal").forEach(function(el){ io.observe(el); });
+
+  /* ================= hero stage — the passline field =================
+     Two families of light travel one horizon: fine claim-threads above,
+     one record-band below. At the gauge point they register; a thread out
+     of correspondence blooms briefly and is set aside with its evidence.
+     Abstract by design — no digits, no chrome. Deterministic geometry.   */
+  var stage = document.getElementById("stage");
+  var toggle = document.getElementById("motion-toggle");
+  var sctx = stage.getContext("2d");
+  var playing = !reduced, rafId = 0, t0 = 0, tAcc = 0;
+  var MAXPX = 16777216;
+
+  function fit(c){
+    var r = c.getBoundingClientRect();
+    var dpr = devicePixelRatio || 1;
+    if (r.width*r.height*dpr*dpr > MAXPX) dpr = Math.sqrt(MAXPX/(r.width*r.height));
+    c.width = Math.max(1, Math.round(r.width*dpr));
+    c.height = Math.max(1, Math.round(r.height*dpr));
+    c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+    return {w:r.width, h:r.height};
+  }
+  var S = fit(stage);
+
+  function drawStage(t){
+    var w=S.w, h=S.h, gx=w*0.78, hy=h*0.6;
+    sctx.clearRect(0,0,w,h);
+    /* horizon */
+    sctx.strokeStyle="rgba(16,19,34,.10)"; sctx.lineWidth=1;
+    sctx.beginPath(); sctx.moveTo(0,hy); sctx.lineTo(w,hy); sctx.stroke();
+    /* gauge aperture */
+    sctx.strokeStyle="rgba(87,70,197,.5)"; sctx.lineWidth=1.5;
+    sctx.beginPath(); sctx.moveTo(gx,hy-34); sctx.lineTo(gx,hy+34); sctx.stroke();
+    sctx.strokeStyle="rgba(87,70,197,.18)";
+    sctx.beginPath(); sctx.moveTo(gx-8,hy-22); sctx.lineTo(gx-8,hy+22); sctx.stroke();
+    sctx.beginPath(); sctx.moveTo(gx+8,hy-22); sctx.lineTo(gx+8,hy+22); sctx.stroke();
+    /* record band (below horizon, slow breathing) */
+    var bh = 16 + Math.sin(t*0.0006)*1.5;
+    var grd = sctx.createLinearGradient(0,hy+8,0,hy+8+bh);
+    grd.addColorStop(0,"rgba(87,70,197,.10)"); grd.addColorStop(1,"rgba(87,70,197,0)");
+    sctx.fillStyle=grd; sctx.fillRect(0,hy+8,w,bh);
+    /* claim threads */
+    for(var i=0;i<5;i++){
+      var seed=i*137.5, speed=0.028+i*0.006;
+      var x=((t*speed+seed*13)%(w+240))-120;
+      var y=hy-14-i*11, mis=(i===3);
+      var near=Math.max(0,1-Math.abs(x-gx)/120);
+      sctx.strokeStyle = mis && near>0.4 ? "rgba(180,35,24,"+(0.25+near*0.5)+")" : "rgba(16,19,34,"+(0.16+near*0.25)+")";
+      sctx.lineWidth = 1 + near*0.8;
+      sctx.beginPath(); sctx.moveTo(x-70,y); sctx.lineTo(x+70,y); sctx.stroke();
+      if(mis && near>0.55){
+        /* the bloom — correspondence breaking pattern, no digits */
+        var r0=6+(1-near)*22;
+        sctx.strokeStyle="rgba(180,35,24,"+(near*0.35)+")";
+        sctx.beginPath(); sctx.arc(gx,y,r0,0,Math.PI*2); sctx.stroke();
+        sctx.beginPath(); sctx.arc(gx,y,r0*1.7,0,Math.PI*2);
+        sctx.strokeStyle="rgba(180,35,24,"+(near*0.15)+")"; sctx.stroke();
+      }
+      /* registration tick at the gauge for corresponding threads */
+      if(!mis && near>0.85){
+        sctx.strokeStyle="rgba(87,70,197,.7)"; sctx.lineWidth=1.5;
+        sctx.beginPath(); sctx.moveTo(gx-4,y+3); sctx.lineTo(gx-1,y+6); sctx.lineTo(gx+5,y-3); sctx.stroke();
+      }
+    }
+  }
+
+  function loop(ts){
+    if(!t0) t0 = ts - tAcc;
+    tAcc = ts - t0;
+    drawStage(tAcc);
+    if(playing) rafId = requestAnimationFrame(loop);
+  }
+  function setPlaying(p){
+    playing = p; t0 = 0;
+    toggle.querySelector(".mt-label").textContent = p ? "Pause motion" : "Play motion";
+    toggle.setAttribute("aria-label", p ? "Pause motion" : "Play motion");
+    toggle.querySelector(".mt-icon").textContent = p ? "❚❚" : "▶";
+    if(p) rafId = requestAnimationFrame(loop);
+    else { cancelAnimationFrame(rafId); drawStage(tAcc); }
+  }
+  toggle.addEventListener("click", function(){ setPlaying(!playing); });
+  document.addEventListener("visibilitychange", function(){
+    if(document.hidden){ cancelAnimationFrame(rafId); }
+    else if(playing){ t0 = 0; rafId = requestAnimationFrame(loop); }
+  });
+  var hio = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!playing) return;
+      if(e.isIntersecting){ t0 = 0; rafId = requestAnimationFrame(loop); }
+      else cancelAnimationFrame(rafId);
+    });
+  }, {threshold:.05});
+  hio.observe(stage);
+  if(reduced){ setPlaying(false); } else { rafId = requestAnimationFrame(loop); }
+
+  /* ================= the reading — opens settled, replayable =================
+     One claim-thread meets the record-band at the aperture; correspondence
+     breaks; the reading holds with the evidence facet attached. Opens at the
+     settled end state; Replay re-runs the pass in the same footprint.       */
+  var rc = document.getElementById("reading-canvas");
+  var rctx = rc.getContext("2d");
+  var R = fit(rc);
+  var scene = document.getElementById("scene");
+  var stateEl = document.getElementById("scene-state");
+  var replayBtn = document.getElementById("replay");
+  var rRaf = 0;
+
+  addEventListener("resize", function(){
+    S = fit(stage); R = fit(rc);
+    if(!playing) drawStage(tAcc);
+    drawReading(lastP);
+  });
+
+  var lastP = 1;
+  function drawReading(p){ /* p 0..1; 1 = settled */
+    lastP = p;
+    var w=R.w, h=R.h;
+    rctx.clearRect(0,0,w,h);
+    var hy=h*0.52, gx=w*0.58;
+    /* bench line + aperture */
+    rctx.strokeStyle="rgba(16,19,34,.12)"; rctx.lineWidth=1;
+    rctx.beginPath(); rctx.moveTo(28,hy); rctx.lineTo(w-28,hy); rctx.stroke();
+    rctx.strokeStyle="rgba(87,70,197,.55)"; rctx.lineWidth=1.6;
+    rctx.beginPath(); rctx.moveTo(gx,hy-56); rctx.lineTo(gx,hy+56); rctx.stroke();
+    /* record band */
+    var grd=rctx.createLinearGradient(0,hy+10,0,hy+34);
+    grd.addColorStop(0,"rgba(87,70,197,.12)"); grd.addColorStop(1,"rgba(87,70,197,0)");
+    rctx.fillStyle=grd; rctx.fillRect(28,hy+10,w-56,24);
+    /* claim thread travels to the aperture */
+    var x = 28 + (gx-28)*Math.min(1,p*1.25);
+    var y = hy-26;
+    rctx.strokeStyle="rgba(16,19,34,.55)"; rctx.lineWidth=1.4;
+    rctx.beginPath(); rctx.moveTo(Math.max(28,x-90),y); rctx.lineTo(x,y); rctx.stroke();
+    /* at the aperture: the bloom, then the held facet */
+    if(p>0.55){
+      var q=(p-0.55)/0.45;
+      rctx.strokeStyle="rgba(180,35,24,"+(0.5-q*0.25)+")";
+      rctx.beginPath(); rctx.arc(gx,y,8+q*10,0,Math.PI*2); rctx.stroke();
+      rctx.strokeStyle="rgba(180,35,24,"+(0.22-q*0.12)+")";
+      rctx.beginPath(); rctx.arc(gx,y,(8+q*10)*1.8,0,Math.PI*2); rctx.stroke();
+    }
+    if(p>=1){
+      /* the evidence facet — held, attached, quiet */
+      rctx.save();
+      rctx.translate(gx+72,y);
+      rctx.rotate(Math.PI/4);
+      rctx.strokeStyle="rgba(180,35,24,.9)"; rctx.lineWidth=1.6;
+      rctx.strokeRect(-9,-9,18,18);
+      rctx.restore();
+      rctx.strokeStyle="rgba(180,35,24,.4)";
+      rctx.beginPath(); rctx.moveTo(gx,y); rctx.lineTo(gx+58,y); rctx.stroke();
+    }
+  }
+
+  function runReading(){
+    cancelAnimationFrame(rRaf);
+    replayBtn.disabled = true;
+    scene.classList.remove("is-held");
+    stateEl.textContent = "READING IN PASS…";
+    if(reduced){
+      drawReading(1);
+      settle();
+      return;
+    }
+    var start = performance.now(), DUR = 2400;
+    (function step(ts){
+      var p = Math.min(1,(ts-start)/DUR);
+      drawReading(p);
+      if(p<1) rRaf = requestAnimationFrame(step);
+      else settle();
+    })(performance.now());
+  }
+  function settle(){
+    scene.classList.add("is-held");
+    stateEl.textContent = "READING SETTLED · EVIDENCE ATTACHED";
+    replayBtn.disabled = false;
+  }
+  drawReading(1); settle(); /* opens complete — nothing opens empty */
+  replayBtn.addEventListener("click", runReading);
+
+  /* ================= method keys ================= */
+  var COPY = {
+    claim:{t:"THE CLAIM", b:"A listing is a set of statements — a price, an availability, a name. The instrument treats each one as a claim to be read, not a fact to be believed."},
+    record:{t:"THE RECORD", b:"The merchant’s own source of truth for the same statement. The instrument never invents a record; it only reads the one it is given."},
+    rule:{t:"THE RULE", b:"A registered check naming how claim and record must correspond — so a disagreement is a rule firing, never an opinion."},
+    verdict:{t:"THE VERDICT", b:"The call the instrument makes, with the claim, the record, and the rule still fastened to it — inspectable end to end."}
+  };
+  var keys = document.querySelectorAll(".key");
+  var kpT = document.getElementById("kp-title"), kpB = document.getElementById("kp-body");
+  keys.forEach(function(k){
+    k.addEventListener("click", function(){
+      keys.forEach(function(o){ o.setAttribute("aria-pressed", String(o===k)); });
+      var c = COPY[k.dataset.key];
+      kpT.textContent = c.t; kpB.textContent = c.b;
+    });
+  });
+})();
+</script>
+</body>
+</html>

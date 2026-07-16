@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getReplaySnapshot } from "@/legacy/activation/lib/replay/run";
 import { PLATFORM_NAME } from "@/lib/product";
-import { GEMINI_PRICING, PRICING_VERSION } from "@/lib/agents/pricing";
+import { dejargon } from "@/lib/legacy/display";
 import { DEFAULT_BUDGET_CAP_USD } from "@/lib/agents/budget";
 
 export const metadata: Metadata = { title: "Cost" };
@@ -37,12 +37,12 @@ export default function CostPage() {
           <div className="l">live calls</div>
         </div>
         <div className="ds-stat">
-          <div className="v">{snap.servedMode}</div>
+          <div className="v">{dejargon(snap.servedMode)}</div>
           <div className="l">serve mode</div>
         </div>
       </section>
 
-      <p className="ds-note">{led.note}</p>
+      <p className="ds-note">{dejargon(led.note)}</p>
 
       <section>
         <h2 className="ds-h2-row">How the cap holds</h2>
@@ -59,39 +59,8 @@ export default function CostPage() {
           <li>Before every live call, a fail-closed guard blocks it if spent + next-estimate would exceed the cap.</li>
           <li>A batch threads cumulative spend, so the cap holds across the whole run — not just per call.</li>
           <li>An unknown model id fails loud (never silently prices at $0); a billed-then-failed call still records its cost.</li>
-          <li>The price table was pinned + verified against official Gemini pricing for the recorded run; it must be re-checked before any future live run (never trusted from memory).</li>
+          <li>The price list was pinned to a fixed, published version and verified for the recorded run; it must be re-checked before any future live run (never trusted from memory).</li>
         </ul>
-      </section>
-
-      <section>
-        <h2 className="ds-h2-row">
-          Pinned price table{" "}
-          <span style={{ fontWeight: 400, color: "var(--muted)", fontFamily: "var(--ff-sans)", fontSize: "14px" }}>
-            ({PRICING_VERSION})
-          </span>
-        </h2>
-        <div className="ds-tbl">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Model</th>
-                <th scope="col">Input $/1M</th>
-                <th scope="col">Output $/1M</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(GEMINI_PRICING).map(([model, p]) => (
-                <tr key={model}>
-                  <td className="ds-mono" style={{ fontSize: "12.5px" }}>
-                    {model}
-                  </td>
-                  <td className="ds-mono">${p.inputPerMillionUsd}</td>
-                  <td className="ds-mono">${p.outputPerMillionUsd}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </section>
     </main>
   );

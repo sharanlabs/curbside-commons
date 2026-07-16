@@ -13,7 +13,9 @@ test("legacy console renders the queue with both human-in-the-loop outcomes", as
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Activate stalled");
   await expect(page.getByRole("heading", { name: "Activation queue" })).toBeVisible();
   await expect(page.getByText("Held for review").first()).toBeVisible();
-  await expect(page.getByText("Simulated sent").first()).toBeVisible();
+  // De-jargon (redesign Slice E): the outcome label reads "Marked sent" on the
+  // public page (the internal outreach state keeps its name in the project).
+  await expect(page.getByText("Marked sent").first()).toBeVisible();
 });
 
 test("a merchant opens its full why-chain end to end under /legacy/", async ({ page }) => {
@@ -34,6 +36,14 @@ test("a merchant opens its full why-chain end to end under /legacy/", async ({ p
     await expect(page.getByRole("heading", { name: section }).first()).toBeVisible();
   }
   await expect(page.getByText("Why they're stuck", { exact: false })).toBeVisible();
+  // Phase-F batch findings #1/#2: the preserved module's diagnosis prose renders
+  // through the display-layer de-jargon — no vendor/agency names reach the page.
+  const merchantBody = await page.locator("main").innerText();
+  for (const leak of [/\bstripe\b/i, /\bIRS\b/, /\bDataSF\b/i]) {
+    expect(merchantBody, `vendor/agency name leaked on the merchant page: ${leak}`).not.toMatch(
+      leak,
+    );
+  }
 });
 
 test("the /legacy/ skeleton serves every moved surface under the provenance banner", async ({
@@ -49,7 +59,7 @@ test("the /legacy/ skeleton serves every moved surface under the provenance bann
   await expect(page.locator("footer")).toHaveCount(1);
   // The remaining moved surfaces resolve with their original H1s + the banner.
   const moved: Array<[string, string]> = [
-    ["/legacy/metrics", "Workflow metrics (simulated)"],
+    ["/legacy/metrics", "Workflow metrics (illustrative)"],
     ["/legacy/cost", "Cost ledger"],
     ["/legacy/audit", "Audit Trail"],
   ];
@@ -60,6 +70,10 @@ test("the /legacy/ skeleton serves every moved surface under the provenance bann
       page.getByText("Legacy activation module", { exact: false }).first(),
     ).toBeVisible();
   }
-  // legacy cost still shows the honest $0.00 replay ledger
+  // legacy cost still shows the honest $0.00 replay ledger. (Asserted on the cost
+  // page itself: pre-freeze-reversal this incidentally passed on whatever page the
+  // loop last landed on, because the removed nav "· $0.00" pill rendered on every
+  // page. With the pill gone, the check is repointed to its stated intent.)
+  await page.goto("/legacy/cost");
   await expect(page.getByText("$0.00").first()).toBeVisible();
 });

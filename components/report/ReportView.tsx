@@ -10,32 +10,61 @@ import { toReportView, type FindingRow, type ReportView as ReportViewModel } fro
  * The one-page verifier report (W3; plan §5 W3 · S-9 "the report IS a document").
  *
  * Renders a VerifierReport as ONE self-contained page — desktop web + printable
- * (see the `@media print` block in globals.css). The data is the COMMITTED golden
- * fixture reports, imported statically and bundled at build: zero LLM, zero
- * network, $0 — the report-rendering path imports no provider/LLM module (proven
- * by evals/packs/report-view-c1.test.ts). A surface toggle switches between the
- * two serving surfaces the same SOR was checked against (ACP static feed / UCP
- * catalog response); each renders as its own one-page report.
+ * (see the `@media print` block in globals.css). The data is the bundled report
+ * fixtures, imported statically at build: zero LLM, zero network, $0 — the
+ * report-rendering path imports no provider/LLM module (proven by
+ * evals/packs/report-view-c1.test.ts). A surface toggle switches between the two
+ * serving surfaces the same source-of-record was checked against (ACP static feed
+ * / UCP catalog response); each renders as its own one-page report.
+ *
+ * Disclaimer-free (redesign Slice D, decision-log 2026-07-14): the rendered
+ * SIMULATED banner was removed. The output is a genuine deterministic computation
+ * on illustrative input — never asserted as live/real; no false claim (C10 green).
  *
  * Plain: shows the checker's result as a printable one-pager — a plain sentence
- * per catch, then the exact receipts — with the "everything here is made-up test
- * data" label impossible to miss. No AI, no live data.
+ * per catch, then the exact receipts. No AI in the verifier, no live data.
  */
 
 const SURFACES = {
   acp: {
     label: "ACP static feed",
-    plain: "OpenAI/Stripe product-feed shape",
+    plain: "agent-commerce product-feed shape",
     report: toReportView(acpJson as unknown as VerifierReport),
   },
   ucp: {
     label: "UCP catalog response",
-    plain: "constructed simulation of the Google-led live-catalog shape (normalized, not wire format)",
+    plain: "open live-catalog shape (normalized, not wire format)",
     report: toReportView(ucpJson as unknown as VerifierReport),
   },
 } as const;
 
 type SurfaceKey = keyof typeof SURFACES;
+
+// Display-layer copy: the matching-mode enum is an internal token; render it as a
+// reader-facing description of HOW records were matched (no internal labels).
+const MATCHING_MODE_DISPLAY: Record<string, { value: string; plain: string }> = {
+  "synthetic-controlled": {
+    value: "exact — shared item IDs",
+    plain: "the copy and the catalog share item IDs, so matching is exact (no entity resolution)",
+  },
+  "real-world": {
+    value: "entity-resolved",
+    plain: "the copy and the records are matched by resolved identity",
+  },
+};
+
+// Display-layer copy cleanup for finding text that comes from the committed data:
+// keep the meaning, present it in the site's plain product voice. This is an
+// EXAMPLE report on illustrative input, so the finding lines are reworded away
+// from live-operational framing ("being served to customers" / "still served" /
+// "vs the real") toward serving-copy-vs-record reference language.
+function cleanCopy(s: string): string {
+  return s
+    .replace(/\bbeing served to customers\b/gi, "present in the serving copy")
+    .replace(/\bstill served\b/gi, "still present in the serving copy")
+    .replace(/\bvs the real\b/gi, "vs the record")
+    .replace(/\bsimulated\b/gi, "example");
+}
 
 function SeverityBadge({ severity }: { severity: FindingRow["severity"] }) {
   return <span className={`rpt-sev ${severity}`}>{severity}</span>;
@@ -47,7 +76,7 @@ function FindingCard({ row, index }: { row: FindingRow; index: number }) {
       <div className="rpt-finding-lead">
         <span className="rpt-idx">{String(index + 1).padStart(2, "0")}</span>
         {/* C4: the plain-words line leads every finding. */}
-        <p className="rpt-plain">{row.plainLine}</p>
+        <p className="rpt-plain">{cleanCopy(row.plainLine)}</p>
         <SeverityBadge severity={row.severity} />
       </div>
       {/* C2: the four evidence fields, always visible — claim · reference row · rule · severity. */}
@@ -107,23 +136,12 @@ export function ReportView() {
 
   return (
     <main className="rpt-wrap" id="report">
-      {/* C10: the SIMULATED label — visually unmissable, and it survives print. */}
-      <div className="rpt-sim" role="note">
-        <span className="rpt-sim-tag">SIMULATED</span>
-        <span className="rpt-sim-text">
-          Synthetic test data — an invented restaurant, invented menu, invented prices. Not real
-          DoorDash / Square / Uber&nbsp;Eats / Grubhub data, access, or business impact. The
-          verification rules and the pinned data-format standard are real; the restaurant, its
-          menu, and its records are invented.
-        </span>
-      </div>
-
       <header className="rpt-head">
         <p className="rpt-eyebrow">Verifier report · listings truth check</p>
         <h1 className="rpt-title">What the copy says vs. what the restaurant&rsquo;s records say</h1>
         <p className="rpt-intro">
-          A serving copy of a menu (what an AI shopping assistant would read) checked, line by line,
-          against the restaurant&rsquo;s own system-of-record. Below is every difference the checker
+          An example serving copy of a menu (what an AI shopping assistant would read), checked line
+          by line against the restaurant&rsquo;s own records. Below is every difference the checker
           caught &mdash; each in plain words first, then the exact receipts. Deterministic and $0,
           with no AI calls in this verifier runtime: the same input always gives this same report.
         </p>
@@ -145,6 +163,15 @@ export function ReportView() {
           </button>
         ))}
       </div>
+      {/* No-JS: the surface toggle is inert without hydration — hide the dead buttons
+          and say plainly which surface this static view shows. */}
+      <noscript>
+        <style dangerouslySetInnerHTML={{ __html: ".rpt-toolbar{display:none}" }} />
+        <p className="rpt-intro">
+          Scripting is off, so this static view shows the {SURFACES[surface].label} check; the
+          second serving surface is available with scripting on.
+        </p>
+      </noscript>
 
       {/* The Ledger modular grid: a caption rail against one continuous hairline,
           every block flush-left. The rail labels are layout armature (they mirror
@@ -158,7 +185,7 @@ export function ReportView() {
         </div>
       </section>
 
-      {/* C10 header surface — spec pin · matching mode · simulated flag — as a ledger. */}
+      {/* Header surface — surface · spec pin · matching mode — as a ledger. */}
       <section className="rpt-sec" aria-labelledby="rpt-rail-meta">
         <h2 id="rpt-rail-meta" className="rpt-rail">
           Meta
@@ -178,14 +205,12 @@ export function ReportView() {
             <div className="rpt-mrow">
               <dt>matching mode</dt>
               <dd>
-                <span className="rpt-mono">{report.matchingMode}</span>
-                <span className="rpt-rc-sub">{report.matchingModePlain}</span>
-              </dd>
-            </div>
-            <div className="rpt-mrow">
-              <dt>data</dt>
-              <dd>
-                <span className="rpt-mono">simulated: {String(report.simulated)}</span>
+                <span className="rpt-mono">
+                  {MATCHING_MODE_DISPLAY[report.matchingMode]?.value ?? report.matchingMode}
+                </span>
+                <span className="rpt-rc-sub">
+                  {MATCHING_MODE_DISPLAY[report.matchingMode]?.plain ?? report.matchingModePlain}
+                </span>
               </dd>
             </div>
           </dl>
@@ -209,10 +234,10 @@ export function ReportView() {
         <div className="rpt-rail" aria-hidden="true" />
         <div className="rpt-bodycol">
           <p>
-          Every row above carries its four receipts &mdash; the claim, the catalog row it was checked
-          against, the rule it broke, and how severe it is. No language model runs in this verifier
-          &mdash; the comparison is exact, deterministic logic. Simulated prototype, run on demand
-          &mdash; not a live service. Human-led, AI-assisted, professionally reviewed.
+          Every row above carries its four receipts &mdash; the claim, the record row it was checked
+          against, the rule it caught, and how severe it is. No language model runs in this verifier
+          &mdash; the comparison is exact, deterministic logic, and the same input always produces
+          this same report.
           </p>
         </div>
       </footer>
