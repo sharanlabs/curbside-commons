@@ -13,6 +13,17 @@ import type { MethodDetail } from "@/lib/landing/specimen";
  * marks the active word; a polite live region announces the swapped panel.
  */
 
+/** ONE source for the thesis sentence — the interactive render and the no-JS
+    fallback both assemble from these fragments, so the two copies cannot drift
+    (batch P2, 2026-07-16: the fallback had kept a superseded wording). */
+const SENTENCE = {
+  lead: "A ",
+  afterClaim: " is checked against a ",
+  afterRecord: " under a ",
+  afterRule: ". The ",
+  tail: " keeps all three together, so the conclusion can be checked instead of trusted.",
+} as const;
+
 export function MethodRelation({ details }: { details: MethodDetail[] }) {
   const [active, setActive] = useState(details[0]?.key ?? "claim");
   const current = details.find((d) => d.key === active) ?? details[0];
@@ -31,9 +42,15 @@ export function MethodRelation({ details }: { details: MethodDetail[] }) {
   return (
     <div className="mr">
       <p className="mr-sentence">
-        A {word("claim", "claim")} meets a {word("record", "record")} through a{" "}
-        {word("rule", "rule")}. The {word("verdict", "verdict")} keeps all three attached, so the
-        conclusion can be checked instead of trusted.
+        {SENTENCE.lead}
+        {word("claim", "claim")}
+        {SENTENCE.afterClaim}
+        {word("record", "record")}
+        {SENTENCE.afterRecord}
+        {word("rule", "rule")}
+        {SENTENCE.afterRule}
+        {word("verdict", "verdict")}
+        {SENTENCE.tail}
       </p>
 
       <div className="mr-panel mr-live-panel" aria-live="polite">
@@ -53,8 +70,15 @@ export function MethodRelation({ details }: { details: MethodDetail[] }) {
           }}
         />
         <p className="mr-sentence mr-sentence-static" style={{ display: "block" }}>
-          A <em>claim</em> meets a <em>record</em> through a <em>rule</em>. The <em>verdict</em>{" "}
-          keeps all three attached, so the conclusion can be checked instead of trusted.
+          {SENTENCE.lead}
+          <em>claim</em>
+          {SENTENCE.afterClaim}
+          <em>record</em>
+          {SENTENCE.afterRecord}
+          <em>rule</em>
+          {SENTENCE.afterRule}
+          <em>verdict</em>
+          {SENTENCE.tail}
         </p>
         <dl className="mr-noscript">
           {details.map((d) => (

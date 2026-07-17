@@ -122,7 +122,11 @@ function extractSpecifiers(src: string): string[] {
 }
 
 /** Bare specifiers the browser bundle legitimately provides. Everything else fails. */
-const BARE_ALLOWLIST = new Set(["react"]);
+// "@number-flow/react": vetted ADOPT-WITH-CONDITIONS 2026-07-16 (MIT, exact-pinned
+// 0.6.1; zero network/hooks verified in the repo AND the published tarballs incl.
+// the esm-env transitive; reduced-motion/ARIA floors verified) — first real use is
+// the /fees paste-leg tally. The covering batch re-probes the whole condition set.
+const BARE_ALLOWLIST = new Set(["react", "@number-flow/react"]);
 const BARE_PREFIX_ALLOWLIST = ["react/", "next/", "react-dom/"];
 const NODE_BUILTINS = new Set([...builtinModules, ...builtinModules.map((m) => `node:${m}`)]);
 

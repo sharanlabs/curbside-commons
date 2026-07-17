@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>Grilling round 1 — five registers · Curbside Commons</title>
+<!-- Design prototype (grilling-frontend-prototyping, round 1 — 2026-07-16).
+     NOT the product. One mocked landing (hero + the FIRST CLAIM bench) restyled
+     live into five radically different registers from the cross-industry sweep
+     (docs/research/design-crossindustry-2026-07-16.md). Figures are the REAL
+     committed illustrative specimen (2150 vs $21.50, finding 11 of 16). This is a
+     simulated demonstration — no real platform statement, no live connection.
+     Zero external requests. Desktop-only. -->
+<style>
+/* ---------- base ---------- */
+* { box-sizing: border-box; margin: 0; }
+:root {
+  --ink: #16150f; --ground: #fcfbf8; --mut: #6e695f; --acc: #9a7b2d; --sig: #8c2f1d;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ground); color: var(--ink);
+  font-family: ui-sans-serif, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh; padding-bottom: 120px;
+  transition: background 0.4s ease;
+}
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--sig); outline-offset: 2px; }
+.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+
+/* shared skeleton (each register restyles + may reorder these) */
+.hero { padding: 72px 0 56px; }
+.brand { display: flex; align-items: baseline; gap: 14px; margin-bottom: 44px; }
+.brand-name { font-weight: 700; letter-spacing: 0.02em; }
+.brand-tag { font-size: 11px; letter-spacing: 0.16em; color: var(--mut); }
+.hline { max-width: 21ch; text-wrap: balance; }
+.hsub { max-width: 58ch; margin-top: 18px; color: var(--mut); line-height: 1.55; }
+.proofline { margin-top: 34px; font-size: 13px; letter-spacing: 0.08em; }
+.honesty { margin-top: 10px; font-size: 11px; color: var(--mut); letter-spacing: 0.04em; }
+
+.bench { padding: 56px 0 80px; }
+.b-eyebrow { font-size: 12px; letter-spacing: 0.22em; color: var(--mut); margin-bottom: 8px; }
+.b-title { margin-bottom: 34px; text-wrap: balance; }
+.b-card { position: relative; }
+.b-tally { font-size: 12px; color: var(--mut); letter-spacing: 0.06em; }
+.b-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 40px; align-items: start; margin: 30px 0; }
+.b-col-label { display: block; font-size: 10.5px; letter-spacing: 0.2em; color: var(--mut); margin-bottom: 12px; }
+.b-field { display: block; font-size: 12px; color: var(--mut); margin-bottom: 6px; }
+.b-money { display: block; font-size: 44px; font-weight: 650; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.b-sub { display: block; font-size: 12.5px; color: var(--mut); margin-top: 6px; }
+.b-axis { display: flex; flex-direction: column; gap: 10px; padding-top: 22px; min-width: 300px; }
+.b-rule-name { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; }
+.b-rule-plain { font-size: 11.5px; color: var(--mut); }
+.b-math { font-size: 12.5px; display: flex; flex-direction: column; gap: 3px; }
+.b-delta { margin: 8px 0 0; }
+.b-delta-num { font-size: 84px; font-weight: 750; letter-spacing: -0.03em; line-height: 1; display: inline-block; }
+.b-delta-cap { display: block; font-size: 11.5px; letter-spacing: 0.14em; color: var(--mut); margin-top: 8px; }
+.b-steps { display: flex; gap: 8px; margin: 26px 0 0; flex-wrap: wrap; }
+.b-step { border: 1px solid var(--mut); background: transparent; color: var(--ink);
+  font-size: 11px; letter-spacing: 0.08em; padding: 7px 12px; min-height: 28px; }
+.b-receipt { margin-top: 30px; padding-top: 20px; }
+.b-receipt-label { font-size: 10.5px; letter-spacing: 0.16em; color: var(--mut); }
+.b-sev { display: inline-block; font-size: 10px; letter-spacing: 0.12em; padding: 3px 8px;
+  background: var(--sig); color: #fff; margin-right: 10px; }
+.b-plain { margin: 12px 0; font-size: 15px; }
+.b-rows { display: grid; grid-template-columns: max-content 1fr; gap: 6px 22px; font-size: 12.5px; }
+.b-rows dt { color: var(--mut); }
+.b-foot { display: block; margin-top: 14px; font-size: 11px; color: var(--mut); letter-spacing: 0.08em; }
+footer.note { padding: 40px 48px; font-size: 11px; color: var(--mut); max-width: 1080px; margin: 0 auto; line-height: 1.6; }
+
+/* examination state: mid-exam dims later stages, lights stage 1-3 */
+body[data-state="mid"] .st4, body[data-state="mid"] .st5, body[data-state="mid"] .st6 { opacity: 0.22; }
+body[data-state="mid"] .st3 { opacity: 1; }
+.stagey { transition: opacity 0.5s ease; }
+
+/* variant-specific decorations default hidden */
+.only { display: none; }
+
+/* ---------- picker ---------- */
+#picker { position: fixed; right: 22px; bottom: 22px; z-index: 50; background: #101014; color: #f5f5f2;
+  border-radius: 4px; padding: 12px 14px; width: 250px; box-shadow: 0 10px 30px rgba(0,0,0,0.28);
+  font-family: ui-monospace, Menlo, monospace; user-select: none; }
+#picker .pk-head { display: flex; justify-content: space-between; align-items: center; cursor: grab; font-size: 10px; letter-spacing: 0.14em; color: #9a9a92; margin-bottom: 8px; }
+#picker .pk-name { font-size: 14px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 2px; }
+#picker .pk-note { font-size: 10.5px; color: #b9b9b0; line-height: 1.45; min-height: 44px; }
+#picker .pk-row { display: flex; gap: 6px; margin-top: 10px; align-items: center; }
+#picker button { background: #26262c; color: #f5f5f2; border: 1px solid #3a3a42; border-radius: 3px; font-size: 11px; padding: 5px 9px; min-width: 28px; }
+#picker button[aria-pressed="true"] { background: #f5f5f2; color: #101014; }
+#picker .pk-dots { display: flex; gap: 5px; margin-left: auto; }
+#picker .pk-dot { width: 8px; height: 8px; border-radius: 50%; background: #3a3a42; }
+#picker .pk-dot.on { background: #f5f5f2; }
+
+/* ============ A · ACCESSION — museum catalogue ============ */
+body[data-variant="a"] { --ink:#1c1a16; --ground:#fcfbf8; --mut:#6e695f; --acc:#9a7b2d; --sig:#8c2f1d;
+  font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+body[data-variant="a"] .hline { font-size: 46px; font-weight: 500; line-height: 1.12; }
+body[data-variant="a"] .brand-name { font-variant: small-caps; letter-spacing: 0.08em; }
+body[data-variant="a"] .hero { text-align: center; border-bottom: 3px double #c8c2b4; }
+body[data-variant="a"] .hline, body[data-variant="a"] .hsub { margin-left: auto; margin-right: auto; }
+body[data-variant="a"] .brand { justify-content: center; }
+body[data-variant="a"] .b-card { border: 1px solid #c8c2b4; padding: 44px 48px; background: #fffefb; }
+body[data-variant="a"] .b-eyebrow::before { content: "CAT. № CC-2026-011 · "; color: var(--acc); }
+body[data-variant="a"] .b-money { font-weight: 500; }
+body[data-variant="a"] .b-delta-num { color: var(--sig); font-weight: 600;
+  border: 3px solid var(--sig); border-radius: 50%; padding: 22px 26px; transform: rotate(-7deg); font-size: 56px; }
+body[data-variant="a"] .a-prov { display: block; margin-top: 26px; border-top: 1px solid #c8c2b4; padding-top: 14px; }
+body[data-variant="a"] .a-prov li { font-size: 12.5px; padding: 5px 0; border-bottom: 1px dotted #d8d2c4; list-style: none; display: flex; gap: 18px; }
+body[data-variant="a"] .a-prov .d { color: var(--acc); min-width: 130px; font-variant: small-caps; }
+body[data-variant="a"] .b-steps .b-step { border-radius: 0; border-color: #c8c2b4; font-variant: small-caps; }
+
+/* ============ B · INSTRUMENT — metrology / HMI ============ */
+body[data-variant="b"] { --ink:#142027; --ground:#eef1f2; --mut:#5c6b70; --acc:#0f766e; --sig:#c2410c;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+body[data-variant="b"] .hline { font-size: 40px; font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase; }
+body[data-variant="b"] .hero, body[data-variant="b"] .bench { }
+body[data-variant="b"] .b-card { background: #ffffff; border: 1px solid #cfd8da; border-top: 6px solid #142027; padding: 38px 42px;
+  box-shadow: inset 0 0 0 1px #eef1f2, 0 1px 0 #cfd8da; }
+body[data-variant="b"] .b-ticks { display: block; height: 14px; margin-bottom: 22px;
+  background: repeating-linear-gradient(90deg, #b9c4c7 0 1px, transparent 1px 12px); position: relative; }
+body[data-variant="b"] .b-money { font-size: 40px; background: #f4f7f7; border: 1px solid #cfd8da; padding: 10px 14px; }
+body[data-variant="b"] .b-delta-num { color: var(--sig); font-size: 72px; background: #142027; color: #ffb38a; padding: 12px 22px; }
+body[data-variant="b"] .lamps { display: flex; gap: 16px; margin-top: 24px; font-size: 10.5px; letter-spacing: 0.1em; }
+body[data-variant="b"] .lamp { display: flex; align-items: center; gap: 6px; }
+body[data-variant="b"] .lamp i { width: 10px; height: 10px; border-radius: 50%; border: 1px solid #5c6b70; }
+body[data-variant="b"] .lamp.err i { background: var(--sig); border-color: var(--sig); }
+body[data-variant="b"] .lamp.ok i { background: transparent; }
+body[data-variant="b"] .lamp.held i { background: #a16207; border-color: #a16207; }
+body[data-variant="b"] .b-step { border-radius: 2px; background: #f4f7f7; }
+body[data-variant="b"] .only.b-ticks, body[data-variant="b"] .only.lamps { display: flex; }
+body[data-variant="b"] .only.b-ticks { display: block; }
+
+/* ============ C · VITRINE — luxury / horlogerie ============ */
+body[data-variant="c"] { --ink:#221d18; --ground:#fbf9f5; --mut:#8a7f70; --acc:#b39359; --sig:#7a2e1d;
+  font-family: "Didot", "Palatino", "Iowan Old Style", serif; }
+body[data-variant="c"] .wrap { max-width: 920px; }
+body[data-variant="c"] .hero { padding: 120px 0 90px; text-align: center; }
+body[data-variant="c"] .brand { justify-content: center; }
+body[data-variant="c"] .brand-name { font-weight: 400; letter-spacing: 0.34em; text-transform: uppercase; font-size: 13px; }
+body[data-variant="c"] .hline { font-size: 52px; font-weight: 350; line-height: 1.18; margin: 0 auto; }
+body[data-variant="c"] .hsub { margin-left: auto; margin-right: auto; }
+body[data-variant="c"] .proofline { letter-spacing: 0.28em; font-size: 11px; color: var(--acc); }
+body[data-variant="c"] .b-card { text-align: center; padding: 70px 40px; background:
+  linear-gradient(180deg, #fbf9f5 0%, #f4efe6 100%); border-top: 1px solid var(--acc); border-bottom: 1px solid var(--acc); }
+body[data-variant="c"] .b-grid { grid-template-columns: 1fr; gap: 26px; justify-items: center; }
+body[data-variant="c"] .b-axis { order: 3; align-items: center; }
+body[data-variant="c"] .b-money { font-size: 34px; font-weight: 400; }
+body[data-variant="c"] .b-delta-num { font-size: 150px; font-weight: 300; color: var(--ink);
+  text-shadow: 0 24px 40px rgba(122, 92, 46, 0.22); }
+body[data-variant="c"] .b-delta-cap { letter-spacing: 0.3em; color: var(--acc); }
+body[data-variant="c"] .b-steps { justify-content: center; }
+body[data-variant="c"] .b-step { border: none; border-bottom: 1px solid transparent; letter-spacing: 0.18em; }
+body[data-variant="c"] .b-step:hover { border-bottom-color: var(--acc); }
+body[data-variant="c"] .b-receipt { max-width: 560px; margin: 34px auto 0; border: 1px solid #d9cdb7; padding: 26px 30px; background: #fffdf9; text-align: left; }
+body[data-variant="c"] .b-receipt-label::after { content: " · CERTIFICATE OF EXAMINATION"; color: var(--acc); }
+
+/* ============ D · SYNCHRONY — forensic timeline ============ */
+body[data-variant="d"] { --ink:#0f1720; --ground:#fafbfc; --mut:#5b6572; --acc:#1d4ed8; --sig:#b91c1c;
+  font-family: ui-sans-serif, "Helvetica Neue", Arial, sans-serif; }
+body[data-variant="d"] .hline { font-size: 42px; font-weight: 650; letter-spacing: -0.015em; }
+body[data-variant="d"] .b-card { border-left: 4px solid var(--ink); padding: 8px 0 8px 40px; }
+body[data-variant="d"] .d-spine { display: flex; gap: 0; margin: 26px 0 34px; counter-reset: st; }
+body[data-variant="d"] .d-node { flex: 1; border-top: 2px solid #c6ccd4; padding: 12px 10px 0 0; font-size: 10.5px;
+  letter-spacing: 0.1em; color: var(--mut); counter-increment: st; position: relative; }
+body[data-variant="d"] .d-node::before { content: counter(st, decimal-leading-zero); display: block;
+  font-weight: 700; color: var(--ink); font-size: 12px; margin-bottom: 3px; }
+body[data-variant="d"] .d-node::after { content: ""; position: absolute; top: -5px; left: 0; width: 8px; height: 8px;
+  border-radius: 50%; background: #c6ccd4; }
+body[data-variant="d"] .d-node.lit::after { background: var(--acc); }
+body[data-variant="d"] .d-node.hot::after { background: var(--sig); }
+body[data-variant="d"] .b-grid { border: 1px solid #dde2e8; }
+body[data-variant="d"] .b-grid > * { padding: 22px 24px; }
+body[data-variant="d"] .b-claim { border-right: 1px solid #dde2e8; background: #fff; box-shadow: inset 3px 0 0 var(--sig); }
+body[data-variant="d"] .b-record { border-left: 1px solid #dde2e8; background: #fff; box-shadow: inset -3px 0 0 var(--acc); }
+body[data-variant="d"] .b-delta-num { font-size: 64px; color: var(--sig); }
+body[data-variant="d"] .b-receipt { background: #0f1720; color: #e8ebef; padding: 24px 28px; }
+body[data-variant="d"] .b-receipt .b-rows dt { color: #93a1b3; }
+body[data-variant="d"] .b-receipt .b-plain { color: #fff; }
+body[data-variant="d"] .b-receipt-label, body[data-variant="d"] .b-foot { color: #93a1b3; }
+body[data-variant="d"] .only.d-spine { display: flex; }
+
+/* ============ E · MARQUEE — cinematic title-card futurism ============ */
+body[data-variant="e"] { --ink:#101014; --ground:#f7f7f9; --mut:#63636e; --acc:#e2490f; --sig:#e2490f;
+  font-family: "Helvetica Neue", ui-sans-serif, Arial, sans-serif; }
+body[data-variant="e"] .hero { padding: 110px 0 70px; }
+body[data-variant="e"] .hline { font-size: 88px; font-weight: 800; line-height: 0.98;
+  letter-spacing: -0.035em; text-transform: uppercase; max-width: 14ch; }
+body[data-variant="e"] .hline em { font-style: normal; color: var(--acc); }
+body[data-variant="e"] .hsub { font-size: 17px; }
+body[data-variant="e"] .proofline { font-size: 15px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+body[data-variant="e"] .b-eyebrow { font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: 0.3em; }
+body[data-variant="e"] .b-title { font-size: 40px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.02em; }
+body[data-variant="e"] .b-money { font-size: 60px; font-weight: 800; letter-spacing: -0.03em; }
+body[data-variant="e"] .b-delta-num { font-size: 180px; font-weight: 850; letter-spacing: -0.05em; color: var(--acc); }
+body[data-variant="e"] .b-card { border-top: 6px solid var(--ink); padding-top: 40px; }
+body[data-variant="e"] .b-step { border: 2px solid var(--ink); font-weight: 700; text-transform: uppercase; }
+body[data-variant="e"] .b-receipt { border: 2px solid var(--ink); padding: 26px 30px; }
+
+/* entrance motion (marquee only), killed under reduce */
+@media (prefers-reduced-motion: no-preference) {
+  body[data-variant="e"] .hline { animation: rise 0.7s cubic-bezier(.2,.7,.2,1) both; }
+  body[data-variant="e"] .b-delta-num { animation: rise 0.7s 0.15s cubic-bezier(.2,.7,.2,1) both; }
+  body[data-variant="c"] .b-delta-num { animation: fadein 1.6s ease both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body data-variant="a" data-state="settled">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand">
+      <span class="brand-name">Curbside Commons</span>
+      <span class="brand-tag">THE PROOF LAYER</span>
+    </div>
+    <h1 class="hline">Machines are starting to buy. Someone has to check the receipts.</h1>
+    <p class="hsub">A verification layer for agentic commerce: every machine-made claim is read
+      against the merchant's own record, and every verdict ships with the evidence attached.</p>
+    <p class="proofline mono">THE MENU: 2150 · THE KITCHEN RECORD: 21.50 · CLAIM: 100× THE RECORD</p>
+    <p class="honesty">Simulated demonstration on an illustrative record — no real platform statement, no live connection.</p>
+  </div>
+</header>
+
+<main class="bench">
+  <div class="wrap">
+    <p class="b-eyebrow mono">01 / THE FIRST CLAIM</p>
+    <h2 class="b-title">One served price, read against the kitchen's own book.</h2>
+
+    <section class="b-card" aria-label="Evidence bench — illustrative run">
+      <span class="b-tally mono">16 findings · 11 error · 5 warn</span>
+
+      <span class="only b-ticks" aria-hidden="true"></span>
+      <ol class="only d-spine" aria-hidden="true">
+        <li class="d-node lit">CLAIM READ</li>
+        <li class="d-node lit">RECORD READ</li>
+        <li class="d-node hot">RULE APPLIED</li>
+        <li class="d-node st4 stagey">ARITHMETIC</li>
+        <li class="d-node st5 stagey">BREAK</li>
+        <li class="d-node st6 stagey">EVIDENCE LOCKED</li>
+      </ol>
+
+      <div class="b-grid">
+        <div class="b-claim">
+          <span class="b-col-label mono">CLAIM SURFACE</span>
+          <span class="b-field mono">offers.price</span>
+          <span class="b-money mono st1 stagey">$2,150.00</span>
+          <span class="b-sub mono">2150.00 USD — as served</span>
+        </div>
+        <div class="b-axis">
+          <div class="st3 stagey">
+            <span class="b-rule-name mono">CENTS-AS-DECIMAL ×100</span>
+            <span class="b-rule-plain">decimal dollars × 100 = integer cents</span>
+          </div>
+          <div class="b-math mono st4 stagey">
+            <span>2150.00 × 100 = 215000¢</span>
+            <span>merchant record = 2150¢</span>
+          </div>
+          <p class="b-delta st5 stagey">
+            <span class="b-delta-num" aria-label="one hundred times the record">×100</span>
+            <span class="b-delta-cap">THE CLAIM IS 100× THE MERCHANT'S OWN RECORD</span>
+          </p>
+        </div>
+        <div class="b-record">
+          <span class="b-col-label mono">MERCHANT RECORD</span>
+          <span class="b-field mono">price_cents</span>
+          <span class="b-money mono st2 stagey">2150</span>
+          <span class="b-sub mono">$21.50 — the kitchen's own book</span>
+        </div>
+      </div>
+
+      <div class="only lamps" aria-hidden="true">
+        <span class="lamp err"><i></i>VIOLATION</span>
+        <span class="lamp ok"><i></i>VERIFIED</span>
+        <span class="lamp held"><i></i>HELD</span>
+      </div>
+
+      <div class="b-steps" role="group" aria-label="Step through the examination (prototype)">
+        <button type="button" class="b-step">1 · CLAIM</button>
+        <button type="button" class="b-step">2 · RECORD</button>
+        <button type="button" class="b-step">3 · RULE</button>
+        <button type="button" class="b-step">4 · ARITHMETIC</button>
+        <button type="button" class="b-step">5 · BREAK</button>
+        <button type="button" class="b-step">6 · RECEIPT</button>
+      </div>
+
+      <div class="b-receipt st6 stagey">
+        <span class="b-receipt-label mono">EVIDENCE LOCKED</span>
+        <p class="b-plain"><span class="b-sev">ERROR</span>Claim is 100× the merchant record.</p>
+        <dl class="b-rows">
+          <div style="display:contents"><dt class="mono">claim</dt><dd class="mono">offers.price · $2,150.00</dd></div>
+          <div style="display:contents"><dt class="mono">record</dt><dd class="mono">price_cents · $21.50</dd></div>
+          <div style="display:contents"><dt class="mono">rule</dt><dd class="mono">CENTS-AS-DECIMAL ×100</dd></div>
+          <div style="display:contents"><dt class="mono">comparison</dt><dd class="mono">215000¢ ≠ 2150¢ (×100)</dd></div>
+        </dl>
+        <ul class="a-prov only" style="padding:0">
+          <li><span class="d">SERVED</span><span>offers.price read from the machine feed — 2150</span></li>
+          <li><span class="d">RECORDED</span><span>price_cents read from the merchant system — 2150¢ ($21.50)</span></li>
+          <li><span class="d">HELD TO</span><span>LST-PRICE-CENTS-AS-DECIMAL — decimal dollars × 100 = integer cents</span></li>
+          <li><span class="d">CONCLUDED</span><span>error — the claim is 100× the record; evidence attached</span></li>
+        </ul>
+        <span class="b-foot mono">FINDING 11 OF 16 · ILLUSTRATIVE RUN</span>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="note">
+  Design prototype — grilling round 1 (register). Not the product. All figures are the committed
+  illustrative specimen; simulated demonstration, no real merchant or platform data, no external requests.
+</footer>
+
+<div id="picker" role="region" aria-label="Design picker">
+  <div class="pk-head" id="pk-drag"><span>ROUND 1 · REGISTER</span><span>drag</span></div>
+  <div class="pk-name" id="pk-name">A · Accession</div>
+  <div class="pk-note" id="pk-note"></div>
+  <div class="pk-row">
+    <button type="button" id="pk-prev" aria-label="Previous design">←</button>
+    <button type="button" id="pk-next" aria-label="Next design">→</button>
+    <span class="pk-dots" id="pk-dots" aria-hidden="true"></span>
+  </div>
+  <div class="pk-row" role="group" aria-label="Bench state">
+    <button type="button" data-st="settled" aria-pressed="true">Settled</button>
+    <button type="button" data-st="mid" aria-pressed="false">Mid-examination</button>
+  </div>
+</div>
+
+<noscript><style>#picker{display:none}</style></noscript>
+
+<script>
+(function () {
+  var V = [
+    ["a", "A · Accession", "Museum catalogue: the held claim as an accessioned exhibit — provenance chain, curator's stamp, double-rule institutional authority."],
+    ["b", "B · Instrument", "Metrology / HMI: gauge windows, registered tick rail, fixed-meaning lamps, data-plate receipt. Futurism through precision."],
+    ["c", "C · Vitrine", "Haute horlogerie: the ×100 staged as the jewel on a lit pedestal; watchmaker tempo, certificate receipt, extreme whitespace."],
+    ["d", "D · Synchrony", "Forensic timeline: a six-node spine, claim/record lanes registered to one frame, incident-log receipt. Evidence-board energy."],
+    ["e", "E · Marquee", "Cinematic title cards: the type IS the interface — 88px arrivals, one ember accent, end-credit chrome."]
+  ];
+  var i = 0, name = document.getElementById("pk-name"), note = document.getElementById("pk-note"),
+      dots = document.getElementById("pk-dots");
+  V.forEach(function () { var d = document.createElement("span"); d.className = "pk-dot"; dots.appendChild(d); });
+  function apply() {
+    document.body.setAttribute("data-variant", V[i][0]);
+    name.textContent = V[i][1]; note.textContent = V[i][2];
+    [].forEach.call(dots.children, function (d, k) { d.className = "pk-dot" + (k === i ? " on" : ""); });
+  }
+  function step(d) { i = (i + d + V.length) % V.length; apply(); }
+  document.getElementById("pk-prev").addEventListener("click", function () { step(-1); });
+  document.getElementById("pk-next").addEventListener("click", function () { step(1); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") step(-1);
+    if (e.key === "ArrowRight") step(1);
+  });
+  [].forEach.call(document.querySelectorAll("[data-st]"), function (b) {
+    b.addEventListener("click", function () {
+      document.body.setAttribute("data-state", b.getAttribute("data-st"));
+      [].forEach.call(document.querySelectorAll("[data-st]"), function (x) {
+        x.setAttribute("aria-pressed", String(x === b));
+      });
+    });
+  });
+  // draggable picker
+  var pk = document.getElementById("picker"), h = document.getElementById("pk-drag"), sx, sy, ox, oy, on = false;
+  h.addEventListener("pointerdown", function (e) {
+    on = true; sx = e.clientX; sy = e.clientY;
+    var r = pk.getBoundingClientRect(); ox = r.left; oy = r.top;
+    h.setPointerCapture(e.pointerId);
+  });
+  h.addEventListener("pointermove", function (e) {
+    if (!on) return;
+    pk.style.left = ox + (e.clientX - sx) + "px";
+    pk.style.top = oy + (e.clientY - sy) + "px";
+    pk.style.right = "auto"; pk.style.bottom = "auto";
+  });
+  h.addEventListener("pointerup", function () { on = false; });
+  apply();
+})();
+</script>
+</body>
+</html>

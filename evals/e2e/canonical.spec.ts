@@ -29,7 +29,7 @@ test("landing tells the truth-audit story: metadata, H1, the chapter arc, the di
     page.getByRole("heading", { level: 2, name: "A price that cannot pass." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "Three moves. No trust required." }),
+    page.getByRole("heading", { level: 2, name: "Three moves. Each can be checked." }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { level: 2, name: "One report. Sixteen findings." }),
@@ -51,7 +51,7 @@ test("landing tells the truth-audit story: metadata, H1, the chapter arc, the di
   const h2Sequence = await page.locator("main h2").allTextContents();
   expect(h2Sequence).toEqual([
     "A price that cannot pass.",
-    "Three moves. No trust required.",
+    "Three moves. Each can be checked.",
     "One report. Sixteen findings.",
     "The statement, read against the law.",
     "Out of focus stays unresolved.",
@@ -74,7 +74,13 @@ test("landing tells the truth-audit story: metadata, H1, the chapter arc, the di
   await expect(bench).toBeVisible();
   await expect(bench).toContainText("16 findings · 11 error · 5 warn");
   await expect(bench).toContainText("Claim is 100× the merchant record.");
-  await expect(bench).not.toContainText(/simulated/i);
+  // The bench CHROME carries no "SIMULATED" tag (the contract's original intent).
+  // Scoped since session 21: the finding-browse list legitimately renders the
+  // committed golden's own plain lines, and finding 07 honestly describes a
+  // "(simulated ghost item)" — the goldens' language is not a chrome tag.
+  await expect(bench.locator(".eb-kicker")).not.toContainText(/simulated/i);
+  await expect(bench.locator(".eb-receipt")).not.toContainText(/simulated/i);
+  await expect(bench.locator(".eb-table")).not.toContainText(/simulated/i);
   // The Coverage default panel grounds the FAIL verdict + the same 16/11/5 tally.
   const coverage = page.locator("#coverage");
   await expect(coverage).toContainText("closes at FAIL with 16 findings: 11 error and 5 warn");
@@ -168,7 +174,7 @@ test("landing interactions: Evidence Bench replays, Method swaps, Coverage tabs 
   await expect(page.locator(".mr-panel")).toContainText("21.50");
 
   // 03 Coverage: a proper tablist — switching tabs changes the visible panel.
-  const tablist = page.getByRole("tablist", { name: "Measured coverage lanes" });
+  const tablist = page.getByRole("tablist", { name: "Measured coverage categories" });
   const schemaTab = tablist.getByRole("tab", { name: "SCHEMA + PROTOCOL" });
   await schemaTab.click();
   await expect(schemaTab).toHaveAttribute("aria-selected", "true");
@@ -208,7 +214,7 @@ test("Coverage tabs are a keyboard-operable roving tablist (Arrow/Home/End, aria
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const tablist = page.getByRole("tablist", { name: "Measured coverage lanes" });
+  const tablist = page.getByRole("tablist", { name: "Measured coverage categories" });
   const tabs = tablist.getByRole("tab");
   await expect(tabs).toHaveCount(3);
   const first = tabs.nth(0);
@@ -333,4 +339,89 @@ test("old root URLs carry the tested redirect policy to /legacy/**", async ({ pa
   await expect(page.getByText("Legacy activation module", { exact: false }).first()).toBeVisible();
   await page.goto("/audit");
   await expect(page).toHaveURL(/\/legacy\/audit/, { timeout: 10_000 });
+});
+
+test("bench substance: explicit delta, step-through, provenance receipts, finding browse", async ({
+  page,
+}) => {
+  // Session-21 enhancement slice (owner directive 2026-07-16): the bench gains
+  // direction v1's interactive skeleton INSIDE the fixed v8 language — a rendered
+  // ×100 delta (never computed by the reader), a discrete step-through of the
+  // completed examination, native <details> provenance for every figure, and a
+  // browsable findings index behind the tally (D-4 resolved). Reduced motion is
+  // emulated so state changes are deterministic (states, not animation).
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const bench = page.locator(".eb");
+
+  // ① The ×100 delta is a first-class rendered element at the axis terminus.
+  const delta = bench.locator(".eb-delta");
+  await expect(delta).toBeVisible();
+  await expect(delta).toContainText("100");
+  await expect(delta).toContainText(/100× THE MERCHANT'S OWN RECORD/i);
+
+  // ② Step-through: discrete stages the reader inspects at their own pace
+  // (WCAG 2.5.7 — no timing, no dragging). Stepping to RULE dims later stages
+  // as STATE (allowed under reduced motion; it is not animation).
+  const steps = bench.getByRole("group", { name: /step through the examination/i });
+  await steps.getByRole("button", { name: /3 · RULE/ }).click();
+  await expect(bench.locator(".eb-math")).toHaveCSS("opacity", "0.3");
+  await expect(bench.locator(".eb-break")).toHaveCSS("opacity", "0.3");
+  await expect(steps.getByRole("button", { name: /3 · RULE/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  // Stepping back to the receipt restores the settled examination.
+  await steps.getByRole("button", { name: /6 · RECEIPT/ }).click();
+  await expect(bench.locator(".eb-math")).toHaveCSS("opacity", "1");
+
+  // ③ Provenance receipts: native <details> per figure — the exact source named.
+  const claimProv = bench.locator("details.eb-prov").first();
+  await claimProv.locator("summary").click();
+  await expect(claimProv).toContainText("item-001-v1#price.amount");
+  await expect(claimProv).toContainText("acp-feed");
+  const recordProv = bench.locator("details.eb-prov").nth(1);
+  await recordProv.locator("summary").click();
+  await expect(recordProv).toContainText("2150¢");
+
+  // ④ Finding browse: the tally opens the full committed index — 16 real rows,
+  // the benched finding marked current. Golden-bound: finding 1's plain line.
+  const browse = bench.locator("details.eb-browse");
+  await browse.locator("summary").click();
+  await expect(browse.locator("li")).toHaveCount(16);
+  await expect(browse).toContainText("hidden in the merchant's own catalog");
+  await expect(browse.locator("[aria-current='true']")).toContainText("100× overstatement");
+});
+
+test("bench print lifecycle: a print mid-replay settles the page for paper, then the interrupted replay resumes (batch P2, 2026-07-16)", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const bench = page.locator(".eb");
+  await expect(bench).toHaveAttribute("data-phase", "done");
+  // Start a replay, then print in the middle of it.
+  await bench.getByRole("button", { name: "Replay the check" }).click();
+  await expect(bench).toHaveAttribute("data-phase", "running");
+  await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
+  // For paper: the examination is settled-complete and every disclosure is open.
+  await expect(bench).toHaveAttribute("data-phase", "done");
+  const openCount = await bench.locator("details[open]").count();
+  expect(openCount).toBe(await bench.locator("details").count());
+  await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
+  // Back on screen: the interrupted replay RESUMES (re-runs) and settles complete —
+  // never a stuck partial state with dead timers.
+  await expect(bench).toHaveAttribute("data-phase", "running");
+  await expect(bench).toHaveAttribute("data-phase", "done", { timeout: 6_000 });
+  await expect(bench.locator(".eb-receipt-plain")).toBeVisible();
+
+  // Steady-state path: a stepped-to stage survives the print round-trip exactly.
+  await bench.getByRole("button", { name: "3 · RULE" }).click();
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("beforeprint"));
+    window.dispatchEvent(new Event("afterprint"));
+  });
+  await expect(bench.getByRole("button", { name: "3 · RULE" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
 });

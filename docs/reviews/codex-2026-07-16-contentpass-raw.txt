@@ -1,0 +1,180 @@
+FINDING 1 [P1] components/fees/fee-report-data.ts:398  
+CURRENT: "a clean month — every line lawful and within cap"  
+ISSUE: Calling every line “lawful” contradicts the page’s statement that a clean bill is not a lawfulness certificate.  
+PROPOSED: "a clean month — every fee line within its cap as declared"
+
+FINDING 2 [P1] components/landing/CommonsScene.tsx:54  
+CURRENT: "A CLAIM HELD · OUT OF FOCUS"  
+ISSUE: “Out of focus” elsewhere means unresolved evidence, so this status conflates a confirmed mismatch with an unresolved case.  
+PROPOSED: "A CLAIM HELD · DOES NOT MATCH THE RECORD"
+
+FINDING 3 [P1] app/metrics/page.tsx:65  
+CURRENT: "78 official UCP JSON Schemas (spec version 2026-04-08), fetched verbatim, pinned to a fixed version, and validated against — never edited. The headline the engine demonstrates: a feed can be schema-conformant and still false against the merchant’s own records."  
+ISSUE: The grammar makes the schemas appear to be “validated against,” while “the headline” introduces promotional language into a technical explanation.  
+PROPOSED: "78 official UCP JSON Schemas (spec version 2026-04-08), fetched verbatim and pinned to a fixed version — never edited. The engine validates feeds against them. The result: a feed can be schema-conformant and still false against the merchant’s own records."
+
+FINDING 4 [P1] app/page.tsx:119  
+CURRENT: "Three moves. No trust required."  
+ISSUE: The categorical trust-free claim is unsupported and breaks the restrained professional register.  
+PROPOSED: "Three moves. Each can be checked."
+
+FINDING 5 [P1] components/landing/MethodRelation.tsx:34  
+CURRENT: "A claim meets a record through a rule. The verdict keeps all three attached, so the conclusion can be checked instead of trusted."  
+ISSUE: “Meets … through” and “keeps all three attached” obscure the comparison for non-technical readers.  
+PROPOSED: "A claim is checked against a record under a rule. The verdict keeps all three together so the conclusion can be checked."
+
+FINDING 6 [P1] components/landing/CommonsScene.tsx:452  
+CURRENT: "The menu"  
+ISSUE: This control highlights both the menu and kitchen stations, so its label does not describe its full action.  
+PROPOSED: "The menu and kitchen"
+
+FINDING 7 [P1] components/landing/CommonsScene.tsx:458  
+CURRENT: "The agent"  
+ISSUE: This control highlights both the agent and order stations, so its label does not describe its full action.  
+PROPOSED: "The agent and order"
+
+FINDING 8 [P1] components/landing/EvidenceBench.tsx:44  
+CURRENT: "5 · BREAK"  
+ISSUE: “Break” does not identify what failed and is unclear across all three intended audiences.  
+PROPOSED: "5 · MISMATCH"
+
+FINDING 9 [P1] components/landing/EvidenceBench.tsx:252  
+CURRENT: "EVIDENCE LOCKED"  
+ISSUE: “Locked” implies an unexplained tamper-resistance property rather than the demonstrated attachment of evidence.  
+PROPOSED: "EVIDENCE ATTACHED"
+
+FINDING 10 [P1] app/cost/page.tsx:44  
+CURRENT: "Technically: automated checks prove that no part of the verifier can make an AI or network call, and that the delivery builders hold to zero connections. The few recorded live runs are frozen records, cited per figure."  
+ISSUE: “Delivery builders hold to zero connections” is internal jargon that obscures the enforced network boundary.  
+PROPOSED: "Technically: automated checks prove that the verifier cannot make AI or network calls and that the delivery builders make no network connections. The few recorded live runs are frozen records, cited per figure."
+
+FINDING 11 [P1] app/eval/page.tsx:101  
+CURRENT: "Durable teeth: a recorded snapshot plus a standing lock hold this result in place."  
+ISSUE: “Durable teeth” and “standing lock” are opaque internal metaphors in an evidence explanation.  
+PROPOSED: "A recorded snapshot and a standing check preserve this result."
+
+FINDING 12 [P1] app/eval/page.tsx:191  
+CURRENT: "out-of-scope abstained (shipped method)"  
+ISSUE: The adjective-plus-verb construction is not a coherent metric label.  
+PROPOSED: "out-of-scope abstention (shipped method)"
+
+FINDING 13 [P1] components/playground/verify-in-browser.ts:98  
+CURRENT: "Expected a JSON object with an `items` array — got a non-object."  
+ISSUE: The error also handles arrays, so “non-object” can misdiagnose the submitted JSON value.  
+PROPOSED: "Expected a JSON object with an `items` array — the top-level value is not a feed object."
+
+FINDING 14 [P1] app/cost/page.tsx:72  
+CURRENT: "Recorded live legs"  
+ISSUE: “Legs” is unexplained workflow jargon and obscures what the section contains.  
+PROPOSED: "Recorded live runs"
+
+FINDING 15 [P2] app/page.tsx:36  
+CURRENT: "The full audit renders on the fee-cap page."  
+ISSUE: “Renders” is implementation jargon in otherwise reader-facing copy.  
+PROPOSED: "The full audit appears on the fee-cap page."
+
+FINDING 16 [P2] app/page.tsx:94  
+CURRENT: "A price that cannot pass."  
+ISSUE: The metaphor leaves the failed comparison unstated where the proof story introduces its first claim.  
+PROPOSED: "A price claim that does not match the record."
+
+FINDING 17 [P2] app/page.tsx:151  
+CURRENT: "The kitchen’s own log answers: what is actually offered, at what price, in the merchant’s own words."  
+ISSUE: “Answers:” creates an awkward construction and weakens the record’s role in the comparison.  
+PROPOSED: "The kitchen’s own log records what is offered, at what price, in the merchant’s own words."
+
+FINDING 18 [P2] app/page.tsx:165  
+CURRENT: "The commons reads claim against record and preserves the comparison — and holds what does not agree."  
+ISSUE: Missing articles and the vague object “what” make the central examination step read unnaturally.  
+PROPOSED: "The commons reads the claim against the record, preserves the comparison, and holds any claim that does not agree."
+
+FINDING 19 [P2] app/page.tsx:301  
+CURRENT: "Coverage is reported as findings, schemas, and rules — not as a broad success score. The evidence pages carry the earned labels, including an honest first-attempt DEFER, beside the enforcement proofs that run for $0."  
+ISSUE: “Earned labels” and “enforcement proofs” sound self-congratulatory and obscure the concrete checks behind the result.  
+PROPOSED: "Coverage is reported as findings, schemas, and rules — not as a broad success score. The evidence pages show those labels, including a first-attempt DEFER, alongside the checks that keep the runtime at $0."
+
+FINDING 20 [P2] app/page.tsx:260  
+CURRENT: "Out of focus stays unresolved."  
+ISSUE: The lens metaphor does not say whether the problem is missing evidence, a failed check, or incomplete scope.  
+PROPOSED: "What the audit cannot establish stays unresolved."
+
+FINDING 21 [P2] components/landing/EvidenceBench.tsx:159  
+CURRENT: "16 findings · 11 error · 5 warn"  
+ISSUE: The singular severity labels make the tally read like exposed internal enum values rather than professional summary copy.  
+PROPOSED: "16 findings · 11 errors · 5 warnings"
+
+FINDING 22 [P2] components/landing/EvidenceBench.tsx:44  
+CURRENT: "the break"  
+ISSUE: The live-region announcement repeats the ambiguous stage label without naming the failed comparison.  
+PROPOSED: "the mismatch"
+
+FINDING 23 [P2] components/landing/EvidenceBench.tsx:45  
+CURRENT: "the locked evidence"  
+ISSUE: The announcement introduces an unexplained locking claim instead of naming the evidence being inspected.  
+PROPOSED: "the evidence receipt"
+
+FINDING 24 [P2] components/landing/EvidenceBench.tsx:151  
+CURRENT: "Analyzing…"  
+ISSUE: The control is replaying a completed examination, so “Analyzing…” misstates the interaction.  
+PROPOSED: "Replaying…"
+
+FINDING 25 [P2] components/landing/EvidenceBench.tsx:244  
+CURRENT: "held to"  
+ISSUE: The provenance label does not clearly identify the referenced value as the governing rule.  
+PROPOSED: "governing rule"
+
+FINDING 26 [P2] app/fees/page.tsx:21  
+CURRENT: "A delivery fee statement audited against the 17 codified rules of NYC Administrative Code §20-563.3: verdict states, per-finding receipts, the honest boundary between statement-checkable rules and those needing external evidence — and a paste-a-statement audit that runs in your browser."  
+ISSUE: “Verdict states,” “honest boundary,” and “paste-a-statement audit” read like internal product language rather than natural professional copy.  
+PROPOSED: "A delivery fee statement audited against the 17 codified rules of NYC Administrative Code §20-563.3: verdicts, per-finding receipts, the boundary between statement-checkable rules and those needing external evidence — and an in-browser audit for pasted statements."
+
+FINDING 27 [P2] components/fees/FeePlaygroundClient.tsx:81  
+CURRENT: "The paste leg runs the audit entirely in your browser and needs scripting turned on; the four example months above render either way."  
+ISSUE: “Paste leg” is internal workflow jargon, while “render” is unnecessarily technical in fallback guidance.  
+PROPOSED: "The pasted-statement audit runs entirely in your browser and needs scripting turned on; the four example months above are available either way."
+
+FINDING 28 [P2] components/report/ReportView.tsx:31  
+CURRENT: "agent-commerce product-feed shape"  
+ISSUE: The stacked hyphenation and vague “shape” make the ACP gloss unnecessarily difficult to parse.  
+PROPOSED: "agent-commerce product feed format"
+
+FINDING 29 [P2] app/layout.tsx:37  
+CURRENT: "The truth layer for agentic commerce — a deterministic verifier that checks a platform or AI agent's serving copy against a merchant's own records, validates data-format conformance, and audits NYC delivery fee statements, with evidence attached to every finding."  
+ISSUE: “Truth layer” reads as marketing framing, while “a platform or AI agent’s” creates an ambiguous possessive.  
+PROPOSED: "A deterministic verifier for agentic commerce that checks serving copy from a platform or AI agent against a merchant's own records, validates data-format conformance, and audits NYC delivery fee statements, with evidence attached to every finding."
+
+FINDING 30 [P2] app/metrics/page.tsx:18  
+CURRENT: "In plain terms: the checker’s substance in numbers — how many codified fee rules it enforces, how many official protocol schemas it validates against, and exactly what the public demo report contains. Each number is either derived from the committed source it lives in, or pinned to a fixed version and checked against that source."  
+ISSUE: “Substance in numbers” is abstract, and saying a number “lives in” a source adds an imprecise metaphor to provenance copy.  
+PROPOSED: "In plain terms: the checker’s scope in numbers — how many codified fee rules it enforces, how many official protocol schemas it validates against, and exactly what the public demo report contains. Each number is either derived from its committed source or pinned to a fixed version and checked against that source."
+
+FINDING 31 [P2] app/eval/page.tsx:176  
+CURRENT: "So it ships marked experimental, the scoreboard is published, and the simpler of the two search methods was kept — the fancier one didn’t beat it."  
+ISSUE: “Fancier” is informal and imprecise when comparing retrieval methods.  
+PROPOSED: "So it ships marked experimental, the scoreboard is published, and the simpler of the two search methods was kept — the more complex method didn’t beat it."
+
+FINDING 32 [P2] app/eval/page.tsx:189  
+CURRENT: "richer (embedding) method"  
+ISSUE: “Richer” implies superiority that the displayed result does not support.  
+PROPOSED: "embedding-based method"
+
+FINDING 33 [P2] app/eval/page.tsx:256  
+CURRENT: "The first exam was thrown out — by us, on the record."  
+ISSUE: The self-conscious aside is more theatrical than the surrounding evidence register.  
+PROPOSED: "The first exam was voided and kept on the record."
+
+FINDING 34 [P2] app/not-found.tsx:11  
+CURRENT: "Fitting, for a site about verifying what gets served: this URL has no page behind it. If a link brought you here, the surfaces below are the real inventory."  
+ISSUE: The extended serving/inventory metaphor makes basic recovery guidance sound like internal product copy.  
+PROPOSED: "This URL has no page behind it. If a link brought you here, use one of the pages below."
+
+FINDING 35 [P3] components/landing/CoverageTabs.tsx:38  
+CURRENT: "Measured coverage lanes"  
+ISSUE: “Lanes” is internal framing that adds little meaning to the tab-list label.  
+PROPOSED: "Measured coverage categories"
+
+NARRATIVE VERDICT 1/5: The hero establishes the claim-versus-record premise clearly and carries it into a concrete order scene.  
+NARRATIVE VERDICT 2/5: The first-claim chapter moves naturally from assertion to record and then to the landing’s strongest element, the inspectable evidence bench.  
+NARRATIVE VERDICT 3/5: The method chapter completes the examination logic, but abstract phrases such as “meets through,” “break,” and “locked” briefly obscure what is being compared.  
+NARRATIVE VERDICT 4/5: The listings and fee-cap audits broaden the proof story effectively, while the limits and evidence chapters qualify the resulting verdicts without re-plotting the arc.  
+NARRATIVE VERDICT 5/5: The landing reads as one story overall; its main stumble is that “out of focus” means both a confirmed mismatch and an unresolved boundary, blurring the path from examination to verdict.

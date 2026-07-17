@@ -1,0 +1,114 @@
+[
+  {
+    "index": 1,
+    "severity": "error",
+    "ruleId": "LST-AVAIL-HIDDEN-SHOWN",
+    "plain": "This item is hidden in the merchant's own catalog but is being served to customers.",
+    "onBench": false
+  },
+  {
+    "index": 2,
+    "severity": "error",
+    "ruleId": "LST-AVAIL-STATE",
+    "plain": "The copy says \"pre_order\" but the catalog state is in stock (expected \"in_stock\").",
+    "onBench": false
+  },
+  {
+    "index": 3,
+    "severity": "error",
+    "ruleId": "LST-AVAIL-STATE",
+    "plain": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\").",
+    "onBench": false
+  },
+  {
+    "index": 4,
+    "severity": "error",
+    "ruleId": "LST-XF-CHECKOUT-SEARCH",
+    "plain": "The row is checkout-eligible but not search-eligible — the extracted invariant requires checkout ⇒ search.",
+    "onBench": false
+  },
+  {
+    "index": 5,
+    "severity": "warn",
+    "ruleId": "LST-ENC-TRUNC",
+    "plain": "The name is cut off on the serving copy: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\".",
+    "onBench": false
+  },
+  {
+    "index": 6,
+    "severity": "warn",
+    "ruleId": "LST-ENC-UTF8",
+    "plain": "The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the real \"Jalapeño Poppers (Large)\".",
+    "onBench": false
+  },
+  {
+    "index": 7,
+    "severity": "error",
+    "ruleId": "LST-EXIST-GHOST",
+    "plain": "The copy serves \"Phantom Platter (simulated ghost item)\" but no such item exists in the merchant's catalog.",
+    "onBench": false
+  },
+  {
+    "index": 8,
+    "severity": "error",
+    "ruleId": "LST-EXIST-MISSING",
+    "plain": "\"Café Latte (Small)\" exists in the merchant's catalog but is missing from the serving copy.",
+    "onBench": false
+  },
+  {
+    "index": 9,
+    "severity": "error",
+    "ruleId": "LST-IDENT-ID-MISMATCH",
+    "plain": "The copy keys this row as \"legacy-pos-4471\" but the catalog row is \"item-003-v2\" — same item, mismatched identity (resolved by exact name).",
+    "onBench": false
+  },
+  {
+    "index": 10,
+    "severity": "error",
+    "ruleId": "LST-IDENT-MODIFIER-AMBIG",
+    "plain": "The variant label says \"Small\" but this row is the \"Medium\" variation — variants of this item can no longer be told apart.",
+    "onBench": false
+  },
+  {
+    "index": 11,
+    "severity": "error",
+    "ruleId": "LST-PRICE-CENTS-AS-DECIMAL",
+    "plain": "The price is serialized in cents (2150) where dollars are expected (21.50) — a 100× overstatement.",
+    "onBench": true
+  },
+  {
+    "index": 12,
+    "severity": "warn",
+    "ruleId": "LST-PRICE-CURRENCY-FORM",
+    "plain": "The currency code is malformed: \"usd\" instead of ISO-4217 \"USD\".",
+    "onBench": false
+  },
+  {
+    "index": 13,
+    "severity": "error",
+    "ruleId": "LST-PRICE-SALE-GT",
+    "plain": "The sale price 28.50 is higher than the regular price 27.50 — a \"sale\" that costs more.",
+    "onBench": false
+  },
+  {
+    "index": 14,
+    "severity": "error",
+    "ruleId": "LST-PRICE-VALUE",
+    "plain": "The served price 12.00 does not match the catalog price 10.00.",
+    "onBench": false
+  },
+  {
+    "index": 15,
+    "severity": "warn",
+    "ruleId": "LST-STALE-AVAILDATE",
+    "plain": "The pre-order availability date 2026-02-01T00:00:00Z already passed (catalog as-of 2026-07-03T00:00:00Z) — the promise is stale.",
+    "onBench": false
+  },
+  {
+    "index": 16,
+    "severity": "warn",
+    "ruleId": "LST-STALE-EXPIRED",
+    "plain": "This row expired 2026-01-01T00:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z).",
+    "onBench": false
+  }
+]

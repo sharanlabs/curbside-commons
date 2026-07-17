@@ -1,6 +1,7 @@
 import demoJson from "@/fixtures/synthetic-restaurant/expected-demo.json";
 import type { DemoBeat, DemoFinding, DemoTranscript } from "@/lib/packs/listings/demo/types";
 import { DEMO_SUBHEAD } from "@/lib/packs/listings/demo/copy";
+import { SectionRail } from "@/components/data-surfaces/SectionRail";
 
 /**
  * The one-page demo walkthrough (D1; plan §5 D1, criterion C7).
@@ -80,7 +81,7 @@ function Receipts({ finding, index }: { finding: DemoFinding; index: number }) {
 
 function Beat({ beat, ordinal }: { beat: DemoBeat; ordinal: number }) {
   return (
-    <section className="dmo-beat" aria-label={clean(beat.title)}>
+    <section className="dmo-beat" id={beat.id} aria-label={clean(beat.title)}>
       <div className="dmo-beat-head">
         <span className="dmo-beat-no">Beat {ordinal}</span>
         <h2 className="dmo-beat-title">{clean(beat.title)}</h2>
@@ -132,6 +133,13 @@ export function DemoView() {
           </div>
         </dl>
       </header>
+
+      <SectionRail
+        items={transcript.beats.map((beat, i) => ({
+          id: beat.id,
+          label: `Beat ${i + 1}`,
+        }))}
+      />
 
       <div className="dmo-beats">
         {transcript.beats.map((beat, i) => (

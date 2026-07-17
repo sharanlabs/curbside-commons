@@ -95,7 +95,7 @@ export function parseAcpFeedText(text: string): ParseResult {
     };
   }
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-    return { ok: false, error: "Expected a JSON object with an `items` array — got a non-object." };
+    return { ok: false, error: "Expected a JSON object with an `items` array — the top-level value is not a feed object." };
   }
   const items = (raw as { items?: unknown }).items;
   if (!Array.isArray(items)) {

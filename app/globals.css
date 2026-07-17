@@ -2265,6 +2265,30 @@ body {
   .dmo-beat {
     break-inside: avoid;
   }
+  /* Print rescue for motion-gated content (design review 2026-07-16, D-1):
+     when motion is allowed, Reveal strips the settled state on mount and
+     below-fold blocks sit at opacity 0 until intersected — a print pass never
+     intersects them, so without this rescue every unseen chapter prints as
+     blank white. Mirrors the reduced-motion rescue above. */
+  .ds-reveal,
+  .ds-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .ds-reveal .lp-sec-rule {
+    width: 44px !important;
+  }
+  /* the Evidence Bench's replay-dim stages read fully lit on paper */
+  .eb-corr,
+  .eb-rule,
+  .eb-math,
+  .eb-break,
+  .eb-delta,
+  .eb-receipt-body {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* ============================================================================
@@ -2404,6 +2428,62 @@ body {
 }
 .ds-wrap.ds-narrow {
   max-width: 880px;
+}
+
+/* ----- section rail — the "On this page" instrument (session-22 ③, D-2) ----- */
+/* Sticky under the site nav; real anchors; the live position marker is an iris
+   underline (v8 accent), never colour-alone (weight shifts with it). */
+.dsr {
+  position: sticky;
+  top: 62px;
+  z-index: 30;
+  margin: 26px 0 6px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(23, 21, 27, 0.07);
+}
+.dsr-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+  margin: 0;
+  padding: 8px 0 0;
+}
+.dsr-link {
+  display: inline-block;
+  padding: 6px 2px 10px;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  transition: color 160ms var(--ease-arrival), border-color 160ms var(--ease-arrival);
+}
+.dsr-link:hover {
+  color: var(--ink);
+}
+.dsr-link:focus-visible {
+  outline: 2px solid var(--iris-ink);
+  outline-offset: 2px;
+}
+.dsr-link[aria-current="location"] {
+  color: var(--ink);
+  font-weight: 600;
+  border-bottom-color: var(--iris-ink);
+}
+/* Jumped-to targets clear the sticky nav + rail. */
+.ds-data h2[id],
+.ds-data section[id],
+.dmo-beat[id] {
+  scroll-margin-top: 128px;
+}
+@media print {
+  .dsr {
+    display: none;
+  }
 }
 
 /* serif display headings — the Oxblood register, scoped to data surfaces */
@@ -3193,6 +3273,19 @@ body {
 .pg-verdict.fail { color: var(--error-ink); }
 .pg-verdict.ok { color: var(--ink-2); }
 .pg-tally { font-size: 15px; color: var(--ink-2); }
+/* NumberFlow tally (session-22): the animated line is presentation-only; the
+   sr-only mirror carries the sentence for assistive tech + text tooling. */
+.pg-tally-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 .pg-prov { max-width: 68ch; margin-top: 12px; font-size: 14px; line-height: 1.6; color: var(--muted); }
 .pg-meta { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 14px; padding: 10px 0; border-top: 1px solid var(--rule-2); border-bottom: 1px solid var(--rule-2); }
 .pg-meta dt { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
@@ -3265,103 +3358,7 @@ body {
   border-top-color: var(--rule-3);
 }
 
-/* ----- HERO: the Prismatic Passline (engine adopted 2026-07-15) -------------
-   Full-bleed aria-hidden Canvas2D behind a top-anchored copy corridor. The copy
-   rides a radial white scrim so it always reads on pure white; the scene rail
-   sits in the lower third, clear of the words. */
-.cc-hero {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  background: var(--bg);
-  min-height: min(900px, 96svh);
-  padding: 0 clamp(18px, 4vw, 40px) clamp(48px, 8vh, 96px);
-}
-.cc-canvas {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  pointer-events: none;
-}
-.cc-hero-copy {
-  position: relative;
-  z-index: 1;
-  width: min(780px, 68vw);
-  margin: 0 auto;
-  padding-top: clamp(120px, 15vh, 160px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-/* the protected reading corridor — a radial white scrim keeping copy on pure white */
-.cc-hero-copy::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: -64px -120px -48px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 255, 255, 0.99) 0 49%,
-    rgba(255, 255, 255, 0.92) 64%,
-    rgba(255, 255, 255, 0) 82%
-  );
-  pointer-events: none;
-}
-.cc-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  margin: 0 0 18px;
-  font-size: 12px;
-  font-weight: 650;
-  letter-spacing: 0.13em;
-  color: var(--muted);
-}
-.cc-eyebrow::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  flex: none;
-  transform: rotate(45deg);
-  background: rgba(61, 92, 235, 0.5);
-}
-.cc-hero-title {
-  margin: 0;
-  font-family: var(--serif);
-  font-weight: 570;
-  font-size: clamp(38px, 5.4vw, 74px);
-  line-height: 1;
-  letter-spacing: -0.046em;
-  color: var(--ink);
-  max-width: 15ch;
-  text-wrap: balance;
-}
-/* the gradient phrase — matches the brand mark's ink→cyan→iris family. The
-   solid fallback color is --iris-ink (6.80:1); the clip only upgrades it. */
-.cc-hero-lit {
-  color: var(--iris-ink);
-}
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .cc-hero-lit {
-    background: var(--grad-phrase);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-}
-.cc-hero-lede {
-  margin: 22px 0 0;
-  font-size: clamp(16px, 1.85vw, 19px);
-  line-height: 1.58;
-  color: var(--body);
-  max-width: 56ch;
-  text-wrap: pretty;
-}
+/* CTA row — shared by the landing close section (.cc-close-cta pairs with it) */
 .cc-hero-cta {
   display: flex;
   flex-wrap: wrap;
@@ -3370,129 +3367,6 @@ body {
   margin-top: 32px;
 }
 
-/* WCAG 2.2 SC 2.2.2 pause/play control — quiet outlined, ≥44px, violet focus ring */
-.cc-pause {
-  position: absolute;
-  right: clamp(16px, 3vw, 32px);
-  bottom: clamp(16px, 3vh, 28px);
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--graphite);
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--rule-2);
-  border-radius: 6px;
-  padding: 6px 13px;
-  min-height: 44px;
-  min-width: 44px;
-  cursor: pointer;
-  transition:
-    color 0.15s ease,
-    border-color 0.15s ease;
-}
-.cc-pause:hover {
-  color: var(--ink);
-  border-color: var(--graphite);
-}
-.cc-pause:focus-visible {
-  outline: 2px solid var(--iris-ink);
-  outline-offset: 2px;
-}
-.cc-pause-ic {
-  width: 14px;
-  height: 14px;
-  flex: none;
-}
-.cc-sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-.cc-noscript {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-.cc-fallback {
-  width: 100%;
-  height: 100%;
-}
-.cc-fb-record {
-  fill: none;
-  stroke: var(--graphite);
-  stroke-opacity: 0.09;
-  stroke-width: 1;
-}
-.cc-fb-claim {
-  fill: none;
-  stroke: var(--graphite);
-  stroke-opacity: 0.08;
-  stroke-width: 1;
-  stroke-dasharray: 5 4;
-}
-.cc-fb-azure {
-  stroke: var(--azure);
-  stroke-opacity: 0.5;
-  stroke-width: 1.4;
-}
-.cc-fb-ember {
-  stroke: var(--ember);
-  stroke-opacity: 0.55;
-  stroke-width: 1.4;
-  stroke-dasharray: 5 4;
-}
-.cc-fb-gold {
-  stroke: var(--gold);
-  stroke-opacity: 0.85;
-  stroke-width: 1.6;
-}
-.cc-fb-bracket {
-  fill: none;
-  stroke: var(--violet);
-  stroke-opacity: 0.7;
-  stroke-width: 1.3;
-}
-.cc-fb-frag {
-  font-family: var(--ff-mono);
-  font-size: 13px;
-  fill: var(--graphite);
-  fill-opacity: 0.34;
-}
-.cc-fb-aperture {
-  fill: var(--bg);
-}
-
-/* hero responsive — widen the corridor + shrink height on smaller viewports */
-@media (max-width: 980px) {
-  .cc-hero-copy {
-    width: min(720px, 84vw);
-  }
-}
-@media (max-width: 768px) {
-  .cc-hero {
-    min-height: clamp(560px, 84vh, 720px);
-    padding-bottom: 56px;
-  }
-  .cc-hero-copy {
-    width: calc(100% - 40px);
-    padding-top: clamp(72px, 12vh, 108px);
-  }
-  .cc-hero-copy::before {
-    inset: -48px -28px -40px;
-  }
-}
 
 /* ----- 01 EVIDENCE BENCH: the conservator's examination table --------------- */
 .eb {
@@ -3739,6 +3613,190 @@ body {
 
 .eb-actions {
   margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+
+/* ----- session-21 substance: step-through · provenance · finding browse ·
+   the rendered delta (design review 2026-07-16 D-3/D-4; v8 tokens only) ----- */
+.eb-steps {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  flex-wrap: wrap;
+}
+.eb-step {
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--graphite);
+  background: var(--bg);
+  border: 1px solid var(--rule-2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+.eb-step:hover {
+  border-color: var(--rule-3);
+  color: var(--ink-2);
+}
+.eb-step[aria-pressed="true"] {
+  border-color: var(--iris-ink);
+  color: var(--iris-ink);
+  background: var(--accent-soft);
+}
+.eb-step:focus-visible {
+  outline: 2px solid var(--iris-ink);
+  outline-offset: 2px;
+}
+
+.eb-delta {
+  margin: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0.3; /* replay-dim */
+  transition: opacity 0.45s ease;
+}
+.eb-delta.is-lit {
+  opacity: 1;
+}
+.eb-delta-num {
+  font-size: 40px;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--error-ink);
+  font-variant-numeric: tabular-nums;
+}
+.eb-delta-cap {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.eb-browse summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+}
+/* Open, the index takes the full bench measure (.eb-head wraps) — the rows are
+   sentence-length evidence and must never inherit the tally's narrow flex slot
+   (the layout-sanity sweep caught exactly that at 117px). */
+.eb-browse[open] {
+  flex-basis: 100%;
+}
+.eb-browse summary::-webkit-details-marker {
+  display: none;
+}
+.eb-browse summary::after {
+  content: "▸";
+  color: var(--faint);
+  transition: transform 0.18s ease;
+}
+.eb-browse[open] summary::after {
+  transform: rotate(90deg);
+}
+.eb-browse summary:focus-visible {
+  outline: 2px solid var(--iris-ink);
+  outline-offset: 2px;
+}
+.eb-browse-list {
+  margin: var(--s3) 0 var(--s1);
+  padding: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border-top: 1px solid var(--rule);
+}
+.eb-browse-list li {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 30px 56px 1fr;
+  gap: var(--s3);
+  align-items: baseline;
+  padding: 7px var(--s2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 11.5px;
+}
+.eb-browse-list li[aria-current="true"] {
+  background: var(--ember-soft);
+  box-shadow: inset 2px 0 0 var(--ember);
+}
+.eb-browse-idx {
+  color: var(--faint);
+}
+.eb-browse-sev.is-error {
+  color: var(--error-ink);
+  font-weight: 700;
+}
+.eb-browse-sev.is-warn {
+  color: var(--warn-ink);
+  font-weight: 700;
+}
+.eb-browse-line {
+  color: var(--body);
+}
+.eb-browse-line em {
+  font-style: normal;
+  color: var(--ember-text);
+}
+
+.eb-prov {
+  margin-top: var(--s3);
+}
+.eb-prov summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+.eb-prov summary::-webkit-details-marker {
+  display: none;
+}
+.eb-prov summary::after {
+  content: "▸";
+  color: var(--faint);
+  transition: transform 0.18s ease;
+}
+.eb-prov[open] summary::after {
+  transform: rotate(90deg);
+}
+.eb-prov summary:focus-visible {
+  outline: 2px solid var(--iris-ink);
+  outline-offset: 2px;
+}
+.eb-prov[open] summary {
+  color: var(--ink-2);
+}
+.eb-prov dl {
+  margin: var(--s2) 0 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px var(--s3);
+  font-size: 11.5px;
+}
+.eb-prov dt {
+  color: var(--muted);
+}
+.eb-prov dd {
+  margin: 0;
+  color: var(--graphite);
+  overflow-wrap: anywhere;
 }
 .eb-run:active {
   transform: translateY(1px);
@@ -3994,15 +4052,6 @@ body {
     position: static;
   }
 }
-@media (max-width: 560px) {
-  .cc-pause span {
-    display: none;
-  }
-  .cc-pause {
-    gap: 0;
-    padding: 8px;
-  }
-}
 
 /* ----- motion: staged reveals + hover transitions, gated to allowed motion -- */
 @media (prefers-reduced-motion: no-preference) {
@@ -4054,11 +4103,18 @@ body {
 
 /* ----- reduced-motion kill: everything settled, no transitions -------------- */
 @media (prefers-reduced-motion: reduce) {
+  /* Transitions die; opacity is NOT forced — the step-through's dim/relight is
+     STATE, not animation, and must read under reduced motion too. The bench
+     still opens complete (SSR stage 6 = everything lit) and a reduced-motion
+     replay jumps straight to the settled stage. */
   .eb-corr,
   .eb-rule,
   .eb-math,
-  .eb-break {
-    opacity: 1;
+  .eb-break,
+  .eb-delta,
+  .eb-step,
+  .eb-browse summary::after,
+  .eb-prov summary::after {
     transform: none;
     transition: none;
   }

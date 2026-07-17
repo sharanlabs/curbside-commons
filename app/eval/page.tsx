@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CALIBRATION, E2, E3, E4, L1, type Provenance } from "@/lib/dashboard/evidence";
 import { Mark } from "@/components/data-surfaces/Mark";
+import { SectionRail } from "@/components/data-surfaces/SectionRail";
 
 export const metadata: Metadata = { title: "Eval evidence" };
 
@@ -35,8 +36,19 @@ export default function EvalEvidencePage() {
         run, each set is scored once and then retired, and misses are kept on the record.
       </div>
 
+      <SectionRail
+        items={[
+          { id: "calibration", label: "Calibration" },
+          { id: "crew-run", label: "Crew run" },
+          { id: "retrieval", label: "Retrieval" },
+          { id: "entity-resolution", label: "Entity resolution" },
+          { id: "approvals", label: "Approvals" },
+          { id: "one-pass", label: "One-pass rule" },
+        ]}
+      />
+
       {/* b. fee-line classifier calibration — the honest two-run arc */}
-      <h2 className="ds-h2-row">Fee-line classifier — calibration</h2>
+      <h2 className="ds-h2-row" id="calibration">Fee-line classifier — calibration</h2>
       <p className="ds-lead tech" style={{ marginTop: "8px" }}>
         A first run missed one pre-registered floor and was <b>deferred</b>; a retry on a fresh,
         pre-registered held-out split cleared every floor on one pass. Both are kept on the record.
@@ -98,11 +110,11 @@ export default function EvalEvidencePage() {
       </div>
       <div className="ds-note">{CALIBRATION.scopeNote}</div>
       <p className="ds-meta-line">
-        Durable teeth: a recorded snapshot plus a standing lock hold this result in place.
+        A recorded snapshot and a standing check preserve this result.
       </p>
 
       {/* c. assistant crew live run — COMPUTED from the committed matrix */}
-      <h2 className="ds-h2-row">Assistant crew — recorded run</h2>
+      <h2 className="ds-h2-row" id="crew-run">Assistant crew — recorded run</h2>
       <p className="ds-lead tech" style={{ marginTop: "8px" }}>
         A recorded run of the four-member assistant crew. The per-member labels below are
         classification outcomes computed from the record kept in the project, not marketing — only the two
@@ -171,12 +183,12 @@ export default function EvalEvidencePage() {
       <Prov of={L1.provenance} />
 
       {/* e. reference-retrieval lane — scored 2026-07-12, floors MISSED, label deferred */}
-      <h2 className="ds-h2-row">Reference-retrieval lane — floors not met, and it says so</h2>
+      <h2 className="ds-h2-row" id="retrieval">Reference-retrieval lane — floors not met, and it says so</h2>
       <p className="ds-lead plain" style={{ marginTop: "8px" }}>
         <b>In plain terms:</b> we built a &ldquo;look it up and quote the rulebook&rdquo; feature, wrote
         the passing bars into the record before the scoring run, and it missed them. So it ships marked{" "}
         <b>experimental</b>, the scoreboard is published, and the simpler of the two search methods was
-        kept — the fancier one didn&rsquo;t beat it.
+        kept — the more complex method didn&rsquo;t beat it.
       </p>
       <div className="ds-grid g2">
         <section className="ds-card flush">
@@ -186,9 +198,9 @@ export default function EvalEvidencePage() {
           <dl className="ds-ratefacts">
             <dt>keyword-search baseline</dt>
             <dd>{E2.bm25M1}</dd>
-            <dt>richer (embedding) method</dt>
+            <dt>embedding-based method</dt>
             <dd>{E2.hybridM1}</dd>
-            <dt>out-of-scope abstained (shipped method)</dt>
+            <dt>out-of-scope abstention (shipped method)</dt>
             <dd>{E2.bm25M4Out}</dd>
             <dt>shipped method</dt>
             <dd className="ds-mono">keyword search</dd>
@@ -218,7 +230,7 @@ export default function EvalEvidencePage() {
       </div>
 
       {/* f. entity resolution — scored 2026-07-12, one floor missed, ties baseline */}
-      <h2 className="ds-h2-row">Entity-resolution lane — the exact-match default won</h2>
+      <h2 className="ds-h2-row" id="entity-resolution">Entity-resolution lane — the exact-match default won</h2>
       <p className="ds-lead plain" style={{ marginTop: "8px" }}>
         <b>In plain terms:</b> a fuzzy name-matcher (&ldquo;FOG CITY TACOS LLC&rdquo; vs &ldquo;Fog City
         Tacos&rdquo;) was graded against bars fixed in advance. Required to <b>never</b> confuse two
@@ -253,7 +265,7 @@ export default function EvalEvidencePage() {
         {E4.tiesBaselineNote}.
       </p>
       <div className="ds-note">
-        <b>The first exam was thrown out — by us, on the record.</b> {E4.voidedFirstRunNote}. A
+        <b>We voided the first exam ourselves, on the record.</b> {E4.voidedFirstRunNote}. A
         cross-model review caught that our own exam set broke our own registered minimum; keeping the
         convenient number and calling the difference immaterial was the one option not available.
       </div>
@@ -263,7 +275,7 @@ export default function EvalEvidencePage() {
       <Prov of={E4.provenance} />
 
       {/* g. approvals simulator — structural evidence, no scoring by design */}
-      <h2 className="ds-h2-row">Signed-approvals simulator — threat-model evidence</h2>
+      <h2 className="ds-h2-row" id="approvals">Signed-approvals simulator — threat-model evidence</h2>
       <p className="ds-lead plain" style={{ marginTop: "8px" }}>
         <b>In plain terms:</b> the &ldquo;a human signs off before anything runs&rdquo; flow exists as a
         fully offline rehearsal: every approval is cryptographically tied to one exact case, one
@@ -285,7 +297,7 @@ export default function EvalEvidencePage() {
       </section>
 
       {/* h. the one-pass FAQ — the prepared honest answer */}
-      <h2 className="ds-h2-row">&ldquo;Why not just run it again?&rdquo; — the one-pass rule</h2>
+      <h2 className="ds-h2-row" id="one-pass">&ldquo;Why not just run it again?&rdquo; — the one-pass rule</h2>
       <div className="ds-note">
         Four evaluation sets have now been used and their results shown. Once a set&rsquo;s results are
         public, it is never scored again — a re-run would stop measuring the system and start measuring

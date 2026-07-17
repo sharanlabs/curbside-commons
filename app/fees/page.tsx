@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "Fee-cap audit — a statement read against NYC's caps",
   description:
-    "A delivery fee statement audited against the 17 codified rules of NYC Administrative Code §20-563.3: verdict states, per-finding receipts, the honest boundary between statement-checkable rules and those needing external evidence — and a paste-a-statement audit that runs in your browser.",
+    "A delivery fee statement audited against the 17 codified rules of NYC Administrative Code §20-563.3: verdicts, per-finding receipts, the boundary between statement-checkable rules and those needing external evidence — and an in-browser audit for pasted statements.",
 };
 
 export default function FeesPage() {

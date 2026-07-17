@@ -96,6 +96,24 @@ export type BenchSpecimen = {
     claimId: string;
     idBase: string;
   };
+  /** Provenance receipts (session-21 substance): where each figure comes from —
+      read from the same finding + SOR row as the figures themselves. */
+  provenance: {
+    claim: { id: string; source: string; served: string };
+    record: { rowId: string; cents: string };
+    rule: { id: string };
+  };
+};
+
+/** The full findings index (session-21 finding-browse): every row the tally
+    advertises, derived from the committed golden — the tally can no longer
+    imply depth the surface doesn't carry (design review 2026-07-16, D-4). */
+export type BrowseFinding = {
+  index: number;
+  severity: string;
+  ruleId: string;
+  plain: string;
+  onBench: boolean;
 };
 
 export const BENCH: BenchSpecimen = {
@@ -133,7 +151,27 @@ export const BENCH: BenchSpecimen = {
     claimId: price.claim.id, // item-001-v1#price.amount
     idBase, // item-001-v1
   },
+  provenance: {
+    claim: {
+      id: price.claim.id, // item-001-v1#price.amount
+      source: price.claim.source, // acp-feed
+      served: String(raw), // 2150
+    },
+    record: {
+      rowId: price.referenceRowId, // the SOR variation row the record was read from
+      cents: `${recordCents}¢`, // 2150¢
+    },
+    rule: { id: price.ruleId }, // LST-PRICE-CENTS-AS-DECIMAL
+  },
 };
+
+export const FINDINGS_INDEX: BrowseFinding[] = findings.map((f, i) => ({
+  index: i + 1,
+  severity: f.severity,
+  ruleId: f.ruleId,
+  plain: f.plainLine,
+  onBench: f === price,
+}));
 
 export type MethodDetail = { key: string; label: string; value: string; note: string };
 

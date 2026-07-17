@@ -1,0 +1,59 @@
+VERDICT: REVISE
+
+[P2] components/landing/EvidenceBench.tsx:99 — Printing during replay corrupts the restored interaction state — `beforeprint` cancels every pending timer and sets `phase="done"`; `afterprint` restores only `stage`, leaving a permanently partial, non-running examination despite the “exact state” contract — preserve phase/timing state or resume the remaining sequence, and add a print-mid-replay test.
+
+[P2] NOTICE:4 — Bundled production dependencies ship without their required MIT notices — `@number-flow/react`, `number-flow`, and `esm-env` require their copyright and permission text to accompany substantial copies, while the current notice and `out/` cover only UCP — add a third-party notice containing both copyright attributions and the full MIT text, and include it in the distributed artifact.
+
+[P2] components/landing/MethodRelation.tsx:55 — No-JS users receive stale, rejected copy — hydrated output says “is checked against … under” and “keeps all three together,” while the shipped fallback still says “meets … through” and “keeps all three attached”; `out/index.html` contains the stale version — share one copy source or synchronize the fallback and add a no-JS assertion.
+
+[P2] docs/reviews/codex-2026-07-16-contentpass.md:7 — The adjudication totals are false — the 35 table rows contain 24 `ACCEPTED`, 8 `ACCEPTED-MODIFIED`, and 3 `REFUTED`, not 27 accepted/6 modified/3 refuted; the same error appears in `docs/task-log.md:1740` and `docs/tooling-and-skills-usage.md:81` — correct all three records to 32 accepted, including 8 modified, and 3 refuted.
+
+[P2] PROJECT_STATE.md:3 — Ship-state documentation still describes session 21 and says the content pass, NumberFlow use, artifact run, and later stages are pending — this contradicts `docs/task-log.md:1738-1747`; `CURRENT_TASK.md:6` and `HANDOFF.md:7-9` retain the same obsolete resume path — publish a session-22 current-state block before committing.
+
+[P3] components/fees/FeePlaygroundClient.tsx:95 — The no-JS paste-leg floor is incomplete — only the textarea and buttons are hidden, leaving the orphaned “Fee statement JSON” label and impossible “load the sample…audit again” instruction visible — wrap and hide the complete JS-only control/tip group while retaining the honest fallback paragraph.
+
+[P3] evals/e2e/fees.spec.ts:174 — The test does not substantiate the claimed re-audit animation behavior — it performs one audit and merely counts five custom elements; it never changes a value, re-audits, verifies animation, checks reduced motion, inspects the accessibility tree, or prints a dynamic result — add two-audit animation, reduced-motion, ARIA, and result-print assertions.
+
+[P3] docs/reviews/codex-2026-07-16-contentpass.md:5 — The durable review record points to an ephemeral `/tmp` file and a nonexistent `§Raw` section — the actual committed evidence is `docs/reviews/codex-2026-07-16-contentpass-raw.txt` — link that repository file directly.
+
+## NumberFlow probe results (a–f)
+
+### a. Bundle size
+
+The installed package material totals 80,574 bytes raw, but that includes duplicate module formats, declarations, licenses, and documentation. The browser-relevant ESM closure is 29,416 bytes raw / 8,686 gzip / 7,683 Brotli.
+
+In `out/_next/static/chunks/14phw7c8ygirb.js`, the attributable NumberFlow segment is approximately 17,161 bytes raw / 5,684 gzip / 5,073 Brotli. The complete `/fees`-specific chunk is 63,904 bytes raw / about 17.1 KB gzip, while all `/fees` scripts total about 206.6 KB gzip. NumberFlow therefore contributes roughly 2.75% of transferred `/fees` JavaScript and is route-local. That cost is proportionate to five genuinely changing figures.
+
+### b. License notices
+
+`package-lock.json:1779-1786`, `5176-5180`, and `7516-7523` resolve exact-pinned `@number-flow/react@0.6.1`, `number-flow@0.6.1`, and `esm-env@1.2.2`, all MIT.
+
+The license conditions appear at `node_modules/@number-flow/react/LICENSE.md:12-13`, `node_modules/number-flow/LICENSE.md:12-13`, and `node_modules/esm-env/LICENSE:5`. Neither the minified bundle nor `out/` preserves them, and root `NOTICE` names only UCP. This is the P2 notice defect above.
+
+### c. `esm-env` transitive
+
+`esm-env/browser-fallback.js:1` tests `typeof window`; `dev-fallback.js:1-2` reads `NODE_ENV`; package conditional exports choose literal environment modules. NumberFlow imports only `BROWSER`, and the emitted browser branch contains no remaining development or `process` branch.
+
+No telemetry, analytics, lifecycle hooks, install scripts, or dev/static-export divergence was found in the three shipped packages.
+
+### d. No-JS and reduced-motion floors
+
+No NumberFlow surface renders without JavaScript: result state begins `null`, all instances are beneath `run !== null` at `FeePlaygroundClient.tsx:114-126`, and `out/fees.html` contains no result or NumberFlow markup. The surrounding no-JS control presentation has the separate P3 defect above.
+
+Reduced motion is honored in shipped code: the media query is created at `number-flow/dist/ssr-DvIINv8w.mjs:9`; animation is disabled when it matches at `number-flow/dist/lite.mjs:81-85`; `respectMotionPreference` defaults to `true` at lines 128-140. Repository e2e does not currently exercise this mechanism.
+
+### e. Zero-external-request invariant
+
+All shipped JavaScript/MJS for the three packages was scanned for `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`, `sendBeacon`, network-oriented `new URL`, and dynamic URL imports. None were found. The only HTTPS strings are source-code comments.
+
+NumberFlow is imported only by `/fees`; it cannot independently issue an external runtime request. Framework code contains internal static-chunk/navigation machinery, but no NumberFlow-originated external endpoint.
+
+### f. Shadow-DOM accessibility
+
+`number-flow/dist/lite.mjs:90-106` creates an open shadow root and assigns `ElementInternals.role="img"` plus a per-value `ariaLabel`. The application correctly places the complete visual tally beneath inherited `aria-hidden="true"` and follows it with one plain-sentence `.pg-tally-text` mirror. That prevents double announcements and remains robust where `ElementInternals` support is absent.
+
+At steady state, the visible tally prints because `aria-hidden` does not affect rendering; the screen-reader mirror remains visually clipped. Dynamic-result and mid-animation printing are untested, as recorded above.
+
+Summary: No P1 blocker; revision is required for MIT notice compliance, state restoration, copy/record integrity, and no-JS completeness.  
+Clean: honesty bytes and banned-claim scans, deleted-hero CSS liveness, 16-row drift lock, section rails, layout-sanity coverage, package networking, reduced-motion implementation, and ARIA mirroring.  
+Validation evidence supports the recorded 58/58 build, vitest 1241+7, dev 40/40, artifact 43/43, axe 9/9, and layout-sanity 7/7; the review was read-only and did not rerun them.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SectionRail } from "@/components/data-surfaces/SectionRail";
 import {
   RECORDED_LEGACY_GEMINI,
   RUN_RECORDS,
@@ -41,13 +42,21 @@ export default function CostEnforcementPage() {
         ever made are each recorded below, with their exact cost.
       </p>
       <p className="ds-lead tech">
-        <b>Technically:</b> automated checks prove that no part of the verifier can make an AI or
-        network call, and that the delivery builders hold to zero connections. The few recorded live
+        <b>Technically:</b> automated checks prove that the verifier cannot make AI or network
+        calls and that the delivery builders make no network connections. The few recorded live
         runs are frozen records, cited per figure.
       </p>
 
+      <SectionRail
+        items={[
+          { id: "enforcement", label: "Enforcement" },
+          { id: "live-runs", label: "Live runs" },
+          { id: "ai-spend", label: "AI spend" },
+        ]}
+      />
+
       <section>
-        <h2 className="ds-h2-row">Machine enforcement (not policy)</h2>
+        <h2 className="ds-h2-row" id="enforcement">Machine enforcement (not policy)</h2>
         <div className="ds-tbl" style={{ marginTop: "12px" }}>
           <table>
             <thead>
@@ -69,7 +78,7 @@ export default function CostEnforcementPage() {
       </section>
 
       <section>
-        <h2 className="ds-h2-row">Recorded live legs</h2>
+        <h2 className="ds-h2-row" id="live-runs">Recorded live runs</h2>
         <p className="ds-runline" style={{ maxWidth: "78ch" }}>
           Each run below was approved by a person, held to a bar fixed in advance where it earned a
           label, and committed as a frozen record — including the first calibration attempt, which
@@ -91,7 +100,7 @@ export default function CostEnforcementPage() {
       </section>
 
       <section>
-        <h2 className="ds-h2-row">The one recorded AI-drafting spend</h2>
+        <h2 className="ds-h2-row" id="ai-spend">The one recorded AI-drafting spend</h2>
         <p className="ds-runline" style={{ maxWidth: "78ch" }}>
           The earlier activation module once recorded a real AI drafting run:{" "}
           <span className="ds-num">{RECORDED_LEGACY_GEMINI.totalUsd}</span> against a{" "}

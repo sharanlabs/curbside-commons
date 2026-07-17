@@ -10,7 +10,19 @@ import AxeBuilder from "@axe-core/playwright";
  * hand-written checks (keyboard toggles, reduced-motion, contrast recomputes).
  */
 
-const SURFACES = ["/", "/report", "/eval", "/legacy/console", "/playground", "/fees"] as const;
+// /demo, /metrics, /cost joined 2026-07-16 (session 22) with the section-rail
+// instrument — every rail surface carries the same zero-violation bar.
+const SURFACES = [
+  "/",
+  "/report",
+  "/eval",
+  "/legacy/console",
+  "/playground",
+  "/fees",
+  "/demo",
+  "/metrics",
+  "/cost",
+] as const;
 
 for (const path of SURFACES) {
   test(`axe: ${path} has zero WCAG A/AA violations`, async ({ page }) => {

@@ -28,7 +28,7 @@ import { toReportView, type FindingRow, type ReportView as ReportViewModel } fro
 const SURFACES = {
   acp: {
     label: "ACP static feed",
-    plain: "agent-commerce product-feed shape",
+    plain: "agent-commerce product feed format",
     report: toReportView(acpJson as unknown as VerifierReport),
   },
   ucp: {

@@ -170,3 +170,40 @@ test("garbage and unmarked pastes get honest errors, never a verdict", async ({ 
   await expect(alert).toContainText("illustrative");
   await expect(page.getByRole("region", { name: "Fee audit result" })).toHaveCount(0);
 });
+
+test("the paste-leg tally is a live instrument: NumberFlow renders every tally figure with the sentence intact", async ({
+  page,
+}) => {
+  // NumberFlow's FIRST real use (session-22 ③): the tally values genuinely change
+  // when the reader edits and re-audits, so the transition is honest — unlike the
+  // bench delta, which stays static by the recorded honesty adjudication.
+  // Reduced motion emulated: the value swap must be exact and instant (the
+  // package's own prefers-reduced-motion branch), so the assertions below are
+  // deterministic — frame-level animation checks would be theater (recorded
+  // adjudication of the batch P3, 2026-07-16).
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/fees");
+  await page.getByRole("button", { name: "Load the sample statement" }).click();
+  await page.getByRole("button", { name: "Audit this statement" }).click();
+  const result = page.getByRole("region", { name: "Fee audit result" });
+  const tally = result.locator(".pg-tally");
+  // One flow per figure: the findings count + the four verdict-tally counts.
+  await expect(tally.locator("number-flow-react")).toHaveCount(5);
+  // The sentence still reads as one line of copy (screen readers + text search).
+  await expect(result.getByText(/5 findings — 5 violation/)).toBeVisible();
+  // The figures are LIVE: an edit + re-audit moves the same NumberFlow elements
+  // (5 findings → 4) and the sr-only sentence mirror moves with them.
+  const edited = await page.evaluate(() => {
+    const ta = document.getElementById("fee-statement") as HTMLTextAreaElement;
+    const stmt = JSON.parse(ta.value);
+    for (const line of stmt.lines) {
+      if (line.declaredCategory === "delivery_fee") line.amountCents = 100;
+    }
+    return JSON.stringify(stmt, null, 2);
+  });
+  await page.getByLabel("Fee statement JSON").fill(edited);
+  await page.getByRole("button", { name: "Audit this statement" }).click();
+  await expect(tally.locator("number-flow-react")).toHaveCount(5);
+  await expect(result.getByText(/4 findings — 4 violation/)).toBeVisible();
+  await expect(result.getByText(/5 findings — 5 violation/)).toHaveCount(0);
+});

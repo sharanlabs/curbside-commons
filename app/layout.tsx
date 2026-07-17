@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s · Curbside Commons",
   },
   description:
-    "The truth layer for agentic commerce — a deterministic verifier that checks a platform or AI agent's serving copy against a merchant's own records, validates data-format conformance, and audits NYC delivery fee statements, with evidence attached to every finding.",
+    "The proof layer for agentic commerce — a deterministic verifier that checks the serving copy of a platform or AI agent against a merchant's own records, validates data-format conformance, and audits NYC delivery fee statements, with evidence attached to every finding.",
   openGraph: {
     siteName: "Curbside Commons",
     title: "Curbside Commons — the proof layer for agentic commerce",

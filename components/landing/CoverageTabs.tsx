@@ -35,7 +35,7 @@ export function CoverageTabs({ tabs }: { tabs: CoverageTab[] }) {
 
   return (
     <div className="cv">
-      <div className="cv-tabs" role="tablist" aria-label="Measured coverage lanes">
+      <div className="cv-tabs" role="tablist" aria-label="Measured coverage categories">
         {tabs.map((t, i) => (
           <button
             key={t.id}

@@ -4,7 +4,7 @@ import { CommonsScene } from "@/components/landing/CommonsScene";
 import { EvidenceBench } from "@/components/landing/EvidenceBench";
 import { MethodRelation } from "@/components/landing/MethodRelation";
 import { CoverageTabs, type CoverageTab } from "@/components/landing/CoverageTabs";
-import { BENCH, METHOD, COVERAGE, PROOF_BAR } from "@/lib/landing/specimen";
+import { BENCH, FINDINGS_INDEX, METHOD, COVERAGE, PROOF_BAR } from "@/lib/landing/specimen";
 
 // Landing — the v8 "commons scene" arc (design adoption 2026-07-16: the owner's
 // chosen "Curbside Commons Hero v8" sample; narrative flow drafted by gpt-5.6-sol
@@ -33,7 +33,7 @@ const COVERAGE_TABS: CoverageTab[] = [
   {
     id: "fees",
     label: "NYC FEE-CAP",
-    body: `Evaluates delivery fee statements against ${COVERAGE.feeRulesTotal} codified rules from NYC §20-563.3: ${COVERAGE.feeExecutable} executable checks and ${COVERAGE.feeExternal} that require external evidence. The full audit renders on the fee-cap page.`,
+    body: `Evaluates delivery fee statements against ${COVERAGE.feeRulesTotal} codified rules from NYC §20-563.3: ${COVERAGE.feeExecutable} executable checks and ${COVERAGE.feeExternal} that require external evidence. The full audit appears on the fee-cap page.`,
   },
 ];
 
@@ -102,7 +102,7 @@ export default function Landing() {
           </p>
         </Reveal>
         <Reveal>
-          <EvidenceBench bench={BENCH} />
+          <EvidenceBench bench={BENCH} findings={FINDINGS_INDEX} />
         </Reveal>
       </section>
 
@@ -116,7 +116,7 @@ export default function Landing() {
           <p className="lp-eyebrow">02 / HOW THE COMMONS PROVES IT</p>
           <span className="lp-sec-rule" aria-hidden="true" />
           <h2 id="method-h2" className="lp-h2">
-            Three moves. No trust required.
+            Three moves. Each can be checked.
           </h2>
         </Reveal>
         <Reveal>
@@ -148,7 +148,7 @@ export default function Landing() {
               </div>
               <h3 className="tm-title">The record</h3>
               <p className="tm-body">
-                The kitchen&rsquo;s own log answers: what is actually offered, at what price, in
+                The kitchen&rsquo;s own log records what is actually offered, at what price, in
                 the merchant&rsquo;s own words.
               </p>
             </div>
@@ -162,8 +162,8 @@ export default function Landing() {
               </div>
               <h3 className="tm-title">The proof</h3>
               <p className="tm-body">
-                The commons reads claim against record and preserves the comparison &mdash; and
-                holds what does not agree.
+                The commons reads the claim against the record, preserves the comparison, and
+                holds any claim that does not agree.
               </p>
             </div>
           </div>
@@ -300,8 +300,8 @@ export default function Landing() {
           </h2>
           <p className="lp-foot">
             Coverage is reported as findings, schemas, and rules &mdash; not as a broad success
-            score. The evidence pages carry the earned labels, including an honest first-attempt
-            DEFER, beside the enforcement proofs that run for $0.
+            score. The evidence pages carry the earned labels, including a first-attempt DEFER,
+            alongside the checks that keep the runtime at $0.
           </p>
         </Reveal>
         <Reveal>

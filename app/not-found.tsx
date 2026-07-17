@@ -9,7 +9,7 @@ export default function NotFound() {
       <h1>Nothing is served at this path</h1>
       <p className="ds-lead plain">
         Fitting, for a site about verifying what gets served: this URL has no page behind it. If a
-        link brought you here, the surfaces below are the real inventory.
+        link brought you here, the pages below are the real inventory.
       </p>
       <ul style={{ margin: "14px 0 0", paddingLeft: "18px", lineHeight: 2 }}>
         <li>

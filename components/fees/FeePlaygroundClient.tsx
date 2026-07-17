@@ -7,6 +7,7 @@
  * whole bridge; its import closure is walked fail-closed by the pack tests).
  */
 import { useState } from "react";
+import NumberFlow from "@number-flow/react";
 import type { FeeAuditReport } from "@/lib/packs/fees";
 import { VERDICT_TAG_DISPLAY, VERDICT_TALLY_WORD, cleanFeeCopy } from "./fee-report-data";
 import { auditStatementText, sampleStatementText } from "./audit-in-browser";
@@ -45,7 +46,22 @@ export function FeePlaygroundClient() {
     });
   }
 
-  const tallyLine = (report: FeeAuditReport): string =>
+  // NumberFlow's first real use (session-22 ③): each tally figure animates when a
+  // re-audit changes it — an honest transition on a surface whose values genuinely
+  // move (reduced-motion readers get the instant swap; NumberFlow honors the
+  // preference itself). NumberFlow keeps its digits in shadow DOM, so the visible
+  // line is marked presentation-only and an sr-only mirror carries the sentence
+  // as one natural line for assistive tech and text tooling.
+  const tallyFlows = (report: FeeAuditReport) =>
+    (Object.keys(VERDICT_TALLY_WORD) as Array<keyof typeof VERDICT_TALLY_WORD>).map((v, i) => (
+      <span key={v}>
+        {i > 0 ? " · " : ""}
+        <NumberFlow value={report.verdictTally[v]} /> {VERDICT_TALLY_WORD[v]}
+      </span>
+    ));
+
+  const tallyText = (report: FeeAuditReport): string =>
+    `${report.findings.length} finding${report.findings.length === 1 ? "" : "s"} — ` +
     (Object.keys(VERDICT_TALLY_WORD) as Array<keyof typeof VERDICT_TALLY_WORD>)
       .map((v) => `${report.verdictTally[v]} ${VERDICT_TALLY_WORD[v]}`)
       .join(" · ");
@@ -76,13 +92,21 @@ export function FeePlaygroundClient() {
           </button>
         </div>
         <noscript>
-          <style dangerouslySetInnerHTML={{ __html: ".pg-actions,.pg-input{display:none}" }} />
+          {/* Batch P3 (2026-07-16): hide the WHOLE JS-only control group — the
+              textarea, buttons, its label, and the edit-and-re-audit tip — so
+              no-JS readers see only the honest fallback line, never an orphaned
+              label or an impossible instruction. */}
+          <style
+            dangerouslySetInnerHTML={{
+              __html: ".pg-actions,.pg-input,.pg-label,.pg-tip{display:none}",
+            }}
+          />
           <p className="pg-hint">
-            The paste leg runs the audit entirely in your browser and needs scripting turned on;
-            the four example months above render either way.
+            The pasted-statement audit runs entirely in your browser and needs scripting turned
+            on; the four example months above are available either way.
           </p>
         </noscript>
-        <p className="pg-hint">
+        <p className="pg-hint pg-tip">
           Tip: load the sample, change one fee amount or a refund date, and audit again — the
           verdicts move with your edit. The audit is deterministic: the same statement always
           produces the same result.
@@ -102,8 +126,11 @@ export function FeePlaygroundClient() {
               {run.report.ok ? "PASS" : "FAIL"}
             </p>
             <p className="pg-tally">
-              {run.report.findings.length} finding{run.report.findings.length === 1 ? "" : "s"} —{" "}
-              {tallyLine(run.report)}
+              <span aria-hidden="true">
+                <NumberFlow value={run.report.findings.length} /> finding
+                {run.report.findings.length === 1 ? "" : "s"} — {tallyFlows(run.report)}
+              </span>
+              <span className="pg-tally-text">{tallyText(run.report)}</span>
             </p>
           </header>
 

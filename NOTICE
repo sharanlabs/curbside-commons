@@ -1,4 +1,4 @@
-Commerce Truth Audit
+Curbside Commons
 Copyright 2026 Sharan Kumar
 
 This product includes the official Universal Commerce Protocol (UCP) JSON
@@ -6,3 +6,9 @@ Schemas, pinned verbatim under fixtures/ucp-schemas/ from
 https://github.com/Universal-Commerce-Protocol/ucp (tag v2026-04-08),
 licensed under the Apache License 2.0 by the UCP Authors. Their upstream
 LICENSE and a per-file sha256 provenance record are retained alongside them.
+
+The site's client bundle includes number-flow v0.6.1 and @number-flow/react
+v0.6.1 (Copyright (c) 2024 Maxwell Barvian) and esm-env v1.2.2 (Copyright
+2022 Benjamin McCann), each under the MIT License. The full attributions and
+MIT text ship with the site at /third-party-notices.txt (source:
+public/third-party-notices.txt).

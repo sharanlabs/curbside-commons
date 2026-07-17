@@ -395,7 +395,7 @@ export const FEE_CASES: readonly FeeStatementCase[] = [
   {
     key: "faithful",
     label: "Within the caps",
-    plain: "a clean month — every line lawful and within cap",
+    plain: "a clean month — every fee line within its cap",
     view: toFeeView(faithfulReportJson, faithfulStatementJson),
   },
   {

@@ -51,7 +51,7 @@ const HOLD_RED = "#b42318";
 const GRAY = "#6a6e7a"; /* quiet-text gray — 5.09:1 on #fff (the sample's #8d919c failed AA) */
 
 const SETTLED_STATUS = "SCENE SETTLED · ORDER PLACED WITH PROOF";
-const HOLD_STATUS = "A CLAIM HELD · OUT OF FOCUS";
+const HOLD_STATUS = "A CLAIM HELD · DOES NOT MATCH THE RECORD";
 
 type Pt = { x: number; y: number };
 type Geometry = {
@@ -449,13 +449,13 @@ export function CommonsScene({ children, ctaPrimary, ctaSecondary }: CommonsScen
       </div>
       <div className="cs-zones" role="group" aria-label="Highlight a part of the scene">
         <button type="button" className="cs-zone-btn" aria-pressed={zone === "menu"} onClick={() => pickZone("menu")}>
-          The menu
+          The menu and kitchen
         </button>
         <button type="button" className="cs-zone-btn" aria-pressed={zone === "commons"} onClick={() => pickZone("commons")}>
           The commons
         </button>
         <button type="button" className="cs-zone-btn" aria-pressed={zone === "agent"} onClick={() => pickZone("agent")}>
-          The agent
+          The agent and order
         </button>
       </div>
 
