@@ -5,40 +5,78 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PLATFORM_NAME } from "@/lib/product";
 
-// S5 canonical nav (owner-ratified /legacy/ split): truth-engine surfaces only,
-// plus ONE secondary link into the preserved legacy activation module.
-// Labels: the v8 narrative voice (sol draft 2026-07-16, Fable-adjudicated).
-const LINKS = [
-  { href: "/report", label: "Listings report" },
-  { href: "/demo", label: "Order scene" },
-  { href: "/playground", label: "Check a feed" },
-  { href: "/fees", label: "Fee-cap audit" },
-  { href: "/eval", label: "Evidence" },
-  { href: "/metrics", label: "Measurables" },
-  { href: "/cost", label: "$0 cost" },
-];
+/**
+ * Site nav — the v9 takeover header (build piece 1, 2026-07-20; design source
+ * `mockups/takeover-v9-home-listings-2026-07-17.html`, ADOPTED; spec §1).
+ * Brand lockup (the ONE blue→gold mark, D6 ruling) + four numbered chapters +
+ * the case-status readout speaking in the instrument's voice.
+ *
+ * ONE CONTINUING CASE (owner ruling 2026-07-20): every readout opens CASE 001;
+ * chapters are files of that case, never their own case numbers.
+ * D6 lamp voice: gold = held status · ember = the FAIL verdict · graphite =
+ * neutral chrome. Blue is never a lamp.
+ * D3: no parked/sample tooltips — all four chapters are live routes.
+ *
+ * Readout FIGURES arrive as props from the server layout (derived in
+ * lib/landing/specimen.ts from the engine's own report — never hand-typed).
+ * The readout words are chrome (the instrument narrating), present tense.
+ * Desktop-only bar (owner word 2026-07-15): the four-link chapter row fits the
+ * 1280px floor, so the old <900px hamburger is retired with the 8-tab nav.
+ */
 
-const LEGACY_LINK = { href: "/legacy/console", label: "Legacy activation" };
+export type NavReadoutFigures = {
+  findingsTotal: number;
+  errors: number;
+  warns: number;
+};
 
-export function Nav() {
-  const pathname = usePathname();
-  // Mobile menu (<900px): a hamburger toggles the link cluster so the nav never
-  // wraps to multiple rows on phones. On desktop the menu is always shown inline
-  // (CSS), so this state only governs the collapsed mobile panel.
-  const [open, setOpen] = useState(false);
+const CHAPTERS = [
+  { num: "01", label: "Listings audit", href: "/report" },
+  { num: "02", label: "Fee audit", href: "/fees" },
+  { num: "03", label: "Try it live", href: "/playground" },
+  { num: "04", label: "Proof", href: "/proof" },
+] as const;
 
-  // Collapse the mobile menu whenever the route changes (covers browser back/
-  // forward too). React's "reset state during render on prop change" pattern —
-  // synchronous, no effect, no intermediate paint.
-  const [prevPath, setPrevPath] = useState(pathname);
-  if (pathname !== prevPath) {
-    setPrevPath(pathname);
-    setOpen(false);
+type Readout = { lamp: "gold" | "ember" | "graphite"; parts: Array<string | { b: string }> };
+
+function readoutFor(pathname: string, f: NavReadoutFigures): Readout {
+  if (pathname.startsWith("/report")) {
+    return {
+      lamp: "ember",
+      parts: ["CASE 001 · ", { b: "FILE A" }, ` · FAIL · ${f.errors} ERR · ${f.warns} WARN`],
+    };
   }
+  if (pathname.startsWith("/fees")) {
+    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "FILE B" }, " · FEE AUDIT"] };
+  }
+  if (pathname.startsWith("/playground")) {
+    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "BENCH" }, " · IN YOUR BROWSER"] };
+  }
+  if (
+    pathname.startsWith("/proof") ||
+    pathname.startsWith("/eval") ||
+    pathname.startsWith("/metrics") ||
+    pathname.startsWith("/cost")
+  ) {
+    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "LOGBOOK" }, " · THE PROOF"] };
+  }
+  if (pathname.startsWith("/legacy")) {
+    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "ARCHIVE" }, " · LEGACY MODULE"] };
+  }
+  if (pathname.startsWith("/docs")) {
+    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "REFERENCE" }, " · THE METHOD"] };
+  }
+  return {
+    lamp: "gold",
+    parts: ["CASE 001 · ", { b: "CLAIM HELD" }, ` · ${f.findingsTotal} FINDINGS`],
+  };
+}
 
-  // Storyboard header (adoption 2026-07-15): pure white at the top of the page,
-  // glass once scrolled. rAF-throttled passive listener toggles one class; the
-  // no-JS/SSR default is the solid-white state (progressive enhancement only).
+export function Nav({ figures }: { figures: NavReadoutFigures }) {
+  const pathname = usePathname();
+
+  // White at the top, glass once scrolled (v8→v9 continuity; the no-JS/SSR
+  // default is the solid-white state — progressive enhancement only).
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     let frame = 0;
@@ -57,18 +95,19 @@ export function Nav() {
     };
   }, []);
 
+  const readout = readoutFor(pathname, figures);
+
   return (
-    <nav aria-label="Primary" className={`site-nav${scrolled ? " is-scrolled" : ""}`}>
+    <header className={`site-nav${scrolled ? " is-scrolled" : ""}`}>
       <div className="site-nav-in">
         <Link
           href="/"
           aria-current={pathname === "/" ? "page" : undefined}
           className="site-brand"
         >
-          {/* v8 brand mark (design adoption 2026-07-16): two open C-arcs on the
-              ultramarine→azure→amber gradient with terminal registration dots —
-              the owner's chosen sample's mark. Static (no self-draw), so
-              reduced-motion / no-JS render identically. */}
+          {/* v8/v9 brand mark (unchanged geometry): two open C-arcs on the
+              ultramarine→azure→amber gradient with terminal registration dots.
+              Static (no self-draw) — reduced-motion / no-JS render identically. */}
           <svg
             className="site-brand-mark"
             viewBox="0 0 38 32"
@@ -105,70 +144,37 @@ export function Nav() {
             <circle cx="32.6" cy="21.6" r="1.7" fill="#ffb020" />
           </svg>
           <span className="site-brand-word">{PLATFORM_NAME}</span>
-          <span className="site-brand-divider" aria-hidden="true" />
-          <span className="site-brand-tag">PROOF LAYER</span>
         </Link>
 
-        {/* Mobile menu toggle — hidden on desktop (the menu is inline), shown
-            <900px so the links collapse into a dropdown instead of wrapping. */}
-        <button
-          type="button"
-          className="site-nav-toggle"
-          aria-expanded={open}
-          aria-controls="site-nav-menu"
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="22"
-            height="22"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            {open ? (
-              <>
-                <path d="M6 6l12 12" />
-                <path d="M18 6L6 18" />
-              </>
-            ) : (
-              <>
-                <path d="M4 7h16" />
-                <path d="M4 12h16" />
-                <path d="M4 17h16" />
-              </>
-            )}
-          </svg>
-        </button>
-
-        <div id="site-nav-menu" className={`site-nav-menu${open ? " open" : ""}`}>
-          {LINKS.map((l) => {
-            const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
+        <nav className="site-nav-links" aria-label="Chapters">
+          {CHAPTERS.map((c) => {
+            const active = pathname === c.href || pathname.startsWith(`${c.href}/`);
             return (
               <Link
-                key={l.href}
-                href={l.href}
+                key={c.href}
+                href={c.href}
                 aria-current={active ? "page" : undefined}
                 className="site-navlink"
-                onClick={() => setOpen(false)}
               >
-                {l.label}
+                <span className="num">{c.num}</span>
+                {c.label}
               </Link>
             );
           })}
-          <Link
-            href={LEGACY_LINK.href}
-            aria-current={pathname.startsWith("/legacy") ? "page" : undefined}
-            className="site-navlink site-navlink-legacy"
-            onClick={() => setOpen(false)}
-          >
-            {LEGACY_LINK.label}
-          </Link>
-        </div>
+        </nav>
+
+        <p className="nav-case" aria-label="Case status">
+          <span
+            className={`lamp${readout.lamp === "gold" ? "" : ` ${readout.lamp}`}`}
+            aria-hidden="true"
+          />
+          {/* Keyed by pathname so the readout re-enters on route change
+              (CSS animation, motion-safe only). */}
+          <span key={pathname} className="nav-case-text">
+            {readout.parts.map((p, i) => (typeof p === "string" ? p : <b key={i}>{p.b}</b>))}
+          </span>
+        </p>
       </div>
-    </nav>
+    </header>
   );
 }

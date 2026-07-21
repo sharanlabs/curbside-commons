@@ -630,7 +630,7 @@
     },
     {
       "item_id": "ghost-001",
-      "title": "Phantom Platter (simulated ghost item)",
+      "title": "Phantom Platter",
       "description": "Illustrative catalog item.",
       "url": "https://example.com/example/items/item-001",
       "brand": "Illustrative merchant",

@@ -631,8 +631,8 @@
     },
     {
       "item_id": "ghost-001",
-      "title": "Phantom Platter (simulated ghost item)",
-      "description": "A simulated ghost item that exists on the serving copy only.",
+      "title": "Phantom Platter",
+      "description": "An item that exists in the feed only.",
       "url": "https://example.com/curbside-commons-simulated/items/item-001",
       "brand": "Curbside Commons Test Kitchen (simulated)",
       "image_url": "https://example.com/curbside-commons-simulated/img/item-001.png",

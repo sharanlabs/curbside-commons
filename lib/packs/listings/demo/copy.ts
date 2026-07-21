@@ -52,7 +52,7 @@ export const DEMO_FOIL_LINE = "passes the official schema check; still lies";
 /** Per-beat plain-words leads (C4: the plain line leads every beat). */
 export const DEMO_BEAT = {
   actorRead: {
-    title: "The agent reads the published serving copy",
+    title: "The agent reads the published feed",
     plain:
       "A shopping agent reads the published menu feed — the same data any AI assistant would consume — and never sees the restaurant's own records.",
   },

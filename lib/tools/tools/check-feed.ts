@@ -16,6 +16,7 @@
  * same truth-check report the command-line tool would print.
  */
 import { runCheck, type CliSurface } from "../../packs/listings/cli.ts";
+import { resolveInAllowedRoot } from "../paths.ts";
 import { freezeToolResult, type ToolResult } from "../types.ts";
 
 /** Params for `check_feed` (schema: `schemas/check_feed.input.schema.json`). */
@@ -28,7 +29,11 @@ export interface CheckFeedParams {
 /** Run `check_feed`. `params` must already be ajv-validated by `callTool`. */
 export function runCheckFeedTool(params: unknown): ToolResult {
   const p = params as CheckFeedParams;
-  const result = runCheck(p.feedPath, p.catalogPath, p.surface);
+  const result = runCheck(
+    resolveInAllowedRoot(p.feedPath, "feedPath"),
+    resolveInAllowedRoot(p.catalogPath, "catalogPath"),
+    p.surface,
+  );
   return freezeToolResult({
     tool: "check_feed",
     ok: result.exitCode === 0,

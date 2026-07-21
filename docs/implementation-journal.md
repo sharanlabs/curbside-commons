@@ -562,3 +562,117 @@ The same review showed that the long-form page lost its navigation after the her
 4. **Copy adjudication mattered:** sol's draft used "committed record/example" in rendered copy — repo-true but display-jargon under the de-jargon bar. Reworded without losing the grounding ("the kitchen's own record", "the worked example").
 
 **Design-honesty note.** The v8 sample's proof bar carried invented values ("proof://cc-2381 … match=true"); the shipped bar renders the REAL held-claim specimen (2150 vs 21.50, HOLD, 100×) derived from the same finding the bench uses — the anti-fabrication contract extended to decoration. The hero's order story stays an illustrative scene; the lede says so, and the copy never claims the product places orders.
+
+## 2026-07-20 — Session 29: the build opens — D4 vocab slice + piece-1 surfaces, with a mid-flight seat-death handover to inline Fable
+
+**What happened.** The five adopted mockups became real app surfaces for the first time: the D4 "serving copy" vocabulary retirement went through the engine's two plainLine templates with every downstream golden regenerated through its real generator (7 teeth bit RED first; the landing drift-lock's re-commit diff was exactly the two sanctioned lines), and piece 1 (nav + Home + 01/report) landed — half by a dispatched builder, half inline after the builder seat-died on the Fable limit and the owner worded "use fable to do it."
+
+**Deviations ledger (Field Guide pattern, owner-adopted this session):**
+1. **Both background agents seat-died** (builder mid-Home; research sweep pre-findings) — raw errors recorded verbatim in the decision log; conservative option = inline Fable continuation (NO-WAIT), sweep re-run owed before motion decisions.
+2. **First L-1 regen dropped the live-run provenance headers** (run/startedAt/model/finishedAt/degradedCount) — caught on diff review, restored, regen redone preserving them. Lesson: re-derivation scripts must spread the original file object, never rebuild it.
+3. **`.lp-btn[hidden]` rescue**: the recorded v9 defect class recurred in the app layer (builder omitted the session-25 CSS rescue). Identified statically (grep: rule absent), fixed, verified green in the 51-check battery — recorded as identified-static/verified-green, not claimed as a strict red-green.
+4. **Old ReportView superseded**: the acp/ucp surface toggle + per-finding receipt detail of the pre-v9 /report do not exist in the adopted 01 design — retired with the design authority's word (mockup adopted); NEW-10 e2e contract retires at the canonical rewrite; toReportView + ucp golden stay covered by wedge/transcript packs.
+5. **Footer links /docs before the route exists** (piece 3 builds it this same tree) — transient 404 if the tree is inspected between pieces; flagged in HANDOFF.
+6. **Nav hamburger retired** with the 8-tab nav (desktop-only owner word; the 4-chapter row fits the 1280 floor).
+7. **Interim readout wording** for /fees /playground /proof /docs until pieces 2–3 bind the final chrome (figures already derive).
+8. **Cross-route View Transitions deferred**: the mockup's same-document VT readout flip became a motion-safe CSS re-entry (Next cross-route VT is not stable-flagged; the re-run motion sweep will adjudicate).
+9. **Landing prose-figure locks flipped form**: spelled-word assertions → derivation-only bans; the new ban immediately caught one real hand-typed "sixteen" in the door sub (fixed by a derived word table). The tooth works.
+
+**Why it matters.** The engine's own language now carries the site's vocabulary (feed, not serving copy) with zero hand-edited goldens; the landing/report figures cannot drift from the engine (derivation + bans + the TryBench↔engine equivalence pack); and the recorded v9 defect classes now have permanent CSS rescues at source.
+
+## Session 30 — 2026-07-20 (Fable 5 primary seat; Opus builders on owner word)
+
+Build pieces 2–3 landed on the uncommitted tree: /proof (04, evidence.ts-derived),
+redirect stubs (/eval /metrics /cost → /proof; /demo → /), /legacy archive landing,
+/fees rebuilt (02, ultramarine at build = D1), /playground rebuilt (03, live bench),
+/docs new (§11 register), Label Register v2 (owner directive), real-product voice
+sweep + freeze-reversal executed (see the decision rows), ghost-item rename with
+full golden regeneration through real generators, crew case/matrix/record
+re-derivations from committed turns, README voice pass, motion-currency sweep re-run
+live + View-Transition polish applied.
+
+### Deviations ledger (Field Guide pattern — edge case → conservative option → logged → keep going)
+
+1. **04's "1,145 TESTS PASSED" fact card** — a hand-typed volatile figure with no
+   committed source (violates the derivation-only lock). Replaced with the
+   RECORDED RUNS card derived from RUN_RECORDS.length. Conservative: derivable
+   truth over a stale count.
+2. **04's blue `.vd` chip lamp-dots** — D6 says blue is never a lamp; the ruling
+   named only the header lamp + logo, but chip dots are lamps too. Replaced with
+   the diamond ornament (eyebrow vocabulary); console dot neutralized (#c6cbd8).
+3. **Crew console line carried "(Groq)"** — the /cost plainLeg display-layer
+   precedent strips vendor parentheticals; applied the same strip on /proof.
+4. **"PINNED UCP SCHEMAS" cap** — protocol brand in chrome; site language says
+   "data-format schemas". Renamed the cap; figures unchanged.
+5. **03's ghost/drop presets were REPLAY (recorded runs) in the mockup** — the app
+   can run the REAL engine live on edited copies of the committed feed, which is
+   spec §8's preferred tier. All four presets are LIVE; the REPLAY register stays
+   on /proof where runs are genuinely historical. Delta reporting (added/removed
+   finding keys vs the reference run) keeps the "one edit → one finding" story
+   honest inside a full-feed run.
+6. **Nav readout does not flip per month-tab/scenario** (mockups flipped it) — the
+   readout is shared one-case chrome; the in-page verdict chips/stamps carry the
+   state. Conservative: chrome consistency over per-page mutation.
+7. **/docs keeps the shared Nav** instead of the mockup's standalone doc header —
+   site-chrome coherence; the doc-return affordance is the footer + in-page links.
+8. **`.sr` utility was missing** — piece-1 /report used class "sr" with no CSS
+   definition (method heading rendered visibly). Fable-evaluation catch at piece 2;
+   utility added (the v9 mockup's own definition).
+9. **Injection fixture briefly renamed, then reverted** — the ghost title inside
+   `evals/crew/fixtures/acp-feed.injection.json` is part of a committed historical
+   live run; renaming it broke the committed-turn re-derivations. Reverted:
+   historical records are provenance, not site chrome.
+10. **MCP tool-description honesty strings kept** — the freeze-reversal names
+    "MCP/n8n/delivery scope", but those strings are a developer/API surface
+    (background, per the owner's own framing) and transcript-golden-bound.
+    Kept; surfaced as an owner pick at wrap.
+
+## 2026-07-21 — Session 31: capability review + MCP security hardening (Opus 4.8 @ max, Fable-equivalence bar)
+
+The owner opened with a process concern — the session-30 work and this session's early
+analysis had run at a lower model tier, and they wanted it re-judged at the Fable bar with
+the primary seat verifying everything itself (not relaying subagent summaries) and sol as the
+cross-model adversary. That framing paid off immediately: it caught a real, live security hole.
+
+**The catch.** A whole-capability sweep (project-advisor → guidelines-monitor → utilization-
+coordinator → blindspot-scout → security-specialist) found that `check_conformance`'s
+caller-supplied `schemaDir` param was passed **raw** into `walkJson`'s recursive
+`readdirSync`/`readFileSync` — arbitrary directory enumeration + arbitrary JSON read + a
+recurse-`/` DoS, reachable by any MCP client. The sharp part: it sat on the *same line* as
+`docPath`, which an earlier fix had just guarded — so the guarded and unguarded params were
+literal neighbors. A lower-tier pass fixed the one it was told about and left its twin open.
+This is the exact "fix the named thing, miss its sibling" failure the primary seat was asked
+to hunt for.
+
+**The fixes (all primary-seat-verified, not taken on the agents' word):**
+1. `schemaDir` now routes through `resolveInAllowedRoot` (the shared containment helper),
+   guarded only when present so the pinned in-repo default still applies. Red-green proven by
+   the primary seat: reverting the guard sent the payload into `readdirSync('/etc/passwd')`
+   (ENOTDIR, file actually reached), restoring it produced the guard's own refusal message.
+2. `walkJson` gained a `MAX_SCHEMA_DIR_DEPTH=8` recursion cap — defense-in-depth *behind* the
+   boundary guard, protecting every caller of the primitive (CLI, fixture generators) even
+   though the MCP surface is already contained.
+3. Independent completeness sweep by the primary seat (not sol): all 6 caller path params
+   across the 4 file-path tools are now guarded; the other 3 tools take no path — zero
+   unguarded file-path params remain on the MCP surface.
+4. (HIGH) `SERVER_INSTRUCTIONS` gained an injection-hygiene sentence telling a calling LLM to
+   treat a report's verbatim-quoted audited text as data, not instructions — the spec's own
+   channel for this. Fencing every report was considered and rejected: it breaks the human-
+   readable equivalence and threads fragile logic through the whole engine, disproportionate
+   to a risk the server can prompt-for-but-not-enforce anyway. Made a tested contract
+   (`mcp-conformance.test.ts`) + golden regenerated through its real generator.
+5. (MED) injection-resistance gold extended from label-only to also cover the `declaredCategory`
+   channel (the second untrusted string reaching the classifier prompt).
+6. Non-breaking `npm audit fix` closed 2 dev-only ReDoS highs; the 5 `--force`-only advisories
+   (all dev-only or behind the gated live-AI flag) were deliberately NOT force-bumped —
+   surfaced for owner sign-off rather than silently changing Next/the AI SDK.
+
+**Capability blindspots closed at the system level (not just this repo):** the guidelines-monitor
+pass had to pull MCP-security guidance live because claude-os had **no** security KB — so a new
+`knowledge/security_kb` (MCP path-traversal as the dominant class + the containment pattern) and
+a new `evals_kb/rag-evaluation.md` (this project's own pre-registered-floors + injection-metric
+pattern, which the review judged *better* than the KB's existing RAG note) were compiled, so the
+next project inherits both instead of re-deriving them live.
+
+Gate: `npm run verify` exit 0, 1283 passed / 8 skipped, re-verified identical after the dep fix.
+sol xhigh adversarial review adjudicated primary-model-final (see decision-log).

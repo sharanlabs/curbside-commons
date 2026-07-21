@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
-import { DemoView } from "@/components/demo/DemoView";
+import Link from "next/link";
 
 /**
- * `/demo` — the one-page verifier demo (D1; plan §5 D1, criteria C7/C10).
- *
- * A thin server wrapper (metadata only) around the static {@link DemoView}, which
- * renders the COMMITTED demo transcript. No LLM, no network, $0 — the whole
- * demo-render path is provably provider-free (evals/packs/demo-blindness.test.ts).
- *
- * Plain: the page that plays the scripted demo as a printable one-pager.
+ * Redirect stub (build piece 2, 2026-07-20; spec §12 — /demo folds into the
+ * landing + /report: the landing's turn section carries the examined claim and
+ * the try bench, and 01 carries the full audit). Static-export-safe: a
+ * client-side <meta refresh> (no server redirect) preserves the old URL.
+ * Pattern: app/audit/page.tsx (S5 precedent).
  */
 export const metadata: Metadata = {
-  title: "Verifier demo — a claim checked against the record",
-  description:
-    "A scripted, deterministic walkthrough: a shopping agent follows a spec-valid but false serving copy; the verifier checks that same copy against the merchant's records and catches the mismatch. Zero AI calls; ends at item selection (no checkout).",
+  title: "Moved to the front page",
+  robots: { index: false },
 };
 
-export default function DemoPage() {
-  return <DemoView />;
+export default function DemoMoved() {
+  return (
+    <main className="ds-data ds-wrap ds-view">
+      <meta httpEquiv="refresh" content="0;url=/" />
+      <p className="ds-note">
+        This page folded into the <Link href="/">front page</Link> — the examined claim now opens
+        the story there, and the full audit lives in{" "}
+        <Link href="/report">chapter 01, the listings audit</Link>.
+      </p>
+    </main>
+  );
 }

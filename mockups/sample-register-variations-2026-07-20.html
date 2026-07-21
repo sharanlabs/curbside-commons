@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Register variations — Curbside Commons — 2026-07-20</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300..800&family=JetBrains+Mono:wght@400..800&family=Newsreader:opsz,wght@6..72,300..600&family=Instrument+Sans:wght@400..700&family=Fragment+Mono&family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400..700&family=Commissioner:wght@400..700&family=Spline+Sans+Mono:wght@400..600&family=Bodoni+Moda:opsz,wght@6..96,400..900&family=Manrope:wght@400..800&family=Geist+Mono:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff;
+  --um:#2438d6;      /* ultramarine accent */
+  --um2:#3d5ceb;     /* iris / interactive */
+  --um-soft:rgba(61,92,235,0.055);
+  --gold:#ffb020; --gold-soft:rgba(255,176,32,0.12); --gold-text:#9c6208; --gold-line:rgba(156,98,8,0.35);
+  --graphite:#4a4e5a;
+  --ink:#12141c; --ink-2:#22252f; --body:#3b3f4b; --muted:#585d69;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#f6f7fa;color:var(--ink);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;}
+body{font-family:"Onest",system-ui,sans-serif;}
+
+/* ---- page header ---- */
+.page-head{max-width:1200px;margin:0 auto;padding:56px 40px 8px;}
+.page-head h1{font-size:30px;font-weight:700;letter-spacing:-0.02em;margin:0 0 12px;color:var(--ink);}
+.page-head p{font-size:14.5px;line-height:1.65;color:var(--muted);max-width:92ch;margin:0;font-weight:450;}
+
+/* ---- variant frame ---- */
+.variant{max-width:1200px;margin:0 auto;padding:40px;}
+.variant + .variant{border-top:1px solid #e4e6ec;}
+.vtag{display:flex;align-items:baseline;gap:16px;margin:0 0 30px;}
+.vtag b{font-family:"JetBrains Mono",monospace;font-size:44px;font-weight:800;line-height:1;
+  letter-spacing:-0.03em;color:var(--um);}
+.vtag span{font-size:16px;font-weight:600;letter-spacing:-0.01em;color:var(--ink-2);}
+.vtag em{font-style:normal;font-size:12.5px;color:var(--muted);font-weight:450;margin-left:auto;}
+
+.demo{display:flex;flex-direction:column;}
+
+/* shared structural resets so variants only add personality */
+.demo h2,.demo p{margin:0;}
+.tabsbar{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.tabs{display:flex;align-items:stretch;}
+.tab{display:inline-flex;align-items:center;cursor:default;}
+.lede-block{}
+.crew{display:grid;grid-template-columns:1fr 1fr;}
+.card{display:flex;flex-direction:column;}
+.chip{align-self:flex-start;display:inline-flex;align-items:center;white-space:nowrap;}
+.lowrow{display:grid;grid-template-columns:1.1fr 1fr 1.3fr;align-items:start;}
+.verdicts{display:flex;flex-wrap:wrap;align-items:center;}
+.vchip{display:inline-flex;align-items:center;white-space:nowrap;}
+.held{color:var(--gold-text);}
+
+/* ==========================================================================
+   VARIANT F — the register as built (Onest + JetBrains Mono)
+   ========================================================================== */
+.v-f .demo{gap:30px;}
+.v-f .tabsbar{padding:14px 20px;background:#fff;border:1px solid #e7e8ed;border-radius:14px;
+  box-shadow:0 1px 2px rgba(18,20,28,0.05),0 8px 20px rgba(18,20,28,0.05);}
+.v-f .tabs{gap:6px;}
+.v-f .tab{gap:8px;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:650;
+  letter-spacing:-0.006em;color:var(--muted);}
+.v-f .tab .tnum{font-family:"JetBrains Mono",monospace;font-size:11.5px;font-weight:800;}
+.v-f .tab.active{background:var(--um);color:#fff;font-weight:750;}
+.v-f .tab.active .tnum{color:rgba(255,255,255,0.85);}
+.v-f .case{font-family:"JetBrains Mono",monospace;font-size:11.5px;font-weight:650;
+  letter-spacing:0.04em;color:var(--graphite);}
+.v-f .case i{font-style:normal;color:var(--rule-3,#b9bcc6);margin:0 5px;}
+.v-f .case b.held{font-weight:800;color:var(--gold-text);}
+
+.v-f .eyebrow{font-size:13px;font-weight:800;letter-spacing:0.1em;color:var(--ink-2);
+  text-transform:uppercase;display:inline-flex;align-items:center;gap:9px;}
+.v-f .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(61,92,235,0.65);}
+.v-f .h2{font-size:31px;font-weight:560;letter-spacing:-0.028em;line-height:1.14;color:var(--ink);margin-top:18px;}
+.v-f .lede{font-size:16px;line-height:1.65;color:var(--muted);max-width:58ch;margin-top:14px;}
+
+.v-f .crew{gap:1px;background:var(--rule-2,rgba(18,20,28,0.15));border:1px solid rgba(18,20,28,0.15);
+  border-radius:16px;overflow:hidden;}
+.v-f .card{background:#fff;padding:22px 24px 24px;gap:8px;}
+.v-f .card-k{font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:800;letter-spacing:0.12em;color:var(--ink);}
+.v-f .chip{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:750;letter-spacing:0.12em;
+  border-radius:999px;padding:5px 11px;}
+.v-f .chip.agent{color:var(--um);border:1px solid rgba(61,92,235,0.38);background:var(--um-soft);}
+.v-f .chip.flow{color:var(--graphite);border:1px solid rgba(74,78,90,0.4);background:rgba(74,78,90,0.05);}
+.v-f .card-d{font-size:13.5px;line-height:1.55;color:var(--body);margin-top:2px;}
+
+.v-f .lowrow{gap:24px;}
+.v-f .measure{background:#fff;border:1px solid #e7e8ed;border-radius:16px;padding:22px 24px;
+  box-shadow:0 1px 2px rgba(18,20,28,0.05),0 8px 20px rgba(18,20,28,0.05);}
+.v-f .m-k{font-family:"JetBrains Mono",monospace;font-size:10.5px;font-weight:800;letter-spacing:0.12em;color:var(--um);}
+.v-f .m-v{font-family:"JetBrains Mono",monospace;font-size:30px;font-weight:750;letter-spacing:-0.02em;
+  color:var(--ink);margin-top:12px;font-variant-numeric:tabular-nums;}
+.v-f .m-n{font-size:13.5px;color:var(--graphite);margin-top:8px;}
+.v-f .verdicts{gap:10px;}
+.v-f .vchip{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:800;letter-spacing:0.16em;
+  padding:6px 12px;border-radius:6px;gap:8px;}
+.v-f .vchip::before{content:"";width:6px;height:6px;transform:rotate(45deg);}
+.v-f .vchip.held{background:var(--gold-soft);color:var(--gold-text);border:1px solid var(--gold-line);}
+.v-f .vchip.held::before{background:var(--gold);}
+.v-f .vchip.defer{background:rgba(74,78,90,0.05);color:var(--graphite);border:1px solid rgba(74,78,90,0.4);}
+.v-f .vchip.defer::before{background:rgba(74,78,90,0.55);}
+.v-f .preset{background:#fff;border:1px solid #e7e8ed;border-radius:16px;padding:20px 22px;
+  box-shadow:0 1px 2px rgba(18,20,28,0.05),0 8px 20px rgba(18,20,28,0.05);}
+.v-f .preset-tab{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:750;
+  letter-spacing:0.14em;color:#fff;background:var(--um);padding:4px 10px;border-radius:999px;}
+.v-f .preset-title{font-size:17px;font-weight:600;letter-spacing:-0.015em;color:var(--ink);margin-top:14px;}
+.v-f .preset-sub{font-family:"JetBrains Mono",monospace;font-size:10.5px;font-weight:700;letter-spacing:0.1em;
+  color:var(--muted);margin-top:9px;}
+
+/* ==========================================================================
+   VARIANT S1 — Proof Gazette (Newsreader + Instrument Sans + Fragment Mono)
+   editorial spread · hairlines · 0–4px corners · no shadow
+   ========================================================================== */
+.v-s1 .demo{gap:42px;font-family:"Instrument Sans",sans-serif;}
+.v-s1 .tabsbar{padding:0 0 20px;border-bottom:1px solid var(--graphite);align-items:flex-end;}
+.v-s1 .tabs{gap:30px;}
+.v-s1 .tab{gap:0;font-family:"Instrument Sans",sans-serif;font-size:12px;font-weight:600;color:var(--graphite);
+  padding-bottom:3px;letter-spacing:0.01em;}
+.v-s1 .tab .tnum{font-weight:600;}
+.v-s1 .tab .tnum::after{content:" / ";white-space:pre;color:var(--um);opacity:0.6;}
+.v-s1 .tab.active{color:var(--ink);border-bottom:3px double var(--um);}
+.v-s1 .case{font-family:"Fragment Mono",monospace;font-size:10.5px;letter-spacing:0.05em;color:var(--graphite);}
+.v-s1 .case i{font-style:normal;margin:0 6px;color:var(--um);}
+.v-s1 .case b.held{color:var(--gold-text);font-weight:400;}
+
+.v-s1 .eyebrow{font-family:"Fragment Mono",monospace;font-size:12px;font-weight:400;letter-spacing:0.04em;
+  color:var(--um);display:inline-flex;align-items:center;gap:14px;}
+.v-s1 .eyebrow::before{content:"";width:36px;height:1px;background:var(--um);}
+.v-s1 .h2{font-family:"Newsreader",serif;font-size:44px;font-weight:400;letter-spacing:-0.01em;line-height:1.06;
+  color:var(--ink);margin-top:18px;max-width:20ch;}
+.v-s1 .lede{font-family:"Instrument Sans",sans-serif;font-size:16px;line-height:1.7;color:var(--body);
+  max-width:56ch;margin-top:16px;}
+
+.v-s1 .crew{gap:28px;}
+.v-s1 .card{background:#fff;border:1px solid var(--graphite);border-radius:2px;padding:26px;gap:14px;}
+.v-s1 .card-k{font-family:"Newsreader",serif;font-size:24px;font-weight:500;letter-spacing:-0.01em;color:var(--ink);
+  border-bottom:1px solid rgba(18,20,28,0.14);padding-bottom:14px;}
+.v-s1 .chip{font-family:"Fragment Mono",monospace;font-size:10px;font-weight:400;letter-spacing:0.05em;
+  text-transform:uppercase;padding:3px 4px;border:1px solid;border-radius:0;}
+.v-s1 .chip::before{content:"[ ";}
+.v-s1 .chip::after{content:" ]";}
+.v-s1 .chip.agent{color:var(--um);border-color:rgba(36,56,214,0.4);}
+.v-s1 .chip.flow{color:var(--graphite);border-color:rgba(74,78,90,0.4);}
+.v-s1 .card-d{font-family:"Instrument Sans",sans-serif;font-size:14px;line-height:1.6;color:var(--body);}
+
+.v-s1 .lowrow{gap:36px;}
+.v-s1 .measure{background:#fff;border:1px solid var(--graphite);border-radius:2px;}
+.v-s1 .m-k{font-family:"Fragment Mono",monospace;font-size:9.5px;font-weight:400;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--graphite);border-bottom:1px solid rgba(18,20,28,0.14);padding:12px 18px;}
+.v-s1 .m-v{font-family:"Newsreader",serif;font-size:40px;font-weight:400;color:var(--ink);padding:16px 18px 6px;
+  font-variant-numeric:tabular-nums;}
+.v-s1 .m-n{font-family:"Instrument Sans",sans-serif;font-size:13px;color:var(--graphite);padding:0 18px 16px;}
+.v-s1 .verdicts{gap:12px;align-content:start;}
+.v-s1 .vchip{font-family:"Fragment Mono",monospace;font-size:10.5px;font-weight:400;letter-spacing:0.08em;
+  padding:6px 12px;border:1px solid;border-radius:2px;}
+.v-s1 .vchip.held{color:var(--gold-text);border-color:var(--gold-line);background:var(--gold-soft);}
+.v-s1 .vchip.defer{color:var(--graphite);border-color:rgba(74,78,90,0.4);}
+.v-s1 .preset{background:#fff;border:1px solid var(--graphite);padding:22px;position:relative;
+  border-radius:0;clip-path:polygon(0 0,100% 0,100% 100%,14px 100%,0 calc(100% - 14px));}
+.v-s1 .preset-tab{font-family:"Fragment Mono",monospace;font-size:10px;font-weight:400;letter-spacing:0.1em;
+  color:var(--um);border:1px solid rgba(36,56,214,0.4);padding:3px 9px;display:inline-block;}
+.v-s1 .preset-title{font-family:"Newsreader",serif;font-size:22px;font-weight:400;color:var(--ink);margin-top:14px;}
+.v-s1 .preset-sub{font-family:"Fragment Mono",monospace;font-size:9.5px;letter-spacing:0.08em;color:var(--graphite);margin-top:10px;}
+
+/* ==========================================================================
+   VARIANT S2 — Instrument Bay (Barlow Condensed + IBM Plex Sans + IBM Plex Mono)
+   engineered grid · hard left · zero radius · registration marks · no shadow
+   ========================================================================== */
+.v-s2 .demo{gap:34px;font-family:"IBM Plex Sans",sans-serif;}
+.v-s2 .tabsbar{align-items:stretch;border:1px solid var(--graphite);}
+.v-s2 .tabs{gap:0;}
+.v-s2 .tab{flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.04em;color:var(--graphite);padding:12px 18px;border-right:1px solid rgba(18,20,28,0.14);
+  border-top:4px solid transparent;}
+.v-s2 .tab .tnum{font-size:9.5px;color:var(--um);}
+.v-s2 .tab.active{color:var(--ink);border-top-color:var(--um);background:rgba(61,92,235,0.04);}
+.v-s2 .case{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:0.03em;
+  color:var(--graphite);padding:0 16px;}
+.v-s2 .case i{font-style:normal;color:var(--um);margin:0 5px;}
+.v-s2 .case b.held{color:var(--gold-text);font-weight:600;}
+
+.v-s2 .eyebrow{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--graphite);display:inline-flex;align-items:center;gap:8px;}
+.v-s2 .eyebrow::before{content:"///";color:var(--um);font-weight:700;letter-spacing:-0.04em;}
+.v-s2 .h2{font-family:"Barlow Condensed",sans-serif;font-size:46px;font-weight:600;letter-spacing:0.005em;
+  line-height:1;color:var(--ink);margin-top:14px;text-transform:none;}
+.v-s2 .lede{font-family:"IBM Plex Sans",sans-serif;font-size:15px;line-height:1.6;color:var(--body);
+  max-width:54ch;margin-top:14px;}
+
+.v-s2 .crew{gap:20px;}
+.v-s2 .card{background:#fff;border:1px solid var(--graphite);border-radius:0;border-top:4px solid var(--um);
+  padding:22px 24px;gap:12px;position:relative;}
+.v-s2 .card::before,.v-s2 .card::after{content:"";position:absolute;width:7px;height:7px;border:1px solid var(--graphite);}
+.v-s2 .card::before{left:-1px;bottom:-1px;border-top:0;border-right:0;}
+.v-s2 .card::after{right:-1px;bottom:-1px;border-top:0;border-left:0;}
+.v-s2 .card-k{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;letter-spacing:0.12em;color:var(--ink);}
+.v-s2 .chip{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:0.08em;
+  text-transform:uppercase;padding:5px 10px;border-radius:0;}
+.v-s2 .chip.agent{color:#fff;background:var(--um);}
+.v-s2 .chip.flow{color:var(--graphite);background:#fff;border:1px solid var(--graphite);}
+.v-s2 .card-d{font-family:"IBM Plex Sans",sans-serif;font-size:13.5px;line-height:1.55;color:var(--body);}
+
+.v-s2 .lowrow{gap:20px;}
+.v-s2 .measure{background:#fff;border:1px solid var(--graphite);border-top:4px solid var(--um);padding:22px 24px;position:relative;}
+.v-s2 .measure::before{content:"";position:absolute;left:-1px;bottom:-1px;width:7px;height:7px;
+  border:1px solid var(--graphite);border-top:0;border-right:0;}
+.v-s2 .m-k{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:500;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--graphite);}
+.v-s2 .m-v{font-family:"IBM Plex Mono",monospace;font-size:38px;font-weight:600;color:var(--ink);margin-top:10px;
+  letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
+.v-s2 .m-n{font-family:"IBM Plex Sans",sans-serif;font-size:13px;color:var(--graphite);margin-top:8px;}
+.v-s2 .verdicts{gap:12px;align-content:start;}
+.v-s2 .vchip{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:0.1em;
+  padding:7px 13px;border-radius:0;}
+.v-s2 .vchip.held{color:var(--gold-text);background:var(--gold-soft);border:1px solid var(--gold-line);}
+.v-s2 .vchip.defer{color:var(--graphite);background:#fff;border:1px solid var(--graphite);}
+.v-s2 .preset{background:#fff;border:1px solid var(--graphite);border-top:4px solid var(--um);padding:22px 24px;position:relative;}
+.v-s2 .preset::after{content:"";position:absolute;right:-1px;bottom:-1px;width:7px;height:7px;
+  border:1px solid var(--graphite);border-top:0;border-left:0;}
+.v-s2 .preset-tab{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;
+  color:#fff;background:var(--um);padding:4px 10px;display:inline-block;}
+.v-s2 .preset-title{font-family:"Barlow Condensed",sans-serif;font-size:24px;font-weight:600;color:var(--ink);margin-top:14px;}
+.v-s2 .preset-sub{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:500;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--graphite);margin-top:9px;}
+
+/* ==========================================================================
+   VARIANT S3 — Common Thread (Fraunces + Commissioner + Spline Sans Mono)
+   warm staggered · asymmetric corners · barely-blue fills · one broad shadow
+   ========================================================================== */
+.v-s3 .demo{gap:38px;font-family:"Commissioner",sans-serif;}
+.v-s3 .tabsbar{padding:16px 22px;background:#fbfcff;border:1px solid #dfe4f2;border-radius:20px 20px 6px 20px;}
+.v-s3 .tabs{gap:22px;}
+.v-s3 .tab{gap:8px;font-family:"Commissioner",sans-serif;font-size:13px;font-weight:650;color:var(--graphite);
+  letter-spacing:-0.005em;}
+.v-s3 .tab .tnum{font-family:"Spline Sans Mono",monospace;font-size:10px;font-weight:500;color:var(--um2);}
+.v-s3 .tab.active{color:var(--um);}
+.v-s3 .tab.active .tnum{color:var(--um);}
+.v-s3 .case{font-family:"Spline Sans Mono",monospace;font-size:10.5px;letter-spacing:0.02em;color:var(--graphite);}
+.v-s3 .case i{font-style:normal;margin:0 6px;color:#c4ccdf;}
+.v-s3 .case b.held{color:var(--gold-text);font-weight:550;}
+
+.v-s3 .eyebrow{font-family:"Commissioner",sans-serif;font-size:12px;font-weight:600;letter-spacing:0.02em;
+  color:var(--graphite);display:inline-flex;align-items:center;gap:9px;}
+.v-s3 .eyebrow::before{content:"";width:9px;height:9px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,var(--um2),var(--um));box-shadow:0 0 0 4px rgba(61,92,235,0.1);}
+.v-s3 .h2{font-family:"Fraunces",serif;font-size:38px;font-weight:500;letter-spacing:-0.015em;line-height:1.12;
+  color:var(--ink);margin-top:20px;max-width:22ch;}
+.v-s3 .lede{font-family:"Commissioner",sans-serif;font-size:16px;line-height:1.7;color:var(--body);max-width:56ch;margin-top:16px;}
+
+.v-s3 .crew{gap:26px;}
+.v-s3 .card:nth-child(2){margin-top:22px;}
+.v-s3 .card{background:#fbfcff;border:1px solid #dbe1f0;border-radius:28px 28px 6px 28px;padding:28px 30px;gap:14px;
+  box-shadow:0 18px 40px rgba(36,56,214,0.06);}
+.v-s3 .card-k{font-family:"Fraunces",serif;font-size:22px;font-weight:500;letter-spacing:-0.01em;color:var(--ink);}
+.v-s3 .chip{font-family:"Spline Sans Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:0.02em;
+  text-transform:uppercase;padding:6px 14px;border-radius:999px;}
+.v-s3 .chip.agent{color:var(--um);border:1.5px solid rgba(61,92,235,0.5);background:transparent;}
+.v-s3 .chip.flow{color:var(--um);background:rgba(61,92,235,0.09);}
+.v-s3 .card-d{font-family:"Commissioner",sans-serif;font-size:14px;line-height:1.65;color:var(--body);}
+
+.v-s3 .lowrow{gap:30px;}
+.v-s3 .measure{background:#fbfcff;border:1px solid #dbe1f0;border-radius:8px 24px 24px 24px;padding:22px 26px;
+  box-shadow:0 18px 40px rgba(36,56,214,0.06);}
+.v-s3 .m-k{font-family:"Spline Sans Mono",monospace;font-size:10px;font-weight:550;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--um);}
+.v-s3 .m-v{font-family:"Fraunces",serif;font-size:40px;font-weight:500;color:var(--ink);margin-top:10px;
+  letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
+.v-s3 .m-n{font-family:"Commissioner",sans-serif;font-size:13.5px;color:var(--graphite);margin-top:8px;}
+.v-s3 .verdicts{gap:12px;align-content:start;}
+.v-s3 .vchip{font-family:"Spline Sans Mono",monospace;font-size:10.5px;font-weight:550;letter-spacing:0.06em;
+  padding:7px 15px;border-radius:999px;}
+.v-s3 .vchip.held{color:var(--gold-text);background:var(--gold-soft);border:1px solid var(--gold-line);}
+.v-s3 .vchip.defer{color:var(--graphite);background:rgba(74,78,90,0.06);border:1px solid rgba(74,78,90,0.28);}
+.v-s3 .preset{background:#fbfcff;border:1px solid #dbe1f0;border-radius:24px 24px 24px 6px;padding:22px 26px;
+  box-shadow:0 18px 40px rgba(36,56,214,0.06);}
+.v-s3 .preset-tab{font-family:"Spline Sans Mono",monospace;font-size:10px;font-weight:550;letter-spacing:0.08em;
+  color:var(--um);background:rgba(61,92,235,0.1);padding:5px 12px;border-radius:999px;display:inline-block;}
+.v-s3 .preset-title{font-family:"Fraunces",serif;font-size:22px;font-weight:500;color:var(--ink);margin-top:14px;}
+.v-s3 .preset-sub{font-family:"Spline Sans Mono",monospace;font-size:10px;font-weight:550;letter-spacing:0.06em;
+  text-transform:uppercase;color:var(--graphite);margin-top:10px;}
+
+/* ==========================================================================
+   VARIANT S4 — Blue Manifest (Bodoni Moda + Manrope + Geist Mono)
+   poster contrast · enormous numerals · zero radius · 6px blue offset shadow
+   ========================================================================== */
+.v-s4 .demo{gap:44px;font-family:"Manrope",sans-serif;}
+.v-s4 .tabsbar{align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:0;}
+.v-s4 .tabs{gap:0;align-items:flex-end;}
+.v-s4 .tab{flex-direction:column;align-items:flex-start;gap:0;padding:0 22px 12px;position:relative;}
+.v-s4 .tab .tnum{font-family:"Bodoni Moda",serif;font-size:46px;font-weight:700;line-height:0.9;color:#c7ccda;}
+.v-s4 .tab .tlbl{font-family:"Manrope",sans-serif;font-size:12px;font-weight:700;letter-spacing:-0.005em;color:var(--graphite);margin-top:4px;}
+.v-s4 .tab.active .tnum{color:var(--um);}
+.v-s4 .tab.active .tlbl{color:var(--ink);}
+.v-s4 .tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:4px;background:var(--um);}
+.v-s4 .case{font-family:"Geist Mono",monospace;font-size:10px;font-weight:650;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--graphite);}
+.v-s4 .case i{font-style:normal;margin:0 6px;color:var(--um);}
+.v-s4 .case b.held{color:var(--gold-text);font-weight:700;}
+
+.v-s4 .eyebrow{font-family:"Geist Mono",monospace;font-size:9px;font-weight:700;letter-spacing:0.24em;
+  text-transform:uppercase;color:#fff;background:var(--um);padding:5px 10px 4px;display:inline-block;}
+.v-s4 .h2{font-family:"Bodoni Moda",serif;font-size:56px;font-weight:600;letter-spacing:-0.01em;line-height:1;
+  color:var(--ink);margin-top:22px;max-width:16ch;}
+.v-s4 .lede{font-family:"Manrope",sans-serif;font-size:16px;font-weight:500;line-height:1.6;color:var(--body);max-width:52ch;margin-top:18px;}
+
+.v-s4 .crew{gap:26px;}
+.v-s4 .card{background:#fff;border:2px solid var(--ink);border-radius:0;padding:26px 28px 28px;gap:16px;
+  box-shadow:6px 6px 0 var(--um);}
+.v-s4 .card-k{font-family:"Bodoni Moda",serif;font-size:34px;font-weight:600;letter-spacing:-0.01em;color:var(--ink);line-height:0.95;}
+.v-s4 .chip{font-family:"Geist Mono",monospace;font-size:10px;font-weight:700;letter-spacing:0.08em;
+  text-transform:uppercase;padding:6px 12px;border-radius:0;}
+.v-s4 .chip.agent{color:#fff;background:var(--um);}
+.v-s4 .chip.flow{color:var(--um);background:#fff;border:2px solid var(--um);}
+.v-s4 .card-d{font-family:"Manrope",sans-serif;font-size:14px;font-weight:500;line-height:1.55;color:var(--body);}
+
+.v-s4 .lowrow{gap:26px;}
+.v-s4 .measure{background:#fff;border:2px solid var(--um);border-radius:0;padding:22px 26px 24px;box-shadow:6px 6px 0 rgba(36,56,214,0.16);}
+.v-s4 .m-k{font-family:"Geist Mono",monospace;font-size:9px;font-weight:650;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--um);}
+.v-s4 .m-v{font-family:"Bodoni Moda",serif;font-size:68px;font-weight:600;color:var(--ink);line-height:0.9;margin-top:10px;
+  letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
+.v-s4 .m-n{font-family:"Manrope",sans-serif;font-size:13px;font-weight:600;color:var(--graphite);margin-top:10px;}
+.v-s4 .verdicts{gap:14px;align-content:start;}
+.v-s4 .vchip{font-family:"Geist Mono",monospace;font-size:10px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;padding:9px 15px;border-radius:0;position:relative;}
+.v-s4 .vchip.held{color:var(--gold-text);background:#fff;border:2px solid var(--ink);box-shadow:5px 5px 0 var(--gold);}
+.v-s4 .vchip.held::after{content:"";position:absolute;top:-6px;right:-6px;width:12px;height:12px;
+  background:var(--gold);transform:rotate(45deg);border:1.5px solid #fff;}
+.v-s4 .vchip.defer{color:var(--graphite);background:#fff;border:2px solid var(--graphite);}
+.v-s4 .preset{background:var(--ink);border-radius:0;padding:24px 28px;box-shadow:6px 6px 0 var(--um);}
+.v-s4 .preset-tab{font-family:"Geist Mono",monospace;font-size:9px;font-weight:700;letter-spacing:0.2em;
+  text-transform:uppercase;color:#fff;background:var(--um);padding:5px 11px;display:inline-block;}
+.v-s4 .preset-title{font-family:"Bodoni Moda",serif;font-size:26px;font-weight:500;color:#fff;margin-top:16px;}
+.v-s4 .preset-sub{font-family:"Geist Mono",monospace;font-size:9px;font-weight:650;letter-spacing:0.16em;
+  text-transform:uppercase;color:rgba(255,255,255,0.6);margin-top:11px;}
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <h1>Register variations — the Fable version + four sol directions</h1>
+  <p>Owner pick 2026-07-20 — F is the register as built; S1–S4 are sol-authored directions. Fonts load from Google Fonts in THIS SAMPLE ONLY for preview; the chosen direction would be self-hosted via next/font in the product.</p>
+</header>
+
+<!-- ===================== F ===================== -->
+<section class="variant v-f">
+  <div class="vtag"><b>F</b><span>The register as built</span><em>Onest · JetBrains Mono</em></div>
+  <div class="demo">
+    <div class="tabsbar">
+      <nav class="tabs">
+        <span class="tab active"><span class="tnum">01</span><span class="tlbl">Listings audit</span></span>
+        <span class="tab"><span class="tnum">02</span><span class="tlbl">Fee audit</span></span>
+        <span class="tab"><span class="tnum">03</span><span class="tlbl">Try it live</span></span>
+        <span class="tab"><span class="tnum">04</span><span class="tlbl">Proof</span></span>
+      </nav>
+      <div class="case">CASE 001 <i>·</i> <b class="held">CLAIM HELD</b> <i>·</i> 16 FINDINGS</div>
+    </div>
+    <div class="lede-block">
+      <div class="eyebrow">The assistant crew</div>
+      <h2 class="h2">Four members, one recorded run.</h2>
+      <p class="lede">Each run is recorded end to end — you can replay exactly what the crew saw and did.</p>
+    </div>
+    <div class="crew">
+      <article class="card"><div class="card-k">INTAKE</div><span class="chip agent">AGENT</span><p class="card-d">Reads the owner's raw claim and the served listing, then hands a clean brief to the workflow.</p></article>
+      <article class="card"><div class="card-k">AUDIT</div><span class="chip flow">DETERMINISTIC WORKFLOW</span><p class="card-d">Runs the fixed comparison steps in order — no model in the loop, same input, same verdict.</p></article>
+    </div>
+    <div class="lowrow">
+      <div class="measure"><div class="m-k">MERGE PRECISION</div><div class="m-v">18/18</div><div class="m-n">no bad merges</div></div>
+      <div class="verdicts"><span class="vchip held">CLAIM HELD</span><span class="vchip defer">DEFERRED</span></div>
+      <div class="preset"><div class="preset-tab">LIVE</div><div class="preset-title">Edit one served price yourself</div><div class="preset-sub">COMPUTED ON THIS PAGE, AS YOU TYPE</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S1 ===================== -->
+<section class="variant v-s1">
+  <div class="vtag"><b>S1</b><span>Proof Gazette</span><em>Newsreader · Instrument Sans · Fragment Mono</em></div>
+  <div class="demo">
+    <div class="tabsbar">
+      <nav class="tabs">
+        <span class="tab active"><span class="tnum">01</span><span class="tlbl">Listings audit</span></span>
+        <span class="tab"><span class="tnum">02</span><span class="tlbl">Fee audit</span></span>
+        <span class="tab"><span class="tnum">03</span><span class="tlbl">Try it live</span></span>
+        <span class="tab"><span class="tnum">04</span><span class="tlbl">Proof</span></span>
+      </nav>
+      <div class="case">CASE 001 <i>·</i> <b class="held">CLAIM HELD</b> <i>·</i> 16 FINDINGS</div>
+    </div>
+    <div class="lede-block">
+      <div class="eyebrow">The assistant crew</div>
+      <h2 class="h2">Four members, one recorded run.</h2>
+      <p class="lede">Each run is recorded end to end — you can replay exactly what the crew saw and did.</p>
+    </div>
+    <div class="crew">
+      <article class="card"><div class="card-k">INTAKE</div><span class="chip agent">AGENT</span><p class="card-d">Reads the owner's raw claim and the served listing, then hands a clean brief to the workflow.</p></article>
+      <article class="card"><div class="card-k">AUDIT</div><span class="chip flow">DETERMINISTIC WORKFLOW</span><p class="card-d">Runs the fixed comparison steps in order — no model in the loop, same input, same verdict.</p></article>
+    </div>
+    <div class="lowrow">
+      <div class="measure"><div class="m-k">MERGE PRECISION</div><div class="m-v">18/18</div><div class="m-n">no bad merges</div></div>
+      <div class="verdicts"><span class="vchip held">CLAIM HELD</span><span class="vchip defer">DEFERRED</span></div>
+      <div class="preset"><div class="preset-tab">LIVE</div><div class="preset-title">Edit one served price yourself</div><div class="preset-sub">COMPUTED ON THIS PAGE, AS YOU TYPE</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S2 ===================== -->
+<section class="variant v-s2">
+  <div class="vtag"><b>S2</b><span>Instrument Bay</span><em>Barlow Condensed · IBM Plex Sans · IBM Plex Mono</em></div>
+  <div class="demo">
+    <div class="tabsbar">
+      <nav class="tabs">
+        <span class="tab active"><span class="tnum">01</span><span class="tlbl">Listings audit</span></span>
+        <span class="tab"><span class="tnum">02</span><span class="tlbl">Fee audit</span></span>
+        <span class="tab"><span class="tnum">03</span><span class="tlbl">Try it live</span></span>
+        <span class="tab"><span class="tnum">04</span><span class="tlbl">Proof</span></span>
+      </nav>
+      <div class="case">CASE 001 <i>·</i> <b class="held">CLAIM HELD</b> <i>·</i> 16 FINDINGS</div>
+    </div>
+    <div class="lede-block">
+      <div class="eyebrow">The assistant crew</div>
+      <h2 class="h2">Four members, one recorded run.</h2>
+      <p class="lede">Each run is recorded end to end — you can replay exactly what the crew saw and did.</p>
+    </div>
+    <div class="crew">
+      <article class="card"><div class="card-k">INTAKE</div><span class="chip agent">AGENT</span><p class="card-d">Reads the owner's raw claim and the served listing, then hands a clean brief to the workflow.</p></article>
+      <article class="card"><div class="card-k">AUDIT</div><span class="chip flow">DETERMINISTIC WORKFLOW</span><p class="card-d">Runs the fixed comparison steps in order — no model in the loop, same input, same verdict.</p></article>
+    </div>
+    <div class="lowrow">
+      <div class="measure"><div class="m-k">MERGE PRECISION</div><div class="m-v">18/18</div><div class="m-n">no bad merges</div></div>
+      <div class="verdicts"><span class="vchip held">CLAIM HELD</span><span class="vchip defer">DEFERRED</span></div>
+      <div class="preset"><div class="preset-tab">LIVE</div><div class="preset-title">Edit one served price yourself</div><div class="preset-sub">COMPUTED ON THIS PAGE, AS YOU TYPE</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S3 ===================== -->
+<section class="variant v-s3">
+  <div class="vtag"><b>S3</b><span>Common Thread</span><em>Fraunces · Commissioner · Spline Sans Mono</em></div>
+  <div class="demo">
+    <div class="tabsbar">
+      <nav class="tabs">
+        <span class="tab active"><span class="tnum">01</span><span class="tlbl">Listings audit</span></span>
+        <span class="tab"><span class="tnum">02</span><span class="tlbl">Fee audit</span></span>
+        <span class="tab"><span class="tnum">03</span><span class="tlbl">Try it live</span></span>
+        <span class="tab"><span class="tnum">04</span><span class="tlbl">Proof</span></span>
+      </nav>
+      <div class="case">CASE 001 <i>·</i> <b class="held">CLAIM HELD</b> <i>·</i> 16 FINDINGS</div>
+    </div>
+    <div class="lede-block">
+      <div class="eyebrow">The assistant crew</div>
+      <h2 class="h2">Four members, one recorded run.</h2>
+      <p class="lede">Each run is recorded end to end — you can replay exactly what the crew saw and did.</p>
+    </div>
+    <div class="crew">
+      <article class="card"><div class="card-k">INTAKE</div><span class="chip agent">AGENT</span><p class="card-d">Reads the owner's raw claim and the served listing, then hands a clean brief to the workflow.</p></article>
+      <article class="card"><div class="card-k">AUDIT</div><span class="chip flow">DETERMINISTIC WORKFLOW</span><p class="card-d">Runs the fixed comparison steps in order — no model in the loop, same input, same verdict.</p></article>
+    </div>
+    <div class="lowrow">
+      <div class="measure"><div class="m-k">MERGE PRECISION</div><div class="m-v">18/18</div><div class="m-n">no bad merges</div></div>
+      <div class="verdicts"><span class="vchip held">CLAIM HELD</span><span class="vchip defer">DEFERRED</span></div>
+      <div class="preset"><div class="preset-tab">LIVE</div><div class="preset-title">Edit one served price yourself</div><div class="preset-sub">COMPUTED ON THIS PAGE, AS YOU TYPE</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== S4 ===================== -->
+<section class="variant v-s4">
+  <div class="vtag"><b>S4</b><span>Blue Manifest</span><em>Bodoni Moda · Manrope · Geist Mono</em></div>
+  <div class="demo">
+    <div class="tabsbar">
+      <nav class="tabs">
+        <span class="tab active"><span class="tnum">01</span><span class="tlbl">Listings audit</span></span>
+        <span class="tab"><span class="tnum">02</span><span class="tlbl">Fee audit</span></span>
+        <span class="tab"><span class="tnum">03</span><span class="tlbl">Try it live</span></span>
+        <span class="tab"><span class="tnum">04</span><span class="tlbl">Proof</span></span>
+      </nav>
+      <div class="case">CASE 001 <i>·</i> <b class="held">CLAIM HELD</b> <i>·</i> 16 FINDINGS</div>
+    </div>
+    <div class="lede-block">
+      <div class="eyebrow">The assistant crew</div>
+      <h2 class="h2">Four members, one recorded run.</h2>
+      <p class="lede">Each run is recorded end to end — you can replay exactly what the crew saw and did.</p>
+    </div>
+    <div class="crew">
+      <article class="card"><div class="card-k">INTAKE</div><span class="chip agent">AGENT</span><p class="card-d">Reads the owner's raw claim and the served listing, then hands a clean brief to the workflow.</p></article>
+      <article class="card"><div class="card-k">AUDIT</div><span class="chip flow">DETERMINISTIC WORKFLOW</span><p class="card-d">Runs the fixed comparison steps in order — no model in the loop, same input, same verdict.</p></article>
+    </div>
+    <div class="lowrow">
+      <div class="measure"><div class="m-k">MERGE PRECISION</div><div class="m-v">18/18</div><div class="m-n">no bad merges</div></div>
+      <div class="verdicts"><span class="vchip held">CLAIM HELD</span><span class="vchip defer">DEFERRED</span></div>
+      <div class="preset"><div class="preset-tab">LIVE</div><div class="preset-title">Edit one served price yourself</div><div class="preset-sub">COMPUTED ON THIS PAGE, AS YOU TYPE</div></div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

@@ -4,6 +4,8 @@ Claude Code is the **main planner and builder** for ActivationOps AI.
 
 `RULES.md` is the source of truth. If this file and `RULES.md` ever disagree, `RULES.md` wins.
 
+> **Project-identity note (added 2026-07-21, orientation only).** "ActivationOps AI" is the project/codebase; the current product/site is **Curbside Commons** (a *simulated*-data prototype for feed-vs-record + NYC fee-cap auditing — see the README "Lineage" section and `RULES.md`'s matching note). The "Do not wire live Slack/Resend/Supabase/Gemini/n8n **until the offline thin slice exists and safety controls are defined**" constraint below is now a **gate, not a ban**: the offline slice IS complete, so a live integration is allowed as a **transient, owner-armed, labeled demonstration** (on-demand, dummy data only, per-integration safety controls, never standing infrastructure) — and some already exist (the gated Groq/Gemini classifier lane, an episodic n8n leg, one owner-armed Slack send to the owner's own channel). The shipped site/CLI/MCP tools have no send transport wired into them. The honesty bright line (Rule 4) binds every demo: simulated data always, never a real-platform/merchant/business claim.
+
 ## Mandatory Startup Contract (every session, every account, including CLI)
 
 Begin every session by:
@@ -109,4 +111,6 @@ Before acting on owner input, apply the **Prompt Intake Protocol** (`docs/prompt
 
 ## Reference reading (when relevant to the task)
 
-`docs/project-narrative.md`, `docs/plan-reconciliation.md`, `docs/dual-model-workflow.md`, `docs/product-brief.md`, `docs/data-audit.md`, `docs/decision-log.md`, `docs/decisions/ADR-001-initial-architecture.md`.
+`README.md` (esp. its **Lineage** section), `docs/PLAIN-ENGLISH.md`, `docs/SHOWCASE.md`, `docs/HOW-THIS-WAS-BUILT.md`, `docs/dual-model-workflow.md`, `docs/decision-log.md`, `docs/enterprise-delivery-playbook.md`.
+
+*(The pre-pivot ActivationOps planning artifacts — `docs/data-audit.md`, `docs/plan-reconciliation.md`, `docs/decisions/ADR-001-*`, and the other dated `docs/*-slice-plan.md` — are **historical record**, not current reference; read them only for provenance. The six standalone old-product narrative docs [product-brief, project-narrative, CASE-STUDY, INTERVIEW-WALKTHROUGH, roadmap, ENTERPRISE-READINESS] were deleted 2026-07-21 as superseded by the current docs above.)*

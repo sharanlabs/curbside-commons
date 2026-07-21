@@ -78,12 +78,16 @@ describe("C1 $0-LLM: report-rendering path imports no LLM/provider/network modul
         if (resolved !== null) queue.push(resolved);
       }
     }
-    // The walk actually reached the renderer, the pure view helper, and the data.
+    // The walk actually reached the renderers and the data (v9 takeover build
+    // piece 1, 2026-07-20: ReportView → Jewel + Ledger; figures derive through
+    // lib/landing/specimen from the committed acp report golden — the ucp golden
+    // and the toReportView transform left this page's path and stay covered by
+    // the wedge + transcript packs).
     const reached = [...seen].map((f) => f.replace(root, ""));
-    expect(reached.some((f) => f.includes("components/report/ReportView"))).toBe(true);
-    expect(reached.some((f) => f.includes("lib/packs/listings/report-view"))).toBe(true);
+    expect(reached.some((f) => f.includes("components/report/Jewel"))).toBe(true);
+    expect(reached.some((f) => f.includes("components/report/Ledger"))).toBe(true);
+    expect(reached.some((f) => f.includes("lib/landing/specimen"))).toBe(true);
     expect(reached.some((f) => f.includes("expected-report.acp.json"))).toBe(true);
-    expect(reached.some((f) => f.includes("expected-report.ucp.json"))).toBe(true);
   });
 
   it("no reachable source performs a bare fetch()", () => {

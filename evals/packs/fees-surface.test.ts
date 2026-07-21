@@ -228,16 +228,27 @@ describe("fee-surface honesty (jargon-free prose, boundaries stated, meaning kep
   });
 
   it("the page states the honest boundaries: statement-level scope, no-AI, nothing leaves the browser", () => {
-    expect(pageSrc).toMatch(/statement-level audit/i);
-    expect(pageSrc).toMatch(/No AI calls/i);
-    expect(pageSrc).toMatch(/nothing leaves the browser/i);
-    expect(pageSrc).toMatch(/honestly unresolved/i);
+    // freeze-reversal 2026-07-20: the retired page copy (statement-level audit / No AI calls /
+    // nothing leaves the browser / honestly unresolved) is rebound to the rebuilt chapter-02
+    // honest invariants — line-by-line statement scope, local-only compute that sends nothing,
+    // and an audit that names its own edge instead of pretending.
+    expect(pageSrc).toMatch(/checked line by line/i);
+    expect(pageSrc).toMatch(/computed locally/i);
+    expect(pageSrc).toMatch(/Nothing is\s+sent anywhere/i);
+    expect(pageSrc).toMatch(/An honest audit names its edge/i);
   });
 
   it("the report view states the invented-example boundary in rendered copy", () => {
-    expect(viewSrc).toMatch(/invented examples/i);
-    expect(viewSrc).toMatch(/real, codified law/i);
-    expect(viewSrc).toMatch(/No real platform statement/i);
+    // freeze-reversal 2026-07-20: the retired FeesView footer paragraph ("statements audited
+    // here are invented examples…") is gone from the view; its boundary — invented examples vs
+    // real published law, plus the bright-line "no real platform statement/feed was audited" —
+    // now lives in the /docs "What is real, and what is invented" statement, rebound here at
+    // equal strength (the bright-line honesty check survives, at its new home).
+    const docsSrc = readFileSync(join(root, "app", "docs", "page.tsx"), "utf8");
+    expect(docsSrc).toMatch(/What is real, and what is invented/);
+    expect(docsSrc).toMatch(/invented/i);
+    expect(docsSrc).toMatch(/real published law/i);
+    expect(docsSrc).toMatch(/No real platform feed\s+or statement was audited/i);
   });
 
   it("display cleaning rewords the internal markers but keeps the provisional meaning", () => {
@@ -271,19 +282,47 @@ describe("prose-figure drift-lock (headline words ride the engine values — bat
     readFileSync(join(root, "fixtures", "synthetic-restaurant", "expected-report.acp.json"), "utf8"),
   ) as { findings: unknown[] };
 
-  it('"One report. Sixteen findings." matches the real finding count', () => {
-    expect(landingSrc).toContain("One report. Sixteen findings.");
+  // v9 takeover (build piece 1, 2026-07-20): the landing's figure prose now
+  // renders DERIVED values ({COVERAGE.*}) instead of spelled-out words, so the
+  // lock flips form: the source must reference the derived identifiers and
+  // must NOT hand-type the figures those identifiers carry. (The fees page
+  // keeps its spelled-out lock until piece 3 rebuilds it.)
+  it("landing figure prose is derivation-only: derived identifiers present", () => {
+    expect(landingSrc).toMatch(/COVERAGE\.findingsTotal/);
+    expect(landingSrc).toMatch(/COVERAGE\.errors/);
+    expect(landingSrc).toMatch(/COVERAGE\.warns/);
+    expect(landingSrc).toMatch(/COVERAGE\.feeRulesTotal/);
+    expect(landingSrc).toMatch(/COVERAGE\.feeExternal/);
     expect(goldenAcp.findings.length).toBe(16);
-  });
-
-  it('"Six fee-cap rules" matches the external-evidence registry', () => {
-    expect(landingSrc).toMatch(/Six fee-cap rules/);
     expect(NON_STATEMENT_CHECKABLE.size).toBe(6);
   });
 
-  it('"Four example months" / "four example months" match the committed corpus', () => {
+  it("the report page's heading count is derivation-only too", () => {
+    const reportSrc = readFileSync(join(root, "app", "report", "page.tsx"), "utf8");
+    expect(reportSrc).toMatch(/spelledCap\(COVERAGE\.findingsTotal\)/);
+    expect(reportSrc).not.toMatch(/\bSixteen findings\b/);
+  });
+
+  it("landing source hand-types none of the engine figures it narrates", () => {
+    // The words that would silently drift if the engine moved: spelled-out or
+    // bare-numeral finding/rule counts in prose position.
+    for (const banned of [
+      /One report\. Sixteen findings\./,
+      /\bSixteen findings\b/i,
+      /\b16 findings\b/,
+      /\bSix fee-cap rules\b/i,
+      /\b17 codified rules\b/,
+      /\beleven errors\b/i,
+      /\b11 errors\b/,
+      /\bfive warnings\b/i,
+      /\b5 warnings\b/,
+    ]) {
+      expect(landingSrc, String(banned)).not.toMatch(banned);
+    }
+  });
+
+  it('"Four example months" matches the committed corpus (fees page, until piece 3)', () => {
     expect(feesPageSrc).toMatch(/Four example months/);
-    expect(landingSrc).toMatch(/four example months/);
     expect(FEE_CASES.length).toBe(4);
   });
 });

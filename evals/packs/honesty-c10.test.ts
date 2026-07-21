@@ -43,9 +43,10 @@ function demoSources(): string[] {
     .map((f) => join(dir, f));
 }
 
+// de-slop 2026-07-20: DemoView.tsx deleted (route-orphaned since the /demo stub;
+// liveness-proven — no route import). The stub page stays in the scan.
 const demoScanned = [
   ...demoSources(),
-  join(root, "components", "demo", "DemoView.tsx"),
   join(root, "app", "demo", "page.tsx"),
   join(root, "fixtures", "synthetic-restaurant", "expected-demo.txt"),
   join(root, "fixtures", "synthetic-restaurant", "expected-demo.json"),
@@ -84,6 +85,10 @@ const siteShell = [
   join(root, "app", "playground", "page.tsx"),
   join(root, "components", "playground", "PlaygroundClient.tsx"),
   join(root, "components", "playground", "verify-in-browser.ts"),
+  join(root, "components", "playground", "TryLiveBench.tsx"),
+  // /legacy archive landing (build piece 2, 2026-07-20): the front door to the
+  // archived first-generation module — a viewer-facing prose surface.
+  join(root, "app", "legacy", "page.tsx"),
   // Fee surface (NYC showcase N1+N2, 2026-07-16): the /fees page + its view,
   // paste client, data module, and browser seam — same gates.
   join(root, "app", "fees", "page.tsx"),
@@ -91,6 +96,13 @@ const siteShell = [
   join(root, "components", "fees", "FeePlaygroundClient.tsx"),
   join(root, "components", "fees", "fee-report-data.ts"),
   join(root, "components", "fees", "audit-in-browser.ts"),
+  // Proof + docs surfaces (build pieces 2–3, 2026-07-20): new viewer-facing
+  // prose surfaces — grill-me hardening catch (session 30) closed this gap the
+  // same night these pages shipped, before it could go stale.
+  join(root, "app", "proof", "page.tsx"),
+  join(root, "components", "proof", "CalibrationPlate.tsx"),
+  join(root, "components", "proof", "CountFig.tsx"),
+  join(root, "app", "docs", "page.tsx"),
 ];
 
 const scannedFiles = [
@@ -103,8 +115,10 @@ const scannedFiles = [
   join(root, "fixtures", "ucp-schemas", UCP_PINNED_VERSION, "README.md"),
   join(root, "fixtures", "ucp-schemas", UCP_PINNED_VERSION, "PROVENANCE.json"),
   // W3 public report surface (M1 Codex P3): the page a viewer actually reads
-  // must sit inside the same honesty gate as the corpus docs.
-  join(root, "components", "report", "ReportView.tsx"),
+  // must sit inside the same honesty gate as the corpus docs. (ReportView was
+  // superseded by the v9 takeover's Jewel + Ledger, build piece 1 2026-07-20.)
+  join(root, "components", "report", "Jewel.tsx"),
+  join(root, "components", "report", "Ledger.tsx"),
   join(root, "app", "report", "page.tsx"),
   ...demoScanned,
 ];
@@ -412,6 +426,31 @@ describe("footer is disclaimer-free + honest (app/layout.tsx, freeze-reversal 20
     const plantedFooter =
       "Curbside Commons is connected to DoorDash and shows production platform data; no AI was used.";
     expect(BANNED_CLAIMS.some((p) => p.test(plantedFooter))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// RULES.md §4(b) — the permanent "what is real" carrier (amended 2026-07-20,
+// decision-log row; owner structured-ask, resolving the acceptance-gate BLOCK
+// on this session's build). The rule now requires TWO enforced things instead
+// of a literal "simulated" label everywhere: (a) BANNED_CLAIMS stays green
+// (checked above, site-wide) and (b) one findable, accurate "what is real"
+// page stays footer-linked from every page, never deleted. This is the
+// red-green tooth for (b) — it must fail if either half goes missing.
+// ---------------------------------------------------------------------------
+
+describe("RULES.md §4(b) — the /docs 'what is real' page stays footer-linked (never deleted)", () => {
+  it("the footer links to /docs on every page (app/layout.tsx, shared chrome)", () => {
+    const layoutSrc = readFileSync(join(root, "app", "layout.tsx"), "utf8");
+    const footer = layoutSrc.match(/<footer[\s\S]*?<\/footer>/)?.[0] ?? "";
+    expect(footer).toMatch(/href="\/docs"/);
+  });
+
+  it("/docs states plainly what is real and what is invented", () => {
+    const docsSrc = readFileSync(join(root, "app", "docs", "page.tsx"), "utf8");
+    expect(docsSrc).toMatch(/What is real, and what is invented\./);
+    expect(docsSrc).toMatch(/invented/i);
+    expect(docsSrc).toMatch(/No real platform feed\s+or statement was audited\./i);
   });
 });
 

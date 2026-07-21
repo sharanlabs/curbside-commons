@@ -19,7 +19,10 @@ import { test, expect } from "@playwright/test";
  * Runs in BOTH modes (dev + artifact) like every e2e contract.
  */
 
-const ROUTES = ["/", "/fees", "/report", "/demo", "/playground", "/eval", "/metrics", "/cost"];
+// v9 takeover surfaces (consolidated e2e rewrite, 2026-07-20): the four chapters
+// + /docs + the /legacy archive landing. The retired /demo /eval /metrics /cost
+// dashboards are redirect stubs now and drop off the sweep.
+const ROUTES = ["/", "/report", "/fees", "/playground", "/proof", "/docs", "/legacy"];
 const WIDTHS = [1280, 1440, 1728] as const;
 
 /** Minimum readable measure for sentence-length text (the /fees defect was 48px). */

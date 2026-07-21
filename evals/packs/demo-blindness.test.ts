@@ -121,12 +121,21 @@ describe("D1 web demo-render path is provider-free (and renders committed JSON)"
     }
   });
 
-  it("the web path renders the COMMITTED transcript, never the fs-touching engine", () => {
-    // It must reach the view + the committed JSON + the single-sourced copy...
-    expect(rel.some((f) => f.includes("components/demo/DemoView"))).toBe(true);
-    expect(rel.some((f) => f.includes("fixtures/synthetic-restaurant/expected-demo.json"))).toBe(true);
-    expect(rel.some((f) => f.includes("lib/packs/listings/demo/copy"))).toBe(true);
-    // ...and must NOT pull the engine (transcript.ts → conformance.ts → node:fs).
+  it("the web path is a redirect stub that pulls no fs-touching engine module", () => {
+    // freeze-reversal 2026-07-20: /demo was rebuilt as a static-export-safe redirect stub
+    // (it folds into / + /report), so the old "renders the COMMITTED transcript" binding is
+    // retired. The stub's actual guarantee: it imports ONLY next primitives (no engine, no
+    // fs-touching module) and its <meta refresh> points to the front page.
+    const entrySrc = readFileSync(entry, "utf8");
+    // the stub redirects to the front page
+    expect(entrySrc).toMatch(/httpEquiv="refresh"/);
+    expect(entrySrc).toMatch(/content="0;url=\/"/);
+    // it imports only next primitives — never the fs-touching engine.
+    for (const spec of importsOf(entry)) {
+      expect(spec.startsWith("next"), `demo stub imports non-next module "${spec}"`).toBe(true);
+    }
+    // ...and the whole reachable closure never pulls the engine (transcript.ts →
+    // conformance.ts → node:fs, or run.ts).
     expect(rel.some((f) => /demo\/transcript\.ts$/.test(f))).toBe(false);
     expect(rel.some((f) => /listings\/conformance\.ts$/.test(f))).toBe(false);
     expect(rel.some((f) => /listings\/run\.ts$/.test(f))).toBe(false);

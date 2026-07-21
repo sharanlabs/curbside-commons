@@ -8,12 +8,12 @@ Spec pin:   taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08
 Simulated:  true
 
 ----------------------------------------------------------------------------
-BEAT 1 · The agent reads the published serving copy — spec-faithful demonstration actor — simulated
+BEAT 1 · The agent reads the published feed — spec-faithful demonstration actor — simulated
 
   ▸ A shopping agent reads the published menu feed — the same data any AI assistant would consume — and never sees the restaurant's own records.
 
   intent: Order the "Smoked Brisket Plate" if the published feed lists it as available.
-  source read: the published ACP serving copy only (no system-of-record access)
+  source read: the published ACP feed only (no system-of-record access)
 
 ----------------------------------------------------------------------------
 BEAT 2 · The agent selects an item, trusting the surface

@@ -14,6 +14,7 @@
  */
 import { runConformanceCheck } from "../../packs/listings/cli.ts";
 import { UCP_CATALOG_OPERATIONS, type UcpCatalogOp } from "../../packs/listings/conformance.ts";
+import { resolveInAllowedRoot } from "../paths.ts";
 import { freezeToolResult, type ToolResult } from "../types.ts";
 
 /** The enum this tool's `op` param is validated against — keys of {@link UCP_CATALOG_OPERATIONS}, kept in sync structurally (not hand-duplicated). */
@@ -25,13 +26,19 @@ export const CHECK_CONFORMANCE_OPS: readonly UcpCatalogOp[] = Object.keys(
 export interface CheckConformanceParams {
   readonly docPath: string;
   readonly op?: UcpCatalogOp;
-  readonly schemaDir?: string;
 }
 
 /** Run `check_conformance`. `params` must already be ajv-validated by `callTool`. */
 export function runCheckConformanceTool(params: unknown): ToolResult {
   const p = params as CheckConformanceParams;
-  const result = runConformanceCheck(p.docPath, p.op ?? "search", p.schemaDir);
+  // `docPath` is contained BEFORE the read (security review 2026-07-21). The
+  // caller-settable `schemaDir` was REMOVED from this tool's input schema
+  // (sol run-1/run-2 recommendation, owner-approved): no MCP caller used it,
+  // and a caller-directed schema directory is a directory-walk / enumeration /
+  // DoS surface (`walkJson`) — surface elimination beats containment. The
+  // pinned in-repo `DEFAULT_UCP_SCHEMA_DIR` is always used now; the CLI
+  // (`runConformanceCheck`) keeps its own `schemaDir` arg for trusted local use.
+  const result = runConformanceCheck(resolveInAllowedRoot(p.docPath, "docPath"), p.op ?? "search");
   return freezeToolResult({
     tool: "check_conformance",
     ok: result.exitCode === 0,

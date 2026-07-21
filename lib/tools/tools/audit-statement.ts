@@ -18,6 +18,7 @@ import { readFileSync } from "node:fs";
 import { auditStatement } from "../../packs/fees/audit.ts";
 import { serializeFeeReport } from "../../packs/fees/finding.ts";
 import { parseStatement } from "../../packs/fees/parser.ts";
+import { resolveInAllowedRoot } from "../paths.ts";
 import { freezeToolResult, type ToolResult } from "../types.ts";
 
 /** Params for `audit_statement` (schema: `schemas/audit_statement.input.schema.json`). */
@@ -28,7 +29,7 @@ export interface AuditStatementParams {
 /** Run `audit_statement`. `params` must already be ajv-validated by `callTool`. */
 export function runAuditStatementTool(params: unknown): ToolResult {
   const p = params as AuditStatementParams;
-  const raw = readFileSync(p.statementPath, "utf8");
+  const raw = readFileSync(resolveInAllowedRoot(p.statementPath, "statementPath"), "utf8");
   const statement = parseStatement(raw);
   const report = auditStatement(statement);
   return freezeToolResult({

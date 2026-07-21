@@ -73,7 +73,7 @@ function actorReadsBeat(selection: ActorSelection): DemoBeat {
     plain: DEMO_BEAT.actorRead.plain,
     lines: [
       `intent: ${selection.intent}`,
-      `source read: the published ACP serving copy only (no system-of-record access)`,
+      `source read: the published ACP feed only (no system-of-record access)`,
     ],
   };
 }

@@ -38,14 +38,31 @@ function mustFind(ruleId: string, field: string): Finding {
 // The merchant's own recorded price (in cents), resolved from the reference-row id
 // against the system-of-record — read INDEPENDENTLY from the record, never
 // reconstructed from the claim (integrity: the comparison must use both sources).
-type SorVariation = { id: string; priceCents: number };
-type SorItem = { id: string; variations?: SorVariation[] };
+type SorVariation = { id: string; name?: string; priceCents: number };
+type SorItem = { id: string; name?: string; variations?: SorVariation[] };
 const sorItems = (sorCatalog as { items: SorItem[] }).items;
 
 function recordCentsFor(referenceRowId: string): number {
   for (const item of sorItems) {
     for (const v of item.variations ?? []) {
       if (v.id === referenceRowId) return v.priceCents;
+    }
+  }
+  throw new Error(
+    `landing specimen: reference row ${referenceRowId} not found in the SOR catalog`,
+  );
+}
+
+/** "Crispy Calamari (Small)" — the display name of the specimen row, resolved from
+    the SOR (v9 takeover build, 2026-07-20). The v9 mockup's turn copy named a
+    DIFFERENT item by hand; the app derives the name from the same record the
+    figures come from, so the story can never contradict the receipt. */
+function itemLabelFor(referenceRowId: string): string {
+  for (const item of sorItems) {
+    for (const v of item.variations ?? []) {
+      if (v.id === referenceRowId) {
+        return v.name ? `${item.name ?? item.id} (${v.name})` : (item.name ?? item.id);
+      }
     }
   }
   throw new Error(
@@ -220,7 +237,9 @@ export const HERO_FRAGMENTS = {
 } as const;
 
 /**
- * The proof-object bar (v8 design adoption 2026-07-16) — every value REAL,
+ * The proof-object bar (v8 design adoption 2026-07-16; label reworded at the v9
+ * takeover build 2026-07-20 per the D4 vocabulary ruling — "THE KITCHEN" is
+ * retired chrome vocabulary; the record is the merchant's) — every value REAL,
  * read from the same price finding + SOR row as the bench specimen (the
  * anti-fabrication contract: the bar renders the record, never invents one).
  */
@@ -229,5 +248,49 @@ export const PROOF_BAR = {
   menuValue: String(raw), // 2150 — the served bare number
   recordValue: recordDollars, // 21.50 — the merchant's own record
   factor: BENCH.arithmetic.factor, // 100×
-  line: `THE MENU: ${raw} · THE KITCHEN RECORD: ${recordDollars} · CLAIM: ${BENCH.arithmetic.factor} THE RECORD`,
+  line: `THE MENU: ${raw} · THE MERCHANT RECORD: ${recordDollars} · CLAIM: ${BENCH.arithmetic.factor} THE RECORD`,
+} as const;
+
+/* ============================================================================
+   v9 takeover additions (build piece 1, 2026-07-20) — everything the v9 Home +
+   01 Listings surfaces render that the module did not yet expose. All figures
+   remain READ or COMPUTED from the same finding + SOR row; nothing hand-typed.
+   ========================================================================== */
+
+/** Raw numerals for the receipt / jewel arithmetic (components format the
+    thousands-grouping at render; the values themselves come from the record). */
+export const ARITH = {
+  claimCents, // 215000 — served decimal misread as dollars, × 100
+  recordCents, // 2150 — the merchant's own cent count
+  claimDollars, // "2150.00"
+  recordDollars, // "21.50"
+  served: raw, // 2150 — the bare served number
+} as const;
+
+/** The specimen row's display name, resolved from the SOR record itself. */
+export const SPECIMEN_ITEM = {
+  label: itemLabelFor(price.referenceRowId), // e.g. Crispy Calamari (Small)
+} as const;
+
+/** The in-browser one-rule bench (Home "Break the feed yourself"): the REAL
+    rule arithmetic runs locally against this record value. */
+export const TRY_BENCH = {
+  recordCents, // 2150
+  servedDefault: String(raw), // "2150" — the feed's claim, the opening state
+  truePrice: recordDollars, // "21.50"
+  plainMismatch: "24.00", // a preset that disagrees without the ×100 signature —
+  // illustrative INPUT to the real rule (not a figure read from any record)
+  ruleId: price.ruleId, // LST-PRICE-CENTS-AS-DECIMAL
+  recordRow: `${BENCH.record.field} · ${recordCents}¢ = ${BENCH.record.money}`,
+  servedRow: `${BENCH.claim.field} · ${BENCH.claim.unit}`,
+} as const;
+
+/** PINNED trust figure (spec §2 beat 7 TRUST, owner-approved 2026-07-17: the
+    "1,200+ tests" plot point; v9 mockup renders the same figure). Pinned like
+    ENGINE.ucpSchemaCount — a recorded figure with provenance, not computed at
+    build (the test suite cannot count itself from a page module). */
+export const TRUST_TESTS = {
+  figure: "1,200+",
+  plain: "more than twelve hundred automated tests",
+  provenance: "docs/design-spec-sample-2026-07-17.md §2 (beat 7)",
 } as const;

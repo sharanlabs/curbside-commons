@@ -36,14 +36,17 @@ describe("browser fixtures are jargon-stripped (client-bundle de-jargon)", () =>
     expect(/simulated/i.test(catalogWeb), "browser catalog must carry no 'simulated'").toBe(false);
   });
 
-  it("the browser feed carries no dev-jargon except the golden-bound ghost-title claim value", () => {
+  it("the browser feed carries no dev-jargon at all", () => {
+    // freeze-reversal 2026-07-20: the ghost item's title was renamed from
+    // "Phantom Platter (simulated ghost item)" to the clean "Phantom Platter", so the old
+    // one-'simulated'-exception is obsolete — the feed now carries NO dev-jargon at all.
+    // Strengthened: no /simulated|synthetic/i anywhere in the projection.
     for (const re of JARGON) {
       expect(re.test(feedWeb), `browser feed should not contain ${re}`).toBe(false);
     }
-    // The ONLY allowed 'simulated' is the ghost item's title — a claim value the
-    // frozen golden report quotes verbatim. It appears exactly once, in a title.
-    const simulatedHits = feedWeb.match(/simulated/gi) ?? [];
-    expect(simulatedHits.length, "exactly one 'simulated' (the ghost title) allowed").toBe(1);
-    expect(feedWeb).toContain('"title": "Phantom Platter (simulated ghost item)"');
+    expect(/simulated/i.test(feedWeb), "browser feed must carry no 'simulated'").toBe(false);
+    expect(/synthetic/i.test(feedWeb), "browser feed must carry no 'synthetic'").toBe(false);
+    // the clean ghost title survives as the claim value the frozen golden quotes.
+    expect(feedWeb).toContain('"title": "Phantom Platter"');
   });
 });

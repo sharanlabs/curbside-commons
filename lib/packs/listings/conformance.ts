@@ -36,7 +36,7 @@
  * "true". A perfectly-shaped answer can still quote the wrong price; that lie is
  * the truth leg's job. We keep the two kinds of catch clearly labeled apart.
  */
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { lstatSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import Ajv2020 from "ajv/dist/2020.js";
 import type { ErrorObject, ValidateFunction } from "ajv";
@@ -114,14 +114,48 @@ interface LoadedValidator {
 // + the eval suite call this many times). Keyed by resolved dir.
 const cache = new Map<string, LoadedValidator>();
 
-function walkJson(dir: string): string[] {
-  const out: string[] = [];
-  for (const entry of readdirSync(dir)) {
-    const p = join(dir, entry);
-    if (statSync(p).isDirectory()) out.push(...walkJson(p));
-    else if (p.endsWith(".json")) out.push(p);
-  }
-  return out.sort();
+// A pinned-schema tree is shallow and small (the shipped corpus is ~78 files,
+// depth ≤ 2). These caps bound a CALLER-directed walk so a mis-pointed — or
+// hostile — `schemaDir` (the repo root, `node_modules`, a deep or very wide
+// tree) cannot drive an unbounded synchronous filesystem walk. Defense in depth
+// BEHIND the tool-boundary containment guard (`lib/tools/paths.ts`): the MCP
+// surface already refuses an out-of-root `schemaDir`, but these bound the walk
+// even within an allowed root and protect every caller of the primitive.
+const MAX_SCHEMA_DIR_DEPTH = 8;
+const MAX_SCHEMA_DIR_ENTRIES = 10_000;
+
+// Exported for the containment unit test (`evals/packs/conformance-walk-containment.test.ts`),
+// which locks the symlink-skip + depth/entry caps against regression.
+export function walkJson(dir: string): string[] {
+  let entries = 0;
+  const walk = (d: string, depth: number): string[] => {
+    if (depth > MAX_SCHEMA_DIR_DEPTH) {
+      throw new Error(
+        `ucp conformance: schema dir nesting exceeds ${MAX_SCHEMA_DIR_DEPTH} levels at "${d}" — refusing to walk further`,
+      );
+    }
+    const out: string[] = [];
+    for (const entry of readdirSync(d)) {
+      if (++entries > MAX_SCHEMA_DIR_ENTRIES) {
+        throw new Error(
+          `ucp conformance: schema dir exceeds ${MAX_SCHEMA_DIR_ENTRIES} entries at "${dir}" — refusing (mis-pointed directory?)`,
+        );
+      }
+      const p = join(d, entry);
+      // lstat does NOT follow symlinks. The boundary guard realpath-contains
+      // only the TOP-LEVEL schemaDir; a symlink planted at a DESCENDANT inside
+      // an allowed root (notably the shared OS temp dir) could otherwise
+      // redirect the walk back OUT of it. `isFile()` also rejects FIFOs/devices
+      // (a `.json` FIFO would otherwise block `readFileSync` indefinitely). The
+      // pinned corpus is committed regular files, so this is behavior-preserving.
+      const st = lstatSync(p);
+      if (st.isSymbolicLink()) continue;
+      if (st.isDirectory()) out.push(...walk(p, depth + 1));
+      else if (st.isFile() && p.endsWith(".json")) out.push(p);
+    }
+    return out.sort();
+  };
+  return walk(dir, 0);
 }
 
 /** Build (or reuse) an ajv with every pinned schema registered by `$id`, plus

@@ -47,3 +47,6 @@ screenshots/
 skills-lock.json
 .n8n-artifacts/
 .hf-cache/
+
+# Session scratch — dev junk, never commit
+scratchpad/

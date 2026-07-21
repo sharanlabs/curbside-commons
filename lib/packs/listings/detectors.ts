@@ -73,7 +73,7 @@ export const listingsDetectors: readonly Detector[] = [
           ruleId: "LST-ENC-TRUNC",
           severity: "warn",
           category: "encoding",
-          plainLine: `The name is cut off on the serving copy: "${actual}" vs the real "${expected}".`,
+          plainLine: `The name is cut off in the feed: "${actual}" vs the real "${expected}".`,
         },
       ];
     }

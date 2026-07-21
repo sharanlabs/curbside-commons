@@ -167,7 +167,10 @@ describe("E2 leakage screens (A3) — every gold question AND every pair query",
         expect(jaccard, `${id}: Jaccard ${jaccard.toFixed(2)} vs "${sJoined.slice(0, 60)}"`).toBeLessThan(0.8);
       }
     }
-  });
+    // Heavy O(queries × corpusSentences) Jaccard scan: sub-second in isolation,
+    // but can starve past the global 20s timeout under full-suite parallel CPU
+    // contention. Scoped timeout keeps the (unchanged) assertions from flaking.
+  }, 60_000);
 });
 
 describe("E2 adversarial inserts (A4/M5)", () => {

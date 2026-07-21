@@ -206,8 +206,8 @@ export function applyCorpusDrift(
     const ghost: AcpFeedItem = {
       ...need(items[0], "ghost-template"),
       item_id: "ghost-001",
-      title: "Phantom Platter (simulated ghost item)",
-      description: "A simulated ghost item that exists on the serving copy only.",
+      title: "Phantom Platter",
+      description: "An item that exists in the feed only.",
       group_id: "ghost-group",
       variant_dict: { variation: "Regular" },
       price: "9.99",

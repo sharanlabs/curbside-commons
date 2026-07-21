@@ -30,6 +30,7 @@ import faithfulStatementJson from "@/fixtures/synthetic-restaurant/fees/statemen
 import curedStatementJson from "@/fixtures/synthetic-restaurant/fees/statement.cured.json";
 import conditionalStatementJson from "@/fixtures/synthetic-restaurant/fees/statement.conditional.json";
 import type { FeeAuditReport, FeeVerdict } from "@/lib/packs/fees";
+import type { FeeRule } from "@/lib/packs/fees/rules";
 import { FEE_RULES, FEE_RULE_BY_ID, NON_STATEMENT_CHECKABLE } from "@/lib/packs/fees";
 
 /* ------------------------------------------------------------------ */
@@ -411,3 +412,69 @@ export const FEE_CASES: readonly FeeStatementCase[] = [
     view: toFeeView(conditionalReportJson, conditionalStatementJson),
   },
 ];
+
+/* ------------------------------------------------------------- */
+/* Chapter-02 view derivations (build piece 3, 2026-07-20)        */
+/* ------------------------------------------------------------- */
+
+/** The four headline caps, straight from the drift-locked registry. */
+export type CapCell = { key: string; figure: string; note: string; clause: string };
+const capOf = (id: string): FeeRule => {
+  const r = FEE_RULES.find((x) => x.id === id);
+  if (!r || r.capPct === undefined) throw new Error(`fees surface: cap rule ${id} missing`);
+  return r;
+};
+export const CAPS_VIEW: readonly CapCell[] = [
+  {
+    key: "DELIVERY",
+    figure: `${capOf("NYC-563.3-a-1").capPct}%`,
+    note: "Per order, and as a monthly average across all orders.",
+    clause: capOf("NYC-563.3-a-1").sourceClause,
+  },
+  {
+    key: "ORDER-TAKING",
+    figure: `${capOf("NYC-563.3-b-1").capPct}%`,
+    note: "The (b) fee, for listing and taking the order.",
+    clause: capOf("NYC-563.3-b-1").sourceClause,
+  },
+  {
+    key: "CARD PROCESSING",
+    figure: `${capOf("NYC-563.3-c-1").capPct}%`,
+    note: "A flat cap on the transaction fee, per order.",
+    clause: capOf("NYC-563.3-c-1").sourceClause,
+  },
+  {
+    key: "ENHANCED TIER",
+    figure: `${capOf("NYC-563.3-d-2").capPct}%`,
+    note: "The (d) tier — only if a plain basic plan was offered first.",
+    clause: capOf("NYC-563.3-d-2").sourceClause,
+  },
+];
+
+/**
+ * The averaging-clause jewel — COMPUTED from the drifted month's own
+ * monthly-average finding (never typed): the month's average, the cap, the
+ * division, and the meter geometry on a 0–20% scale.
+ */
+export const FEE_JEWEL = (() => {
+  const report = driftedReportJson as unknown as FeeAuditReport;
+  const f = report.findings.find((x) => x.ruleId === "NYC-563.3-a-2");
+  if (!f) throw new Error("fees surface: the drifted month has no averaging-clause finding");
+  const v = f.claim.value as { sumFeesCents: number; sumPurchasePriceCents: number; capPct: number };
+  const avgPct = (v.sumFeesCents / v.sumPurchasePriceCents) * 100;
+  const scaleMax = 20;
+  return {
+    ruleId: f.ruleId,
+    clause: f.referenceRowId,
+    fees: dollars(v.sumFeesCents),
+    purchases: dollars(v.sumPurchasePriceCents),
+    avg: `${avgPct.toFixed(1)}%`,
+    avgTo: Number(avgPct.toFixed(1)),
+    cap: `${v.capPct.toFixed(1)}%`,
+    capShort: `${v.capPct}%`,
+    scaleMax: `${scaleMax}%`,
+    fillPct: (v.capPct / scaleMax) * 100,
+    overPct: ((avgPct - v.capPct) / scaleMax) * 100,
+    overBy: `${(avgPct - v.capPct).toFixed(1)}`,
+  } as const;
+})();

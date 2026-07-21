@@ -25,7 +25,7 @@ The demo plays one scripted scene: "a spec-faithful simulated agent follows a sp
 
 *The image above is the demo's real captured output — rendered line-for-line by [`scripts-ts/render-demo-svg.mts`](scripts-ts/render-demo-svg.mts) from a live `node bin/check.mjs demo` run, never staged. Regenerate any time: `node scripts-ts/render-demo-svg.mts`.*
 
-Zero network and zero LLM calls on every CLI path — enforced structurally by an import-graph eval, not by promise. A desktop web console (`npm run dev`: `/report`, `/demo`) renders the same machine reports in two registers, plain words first.
+Zero network and zero LLM calls on every CLI path — enforced structurally by an import-graph eval, not by promise. A desktop site (`npm run dev`) tells the same story as one continuing case across four numbered chapters — `/report` (the listings audit), `/fees` (the NYC fee audit), `/playground` (the in-browser bench, the real engine running locally), `/proof` (the instrument's logbook: every evaluation, misses kept in) — with the reference layer at `/docs`.
 
 ## The evals harness is the product's character
 
@@ -44,7 +44,7 @@ When you order food through an app, or tell an AI assistant to do it, the menu b
 
 A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the order.** And every seat in that chain has a conflict of interest: platforms won't audit each other, sync vendors would be grading their own homework, and it isn't the AI companies' job. A credible referee has to sit outside all of those incentives — verifying claims against the merchant's own system of record rather than against another copy. That mechanism, applied with measurement rigor, is what this prototype demonstrates (others work on adjacent trust problems; the differentiation claimed here is the mechanism and the discipline, not exclusivity).
 
-1. **Truth leg** — compare a serving copy (an ACP-style feed, or a UCP catalog response) line by line against the merchant's system of record. Deterministic. No LLM anywhere on this path.
+1. **Truth leg** — compare a published feed (an ACP-style feed, or a UCP catalog response) line by line against the merchant's system of record. Deterministic. No LLM anywhere on this path.
 2. **Conformance leg** — validate a UCP catalog response against the **78 pinned official UCP JSON Schemas** (spec `v2026-04-08`). A document can be perfectly spec-shaped and still false, which is the point:
 
 > **The headline exhibit, machine-checked in CI:** `fixtures/ucp-conformance-ci/valid/conformant-but-false.json` **passes** official-schema conformance and **fails** the truth leg on a price lie. Shape-valid is not true. *(CI = the real thing, not a figure of speech: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `npm run verify` — which includes this differential — plus the legacy suite on every push and PR; first green run observed 2026-07-11 (run 29133350771), most recent observed green 2026-07-12 (run 29208347657 on `d6c7a4d`).)*

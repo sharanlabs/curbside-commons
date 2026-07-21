@@ -33,7 +33,7 @@ export function selectFromSurface(feed: AcpFeed): ActorSelection {
   );
   if (!chosen) {
     throw new Error(
-      `demo actor: no in-stock "${DEMO_INTENT_TITLE}" row on the serving copy (broken fixture?)`,
+      `demo actor: no in-stock "${DEMO_INTENT_TITLE}" row in the feed (broken fixture?)`,
     );
   }
   return {

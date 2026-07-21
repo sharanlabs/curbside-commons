@@ -31,7 +31,7 @@
     "index": 5,
     "severity": "warn",
     "ruleId": "LST-ENC-TRUNC",
-    "plain": "The name is cut off on the serving copy: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\".",
+    "plain": "The name is cut off in the feed: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\".",
     "onBench": false
   },
   {
@@ -45,14 +45,14 @@
     "index": 7,
     "severity": "error",
     "ruleId": "LST-EXIST-GHOST",
-    "plain": "The copy serves \"Phantom Platter (simulated ghost item)\" but no such item exists in the merchant's catalog.",
+    "plain": "The copy serves \"Phantom Platter\" but no such item exists in the merchant's catalog.",
     "onBench": false
   },
   {
     "index": 8,
     "severity": "error",
     "ruleId": "LST-EXIST-MISSING",
-    "plain": "\"Café Latte (Small)\" exists in the merchant's catalog but is missing from the serving copy.",
+    "plain": "\"Café Latte (Small)\" exists in the merchant's catalog but is missing from the feed.",
     "onBench": false
   },
   {

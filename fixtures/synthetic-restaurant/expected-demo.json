@@ -16,11 +16,11 @@
   "beats": [
     {
       "id": "actor-reads",
-      "title": "The agent reads the published serving copy — spec-faithful demonstration actor — simulated",
+      "title": "The agent reads the published feed — spec-faithful demonstration actor — simulated",
       "plain": "A shopping agent reads the published menu feed — the same data any AI assistant would consume — and never sees the restaurant's own records.",
       "lines": [
         "intent: Order the \"Smoked Brisket Plate\" if the published feed lists it as available.",
-        "source read: the published ACP serving copy only (no system-of-record access)"
+        "source read: the published ACP feed only (no system-of-record access)"
       ]
     },
     {

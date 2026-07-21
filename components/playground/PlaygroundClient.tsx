@@ -81,7 +81,7 @@ export function PlaygroundClient() {
           className="pg-input"
           spellCheck={false}
           value={text}
-          placeholder='Paste an ACP feed document here — a JSON object with an "items" array — or load the sample and edit it.'
+          placeholder='Paste an ACP feed document here — a JSON object with an "items" array — or load the committed feed and edit it.'
           onChange={(e) => {
             setText(e.target.value);
             setTextIsSample(false);
@@ -92,7 +92,7 @@ export function PlaygroundClient() {
             Verify this feed
           </button>
           <button type="button" className="lp-btn ghost" onClick={loadSample}>
-            Load the sample feed
+            Load the committed feed
           </button>
         </div>
         {/* No-JS: the whole playground runs in the reader's browser — without
@@ -108,7 +108,7 @@ export function PlaygroundClient() {
           </p>
         </noscript>
         <p className="pg-hint">
-          Tip: load the sample, change a price or a name, and verify again — the findings change
+          Tip: load the committed feed, change a price or a name, and verify again — the findings change
           with your edit. The engine is deterministic: the same text always produces the same
           report.
         </p>
@@ -135,7 +135,7 @@ export function PlaygroundClient() {
           <p className="pg-prov">
             {run.source === "sample" ? (
               <>
-                This is the sample feed — the verdict above is the reference result for it,
+                This is the committed feed — the verdict above is the reference result for it,
                 recomputed in your browser just now, so it always matches the one shown on{" "}
                 <a href="/report">/report</a>.
               </>
@@ -143,7 +143,7 @@ export function PlaygroundClient() {
               <>
                 Computed in your browser just now by the same deterministic engine — no AI calls, no
                 network requests, nothing left this page. Your feed was checked against the
-                illustrative merchant catalog: items outside those records honestly read as unknown
+                pinned merchant catalog: items outside those records honestly read as unknown
                 or missing.
               </>
             )}
@@ -160,7 +160,7 @@ export function PlaygroundClient() {
             </div>
             <div>
               <dt>reference</dt>
-              <dd className="pg-mono">illustrative catalog</dd>
+              <dd className="pg-mono">pinned merchant catalog</dd>
             </div>
           </dl>
 

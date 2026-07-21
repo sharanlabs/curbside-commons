@@ -6,6 +6,8 @@ They live in the repo on purpose (Rule 1). **If anything else — a chat prompt,
 
 Last reviewed: 2026-06-01.
 
+> **Project-identity note (added 2026-07-21, orientation only — changes no rule below).** "ActivationOps AI" is the **project/codebase** identity; the current **product/site** it produces is **Curbside Commons** (a prototype demonstrating agentic feed-vs-record and NYC fee-cap auditing on *simulated* data — see the README "Lineage" section for the full pivot history). On the §8 "Product runtime stack" row (Google Sheets · Supabase · n8n · Slack · Resend · Gemini): as **standing/always-on infrastructure** that is the enterprise-expansion path, not the shipped build. But **live integration is not out of scope** — the prototype doctrine (CLAUDE.md, 2026-06-11) explicitly permits **transient, owner-armed, labeled live-integration *demonstrations* run on demand**, and several already exist: the gated, budget-capped Groq/Gemini classifier lane (`ENABLE_LIVE_AI`), an episodic n8n runtime leg, and exactly **one** owner-armed Slack send to the owner's own channel (2026-07-09, eight written safety controls, redacted record). The shipped SITE / CLI / MCP tools build Slack/email payloads but have **no send transport wired into them** (they cannot themselves send). Rule 8's honesty bar and Rule 4's bright line — **simulated data always, never a real-platform/merchant/business-impact claim** — bind every such demo. New sessions: read this as context; every actual rule still binds as written.
+
 ## 1. Source of truth and continuity
 
 1. The repo is the source of truth — not chat history, not model memory, not a previous session's recollection.
@@ -41,7 +43,13 @@ Order of operations — each precedes the next:
 19. Never claim "AI built this."
 20. Use the framing: **human-led, AI-assisted, professionally reviewed.**
 
-Project integrity: this is a simulation on dummy data. Never claim real DoorDash access, real merchant data, or real business impact. Label all metrics "simulated."
+**Project integrity: this is a simulation on dummy data — always, regardless of chrome register.** Never claim real DoorDash access, real merchant data, or real business impact, anywhere, under any register. This is the bright line and it never moves.
+
+**How that bright line is carried (amended 2026-07-20, decision-log row; supersedes the original "label all metrics simulated" wording as literally-everywhere text):** the disclosure does not have to repeat "simulated" on every surface. It must be carried in TWO enforced ways, both mandatory:
+1. **A no-false-claims gate that actually bites** — an automated scan (this repo's C10 `BANNED_CLAIMS` suite) proves, red-green, that no surface (site chrome, metadata, mockups, footer) ever asserts real platform access, a real merchant relationship, or real business impact. This is the enforcement mechanism, not a courtesy.
+2. **One findable, accurate "what is real" statement** — a single page or section that states plainly what is real (the rules/law/schemas) and what is invented (the merchant, the data), reachable from every page's footer even when it is not in primary navigation. It must never be deleted, even when other disclaimer language is retired elsewhere as a register/design choice.
+
+A register change (e.g., retiring a "working prototype" banner from primary chrome for a more product-like read) is allowed ONLY when both of the above hold and the change is recorded in `docs/decision-log.md` with the owner's word.
 
 ## 5. Claude skills rule
 
@@ -80,7 +88,7 @@ See `docs/visuals/README.md`.
 
 Dual-model engineering is an internal build method, not the product. Do not let the build process overshadow the product.
 
-- **Public docs** focus on the product: the onboarding problem, the AI workflow, data model, risk scoring, blocker diagnosis, guardrails, human review, automation flow, outcome tracking, limitations, roadmap.
+- **Public docs** focus on the product: the feed-vs-record verification problem, the deterministic audit engine, the UCP/ACP data model, conformance-vs-truth, NYC fee-cap auditing, the MCP tool surface, guardrails, human review, honest limitations (incl. the DEFER-labeled experimental lanes), and the documented enterprise-expansion path.
 - **Internal docs** may cover the Claude + Codex workflow, Codex commands, review gates, rescue, handoff, skills usage, cross-account continuity.
 - In public docs, Claude Code and Codex appear only under a short "Development Workflow" note — never as the product runtime stack.
 

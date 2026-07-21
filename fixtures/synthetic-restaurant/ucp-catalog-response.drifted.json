@@ -323,7 +323,7 @@
     },
     {
       "id": "ghost-001",
-      "title": "Phantom Platter (simulated ghost item)",
+      "title": "Phantom Platter",
       "price": {
         "amount": "9.99",
         "currency": "USD"

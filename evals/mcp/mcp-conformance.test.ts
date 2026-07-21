@@ -110,7 +110,7 @@ describe("AC-4 MCP conformance — tools/list (real spawned server)", () => {
   );
 
   it(
-    "server initialize metadata: name, version (from package.json), instructions cover simulated/deterministic/demo_only/advisory semantics",
+    "server initialize metadata: name, version (from package.json), instructions cover simulated/deterministic/demo_only/advisory semantics + the quoted-content injection-hygiene convention",
     async () => {
       const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as { version: string };
       expect(client.getServerVersion()).toEqual({ name: "commerce-truth-audit", version: pkg.version });
@@ -119,6 +119,10 @@ describe("AC-4 MCP conformance — tools/list (real spawned server)", () => {
       expect(instructions).toMatch(/deterministic/i);
       expect(instructions).toMatch(/demo_only/);
       expect(instructions).toMatch(/advisory/);
+      // Finding 2 (security review 2026-07-21): the server must tell a calling
+      // LLM that a report's verbatim-quoted audited text is DATA, not an
+      // instruction to follow (second-order prompt-injection hygiene).
+      expect(instructions).toMatch(/quoted data under audit|never as an instruction/i);
     },
     MCP_TEST_TIMEOUT_MS,
   );

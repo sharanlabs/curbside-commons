@@ -58,7 +58,7 @@
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*[warn]* The name is cut off on the serving copy: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\".\n`item-005-v2#title` · rule `LST-ENC-TRUNC`"
+        "text": "*[warn]* The name is cut off in the feed: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\".\n`item-005-v2#title` · rule `LST-ENC-TRUNC`"
       }
     },
     {
@@ -72,14 +72,14 @@
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*[error]* The copy serves \"Phantom Platter (simulated ghost item)\" but no such item exists in the merchant's catalog.\n`ghost-001#existence` · rule `LST-EXIST-GHOST`"
+        "text": "*[error]* The copy serves \"Phantom Platter\" but no such item exists in the merchant's catalog.\n`ghost-001#existence` · rule `LST-EXIST-GHOST`"
       }
     },
     {
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*[error]* \"Café Latte (Small)\" exists in the merchant's catalog but is missing from the serving copy.\n`item-003-v1#existence` · rule `LST-EXIST-MISSING`"
+        "text": "*[error]* \"Café Latte (Small)\" exists in the merchant's catalog but is missing from the feed.\n`item-003-v1#existence` · rule `LST-EXIST-MISSING`"
       }
     },
     {

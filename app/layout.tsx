@@ -5,6 +5,7 @@ import { Onest, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { BUILD_INFO } from "@/lib/build-info";
 import { PLATFORM_NAME } from "@/lib/product";
+import { COVERAGE } from "@/lib/landing/specimen";
 import "./globals.css";
 
 // Self-hosted via next/font/google (no render-blocking <link>, no inline data-URI).
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     template: "%s · Curbside Commons",
   },
   description:
-    "The proof layer for agentic commerce — a deterministic verifier that checks the serving copy of a platform or AI agent against a merchant's own records, validates data-format conformance, and audits NYC delivery fee statements, with evidence attached to every finding.",
+    "The proof layer for agentic commerce — a deterministic verifier that checks the published feed of a platform or AI agent against the merchant's own records, validates data-format conformance, and audits NYC delivery fee statements, with evidence attached to every finding.",
   openGraph: {
     siteName: "Curbside Commons",
     title: "Curbside Commons — the proof layer for agentic commerce",
@@ -56,16 +57,25 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a href="#main-content" className="ds-skip">
           Skip to main content
         </a>
-        <Nav />
+        {/* Readout figures derive from the engine's own report via the landing
+            specimen module (server) — the nav chrome never hand-types a count. */}
+        <Nav
+          figures={{
+            findingsTotal: COVERAGE.findingsTotal,
+            errors: COVERAGE.errors,
+            warns: COVERAGE.warns,
+          }}
+        />
         <div id="main-content" tabIndex={-1}>
           {children}
         </div>
-        {/* Disclaimer-free professional footer (redesign Slice D freeze-reversal,
-            decision-log 2026-07-14 line ~175). Supersedes the 2026-07-10 S2
-            semantic-disclosure paragraph: the site carries NO disclaimer and NO
-            false claim — the honest technical framing lives in the repo README.
-            Exactly ONE <footer> (legacy.spec asserts it); the build-provenance line
-            is kept (honest + professional). */}
+        {/* v9 takeover footer (spec §1, build piece 1 2026-07-20): Documentation ·
+            Legacy activation · GitHub. Real-product voice (owner directive
+            2026-07-20): the quiet prototype line is retired from the chrome — the
+            honesty statement lives on /docs ("What is real, and what is
+            invented"), linked here; the bright line (no false realness claims,
+            C10) is unchanged. Exactly ONE <footer> (legacy.spec asserts it); the
+            build-provenance + credit lines are kept (honest + professional). */}
         <footer className="site-footer">
           <div className="site-footer-in">
             <div className="site-footer-lead">
@@ -73,21 +83,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 {PLATFORM_NAME}
               </Link>
               <p className="site-footer-tagline">
-                Deterministic verification for agentic commerce.
+                Independent verification for marketplace feeds.
               </p>
             </div>
             <nav className="site-footer-nav" aria-label="Footer">
-              {/* The full canonical surface set, v8 voice — kept label-identical
-                  to the primary nav (the footer-completeness e2e tooth asserts
-                  every canonical surface appears here; blindspot fix 2026-07-16). */}
-              <Link href="/report">Listings report</Link>
-              <Link href="/demo">Order scene</Link>
-              <Link href="/playground">Check a feed</Link>
-              <Link href="/fees">Fee-cap audit</Link>
-              <Link href="/eval">Evidence</Link>
-              <Link href="/metrics">Measurables</Link>
-              <Link href="/cost">$0 cost</Link>
-              <Link href="/legacy/console">Legacy</Link>
+              <Link href="/docs">Documentation</Link>
+              <Link href="/legacy/console">Legacy activation</Link>
+              <a href="https://github.com/sharanlabs/curbside-commons" rel="noopener">
+                GitHub
+              </a>
             </nav>
             <div className="site-footer-meta">
               <span className="site-footer-credit">

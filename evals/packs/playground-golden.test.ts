@@ -126,7 +126,10 @@ function extractSpecifiers(src: string): string[] {
 // 0.6.1; zero network/hooks verified in the repo AND the published tarballs incl.
 // the esm-env transitive; reduced-motion/ARIA floors verified) — first real use is
 // the /fees paste-leg tally. The covering batch re-probes the whole condition set.
-const BARE_ALLOWLIST = new Set(["react", "@number-flow/react"]);
+// "react-dom": the shipped FeesView.tsx imports { flushSync } from it (a client-only
+// React DOM API for the SSR-then-page tab flush) — browser-provided, same bundle as the
+// already-trusted "react-dom/" prefix; no node builtin is reachable through it.
+const BARE_ALLOWLIST = new Set(["react", "react-dom", "@number-flow/react"]);
 const BARE_PREFIX_ALLOWLIST = ["react/", "next/", "react-dom/"];
 const NODE_BUILTINS = new Set([...builtinModules, ...builtinModules.map((m) => `node:${m}`)]);
 
@@ -274,8 +277,12 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
   // non-affiliation disclaimer. These assertions are the red half — they FAIL
   // against the pre-de-jargon copy.
   it("the page states the honest boundary in plain, jargon-free language", () => {
-    expect(pageSrc).toMatch(/Honest boundary/);
-    expect(pageSrc).toMatch(/illustrative/i);
+    // freeze-reversal 2026-07-20: the "illustrative" label requirement is retired; the
+    // rebuilt /playground states its honest boundary as the pinned-world copy — the
+    // merchant catalog of N records, out-of-catalog reads as unknown or missing.
+    expect(pageSrc).toMatch(/HONEST BOUNDARY/);
+    expect(pageSrc).toMatch(/reference world is the merchant catalog/);
+    expect(pageSrc).toMatch(/reads as unknown or missing/);
     // No lab-words / removed disclaimer leak onto the public page.
     expect(pageSrc).not.toMatch(/\bsimulated\b/i);
     expect(pageSrc).not.toMatch(/\bsynthetic\b/i);
@@ -289,18 +296,29 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
   });
 
   it("the noscript fallback exists and cites the real tally (jargon-free, no repo path)", () => {
-    expect(pageSrc).toMatch(/<noscript>/);
-    expect(pageSrc).toMatch(/16 findings \(11 error \/ 5 warn\)/);
-    // The internal fixture path must NOT be cited on the public page.
+    // freeze-reversal 2026-07-20: the page no longer carries a single hardcoded noscript
+    // paragraph citing "16 findings (11 error / 5 warn)"; the bench SSRs the settled
+    // reference result so a no-JS reader gets the complete story, and PlaygroundClient
+    // keeps its own <noscript> for the paste leg. Rebound to those real surfaces — the
+    // byte-exact reference tally is proven by the golden-equality test above.
+    expect(pageSrc).toMatch(/<TryLiveBench \/>/);
+    expect(clientSrc).toMatch(/<noscript>/);
+    // The internal fixture path must NOT be cited on either public surface.
     expect(pageSrc).not.toMatch(/expected-report\.acp\.json/);
     expect(pageSrc).not.toMatch(/fixtures\//);
+    expect(clientSrc).not.toMatch(/expected-report\.acp\.json/);
+    expect(clientSrc).not.toMatch(/fixtures\//);
   });
 
   it("the client distinguishes the sample run from a pasted run, in plain language", () => {
+    // freeze-reversal 2026-07-20: the "illustrative merchant catalog" label requirement is
+    // retired; the shipped pg-prov copy distinguishes the "committed feed" recompute from a
+    // pasted run checked against the "pinned merchant catalog".
+    expect(clientSrc).toMatch(/This is the committed feed/);
     expect(clientSrc).toMatch(/recomputed in your browser/);
     expect(clientSrc).toMatch(/Computed in your browser just now/);
-    // pasted runs are checked against the illustrative catalog — no lab-words.
-    expect(clientSrc).toMatch(/illustrative merchant catalog/);
+    // pasted runs are checked against the pinned catalog — no lab-words.
+    expect(clientSrc).toMatch(/pinned merchant catalog/);
     expect(clientSrc).not.toMatch(/\bsimulated\b/i);
     expect(clientSrc).not.toMatch(/\bsynthetic\b/i);
   });

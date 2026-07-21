@@ -77,7 +77,7 @@ export function FeePlaygroundClient() {
           className="pg-input"
           spellCheck={false}
           value={text}
-          placeholder='Paste a monthly fee-statement document here — a JSON object with "meta" and "lines" — or load the sample and edit it.'
+          placeholder='Paste a monthly fee-statement document here — a JSON object with "meta" and "lines" — or load the example statement and edit it.'
           onChange={(e) => {
             setText(e.target.value);
             setTextIsSample(false);
@@ -88,7 +88,7 @@ export function FeePlaygroundClient() {
             Audit this statement
           </button>
           <button type="button" className="lp-btn ghost" onClick={loadSample}>
-            Load the sample statement
+            Load the example statement
           </button>
         </div>
         <noscript>
@@ -107,7 +107,7 @@ export function FeePlaygroundClient() {
           </p>
         </noscript>
         <p className="pg-hint pg-tip">
-          Tip: load the sample, change one fee amount or a refund date, and audit again — the
+          Tip: load the example statement, change one fee amount or a refund date, and audit again — the
           verdicts move with your edit. The audit is deterministic: the same statement always
           produces the same result.
         </p>

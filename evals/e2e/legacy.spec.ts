@@ -49,10 +49,17 @@ test("a merchant opens its full why-chain end to end under /legacy/", async ({ p
 test("the /legacy/ skeleton serves every moved surface under the provenance banner", async ({
   page,
 }) => {
-  // Handoff from the truth-engine dashboard into the moved surface
-  await page.goto("/eval");
-  await page.getByRole("link", { name: "/legacy/eval" }).click();
-  await expect(page).toHaveURL(/\/legacy\/eval/, { timeout: 15_000 });
+  // Handoff from the /legacy archive landing into a moved surface (the v9
+  // takeover retired the /eval dashboard into a /proof redirect stub, so the
+  // archive landing is now the door into the preserved module).
+  await page.goto("/legacy");
+  await page.getByRole("link", { name: "Eval", exact: true }).click();
+  // 30s: the App Router updates the URL only once the RSC payload for the target
+  // resolves, and dev compiles /legacy/eval on first hit under parallel load
+  // (artifact mode prebuilds it and is instant). 15s was measured insufficient
+  // cold — same dev-compile allowance the merchant why-chain test uses. Do NOT
+  // re-click: a second click aborts the in-flight navigation and it never lands.
+  await expect(page).toHaveURL(/\/legacy\/eval/, { timeout: 30_000 });
   await expect(page.getByText("Legacy activation module", { exact: false }).first()).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "Eval / Quality" })).toBeVisible();
   // The provenance banner is not a footer — the root footer stays the only one.

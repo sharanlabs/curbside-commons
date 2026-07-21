@@ -5,23 +5,24 @@ import AxeBuilder from "@axe-core/playwright";
  * RV1 (owner review pick 2026-07-11): automated accessibility layer joining the
  * dual e2e contracts — runs in BOTH modes (dev + artifact) like every contract.
  * axe-core runs fully in-page (no network). Bar: zero WCAG 2.0/2.1 A+AA
- * violations on the four representative surfaces (canonical landing, the report,
- * the dashboard, the legacy module). This complements — never replaces — the
- * hand-written checks (keyboard toggles, reduced-motion, contrast recomputes).
+ * violations across the canonical v9 surfaces + the legacy module. This
+ * complements — never replaces — the hand-written checks (keyboard toggles,
+ * reduced-motion, contrast recomputes).
  */
 
-// /demo, /metrics, /cost joined 2026-07-16 (session 22) with the section-rail
-// instrument — every rail surface carries the same zero-violation bar.
+// v9 takeover surface list (consolidated e2e rewrite, 2026-07-20): the four
+// chapters + /docs + the /legacy archive landing + the legacy console. The
+// retired /eval /metrics /cost /demo dashboards are now redirect stubs and drop
+// off the zero-violation bar.
 const SURFACES = [
   "/",
   "/report",
-  "/eval",
-  "/legacy/console",
-  "/playground",
   "/fees",
-  "/demo",
-  "/metrics",
-  "/cost",
+  "/playground",
+  "/proof",
+  "/docs",
+  "/legacy",
+  "/legacy/console",
 ] as const;
 
 for (const path of SURFACES) {

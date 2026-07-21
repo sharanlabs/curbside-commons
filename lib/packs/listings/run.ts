@@ -101,7 +101,7 @@ function completenessSweep(
           ruleId: "LST-EXIST-MISSING",
           severity: "error",
           category: "existence",
-          plainLine: `"${expectedTitle(item, variation)}" exists in the merchant's catalog but is missing from the serving copy.`,
+          plainLine: `"${expectedTitle(item, variation)}" exists in the merchant's catalog but is missing from the feed.`,
         }),
       );
     }

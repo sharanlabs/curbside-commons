@@ -24,6 +24,7 @@ import { readFileSync } from "node:fs";
 import { auditWithClassification } from "../../packs/fees/classified-audit.ts";
 import { DeterministicBaselineClassifier } from "../../packs/fees/classifier.ts";
 import { parseStatement } from "../../packs/fees/parser.ts";
+import { resolveInAllowedRoot } from "../paths.ts";
 import { serializeClassifiedFeeReport } from "../serializers.ts";
 import { freezeToolResult, type ToolResult } from "../types.ts";
 
@@ -35,7 +36,7 @@ export interface ClassifyAndAuditParams {
 /** Run `classify_and_audit`. `params` must already be ajv-validated by `callTool`. */
 export function runClassifyAndAuditTool(params: unknown): ToolResult {
   const p = params as ClassifyAndAuditParams;
-  const raw = readFileSync(p.statementPath, "utf8");
+  const raw = readFileSync(resolveInAllowedRoot(p.statementPath, "statementPath"), "utf8");
   const statement = parseStatement(raw);
   const report = auditWithClassification(statement, DeterministicBaselineClassifier);
   return freezeToolResult({
