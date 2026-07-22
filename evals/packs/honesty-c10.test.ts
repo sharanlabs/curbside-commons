@@ -120,6 +120,12 @@ const scannedFiles = [
   join(root, "components", "report", "Jewel.tsx"),
   join(root, "components", "report", "Ledger.tsx"),
   join(root, "app", "report", "page.tsx"),
+  // Outbound delivery builders (the L-2 one-shots' payload sources): the strings
+  // a RECIPIENT reads must sit inside the same honesty gate as the corpus docs
+  // (session-32 email-HTML slice; the s30 grill lesson — new surfaces join the scan).
+  join(root, "lib", "delivery", "slack.ts"),
+  join(root, "lib", "delivery", "email.ts"),
+  join(root, "lib", "delivery", "email-html.ts"),
   ...demoScanned,
 ];
 

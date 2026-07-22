@@ -9,6 +9,7 @@ import {
   SLACK_MAX_BLOCKS,
 } from "@/lib/delivery/slack.ts";
 import { base64Wrapped, buildEmailReportMessage, EMAIL_FROM_PLACEHOLDER, EMAIL_TO_PLACEHOLDER } from "@/lib/delivery/email.ts";
+import { buildEmailReportHtml, EMAIL_HTML_FINDINGS_CAP } from "@/lib/delivery/email-html.ts";
 
 const FIXED_DATE = "Mon, 06 Jul 2026 12:00:00 +0000"; // deterministic by design — the date is an INPUT (Codex A3 P1)
 
@@ -143,7 +144,7 @@ describe("A3 email builder — goldens + invariants", () => {
 });
 
 describe("A3 import/network boundary — builders are JSON-in/JSON-out, transport-free", () => {
-  const files = ["lib/delivery/slack.ts", "lib/delivery/email.ts"];
+  const files = ["lib/delivery/slack.ts", "lib/delivery/email.ts", "lib/delivery/email-html.ts"];
 
   it("delivery modules import node builtins only (no engine, no registry, no SDK, no transport)", () => {
     for (const f of files) {
@@ -169,3 +170,146 @@ describe("A3 import/network boundary — builders are JSON-in/JSON-out, transpor
     }
   });
 });
+
+describe("A3 email HTML builder — goldens + invariants", () => {
+  // siteLink is CALLER-supplied by design: the builder source must stay
+  // URL-literal-free (boundary suite above), so the one outbound reference is
+  // an input — fixed here for the golden's determinism, like `date`. The
+  // preheader (v2 composition, digest §6 move #11) is likewise caller data:
+  // fixed here to the same verdict-first string the one-shot composes for the
+  // drifted audit.
+  const HTML_META = {
+    tool: "audit_statement",
+    subject: "Fee audit — statement 2026-06 (simulated)",
+    date: "2026-07-22",
+    siteLink: "https://curbside-commons.pages.dev/fees",
+    preheader: "5 violations of the NYC fee caps — simulated statement 2026-06; audit arithmetic in report.json.",
+  } as const;
+
+  it("email-html-fees-drifted: byte-identical to the committed golden", () => {
+    const html = buildEmailReportHtml(feesCanonical, HTML_META);
+    expect(html).toBe(readFileSync(join(GOLD, "email-html-fees-drifted.golden.html"), "utf8"));
+  });
+
+  it("deterministic: building twice yields identical bytes", () => {
+    expect(buildEmailReportHtml(feesCanonical, HTML_META)).toBe(buildEmailReportHtml(feesCanonical, HTML_META));
+  });
+
+  // v2 anchors (session 32): the "claim " anchor is gone WITH the per-row
+  // claim ids (curation directive — the email is the notification, report.json
+  // is the report); the rule-id chip ("NYC-563.3") anchors the findings region
+  // instead.
+  it("the SIMULATED banner is the first rendered content (before header, verdict, findings)", () => {
+    const html = buildEmailReportHtml(feesCanonical, HTML_META);
+    const banner = html.indexOf("SIMULATED DATA");
+    expect(banner).toBeGreaterThan(-1);
+    for (const later of ["Curbside Commons</span>", ">FAIL</td>", "NYC-563.3"]) {
+      expect(banner, `banner must precede ${JSON.stringify(later)}`).toBeLessThan(html.indexOf(later));
+    }
+  });
+
+  it("report-derived text is entity-escaped — a hostile finding cannot inject markup", () => {
+    const hostile = JSON.parse(feesCanonical);
+    hostile.findings[0].plainLine = `<script>alert(1)</script><img src=x onerror=alert(2)> & "q" 'a'`;
+    const html = buildEmailReportHtml(`${JSON.stringify(hostile, null, 2)}\n`, HTML_META);
+    expect(html).not.toContain("<script>alert");
+    expect(html).not.toContain("<img src=x");
+    expect(html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+  });
+
+  // Amended contract (session 32, red-green): `<style>` is now ALLOWED as the
+  // enhancement channel for the dark-mode overrides (digest moves #7/#10) —
+  // but ONLY as a single block inside <head>, never in the body (Gmail strips
+  // body styles; critical styles stay inline). script/link/img/iframe remain
+  // banned everywhere, and the single-outbound-URL rule is unchanged.
+  it("one <style> block, head-only; script/link/img/iframe banned everywhere; the ONLY outbound reference is the caller-supplied site link", () => {
+    const html = buildEmailReportHtml(feesCanonical, HTML_META);
+    expect(/<(script|link|img|iframe)\b/i.test(html)).toBe(false);
+    expect([...html.matchAll(/<style\b/gi)].length).toBe(1);
+    expect(html.indexOf("<style"), "<style> must open inside <head>").toBeLessThan(html.indexOf("<body"));
+    expect(html.indexOf("</style>"), "<style> must close before <body>").toBeLessThan(html.indexOf("<body"));
+    const urls = [...html.matchAll(/https?:\/\/[^"'\s<]+/g)].map((m) => m[0]);
+    expect(urls).toStrictEqual([HTML_META.siteLink]);
+  });
+
+  it("omitting siteLink yields a body with ZERO outbound references", () => {
+    const rest = { tool: HTML_META.tool, subject: HTML_META.subject, date: HTML_META.date };
+    const html = buildEmailReportHtml(feesCanonical, rest);
+    expect(/https?:\/\//.test(html)).toBe(false);
+  });
+
+  it("truncation is explicit on an oversized report, never silent", () => {
+    const many = JSON.parse(feesCanonical);
+    const base = many.findings[0];
+    many.findings = Array.from({ length: EMAIL_HTML_FINDINGS_CAP + 7 }, (_, i) => ({ ...base, plainLine: `finding ${i}` }));
+    const html = buildEmailReportHtml(`${JSON.stringify(many, null, 2)}\n`, HTML_META);
+    expect(html).toContain(`and 7 more finding(s)`);
+    expect(html).toContain("report.json");
+  });
+
+  it("refuses non-decision-grade payloads loudly (the run_demo transcript cannot become a delivery)", () => {
+    const demo = callTool("run_demo", {});
+    expect(() => buildEmailReportHtml(demo.canonical, HTML_META)).toThrow(/not a decision-grade report/);
+  });
+
+  it("lamp ledger honored: PASS renders graphite (no ember anywhere, in either mode); gold renders NOWHERE on any report", () => {
+    const clean = buildEmailReportHtml(cleanCanonical, HTML_META);
+    expect(clean).toContain(">PASS</td>");
+    expect(clean).not.toContain("#b42318"); // ember = violation-only
+    expect(clean).not.toContain("#e0604c"); // the dark-mode ember variant is emitted only when violations exist
+    for (const html of [clean, buildEmailReportHtml(feesCanonical, HTML_META)]) {
+      expect(html).not.toContain("#ffb020"); // gold = held-status only, absent from email entirely
+    }
+  });
+
+  // ---- v2 invariants (session 32 redesign, digest-grounded) ----
+
+  it("preheader: hidden preview div carries the caller text before the banner, invisible; omitted entirely when absent (digest move #11)", () => {
+    const html = buildEmailReportHtml(feesCanonical, HTML_META);
+    const pre = html.indexOf(HTML_META.preheader);
+    expect(pre).toBeGreaterThan(-1);
+    expect(HTML_META.preheader.length).toBeGreaterThanOrEqual(40); // digest §6: 40–100 chars
+    expect(HTML_META.preheader.length).toBeLessThanOrEqual(100);
+    // preview metadata only: hidden with display:none, never rendered content
+    const divOpen = html.lastIndexOf("<div", pre);
+    expect(html.slice(divOpen, pre)).toContain("display:none");
+    // the banner stays the first RENDERED content even with the preheader ahead of it in the DOM
+    expect(pre).toBeLessThan(html.indexOf("SIMULATED DATA"));
+    const noPreheader = { tool: HTML_META.tool, subject: HTML_META.subject, date: HTML_META.date, siteLink: HTML_META.siteLink };
+    expect(buildEmailReportHtml(feesCanonical, noPreheader)).not.toContain("display:none");
+  });
+
+  it("dark-mode kit rides the head (digest §2 + moves #7/#10): both metas, color-scheme root, prefers-color-scheme block, data-ogsc overrides", () => {
+    const html = buildEmailReportHtml(feesCanonical, HTML_META);
+    expect(html).toContain('<meta name="color-scheme" content="light dark">');
+    expect(html).toContain('<meta name="supported-color-schemes" content="light dark">');
+    expect(html).toContain(":root{color-scheme:light dark;}");
+    expect(html).toContain("@media (prefers-color-scheme:dark)");
+    expect(html).toContain("[data-ogsc]");
+  });
+
+  it("dark-mode defensive base colors: no pure #fff / #000 anywhere (digest §2 — near-black on near-white survives forced inversion)", () => {
+    for (const html of [buildEmailReportHtml(feesCanonical, HTML_META), buildEmailReportHtml(cleanCanonical, HTML_META)]) {
+      expect(html.toLowerCase()).not.toContain("#ffffff");
+      expect(html.toLowerCase()).not.toContain("#000000");
+      expect(/#(?:fff|000)\b/i.test(html)).toBe(false);
+    }
+  });
+
+  it("curation contract: no claim ids, no per-row verdict/severity words, no runtime meta (the email is the notification, report.json is the report)", () => {
+    const html = buildEmailReportHtml(feesCanonical, HTML_META);
+    for (const f of (JSON.parse(feesCanonical) as { findings: Array<{ claim?: { id?: string } }> }).findings) {
+      if (f.claim?.id) expect(html, `claim id ${f.claim.id} must live in report.json only`).not.toContain(escapeHtmlLike(f.claim.id));
+    }
+    expect(html).not.toContain("verdict:");
+    expect(html).not.toContain(">error<"); // the old per-row severity chip
+    expect(html).not.toContain("deterministic engine");
+    expect(html).not.toContain("$0 offline");
+  });
+});
+
+// The builder entity-escapes report-derived text, so the absence probe must
+// look for the ESCAPED form a claim id would take in the body.
+function escapeHtmlLike(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}

@@ -25,7 +25,7 @@ key/target to exercise end-to-end · **[BUILD]** planned but not yet wired for a
 | 7 | **RAG lookup** | BM25, extractive | rag evals (pre-registered floors) | **[GREEN]** (advisory/experimental) |
 | 8 | **LLM classifier** | Groq `gpt-oss-120b` / Gemini via `ai` SDK | gold + 3 `.live.test.ts` | **[LIVE]** — keys in your `.env` |
 | 9 | **Slack delivery** | incoming webhook | goldens + one-shot send | **[GREEN + LIVE-DONE]** delivered HTTP 200 (2026-07-21) |
-| 10 | **Email / Resend** | `lib/delivery/email.ts` builder + one-shot | goldens + one-shot send | **[LIVE]** transport ready — first send pending the owner's word |
+| 10 | **Email / Resend** | `lib/delivery/email.ts` builder + one-shot | goldens + one-shot send | **[GREEN + LIVE-DONE]** delivered HTTP 200 (2026-07-22) |
 | 11 | **n8n automation** | `.n8n-artifacts/` workflow | manual episodic run | **[BUILD/LIVE]** run the workflow |
 | 12 | **Supabase** | — | — | **[BUILD]** not built (enterprise-path) |
 
@@ -71,9 +71,9 @@ ENABLE_LIVE_AI=true node --env-file=.env scripts-ts/crew-live-l1-run.mts
 node --env-file=.env scripts-ts/l2-slack-one-shot.mts
 ```
 
-**10 · Email delivery (Resend)** — the one-shot transport exists (`scripts-ts/l2-resend-one-shot.mts`,
-same 8 safety controls as Slack; sends the same real audit to a recipient YOU own via Resend's
-free-tier test sender). Owner-armed: `RESEND_API_KEY` + `RESEND_TO` in the gitignored `.env`, then:
+**10 · Email delivery (Resend)** — DONE 2026-07-22 (HTTP 200; `scripts-ts/l2-resend-one-shot.mts`,
+same 8 safety controls as Slack; the same real audit sent to the owner's own inbox via Resend's
+free-tier test sender). To send again, one word + `RESEND_API_KEY`/`RESEND_TO` in the gitignored `.env`:
 ```bash
 node --env-file=.env scripts-ts/l2-resend-one-shot.mts
 ```
