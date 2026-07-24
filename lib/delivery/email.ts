@@ -33,6 +33,9 @@ export const EMAIL_TO_PLACEHOLDER = "merchant-ops@recipient.example";
 const MIME_BOUNDARY = "commerce-truth-audit-boundary-0000000000000000"; // fixed: determinism over cleverness
 const MAX_ENCODED_LINE = 76;
 
+/** Computed plural suffix (the c8c91a0 copy standard — no literal "(s)" forms). */
+const plural = (n: number): string => (n === 1 ? "" : "s");
+
 export interface EmailReportMeta {
   readonly tool: string;
   readonly subject: string;
@@ -122,22 +125,29 @@ export function buildEmailReportMessage(canonical: string, meta: EmailReportMeta
   const date = assertHeaderSafe("date", meta.date);
   const report = parseCanonical(canonical);
   const verdictLine = report.ok
-    ? `PASS - no violations (${report.findings.length} non-gating finding(s))`
-    : `FAIL - violations present (${report.findings.length} finding(s))`;
+    ? `PASS - no violations (${report.findings.length} non-gating finding${plural(report.findings.length)})`
+    : `FAIL - violations present (${report.findings.length} finding${plural(report.findings.length)})`;
 
   const bodyText = [
     // Template v2 (2026-07-10, plan v3.3 S4b): name migrated → "Curbside Commons"
     // (decision-log row precedes this edit; goldens regenerated under the allowlist).
     "SIMULATED DATA - Curbside Commons demonstration output.",
-    "Not real merchant data, not legal advice. Recommendations only - the engine decides, humans approve.",
+    "Not real merchant data, not legal advice.",
     "",
     `Result: ${verdictLine}`,
     `Tool: ${tool} (deterministic engine, $0 offline)`,
     "",
     ...report.findings.slice(0, 20).map((f) => `- [${f.severity}] ${f.plainLine} (${f.id})`),
-    ...(report.findings.length > 20 ? [`...and ${report.findings.length - 20} more finding(s) - full report attached.`] : []),
+    ...(report.findings.length > 20 ? [`...and ${report.findings.length - 20} more finding${plural(report.findings.length - 20)} - full report attached.`] : []),
     "",
-    "The full machine-readable report is attached (report.json).",
+    // Evidence pointer + footer — copy-coherent with the v5 HTML/one-shot halves
+    // (design source mockups/email-v5-light-tweakable-2026-07-22.html). Non-ASCII
+    // here (em-dash, §) is quoted-printable-encoded on the wire, so the message
+    // stays 7-bit ASCII. Structure (plain-text .eml) is deliberately unchanged.
+    "Attached report.json has the full audit — every claim, rule, and calculation. Re-runs reproduce it byte for byte.",
+    "",
+    "One-time demonstration send. Not a subscription.",
+    "Simulated data checked against real NYC law (§20-563.3 / Local Law 79 of 2025). Not legal advice. No real platform access.",
   ].join("\n");
 
   const lines = [

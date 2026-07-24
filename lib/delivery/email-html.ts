@@ -10,37 +10,37 @@
  * CANONICAL STRING a registry tool returned (JSON-level consumption, never an
  * engine type).
  *
- * HONESTY (C10 extended): the SIMULATED banner is the FIRST rendered content
+ * HONESTY (C10 extended): the SIMULATED plaque is the FIRST rendered content
  * of every body this builder emits — the builder throws if composition ever
  * loses it. All report-derived text is HTML-entity-escaped, so a hostile
  * finding string cannot inject markup into a recipient's mail client.
  *
- * COMPOSITION (v2, session 32 — grounded in the live research digest at
- * `docs/research/research-email-design-2026-07-22.md`, fetched 2026-07-22;
- * digest move numbers cited inline):
- *   hidden preheader (optional, move #11) → SIMULATED plaque (first rendered
- *   content) → mono eyebrow → verdict stamp chip (move #4) + 24px/−0.5px
- *   headline with counts (move #3) → hairline-divided finding rows: plain
- *   language + mono rule-id chip, ember mark strictly on violations
- *   (moves #5/#9) → one action (move #8, only when the caller supplies
- *   `siteLink`) → one-sentence attachment panel (moves #6/#12) → 12px footer:
- *   reason-for-email + honesty line (move #12). The email is the NOTIFICATION;
- *   `report.json` is the report (owner curation directive, 2026-07-22).
+ * COMPOSITION (v5, owner-adopted — a byte-for-byte translation of the design
+ * source `mockups/email-v5-light-tweakable-2026-07-22.html`):
+ *   hidden preheader (optional) → SIMULATED plaque with ultramarine medallion
+ *   (first rendered content) → mono eyebrow + a 28px letterhead kicker rule →
+ *   verdict stamp (FAIL ember / PASS graphite) + a 28px headline whose
+ *   violation COUNT is set in ember → mono tabular meta line
+ *   ("Simulated statement · {period} · sent {date}") → an airy 3-column ledger
+ *   (hung ember index · plain-language sentence · faint mono rule id, hairline
+ *   rows, no chrome) → one action (only when the caller supplies `siteLink`) →
+ *   a quiet ultramarine keyline evidence pointer → footer: reason-for-email +
+ *   honesty line. The email is the NOTIFICATION; `report.json` is the report.
  *
- * EMAIL-CLIENT REALITY (digest §1): one centered 560px table (move #1), every
- * critical style inline, spacing as td padding on a 4/8 scale (move #2),
- * system font stacks only, zero images, zero scripts, zero shadows/gradients.
- * ONE `<style>` block rides the head as an ENHANCEMENT channel only (move #10)
- * carrying the dark-mode overrides (`prefers-color-scheme` + `[data-ogsc]`,
- * digest §2) behind an empty decoy head (the Yahoo-Android first-head strip,
- * digest "off-radar traps"). Base colors are dark-mode DEFENSIVE: near-black
- * on near-white, never pure #000/#fff (digest §2). The ONLY outbound
- * reference is the caller-supplied site link.
+ * EMAIL-CLIENT REALITY: one centered 560px table, every critical style inline,
+ * spacing as td padding, system font stacks only, zero images, zero scripts,
+ * zero shadows/gradients. A SINGLE `<style>` block rides the one head carrying
+ * only `:root{color-scheme:light;}`. The body is LIGHT-LOCKED — the two
+ * color-scheme metas both say `light` and there is no dark-mode override
+ * channel — so a mail client's forced-inversion pass is opted out, not fought.
+ * Base colors stay off-black on off-white (never pure #000/#fff). The ONLY
+ * outbound reference is the caller-supplied site link.
  *
  * Lamp ledger (site law): ember #b42318 marks violations ONLY (a PASS body
- * carries no ember at all — its dark-mode variant is emitted conditionally);
- * gold is reserved for held-status site-wide and is deliberately absent here;
- * ultramarine #2438d6 is the brand accent, never a lamp.
+ * carries no ember at all — the stamp is graphite, the ledger index of any
+ * non-violation row is faint); gold is reserved for held-status site-wide and
+ * is deliberately absent here; ultramarine #2438d6 is the brand accent, never
+ * a lamp.
  *
  * Plain: this turns an audit report into a short, presentable notification —
  * the SIMULATED plaque first, the verdict with counts up top, each finding as
@@ -52,8 +52,14 @@
 /** Caller-supplied metadata. `date` is an INPUT for determinism (never Date.now). */
 export interface EmailHtmlMeta {
   readonly tool: string;
+  /**
+   * Subject line — rendered verbatim in the document `<title>` AND mined for
+   * the statement period shown in the meta line (the first `YYYY-MM[-DD]` token
+   * it carries). No separate period field is required: the subject the L-2
+   * one-shot composes already carries the period (e.g. "… — 2026-06").
+   */
   readonly subject: string;
-  /** Display date string shown in the header (e.g. "2026-07-22"). */
+  /** Display date string shown in the meta line (e.g. "2026-07-22"). */
   readonly date: string;
   /**
    * Optional public-site link for the action button. CALLER-supplied so this
@@ -63,52 +69,47 @@ export interface EmailHtmlMeta {
    */
   readonly siteLink?: string;
   /**
-   * Optional inbox preview text (digest §6, move #11: 40–100 chars,
-   * front-loaded), rendered as the standard hidden-preheader div before the
-   * banner. It is PREVIEW metadata, not rendered content — the SIMULATED
-   * plaque remains the first thing a reader sees, and the subject's own
-   * [SIMULATED] lead token precedes the preheader in every inbox list line.
+   * Optional inbox preview text (40–100 chars, front-loaded), rendered as the
+   * standard hidden-preheader div before the plaque. It is PREVIEW metadata,
+   * not rendered content — the SIMULATED plaque remains the first thing a
+   * reader sees, and the subject's own [SIMULATED] lead token precedes the
+   * preheader in every inbox list line.
    */
   readonly preheader?: string;
 }
 
 /**
  * Findings rendered in full before the explicit "…and N more" row. Curated to
- * SIX (owner directive 2026-07-22 — "clean, not cluttered"; digest §6 "less is
- * more" / move #12): the email carries the verdict and the top lines, the
- * attached report.json carries the full set.
+ * SIX (owner directive — "clean, not cluttered"): the email carries the
+ * verdict and the top lines, the attached report.json carries the full set.
  */
 export const EMAIL_HTML_FINDINGS_CAP = 6;
 
 const SIMULATED_BANNER =
   "SIMULATED DATA — Curbside Commons demonstration output. Not real merchant data, not legal advice.";
 
-/* palette — site tokens (app/globals.css) made dark-mode DEFENSIVE per digest
-   §2: near-black on near-white, no pure #000/#fff anywhere in the body. */
-const INK = "#12141c"; // plaque ground, heading text (site --ink)
-const INK_2 = "#22252f"; // body text (site --ink-2)
-const GRAPHITE = "#4a4e5a"; // muted text + the PASS stamp ground (site --graphite)
-const EMBER = "#b42318"; // violation marks ONLY (site --ember)
-const EMBER_DARK = "#e0604c"; // the same lamp, legible on dark grounds — emitted only when violations exist
-const UM = "#2438d6"; // brand accent, never a lamp (site --um)
-const CARD = "#fdfdfb"; // card ground (near-white, digest §2)
+/* palette — v5 light-locked tokens, lifted verbatim from the design source
+   mockups/email-v5-light-tweakable-2026-07-22.html. Off-black on off-white,
+   never pure #000/#fff; the card carries an ultramarine top+bottom edge. */
+const INK = "#12141c"; // plaque ground + headline (site --ink)
+const INK_2 = "#22252f"; // ledger body text (site --ink-2)
+const GRAPHITE = "#4a4e5a"; // footer text + the PASS stamp ground (site --graphite)
+const EMBER = "#b42318"; // violation marks ONLY — headline count, FAIL stamp, violation index (site --ember)
+const UM = "#2438d6"; // brand accent, never a lamp (site --um): card edge, medallion, button, keyline
+const CARD = "#fdfdfb"; // card ground (near-white)
 const WASH = "#f1f1ee"; // page ground
-const PANEL = "#f6f6f3"; // soft panel fill (digest move #6)
-const CHIP_BG = "#eeeeea"; // mono chip ground (digest move #9)
-const HAIRLINE = "#e5e5e0"; // hairline dividers/borders (digest §3: hex hairlines, no shadows)
-const LIGHT = "#f5f6f8"; // near-white text on dark/solid grounds (never pure #fff)
-
-/* dark-mode overrides (enhancement channel, digest §2 + move #7) */
-const D_BG = "#15161b";
-const D_CARD = "#1d1f26";
-const D_PLAQUE = "#262932";
-const D_PANEL = "#252831";
-const D_CHIP_BG = "#2a2d37";
-const D_HAIR = "#363943";
-const D_INK = "#f0f1f4";
-const D_BODY = "#d7dae1";
-const D_MUTE = "#a9aeba";
-const D_CHIP_TEXT = "#c3c7d1";
+const CARD_BORDER = "#e7e7e2"; // card 1px hairline border
+const LIGHT = "#f5f6f8"; // near-white text on solid grounds (button, PASS stamp)
+const PLAQUE_TEXT = "#f4f5f8"; // SIMULATED banner text on the dark plaque
+const STAMP_FAIL_TEXT = "#fdecea"; // FAIL stamp text (warm off-white on ember)
+const EYEBROW_FAINT = "#6a6e7a"; // eyebrow " · Simulated fee audit" faint half
+const FAINT = "#5c6069"; // meta line + rule-id column + non-violation index
+const KICKER_RULE = "#d7d7cf"; // 28px letterhead kicker hairline
+const LEDGER_HAIR = "#eceae4"; // ledger row hairlines (top on every row, bottom on the last)
+const FOOTER_HAIR = "#e6e6e1"; // footer top border
+const CHIP_BG = "#eeeeea"; // report.json chip ground
+const CHIP_BORDER = "#e3e2db"; // report.json chip border
+const POINTER_TEXT = "#3b3f4b"; // evidence-pointer body text
 
 const MONO = "ui-monospace,'SF Mono',Menlo,Consolas,monospace";
 const TEXT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
@@ -134,29 +135,14 @@ function asString(v: unknown): string {
 }
 
 /**
- * The dark-mode rule set, emitted twice: inside `@media (prefers-color-scheme:
- * dark)` for the clients that honor it, and `[data-ogsc]`-prefixed for
- * Outlook.com's own darkening pass (digest §2.4). Order matters: `.em-hair`
- * (a border-color shorthand) precedes `.em-mark`/`.em-nomark` so the left
- * mark's color wins on cells that carry both. The ember dark variant is
- * emitted ONLY when the report has violations, so a PASS body stays free of
- * every ember hue (lamp ledger).
+ * The statement period for the meta line: the first `YYYY-MM` (optionally
+ * `-DD`) token in the caller's subject. The L-2 one-shot's subject always
+ * carries it ("… — 2026-06"); if a subject somehow carries none, the period
+ * segment is omitted and the meta line reads "Simulated statement · sent …".
  */
-function darkRules(prefix: string, hasViolations: boolean): string {
-  const p = prefix === "" ? "" : `${prefix} `;
-  return [
-    `${p}body,${p}.em-bg{background:${D_BG} !important;}`,
-    `${p}.em-card{background:${D_CARD} !important;border-color:${D_HAIR} !important;}`,
-    `${p}.em-plaque{background:${D_PLAQUE} !important;}`,
-    `${p}.em-ink{color:${D_INK} !important;}`,
-    `${p}.em-body{color:${D_BODY} !important;}`,
-    `${p}.em-mute{color:${D_MUTE} !important;}`,
-    `${p}.em-hair{border-color:${D_HAIR} !important;}`,
-    `${p}.em-panel{background:${D_PANEL} !important;}`,
-    `${p}.em-chip{background:${D_CHIP_BG} !important;border-color:${D_HAIR} !important;color:${D_CHIP_TEXT} !important;}`,
-    `${p}.em-nomark{border-left-color:${D_CARD} !important;}`,
-    ...(hasViolations ? [`${p}.em-mark{border-left-color:${EMBER_DARK} !important;}`] : []),
-  ].join("\n");
+function statementPeriod(subject: string): string {
+  const m = subject.match(/\b(\d{4}-\d{2}(?:-\d{2})?)\b/);
+  return m ? m[1] : "";
 }
 
 /**
@@ -186,119 +172,128 @@ export function buildEmailReportHtml(canonical: string, meta: EmailHtmlMeta): st
 
   const violations = findings.filter((f) => f.verdict === "violation").length;
   const verdictWord = r.ok ? "PASS" : "FAIL";
-  const headline = r.ok ? "No violations found" : `${violations} violation${violations === 1 ? "" : "s"} found`;
   const stampBg = r.ok ? GRAPHITE : EMBER;
+  const stampText = r.ok ? LIGHT : STAMP_FAIL_TEXT;
+  // Headline: the violation COUNT is set in ember, count-span ONLY when there
+  // are violations (a PASS reads "No violations found", plain; a gating report
+  // with zero flagged violations reads the count plainly, no lamp).
+  const headlineHtml = r.ok
+    ? "No violations found"
+    : violations > 0
+      ? `<span class="em-idx" style="color:${EMBER};">${violations}</span> violation${violations === 1 ? "" : "s"} found`
+      : `${violations} violation${violations === 1 ? "" : "s"} found`;
   const reviewedSuffix =
     findings.length !== violations
       ? ` &middot; ${findings.length} finding${findings.length === 1 ? "" : "s"} reviewed`
       : "";
+  const period = statementPeriod(meta.subject);
+  const metaLine = `Simulated statement${period ? ` &middot; ${escapeHtml(period)}` : ""} &middot; sent ${escapeHtml(meta.date)}${reviewedSuffix}`;
 
   const shown = findings.slice(0, EMAIL_HTML_FINDINGS_CAP);
   const remainder = findings.length - shown.length;
+  const hasRemainder = remainder > 0;
 
-  /* Finding rows (digest move #5): plain language left, right-aligned mono
-     rule-id chip; hairline top divider from the second row on; a 3px ember
-     mark in the left gutter strictly on violations (neutral rows carry a
-     card-colored border of identical geometry so text alignment never moves).
-     Both cells of a row share identical vertical padding — classic Outlook
-     equalizes it across the row (digest "off-radar traps"). */
-  const findingRows = shown
-    .map((f, i) => {
-      const isViolation = f.verdict === "violation";
-      const markClass = isViolation ? "em-mark" : "em-nomark";
-      const markColor = isViolation ? EMBER : CARD;
-      const divider = i > 0 ? `border-top:1px solid ${HAIRLINE};` : "";
-      const dividerClass = i > 0 ? " em-hair" : "";
-      return `<tr>
-<td class="em-body ${markClass}${dividerClass}" valign="top" style="${divider}border-left:3px solid ${markColor};padding:12px 0 12px 13px;font-family:${TEXT};font-size:15px;line-height:24px;color:${INK_2};">${escapeHtml(f.plainLine)}</td>
-<td${i > 0 ? ' class="em-hair"' : ""} align="right" valign="top" width="112" style="${divider}padding:12px 0 12px 12px;"><span class="em-chip" style="font-family:${MONO};font-size:11px;letter-spacing:0.3px;color:${GRAPHITE};background:${CHIP_BG};border:1px solid ${HAIRLINE};border-radius:3px;padding:3px 8px;white-space:nowrap;">${escapeHtml(f.ruleId)}</span></td>
+  /* Airy ledger (design source): a hung ember mono index (violation-only lamp;
+     faint on any non-violation row), the plain-language sentence, and a faint
+     right-aligned mono rule id. A hairline top border on EVERY row; a hairline
+     bottom border on the last visible element (last finding row, or the
+     remainder / empty-state row when present). No rail, no chip, no chrome. */
+  const rows: string[] = shown.map((f, i) => {
+    const isViolation = f.verdict === "violation";
+    const idxColor = isViolation ? EMBER : FAINT;
+    const isLast = i === shown.length - 1 && !hasRemainder;
+    const bottom = isLast ? `border-bottom:1px solid ${LEDGER_HAIR};` : "";
+    const num = String(i + 1).padStart(2, "0");
+    return `<tr>
+<td class="em-idx em-hair" valign="top" width="28" style="border-top:1px solid ${LEDGER_HAIR};${bottom}padding:18px 0 18px 0;font-family:${MONO};font-size:12px;font-weight:700;line-height:24px;letter-spacing:0.5px;color:${idxColor};font-variant-numeric:tabular-nums;">${num}</td>
+<td class="em-body em-hair" valign="top" style="border-top:1px solid ${LEDGER_HAIR};padding:18px 14px 18px 0;font-family:${TEXT};font-size:15px;line-height:24px;color:${INK_2};text-wrap:pretty;${bottom}">${escapeHtml(f.plainLine)}</td>
+<td class="em-faint em-hair" align="right" valign="top" width="104" style="border-top:1px solid ${LEDGER_HAIR};padding:18px 0 18px 10px;font-family:${MONO};font-size:10.5px;line-height:24px;letter-spacing:0.4px;color:${FAINT};white-space:nowrap;font-variant-numeric:tabular-nums;${bottom}">${escapeHtml(f.ruleId)}</td>
 </tr>`;
-    })
-    .join("\n");
+  });
 
-  const emptyRow =
-    findings.length === 0
-      ? `<tr><td class="em-body" style="padding:12px 0 12px 16px;font-family:${TEXT};font-size:15px;line-height:24px;color:${INK_2};">No fee lines in this simulated statement exceed the audited caps.</td></tr>`
-      : "";
+  if (findings.length === 0) {
+    rows.push(
+      `<tr><td class="em-body em-hair" valign="top" style="border-top:1px solid ${LEDGER_HAIR};border-bottom:1px solid ${LEDGER_HAIR};padding:18px 0 18px 0;font-family:${TEXT};font-size:15px;line-height:24px;color:${INK_2};text-wrap:pretty;">No fee lines in this simulated statement exceed the audited caps.</td></tr>`,
+    );
+  }
+  if (hasRemainder) {
+    rows.push(
+      `<tr><td colspan="3" class="em-faint em-hair" valign="top" style="border-top:1px solid ${LEDGER_HAIR};border-bottom:1px solid ${LEDGER_HAIR};padding:18px 0 18px 0;font-family:${TEXT};font-size:13px;line-height:20px;color:${FAINT};">&hellip;and ${remainder} more finding${remainder === 1 ? "" : "s"} &mdash; the full set travels in the attached <span class="em-chip" style="font-family:${MONO};font-size:12px;background:${CHIP_BG};border:1px solid ${CHIP_BORDER};border-radius:4px;padding:1px 6px;">report.json</span>.</td></tr>`,
+    );
+  }
+  const ledger = rows.join("\n");
 
-  const remainderRow =
-    remainder > 0
-      ? `<tr><td colspan="2" class="em-mute em-hair" style="border-top:1px solid ${HAIRLINE};padding:12px 0 12px 16px;font-family:${TEXT};font-size:13px;line-height:20px;color:${GRAPHITE};">&hellip;and ${remainder} more finding${remainder === 1 ? "" : "s"} &mdash; the full set travels in the attached <span style="font-family:${MONO};">report.json</span>.</td></tr>`
-      : "";
-
-  /* One action (digest move #8): bulletproof nested-table button, solid
-     ultramarine, ≥44px target (12+20+12). Rendered only when the caller
-     supplies the link — otherwise the body has zero outbound refs. */
+  /* One action: bulletproof nested-table button, solid ultramarine with bevel
+     edges, ≥44px target (13+20+13). Rendered only when the caller supplies the
+     link — otherwise the body has zero outbound refs. */
   const actionRow = meta.siteLink
-    ? `<tr><td style="padding:24px 32px 0 32px;">
+    ? `<tr><td style="padding:28px 40px 0 40px;">
 <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-<td bgcolor="${UM}" style="background:${UM};border-radius:6px;"><a href="${escapeHtml(meta.siteLink)}" style="display:inline-block;font-family:${TEXT};font-size:15px;line-height:20px;font-weight:600;color:${LIGHT};text-decoration:none;padding:12px 28px;">Run the same audit</a></td>
+<td bgcolor="${UM}" style="background:${UM};border-radius:10px;"><a href="${escapeHtml(meta.siteLink)}" style="display:inline-block;font-family:${TEXT};font-size:15px;line-height:20px;font-weight:600;letter-spacing:0.1px;color:${LIGHT};text-decoration:none;padding:13px 28px;border-radius:10px;border-top:1px solid rgba(255,255,255,0.26);border-bottom:1px solid rgba(0,0,0,0.22);">Run the same audit</a></td>
 </tr></table>
-</td></tr>`
+</td></tr>
+`
     : "";
 
-  /* Hidden inbox preview text (digest §6, move #11) — precedes the plaque in
-     the DOM but is invisible in the rendered body; the tail padding keeps
-     inbox previews from bleeding into body text. */
+  /* Hidden inbox preview text — precedes the plaque in the DOM but is invisible
+     in the rendered body; the tail padding keeps inbox previews from bleeding
+     into body text. */
   const preheaderDiv = meta.preheader
     ? `<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;visibility:hidden;mso-hide:all;">${escapeHtml(meta.preheader)}${"&nbsp;&zwnj;".repeat(24)}</div>\n`
     : "";
 
   const html = `<!doctype html>
 <html lang="en" dir="ltr">
-<head></head>
 <head>
 <meta charset="utf-8">
-<meta name="color-scheme" content="light dark">
-<meta name="supported-color-schemes" content="light dark">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
 <title>${escapeHtml(meta.subject)}</title>
-<style>
-:root{color-scheme:light dark;}
-@media (prefers-color-scheme:dark){
-${darkRules("", violations > 0)}
-}
-${darkRules("[data-ogsc]", violations > 0)}
-</style>
+<style>:root{color-scheme:light;}</style>
 </head>
-<body class="em-bg" style="margin:0;padding:0;background:${WASH};">
-${preheaderDiv}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="em-bg" style="background:${WASH};">
-<tr><td align="center" style="padding:32px 16px;">
-<table role="presentation" width="560" cellpadding="0" cellspacing="0" class="em-card" style="width:560px;max-width:100%;background:${CARD};border:1px solid ${HAIRLINE};border-radius:6px;">
+<body class="em-bg" style="margin:0;padding:0;background:${WASH};-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;">
+${preheaderDiv}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="em-bg" bgcolor="${WASH}" style="background:${WASH};">
+<tr><td align="center" style="padding:36px 16px;">
+<table role="presentation" width="560" cellpadding="0" cellspacing="0" class="em-card" bgcolor="${CARD}" style="width:560px;max-width:100%;background:${CARD};border:1px solid ${CARD_BORDER};border-top:2px solid ${UM};border-bottom:2px solid ${UM};">
 
-<!-- SIMULATED plaque — always the first rendered content (C10) -->
-<tr><td class="em-plaque" bgcolor="${INK}" style="background:${INK};border-top:3px solid ${UM};border-radius:5px 5px 0 0;padding:16px 32px;font-family:${MONO};font-size:11px;letter-spacing:0.3px;line-height:18px;color:${LIGHT};">${escapeHtml(SIMULATED_BANNER)}</td></tr>
-
-<!-- eyebrow -->
-<tr><td style="padding:28px 32px 0 32px;">
-<span style="font-family:${MONO};font-size:11px;font-weight:700;letter-spacing:1.5px;color:${UM};text-transform:uppercase;">Curbside Commons</span><span class="em-mute" style="font-family:${MONO};font-size:11px;letter-spacing:1px;color:${GRAPHITE};text-transform:uppercase;">&nbsp;&middot;&nbsp;Simulated fee audit</span>
-</td></tr>
-
-<!-- verdict, first (digest move #12): stamp chip + headline with counts -->
-<tr><td style="padding:20px 32px 0 32px;">
-<table role="presentation" cellpadding="0" cellspacing="0"><tr>
-<td bgcolor="${stampBg}" style="background:${stampBg};border-radius:3px;font-family:${MONO};font-size:11px;font-weight:700;letter-spacing:1px;color:${LIGHT};padding:5px 12px;text-transform:uppercase;">${verdictWord}</td>
+<!-- SIMULATED plaque — always the first rendered content (C10); ultramarine brand medallion -->
+<tr><td class="em-plaque" bgcolor="${INK}" style="background:${INK};padding:15px 40px 16px 40px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+<td valign="middle" style="font-family:${MONO};font-size:11px;letter-spacing:0.4px;line-height:18px;color:${PLAQUE_TEXT};">${escapeHtml(SIMULATED_BANNER)}</td>
+<td class="em-med" align="right" valign="middle" width="22" style="padding-left:16px;"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="${UM}" width="8" height="8" style="background:${UM};width:8px;height:8px;font-size:0;line-height:0;">&nbsp;</td></tr></table></td>
 </tr></table>
 </td></tr>
-<tr><td style="padding:12px 32px 0 32px;"><h1 class="em-ink" style="margin:0;font-family:${TEXT};font-size:24px;line-height:32px;font-weight:600;letter-spacing:-0.5px;color:${INK};">${headline}</h1></td></tr>
-<tr><td class="em-mute" style="padding:8px 32px 0 32px;font-family:${TEXT};font-size:14px;line-height:22px;color:${GRAPHITE};">${escapeHtml(meta.subject)} &middot; sent ${escapeHtml(meta.date)}${reviewedSuffix}</td></tr>
 
-<!-- findings: plain language + rule id, nothing else (curation directive) -->
-<tr><td style="padding:16px 32px 0 16px;">
+<!-- eyebrow + letterhead kicker rule -->
+<tr><td style="padding:34px 40px 0 40px;">
+<span style="font-family:${MONO};font-size:10.5px;font-weight:700;letter-spacing:1.8px;color:${UM};text-transform:uppercase;">Curbside Commons</span><span class="em-faint" style="font-family:${MONO};font-size:10.5px;letter-spacing:1.4px;color:${EYEBROW_FAINT};text-transform:uppercase;">&nbsp;&middot;&nbsp;Simulated fee audit</span>
+</td></tr>
+<tr><td style="padding:12px 40px 0 40px;"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td class="em-hair em-kick" width="28" height="1" style="width:28px;height:1px;border-top:1px solid ${KICKER_RULE};font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
+
+<!-- verdict, first: stamp + count headline (ember count) + meta -->
+<tr><td style="padding:22px 40px 0 40px;">
+<table role="presentation" cellpadding="0" cellspacing="0"><tr>
+<td class="em-stamp" bgcolor="${stampBg}" style="background:${stampBg};border:1px solid rgba(255,255,255,0.3);border-radius:4px;font-family:${MONO};font-size:11px;font-weight:700;letter-spacing:2.5px;color:${stampText};padding:5px 12px 5px 13px;text-transform:uppercase;">${verdictWord}</td>
+</tr></table>
+</td></tr>
+<tr><td style="padding:14px 40px 0 40px;"><h1 class="em-ink em-h1" style="margin:0;font-family:${TEXT};font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.9px;color:${INK};text-wrap:balance;">${headlineHtml}</h1></td></tr>
+<tr><td class="em-faint" style="padding:10px 40px 0 40px;font-family:${MONO};font-size:12px;line-height:19px;letter-spacing:0.2px;color:${FAINT};font-variant-numeric:tabular-nums;">${metaLine}</td></tr>
+
+<!-- airy ledger: hung ember index (lamp) + plain sentence + faint rule id; no rail, no chrome -->
+<tr><td style="padding:28px 40px 4px 40px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-${findingRows}${emptyRow}
-${remainderRow}
+${ledger}
 </table>
 </td></tr>
-${actionRow}
-<!-- the one quiet evidence pointer (digest move #12) -->
-<tr><td style="padding:24px 32px 28px 32px;">
+${actionRow}<!-- quiet evidence pointer: ultramarine keyline note (brand accent, not a lamp) -->
+<tr><td style="padding:28px 40px 32px 40px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-<td class="em-panel em-hair em-body" style="background:${PANEL};border:1px solid ${HAIRLINE};border-radius:5px;padding:16px 20px;font-family:${TEXT};font-size:14px;line-height:22px;color:${INK_2};">The attached <span class="em-chip" style="font-family:${MONO};font-size:12px;background:${CHIP_BG};border:1px solid ${HAIRLINE};border-radius:3px;padding:1px 6px;">report.json</span> contains the full audit: every claim, rule ID, and calculation. Re-running the audit offline reproduces the file byte for byte.</td>
+<td class="em-body" style="border-left:2px solid ${UM};padding:3px 0 3px 16px;font-family:${TEXT};font-size:13px;line-height:21px;color:${POINTER_TEXT};">Attached <span class="em-chip" style="font-family:${MONO};font-size:12px;background:${CHIP_BG};border:1px solid ${CHIP_BORDER};border-radius:4px;padding:1px 6px;">report.json</span> has the full audit — every claim, rule, and calculation. Re-runs reproduce it byte for byte.</td>
 </tr></table>
 </td></tr>
 
-<!-- footer as trust surface (digest §5 + move #12): reason-for-email + honesty line -->
-<tr><td class="em-mute em-hair" style="border-top:1px solid ${HAIRLINE};padding:20px 32px 28px 32px;font-family:${TEXT};font-size:12px;line-height:18px;color:${GRAPHITE};">You're receiving this one-time email because a Curbside Commons demonstration send was set up for this address. This is not a subscription.<br><br>Simulated data audited against real codified NYC law (&sect;20-563.3 / Local Law 79 of 2025). Not legal advice. No penalties calculated. No claim of real platform access.</td></tr>
+<!-- footer -->
+<tr><td class="em-mute em-hair" style="border-top:1px solid ${FOOTER_HAIR};padding:24px 40px 28px 40px;font-family:${TEXT};font-size:12px;line-height:19px;color:${GRAPHITE};">One-time demonstration send. Not a subscription.<br><br>Simulated data checked against real NYC law (<span style="font-family:${MONO};font-size:11px;letter-spacing:0.2px;font-variant-numeric:tabular-nums;">&sect;20-563.3 / Local Law 79 of 2025</span>). Not legal advice. No real platform access.</td></tr>
 
 </table>
 </td></tr>

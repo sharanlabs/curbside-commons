@@ -175,15 +175,17 @@ describe("A3 email HTML builder — goldens + invariants", () => {
   // siteLink is CALLER-supplied by design: the builder source must stay
   // URL-literal-free (boundary suite above), so the one outbound reference is
   // an input — fixed here for the golden's determinism, like `date`. The
-  // preheader (v2 composition, digest §6 move #11) is likewise caller data:
-  // fixed here to the same verdict-first string the one-shot composes for the
-  // drifted audit.
+  // subject + preheader are likewise caller data: fixed here to the same
+  // verdict-first strings the L-2 one-shot composes for the drifted audit (so
+  // the golden is a faithful snapshot of the v5 production email, matching the
+  // owner-adopted mockup email-v5-light-tweakable-2026-07-22.html). The
+  // statement period rendered in the meta line is derived from the subject.
   const HTML_META = {
     tool: "audit_statement",
-    subject: "Fee audit — statement 2026-06 (simulated)",
+    subject: "[SIMULATED] Fee audit: 5 violations — 2026-06",
     date: "2026-07-22",
     siteLink: "https://curbside-commons.pages.dev/fees",
-    preheader: "5 violations of the NYC fee caps — simulated statement 2026-06; audit arithmetic in report.json.",
+    preheader: "5 NYC fee-cap violations found in simulated statement 2026-06. See the arithmetic in report.json.",
   } as const;
 
   it("email-html-fees-drifted: byte-identical to the committed golden", () => {
@@ -195,10 +197,9 @@ describe("A3 email HTML builder — goldens + invariants", () => {
     expect(buildEmailReportHtml(feesCanonical, HTML_META)).toBe(buildEmailReportHtml(feesCanonical, HTML_META));
   });
 
-  // v2 anchors (session 32): the "claim " anchor is gone WITH the per-row
-  // claim ids (curation directive — the email is the notification, report.json
-  // is the report); the rule-id chip ("NYC-563.3") anchors the findings region
-  // instead.
+  // v5 anchors: the per-row claim ids stay out (curation directive — the email
+  // is the notification, report.json is the report); the FAIL stamp and the
+  // rule-id ("NYC-563.3") ledger column anchor the verdict + findings regions.
   it("the SIMULATED banner is the first rendered content (before header, verdict, findings)", () => {
     const html = buildEmailReportHtml(feesCanonical, HTML_META);
     const banner = html.indexOf("SIMULATED DATA");
@@ -262,7 +263,7 @@ describe("A3 email HTML builder — goldens + invariants", () => {
     }
   });
 
-  // ---- v2 invariants (session 32 redesign, digest-grounded) ----
+  // ---- v5 invariants (owner-adopted light-locked redesign) ----
 
   it("preheader: hidden preview div carries the caller text before the banner, invisible; omitted entirely when absent (digest move #11)", () => {
     const html = buildEmailReportHtml(feesCanonical, HTML_META);
@@ -279,16 +280,20 @@ describe("A3 email HTML builder — goldens + invariants", () => {
     expect(buildEmailReportHtml(feesCanonical, noPreheader)).not.toContain("display:none");
   });
 
-  it("dark-mode kit rides the head (digest §2 + moves #7/#10): both metas, color-scheme root, prefers-color-scheme block, data-ogsc overrides", () => {
+  it("light-locked (v5): color-scheme=light meta + root, ONE decoy-free head, NO dark-mode block or data-ogsc overrides", () => {
     const html = buildEmailReportHtml(feesCanonical, HTML_META);
-    expect(html).toContain('<meta name="color-scheme" content="light dark">');
-    expect(html).toContain('<meta name="supported-color-schemes" content="light dark">');
-    expect(html).toContain(":root{color-scheme:light dark;}");
-    expect(html).toContain("@media (prefers-color-scheme:dark)");
-    expect(html).toContain("[data-ogsc]");
+    expect(html).toContain('<meta name="color-scheme" content="light">');
+    expect(html).toContain('<meta name="supported-color-schemes" content="light">');
+    expect(html).toContain(":root{color-scheme:light;}");
+    // the v2 dark-mode enhancement channel is excised in v5 (owner-adopted design)
+    expect(html).not.toContain("light dark");
+    expect(html).not.toContain("@media (prefers-color-scheme:dark)");
+    expect(html).not.toContain("[data-ogsc]");
+    // single, decoy-free head (the v2 empty-first-head strip is gone)
+    expect([...html.matchAll(/<head\b/gi)].length).toBe(1);
   });
 
-  it("dark-mode defensive base colors: no pure #fff / #000 anywhere (digest §2 — near-black on near-white survives forced inversion)", () => {
+  it("light-locked defensive base colors: no pure #fff / #000 anywhere (near-black on near-white; rgba edges only)", () => {
     for (const html of [buildEmailReportHtml(feesCanonical, HTML_META), buildEmailReportHtml(cleanCanonical, HTML_META)]) {
       expect(html.toLowerCase()).not.toContain("#ffffff");
       expect(html.toLowerCase()).not.toContain("#000000");

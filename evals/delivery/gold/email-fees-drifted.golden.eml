@@ -11,10 +11,9 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
 SIMULATED DATA - Curbside Commons demonstration output.
-Not real merchant data, not legal advice. Recommendations only - the engine=
- decides, humans approve.
+Not real merchant data, not legal advice.
 
-Result: FAIL - violations present (5 finding(s))
+Result: FAIL - violations present (5 findings)
 Tool: audit_statement (deterministic engine, $0 offline)
 
 - [error] The bill charges $1.50 as "service_and_delivery" =E2=80=94 that i=
@@ -36,7 +35,12 @@ ends on what "purchase price" includes =E2=80=94 still an open question, U1=
 n't one of the four fee types the law allows, so it's not permitted no matt=
 er what it's called. (ORD-4#promotion_deduction#L7)
 
-The full machine-readable report is attached (report.json).
+Attached report.json has the full audit =E2=80=94 every claim, rule, and ca=
+lculation. Re-runs reproduce it byte for byte.
+
+One-time demonstration send. Not a subscription.
+Simulated data checked against real NYC law (=C2=A720-563.3 / Local Law 79 =
+of 2025). Not legal advice. No real platform access.
 --commerce-truth-audit-boundary-0000000000000000
 Content-Type: application/json; name="report.json"
 Content-Disposition: attachment; filename="report.json"

@@ -93,12 +93,18 @@ const preheader = parsed.ok
   ? "No violations found in simulated statement 2026-06. See the arithmetic in report.json."
   : `${violations} NYC fee-cap violation${plural(violations)} found in simulated statement 2026-06. See the arithmetic in report.json.`;
 
-// Plain-text half, curated like the HTML half (owner directive 2026-07-22):
-// verdict first, capped plain-language lines with rule ids, no claim ids, no
-// runtime meta — the machine detail travels in the report.json attachment.
-// The "engine decides, humans approve" line was CUT from both halves — sol
-// flagged its tension, the primary-model adjudication resolved by removal
-// (the curated HTML half never carried it; the mantra lives on the site/docs).
+// The public site link — caller-supplied HERE (the pure HTML builder may not
+// carry a URL literal, A3 boundary). Shared by the plain-text link line and the
+// HTML action button so both halves point at the same audit.
+const siteLink = "https://curbside-commons.pages.dev/fees";
+
+// Plain-text half, curated to MIRROR the v5 HTML half (owner directive; design
+// source mockups/email-v5-light-tweakable-2026-07-22.html): verdict first,
+// capped plain-language lines with rule ids, then the same evidence pointer,
+// action line, and footer copy the HTML body carries — no claim ids, no runtime
+// meta (that detail travels in the report.json attachment). The SIMULATED
+// banner leads (control #4). The "engine decides, humans approve" line stays
+// cut from both halves (prior adjudication; the mantra lives on the site/docs).
 const bodyText = [
   SIMULATED_BANNER,
   "",
@@ -109,11 +115,16 @@ const bodyText = [
     .map((f) => `- ${String(f.plainLine ?? "")} [${String(f.ruleId ?? "")}]`),
   ...(findings.length > EMAIL_HTML_FINDINGS_CAP
     ? [
-        `...and ${findings.length - EMAIL_HTML_FINDINGS_CAP} more finding${plural(findings.length - EMAIL_HTML_FINDINGS_CAP)} — full report attached (report.json).`,
+        `...and ${findings.length - EMAIL_HTML_FINDINGS_CAP} more finding${plural(findings.length - EMAIL_HTML_FINDINGS_CAP)} — the full set travels in the attached report.json.`,
       ]
     : []),
   "",
-  "The full machine-readable report is attached as report.json.",
+  "Attached report.json has the full audit — every claim, rule, and calculation. Re-runs reproduce it byte for byte.",
+  "",
+  `Run the same audit: ${siteLink}`,
+  "",
+  "One-time demonstration send. Not a subscription.",
+  "Simulated data checked against real NYC law (§20-563.3 / Local Law 79 of 2025). Not legal advice. No real platform access.",
 ].join("\n");
 
 // Control #4 — the banner MUST lead the body; refuse to send otherwise.
@@ -133,7 +144,7 @@ const bodyHtml = buildEmailReportHtml(canonical, {
   tool: "audit_statement",
   subject,
   date: startedAt.slice(0, 10),
-  siteLink: "https://curbside-commons.pages.dev/fees",
+  siteLink,
   preheader,
 });
 // Control #4 extends to the HTML half — refuse to send without the banner.
