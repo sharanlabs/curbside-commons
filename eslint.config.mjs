@@ -13,6 +13,7 @@ export default defineConfig([
     "test-results/**",
     ".agents/**",
     ".claude/**",
+    ".remember/**",
     "reference/**",
     "evals/rag/corpus-snapshot/**",
     "screenshots/**",

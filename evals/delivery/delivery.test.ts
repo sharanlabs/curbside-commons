@@ -188,6 +188,18 @@ describe("A3 email HTML builder — goldens + invariants", () => {
     preheader: "5 NYC fee-cap violations found in simulated statement 2026-06. See the arithmetic in report.json.",
   } as const;
 
+  // PASS-state meta — mirrors HTML_META's discipline (fixed date, caller-supplied
+  // siteLink, subject reflecting the passing statement, verdict-first preheader):
+  // the same strings the L-2 one-shot composes for a clean (ok:true) audit. The
+  // statement period in the meta line is derived from the subject, as for FAIL.
+  const PASS_HTML_META = {
+    tool: "audit_statement",
+    subject: "[SIMULATED] Fee audit: no violations — 2026-06",
+    date: "2026-07-22",
+    siteLink: "https://curbside-commons.pages.dev/fees",
+    preheader: "No violations found in simulated statement 2026-06. See the arithmetic in report.json.",
+  } as const;
+
   it("email-html-fees-drifted: byte-identical to the committed golden", () => {
     const html = buildEmailReportHtml(feesCanonical, HTML_META);
     expect(html).toBe(readFileSync(join(GOLD, "email-html-fees-drifted.golden.html"), "utf8"));
@@ -195,6 +207,21 @@ describe("A3 email HTML builder — goldens + invariants", () => {
 
   it("deterministic: building twice yields identical bytes", () => {
     expect(buildEmailReportHtml(feesCanonical, HTML_META)).toBe(buildEmailReportHtml(feesCanonical, HTML_META));
+  });
+
+  // PASS state gets the SAME first-class byte-frozen treatment as FAIL: the clean
+  // (ok:true, 0-findings) canonical rendered through the real builder — graphite
+  // stamp, "No violations found" headline, the empty-state ledger sentence, no
+  // ember anywhere (lamp ledger). See the pass-rate note in the work report: the
+  // canonical carries no reviewed-line count, so the honest empty-state sentence
+  // is kept verbatim rather than fabricating a denominator.
+  it("email-html-fees-pass: byte-identical to the committed golden (PASS state, first-class)", () => {
+    const html = buildEmailReportHtml(cleanCanonical, PASS_HTML_META);
+    expect(html).toBe(readFileSync(join(GOLD, "email-html-fees-pass.golden.html"), "utf8"));
+  });
+
+  it("PASS deterministic: building twice yields identical bytes", () => {
+    expect(buildEmailReportHtml(cleanCanonical, PASS_HTML_META)).toBe(buildEmailReportHtml(cleanCanonical, PASS_HTML_META));
   });
 
   // v5 anchors: the per-row claim ids stay out (curation directive — the email
