@@ -1,0 +1,61 @@
+=== agentic-audit verify evidence — captured 2026-07-24, unedited ===
+$ git log --oneline -3 && git status --short
+c8c91a0 session-33: sol content pass landed in the email surface — computed plurals, 'sent' date label, de-jargoned footer, 'Simulated fee audit' eyebrow; golden regenerated via the real builder (delivery suite 29/29); adjudication + DesignSync pane-fix log rows; enable frontend-design plugin
+9ffd700 session-32: premium email redesign (live-research-grounded) + two L-2 email sends DELIVERED + delivery builders join the honesty gate
+517cbc6 session-32 resume: test-guide defect fixed red-green against the engine + Resend one-shot ready + continuity backfill
+ M CURRENT_TASK.md
+ M docs/decision-log.md
+ M evals/delivery/delivery.test.ts
+ M evals/delivery/gold/email-html-fees-drifted.golden.html
+ M lib/delivery/email-html.ts
+?? docs/reviews/agentic-audit-2026-07-24-verify-evidence.log
+?? docs/reviews/agentic-audit-2026-07-24.md
+?? mockups/email-v5-light-tweakable-2026-07-22.html
+
+$ node bin/check.mjs demo | tail -4 ; echo exit=$?
+============================================================================
+No language model runs in this demo; the comparison is exact, deterministic
+logic. Simulated data, run on demand — not a live service, no platform access.
+============================================================================
+exit=0
+
+$ find evals/crew evals/mcp evals/agents evals/tools evals/rag evals/approvals -name '*.test.*' -not -path '*node_modules*' | sort
+evals/agents/fee-classifier-live-lane.test.ts
+evals/approvals/no-send-import-graph.test.ts
+evals/approvals/threat-model.test.ts
+evals/crew/crew-composition-lock.test.ts
+evals/crew/crew-import-walk.test.ts
+evals/crew/crew-render.test.ts
+evals/crew/crew-replay-floors.test.ts
+evals/crew/crew-safety.test.ts
+evals/crew/l1-live-composition-lock.test.ts
+evals/crew/l1-live-lock.test.ts
+evals/mcp/mcp-conformance.test.ts
+evals/mcp/mcp-differential.test.ts
+evals/mcp/mcp-import-walk.test.ts
+evals/mcp/mcp-invalid-input.test.ts
+evals/mcp/mcp-path-traversal.test.ts
+evals/mcp/mcp-transcript-freeze.test.ts
+evals/rag/corpus-manifest.test.ts
+evals/rag/lookup-reference-tool.test.ts
+evals/rag/rag-gold-composition.test.ts
+evals/rag/rag-lane-units.test.ts
+evals/rag/rag-results-lock.test.ts
+evals/tools/registry-ac1.test.ts
+evals/tools/registry-ac2-differential.test.ts
+evals/tools/registry-ac3-import-graph.test.ts
+evals/tools/registry-advisory-never-gates.test.ts
+evals/tools/registry-envelope-goldens.test.ts
+
+$ npx vitest run evals/crew evals/mcp evals/agents evals/tools evals/rag evals/approvals
+ Test Files  27 passed (27)
+      Tests  289 passed (289)
+
+=== addendum (route-back item 1+2, same session, unedited) ===
+$ npx vitest list <six dirs> --filesOnly | wc -l  → 27; the 27th vs find's 26:
+legacy/activation/evals/tools-differential.test.ts (vitest path filter 'evals/tools' substring-matches the legacy tree; the agentic-surface set is 26 files)
+
+$ npx vitest run evals/packs/playground-golden.test.ts evals/packs/landing-trybench-equivalence.test.ts
+ Test Files  2 passed (2)
+      Tests  19 passed (19)
+exit=0
