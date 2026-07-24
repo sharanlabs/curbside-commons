@@ -5,6 +5,6 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "ruleId": { "type": "string", "minLength": 1 }
+    "ruleId": { "type": "string", "minLength": 1, "maxLength": 200 }
   }
 }

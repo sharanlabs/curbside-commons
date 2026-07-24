@@ -43,3 +43,13 @@ the typed tool registry. Its posture, stated plainly:
    a demonstration server for a prototype, and a real deployment would need its
    own review. A signed-action approvals flow is designed as an offline simulator
    (plan E3) and is not a live capability.
+6. **Rate limiting — documented exception to the MCP spec MUST.** The MCP spec
+   directs servers to implement rate limiting; this server does not, by design.
+   The exception is bounded: the transport is **stdio-only** (no network listener),
+   the server talks to a **single local client that spawned it**, every tool is
+   **read-only and deterministic** (no send, spend, mutation, or network — item 2),
+   and this is a **prototype run on demand, not an operated service**. There is no
+   remote caller to throttle and no billable or state-changing work to rate-limit.
+   **Revisit trigger:** the moment any network transport is added or the server is
+   hosted for multiple clients, this exception is void and rate limiting must be
+   implemented before that change ships.

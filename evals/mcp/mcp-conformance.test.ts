@@ -29,6 +29,32 @@ const EXPECTED_TOOL_ORDER = [
   "run_demo",
 ] as const;
 
+// Byte-locked behaviour hints + envelope output schema (MCP spec 2025-06-18). Every
+// tool advertises the SAME values: all seven are read-only, non-destructive,
+// idempotent, closed-world deterministic-engine tools, and each returns the fixed
+// `structuredContent` honesty envelope. These lock what the server actually advertises
+// so a hint/schema can never silently drift from tool behaviour.
+const EXPECTED_ANNOTATIONS = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
+
+const EXPECTED_OUTPUT_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["tool", "ok", "exitCode", "demoOnly", "advisory", "earnsLabel"],
+  properties: {
+    tool: { type: "string" },
+    ok: { type: "boolean" },
+    exitCode: { type: "integer" },
+    demoOnly: { type: "boolean" },
+    advisory: { type: "boolean" },
+    earnsLabel: { type: ["boolean", "null"] },
+  },
+} as const;
+
 describe("AC-4 MCP conformance — tools/list (real spawned server)", () => {
   let client: Client;
   let close: () => Promise<void>;
@@ -71,6 +97,26 @@ describe("AC-4 MCP conformance — tools/list (real spawned server)", () => {
         const { tools } = await client.listTools();
         const tool = tools.find((t) => t.name === name);
         expect(tool!.description).toBe(TOOL_DESCRIPTIONS[name]);
+      },
+      MCP_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      `${name}: advertised behaviour annotations are exactly the byte-locked read-only/idempotent/closed-world hints`,
+      async () => {
+        const { tools } = await client.listTools();
+        const tool = tools.find((t) => t.name === name);
+        expect(tool!.annotations).toEqual(EXPECTED_ANNOTATIONS);
+      },
+      MCP_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      `${name}: advertised outputSchema is exactly the byte-locked structuredContent-envelope schema (never the registry text-payload schema)`,
+      async () => {
+        const { tools } = await client.listTools();
+        const tool = tools.find((t) => t.name === name);
+        expect(tool!.outputSchema).toEqual(EXPECTED_OUTPUT_SCHEMA);
       },
       MCP_TEST_TIMEOUT_MS,
     );

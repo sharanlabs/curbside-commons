@@ -78,9 +78,13 @@ export const SOR_CATALOG_PATH = "fixtures/synthetic-restaurant/sor.catalog.json"
  * THE DETERMINISTIC PARAM MAPPER (§6 addendum, binding at L-1 arming): free
  * text never becomes executable params. Derivation uses ONLY the tool name +
  * the case's committed artifact path; surfaces/ops are fixed rules, never
- * model output. Unmapped tools get `{}` — if such a call were ever contracted
- * it would fail the registry's input schema loudly, and an UNcontracted one is
- * blocked by the orchestrator before execution either way.
+ * model output. Unmapped tools get `{}` — including `get_rule`, whose input
+ * schema has NO required params, so `{}` VALIDATES rather than failing loudly.
+ * Containment for an unmapped tool therefore does NOT rest on schema rejection;
+ * it rests on the orchestrator's PRE-COMMITTED param-digest contract: an
+ * UNcontracted call is blocked before execution, and a contracted call's params
+ * must match the committed digest — so a `{}` the contract never sanctioned
+ * cannot run regardless of whether the schema would accept it.
  */
 export function mapParamsForTool(tool: string, artifactPath: string): Record<string, unknown> {
   switch (tool) {
@@ -237,7 +241,7 @@ function errorClassOf(err: unknown): string {
 /** One live turn's honest outcome: a decision, or a degraded record — never a silent default. */
 export type LiveTurnOutcome<D> =
   | { ok: true; decision: D; raw: unknown; usage?: CrewLiveUsage }
-  | { ok: false; errorClass: string; errorMessage: string; raw?: unknown };
+  | { ok: false; errorClass: string; raw?: unknown };
 
 function assertGate(generate: GenerateFn | undefined): void {
   if (!generate && !groqLiveEnabled()) {
@@ -266,7 +270,7 @@ export async function fetchIntakeTurnLive(
     });
     const parsed = IntakeLiveOutputSchema.safeParse(out.object);
     if (!parsed.success) {
-      return { ok: false, errorClass: "SCHEMA_VALIDATION_FAILED", errorMessage: parsed.error.message, raw: out.object };
+      return { ok: false, errorClass: "SCHEMA_VALIDATION_FAILED", raw: out.object };
     }
     const decision: IntakeDecision =
       parsed.data.decision === "route"
@@ -274,7 +278,7 @@ export async function fetchIntakeTurnLive(
         : { kind: "reject", reason: parsed.data.reason };
     return { ok: true, decision, raw: out.object, usage: out.usage };
   } catch (err) {
-    return { ok: false, errorClass: errorClassOf(err), errorMessage: err instanceof Error ? err.message : String(err) };
+    return { ok: false, errorClass: errorClassOf(err) };
   }
 }
 
@@ -292,12 +296,12 @@ export async function fetchReviewerTurnLive(
     });
     const parsed = ReviewerLiveOutputSchema.safeParse(out.object);
     if (!parsed.success) {
-      return { ok: false, errorClass: "SCHEMA_VALIDATION_FAILED", errorMessage: parsed.error.message, raw: out.object };
+      return { ok: false, errorClass: "SCHEMA_VALIDATION_FAILED", raw: out.object };
     }
     const decision: ReviewerDecision =
       parsed.data.decision === "approve" ? { kind: "approve" } : { kind: "escalate", reason: parsed.data.reason };
     return { ok: true, decision, raw: out.object, usage: out.usage };
   } catch (err) {
-    return { ok: false, errorClass: errorClassOf(err), errorMessage: err instanceof Error ? err.message : String(err) };
+    return { ok: false, errorClass: errorClassOf(err) };
   }
 }

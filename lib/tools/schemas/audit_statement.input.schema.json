@@ -6,6 +6,6 @@
   "additionalProperties": false,
   "required": ["statementPath"],
   "properties": {
-    "statementPath": { "type": "string", "minLength": 1 }
+    "statementPath": { "type": "string", "minLength": 1, "maxLength": 500 }
   }
 }

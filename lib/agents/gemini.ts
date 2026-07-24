@@ -6,6 +6,15 @@
  *
  * In this slice the live path is OFF by default (env-flags.liveAiEnabled), so nothing
  * here bills; tests drive it via an injected `generate` (no network, no spend).
+ *
+ * ARMING REQUIREMENT (2026-07-24): the budget hard-stop here is a PRE-call guard that
+ * bounds only the reserved ESTIMATE. The paired POST-call overflow stop that bounds a
+ * single call's actual-vs-reserved overshoot exists ONLY in the archived legacy
+ * activation orchestrator (legacy/activation/lib/agents/loop/orchestrator.ts) — there is
+ * NO active non-legacy driver wired to this boundary. Any future non-legacy live driver
+ * MUST re-implement that post-call overflow stop before arming; the docstrings below name
+ * it "the arming-required post-call overflow stop" to mark it as that mandated (not yet
+ * active) control, never a live safety net that already exists here.
  */
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateObject } from "ai";
@@ -35,8 +44,9 @@ export type AgentRunUsage = {
    * maxOutputTokens (that cap governs only the response/completion candidate; thoughtsTokenCount is a
    * separate budget). So the pre-call estimate reserves them SEPARATELY (MAX_LIVE_REASONING_TOKENS_
    * RESERVED, below) as a CONSERVATIVE BEST-EFFORT bound — Gemini's thinking budget is soft, so this
-   * is not a provider-proven hard ceiling; the orchestrator's post-call overflow stop covers the
-   * residual. With thinkingBudget=0 this should be 0; non-zero here is the fingerprint of the "model
+   * is not a provider-proven hard ceiling; the arming-required post-call overflow stop covers the
+   * residual (legacy-only today; see the file-header ARMING REQUIREMENT). With thinkingBudget=0 this
+   * should be 0; non-zero here is the fingerprint of the "model
    * ignored thinkingBudget" path (and the reason it must be priced).
    */
   reasoningTokens?: number;
@@ -116,7 +126,7 @@ export type LiveGenerateResult = { object: unknown; usage: AgentRunUsage };
  * The completion-token ceiling on every live call. The pre-call cost ESTIMATE reserves it (plus a
  * separate thinking reserve, MAX_LIVE_REASONING_TOKENS_RESERVED) as a CONSERVATIVE BEST-EFFORT bound —
  * the $5 hard-stop is fail-closed, NOT a provider-proven hard guarantee (Gemini's thinking budget is a
- * soft limit; see budget.ts + the orchestrator's post-call overflow stop). Sized with headroom for one
+ * soft limit; see budget.ts + the arming-required post-call overflow stop). Sized with headroom for one
  * outreach draft + its claims; too tight truncates the JSON mid-object.
  *
  * RAISED 2_000 -> 4_096 (drafter-reliability slice, 2026-06-28). The A3-7 live run found the
@@ -144,7 +154,7 @@ const MAX_LIVE_OUTPUT_TOKENS = 4_096;
  * slice-1 confirming P1): Google documents the thinking budget as a SOFT limit that can overflow, so
  * this is a CONSERVATIVE BEST-EFFORT reservation covering the expected ceiling — NOT a provider-proven
  * hard cap. The residual (a soft-budget overflow beyond this) is bounded to a single call by the
- * orchestrator's post-call fail-closed overflow stop (it halts the run if any call's actual cost
+ * arming-required post-call fail-closed overflow stop (it halts the run if any call's actual cost
  * exceeds its reservation). With thinking actually disabled (thinkingBudget=0) real reasoning is 0, so
  * in practice this just makes the reservation conservative. Re-verify the max at use-time if the model
  * id changes.
@@ -181,7 +191,7 @@ export function liveGenerationOptions(): {
     // single reserve silently cover up to THREE billed attempts — breaking that 1:1 accounting. This
     // does NOT make the reserve a provider-proven hard ceiling: a soft thinking-budget overflow or an
     // oversized prompt can still bill above the reservation on that one attempt — that residual is
-    // caught by the orchestrator's post-call budget_overflow stop (the fail-closed best-effort bound),
+    // caught by the arming-required post-call budget_overflow stop (the fail-closed best-effort bound),
     // NOT here. A structured-output parse failure is non-retryable anyway, and the LOOP re-drafts on a
     // verify failure (retry at the right layer).
     maxRetries: 0,
@@ -245,7 +255,7 @@ export async function liveGenerateObject(args: {
  * output rate and they are NOT capped by maxOutputTokens (Codex slice-1 confirming P1). This makes the
  * estimate a CONSERVATIVE BEST-EFFORT reservation over the documented thinking ceiling — it covers the
  * expected worst case, but Gemini's thinking budget is a SOFT limit, so it is not a provider-proven
- * hard bound; the orchestrator's post-call fail-closed overflow stop bounds any soft-overflow to one
+ * hard bound; the arming-required post-call fail-closed overflow stop bounds any soft-overflow to one
  * call. With thinking actually disabled the real cost is far lower — the reservation is deliberately
  * conservative, never under-priced in the expected case.
  */

@@ -17,9 +17,12 @@
  * (estimateLiveCallCostUsd: input + completion cap + the documented max thinking budget). Because
  * Gemini's thinking budget is a SOFT limit and the prompt size is not length-proven, a single call's
  * actual cost CAN exceed its reservation — so the $5 cap is a FAIL-CLOSED BEST-EFFORT bound, not a
- * provider-enforced hard quota. The orchestrator pairs this pre-call guard with a POST-call overflow
- * stop (halt the run if any call billed above its reservation), bounding any overshoot to a single
- * call. With thinkingBudget=0 the expected reasoning is 0, so in practice spend stays far under the cap.
+ * provider-enforced hard quota. The paired POST-call overflow stop that bounds any overshoot to a
+ * single call (halt the run if a call billed above its reservation) exists ONLY in the archived legacy
+ * activation orchestrator (legacy/activation/lib/agents/loop/orchestrator.ts); NO active non-legacy
+ * driver is wired to this guard today. ARMING REQUIREMENT: any future non-legacy live driver MUST
+ * re-implement that post-call overflow stop before arming — this pre-call guard alone does not bound a
+ * single call's overshoot. With thinkingBudget=0 the expected reasoning is 0, so in practice spend stays far under the cap.
  */
 
 /** The default spend cap in USD. The doctrine number, named once. */

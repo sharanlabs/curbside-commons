@@ -72,7 +72,6 @@ interface LiveTurnRecord {
   reviewerInput?: ReviewerTurnInput;
   raw?: unknown;
   errorClass?: string;
-  errorMessage?: string;
   usage?: CrewLiveUsage;
 }
 
@@ -81,7 +80,6 @@ interface DegradedCase {
   member: string;
   stage: "intake" | "reviewer";
   errorClass: string;
-  errorMessage: string;
 }
 
 class ReviewerCarrier extends Error {
@@ -138,11 +136,11 @@ for (const c of cases) {
     ok: intake.ok,
     ...(intake.ok
       ? { decision: intake.decision, raw: intake.raw, usage: intake.usage }
-      : { errorClass: intake.errorClass, errorMessage: intake.errorMessage, raw: intake.raw }),
+      : { errorClass: intake.errorClass, raw: intake.raw }),
   });
   flushTurns();
   if (!intake.ok) {
-    degraded.push({ caseId: c.caseId, member: c.member, stage: "intake", errorClass: intake.errorClass, errorMessage: intake.errorMessage });
+    degraded.push({ caseId: c.caseId, member: c.member, stage: "intake", errorClass: intake.errorClass });
     flushTurns();
     console.log(`✖ ${c.caseId}: PROVIDER-DEGRADED at intake (${intake.errorClass})`);
     continue;
@@ -170,11 +168,11 @@ for (const c of cases) {
       reviewerInput: err.input,
       ...(review.ok
         ? { decision: review.decision, raw: review.raw, usage: review.usage }
-        : { errorClass: review.errorClass, errorMessage: review.errorMessage, raw: review.raw }),
+        : { errorClass: review.errorClass, raw: review.raw }),
     });
     flushTurns();
     if (!review.ok) {
-      degraded.push({ caseId: c.caseId, member: c.member, stage: "reviewer", errorClass: review.errorClass, errorMessage: review.errorMessage });
+      degraded.push({ caseId: c.caseId, member: c.member, stage: "reviewer", errorClass: review.errorClass });
       flushTurns();
       console.log(`✖ ${c.caseId}: PROVIDER-DEGRADED at reviewer (${review.errorClass})`);
       continue;

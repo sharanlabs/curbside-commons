@@ -81,11 +81,58 @@ const SERVER_INSTRUCTIONS =
 /** The tool names (six engine tools + lookup_reference), in the A0 registry's own definition order (never hand-duplicated). */
 const TOOL_ORDER: readonly string[] = Object.freeze([...TOOLS.keys()]);
 
-/** One `tools/list` entry: name + committed description + the VERBATIM committed input schema. */
+/**
+ * The tool behaviour hints advertised on EVERY tool (MCP `ToolAnnotations`, spec
+ * 2025-06-18). All seven tools genuinely qualify — this is verified per tool, not
+ * asserted: every advertised tool routes through the ONE `callTool` path into the
+ * deterministic engine, so each
+ *  - `readOnlyHint: true` — reads fixtures/rules and computes; none writes, sends,
+ *    spends, or mutates any state (the import-walk proves no send/network/mutation
+ *    module is reachable);
+ *  - `destructiveHint: false` — nothing to destroy, being read-only;
+ *  - `idempotentHint: true` — deterministic $0 engine: same args ⇒ same result, with
+ *    no additional effect from a repeat call;
+ *  - `openWorldHint: false` — closed world: no network, no external entities, only the
+ *    committed local corpus/fixtures.
+ * These are HINTS (untrusted per the MCP spec), byte-locked by the conformance test so
+ * they can never silently drift from what the tools actually do.
+ */
+const TOOL_ANNOTATIONS: Readonly<Record<string, boolean>> = Object.freeze({
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+});
+
+/**
+ * The `outputSchema` advertised on EVERY tool: it describes the `structuredContent`
+ * ENVELOPE this server returns ({@link structuredContentFor}) — NOT the registry's own
+ * committed output schema, which describes the tool's TEXT payload (the `canonical`
+ * string) and is deliberately not advertised here. A client reads `structuredContent`
+ * for the machine-readable honesty flags; this schema is the contract for exactly those
+ * six keys, byte-locked by the conformance test.
+ */
+const STRUCTURED_CONTENT_OUTPUT_SCHEMA: Readonly<Record<string, unknown>> = Object.freeze({
+  type: "object",
+  additionalProperties: false,
+  required: ["tool", "ok", "exitCode", "demoOnly", "advisory", "earnsLabel"],
+  properties: {
+    tool: { type: "string" },
+    ok: { type: "boolean" },
+    exitCode: { type: "integer" },
+    demoOnly: { type: "boolean" },
+    advisory: { type: "boolean" },
+    earnsLabel: { type: ["boolean", "null"] },
+  },
+});
+
+/** One `tools/list` entry: name + committed description + the VERBATIM committed input schema + behaviour hints + the envelope output schema. */
 interface McpToolDescriptor {
   readonly name: string;
   readonly description: string;
   readonly inputSchema: Readonly<Record<string, unknown>>;
+  readonly annotations: Readonly<Record<string, boolean>>;
+  readonly outputSchema: Readonly<Record<string, unknown>>;
 }
 
 function listedTools(): McpToolDescriptor[] {
@@ -99,7 +146,13 @@ function listedTools(): McpToolDescriptor[] {
     if (description === undefined) {
       throw new Error(`lib/mcp/server.ts: tool "${name}" has no committed MCP description`);
     }
-    return { name: meta.name, description, inputSchema: meta.inputSchema };
+    return {
+      name: meta.name,
+      description,
+      inputSchema: meta.inputSchema,
+      annotations: TOOL_ANNOTATIONS,
+      outputSchema: STRUCTURED_CONTENT_OUTPUT_SCHEMA,
+    };
   });
 }
 

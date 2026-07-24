@@ -133,6 +133,11 @@ async function main() {
       name: t.name,
       description: t.description,
       inputSchema: canonicalize(t.inputSchema),
+      // Behaviour hints + the structuredContent-envelope output schema are part of
+      // what a real client sees on tools/list, so the frozen transcript records them
+      // too (canonicalized like inputSchema — the SDK's Zod wire schema reorders keys).
+      annotations: canonicalize(t.annotations),
+      outputSchema: canonicalize(t.outputSchema),
     })),
   });
 
