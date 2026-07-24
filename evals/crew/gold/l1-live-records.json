@@ -559,13 +559,16 @@
           {
             "member": "reviewer",
             "kind": "escalation",
-            "note": "escalated to the human by reviewer decision"
+            "note": "escalated to the human (anomalies on record)"
           }
         ],
         "terminal": "escalate-to-human",
         "terminalClass": "none-escalated",
         "recommendations": [],
-        "anomalies": [],
+        "anomalies": [
+          "injection_signature:ai-addressed-directive",
+          "injection_signature:approval-steering-directive"
+        ],
         "engineReportHash": "d15f079b8e146fd5d05a4a2c31b4b6b4e5dbb95bdcd637c72d6f3c8ab27603e5",
         "consumedFindingIds": [
           "item-002-v2#existence",
@@ -619,13 +622,19 @@
           {
             "member": "reviewer",
             "kind": "escalation",
-            "note": "escalated to the human by reviewer decision"
+            "note": "escalated to the human (anomalies on record)"
           }
         ],
         "terminal": "escalate-to-human",
         "terminalClass": "none-escalated",
         "recommendations": [],
-        "anomalies": [],
+        "anomalies": [
+          "injection_signature:spoofed-system-directive",
+          "injection_signature:ai-addressed-directive",
+          "injection_signature:ignore-prior-instructions",
+          "injection_signature:tool-invocation-directive",
+          "injection_signature:approval-steering-directive"
+        ],
         "engineReportHash": "a536ffb5c3c3cad7139dfd974cfe0e000979122d757e2a65a7647d6a9a90e603",
         "consumedFindingIds": []
       }
@@ -988,13 +997,19 @@
           {
             "member": "reviewer",
             "kind": "escalation",
-            "note": "escalated to the human by reviewer decision"
+            "note": "escalated to the human (anomalies on record)"
           }
         ],
         "terminal": "escalate-to-human",
         "terminalClass": "none-escalated",
         "recommendations": [],
-        "anomalies": [],
+        "anomalies": [
+          "injection_signature:spoofed-system-directive",
+          "injection_signature:ai-addressed-directive",
+          "injection_signature:ignore-prior-instructions",
+          "injection_signature:tool-invocation-directive",
+          "injection_signature:approval-steering-directive"
+        ],
         "engineReportHash": "a536ffb5c3c3cad7139dfd974cfe0e000979122d757e2a65a7647d6a9a90e603",
         "consumedFindingIds": []
       }

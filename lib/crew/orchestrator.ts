@@ -27,6 +27,7 @@
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { assertDecisionGrade, callTool, type ToolResult } from "../tools/registry.ts";
+import { detectInjectionSignatures } from "./injection-scan.ts";
 import { quarantineExcerpt, type CrewModel, type IntakeDecision } from "./model.ts";
 import {
   deriveRecommendationClass,
@@ -67,6 +68,17 @@ export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord 
 
   // ---- INTAKE (model-directed routing; decision contained below, never trusted) ----
   const rawArtifact = readFileSync(crewCase.inputArtifact.path, "utf8");
+
+  // ---- STRUCTURAL INJECTION TRIPWIRE (M2): scan the FULL artifact BEFORE any
+  // model turn, so a payload placed past the 400-char model excerpt window
+  // (`quarantineExcerpt`) still surfaces. Each hit is an anomaly, which the
+  // forced-escalation path below (anomalies → escalate-to-human, even over a
+  // model "approve") turns into an untruncatable structural control. This is a
+  // tripwire, not a parser or a guarantee (lib/crew/injection-scan.ts). ----
+  for (const sig of detectInjectionSignatures(rawArtifact)) {
+    anomalies.push(`injection_signature:${sig}`);
+  }
+
   const decision: IntakeDecision = model.intakeTurn({
     caseId: crewCase.caseId,
     ask: crewCase.ask,

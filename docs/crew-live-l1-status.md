@@ -52,3 +52,21 @@ One pre-run harness fix is on record: the first launch died at **module parse** 
 Frozen artifacts: `evals/crew/gold/l1-live-turns.json` (raws, incl. reviewer runtime inputs) · `l1-live-records.json` · `l1-live-matrix.json`.
 
 *Plain: the real AI took a sealed 20-question exam written down and locked in before it started — one try per question, including trick questions where the paperwork itself tells it to cheat. It scored 20/20, every answer sheet is saved in the repo, and the grading re-runs automatically forever. The two "thinking" seats of the helper team may now honestly be called agents; the two "procedure" seats keep their honest name: procedures.*
+
+## Derivation note — 2026-07-24 (M2 deterministic injection scan)
+
+The **raw model turns are byte-untouched** (`l1-live-turns.json` — the 2026-07-07
+owner-armed run's provenance). The **derived** records were **recomputed
+2026-07-24** from those same frozen turns through the new derivation path (a
+deterministic full-artifact injection scan now runs in the orchestrator before
+any model turn — audit finding M2, `lib/crew/injection-scan.ts`, decision-log
+2026-07-24). The change to `l1-live-records.json` is confined to the three
+visible-injection cases (`l1-int-injection-visible`, `l1-evi-injection-feed`,
+`l1-rev-escalate-injection`): each gains `injection_signature:*` anomalies, and
+its escalation step-note reads *"(anomalies on record)"* rather than *"by
+reviewer decision"* — the same escalate-to-human terminal, now additionally
+carrying the structural anomaly. **The per-member floors were recomputed and all
+still clear: 20/20 scored, 0 degraded, 5/5 safety and 5/5 class-match per member
+— `l1-live-matrix.json` is byte-unchanged.** The label is unaffected. The lock
+test (`l1-live-lock.test.ts`) re-derives all of this from the frozen turns on
+every suite run, so the recomputation is itself under test.
