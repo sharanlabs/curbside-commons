@@ -76,27 +76,31 @@ if (typeof parsed.ok !== "boolean" || !Array.isArray(parsed.findings)) {
 }
 const findings = parsed.findings;
 const violations = findings.filter((f) => f.verdict === "violation").length;
+const plural = (n: number) => (n === 1 ? "" : "s");
 const verdictLine = parsed.ok
-  ? `PASS — no violations (${findings.length} non-gating finding(s))`
-  : `FAIL — ${violations} violation(s) across ${findings.length} finding(s)`;
+  ? `PASS — no violations (${findings.length} non-gating finding${plural(findings.length)})`
+  : `FAIL — ${violations} violation${plural(violations)} across ${findings.length} finding${plural(findings.length)}`;
 
 // Subject + preheader per the session-32 research digest
 // (`docs/research/research-email-design-2026-07-22.md` §6, move #11): subject
 // ≤50 chars, verdict-first with counts; preheader 40–100 chars, front-loaded.
 // The [SIMULATED] lead token is control #4 riding the subject — it stays.
 const subject = `[SIMULATED] Fee audit: ${
-  parsed.ok ? "no violations" : `${violations} violation${violations === 1 ? "" : "s"}`
+  parsed.ok ? "no violations" : `${violations} violation${plural(violations)}`
 } — 2026-06`;
+// Preheader wording: sol content pass 2026-07-22, adjudicated primary-model-final.
 const preheader = parsed.ok
-  ? "No violations found — simulated statement 2026-06 audited clean; audit arithmetic in report.json."
-  : `${violations} violation${violations === 1 ? "" : "s"} of the NYC fee caps — simulated statement 2026-06; audit arithmetic in report.json.`;
+  ? "No violations found in simulated statement 2026-06. See the arithmetic in report.json."
+  : `${violations} NYC fee-cap violation${plural(violations)} found in simulated statement 2026-06. See the arithmetic in report.json.`;
 
 // Plain-text half, curated like the HTML half (owner directive 2026-07-22):
 // verdict first, capped plain-language lines with rule ids, no claim ids, no
 // runtime meta — the machine detail travels in the report.json attachment.
+// The "engine decides, humans approve" line was CUT from both halves — sol
+// flagged its tension, the primary-model adjudication resolved by removal
+// (the curated HTML half never carried it; the mantra lives on the site/docs).
 const bodyText = [
   SIMULATED_BANNER,
-  "Recommendations only — the engine decides, humans approve.",
   "",
   `Result: ${verdictLine}`,
   "",
@@ -104,7 +108,9 @@ const bodyText = [
     .slice(0, EMAIL_HTML_FINDINGS_CAP)
     .map((f) => `- ${String(f.plainLine ?? "")} [${String(f.ruleId ?? "")}]`),
   ...(findings.length > EMAIL_HTML_FINDINGS_CAP
-    ? [`...and ${findings.length - EMAIL_HTML_FINDINGS_CAP} more finding(s) — full report attached (report.json).`]
+    ? [
+        `...and ${findings.length - EMAIL_HTML_FINDINGS_CAP} more finding${plural(findings.length - EMAIL_HTML_FINDINGS_CAP)} — full report attached (report.json).`,
+      ]
     : []),
   "",
   "The full machine-readable report is attached as report.json.",

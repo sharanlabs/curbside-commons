@@ -243,7 +243,7 @@ describe("A3 email HTML builder — goldens + invariants", () => {
     const base = many.findings[0];
     many.findings = Array.from({ length: EMAIL_HTML_FINDINGS_CAP + 7 }, (_, i) => ({ ...base, plainLine: `finding ${i}` }));
     const html = buildEmailReportHtml(`${JSON.stringify(many, null, 2)}\n`, HTML_META);
-    expect(html).toContain(`and 7 more finding(s)`);
+    expect(html).toContain(`and 7 more findings`);
     expect(html).toContain("report.json");
   });
 

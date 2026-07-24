@@ -189,7 +189,9 @@ export function buildEmailReportHtml(canonical: string, meta: EmailHtmlMeta): st
   const headline = r.ok ? "No violations found" : `${violations} violation${violations === 1 ? "" : "s"} found`;
   const stampBg = r.ok ? GRAPHITE : EMBER;
   const reviewedSuffix =
-    findings.length !== violations ? ` &middot; ${findings.length} finding(s) reviewed` : "";
+    findings.length !== violations
+      ? ` &middot; ${findings.length} finding${findings.length === 1 ? "" : "s"} reviewed`
+      : "";
 
   const shown = findings.slice(0, EMAIL_HTML_FINDINGS_CAP);
   const remainder = findings.length - shown.length;
@@ -216,12 +218,12 @@ export function buildEmailReportHtml(canonical: string, meta: EmailHtmlMeta): st
 
   const emptyRow =
     findings.length === 0
-      ? `<tr><td class="em-body" style="padding:12px 0 12px 16px;font-family:${TEXT};font-size:15px;line-height:24px;color:${INK_2};">Every fee line on this statement sits inside the audited caps &mdash; nothing to flag.</td></tr>`
+      ? `<tr><td class="em-body" style="padding:12px 0 12px 16px;font-family:${TEXT};font-size:15px;line-height:24px;color:${INK_2};">No fee lines in this simulated statement exceed the audited caps.</td></tr>`
       : "";
 
   const remainderRow =
     remainder > 0
-      ? `<tr><td colspan="2" class="em-mute em-hair" style="border-top:1px solid ${HAIRLINE};padding:12px 0 12px 16px;font-family:${TEXT};font-size:13px;line-height:20px;color:${GRAPHITE};">&hellip;and ${remainder} more finding(s) &mdash; the full set travels in the attached <span style="font-family:${MONO};">report.json</span>.</td></tr>`
+      ? `<tr><td colspan="2" class="em-mute em-hair" style="border-top:1px solid ${HAIRLINE};padding:12px 0 12px 16px;font-family:${TEXT};font-size:13px;line-height:20px;color:${GRAPHITE};">&hellip;and ${remainder} more finding${remainder === 1 ? "" : "s"} &mdash; the full set travels in the attached <span style="font-family:${MONO};">report.json</span>.</td></tr>`
       : "";
 
   /* One action (digest move #8): bulletproof nested-table button, solid
@@ -268,7 +270,7 @@ ${preheaderDiv}<table role="presentation" width="100%" cellpadding="0" cellspaci
 
 <!-- eyebrow -->
 <tr><td style="padding:28px 32px 0 32px;">
-<span style="font-family:${MONO};font-size:11px;font-weight:700;letter-spacing:1.5px;color:${UM};text-transform:uppercase;">Curbside Commons</span><span class="em-mute" style="font-family:${MONO};font-size:11px;letter-spacing:1px;color:${GRAPHITE};text-transform:uppercase;">&nbsp;&middot;&nbsp;Simulated demonstration</span>
+<span style="font-family:${MONO};font-size:11px;font-weight:700;letter-spacing:1.5px;color:${UM};text-transform:uppercase;">Curbside Commons</span><span class="em-mute" style="font-family:${MONO};font-size:11px;letter-spacing:1px;color:${GRAPHITE};text-transform:uppercase;">&nbsp;&middot;&nbsp;Simulated fee audit</span>
 </td></tr>
 
 <!-- verdict, first (digest move #12): stamp chip + headline with counts -->
@@ -278,7 +280,7 @@ ${preheaderDiv}<table role="presentation" width="100%" cellpadding="0" cellspaci
 </tr></table>
 </td></tr>
 <tr><td style="padding:12px 32px 0 32px;"><h1 class="em-ink" style="margin:0;font-family:${TEXT};font-size:24px;line-height:32px;font-weight:600;letter-spacing:-0.5px;color:${INK};">${headline}</h1></td></tr>
-<tr><td class="em-mute" style="padding:8px 32px 0 32px;font-family:${TEXT};font-size:14px;line-height:22px;color:${GRAPHITE};">${escapeHtml(meta.subject)} &middot; ${escapeHtml(meta.date)}${reviewedSuffix}</td></tr>
+<tr><td class="em-mute" style="padding:8px 32px 0 32px;font-family:${TEXT};font-size:14px;line-height:22px;color:${GRAPHITE};">${escapeHtml(meta.subject)} &middot; sent ${escapeHtml(meta.date)}${reviewedSuffix}</td></tr>
 
 <!-- findings: plain language + rule id, nothing else (curation directive) -->
 <tr><td style="padding:16px 32px 0 16px;">
@@ -291,12 +293,12 @@ ${actionRow}
 <!-- the one quiet evidence pointer (digest move #12) -->
 <tr><td style="padding:24px 32px 28px 32px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-<td class="em-panel em-hair em-body" style="background:${PANEL};border:1px solid ${HAIRLINE};border-radius:5px;padding:16px 20px;font-family:${TEXT};font-size:14px;line-height:22px;color:${INK_2};">The attached <span class="em-chip" style="font-family:${MONO};font-size:12px;background:${CHIP_BG};border:1px solid ${HAIRLINE};border-radius:3px;padding:1px 6px;">report.json</span> carries the full audit &mdash; every claim, rule id, and the arithmetic &mdash; and the same audit re-run offline reproduces it byte-for-byte.</td>
+<td class="em-panel em-hair em-body" style="background:${PANEL};border:1px solid ${HAIRLINE};border-radius:5px;padding:16px 20px;font-family:${TEXT};font-size:14px;line-height:22px;color:${INK_2};">The attached <span class="em-chip" style="font-family:${MONO};font-size:12px;background:${CHIP_BG};border:1px solid ${HAIRLINE};border-radius:3px;padding:1px 6px;">report.json</span> contains the full audit: every claim, rule ID, and calculation. Re-running the audit offline reproduces the file byte for byte.</td>
 </tr></table>
 </td></tr>
 
 <!-- footer as trust surface (digest §5 + move #12): reason-for-email + honesty line -->
-<tr><td class="em-mute em-hair" style="border-top:1px solid ${HAIRLINE};padding:20px 32px 28px 32px;font-family:${TEXT};font-size:12px;line-height:18px;color:${GRAPHITE};">You are receiving this because a Curbside Commons demonstration send was armed for this address &mdash; a one-shot, never a subscription.<br><br>Simulated data audited against real codified NYC law (&sect;20-563.3 / Local Law 79 of 2025). Not legal advice; no penalties computed; no real platform access claimed.</td></tr>
+<tr><td class="em-mute em-hair" style="border-top:1px solid ${HAIRLINE};padding:20px 32px 28px 32px;font-family:${TEXT};font-size:12px;line-height:18px;color:${GRAPHITE};">You're receiving this one-time email because a Curbside Commons demonstration send was set up for this address. This is not a subscription.<br><br>Simulated data audited against real codified NYC law (&sect;20-563.3 / Local Law 79 of 2025). Not legal advice. No penalties calculated. No claim of real platform access.</td></tr>
 
 </table>
 </td></tr>
