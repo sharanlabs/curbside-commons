@@ -35,7 +35,8 @@
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildEmailReportHtml, EMAIL_HTML_FINDINGS_CAP } from "../lib/delivery/email-html.ts";
+import { buildEmailReportHtml } from "../lib/delivery/email-html.ts";
+import { buildEmailReportText } from "../lib/delivery/email-text.ts";
 import { callTool } from "../lib/tools/registry.ts";
 
 const SIMULATED_BANNER =
@@ -77,9 +78,10 @@ if (typeof parsed.ok !== "boolean" || !Array.isArray(parsed.findings)) {
 const findings = parsed.findings;
 const violations = findings.filter((f) => f.verdict === "violation").length;
 const plural = (n: number) => (n === 1 ? "" : "s");
-const verdictLine = parsed.ok
-  ? `PASS — no violations (${findings.length} non-gating finding${plural(findings.length)})`
-  : `FAIL — ${violations} violation${plural(violations)} across ${findings.length} finding${plural(findings.length)}`;
+// NOTE: the body's verdict headline is composed INSIDE the golden-tested
+// builder (`emailVerdictLine` in lib/delivery/email-text.ts) — one definition,
+// so the body can never disagree with itself. The subject line below derives
+// its own shorter phrasing from the same `violations` count.
 
 // Subject + preheader per the session-32 research digest
 // (`docs/research/research-email-design-2026-07-22.md` §6, move #11): subject
@@ -98,34 +100,15 @@ const preheader = parsed.ok
 // HTML action button so both halves point at the same audit.
 const siteLink = "https://curbside-commons.pages.dev/fees";
 
-// Plain-text half, curated to MIRROR the v5 HTML half (owner directive; design
-// source mockups/email-v5-light-tweakable-2026-07-22.html): verdict first,
-// capped plain-language lines with rule ids, then the same evidence pointer,
-// action line, and footer copy the HTML body carries — no claim ids, no runtime
-// meta (that detail travels in the report.json attachment). The SIMULATED
-// banner leads (control #4). The "engine decides, humans approve" line stays
-// cut from both halves (prior adjudication; the mantra lives on the site/docs).
-const bodyText = [
-  SIMULATED_BANNER,
-  "",
-  `Result: ${verdictLine}`,
-  "",
-  ...findings
-    .slice(0, EMAIL_HTML_FINDINGS_CAP)
-    .map((f) => `- ${String(f.plainLine ?? "")} [${String(f.ruleId ?? "")}]`),
-  ...(findings.length > EMAIL_HTML_FINDINGS_CAP
-    ? [
-        `...and ${findings.length - EMAIL_HTML_FINDINGS_CAP} more finding${plural(findings.length - EMAIL_HTML_FINDINGS_CAP)} — the full set travels in the attached report.json.`,
-      ]
-    : []),
-  "",
-  "Attached report.json has the full audit — every claim, rule, and calculation. Re-runs reproduce it byte for byte.",
-  "",
-  `Run the same audit: ${siteLink}`,
-  "",
-  "One-time demonstration send. Not a subscription.",
-  "Simulated data checked against real NYC law (§20-563.3 / Local Law 79 of 2025). Not legal advice. No real platform access.",
-].join("\n");
+// Plain-text half — built by the SHARED, GOLDEN-TESTED builder
+// (`lib/delivery/email-text.ts`). It was composed inline here until 2026-07-25,
+// which made it the only live-send surface whose exact bytes no test observed
+// (the html half has always used `buildEmailReportHtml`; the Slack one-shot
+// imports `buildSlackReportPayload`). The copy is unchanged by the extraction —
+// it still MIRRORS the v5 HTML half per the owner directive (design source
+// mockups/email-v5-light-tweakable-2026-07-22.html); only its provenance moved,
+// so script and golden can no longer drift apart.
+const bodyText = buildEmailReportText(canonical, { siteLink });
 
 // Control #4 — the banner MUST lead the body; refuse to send otherwise.
 if (!bodyText.startsWith(SIMULATED_BANNER)) {

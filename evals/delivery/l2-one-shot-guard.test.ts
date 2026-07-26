@@ -91,9 +91,19 @@ describe("L-2 one-shot transport guard — offline NOT-ARMED contract", () => {
 describe("L-2 one-shot transport guard — static teeth (source-level invariants)", () => {
   const src = readFileSync(join(root, SCRIPT), "utf8");
 
-  it("the SIMULATED banner constant leads bodyText composition, on both halves (control #4)", () => {
-    // banner is the FIRST element of the bodyText array literal
-    expect(/const bodyText\s*=\s*\[\s*SIMULATED_BANNER\s*,/.test(src)).toBe(true);
+  it("the SIMULATED banner leads bodyText composition, on both halves (control #4)", () => {
+    // UPDATED 2026-07-25 — the assertion follows the code, the CONTROL does not
+    // move. The plain-text half used to be an inline array literal in this
+    // script, so this check pattern-matched the literal's first element. That
+    // composition now lives in the golden-tested `lib/delivery/email-text.ts`
+    // (it was the only live-send surface no golden covered). A source-text
+    // guard keyed to the OLD shape would have silently passed-then-failed on a
+    // pure refactor, so it is re-pointed at the property that actually matters:
+    // whatever builds the body, the banner must lead it.
+    expect(/const bodyText\s*=\s*buildEmailReportText\(/.test(src)).toBe(true);
+    // …and the builder is the one whose golden pins the banner-first ordering.
+    const builderSrc = readFileSync(join(root, "lib", "delivery", "email-text.ts"), "utf8");
+    expect(/return\s*\[\s*SIMULATED_BANNER\s*,/.test(builderSrc)).toBe(true);
     // runtime guard: refuse a plain-text body that lost the leading banner
     expect(src).toContain("!bodyText.startsWith(SIMULATED_BANNER)");
     // control #4 extends to the HTML half
