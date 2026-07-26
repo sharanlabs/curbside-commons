@@ -72,7 +72,7 @@ output of a completed, human-approved audit, never inside it — is in
 
 | Surface | Status |
 | --- | --- |
-| Test suite | `npm run verify` green: **1145 passed + 7 skipped** locally, **1144 + 8 in CI** (count re-measured live 2026-07-12 after the E2/E3/E4 lanes, their eval-locks, and the batch-D review fixes landed). The skips are live-network harnesses, off by default; the one-test difference is the embedding-hybrid check, which is cache-gated and therefore *skipped* in CI — the model cache is gitignored and inference never downloads, so a fresh runner honestly reports it as skipped rather than silently passing. |
+| Test suite | `npm run verify` green: **1507 passed + 8 skipped** (re-measured live 2026-07-26). **All 8 skips are `describe.skipIf(!live)` owner-armed live-network harnesses** — off by default and skipped *identically* locally and in CI, so the counts now match on both. The previous entry documented a one-test local/CI difference caused by a cache-gated embedding check; that lane was **retired 2026-07-26** (it lost to plain BM25 on its own scored run, so the simpler lane ships), which removed the repo's only environment-dependent skip along with it. Its losing scoreboard is kept in `evals/rag/results/` — the capability retired, the evidence did not. |
 | Listings drift taxonomy (8 classes) | **8/8 injected and caught, measured** by the C6 coverage eval; never an "all edge cases" claim |
 | Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
 | Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |

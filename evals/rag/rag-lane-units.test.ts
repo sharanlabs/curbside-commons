@@ -6,15 +6,16 @@
  * hybrid determinism (cache-gated: skipped loudly when the local model cache
  * is absent — e.g. bare CI — because inference NEVER downloads).
  */
-import { existsSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
+// NOTE: `existsSync`, `RAG_HF_CACHE_DIR`, `TransformersEmbedder` and
+// `HybridIndex` were imported only by the retired hybrid block below. Dropping
+// them with it is the point: an unused model-cache import is what kept a
+// retired lane looking load-bearing.
 import { Bm25Index, BM25_B, BM25_K1, tokenize } from "@/lib/rag/bm25.ts";
 import { approxTokens, CHUNK_HARD_CAP, chunkFile } from "@/lib/rag/chunker.ts";
 import manifest from "@/lib/rag/corpus-manifest.json" with { type: "json" };
 import { loadCorpusChunks } from "@/lib/rag/corpus.ts";
-import { RAG_HF_CACHE_DIR, TransformersEmbedder } from "@/lib/rag/embed-transformers.ts";
-import { HybridIndex } from "@/lib/rag/hybrid.ts";
 import { bestWindow, toLaneResult } from "@/lib/rag/retrieve.ts";
 import type { Chunk } from "@/lib/rag/types.ts";
 
@@ -99,18 +100,28 @@ describe("E2 extractive answer layer", () => {
   });
 });
 
-const cachePresent = existsSync(RAG_HF_CACHE_DIR);
-describe.skipIf(!cachePresent)("E2 hybrid lane (local model cache required — never downloads)", () => {
-  it("produces deterministic RRF hits + a cosine abstention signal", { timeout: 120_000 }, async () => {
-    const chunks = loadCorpusChunks();
-    const idx = await HybridIndex.build(chunks, new TransformersEmbedder());
-    const q = "What does drift mean for a published menu?";
-    const a = await idx.search(q);
-    const b = await idx.search(q);
-    expect(a.hits.map((h) => h.chunk.id)).toEqual(b.hits.map((h) => h.chunk.id));
-    expect(a.topCosine).toBe(b.topCosine);
-    expect(a.hits.length).toBe(5);
-    expect(a.topCosine).toBeGreaterThan(0);
-    expect(a.topCosine).toBeLessThanOrEqual(1.0001);
-  });
-});
+/**
+ * E2 HYBRID LANE — RETIRED 2026-07-26 (decision: `docs/decisions/e2-e4-lanes-2026-07-25.md`).
+ *
+ * The hybrid was built, scored once against pre-registered floors, and LOST to
+ * plain BM25 — so the simpler lane shipped and `lookup-reference.ts` has used
+ * BM25 only ever since. What remained here was a cache-gated determinism test
+ * for a lane nothing ships: it required a local model cache, was therefore the
+ * repo's ONLY skipped-in-CI test, and its skip is what forced the README's
+ * "1145 local vs 1144 in CI" one-test-difference caveat.
+ *
+ * It is retired rather than kept because it carried weight it did not earn: an
+ * inference path and a model-cache dependency supporting a conclusion that was
+ * already reached and published ("BM25 is enough"). Keeping a green test for a
+ * retired lane is how a dead capability looks alive.
+ *
+ * WHAT IS DELIBERATELY NOT DELETED — the EVIDENCE. `evals/rag/results/` keeps
+ * the full scoreboard including the hybrid's losing numbers; `scripts-ts/`
+ * retains the scoring path so the published record stays REPRODUCIBLE; and
+ * `lib/rag/hybrid.ts` + `embed*.ts` remain as the artifacts those numbers were
+ * measured on. Retiring a capability is not the same as erasing the evidence
+ * that it was evaluated and lost — the honest record of a miss is the most
+ * valuable thing this lane produced.
+ *
+ * The BM25 lane — the one that actually ships — is unit-tested above.
+ */
