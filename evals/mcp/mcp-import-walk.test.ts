@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { walkImports } from "../lib/import-walk.ts";
 
 /**
  * A1 import-boundary + $0/offline proof (plan §5 row A1, AC-3, AC-4).
@@ -86,6 +87,21 @@ function listMcpSourceFiles(dir: string): string[] {
 
 // Same ban list as evals/tools/registry-ac3-import-graph.test.ts, reused
 // verbatim (not re-derived) so the two proofs agree on what "network/LLM" means.
+//
+// KEPT, NOT REPLACED (2026-07-26). The allowlist walk added at the bottom of
+// this file is what the "no network / no LLM" guarantee now RESTS on; this
+// denylist stays because the two layers fail differently and both are useful:
+// a denylist hit says "you imported an LLM provider" (legible, actionable),
+// while the allowlist says "this module is not permitted" (complete, but
+// generic). Common case gets the good message; unknown case still fails.
+//
+// Measured gaps in THIS list, probed 2026-07-26 — it is better than the CLI's
+// was (it does carry node:net|tls|dgram, which the CLI's did not) but it is
+// still a denylist and still incomplete: `node:child_process`,
+// `node:worker_threads` and `node:inspector` all pass it, as do
+// `globalThis.fetch(` and `(0,fetch)(` on the source scan below. Those are the
+// holes the allowlist closes — which is the whole argument for shape over
+// patterns: this list was CORRECT and still had five ways through.
 const banned = [
   /lib\/agents\//,
   /@ai-sdk/,
@@ -251,5 +267,56 @@ describe("A1 SDK-internal walk — the pinned SDK's stdio path imports no HTTP/S
         }
       }
     }
+  });
+});
+
+/**
+ * THE ALLOWLIST WALK — what the MCP server's "no network / no LLM" guarantee
+ * actually rests on (added 2026-07-26, after the sibling CLI guard was proved
+ * bypassable by a beacon that EXECUTED while its eval printed PASS).
+ *
+ * The denylist above was audited the same day and is genuinely better than the
+ * CLI's was — it carries `node:net|tls|dgram`, which the CLI's did not. It was
+ * still incomplete, measurably: `node:child_process`, `node:worker_threads` and
+ * `node:inspector` pass it, and the source scan's `(^|[^.\w])fetch\s*\(` misses
+ * `globalThis.fetch(` and `(0,fetch)(`. Five ways through a list that was
+ * carefully written and not wrong — which is the argument for changing the SHAPE
+ * rather than adding patterns.
+ *
+ * The shared walker (`evals/lib/import-walk.ts`, whose own known-positive /
+ * known-negative set lives in `evals/packs/import-walk-guard.test.ts`) inverts
+ * the default: only explicitly-permitted modules pass, so a module nobody has
+ * thought of — including one shipping in a future Node — fails the day it
+ * appears. It also treats a non-literal dynamic import as a hard failure: an
+ * import the walker cannot resolve is one it cannot police.
+ */
+describe("A1 $0/offline — ALLOWLIST walk from the MCP server entry", () => {
+  it("every module reachable from lib/mcp/server.ts is explicitly permitted", () => {
+    // THE ONE REVIEWED EXCEPTION: the MCP SDK itself. An MCP server cannot be
+    // written without it, so it is permitted here rather than estate-wide —
+    // scoped to this surface, where it is load-bearing, and absent from the
+    // CLI's allowlist, where importing it would be a real finding.
+    //
+    // It is NOT permitted blindly. The SDK ships HTTP/SSE transports, and the
+    // tests ABOVE in this file already forbid reaching them: no
+    // `streamableHttp`, no `/sse`, no `server/express` on the reachable graph —
+    // stdio only. So the allowlist grants the package while a narrower,
+    // pre-existing check keeps its networked half unreachable. That pairing is
+    // the reason this exception is safe to state.
+    const { violations, seen } = walkImports(entry, {
+      root,
+      allowPackages: ["@modelcontextprotocol/sdk"],
+    });
+    expect(
+      violations,
+      violations.length > 0
+        ? `MCP offline-path violations:\n${violations
+            .map((v) => `  ${v.kind}: ${v.detail}\n    in ${v.file}`)
+            .join("\n")}`
+        : "",
+    ).toEqual([]);
+    // Positive control: an empty violation list must mean "looked and found
+    // nothing", never "looked nowhere".
+    expect(seen.size, "the allowlist walk did not traverse the server").toBeGreaterThan(5);
   });
 });

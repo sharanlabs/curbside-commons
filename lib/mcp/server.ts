@@ -82,8 +82,20 @@ const SERVER_INSTRUCTIONS =
 const TOOL_ORDER: readonly string[] = Object.freeze([...TOOLS.keys()]);
 
 /**
- * The tool behaviour hints advertised on EVERY tool (MCP `ToolAnnotations`, spec
- * 2025-06-18). All seven tools genuinely qualify — this is verified per tool, not
+ * The tool behaviour hints advertised on EVERY tool (MCP `ToolAnnotations`).
+ *
+ * SPEC CURRENCY (re-verified live 2026-07-26): `ToolAnnotations` entered the
+ * spec at revision 2025-06-18, which this comment used to cite as though it were
+ * current. It is not — the current MCP revision is **2025-11-25**, and the
+ * pinned SDK (`@modelcontextprotocol/sdk` 1.29.0, confirmed latest on npm the
+ * same day) already advertises it as `LATEST_PROTOCOL_VERSION`, negotiating
+ * downward through 2025-06-18 / 2025-03-26 / 2024-11-05 / 2024-10-07. So the
+ * CODE was current and only the citation was stale — the annotations contract
+ * these hints implement is unchanged across both revisions. Dates are stated
+ * here rather than a bare "latest" so the next reader can tell at a glance
+ * whether this note has itself gone stale.
+ *
+ * All seven tools genuinely qualify — this is verified per tool, not
  * asserted: every advertised tool routes through the ONE `callTool` path into the
  * deterministic engine, so each
  *  - `readOnlyHint: true` — reads fixtures/rules and computes; none writes, sends,

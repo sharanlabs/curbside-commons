@@ -114,6 +114,18 @@ async function main() {
   const outPath = parseOutPath(process.argv.slice(2));
 
   const transport = new StdioClientTransport({ command: process.execPath, args: [serverEntry] });
+
+  // Capture the NEGOTIATED protocol revision. The client calls
+  // `transport.setProtocolVersion(agreed)` during initialize and the Transport
+  // interface exposes no getter, so the hook is wrapped here — the only place
+  // the value is observable — rather than read back off the transport.
+  let negotiatedProtocolVersion = null;
+  const originalSet = transport.setProtocolVersion?.bind(transport);
+  transport.setProtocolVersion = (version) => {
+    negotiatedProtocolVersion = version;
+    originalSet?.(version);
+  };
+
   const client = new Client({ name: "a1-transcript-recorder", version: "0.0.0" });
   await client.connect(transport);
 
@@ -121,6 +133,20 @@ async function main() {
 
   steps.push({
     step: "initialize",
+    // The NEGOTIATED protocol revision (added 2026-07-26, agentic currency pass).
+    // It was previously absent from the transcript, so the byte-lock could not
+    // see a spec-version change AT ALL: the SDK could start negotiating a
+    // different revision — the single event that most matters for an MCP
+    // server's currency — and every test would stay green.
+    //
+    // Captured via the transport's `setProtocolVersion` hook, which the client
+    // calls with the agreed revision during initialize. There is no public
+    // getter for it (the Transport interface exposes only the setter), so the
+    // hook is wrapped above rather than read back off the transport — an
+    // earlier cut of this line read `transport.protocolVersion`, which does not
+    // exist and would have frozen `null` into the golden forever: a field that
+    // looks like coverage and observes nothing.
+    protocolVersion: negotiatedProtocolVersion ?? null,
     serverInfo: client.getServerVersion() ?? null,
     capabilities: client.getServerCapabilities() ?? null,
     instructions: client.getInstructions() ?? null,

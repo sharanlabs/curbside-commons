@@ -63,4 +63,31 @@ describe("MCP scripted-client transcript is byte-frozen", () => {
     expect(stepNames.filter((s) => s === "tools/call")).toHaveLength(7);
     expect(stepNames.filter((s) => s === "tools/call (invalid)")).toHaveLength(2);
   });
+
+  /**
+   * PROTOCOL-REVISION DRIFT (added 2026-07-26, agentic currency pass).
+   *
+   * The transcript recorded `serverInfo`, `capabilities` and `instructions` but
+   * NOT the negotiated protocol revision — so the single fact that most defines
+   * an MCP server's currency was invisible to a byte-lock built to freeze
+   * exactly this session. An SDK bump could change the negotiated revision and
+   * every test would stay green.
+   *
+   * `2025-11-25` is the current MCP revision, verified live against the spec's
+   * versioning page and the pinned SDK's `LATEST_PROTOCOL_VERSION` on
+   * 2026-07-26. This assertion is deliberately EXACT: when the SDK moves, this
+   * test fails, and that failure is the prompt to re-verify the spec and
+   * re-record — which is the behaviour we want, not noise.
+   */
+  it("records the NEGOTIATED protocol revision, and it is the one we verified", () => {
+    const transcript = JSON.parse(readFileSync(golden, "utf8")) as {
+      steps: ReadonlyArray<{ step: string; protocolVersion?: unknown }>;
+    };
+    const init = transcript.steps[0];
+    expect(init.step).toBe("initialize");
+    expect(
+      init.protocolVersion,
+      "the negotiated MCP revision changed — re-verify the spec, then re-record the transcript",
+    ).toBe("2025-11-25");
+  });
 });

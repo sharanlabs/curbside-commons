@@ -16,7 +16,20 @@
  * gate before any real call — that is the true "use-time".
  */
 
-/** The pinned price-list version. Bump this (and the prices) together on a re-price. */
+/**
+ * The pinned price-list version. Bump this (and the prices) together on a re-price.
+ *
+ * RE-VERIFIED 2026-07-26 (agentic currency pass) against the official Gemini
+ * pricing page: flash $0.30/$2.50 and flash-lite $0.10/$0.40 per 1M tokens —
+ * BOTH UNCHANGED, so the version string is deliberately NOT bumped (it tracks
+ * the prices, not the date they were last read; bumping it on an unchanged
+ * re-read would falsely signal a re-price to anyone diffing it).
+ *
+ * Also confirmed the same day: gemini-2.5-flash is still an active model, not
+ * retired or superseded — newer generations exist alongside it. Model SELECTION
+ * is a separate, owner-gated decision from price currency, and this lane stays
+ * on the pinned ids until that decision is made.
+ */
 export const PRICING_VERSION = "2026-06-18";
 
 type ModelPrice = { inputPerMillionUsd: number; outputPerMillionUsd: number };

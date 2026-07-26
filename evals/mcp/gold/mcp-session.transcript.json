@@ -3,6 +3,7 @@
   "steps": [
     {
       "step": "initialize",
+      "protocolVersion": "2025-11-25",
       "serverInfo": {
         "name": "commerce-truth-audit",
         "version": "0.1.0"
