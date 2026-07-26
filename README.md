@@ -44,6 +44,22 @@ When you order food through an app, or tell an AI assistant to do it, the menu b
 
 A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the order.** And every seat in that chain has a conflict of interest: platforms won't audit each other, sync vendors would be grading their own homework, and it isn't the AI companies' job. A credible referee has to sit outside all of those incentives — verifying claims against the merchant's own system of record rather than against another copy. That mechanism, applied with measurement rigor, is what this prototype demonstrates (others work on adjacent trust problems; the differentiation claimed here is the mechanism and the discipline, not exclusivity).
 
+### It is an agentic system that deliberately does not act
+
+The referee is itself built as one: a **four-role crew** (intake · audit · evidence · reviewer) over a
+**seven-tool MCP surface**, with artifact content quarantined as untrusted, a deterministic injection
+tripwire that forces escalation before any model turn, and the engine's report hash pinned precisely
+*because* a model touched the run.
+
+What it will not do is take actions. **Agents recommend; the engine decides; a human owns anything
+irreversible** — and on this product that ordering is the point, not a limitation. A referee that
+could also amend a feed, issue a credit, or file a dispute would have acquired the very stake that
+disqualifies every other seat in the chain. The agents are explicitly the *untrusted* layer wrapped
+around a deterministic core, which is why they are allowed to be wrong: nothing they say becomes a
+verdict. (The full reasoning, including where an acting path *would* be legitimate — operating on the
+output of a completed, human-approved audit, never inside it — is in
+[`docs/decisions/crew-acts-2026-07-26.md`](docs/decisions/crew-acts-2026-07-26.md).)
+
 1. **Truth leg** — compare a published feed (an ACP-style feed, or a UCP catalog response) line by line against the merchant's system of record. Deterministic. No LLM anywhere on this path.
 2. **Conformance leg** — validate a UCP catalog response against the **78 pinned official UCP JSON Schemas** (spec `v2026-04-08`). A document can be perfectly spec-shaped and still false, which is the point:
 
@@ -61,7 +77,7 @@ A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the or
 | Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
 | Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |
 | LLM line-item classifier | **Calibrated — earned 2026-07-09** on an owner-armed retry: a **fresh pre-registered held-out split** (the first split was exposed and never re-scored; *authorship-provenance caveat and its mechanical mitigation recorded in [the status doc](docs/fee-classifier-recalibration-status.md)* — the split was pre-registered and textually disjoint but not authored blind, and the deterministic baseline re-measured on it landed at **19/21, identical to the original pin**, which a split built to be an easier beat would have moved), floors identical to the first registration, **21/21 accuracy with every floor cleared**. The first run (2026-07-05) scored 20/21 and was **honestly DEFERRED** for missing one per-class recall floor (0.75 vs a pre-registered ≥ 0.80) — that record stands. The floors never moved in either run. |
-| Agent extension | Two of the four crew roles (**Intake** and **Reviewer**) earned the label **"agent (live-run floors cleared)"** on an owner-armed live run (2026-07-07): 20/20 pre-registered held-out scenarios, 0 degraded, including planted in-document injection the live model visibly resisted. The other two roles are deterministic workflows by design and are labeled exactly that. Agents recommend; the engine decides; a human owns anything irreversible. |
+| Agent extension | Two of the four crew roles (**Intake** and **Reviewer**) earned the label **"agent (live-run floors cleared)"** on an owner-armed live run (2026-07-07): 20/20 pre-registered held-out scenarios, 0 degraded, including planted in-document injection the live model visibly resisted. The other two roles are deterministic workflows by design and are labeled exactly that. Agents recommend; the engine decides; a human owns anything irreversible. **That label is a K=1 label** — one live pass. Multi-rep stability (K≥3, flip-rate, zero safety flips) is **registered but NOT YET RUN**: floors and scorer are committed ahead of any data (`docs/l1-consistency-preregistration.md`), so the bar cannot be fitted to a result. Until an owner-armed run scores against them, the honest reading is "reached the right terminal," not "reaches it reliably." |
 | MCP tool surface | **Seven read-only tools over the same deterministic engine, exposed over stdio only** (never a network transport). An import-walk eval proves the server path is **$0 / no-transport** end to end; the conformance suite **byte-locks every tool's advertised description, input schema, behavior annotations, and output-envelope schema**; and a **real recorded client transcript is re-recorded through a freshly spawned server on every test run** and must reproduce the committed golden byte-for-byte. No LLM sits on any tool path (`evals/mcp/`). |
 | Delivery | The system can **write** Slack/email payloads but the site, CLI, and tools structurally cannot send. Exactly **one** recorded delivery exists: a single owner-armed Slack send to the owner's own channel (2026-07-09), executed under eight written safety controls, with a redacted run record committed (`docs/reviews/`). |
 | Reference-retrieval lane (E2) | **Floors NOT met — label deferred (2026-07-12), and the scoreboard is published.** An extractive, offline, $0 retrieval tool over the committed rule/schema/glossary corpus was scored once against pre-registered floors: retrieval hit-rate 19/24 (< the 0.85 floor), and the embedding hybrid failed to beat plain BM25 — so the **simpler lane shipped**, labeled *experimental, advisory only* in every payload (`docs/e2-rag-preregistration.md` RESULTS). |
