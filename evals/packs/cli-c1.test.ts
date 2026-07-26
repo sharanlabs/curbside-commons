@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { walkImports } from "../lib/import-walk.ts";
 
 /**
  * C1 — the one-command validator, exercised as a real child process: exit 0 on
@@ -222,6 +223,130 @@ describe("C1 machine-JSON leg — --json alias + C10 header surface (W3)", () =>
     expect(["synthetic-controlled", "real-world"]).toContain(report.matchingMode);
     expect(report.simulated).toBe(true);
   }, 60000);
+
+  /**
+   * The C10 header claim, made EXACT (capability-sweep CLI finding, 2026-07-26).
+   *
+   * The usage text said every report "always" carries specVersion · matchingMode
+   * · simulated. True of the two `check` legs; false of `fees` and `demo`, which
+   * carry specVersion + simulated and no matchingMode. The claim was corrected
+   * rather than the code: a fee audit MATCHES nothing, so `matchingMode` there
+   * would be a meaningless field, not a missing one. This pins the corrected
+   * contract per-command so the usage text cannot drift from it again.
+   */
+  it("the C10 header surface is exactly what the usage text now claims, per command", () => {
+    const universal = (json: string) => {
+      const r = JSON.parse(json) as { specVersion?: unknown; simulated?: unknown };
+      expect(typeof r.specVersion, "specVersion rides EVERY report").toBe("string");
+      expect(r.simulated, "simulated rides EVERY report").toBe(true);
+      return r as Record<string, unknown>;
+    };
+    // The matching legs carry matchingMode…
+    const truth = runCli([
+      "check",
+      join(fixtures, "acp-feed.drifted.json"),
+      "--against",
+      join(fixtures, "sor.catalog.json"),
+      "--json",
+    ]);
+    expect(typeof universal(truth.stdout).matchingMode).toBe("string");
+
+    // …the fee audit does not, and that is the documented contract.
+    const fees = runCli(["fees", join(fixtures, "fees", "statement.drifted.json"), "--json"]);
+    expect(universal(fees.stdout).matchingMode, "fees matches nothing — the field would be meaningless").toBeUndefined();
+
+    // The usage text must state it that way, not claim "always".
+    const usage = readFileSync(join(root, "bin", "check.mjs"), "utf8");
+    expect(usage).toContain("Every\n    report carries specVersion + simulated");
+    expect(usage).not.toMatch(/always\s*\n?\s*carrying the C10 header surface/);
+  }, 60000);
+});
+
+/**
+ * THE HEADLINE EXHIBIT'S TRUTH LEG — a clear refusal, not an opaque crash
+ * (capability-sweep CLI finding, 2026-07-26).
+ *
+ * The README's central thesis is `conformant-but-false.json`: shape-valid, still
+ * false. Pointing the standalone truth leg at it — which the README's own recipe
+ * invited — died inside an adapter with
+ * `Cannot read properties of undefined (reading 'flatMap')`, naming neither the
+ * file nor the real problem. That document is a UCP WIRE response
+ * (`{simulated, ucp, products}`); the truth leg consumes a catalog-response
+ * FIXTURE (`{items: [...]}`).
+ *
+ * The fix refuses clearly rather than coercing the shapes together: the two
+ * formats carry different identity semantics, and silently treating one as the
+ * other is exactly the failure this product exists to catch.
+ */
+describe("C1 shape guard: wrong-shaped input is refused with an actionable message", () => {
+  it("a UCP wire document on the truth leg names the problem AND the right command", () => {
+    // The refusal goes to STDERR and exits 2 (a usage error), so `runCli` above
+    // — which captures stdout only — cannot see it. Spawn directly and read the
+    // error stream off the thrown result.
+    let stderr = "";
+    let status = 0;
+    try {
+      execFileSync(
+        process.execPath,
+        [
+          join(root, "bin", "check.mjs"),
+          "check",
+          join(root, "fixtures", "ucp-conformance-ci", "valid", "conformant-but-false.json"),
+          "--against",
+          join(fixtures, "sor.catalog.json"),
+          "--surface",
+          "ucp",
+        ],
+        { encoding: "utf8" },
+      );
+    } catch (err) {
+      const e = err as { status?: number; stderr?: string };
+      status = e.status ?? -1;
+      stderr = e.stderr ?? "";
+    }
+    expect(status, "a refusal must not report success").toBe(2);
+    expect(stderr, "the opaque adapter crash must not resurface").not.toContain("flatMap");
+    expect(stderr).toContain("UCP WIRE document");
+    expect(stderr).toContain("--conformance");
+  }, 60000);
+
+  it("the SAME document still passes the conformance leg (the exhibit is intact)", () => {
+    const r = runCli([
+      "check",
+      join("fixtures", "ucp-conformance-ci", "valid", "conformant-but-false.json"),
+      "--conformance",
+      "--json",
+    ]);
+    expect(r.status).toBe(0);
+    const report = JSON.parse(r.stdout) as { ok: boolean; findings: unknown[] };
+    expect(report.ok).toBe(true);
+    expect(report.findings).toEqual([]);
+  }, 60000);
+
+  it("an itemless document is refused with a shape message, not a stack trace", () => {
+    // NOTE: a catalog file is NOT a valid case here — it has an `items` array,
+    // so it passes the shape guard and runs as a real (if odd) comparison,
+    // exiting 1 on drift. That is correct behavior, and asserting a refusal
+    // there would have pinned a bug. This uses a document with no `items` at
+    // all, which is the shape the adapter used to crash on.
+    const conformanceDoc = join(root, "fixtures", "ucp-conformance-ci", "valid", "search-full-catalog.json");
+    let stderr = "";
+    let status = 0;
+    try {
+      execFileSync(
+        process.execPath,
+        [join(root, "bin", "check.mjs"), "check", conformanceDoc, "--against", join(fixtures, "sor.catalog.json")],
+        { encoding: "utf8" },
+      );
+    } catch (err) {
+      const e = err as { status?: number; stderr?: string };
+      status = e.status ?? -1;
+      stderr = e.stderr ?? "";
+    }
+    expect(status, "a wrong-shaped input must not report success").toBe(2);
+    expect(stderr, "an adapter stack trace must not reach the user").not.toContain("flatMap");
+    expect(stderr).toMatch(/does not look like|UCP WIRE document/);
+  }, 60000);
 });
 
 describe("C1 $0-LLM: structural import-graph proof", () => {
@@ -285,6 +410,38 @@ describe("C1 $0-LLM: structural import-graph proof", () => {
     }
     // Sanity: the walk actually traversed the engine + pack, not just the entry.
     expect(seen.size).toBeGreaterThan(10);
+  });
+
+  /**
+   * THE ALLOWLIST WALK — the check the README's claim actually rests on
+   * (added 2026-07-26, capability-sweep CLI finding, HIGH).
+   *
+   * The denylist above is KEPT as a fast, legible tripwire for the specific
+   * families it names, but it is no longer what backs the words "enforced
+   * structurally". It could not be: a capability sweep proved the old eval green
+   * WHILE a `node:net` socket and a `globalThis.fetch` beacon executed on the
+   * CLI path. `node:net`, `node:tls`, `node:dgram`, `node:worker_threads` and
+   * `node:child_process` all passed it; so did `globalThis.fetch(` and
+   * `(0,fetch)(`; and `import(mod)` was invisible to its specifier extractor,
+   * leaving whole subtrees unwalked as well as unbanned.
+   *
+   * A denylist of egress-capable modules cannot be completed — every Node
+   * release can add another. The allowlist inverts the default: anything not
+   * explicitly permitted fails, so the module nobody has thought of yet is
+   * caught the day it arrives. `evals/packs/import-walk-guard.test.ts` holds the
+   * guard's own known-positive / known-negative set.
+   */
+  it("ALLOWLIST: every module reachable from bin/check.mjs is explicitly permitted", () => {
+    const { violations, seen } = walkImports(cli, { root });
+    expect(
+      violations,
+      violations.length > 0
+        ? `offline-path violations:\n${violations.map((v) => `  ${v.kind}: ${v.detail}\n    in ${v.file}`).join("\n")}`
+        : "",
+    ).toEqual([]);
+    // Positive control: the walk must actually traverse the engine, or an empty
+    // violation list means "found nothing because it looked nowhere".
+    expect(seen.size, "the allowlist walk did not traverse the engine").toBeGreaterThan(10);
   });
 
   it("no reachable source performs a bare fetch() (P3-5: source-text network scan)", () => {

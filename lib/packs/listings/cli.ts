@@ -44,6 +44,38 @@ export function runCheck(
     throw new Error(`--against file does not look like a catalog SOR: ${catalogPath}`);
   }
   const raw = JSON.parse(readFileSync(feedPath, "utf8")) as unknown;
+
+  // SHAPE GUARD (capability-sweep CLI finding, 2026-07-26). Both adapters index
+  // `.items`, so a document of the wrong shape used to die inside the adapter
+  // with `Cannot read properties of undefined (reading 'flatMap')` — an opaque
+  // stack-trace message that names neither the file nor the real problem. This
+  // was reachable from the README's own documented recipe: the headline exhibit
+  // `fixtures/ucp-conformance-ci/valid/conformant-but-false.json` is a UCP WIRE
+  // document (`{simulated, ucp, products}`), not the fixture shape the truth leg
+  // consumes (`{items: [...]}`), so the repo's central thesis command crashed.
+  //
+  // Deliberately NOT "fixed" by teaching the adapter both shapes: the wire and
+  // fixture formats carry different identity semantics, and silently coercing
+  // one into the other is precisely the failure this product exists to catch —
+  // a shape-valid document treated as if it meant something it does not. Refuse
+  // clearly instead, and name the command that DOES answer the question.
+  const looksLikeWire =
+    typeof raw === "object" && raw !== null && "products" in raw && !("items" in raw);
+  if (looksLikeWire) {
+    throw new Error(
+      `${feedPath} is a UCP WIRE document (has "products", no "items"), which the truth leg cannot compare ` +
+        `against a system-of-record catalog. The truth and conformance legs answer different questions: run ` +
+        `\`check ${feedPath} --conformance\` to validate it against the pinned UCP schemas. ` +
+        `The truth leg takes a catalog-response FIXTURE (with "items") or an ACP feed via --surface acp.`,
+    );
+  }
+  if (typeof raw !== "object" || raw === null || !Array.isArray((raw as { items?: unknown }).items)) {
+    throw new Error(
+      `${feedPath} does not look like a ${surface.toUpperCase()} ${surface === "acp" ? "feed" : "catalog response"}: ` +
+        `expected an object with an "items" array.`,
+    );
+  }
+
   const claims =
     surface === "acp"
       ? acpFeedToClaims(raw as AcpFeed)

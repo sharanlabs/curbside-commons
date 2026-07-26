@@ -51,9 +51,11 @@ Usage:
 Notes:
   - No LLM / network calls on either path (C1: $0-LLM; conformance reads pinned
     schemas from disk via ajv).
-  - Output is the machine-readable report (JSON) on stdout — CI-usable, always
-    carrying the C10 header surface (specVersion · matchingMode · simulated).
-    --json is the explicit, trailing alias for that default serialization.
+  - Output is the machine-readable report (JSON) on stdout — CI-usable. Every
+    report carries specVersion + simulated; the two check legs also carry
+    matchingMode (the fee audit and demo match nothing, so they do not — the
+    field would be meaningless there, not missing). --json is the explicit,
+    trailing alias for that default serialization.
   - Unknown flags, surplus positionals, and mixed modes exit 2 (loud) — a typo
     never silently falls back to a default, and --conformance never silently
     swallows a truth-leg request (the legs are separate commands by design).

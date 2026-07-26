@@ -32,12 +32,12 @@
 <text x="28" y="210" class="ln b1 body" xml:space="preserve">Simulated:  true</text>
 <text x="28" y="229" class="ln b1 body" xml:space="preserve"></text>
 <text x="28" y="248" class="ln b2 rule" xml:space="preserve">----------------------------------------------------------------------------</text>
-<text x="28" y="267" class="ln b2 beat" xml:space="preserve">BEAT 1 · The agent reads the published serving copy — spec-faithful demonstration actor — simulated</text>
+<text x="28" y="267" class="ln b2 beat" xml:space="preserve">BEAT 1 · The agent reads the published feed — spec-faithful demonstration actor — simulated</text>
 <text x="28" y="286" class="ln b2 body" xml:space="preserve"></text>
 <text x="28" y="305" class="ln b2 note" xml:space="preserve">  ▸ A shopping agent reads the published menu feed — the same data any AI assistant would consume — and never sees the restaurant's own records.</text>
 <text x="28" y="324" class="ln b2 body" xml:space="preserve"></text>
 <text x="28" y="343" class="ln b2 body" xml:space="preserve">  intent: Order the "Smoked Brisket Plate" if the published feed lists it as available.</text>
-<text x="28" y="362" class="ln b2 body" xml:space="preserve">  source read: the published ACP serving copy only (no system-of-record access)</text>
+<text x="28" y="362" class="ln b2 body" xml:space="preserve">  source read: the published ACP feed only (no system-of-record access)</text>
 <text x="28" y="381" class="ln b2 body" xml:space="preserve"></text>
 <text x="28" y="400" class="ln b3 rule" xml:space="preserve">----------------------------------------------------------------------------</text>
 <text x="28" y="419" class="ln b3 beat" xml:space="preserve">BEAT 2 · The agent selects an item, trusting the surface</text>
