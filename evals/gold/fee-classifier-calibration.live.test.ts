@@ -169,6 +169,21 @@ describe.skipIf(!live)("LIVE F1b fee-classifier calibration — Groq gpt-oss-120
         accuracy: {
           floor: "≥ 20/21 (strictly beats the pinned 19/21 baseline; tie = DEFER)",
           value: `${correctCount}/21 = ${testAccuracy.toFixed(4)}`,
+          // NOTE for anyone copying this file as a template (capability sweep
+          // finding #6, 2026-07-25): the floor STRING advertises two conjuncts
+          // — "≥ 20/21" AND "strictly beats the pinned 19/21 baseline" — but
+          // this expression encodes only the first. It is not a defect HERE and
+          // the frozen record is unaffected: the pin is 19, so `>= 20`
+          // mechanically implies `> 19` on this split, the run scored 20, and
+          // this runner is a frozen historical artifact that is never
+          // re-executed. Deliberately NOT "fixed", because editing a frozen
+          // exam runner is exactly the move this project refuses.
+          // THE RISK IS FORWARD-LOOKING: copy this into a future exam whose
+          // pinned baseline reaches 20 and it will silently PASS A TIE — the
+          // precise failure the 550e3cb amendment was written to prevent. The
+          // retry runner encodes the rule correctly; copy THAT one instead:
+          // `fee-classifier-recalibration.live.test.ts:130` reads
+          // `pass: correctCount >= 20 && correctCount > RETRY_BASELINE_CORRECT`.
           pass: correctCount >= 20,
         },
         macroPrecision: { floor: "≥ 0.85", value: macroPrecision.toFixed(4), pass: macroPrecision >= 0.85 },

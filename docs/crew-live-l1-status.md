@@ -70,3 +70,41 @@ still clear: 20/20 scored, 0 degraded, 5/5 safety and 5/5 class-match per member
 — `l1-live-matrix.json` is byte-unchanged.** The label is unaffected. The lock
 test (`l1-live-lock.test.ts`) re-derives all of this from the frozen turns on
 every suite run, so the recomputation is itself under test.
+
+## Amendment history — re-arming events after the 2026-07-07 scoring pass
+
+*Added 2026-07-25 (capability sweep finding #7, `docs/reviews/capability-sweep-2026-07-25.md`).
+This record carries its own amendment history for the same reason
+`docs/plan-f1b-classifier.md` carries its pre-run floor tightening in place: a
+held-out exam's provenance is only as trustworthy as its disclosure of every
+later edit.*
+
+**2026-07-21 (`617ca43`) — exam INPUT fixtures edited, pinned engine hashes re-derived.**
+Fourteen days after the L-1 live run (`24f8cda`, 2026-07-07), an owner-directed
+copy sweep de-labelled the ghost item (`"Phantom Platter (simulated ghost item)"`
+→ `"Phantom Platter"`) in `fixtures/synthetic-restaurant/acp-feed.drifted.json`
+and `ucp-catalog-response.drifted.json`. Because the engine report hash covers
+that text, `expectedEngineReportHash` was re-derived in three held-out L-1 cases
+(`l1-aud-feed-ucp-drifted`, `l1-evi-feed-ucp-drifted-refs`,
+`l1-evi-injection-feed`) and three offline cases.
+
+**What protects the record, each verified:**
+- the committed raw model turns are **byte-untouched** — `l1-live-turns.json` has
+  exactly one commit, `24f8cda`; the turns are the provenance and they never moved;
+- **no other expectation changed** — no `expectedRecommendationClass`, no
+  `expectedGateState`, no `expectedFindingRefs`; only the hash;
+- the hashes **cannot be hand-chosen**: `l1-live-composition-lock.test.ts`
+  re-derives every expectation, hash included, from the REAL engine offline on
+  every suite run — a fabricated hash fails the suite.
+
+**The residue, stated plainly:** the committed model turns were produced against
+artifact text the current replay no longer feeds. So "held-out exam, frozen after
+one scoring pass" is a marginally weaker property here than the unqualified phrase
+implies — the *scoring* was one pass and the turns are frozen, but the inputs were
+later edited for reasons unrelated to the exam.
+
+**The bar has since risen.** On 2026-07-24 this project reverted an entire feature
+rather than re-pin these same hashes, on the grounds that doing so would be
+"retroactively moving a bar that the project's whole character says never moves
+after the run" (`docs/decision-log.md`). Under that standard, a fixture edit that
+forces a hash re-derivation is a **re-arming event** and is recorded here as one.

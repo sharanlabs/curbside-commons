@@ -8,6 +8,8 @@ import {
   EMAIL_TEXT_FINDINGS_CAP,
   SIMULATED_BANNER,
 } from "@/lib/delivery/email-text.ts";
+import { buildEmailReportHtml } from "@/lib/delivery/email-html.ts";
+import { buildEmailReportMessage, EML_FINDINGS_CAP } from "@/lib/delivery/email.ts";
 import { detectInjectionSignatures } from "@/lib/crew/injection-scan.ts";
 
 /**
@@ -136,6 +138,171 @@ describe("L-2 email text builder — the A3 delivery invariants", () => {
   it("the text half never trips the injection tripwire (M2-SELF property)", () => {
     expect(detectInjectionSignatures(body)).toEqual([]);
     expect(detectInjectionSignatures(buildEmailReportText(passCanonical, { siteLink: SITE_LINK }))).toEqual([]);
+  });
+});
+
+/**
+ * CAPABILITY SWEEP FINDINGS #3–#5 (2026-07-25,
+ * `docs/reviews/capability-sweep-2026-07-25.md`) — three lane-wide contracts
+ * that were true-by-convention and enforced by nothing.
+ */
+describe("delivery lane — contracts closed by the 2026-07-25 capability sweep", () => {
+  /**
+   * #3 — the HTML builder renders FEE-AUDIT copy but structurally accepted ANY
+   * canonical with ok+findings[]. Rendering a real check_feed canonical produced
+   * an email calling a feed-vs-catalog check a "Simulated fee audit" and
+   * reporting on "fee lines" it never examined. Latent (the sole caller passes
+   * audit_statement), explicitly NOT a §4 breach — the SIMULATED framing was
+   * intact throughout. Fixed by NARROWING the contract rather than
+   * parameterizing the strings: parameterizing keeps the failure mode open and
+   * merely relocates it to the caller, whereas refusal makes the mislabel
+   * unrepresentable.
+   */
+  it("#3: the fee-audit email builder REFUSES a non-fee canonical (mislabel is unrepresentable)", () => {
+    const feedCanonical = callTool("check_feed", {
+      feedPath: "fixtures/synthetic-restaurant/acp-feed.faithful.json",
+      catalogPath: "fixtures/synthetic-restaurant/sor.catalog.json",
+      surface: "acp",
+    }).canonical;
+    // Structurally decision-grade — this is why the old guard let it through.
+    const parsed = JSON.parse(feedCanonical) as { ok: unknown; findings: unknown };
+    expect(typeof parsed.ok).toBe("boolean");
+    expect(Array.isArray(parsed.findings)).toBe(true);
+    // …and yet it must be refused, because the COPY would lie about the domain.
+    expect(() =>
+      buildEmailReportHtml(feedCanonical, { tool: "check_feed", subject: "ACP feed (simulated)", date: "2026-07-25" }),
+    ).toThrow(/not a fee-audit report/);
+    // The legitimate domain still builds.
+    expect(
+      buildEmailReportHtml(driftedCanonical, {
+        tool: "audit_statement",
+        subject: "statement 2026-06 (simulated)",
+        date: "2026-07-25",
+      }),
+    ).toContain("Simulated fee audit");
+  });
+
+  /**
+   * #3b — THE FORGED-METADATA BYPASS, found by a cross-model review OF THE #3 FIX
+   * and pinned so it cannot reopen.
+   *
+   * The first cut of #3 gated on `meta.tool`, which is caller-supplied. Passing a
+   * `check_feed` canonical with `{tool: "audit_statement"}` sailed straight
+   * through and rendered the fee copy again — so the fix's own claim ("the
+   * mislabel is unrepresentable") was true of the intent and false of the code.
+   * The guard now reads the canonical's INTRINSIC SHAPE, which a caller cannot
+   * fake. Same lesson as the injection-scan work this session: a check that
+   * trusts a label instead of the payload is a check you can walk around.
+   */
+  it("#3b: a feed canonical CANNOT be laundered by lying about meta.tool", () => {
+    const feedCanonical = callTool("check_feed", {
+      feedPath: "fixtures/synthetic-restaurant/acp-feed.faithful.json",
+      catalogPath: "fixtures/synthetic-restaurant/sor.catalog.json",
+      surface: "acp",
+    }).canonical;
+    expect(() =>
+      buildEmailReportHtml(feedCanonical, {
+        tool: "audit_statement", // the lie
+        subject: "laundered 2026-06",
+        date: "2026-07-25",
+      }),
+    ).toThrow(/not a fee-audit report/);
+  });
+
+  it("#3b: the inverse mismatch is refused too (fee payload, wrong provenance label)", () => {
+    expect(() =>
+      buildEmailReportHtml(driftedCanonical, { tool: "check_feed", subject: "x 2026-06", date: "2026-07-25" }),
+    ).toThrow(/provenance label contradicts its payload/);
+  });
+
+  /**
+   * #4 — the lane advertises "truncation is explicit, never silent", proven for
+   * the Slack and HTML builders but NOT the .eml builder, whose cap is 20 while
+   * the only fixture driving it yields 5 findings. The branch never ran in the
+   * suite. The behavior was correct when exercised by hand; it was simply
+   * unguarded, on the one surface whose truncation copy was a bare literal.
+   */
+  it("#4: the .eml builder's truncation is explicit, and the test binds the CONSTANT not a magic number", () => {
+    const over = EML_FINDINGS_CAP + 6;
+    // Shape mirrors what the real engine emits — the .eml builder validates
+    // `claim.id` on every finding and refuses a payload that lacks it (a good
+    // guard: it is what stops a malformed report becoming a sent email).
+    const synthetic = JSON.stringify({
+      ok: false,
+      findings: Array.from({ length: over }, (_, i) => ({
+        id: `F-${i}`,
+        claim: { id: `CLAIM-${i}` },
+        severity: "high",
+        verdict: "violation",
+        plainLine: `synthetic finding ${i}`,
+      })),
+    });
+    const eml = buildEmailReportMessage(synthetic, {
+      tool: "audit_statement",
+      subject: "truncation probe (simulated)",
+      date: "Mon, 06 Jul 2026 12:00:00 +0000",
+    });
+    const body = Buffer.from(
+      eml.split("\r\n\r\n").slice(1).join("\r\n\r\n").replace(/=\r\n/g, "").replace(/\r\n/g, "\n"),
+      "utf8",
+    ).toString("utf8");
+    expect(body).toContain(`...and 6 more findings`);
+    expect(body).toContain("synthetic finding 19"); // the last row inside the cap
+    expect(body).not.toContain("synthetic finding 20"); // past it — carried by the attachment
+  });
+
+  /**
+   * #5 — the "no literal (s)" copy standard was named in email.ts, honored
+   * across the email lane, contradicted in three places by the Slack builder,
+   * and enforced by no test either way. Decision recorded at the constant:
+   * the standard is scoped to the EMAIL lane, because the Slack "(s)" forms are
+   * frozen into goldens bound to a real delivered send. Now mechanical.
+   */
+  it("#5: the no-literal-(s) copy standard holds across the EMAIL lane (scoped, and now enforced)", () => {
+    // INSTRUMENT CORRECTED 2026-07-25 after a cross-model review of this fix.
+    // The first cut scanned SOURCE with a comment-stripping regex, which is
+    // unsound in both directions: it falsely passes `const c = "/* (s) */"`
+    // (the stripper deletes quoted content), it cannot see `"(" + "s)"` which
+    // renders the literal without containing it, and it would falsely FAIL on
+    // an internal `throw new Error("no (s) copy")` that never reaches an inbox.
+    // A copy standard is a claim about OUTPUT, so the proof must read output.
+    // Every rendered surface of the email lane, at both plural arities:
+    const one = JSON.stringify({
+      ok: false,
+      findings: [{ claim: { id: "C1" }, id: "F1", severity: "high", verdict: "violation", ruleId: "R1", plainLine: "one" }],
+    });
+    const two = JSON.stringify({
+      ok: false,
+      findings: [
+        { claim: { id: "C1" }, id: "F1", severity: "high", verdict: "violation", ruleId: "R1", plainLine: "one" },
+        { claim: { id: "C2" }, id: "F2", severity: "high", verdict: "violation", ruleId: "R2", plainLine: "two" },
+      ],
+    });
+    const rendered: Array<[string, string]> = [];
+    for (const [arity, canonical] of [["singular", one], ["plural", two]] as const) {
+      rendered.push([`text/${arity}`, buildEmailReportText(canonical, { siteLink: SITE_LINK })]);
+      rendered.push([
+        `html/${arity}`,
+        buildEmailReportHtml(driftedCanonical, { tool: "audit_statement", subject: "s 2026-06", date: "2026-07-25" }),
+      ]);
+      rendered.push([
+        `eml/${arity}`,
+        buildEmailReportMessage(canonical, {
+          tool: "audit_statement",
+          subject: "s (simulated)",
+          date: "Mon, 06 Jul 2026 12:00:00 +0000",
+        }),
+      ]);
+    }
+    for (const [label, body] of rendered) {
+      expect(body, `${label} rendered a literal "(s)" form`).not.toContain("(s)");
+    }
+    // Positive control: the assertion is not vacuous — it DOES catch the form.
+    expect("1 finding(s)").toContain("(s)");
+    // And the committed goldens (the frozen record of what actually shipped).
+    for (const g of ["email-text-fees-drifted.golden.txt", "email-text-fees-pass.golden.txt"]) {
+      expect(readFileSync(join(GOLD, g), "utf8"), `${g} carries "(s)"`).not.toContain("(s)");
+    }
   });
 });
 

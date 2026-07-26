@@ -51,6 +51,11 @@
 
 /** Caller-supplied metadata. `date` is an INPUT for determinism (never Date.now). */
 export interface EmailHtmlMeta {
+  /**
+   * The registry tool whose canonical this is. MUST be `audit_statement` —
+   * this builder's copy is fee-audit-specific and refuses any other domain
+   * (capability sweep finding #3; see the guard in `buildEmailReportHtml`).
+   */
   readonly tool: string;
   /**
    * Subject line — rendered verbatim in the document `<title>` AND mined for
@@ -160,6 +165,53 @@ export function buildEmailReportHtml(canonical: string, meta: EmailHtmlMeta): st
   const r = parsed as { ok?: unknown; findings?: unknown };
   if (typeof r.ok !== "boolean" || !Array.isArray(r.findings)) {
     throw new Error(`delivery/email-html: canonical payload for tool "${meta.tool}" is not a decision-grade report (no ok/findings)`);
+  }
+  // DOMAIN GUARD (capability sweep finding #3, 2026-07-25). This builder's body
+  // copy is FEE-AUDIT-SPECIFIC in two places — the eyebrow "Simulated fee audit"
+  // and the empty-state sentence "No fee lines in this simulated statement
+  // exceed the audited caps." — but the structural check above admits ANY
+  // canonical carrying `ok` + `findings[]`. Rendering a real `check_feed`
+  // canonical therefore produced an email that called a feed-vs-catalog
+  // conformance check a "fee audit" and reported on "fee lines" it never
+  // examined. Not shipped (the sole caller passes `audit_statement`), so it was
+  // a LATENT mislabel rather than a RULES §4 breach — but on a product whose
+  // entire claim is that labels are earned, a builder that can be silently
+  // wrong about what it audited is the wrong shape.
+  //
+  // Chosen fix: NARROW THE CONTRACT rather than parameterize the strings.
+  // Parameterizing would keep the failure mode open and merely relocate it — a
+  // caller passing no/wrong domain wording still yields a mislabeled email.
+  //
+  // CORRECTED 2026-07-25 after a cross-model review of this very fix: the first
+  // cut gated on `meta.tool`, which is CALLER-SUPPLIED and therefore forgeable —
+  // passing a `check_feed` canonical with `{tool: "audit_statement"}` sailed
+  // through and rendered the fee copy again. The claim "the mislabel is
+  // unrepresentable" was true of the intent and false of the code. The gate now
+  // reads the CANONICAL'S OWN SHAPE, which the payload carries intrinsically and
+  // a caller cannot fake: a fee-audit report has `classification`,
+  // `assumedPurchasePriceBase`, and `verdictTally`; a feed/conformance report
+  // has `matchingMode` and none of those. `meta.tool` is still checked, as a
+  // cheap consistency assertion — but it is no longer what the guarantee rests
+  // on. If a feed-audit email is ever wanted it gets its own builder + goldens.
+  const fee = parsed as { classification?: unknown; assumedPurchasePriceBase?: unknown; verdictTally?: unknown };
+  const looksLikeFeeAudit =
+    typeof fee.classification === "string" &&
+    typeof fee.assumedPurchasePriceBase === "string" &&
+    typeof fee.verdictTally === "object" &&
+    fee.verdictTally !== null;
+  if (!looksLikeFeeAudit) {
+    throw new Error(
+      `delivery/email-html: this builder renders FEE-AUDIT copy ("Simulated fee audit", "No fee lines…") and the ` +
+        `canonical it was given is not a fee-audit report (no classification/assumedPurchasePriceBase/verdictTally; ` +
+        `meta.tool="${meta.tool}"). A different audit domain needs its own builder and goldens, not this one with ` +
+        `the wrong labels.`,
+    );
+  }
+  if (meta.tool !== "audit_statement") {
+    throw new Error(
+      `delivery/email-html: canonical is a fee-audit report but meta.tool="${meta.tool}" disagrees — refusing to ` +
+        `render an email whose provenance label contradicts its payload.`,
+    );
   }
   const findings: FindingView[] = r.findings.map((f) => {
     const o = (f ?? {}) as Record<string, unknown>;

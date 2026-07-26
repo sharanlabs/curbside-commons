@@ -33,8 +33,32 @@ export const EMAIL_TO_PLACEHOLDER = "merchant-ops@recipient.example";
 const MIME_BOUNDARY = "commerce-truth-audit-boundary-0000000000000000"; // fixed: determinism over cleverness
 const MAX_ENCODED_LINE = 76;
 
-/** Computed plural suffix (the c8c91a0 copy standard — no literal "(s)" forms). */
+/**
+ * Computed plural suffix (the c8c91a0 copy standard — no literal "(s)" forms).
+ *
+ * SCOPE, decided 2026-07-25 (capability sweep finding #5): this standard binds
+ * the EMAIL lane only — this module and `email-html.ts`/`email-text.ts`, which
+ * hold zero literal "(s)" forms. The Slack builder deliberately keeps "(s)"
+ * (`slack.ts` headline/summary/truncation rows) because those exact strings are
+ * frozen into the committed Slack goldens, which are bound to the 2026-07-21
+ * DELIVERED record — regenerating them to satisfy a copy preference would edit
+ * the byte record of a real owner-armed send, which this project does not do for
+ * cosmetics. The standard was previously stated as if it were repo-wide while
+ * being violated one module over with no gate either way; it is now scoped in
+ * prose AND enforced mechanically for the lane it actually governs
+ * (`evals/delivery/email-text.test.ts`, the copy-standard tooth).
+ * Revisit trigger: if the Slack goldens are ever regenerated for a substantive
+ * reason, migrate the three "(s)" sites in the same change.
+ */
 const plural = (n: number): string => (n === 1 ? "" : "s");
+
+/**
+ * Findings rendered in full before the explicit "…and N more" row. Promoted from
+ * two bare `20` literals 2026-07-25 (capability sweep finding #4) so the
+ * truncation test binds the CONSTANT rather than a magic number — the shape
+ * `EMAIL_HTML_FINDINGS_CAP` already had.
+ */
+export const EML_FINDINGS_CAP = 20;
 
 export interface EmailReportMeta {
   readonly tool: string;
@@ -137,8 +161,12 @@ export function buildEmailReportMessage(canonical: string, meta: EmailReportMeta
     `Result: ${verdictLine}`,
     `Tool: ${tool} (deterministic engine, $0 offline)`,
     "",
-    ...report.findings.slice(0, 20).map((f) => `- [${f.severity}] ${f.plainLine} (${f.id})`),
-    ...(report.findings.length > 20 ? [`...and ${report.findings.length - 20} more finding${plural(report.findings.length - 20)} - full report attached.`] : []),
+    ...report.findings.slice(0, EML_FINDINGS_CAP).map((f) => `- [${f.severity}] ${f.plainLine} (${f.id})`),
+    ...(report.findings.length > EML_FINDINGS_CAP
+      ? [
+          `...and ${report.findings.length - EML_FINDINGS_CAP} more finding${plural(report.findings.length - EML_FINDINGS_CAP)} - full report attached.`,
+        ]
+      : []),
     "",
     // Evidence pointer + footer — copy-coherent with the v5 HTML/one-shot halves
     // (design source mockups/email-v5-light-tweakable-2026-07-22.html). Non-ASCII

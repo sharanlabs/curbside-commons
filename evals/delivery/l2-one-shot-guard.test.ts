@@ -6,8 +6,17 @@ import { describe, expect, it } from "vitest";
 /**
  * L-2 ONE-SHOT TRANSPORT GUARD SUITE — closes the audit LOW item
  * (`docs/reviews/agentic-audit-2026-07-24.md`, small-findings batch, last
- * bullet): `scripts-ts/l2-resend-one-shot.mts` is the ONLY transport-bearing
- * code in the repo, and it carried no committed assertions.
+ * bullet): the L-2 one-shot scripts are the ONLY transport-bearing code in the
+ * repo, and they carried no committed assertions.
+ *
+ * DOCSTRING CORRECTED 2026-07-25 (capability sweep finding #2,
+ * `docs/reviews/capability-sweep-2026-07-25.md`): this header previously named
+ * `l2-resend-one-shot.mts` as the ONLY transport-bearing script. That was FALSE
+ * — `scripts-ts/l2-slack-one-shot.mts:94` performs `await fetch(webhook, …)` to
+ * an env-supplied URL and had zero committed assertions. The false docstring was
+ * the evidence the gap went unnoticed, which is exactly how an unguarded
+ * contract survives a review: the prose asserted the coverage was complete, so
+ * nobody looked. BOTH transport-bearing scripts are now guarded here.
  *
  * This suite pins the OFFLINE / NOT-ARMED contract WITHOUT ever reaching the
  * network. Two kinds of teeth:
@@ -125,5 +134,100 @@ describe("L-2 one-shot transport guard — static teeth (source-level invariants
   it("the payload sha256 covers subject + text + html + attachment", () => {
     expect(src).toContain('createHash("sha256")');
     expect(src).toContain("${subject}\\n${bodyText}\\n${bodyHtml}\\n${attachmentBase64}");
+  });
+});
+
+/**
+ * THE SLACK MIRROR — capability sweep finding #2 (2026-07-25).
+ *
+ * `scripts-ts/l2-slack-one-shot.mts` is the repo's OTHER transport-bearing
+ * script and had no committed assertions at all. It was verified by hand to
+ * exit 2 and touch nothing when unarmed, so this was an UNGUARDED CONTRACT
+ * rather than a live defect — but an unguarded contract is one careless edit
+ * away from becoming one, and this script can reach the public internet.
+ *
+ * Same two kinds of teeth as the Resend suite above: spawned live-guard
+ * behaviour under a provably-unarmed env, plus static source invariants. No test
+ * path can send — every case either has no webhook at all or supplies a
+ * deliberately non-Slack / malformed URL that trips the allowlist guards long
+ * before the fetch.
+ */
+const SLACK_SCRIPT = join("scripts-ts", "l2-slack-one-shot.mts");
+
+function slackEnv(extra: Record<string, string> = {}): NodeJS.ProcessEnv {
+  const env = { ...process.env };
+  delete env.SLACK_WEBHOOK_URL;
+  return { ...env, ...extra };
+}
+
+function runSlackUnarmed(extra: Record<string, string> = {}): { status: number | null; output: string } {
+  const res = spawnSync("node", [SLACK_SCRIPT], {
+    cwd: root,
+    env: slackEnv(extra),
+    encoding: "utf8",
+    timeout: 30_000,
+  });
+  return { status: res.status, output: `${res.stdout ?? ""}${res.stderr ?? ""}` };
+}
+
+describe("L-2 SLACK one-shot transport guard — offline NOT-ARMED contract", () => {
+  it("the spawn env is provably unarmed (no webhook reaches the child)", () => {
+    expect(slackEnv().SLACK_WEBHOOK_URL).toBeUndefined();
+  });
+
+  it("missing SLACK_WEBHOOK_URL: refuses with a non-zero exit, names the missing var, sends nothing", () => {
+    const res = runSlackUnarmed();
+    expect(res.status).toBe(2);
+    expect(res.output).toContain("SLACK_WEBHOOK_URL is not set");
+    expect(res.output).toContain("NOT armed");
+    expect(res.output).not.toContain("L-2 DELIVERED");
+  });
+
+  it("malformed webhook: refuses before any send", () => {
+    const res = runSlackUnarmed({ SLACK_WEBHOOK_URL: "not-a-url" });
+    expect(res.status).toBe(2);
+    expect(res.output).toContain("not a valid URL");
+    expect(res.output).not.toContain("L-2 DELIVERED");
+  });
+
+  it("host allowlist (control #2): a non-Slack host is refused even when well-formed", () => {
+    // The single most important guard on this script — it is what stops an
+    // env-supplied URL from turning a demo into an arbitrary-host POST.
+    const res = runSlackUnarmed({ SLACK_WEBHOOK_URL: "https://evil.example/services/T000/B000/XXXX" });
+    expect(res.status).toBe(2);
+    expect(res.output).toContain("is not hooks.slack.com");
+    expect(res.output).not.toContain("L-2 DELIVERED");
+  });
+
+  it("path allowlist: a Slack host with a non-/services/ path is refused", () => {
+    const res = runSlackUnarmed({ SLACK_WEBHOOK_URL: "https://hooks.slack.com/not-services/abc" });
+    expect(res.status).toBe(2);
+    expect(res.output).not.toContain("L-2 DELIVERED");
+  });
+});
+
+describe("L-2 SLACK one-shot transport guard — static teeth (source-level invariants)", () => {
+  const slackSrc = readFileSync(join(root, SLACK_SCRIPT), "utf8");
+
+  it("the single fetch/send is lexically gated behind every arming guard exit", () => {
+    const fetchAt = slackSrc.indexOf("fetch(");
+    expect(fetchAt, "the script must contain the send fetch").toBeGreaterThan(-1);
+    const lastGuardExit = slackSrc.lastIndexOf("process.exit(2)");
+    expect(lastGuardExit).toBeGreaterThan(-1);
+    expect(fetchAt, "fetch must appear after the final arming guard").toBeGreaterThan(lastGuardExit);
+    expect([...slackSrc.matchAll(/fetch\(/g)].length, "exactly one send").toBe(1);
+  });
+
+  it("the payload is built by the GOLDEN-TESTED builder, never composed inline", () => {
+    // This is the property whose ABSENCE on the email side was capability-sweep
+    // finding #1. The Slack lane already had it; now it is pinned so it cannot
+    // regress into an inline literal the goldens do not cover.
+    expect(slackSrc).toContain('from "../lib/delivery/slack.ts"');
+    expect(/buildSlackReportPayload\(/.test(slackSrc)).toBe(true);
+  });
+
+  it("the host+path allowlist is enforced in source (control #2), not just by convention", () => {
+    expect(slackSrc).toContain('url.host !== "hooks.slack.com"');
+    expect(slackSrc).toContain('url.pathname.startsWith("/services/")');
   });
 });
