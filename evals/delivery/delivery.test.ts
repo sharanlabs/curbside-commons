@@ -184,7 +184,7 @@ describe("A3 email HTML builder — goldens + invariants", () => {
     tool: "audit_statement",
     subject: "[SIMULATED] Fee audit: 5 violations — 2026-06",
     date: "2026-07-22",
-    siteLink: "https://curbside-commons.pages.dev/fees",
+    siteLink: "https://curbside-commons.vercel.app/fees",
     preheader: "5 NYC fee-cap violations found in simulated statement 2026-06. See the arithmetic in report.json.",
   } as const;
 
@@ -196,7 +196,7 @@ describe("A3 email HTML builder — goldens + invariants", () => {
     tool: "audit_statement",
     subject: "[SIMULATED] Fee audit: no violations — 2026-06",
     date: "2026-07-22",
-    siteLink: "https://curbside-commons.pages.dev/fees",
+    siteLink: "https://curbside-commons.vercel.app/fees",
     preheader: "No violations found in simulated statement 2026-06. See the arithmetic in report.json.",
   } as const;
 

@@ -98,7 +98,7 @@ const preheader = parsed.ok
 // The public site link — caller-supplied HERE (the pure HTML builder may not
 // carry a URL literal, A3 boundary). Shared by the plain-text link line and the
 // HTML action button so both halves point at the same audit.
-const siteLink = "https://curbside-commons.pages.dev/fees";
+const siteLink = "https://curbside-commons.vercel.app/fees";
 
 // Plain-text half — built by the SHARED, GOLDEN-TESTED builder
 // (`lib/delivery/email-text.ts`). It was composed inline here until 2026-07-25,

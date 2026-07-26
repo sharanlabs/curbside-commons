@@ -8,8 +8,15 @@ import { describe, expect, it } from "vitest";
  * The three surfaces a visitor or a crawler meets BEFORE any page content:
  * `metadataBase` (every absolute URL Next derives), the social card, and
  * robots.txt. None of them had a test, and one of them was wrong: `metadataBase`
- * named `curbside-commons.vercel.app` while the site is deployed on Cloudflare
- * Pages, so every absolute URL pointed at a host that does not serve the site.
+ * named a host that was not serving the site, so every absolute URL it derived
+ * (OG image, canonical) addressed somewhere the site does not live.
+ *
+ * That line has since been wrong in BOTH directions — it named Vercel during the
+ * Cloudflare Pages period, was corrected to `pages.dev`, and then the owner moved
+ * the deploy target to Vercel (2026-07-26), making `pages.dev` wrong in turn.
+ * Which is exactly why it is asserted here against the BUILT export rather than
+ * trusted: `metadataBase` is a factual claim about where the site is hosted, so
+ * it goes stale whenever hosting changes, and nothing else in the build notices.
  *
  * The honesty stake here is specific and worth stating: a social card is the ONE
  * surface that travels WITHOUT its page. Every other surface carries its
@@ -42,12 +49,18 @@ function meta(property: string): string {
 }
 
 describe("presentation — metadataBase names the host that actually serves the site", () => {
-  it("absolute URLs point at the live Cloudflare Pages deploy, not a host that never served it", () => {
-    // The defect this pins: metadataBase named curbside-commons.vercel.app
-    // while the site is deployed on Cloudflare Pages, so every derived
-    // absolute URL addressed a host that does not serve the site.
-    expect(meta("og:image")).toContain("curbside-commons.pages.dev");
-    expect(meta("og:image")).not.toContain("vercel.app");
+  it("absolute URLs point at the live Vercel deploy, not a host that no longer serves it", () => {
+    // The deploy target is Vercel as of 2026-07-26 (owner directive; Cloudflare
+    // Pages retired). Every derived absolute URL must name it.
+    expect(meta("og:image")).toContain("curbside-commons.vercel.app");
+    expect(meta("og:image")).not.toContain("pages.dev");
+  });
+
+  it("no retired host survives anywhere in the built page", () => {
+    // A migration that repoints the metadata but leaves a hardcoded link, a
+    // canonical, or a preconnect behind is the failure this catches — the page
+    // would still work, while quietly advertising a host we no longer control.
+    expect(HTML).not.toContain("pages.dev");
   });
 
   it("absolute URLs are https (they must not downgrade)", () => {

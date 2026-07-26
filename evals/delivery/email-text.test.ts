@@ -34,7 +34,7 @@ import { detectInjectionSignatures } from "@/lib/crew/injection-scan.ts";
  */
 
 const GOLD = join(process.cwd(), "evals", "delivery", "gold");
-const SITE_LINK = "https://curbside-commons.pages.dev/fees";
+const SITE_LINK = "https://curbside-commons.vercel.app/fees";
 const DRIFTED = "fixtures/synthetic-restaurant/fees/statement.drifted.json";
 const FAITHFUL = "fixtures/synthetic-restaurant/fees/statement.faithful.json";
 

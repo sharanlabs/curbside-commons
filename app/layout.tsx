@@ -28,13 +28,21 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  // metadataBase = the LIVE deploy target. Corrected 2026-07-25 (presentation
-  // lane (e)): this pointed at `curbside-commons.vercel.app`, but the site is
-  // deployed on Cloudflare Pages and the Vercel host was never serving it — so
-  // every absolute URL Next derives from this base (OG image, canonical) named
-  // a host that does not serve the site. A metadataBase is only correct
-  // relative to where the thing actually lives.
-  metadataBase: new URL("https://curbside-commons.pages.dev"),
+  // metadataBase = the LIVE deploy target.
+  //
+  // HISTORY, because this line has now been wrong in both directions and the
+  // reason matters more than the value: it named the Vercel host while the site
+  // was served from Cloudflare Pages (so every derived absolute URL — OG image,
+  // canonical — addressed a host that did not serve the site). That was
+  // corrected to `pages.dev` on 2026-07-25, and then the OWNER MOVED THE DEPLOY
+  // TARGET TO VERCEL the same day, which made `pages.dev` wrong in turn.
+  //
+  // The invariant, not the value: **a metadataBase is only correct relative to
+  // where the thing actually lives.** It is not a preference or a brand name —
+  // it is a factual claim about hosting, so it changes whenever hosting does.
+  // `evals/presentation-posture.test.ts` asserts this against the BUILT export,
+  // which is the only place the claim can be checked rather than assumed.
+  metadataBase: new URL("https://curbside-commons.vercel.app"),
   title: {
     default: "Curbside Commons — deterministic commerce-truth verifier",
     template: "%s · Curbside Commons",
