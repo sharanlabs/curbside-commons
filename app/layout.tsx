@@ -28,21 +28,42 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  // metadataBase = the Vercel deploy target (blindspot fix 2026-07-16); the
-  // OG image card + indexing posture stay owner picks — none set here.
-  metadataBase: new URL("https://curbside-commons.vercel.app"),
+  // metadataBase = the LIVE deploy target. Corrected 2026-07-25 (presentation
+  // lane (e)): this pointed at `curbside-commons.vercel.app`, but the site is
+  // deployed on Cloudflare Pages and the Vercel host was never serving it — so
+  // every absolute URL Next derives from this base (OG image, canonical) named
+  // a host that does not serve the site. A metadataBase is only correct
+  // relative to where the thing actually lives.
+  metadataBase: new URL("https://curbside-commons.pages.dev"),
   title: {
     default: "Curbside Commons — deterministic commerce-truth verifier",
     template: "%s · Curbside Commons",
   },
   description:
-    "The proof layer for agentic commerce — a deterministic verifier that checks the published feed of a platform or AI agent against the merchant's own records, validates data-format conformance, and audits NYC delivery fee statements, with evidence attached to every finding.",
+    "The proof layer for agentic commerce — a deterministic verifier that checks a published feed against the merchant's own records, validates data-format conformance, and audits NYC delivery fee statements, with evidence attached to every finding. A working prototype on simulated data.",
   openGraph: {
     siteName: "Curbside Commons",
     title: "Curbside Commons — the proof layer for agentic commerce",
+    // HONESTY (RULES §4) — a social card is the one surface that travels
+    // WITHOUT its page, so it has to carry its own scope. Every other surface
+    // is labelled in its chrome; a screenshotted card is not. The prototype +
+    // simulated-data qualifier is therefore part of the card copy itself, not
+    // something a reader has to click through to discover.
     description:
-      "Menu and catalog claims checked against the merchant's own record; NYC delivery fee statements audited against the codified caps — evidence attached to every finding.",
+      "Menu and catalog claims checked against the merchant's own record; NYC delivery fee statements audited against the codified caps — evidence attached to every finding. A working prototype run on simulated data; not affiliated with any delivery platform.",
     type: "website",
+    locale: "en_US",
+    // Static SVG (the site is a static export — no runtime image route). It
+    // carries "SIMULATED DATA · PROTOTYPE" on its face, because a card is the
+    // one surface that travels without its page.
+    images: [{ url: "/og.svg", width: 1200, height: 630, alt: "Curbside Commons — deterministic verifier for agentic commerce. Simulated data, prototype." }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og.svg"],
+    title: "Curbside Commons — the proof layer for agentic commerce",
+    description:
+      "A deterministic verifier for agentic commerce: feed-vs-record truth, schema conformance, NYC fee-cap audits. Working prototype, simulated data.",
   },
 };
 

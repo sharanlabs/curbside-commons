@@ -1,0 +1,26 @@
+# Curbside Commons — robots posture, decided 2026-07-25 (presentation lane (e)).
+#
+# INDEXABLE BY DESIGN. This is a portfolio prototype; it exists to be read by
+# people evaluating the work, so a blanket noindex would defeat its only
+# purpose. The honesty obligation is met the way it is everywhere else on this
+# site — by labelling, not by hiding: every page's chrome, the footer-linked
+# /docs "what is real" page, and the social card all state
+# prototype-on-simulated-data on their face.
+#
+# /legacy is disallowed because it is superseded material kept for provenance.
+# An indexed legacy page is how a stale claim outlives the correction that
+# replaced it — a search result has no way to know it is reading the archive.
+# It stays reachable for a reader who follows a link; it is not a surface for a
+# crawler that arrives cold.
+#
+# No Sitemap: line — no sitemap route exists, and naming one that 404s is worse
+# than naming none (a crawler reads the dangling reference as a site defect).
+#
+# Static file rather than an app/robots.ts route: this site is a static export
+# (next.config.ts output: "export"), which cannot collect a dynamic metadata
+# route — proven by a build failure, not assumed.
+
+User-agent: *
+Allow: /
+Disallow: /legacy
+Disallow: /legacy/
