@@ -7,6 +7,12 @@
  * (owner-armed only; run scripts-ts/groq-preflight.mjs FIRST — the TPD window
  * must be fresh; the 2026-06-29 depletion lesson.)
  *
+ * K≥3 consistency reps (`docs/l1-consistency-preregistration.md`): set
+ * `L1_OUT_DIR=consistency/rep-1` (…rep-2, rep-3) so each independent pass writes
+ * its own frozen artifacts and the canonical K=1 record is never overwritten.
+ * Reps are INDEPENDENT PASSES, never retries of failed cases — re-running only
+ * the failures would manufacture the stability being measured (§4).
+ *
  * MECHANICS (capture-then-replay; zero changes to shipped crew code):
  *  1. For each held-out case (sorted): build the Intake turn input EXACTLY as
  *     the orchestrator builds it (same fields, same `quarantineExcerpt` — see
@@ -53,9 +59,28 @@ import { evaluateCase, type MatrixRow } from "../evals/crew/harness.ts";
 
 const LIVE_CASES_DIR = join(process.cwd(), "evals", "crew", "cases-live");
 const GOLD_DIR = join(process.cwd(), "evals", "crew", "gold");
-const TURNS_PATH = join(GOLD_DIR, "l1-live-turns.json");
-const RECORDS_PATH = join(GOLD_DIR, "l1-live-records.json");
-const MATRIX_PATH = join(GOLD_DIR, "l1-live-matrix.json");
+
+/**
+ * Where this run's artifacts land. Defaults to the canonical gold dir — the
+ * 2026-07-07 K=1 behaviour, unchanged.
+ *
+ * WHY THIS IS PARAMETERISED (2026-07-27): the probe-write below overwrites all
+ * three output files BEFORE the first live call. With a fixed path that is
+ * correct for the first run and destructive for every one after it — a second
+ * invocation wipes the committed K=1 exam record (pinned by `l1-live-lock`,
+ * `l1-live-composition-lock`, and `l1-lane-drift-lock`, which reads the model id
+ * straight out of `l1-live-matrix.json`) at second zero, before spending a cent.
+ * The K≥3 consistency pre-registration needs N independent passes, so each rep
+ * writes to its own directory and the canonical artifacts are never touched.
+ *
+ * `L1_OUT_DIR` is resolved against the gold dir, so it cannot escape it.
+ */
+const OUT_DIR = process.env.L1_OUT_DIR?.trim()
+  ? join(GOLD_DIR, process.env.L1_OUT_DIR.trim())
+  : GOLD_DIR;
+const TURNS_PATH = join(OUT_DIR, "l1-live-turns.json");
+const RECORDS_PATH = join(OUT_DIR, "l1-live-records.json");
+const MATRIX_PATH = join(OUT_DIR, "l1-live-matrix.json");
 
 if (process.env.ENABLE_LIVE_AI !== "true" || !process.env.GROQ_API_KEY?.trim()) {
   console.error("REFUSING: L-1 is owner-armed only — ENABLE_LIVE_AI=true (CLI override) + GROQ_API_KEY required.");
@@ -96,11 +121,20 @@ const cases: CrewCase[] = readdirSync(LIVE_CASES_DIR)
   .map((f) => JSON.parse(readFileSync(join(LIVE_CASES_DIR, f), "utf8")) as CrewCase);
 
 // ---- probe-write BEFORE any spend (the 2026-07-05 ENOENT lesson) ----
-mkdirSync(GOLD_DIR, { recursive: true });
+mkdirSync(OUT_DIR, { recursive: true });
 const startedAt = new Date().toISOString();
-const header = { run: "L-1 crew live", startedAt, model: resolvedCrewLiveModel(), cases: cases.length };
+const header = {
+  run: "L-1 crew live",
+  startedAt,
+  model: resolvedCrewLiveModel(),
+  cases: cases.length,
+  // Provenance: which rep this is, so a frozen artifact identifies itself without
+  // relying on its directory name surviving a move. Additive — the lock suites
+  // read `model`/`turns`/`records`/`matrix`/`summary` and ignore extra fields.
+  ...(process.env.L1_OUT_DIR?.trim() ? { rep: process.env.L1_OUT_DIR.trim() } : {}),
+};
 for (const p of [TURNS_PATH, RECORDS_PATH, MATRIX_PATH]) writeFileSync(p, `${JSON.stringify({ probe: header }, null, 2)}\n`);
-console.log(`probe-writes OK (${GOLD_DIR}); model=${header.model}; cases=${header.cases}\n`);
+console.log(`probe-writes OK (${OUT_DIR}); model=${header.model}; cases=${header.cases}\n`);
 
 const turns: LiveTurnRecord[] = [];
 const degraded: DegradedCase[] = [];
@@ -216,7 +250,7 @@ for (const m of members) {
 }
 const finishedAt = new Date().toISOString();
 writeFileSync(MATRIX_PATH, `${JSON.stringify({ ...header, finishedAt, matrix, summary, degradedCount: degraded.length }, null, 2)}\n`);
-console.log(`\nrun complete: ${matrix.length}/${cases.length} cases scored, ${degraded.length} degraded; artifacts in ${GOLD_DIR}`);
+console.log(`\nrun complete: ${matrix.length}/${cases.length} cases scored, ${degraded.length} degraded; artifacts in ${OUT_DIR}`);
 if (degraded.length >= 5) {
   console.log("⚠ BAIL RULE: ≥5 degraded cases — THE WHOLE RUN IS DIAGNOSTIC (pre-registration §5); no label may move.");
 }
