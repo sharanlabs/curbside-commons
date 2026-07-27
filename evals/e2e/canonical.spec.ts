@@ -173,9 +173,15 @@ test("commons scene: reduced motion settles complete; the pause control is real 
   await expect(page.locator(".cs-status-live")).toContainText(
     "SCENE SETTLED · ORDER PLACED WITH PROOF",
   );
-  // The primary CTA runs the check; the secondary is a native in-page anchor.
+  // The primary CTA runs the check; the secondary is a native link to the
+  // WORKING TOOL. It pointed at "#try" — the one-number bench further down this
+  // same page — until 2026-07-27, so a reader who clicked "try it on a feed"
+  // never reached anything that takes a feed. The destination is the contract.
   await expect(page.getByRole("button", { name: "Watch the check" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Try it on a feed" })).toHaveAttribute("href", "#try");
+  await expect(page.getByRole("link", { name: "Try it on a feed" })).toHaveAttribute(
+    "href",
+    "/playground",
+  );
 });
 
 test("commons scene pause/play genuinely toggles the motion loop", async ({ page }) => {

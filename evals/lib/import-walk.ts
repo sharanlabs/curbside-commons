@@ -74,7 +74,7 @@ export const ALLOWED_NODE_BUILTINS: readonly string[] = [
 export const ALLOWED_BARE_PACKAGES: readonly string[] = ["ajv", "ajv-formats"];
 
 /** Every spelling of a network call the source scan must reject. */
-const NETWORK_CALL_PATTERNS: ReadonlyArray<readonly [RegExp, string]> = [
+export const NETWORK_CALL_PATTERNS: ReadonlyArray<readonly [RegExp, string]> = [
   [/(^|[^.\w])fetch\s*\(/, "bare fetch("],
   [/\bglobalThis\s*\.\s*fetch\b/, "globalThis.fetch"],
   [/\bglobal\s*\.\s*fetch\b/, "global.fetch"],

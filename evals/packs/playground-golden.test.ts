@@ -101,6 +101,9 @@ describe("playground golden equality (the page's central claim)", () => {
  * bites on planted hidden forms.)
  */
 import { builtinModules } from "node:module";
+// The estate's single list of egress spellings — imported rather than
+// re-declared so a new sink added there is enforced here too (gate finding 12).
+import { NETWORK_CALL_PATTERNS } from "../lib/import-walk.ts";
 
 const IMPORT_FORMS: readonly RegExp[] = [
   // import ... from "x" / export ... from "x"
@@ -172,6 +175,19 @@ describe("playground browser safety (fail-closed import-graph walk)", () => {
       if (reqCalls > reqLiterals) {
         offenders.push(`${file} contains a require() with a non-literal specifier — fail closed`);
       }
+      // EGRESS SINKS, not just imports (cross-model gate finding 12,
+      // 2026-07-27). This walk only ever checked what a file IMPORTS — but
+      // `fetch`, `sendBeacon`, `XMLHttpRequest`, `WebSocket` and `EventSource`
+      // are GLOBALS: adding any of them needs no import at all and left this
+      // guard green. That made "zero-network by construction" a claim broader
+      // than the thing backing it — on the very surface that now reads the
+      // reader's files. The shared scanner already had the patterns
+      // (evals/lib/import-walk.ts:77-87); this walk simply never used them.
+      for (const [pattern, label] of NETWORK_CALL_PATTERNS) {
+        if (pattern.test(src)) {
+          offenders.push(`${file} contains a network call: ${label}`);
+        }
+      }
       for (const spec of extractSpecifiers(src)) {
         if (NODE_BUILTINS.has(spec)) {
           offenders.push(`${file} imports the Node builtin "${spec}"`);
@@ -200,7 +216,13 @@ describe("playground browser safety (fail-closed import-graph walk)", () => {
   it("the seam's transitive closure reaches no Node builtin and nothing unresolved", () => {
     const { seen, offenders } = walkClosure([
       join(root, "components", "playground", "verify-in-browser.ts"),
-      join(root, "components", "playground", "PlaygroundClient.tsx"),
+      // The upload surface (2026-07-27) joins the same closure: a file input
+      // is only zero-network if what reads it is. FileReader never touches a
+      // network, and this walk proves nothing in the workbench's import graph
+      // can either — the page's "nothing leaves this page" promise is
+      // structural, not a courtesy.
+      join(root, "components", "playground", "AuditWorkbench.tsx"),
+      join(root, "components", "playground", "FileDrop.tsx"),
       // Fee surface (NYC showcase N1+N2, 2026-07-16): the fee seam + clients
       // run in the same browser closure — same fail-closed proof.
       join(root, "components", "fees", "audit-in-browser.ts"),
@@ -267,10 +289,18 @@ describe("playground browser safety (fail-closed import-graph walk)", () => {
 
 describe("playground honesty labels (de-jargon Slice E — disclaimer-free + honest)", () => {
   const pageSrc = readFileSync(join(root, "app", "playground", "page.tsx"), "utf8");
+  // REBOUND 2026-07-27 (the upload commission). These guards used to read
+  // components/playground/PlaygroundClient.tsx — the one-field paste leg. That
+  // component was DELETED when /playground became the two-file workbench, so
+  // the guards now read the surface that actually ships. Every invariant below
+  // is preserved verbatim; only the file they point at changed. A honesty
+  // guard aimed at a component the page no longer renders is worse than no
+  // guard: it reports green over an unexamined surface.
   const clientSrc = readFileSync(
-    join(root, "components", "playground", "PlaygroundClient.tsx"),
+    join(root, "components", "playground", "AuditWorkbench.tsx"),
     "utf8",
   );
+  const dropSrc = readFileSync(join(root, "components", "playground", "FileDrop.tsx"), "utf8");
 
   // The public copy is disclaimer-free and jargon-free: the honest boundary is
   // stated in plain product language ("illustrative"), NOT with lab-words or a
@@ -280,8 +310,11 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     // freeze-reversal 2026-07-20: the "illustrative" label requirement is retired; the
     // rebuilt /playground states its honest boundary as the pinned-world copy — the
     // merchant catalog of N records, out-of-catalog reads as unknown or missing.
+    // 2026-07-27: reworded from "reference world is …" to "sample catalog of N
+    // records", because the page now ALSO takes the reader's own records — a
+    // single fixed "reference world" stopped being true of every run on it.
     expect(pageSrc).toMatch(/HONEST BOUNDARY/);
-    expect(pageSrc).toMatch(/reference world is the merchant catalog/);
+    expect(pageSrc).toMatch(/checks against the sample catalog/);
     expect(pageSrc).toMatch(/reads as unknown or missing/);
     // No lab-words / removed disclaimer leak onto the public page.
     expect(pageSrc).not.toMatch(/\bsimulated\b/i);
@@ -303,23 +336,61 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     // byte-exact reference tally is proven by the golden-equality test above.
     expect(pageSrc).toMatch(/<TryLiveBench \/>/);
     expect(clientSrc).toMatch(/<noscript>/);
-    // The internal fixture path must NOT be cited on either public surface.
-    expect(pageSrc).not.toMatch(/expected-report\.acp\.json/);
-    expect(pageSrc).not.toMatch(/fixtures\//);
-    expect(clientSrc).not.toMatch(/expected-report\.acp\.json/);
-    expect(clientSrc).not.toMatch(/fixtures\//);
+    // The internal fixture path must NOT be cited on any public surface.
+    for (const src of [pageSrc, clientSrc, dropSrc]) {
+      expect(src).not.toMatch(/expected-report\.acp\.json/);
+      expect(src).not.toMatch(/fixtures\//);
+    }
   });
 
-  it("the client distinguishes the sample run from a pasted run, in plain language", () => {
-    // freeze-reversal 2026-07-20: the "illustrative merchant catalog" label requirement is
-    // retired; the shipped pg-prov copy distinguishes the "committed feed" recompute from a
-    // pasted run checked against the "pinned merchant catalog".
-    expect(clientSrc).toMatch(/This is the committed feed/);
-    expect(clientSrc).toMatch(/recomputed in your browser/);
-    expect(clientSrc).toMatch(/Computed in your browser just now/);
-    // pasted runs are checked against the pinned catalog — no lab-words.
-    expect(clientSrc).toMatch(/pinned merchant catalog/);
-    expect(clientSrc).not.toMatch(/\bsimulated\b/i);
-    expect(clientSrc).not.toMatch(/\bsynthetic\b/i);
+  it("the workbench names the record side of every run, in plain language", () => {
+    // 2026-07-27: the run's provenance is no longer one fixed sentence, because
+    // the record side is now a CHOICE. Whichever way the reader goes, the
+    // result must say which records the verdict was reached against — an
+    // unlabelled verdict is the one thing this surface may never produce.
+    expect(clientSrc).toMatch(/computed\s*\n?\s*in your browser/i);
+    expect(clientSrc).toMatch(/of your own records/);
+    expect(clientSrc).toMatch(/sample records/);
+    expect(clientSrc).toMatch(/unknown or missing/);
+    // Both provenance phrases must read from the recorded ACTION, never from a
+    // "is this slot non-empty" proxy — the bug gate finding 4 named.
+    expect(clientSrc).toMatch(/run\.origin\.catalog === "reader"/);
+    expect(clientSrc).toMatch(/run\.origin\.feed === "reader"/);
+    // No lab-words on any public surface. The predecessor guard banned the
+    // WHOLE WORD `simulated`, and an earlier version of this rebound tooth
+    // narrowed it to `simulated: true` — which would have let the bare word
+    // back onto a shipping surface. Caught by diffing old assertions against
+    // new (claim-F attack, 2026-07-27); the original breadth is restored, and
+    // this comment exists so the next narrowing has to be deliberate.
+    for (const src of [clientSrc, dropSrc]) {
+      expect(src).not.toMatch(/\bsimulated\b/i);
+      expect(src).not.toMatch(/\bsynthetic\b/i);
+    }
+  });
+
+  it("an uploaded run cannot inherit the committed corpus's honesty label", () => {
+    // The C3/C10 labels describe the RUN. When the records are the reader's
+    // own, the report must not claim synthetic-controlled matching or a
+    // simulated corpus — see lib/packs/listings/run.ts (slice 1) and the
+    // provenance suite. This tooth pins that the workbench actually passes a
+    // catalog through rather than falling back to the compiled-in one.
+    expect(clientSrc).toMatch(/verifyAcpFeed\(parsedFeed\.feed, catalog, origin\)/);
+    // Provenance is carried, not inferred: the origin passed to the engine is
+    // built from slot state, and the slot records the action that filled it.
+    expect(clientSrc).toMatch(/catalogOrigin = record\.source/);
+    expect(clientSrc).toMatch(/feed: feed\.source/);
+  });
+
+  it("FEED origin is distinguished, not just record origin", () => {
+    // The deleted paste client distinguished the committed sample feed from a
+    // pasted one, and the first rebound guard checked record origin ONLY —
+    // retiring an invariant by accident rather than by decision (gate finding
+    // 16). It is restored: both sides carry an origin, the sample-feed button
+    // records "sample", and the result panel renders a `feed side` row that the
+    // e2e asserts. This tooth exists so the next lapse has to be deliberate.
+    expect(clientSrc).toMatch(/sampleFeedText\(\), "sample-feed\.json", "sample"/);
+    expect(clientSrc).toMatch(/catalogSampleText\(\), "sample-catalog\.json", "sample"/);
+    expect(clientSrc).toMatch(/feed side/);
+    expect(clientSrc).toMatch(/sample feed/);
   });
 });

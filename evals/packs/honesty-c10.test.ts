@@ -83,7 +83,11 @@ const siteShell = [
   // Playground slice (owner commission 2026-07-13): the in-browser verifier's
   // page + client + seam are viewer-facing prose surfaces — same gates.
   join(root, "app", "playground", "page.tsx"),
-  join(root, "components", "playground", "PlaygroundClient.tsx"),
+  // The two-file workbench (owner commission 2026-07-27) replaced the
+  // single-field paste client as the page's working surface; both of its
+  // components are viewer-facing prose and carry the same C10 gates.
+  join(root, "components", "playground", "AuditWorkbench.tsx"),
+  join(root, "components", "playground", "FileDrop.tsx"),
   join(root, "components", "playground", "verify-in-browser.ts"),
   join(root, "components", "playground", "TryLiveBench.tsx"),
   // /legacy archive landing (build piece 2, 2026-07-20): the front door to the
