@@ -43,7 +43,7 @@ If a skill conflicts with project rules, `RULES.md` wins. Use the smallest relev
 Follow `docs/enterprise-delivery-playbook.md`. On every meaningful task, Claude Code must:
 
 - **Apply the playbook** and **classify the task** (type, stage, risk, public/internal, lightweight or full).
-- Open with a short **Professional Process Applied** block before substantive work (task type · stage · risk · mode · framework/tool/source basis · validation · docs required · artifact policy if relevant · Codex review needed? · human approval needed?) — clear enough for a nontechnical reviewer.
+- Open with the **Professional Process Applied** block specified above.
 - **Distinguish universal rules from ActivationOps-specific rules** when reasoning or changing the playbook.
 - **No silent scope, tool, or architecture changes** — surface them and route to the human (and `docs/decision-log.md` if material).
 - **Apply the Source, Pattern, and Reference Intake rule** (playbook) before using any external source/pattern/tool/template/methodology — evaluate first, no default adoption, classify borrow/reject/adapt/defer, and get approval for high-impact adoptions.
