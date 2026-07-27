@@ -676,3 +676,106 @@ next project inherits both instead of re-deriving them live.
 
 Gate: `npm run verify` exit 0, 1283 passed / 8 skipped, re-verified identical after the dep fix.
 sol xhigh adversarial review adjudicated primary-model-final (see decision-log).
+
+## 2026-07-27 — Session 35: two gated items executed, and three defects that only executing could find
+
+The owner authorized the last two open items. Both went through on the first *intent* and neither on
+the first *attempt*, and the gap between those is the whole entry.
+
+### The pattern, stated once
+
+Three separate defects this session shared one shape: **an artifact that was correct in the repo and
+wrong in reality.** Session 34 recorded the same shape four times and named it "a claim broader than
+the code backing it." The 2026-07-27 variant is narrower and more uncomfortable: *a check that
+verifies the thing it can see, and is silent about the thing that actually matters.*
+
+### Defect 1 — the Vercel config passed every shape check and failed the deploy
+
+`vercel.json` carried `framework: "nextjs"` and `outputDirectory: "out"`. Both keys are valid. Session
+34 verified the file "parses, correct shape" and it genuinely did. But `framework: nextjs` invokes
+Vercel's Next.js builder, which requires `routes-manifest.json`, and `outputDirectory: out` aims that
+builder at an `output: "export"` folder that has none. The deploy died on exactly that.
+
+Root cause is not a typo — it is that **shape-correctness and deploy-correctness are different
+properties**, and only one of them was ever tested.
+
+### Defect 2 — the deploy then succeeded and the site was five-sixths dead
+
+With `framework: null` the deploy went green. `/` returned 200. `/report`, `/fees`, `/playground`,
+`/proof` and `/docs` all returned 404, while `/report.html` served fine: Next's export emits
+`report.html`, not `report/index.html`, and static hosting needs `cleanUrls` to bridge that.
+
+This is the one worth remembering. **Every in-repo check — including the C10 honesty gate's recursive
+walk over all 60 built pages — verifies that THE FILES EXIST. None of them verify that THE HOST MAPS
+A URL TO A FILE.** The build artifact was complete and correct while the product was broken, and no
+amount of local testing could have distinguished the two. It was caught only because the runbook
+insisted on post-deploy verification instead of treating a green deploy as success — and only because
+the routes were checked individually rather than at `/`, which alone would have looked perfect.
+
+Both are now pinned red-green in `evals/packs/header-policy.test.ts`, each carrying the real deploy
+error in its comment so the assertion traces to an outcome rather than to a preference. The honest
+limit is recorded with them: an in-repo test still cannot detect a host-routing failure. That remains
+live-only, which is precisely why the runbook step is not optional.
+
+A correction to my own earlier framing, since it was wrong in a way worth keeping: the runbook says
+the `curl -I` header check "is the one that matters." The deploy disproved that. All four headers
+arrived correctly on the deploy where five of six routes 404'd. **Headers and routing are independent
+failure modes and neither substitutes for the other.**
+
+### Defect 3 — the pre-registration had no way to collect its own input
+
+Before firing a single rep: `crew-live-l1-run.mts` probe-writes over all three canonical gold
+artifacts *before the first live call*. Correct for the first run, destructive for every one after.
+Running it three times, as the K≥3 registration implies, would have destroyed the committed
+2026-07-07 K=1 exam record — pinned by `l1-live-lock`, `l1-live-composition-lock` and
+`l1-lane-drift-lock` — at second zero of rep 1, before spending a cent.
+
+Session 34 committed the scorer and the seven floors and exercised both against synthetic reps. The
+protocol line "the scoring code is committed BEFORE the run" was satisfied, **which is exactly why
+nobody noticed there was no runner.** A measurement can be fully specified, fully tested, and still
+have no non-destructive path to its own data.
+
+Fixed with a rep-scoped `L1_OUT_DIR` (unset → byte-identical to the old behaviour), committed before
+any rep fired, with the canonical artifacts verified untouched by `git status` rather than assumed.
+
+### The one I did to myself
+
+The first scoring pass reported floor C-5 at **9/20** and a verdict of **DEFERRED**. My scoring CLI
+compared `expectedGateState` (`approve-recommendation | escalate-to-human`) directly against
+`terminal` (`recommendation | escalate-to-human`). The two vocabularies agree on one value and differ
+on the other, so the comparison type-checked, passed all 9 escalate cases, and failed all 11 approve
+cases **regardless of what the crew did.** C-5 was unpassable by any possible output — a broken gauge
+wearing the costume of a strict bar.
+
+It was caught for one reason: six floors read a perfect `0.0000` and the seventh read 9/20. **That is
+not a shape a real system produces.** The lesson is general — when a measurement returns an internally
+impossible result, suspect the instrument before the subject.
+
+Correcting it required care, because "I fixed the scorer and now it passes" is indistinguishable in
+outline from retrying to green. What makes it defensible is that the raws were **frozen and committed
+before either scoring pass**: no floor moved, no rep re-ran, no case was re-fetched, and only the
+arithmetic changed over byte-identical data anyone can independently re-score. That is precisely the
+protection freeze-before-scoring exists to provide, and this is the first time it has actually been
+load-bearing here.
+
+Fixed by *importing* the repo's own documented mapping (`expectedTerminalFor`, extracted from
+`harness.ts` where it already governed the live run's own gate check) rather than re-typing it — a
+second hand-written copy of a subtle mapping is how two callers end up disagreeing about what
+"correct" means. The extraction is provably inert: `l1-live-lock` re-derives every committed matrix
+row through `evaluateCase` and stayed green.
+
+### Prevent-repeat checklist
+
+- Did anything fail? **Yes — four things** (deploy config ×2, missing multi-rep runner, scorer vocabulary bug).
+- Documented? **Yes — this entry + two decision-log rows.**
+- Root cause, not symptom? **Yes** — in all four the root cause is a check that verified the visible property rather than the load-bearing one.
+- Fix verified? **Yes** — live `curl` for the deploy defects; red-green for every tooth; full verify exit 0 at 1516+8.
+- Test added? **Yes — 5**: two on the Vercel config, three on the gate-state→terminal mapping. Red-green proven by reintroducing each defect.
+- Rule updated? **No RULES change needed** — §9/§13 already govern; the gap was in applying them, not in their text.
+- Guardrail for AI output? **Yes** — the mapping is now shared and asserted LOAD-BEARING, so a raw comparison cannot silently reappear.
+- Handoff updated? **Yes** — the resume prompt carries both lessons explicitly.
+- Honest limit recorded? **Yes** — no in-repo test can detect host-routing failure; that check is live-only and permanent.
+
+Gate: `npm run verify` exit 0, **1516 passed / 8 skipped**. Codex xhigh adversarial gate DISPATCHED on the fixes
+(brief attacks the four load-bearing claims, incl. whether the scorer correction is rationalized);
+**verdict pending at this sync** — it lands in the decision log when it returns.
