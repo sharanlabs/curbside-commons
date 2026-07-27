@@ -33,7 +33,11 @@ type CycleKind = "pass" | "hold";
 export type CommonsSceneProps = {
   children: ReactNode; // eyebrow + H1 + lede (server-rendered copy)
   ctaPrimary: string; // runs the HOLD cycle — "Watch the check"
-  ctaSecondary: string; // native anchor to #try — "Try it on a feed"
+  ctaSecondary: string; // native anchor label — "Try it on a feed"
+  /** Where the secondary CTA goes. Defaults to the working tool, not an
+   *  on-page anchor: a reader who clicks "try it on a feed" should land
+   *  somewhere that takes a feed (2026-07-27). */
+  ctaSecondaryHref?: string;
 };
 
 /* v9 clock (ms of scene time). */
@@ -77,7 +81,12 @@ const lerp = (p: Pt, q: Pt, t: number): Pt => ({
   y: p.y + (q.y - p.y) * t,
 });
 
-export function CommonsScene({ children, ctaPrimary, ctaSecondary }: CommonsSceneProps) {
+export function CommonsScene({
+  children,
+  ctaPrimary,
+  ctaSecondary,
+  ctaSecondaryHref = "/playground",
+}: CommonsSceneProps) {
   const [status, setStatus] = useState(ASSEMBLE_STATUS);
   const [statusColor, setStatusColor] = useState(GRAY);
   const [playing, setPlaying] = useState(true);
@@ -556,8 +565,12 @@ export function CommonsScene({ children, ctaPrimary, ctaSecondary }: CommonsScen
         <button type="button" className="lp-btn primary" onClick={() => runCycle("hold")}>
           {ctaPrimary}
         </button>
-        {/* A native anchor: works with scripting off (html scroll-behavior smooth). */}
-        <a className="lp-btn ghost" href="#try">
+        {/* A native anchor: works with scripting off. Pointed at the WORKING
+            TOOL as of 2026-07-27 — it used to scroll to #try, the one-number
+            bench further down this same page, which is why a reader who
+            clicked "try it on a feed" never reached anything that takes a
+            feed. The destination is a prop so this scene stays generic. */}
+        <a className="lp-btn ghost" href={ctaSecondaryHref}>
           {ctaSecondary}
         </a>
       </div>

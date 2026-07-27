@@ -28,7 +28,7 @@
 import type { AcpFeed } from "@/lib/packs/listings/acp-feed";
 import { acpFeedToClaims } from "@/lib/packs/listings/adapters";
 import { runListingsVerification } from "@/lib/packs/listings/run";
-import type { SyntheticCatalog } from "@/lib/packs/listings/types";
+import type { SorItem, SorVariation, SyntheticCatalog } from "@/lib/packs/listings/types";
 import type { VerifierReport } from "@/lib/verifier-core/report";
 import sorCatalogJson from "@/fixtures/synthetic-restaurant/browser/sor.catalog.web.json";
 import sampleFeedJson from "@/fixtures/synthetic-restaurant/browser/acp-feed.web.json";
@@ -62,6 +62,18 @@ export function sampleFeedText(): string {
 }
 
 /**
+ * Pretty-printed sample CATALOG text — the record side of the pair (owner
+ * commission 2026-07-27). A two-file tool is unusable without a worked example
+ * of BOTH files: a reader who has never seen the catalog shape cannot author
+ * one, and guessing at it produces parse refusals that read as the tool being
+ * broken. Loading this beside the sample feed is also the fastest way to see a
+ * PASS, since the pair is internally consistent apart from the planted drift.
+ */
+export function catalogSampleText(): string {
+  return JSON.stringify(SOR_CATALOG, null, 2);
+}
+
+/**
  * Display-layer copy cleanup for rendered finding text (matches /report + /demo).
  * The illustrative feed's ghost item carries a lab-label inside its own title —
  * a genuine claim value the frozen golden quotes verbatim — so rendered receipts
@@ -70,6 +82,20 @@ export function sampleFeedText(): string {
  */
 export function cleanFinding(s: string): string {
   return s.replace(/\bsimulated\b/gi, "example").replace(/\bsynthetic\b/gi, "illustrative");
+}
+
+/**
+ * The same cleanup, applied ONLY where it is honest.
+ *
+ * The rewrite exists because the committed fixture's ghost item carries a
+ * lab-label inside its own title. Applied to a READER's run it corrupts their
+ * evidence: a genuine menu item called "Simulated Burger" would render as
+ * "example Burger", disagreeing with the report they downloaded moments
+ * earlier — the screen and the file stating different facts about the same run
+ * (gate finding 10). Never rewrite words a reader supplied.
+ */
+export function cleanFindingFor(origin: RunOrigin, s: string): string {
+  return origin.feed === "sample" ? cleanFinding(s) : s;
 }
 
 export type ParseResult =
@@ -117,11 +143,19 @@ export function parseAcpFeedText(text: string): ParseResult {
         error: `items[${i}] is not an object — every feed row must be a JSON object. See the sample feed for the expected shape.`,
       };
     }
-    if (typeof (row as { item_id?: unknown }).item_id !== "string") {
+    const itemId = (row as { item_id?: unknown }).item_id;
+    if (typeof itemId !== "string") {
       return {
         ok: false,
         error: `items[${i}] has no string \`item_id\` — every feed row needs one so its findings can name the row they belong to.`,
       };
+    }
+    // Same reserved-id containment as the catalog side (gate finding 7): an id
+    // containing "#" is truncated by the claim-id split and would be compared
+    // against the wrong row.
+    const reserved = reservedIdProblem(itemId);
+    if (reserved !== null) {
+      return { ok: false, error: `items[${i}] ${reserved}` };
     }
   }
   return { ok: true, feed: raw as AcpFeed };
@@ -130,7 +164,298 @@ export function parseAcpFeedText(text: string): ParseResult {
 /**
  * Run the real verification — the exact CLI composition, in the browser.
  * Deterministic: same feed in, same report out.
+ *
+ * `catalog` defaults to the committed illustrative records, so every existing
+ * caller (and the golden-equality suite) is unchanged. A reader-supplied
+ * catalog arrives via {@link parseCatalogText} and is passed explicitly, with
+ * the provenance that describes it (slice 1: the report labels the RUN).
  */
-export function verifyAcpFeed(feed: AcpFeed): VerifierReport {
-  return runListingsVerification(acpFeedToClaims(feed), SOR_CATALOG);
+/**
+ * Where each side of a run came from. Tracked by the CALLER from the action the
+ * reader took — clicking "use the sample" vs supplying a file — never inferred
+ * from the data.
+ *
+ * Inference was tried twice and was wrong twice (cross-model gate, findings
+ * 1-4, `docs/reviews/codex-2026-07-27-s36-gate.md`). Reference identity
+ * mislabelled the sample-catalog button. Content comparison fixed that symptom
+ * and kept the error: a reader's catalog that happens to match the fixture is
+ * still THEIRS, a reordered copy of the fixture is still OURS, and no amount of
+ * looking at bytes can tell you who supplied them. **Provenance is a fact about
+ * the action, not a property of the document.**
+ */
+export interface RunOrigin {
+  readonly feed: "sample" | "reader";
+  readonly catalog: "sample" | "reader";
+}
+
+export const SAMPLE_ORIGIN: RunOrigin = { feed: "sample", catalog: "sample" };
+
+/**
+ * Run the real verification — the exact CLI composition, in the browser.
+ * Deterministic: same inputs in, same report out.
+ *
+ * On the two honesty labels, corrected after the cross-model gate:
+ *
+ * **C10 `simulated`** is true when ANY synthetic artifact participated — the
+ * rule says *any*, and a run pairing our committed sample FEED with a reader's
+ * catalog is still partly ours. It is therefore an OR across both sides, not a
+ * property of the truth side alone (gate finding 1).
+ *
+ * **C3 `matchingMode`** is NOT about ownership at all — that was my conceptual
+ * error. `report-view.ts:76-79` decodes `real-world` as *"identifiers do not
+ * line up, so matches were made by resolution (fuzzier)"*, and `sorReference`
+ * only ever performs exact shared-id lookup (`reference.ts:63,71`). Labelling a
+ * reader's run `real-world` claimed a resolution mechanism the engine never
+ * ran. The label describes HOW MATCHING HAPPENED, so it stays
+ * `synthetic-controlled` for every run this seam performs (gate finding 2).
+ * Whose data it was is carried by `simulated` and by the UI, where it belongs.
+ */
+export function verifyAcpFeed(
+  feed: AcpFeed,
+  catalog: SyntheticCatalog = SOR_CATALOG,
+  origin: RunOrigin = SAMPLE_ORIGIN,
+): VerifierReport {
+  return runListingsVerification(acpFeedToClaims(feed), catalog, {
+    // Exact shared-id matching is the only mechanism this seam runs.
+    matchingMode: "synthetic-controlled",
+    // C10: TRUE if ANY side is ours.
+    simulated: origin.feed === "sample" || origin.catalog === "sample",
+  });
+}
+
+export type CatalogParseResult =
+  | { readonly ok: true; readonly catalog: SyntheticCatalog }
+  | { readonly ok: false; readonly error: string };
+
+const STOCK_STATES = ["in_stock", "soldout_86", "hidden"] as const;
+
+/**
+ * Two id values the engine cannot represent, refused on BOTH sides.
+ *
+ * Claim ids are built as `<rowId>#<field>` and split back on the first `#`
+ * (adapters.ts:36, run.ts:36), so an id CONTAINING `#` is silently TRUNCATED —
+ * `sku#1` becomes `sku`, and a catalog and feed that agree exactly report a
+ * mismatch that does not exist. And `catalog` is the reserved row id for
+ * catalog-level metadata (reference.ts:60), so a row using it is read as meta
+ * and then reported missing. Both are wrong verdicts on correct data — the
+ * failure this product exists to catch (gate finding 7).
+ *
+ * Containment, not a redesign: carrying row identity separately from claim ids
+ * is an engine change with its own gate. Refusing at the door is honest today
+ * and names the reason.
+ */
+function reservedIdProblem(id: string): string | null {
+  if (id.includes("#")) {
+    return `has an \`id\` containing "#" ("${id}"). The verifier builds its internal references as id#field and splits on the first "#", so this id would be read as "${id.split("#")[0]}" and compared against the wrong row.`;
+  }
+  if (id === "catalog") {
+    return 'uses the reserved id "catalog", which names catalog-level metadata inside the verifier. A row with that id would not be checked as a row.';
+  }
+  return null;
+}
+
+/**
+ * Parse pasted/uploaded text as a merchant catalog — the truth side of an
+ * upload (owner commission 2026-07-27).
+ *
+ * Required fields are the ones the ENGINE READS — `asOf`, and per item `name`,
+ * `variations[].id`, `.name`, `.priceCents`, `.stock` (reference.ts:27-46,
+ * detectors.ts:38,94,222) — PLUS one schema-policy field, `items[].id`.
+ *
+ * That `id` is a deliberate exception, called out because the gate correctly
+ * refuted the tidier phrasing "refuses only what the engine cannot index"
+ * (finding 15): no rule reads an item's top-level id. It is required anyway
+ * because a catalog whose items cannot be named is one whose findings cannot be
+ * traced back to a row by a human reading the report, and because every other
+ * catalog this project produces carries it. A stated policy is honest; an
+ * unstated one masquerading as a technical necessity is not.
+ *
+ * `description`, `category` and `modifierLists` ride on the TYPE but are never
+ * read by a rule, so requiring them would refuse a catalog this engine verifies
+ * perfectly — a false refusal is as dishonest as a false verdict. They are
+ * preserved when present.
+ *
+ * Wrong VALUES are deliberately not parse errors: a price that disagrees with
+ * the feed is the product's entire purpose and must reach the engine as a
+ * FINDING. Only rows the engine cannot index are refused, each naming its own
+ * index so the reader can find it.
+ */
+export function parseCatalogText(text: string): CatalogParseResult {
+  if (!text.trim()) {
+    return { ok: false, error: "The catalog is empty — upload or paste a merchant catalog first." };
+  }
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch (e) {
+    return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` };
+  }
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+    return {
+      ok: false,
+      error: "Expected a JSON object with an `items` array — the top-level value is not a catalog object.",
+    };
+  }
+  const doc = raw as Record<string, unknown>;
+  if (typeof doc.asOf !== "string" || !doc.asOf.trim()) {
+    return {
+      ok: false,
+      error:
+        "This catalog has no string `asOf`. The staleness rules read it as data — reading a clock instead would make the same catalog produce different results on different days.",
+    };
+  }
+  // `asOf` is compared LEXICALLY downstream, which is only correct for real
+  // ISO-8601 instants in a canonical form. "not-a-date" or a `+05:30`-offset
+  // stamp would sort wrongly and silently reverse staleness verdicts (gate
+  // finding 6). Validate that it parses AND round-trips to canonical UTC.
+  // Accept both `…T00:00:00Z` and `…T00:00:00.000Z` — the repo's own fixtures
+  // use the second-precision form, and both sort correctly as text because the
+  // fractional part comes after every field that outranks it. What must be
+  // refused is a LOCAL-OFFSET stamp (`+05:30`) or a non-date: those sort by
+  // their literal digits and silently reverse staleness verdicts.
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/.test(doc.asOf) ||
+      Number.isNaN(Date.parse(doc.asOf))) {
+    return {
+      ok: false,
+      error: `\`asOf\` is "${doc.asOf}", which is not a UTC ISO-8601 timestamp (e.g. 2026-07-03T00:00:00Z). Dates here are compared as text, so a local-offset or free-form date would order wrongly and give false staleness verdicts.`,
+    };
+  }
+  // The engine compares currencies against the catalog's own (detectors.ts:124)
+  // and every price is integer cents. Inventing "USD" would rewrite an uploaded
+  // EUR catalog and manufacture a false mismatch against a EUR feed (gate
+  // finding 5). Accept the field only when it is genuinely USD, and say so.
+  if (doc.currency !== undefined && doc.currency !== "USD") {
+    return {
+      ok: false,
+      error: `This catalog is priced in ${String(doc.currency)}. This bench checks USD catalogs only — a non-USD catalog would be compared against USD feed prices and every row would report a currency mismatch that is not really there.`,
+    };
+  }
+  if (!Array.isArray(doc.items)) {
+    return {
+      ok: false,
+      error:
+        "This does not look like a merchant catalog: the top-level `items` array is missing. Load the sample catalog for the expected shape.",
+    };
+  }
+  if (doc.items.length === 0) {
+    // Accepted, an empty catalog yields a report where EVERY feed row is a
+    // ghost — a confident wall of errors whose real cause is that no records
+    // were supplied. Naming that beats producing the verdict (adversarial pass,
+    // evals/packs/catalog-parse-attack.test.ts).
+    return {
+      ok: false,
+      error:
+        "This catalog has no items. An audit against zero records would report every feed row as an item that does not exist, which says nothing about the feed.",
+    };
+  }
+
+  const items: SorItem[] = [];
+  /** Variation ids must be unique ACROSS the whole catalog — see below. */
+  const seenVariationIds = new Set<string>();
+  for (let i = 0; i < doc.items.length; i++) {
+    const row = doc.items[i] as Record<string, unknown>;
+    const at = `items[${i}]`;
+    if (typeof row !== "object" || row === null || Array.isArray(row)) {
+      return { ok: false, error: `${at} is not an object — every catalog item must be a JSON object.` };
+    }
+    if (typeof row.id !== "string" || !row.id) {
+      return { ok: false, error: `${at} has no string \`id\` — every item needs one so its findings can name it.` };
+    }
+    if (typeof row.name !== "string" || !row.name) {
+      return { ok: false, error: `${at} has no string \`name\` — the name is how a feed row is matched when its id does not resolve.` };
+    }
+    if (!Array.isArray(row.variations) || row.variations.length === 0) {
+      return {
+        ok: false,
+        error: `${at} has no non-empty \`variations\` array — an item with no sellable variation has nothing a feed could claim.`,
+      };
+    }
+
+    const variations: SorVariation[] = [];
+    for (let v = 0; v < row.variations.length; v++) {
+      const vr = row.variations[v] as Record<string, unknown>;
+      const vat = `${at}.variations[${v}]`;
+      if (typeof vr !== "object" || vr === null || Array.isArray(vr)) {
+        return { ok: false, error: `${vat} is not an object.` };
+      }
+      if (typeof vr.id !== "string" || !vr.id) {
+        return { ok: false, error: `${vat} has no string \`id\` — the id is what a feed row is matched against.` };
+      }
+      const reserved = reservedIdProblem(vr.id);
+      if (reserved !== null) {
+        return { ok: false, error: `${vat} ${reserved}` };
+      }
+      if (typeof vr.name !== "string") {
+        return { ok: false, error: `${vat} has no string \`name\`.` };
+      }
+      // `isSafeInteger`, not `isInteger`: JSON's 9007199254740993 parses to
+      // ...992, so an unsafe value is silently ALTERED before verification —
+      // a price the reader never wrote (gate finding 14). Negative prices are
+      // refused too; the engine has no meaning for one.
+      if (
+        typeof vr.priceCents !== "number" ||
+        !Number.isSafeInteger(vr.priceCents) ||
+        vr.priceCents < 0
+      ) {
+        return {
+          ok: false,
+          error: `${vat} has a \`priceCents\` that is not a whole, non-negative, exactly-representable number of cents — prices are integer cents, so 21.50 dollars is 2150. A fractional or out-of-range value cannot be compared exactly.`,
+        };
+      }
+      if (typeof vr.stock !== "string" || !STOCK_STATES.includes(vr.stock as SorVariation["stock"])) {
+        return {
+          ok: false,
+          error: `${vat} has an unknown \`stock\` state — expected one of ${STOCK_STATES.join(", ")}.`,
+        };
+      }
+      // UNIQUENESS IS LOAD-BEARING, not tidiness. `indexCatalog` keys a Map by
+      // variation id (reference.ts:38-44), so a duplicate SILENTLY OVERWRITES
+      // the earlier record: a feed row would then be checked against whichever
+      // copy happened to be last, and the report could not say which — two
+      // prices, one verdict, no way to tell them apart. That is a wrong verdict
+      // wearing a clean face, which is the exact failure this product exists to
+      // catch. Refuse and name the id.
+      if (seenVariationIds.has(vr.id)) {
+        return {
+          ok: false,
+          error: `${vat} repeats the variation id "${vr.id}", which already appears earlier in this catalog. Ids identify the record a claim is checked against, so a duplicate makes the verdict ambiguous — no report could say which of the two rows it used.`,
+        };
+      }
+      seenVariationIds.add(vr.id);
+
+      variations.push({
+        id: vr.id,
+        name: vr.name,
+        priceCents: vr.priceCents,
+        stock: vr.stock as SorVariation["stock"],
+      });
+    }
+
+    items.push({
+      id: row.id,
+      name: row.name,
+      description: typeof row.description === "string" ? row.description : "",
+      category: typeof row.category === "string" ? row.category : "",
+      variations,
+      modifierLists: Array.isArray(row.modifierLists)
+        ? (row.modifierLists as SorItem["modifierLists"])
+        : [],
+    });
+  }
+
+  return {
+    ok: true,
+    catalog: {
+      // NORMALIZED, never inherited. `simulated` on the CATALOG type is a
+      // literal `true` describing this corpus family; what a REPORT says about
+      // a run is decided by the caller's ListingsRunProvenance (slice 1), so an
+      // uploaded document cannot assert its own honesty label.
+      simulated: true,
+      generator: { name: "reader-supplied catalog", seed: 0, version: "upload" },
+      merchantName: typeof doc.merchantName === "string" ? doc.merchantName : "Uploaded merchant",
+      currency: "USD",
+      asOf: doc.asOf,
+      items,
+    },
+  };
 }

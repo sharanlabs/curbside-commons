@@ -11,16 +11,48 @@
  * Plain: after checking every statement the copy makes, we also check what it
  * DOESN'T say — items it invented, items it renamed, items it silently dropped.
  */
-import type { Claim, Finding, VerifierReport } from "../../verifier-core/index.ts";
+import type {
+  Claim,
+  Finding,
+  MatchingMode,
+  Reference,
+  VerifierReport,
+} from "../../verifier-core/index.ts";
 import { makeFinding } from "../../verifier-core/guard.ts";
 import { buildReport, verifyClaims } from "../../verifier-core/verify.ts";
 import { listingsDetectors } from "./detectors.ts";
-import { expectedTitle, indexCatalog, sorReference } from "./reference.ts";
+import { expectedTitle, indexCatalog, sorReference, type SorTruth } from "./reference.ts";
 import type { SyntheticCatalog } from "./types.ts";
 import { UCP_PINNED_VERSION } from "./ucp.ts";
 
 /** The pinned spec/taxonomy line stamped into every W1 report header (C10). */
 export const LISTINGS_SPEC_VERSION = `taxonomy-v1+acp-extract-2026-07-02+ucp-pin-${UCP_PINNED_VERSION}`;
+
+/**
+ * A Reference that answers EVERY claim with one already-resolved truth row.
+ *
+ * The ordinary `sorReference` matches by variation id, which is exactly what a
+ * title-resolved row cannot do — its id is stale. Once resolution has settled
+ * identity, the remaining claims still need judging, so they are re-run against
+ * a reference pinned to the record resolution chose (gate finding 8).
+ *
+ * `matching` stays `synthetic-controlled` because that is what the C3 label
+ * means in this engine — exact matching on shared ids, here on the truth side
+ * of an established identity. It is NOT a claim that entity resolution was the
+ * matching mechanism; the ID-MISMATCH finding beside it is what records that.
+ */
+function pinnedReference(truth: SorTruth): Reference {
+  return {
+    kind: "pos-catalog",
+    resolve() {
+      return {
+        referenceRowId: truth.variation.id,
+        matching: "synthetic-controlled",
+        value: truth,
+      };
+    },
+  };
+}
 
 function completenessSweep(
   claims: readonly Claim[],
@@ -68,6 +100,51 @@ function completenessSweep(
           plainLine: `The copy keys this row as "${rowId}" but the catalog row is "${truth.variation.id}" — same item, mismatched identity (resolved by exact name).`,
         }),
       );
+      // AUDIT THE REST OF THE ROW (cross-model gate finding 8, 2026-07-27).
+      // Resolution used to END here: every per-claim detector runs off
+      // `reference.resolve()`, which is keyed by variation id and returns null
+      // for this row, so price, availability, title and the hidden-item rule
+      // all silently no-opped. A merchant who renamed an id AND served a
+      // hidden item — or a wrong price — got one finding about the id and
+      // SILENCE about the rest, which is the more serious half.
+      //
+      // Now that identity is established, re-run the row's own claims against
+      // the resolved record. `pinnedReference` answers every claim with this
+      // one truth row, so each finding cites the RESOLVED id rather than the
+      // feed's stale one.
+      //
+      // The `existence` claim is INCLUDED deliberately: the hidden-item rule
+      // fires only on it (detectors.ts:36-37), so excluding it would leave the
+      // exact hole this fix exists to close — a hidden item sold under a
+      // renamed id. Re-emission is not a risk: the ID-MISMATCH finding above
+      // comes from this sweep, not from a detector, so no detector can produce
+      // it twice.
+      findings.push(
+        ...verifyClaims(
+          claims.filter((c) => c.id.split("#")[0] === rowId),
+          pinnedReference(truth),
+          listingsDetectors,
+        ),
+      );
+    } else if (titleMatches.length > 1) {
+      // AMBIGUOUS, NOT ABSENT (cross-model gate finding 9, 2026-07-27). Several
+      // catalog rows share this expected title, so resolution cannot pick one.
+      // This used to fall into the branch below and report "no such item
+      // exists" — the OPPOSITE of the truth, on data the engine can describe
+      // precisely. Name the candidates so a reader can settle it; the row is
+      // deliberately NOT marked resolved, so every candidate still reports
+      // missing (none of them was actually served under its own id).
+      const candidates = titleMatches.map((m) => m.variation.id);
+      findings.push(
+        makeFinding({
+          claim: existenceClaim,
+          referenceRowId: "catalog-meta",
+          ruleId: "LST-IDENT-TITLE-AMBIGUOUS",
+          severity: "error",
+          category: "identity",
+          plainLine: `The copy keys this row as "${rowId}", which the catalog does not use, and its name "${title}" matches ${candidates.length} catalog rows (${candidates.join(", ")}) — identity cannot be resolved.`,
+        }),
+      );
     } else {
       findings.push(
         makeFinding({
@@ -110,17 +187,49 @@ function completenessSweep(
   return findings;
 }
 
-/** Run the full listings verification for one surface's claims. */
+/**
+ * Who the data belonged to on THIS run — the two C3/C10 honesty labels a
+ * caller may set, and nothing else.
+ *
+ * Both were hardcoded until 2026-07-27, which was true of every caller then in
+ * existence (all fed the committed synthetic catalog) and becomes false the
+ * moment a reader supplies their own records: stamping a reader's real catalog
+ * `simulated: true`, and asserting shared-synthetic-ID matching that never
+ * happened, is a claim broader than the thing backing it (RULES §4).
+ *
+ * `specVersion` is deliberately NOT here. A caller may describe WHOSE data it
+ * ran on; it may never restate WHICH RULES ran — that stays pinned to
+ * {@link LISTINGS_SPEC_VERSION} by the engine (C10), proven by the T3 tooth in
+ * evals/packs/listings-provenance-labels.test.ts.
+ */
+export interface ListingsRunProvenance {
+  /** C3: shared synthetic IDs, or real-world entity resolution. */
+  readonly matchingMode?: MatchingMode;
+  /** C10: true when any synthetic artifact is involved in this run. */
+  readonly simulated?: boolean;
+}
+
+/**
+ * Run the full listings verification for one surface's claims.
+ *
+ * `provenance` is optional and defaults to the committed-corpus values, so
+ * every pre-existing two-argument call site produces a byte-identical report
+ * (the golden + drift-lock suites are the proof, and they were not touched).
+ * The labels describe the run; they never steer it — identical inputs yield
+ * identical findings under either label (T4 tooth), because the engine reads
+ * only `sor.items` and `sor.asOf` from a catalog.
+ */
 export function runListingsVerification(
   claims: readonly Claim[],
   sor: SyntheticCatalog,
+  provenance: ListingsRunProvenance = {},
 ): VerifierReport {
   const reference = sorReference(sor);
   const detected = verifyClaims(claims, reference, listingsDetectors);
   const completeness = completenessSweep(claims, sor);
   return buildReport([...detected, ...completeness], {
     specVersion: LISTINGS_SPEC_VERSION,
-    matchingMode: "synthetic-controlled",
-    simulated: true,
+    matchingMode: provenance.matchingMode ?? "synthetic-controlled",
+    simulated: provenance.simulated ?? true,
   });
 }

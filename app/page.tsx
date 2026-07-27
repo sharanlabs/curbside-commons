@@ -179,8 +179,9 @@ export default function Landing() {
           </h2>
           <p className="lp-foot">
             Change the served price below. The same rule checks it against the merchant&rsquo;s
-            record, and the verdict updates with the result. On the try-it-live page, you can
-            check an entire feed.
+            record, and the verdict updates with the result. This is one field of one item —{" "}
+            <Link href="/playground">upload your own feed and records</Link> to audit a whole
+            catalog.
           </p>
         </Reveal>
         <Reveal>

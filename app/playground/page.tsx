@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "@/components/landing/Reveal";
-import { PlaygroundClient } from "@/components/playground/PlaygroundClient";
+import { AuditWorkbench } from "@/components/playground/AuditWorkbench";
 import { TryLiveBench, CATALOG_RECORDS } from "@/components/playground/TryLiveBench";
 import { SOR_CATALOG } from "@/components/playground/verify-in-browser";
 
@@ -96,9 +96,10 @@ export default function PlaygroundPage() {
           <div className="p3-boundary">
             <span className="basof">THE HONEST BOUNDARY</span>
             <p>
-              The reference world is the merchant catalog of {CATALOG_RECORDS} records.{" "}
+              The bench above checks against the sample catalog of {CATALOG_RECORDS} records.{" "}
               <b>An item outside those records reads as unknown or missing.</b> That is the
-              verifier being honest, not broken.
+              verifier being honest, not broken — and it is the reason the tool below takes your
+              record file too, so your own items are checked against your own catalog.
             </p>
           </div>
         </Reveal>
@@ -109,21 +110,23 @@ export default function PlaygroundPage() {
         </Reveal>
       </section>
 
-      {/* ===== PASTE YOUR OWN ===== */}
+      {/* ===== BRING YOUR OWN FILES — the working tool ===== */}
       <section className="sect ds-wrap" aria-labelledby="paste-h2">
         <Reveal>
-          <p className="lp-eyebrow">PASTE YOUR OWN</p>
+          <p className="lp-eyebrow">BRING YOUR OWN FILES</p>
           <span className="lp-sec-rule" aria-hidden="true" />
           <h2 className="lp-h2" id="paste-h2">
-            Bring a whole feed.
+            Audit your own feed.
           </h2>
           <p className="lp-foot">
-            Paste a feed document — or load the committed one and edit it freely — and the engine
-            checks it line by line against the same pinned catalog, locally, in this tab.
+            Upload two files — the feed an agent reads, and the merchant record it should agree
+            with. Drag them in, choose them, or paste them. The engine checks every claim against
+            your records line by line, in this tab, and hands back a report you can download. Leave
+            the record empty and your feed is checked against the sample catalog instead.
           </p>
         </Reveal>
         <Reveal>
-          <PlaygroundClient />
+          <AuditWorkbench />
         </Reveal>
       </section>
 
