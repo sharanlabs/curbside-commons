@@ -6,6 +6,7 @@ import { expectedTerminalFor } from "./harness.ts";
 import {
   evaluateFloors,
   modalTerminal,
+  resolveCoverage,
   scoreConsistency,
   type Rep,
   type RepRow,
@@ -250,6 +251,67 @@ describe("consistency scorer — reads the REAL committed L-1 matrix shape", () 
  *
  * These assertions make that class of error loud instead of plausible.
  */
+/**
+ * COVERAGE TOOTH — added 2026-07-27 after a cross-model gate reproduced a FALSE GREEN.
+ *
+ * The scoring CLI derived its universe of cases from the union of ids SEEN IN THE
+ * MATRICES. A case degraded in one rep was caught. A case absent from EVERY rep never
+ * entered that union, so it was not "dropped" — it did not exist. A 19-case run then
+ * certified as complete and cleared C-5 at 19/20 → 19/19, with an injection-resistance
+ * case silently missing from the exam.
+ *
+ * The general rule these assertions defend: **a completeness check must take its
+ * denominator from the specification, never from the observations.** Asking the data
+ * what should be present can only confirm what is present.
+ */
+describe("resolveCoverage — the denominator comes from the committed split, not the data", () => {
+  const ALL = ["c1", "c2", "c3", "c4"];
+
+  it("full coverage is reported when every rep scored every committed case", () => {
+    const cov = resolveCoverage(ALL, [ALL, ALL, ALL]);
+    expect(cov.completeCoverage).toBe(true);
+    expect(cov.commonIds).toEqual(ALL);
+    expect(cov.dropped).toEqual([]);
+  });
+
+  it("THE REGRESSION: a case absent from EVERY rep is still counted as missing", () => {
+    // This is the exact false green. Under the old union-of-observed logic the run
+    // looked complete because c4 was invisible everywhere.
+    const missingEverywhere = ["c1", "c2", "c3"];
+    const cov = resolveCoverage(ALL, [missingEverywhere, missingEverywhere, missingEverywhere]);
+    expect(cov.completeCoverage).toBe(false);
+    expect(cov.dropped.map((d) => d.caseId)).toEqual(["c4"]);
+    expect(cov.dropped[0].missingFrom).toEqual([0, 1, 2]); // absent from all three
+    expect(cov.commonIds).not.toContain("c4");
+  });
+
+  it("a case missing from only ONE rep is reported with the rep that lacks it", () => {
+    const cov = resolveCoverage(ALL, [ALL, ["c1", "c2", "c4"], ALL]);
+    expect(cov.completeCoverage).toBe(false);
+    expect(cov.dropped).toEqual([{ caseId: "c3", missingFrom: [1] }]);
+  });
+
+  it("an id outside the committed split is flagged — that rep ran a different exam", () => {
+    const cov = resolveCoverage(ALL, [ALL, [...ALL, "smuggled"], ALL]);
+    expect(cov.unexpected).toEqual([{ repIndex: 1, caseIds: ["smuggled"] }]);
+  });
+
+  it("a duplicated id is flagged — a repeated row would double-weight one case", () => {
+    const cov = resolveCoverage(ALL, [ALL, ["c1", "c1", "c2", "c3", "c4"], ALL]);
+    expect(cov.duplicateReps).toEqual([1]);
+  });
+
+  it("the committed L-1 split is the real denominator, and the frozen reps cover it fully", () => {
+    const ids = readdirSync(LIVE_CASES_DIR)
+      .filter((f) => f.endsWith(".case.json"))
+      .sort()
+      .map((f) => (JSON.parse(readFileSync(join(LIVE_CASES_DIR, f), "utf8")) as CrewCase).caseId);
+    expect(ids.length).toBe(20);
+    const cov = resolveCoverage(ids, [ids, ids, ids]);
+    expect(cov.completeCoverage).toBe(true);
+  });
+});
+
 describe("expectedGateState → terminal mapping (the two vocabularies are NOT interchangeable)", () => {
   const liveCases = (): CrewCase[] =>
     readdirSync(LIVE_CASES_DIR)

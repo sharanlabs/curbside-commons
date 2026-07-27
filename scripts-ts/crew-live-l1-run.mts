@@ -44,8 +44,8 @@
  * question, graded by the same grader as the practice run — and every raw
  * answer is saved to disk before anyone looks at the grade.
  */
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
+import { join, resolve, sep } from "node:path";
 import {
   fetchIntakeTurnLive,
   fetchReviewerTurnLive,
@@ -73,11 +73,41 @@ const GOLD_DIR = join(process.cwd(), "evals", "crew", "gold");
  * The K≥3 consistency pre-registration needs N independent passes, so each rep
  * writes to its own directory and the canonical artifacts are never touched.
  *
- * `L1_OUT_DIR` is resolved against the gold dir, so it cannot escape it.
+ * CONTAINMENT IS ENFORCED, NOT ASSERTED (fixed 2026-07-27, cross-model gate P1).
+ * The first version of this comment claimed the value "is resolved against the gold
+ * dir, so it cannot escape it." That was false: `join()` performs no containment, so
+ * `L1_OUT_DIR=..` escaped, and `L1_OUT_DIR=.` resolved to the canonical gold
+ * directory itself — pointing the destructive probe-write straight at the K=1 record
+ * this parameter exists to protect. A comment asserting a guarantee the code does not
+ * implement is worse than no comment: it stops the next reader from checking.
+ *
+ * So the value must now match a strict `consistency/rep-<N>` grammar, resolve inside
+ * GOLD_DIR after symlink-aware resolution, and name a directory that does not already
+ * exist — a rep that overwrites a previous rep is not an independent pass, it is the
+ * evidence-destroying case wearing a valid-looking name.
  */
-const OUT_DIR = process.env.L1_OUT_DIR?.trim()
-  ? join(GOLD_DIR, process.env.L1_OUT_DIR.trim())
-  : GOLD_DIR;
+function resolveOutDir(raw: string): string {
+  if (!/^consistency\/rep-[1-9][0-9]*$/.test(raw)) {
+    console.error(`REFUSING: L1_OUT_DIR must match consistency/rep-<N>, got ${JSON.stringify(raw)}.`);
+    process.exit(1);
+  }
+  const candidate = resolve(GOLD_DIR, raw);
+  const goldReal = realpathSync(GOLD_DIR);
+  if (candidate !== resolve(goldReal, raw) || !candidate.startsWith(`${goldReal}${sep}`)) {
+    console.error(`REFUSING: L1_OUT_DIR resolves outside the gold directory (${candidate}).`);
+    process.exit(1);
+  }
+  if (existsSync(candidate)) {
+    console.error(
+      `REFUSING: ${candidate} already exists. A rep never overwrites a previous rep — ` +
+        `that is the evidence-destroying case this guard exists for. Use the next free rep number.`,
+    );
+    process.exit(1);
+  }
+  return candidate;
+}
+
+const OUT_DIR = process.env.L1_OUT_DIR?.trim() ? resolveOutDir(process.env.L1_OUT_DIR.trim()) : GOLD_DIR;
 const TURNS_PATH = join(OUT_DIR, "l1-live-turns.json");
 const RECORDS_PATH = join(OUT_DIR, "l1-live-records.json");
 const MATRIX_PATH = join(OUT_DIR, "l1-live-matrix.json");

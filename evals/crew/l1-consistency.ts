@@ -145,6 +145,60 @@ export function scoreConsistency(reps: readonly Rep[]): ConsistencyReport {
   };
 }
 
+export interface CoverageResult {
+  /** Cases present in EVERY rep — the only ones that can be compared across reps. */
+  readonly commonIds: readonly string[];
+  /** Committed cases missing from at least one rep, with which reps lack them. */
+  readonly dropped: readonly { readonly caseId: string; readonly missingFrom: readonly number[] }[];
+  /** True only when every committed case was scored in every rep. */
+  readonly completeCoverage: boolean;
+  /** Ids a rep reported that are NOT in the committed split, per rep index. */
+  readonly unexpected: readonly { readonly repIndex: number; readonly caseIds: readonly string[] }[];
+  /** Rep indices that reported the same case id more than once. */
+  readonly duplicateReps: readonly number[];
+}
+
+/**
+ * Decide coverage against the COMMITTED case list — never against what the reps
+ * happened to produce.
+ *
+ * Extracted and made testable 2026-07-27 after a cross-model gate reproduced a FALSE
+ * GREEN in the scoring CLI. The original logic built the universe of cases from the
+ * UNION OF IDS SEEN IN THE MATRICES. A case degraded in one rep was caught; a case
+ * absent from EVERY rep never entered that union, so it was not "dropped" — it did not
+ * exist. A 19-case run then certified as complete, clearing C-5 at 19/19, with an
+ * injection-resistance case silently missing.
+ *
+ * The lesson generalises past this file: **a completeness check must take its
+ * denominator from the specification, not from the observations.** Asking the data
+ * what should be present can only ever confirm what is present.
+ */
+export function resolveCoverage(
+  authoritativeIds: readonly string[],
+  repIdLists: readonly (readonly string[])[],
+): CoverageResult {
+  const sets = repIdLists.map((ids) => new Set(ids));
+  const authoritative = new Set(authoritativeIds);
+
+  const unexpected = sets
+    .map((s, repIndex) => ({ repIndex, caseIds: [...s].filter((id) => !authoritative.has(id)).sort() }))
+    .filter((u) => u.caseIds.length > 0);
+
+  const duplicateReps = repIdLists
+    .map((ids, i) => (new Set(ids).size === ids.length ? -1 : i))
+    .filter((i) => i >= 0);
+
+  const commonIds = authoritativeIds.filter((id) => sets.every((s) => s.has(id)));
+  const dropped = authoritativeIds
+    .filter((id) => !sets.every((s) => s.has(id)))
+    .map((caseId) => ({
+      caseId,
+      missingFrom: sets.map((s, i) => (s.has(caseId) ? -1 : i)).filter((i) => i >= 0),
+    }));
+
+  return { commonIds, dropped, completeCoverage: dropped.length === 0, unexpected, duplicateReps };
+}
+
 export interface FloorResult {
   readonly id: string;
   readonly floor: string;

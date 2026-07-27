@@ -1,5 +1,11 @@
 # L-1 crew consistency — pre-registration (K≥3 reps + flip-rate)
 
+> **Reader's note (added 2026-07-27, additive — nothing registered below is rewritten).** The run has
+> since been **executed and all seven floors cleared** — see [Status](#status) and the dated
+> [Errata](#errata-dated-the-registered-text-above-is-not-rewritten). The paragraph immediately below
+> describes the state *at registration time* and is preserved verbatim precisely because a
+> pre-registration that gets edited after the fact is not one.
+
 **Registered 2026-07-26, BEFORE any multi-rep run exists.** No K≥3 data has been collected on this
 project. That is the point: floors written after seeing results are not floors. This document is
 committed first so the bar cannot be fitted to an outcome.
@@ -116,8 +122,13 @@ the scoring CLI, not in the crew: it compared `expectedGateState`
 other, so the comparison passed all 9 escalate cases and failed all 11 approve cases **regardless of
 what the crew did** — C-5 was unpassable by any possible behaviour.
 
-It was caught because six floors read a perfect `0.0000` while the seventh read 9/20, which is not a
-shape a real system produces. Fixed by importing the repo's own documented mapping
+What actually gave it away was sharper than "six floors looked clean" — stability floors passing
+proves little, since a system can be perfectly stable and consistently wrong (which is exactly why
+C-5 exists). The tell was that C-5 read **9/20, and 9 is precisely the number of cases whose
+committed expectation is `escalate-to-human`** — the single value the two vocabularies spell
+identically. A failure count landing exactly on "the cases where both spellings coincide" is the
+signature of a naming defect, not a behavioural one. Fixed by importing the repo's own documented
+mapping
 (`expectedTerminalFor`, extracted from `evals/crew/harness.ts` where it already governed the live
 run's own safety check) rather than re-typing it, and pinned by a regression tooth that asserts the
 mapping is load-bearing and that every committed case maps to a lawful terminal.
@@ -127,3 +138,22 @@ only the arithmetic was corrected, over identical bytes. The corrected 20/20 is 
 corroborated by the harness itself: a terminal/expectation mismatch is recorded as a *safety
 violation* during the run, by a different code path that predates this CLI, and all three reps
 reported safety 5/5 for all four members — zero gate mismatches.
+
+### Errata (dated; the registered text above is NOT rewritten)
+
+**E-1 (2026-07-27) — C-5's literal wording.** Floor C-5 as registered says the modal terminal must
+equal the committed `expectedGateState`. Taken literally that is unsatisfiable: `expectedGateState`
+is `approve-recommendation | escalate-to-human` while a terminal is
+`recommendation | escalate-to-human`, and `lib/crew/types.ts:145` closes the terminal vocabulary to
+those two values. The intended meaning is the correspondence already stated on the field itself at
+`lib/crew/types.ts:183` and already implemented in `evaluateCase` **before this registration was
+written** — `approve-recommendation ⇔ recommendation`. C-5 is scored through that pre-existing
+mapping (`expectedTerminalFor`). The registered text is left exactly as committed; this erratum is
+the correction of record.
+
+**E-2 (2026-07-27) — the invalid first report was not retained.** The initial scoring pass (C-5
+9/20, verdict DEFERRED) was overwritten by the corrected pass rather than preserved. The result is
+reproducible from the pre-fix commit against the frozen raws, but the artifact itself is gone, so
+the repo cannot independently evidence *when* that pass ran. **Standing rule going forward: when an
+instrument defect invalidates a scoring pass, commit the invalid report before repairing the
+instrument.** A correction is only fully auditable if the thing being corrected still exists.

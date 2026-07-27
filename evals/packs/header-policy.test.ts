@@ -100,16 +100,21 @@ describe("header policy — vercel.json is exactly the adopted 2026-07-12 policy
     // syntax Vercel never read; this was Vercel syntax Vercel read and rejected.
     // Both looked correct in-repo, and only the live host could say otherwise —
     // so the assertion is pinned to the deploy outcome, not to a preference.
-    const framework = config().framework;
-    expect(framework === null || framework === undefined).toBe(true);
+    // Must be EXPLICIT null, not merely absent. Vercel treats `null` as "Other"
+    // (no framework preset); an OMITTED key lets it auto-detect Next.js from
+    // package.json and re-invoke the builder that failed here — with this test
+    // still green. Cross-model gate finding, 2026-07-27.
+    expect(config().framework).toBeNull();
   });
 
-  it("sets cleanUrls — without it every extensionless route 404s on the live host", () => {
+  it("sets cleanUrls — without it every non-root extensionless route 404s on the live host", () => {
     // Also found by deploying, 2026-07-27. With `framework: null` Vercel serves
     // `out/` as plain static files. Next's `output: "export"` emits `report.html`,
     // not `report/index.html` (trailingSlash is unset), so `/report` resolves to
-    // nothing: the first deploy returned 200 on `/` and 404 on /report, /fees,
-    // /playground, /proof and /docs — five of six surfaces dead.
+    // nothing: the first deploy returned 200 on `/` (which resolves to index.html
+    // and is therefore unaffected) and 404 on /report, /fees, /playground, /proof
+    // and /docs — five of six surfaces dead. The root is the one route that works
+    // WITHOUT cleanUrls, which is exactly why a root-only smoke test misses this.
     //
     // Worth stating why no existing test caught it: C10 walks `out/` recursively
     // and every in-repo check verifies the FILES EXIST. None of them verify that

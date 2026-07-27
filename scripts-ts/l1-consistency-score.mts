@@ -31,7 +31,7 @@
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expectedTerminalFor } from "../evals/crew/harness.ts";
-import { evaluateFloors, scoreConsistency, type Rep, type RepRow } from "../evals/crew/l1-consistency.ts";
+import { evaluateFloors, resolveCoverage, scoreConsistency, type Rep, type RepRow } from "../evals/crew/l1-consistency.ts";
 import type { CrewCase } from "../lib/crew/types.ts";
 
 const GOLD_DIR = join(process.cwd(), "evals", "crew", "gold");
@@ -75,18 +75,49 @@ if (models.size !== 1) {
   process.exit(1);
 }
 
-// ---- coverage: intersect, but never silently ----
-const idSets = files.map((f) => new Set(f.matrix.map((r) => r.caseId)));
-const allIds = [...new Set(files.flatMap((f) => f.matrix.map((r) => r.caseId)))].sort();
-const commonIds = allIds.filter((id) => idSets.every((s) => s.has(id)));
-const droppedIds = allIds.filter((id) => !commonIds.includes(id));
-const completeCoverage = droppedIds.length === 0;
+// ---- the AUTHORITATIVE case list is the committed split, never what the reps produced ----
+//
+// Fixed 2026-07-27 after a cross-model gate reproduced a FALSE GREEN. The previous
+// version derived the universe of cases from the union of IDs SEEN IN THE MATRICES.
+// A case that went provider-degraded in ONE rep was caught — but a case absent from
+// EVERY rep never entered that union at all, so it was not "dropped", it simply did
+// not exist: `droppedIds` came back empty, `completeCoverage` came back true, and a
+// 19-case run certified as FLOORS CLEARED at C-5 19/19. Reproduced by removing
+// `l1-int-injection-visible` (an injection-resistance case) from all three reps.
+//
+// That is precisely the denominator-shrinking this file's header promised to
+// prevent, and the guard missed it because it asked the DATA what should be there.
+// The committed case files are the only thing entitled to answer that.
+const committedCases: CrewCase[] = readdirSync(LIVE_CASES_DIR)
+  .filter((n) => n.endsWith(".case.json"))
+  .sort()
+  .map((f) => JSON.parse(readFileSync(join(LIVE_CASES_DIR, f), "utf8")) as CrewCase);
+const authoritativeIds = committedCases.map((c) => c.caseId).sort();
+
+const coverage = resolveCoverage(
+  authoritativeIds,
+  files.map((f) => f.matrix.map((r) => r.caseId)),
+);
+
+// A rep reporting an id outside the committed split ran a DIFFERENT exam; a rep
+// repeating an id would double-weight that case. Neither is repairable by a caveat.
+for (const u of coverage.unexpected) {
+  console.error(`\nREFUSING: ${repDirs[u.repIndex]} contains case ids absent from the committed split: ${u.caseIds.join(", ")}`);
+  process.exit(1);
+}
+for (const i of coverage.duplicateReps) {
+  console.error(`\nREFUSING: ${repDirs[i]} contains DUPLICATE case ids — a repeated row would double-weight a case.`);
+  process.exit(1);
+}
+
+const { commonIds, completeCoverage } = coverage;
+const droppedIds = coverage.dropped.map((d) => d.caseId);
 
 if (!completeCoverage) {
-  console.log(`\n⚠ COVERAGE INCOMPLETE — ${droppedIds.length} case(s) missing from at least one rep:`);
-  for (const id of droppedIds) {
-    const missing = repDirs.filter((_, i) => !idSets[i].has(id));
-    console.log(`    ${id} — absent from ${missing.join(", ")}`);
+  console.log(`\n⚠ COVERAGE INCOMPLETE — ${droppedIds.length} of ${authoritativeIds.length} committed case(s) not scored in every rep:`);
+  for (const d of coverage.dropped) {
+    const where = d.missingFrom.length === repDirs.length ? "EVERY rep" : d.missingFrom.map((i) => repDirs[i]).join(", ");
+    console.log(`    ${d.caseId} — absent from ${where}`);
   }
   console.log("  Scoring the intersection; the report is stamped completeCoverage:false.");
   console.log("  Any label derived from this run MUST carry that caveat.");
@@ -108,11 +139,17 @@ const reps: Rep[] = files.map((f) => {
 // approve-recommendation cases REGARDLESS OF CREW BEHAVIOUR — the first scoring
 // run of 2026-07-27 did exactly that and reported C-5 as 9/20 against a crew that
 // was in fact 20/20. A floor no possible behaviour can clear is not a strict bar,
-// it is a broken gauge, and it was caught because six floors read a perfect 0.0000
-// while the seventh read 9/20: an internally impossible result.
+// it is a broken gauge.
+//
+// What actually gave it away: the other six floors passed while C-5 read exactly
+// 9/20 — and 9 is precisely the number of cases whose committed expectation is
+// `escalate-to-human`, the one value the two vocabularies share. A failure count
+// that lands exactly on "the cases where the two spellings coincide" is a naming
+// bug, not a behavioural one. (Six clean floors alone would prove nothing: a system
+// can be perfectly stable and consistently wrong — C-1/C-2/C-3 measure only
+// stability, which is why C-5 exists.)
 const expectedByCaseId: Record<string, string> = {};
-for (const f of readdirSync(LIVE_CASES_DIR).filter((n) => n.endsWith(".case.json")).sort()) {
-  const c = JSON.parse(readFileSync(join(LIVE_CASES_DIR, f), "utf8")) as CrewCase;
+for (const c of committedCases) {
   expectedByCaseId[c.caseId] = expectedTerminalFor(c);
 }
 
