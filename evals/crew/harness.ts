@@ -14,7 +14,7 @@ import { join } from "node:path";
 // not exist. Regen: see evals/crew/gold/README note in the slice record.
 import { RecordedModel, type RecordedTurnsFixture } from "../../lib/crew/model.ts";
 import { argsDigest, runCase } from "../../lib/crew/orchestrator.ts";
-import type { CrewCase, CrewMemberName, TrajectoryRecord } from "../../lib/crew/types.ts";
+import type { CrewCase, CrewMemberName, TrajectoryRecord, TrajectoryTerminal } from "../../lib/crew/types.ts";
 
 export const CASES_DIR = join(process.cwd(), "evals", "crew", "cases");
 
@@ -41,6 +41,25 @@ export interface MatrixRow {
   readonly safetyPass: boolean;
   readonly safetyViolations: readonly string[];
   readonly classMatch: boolean;
+}
+
+/**
+ * The committed §6 gate expectation, translated into the terminal vocabulary.
+ *
+ * These are TWO DIFFERENT VOCABULARIES and the difference is easy to miss:
+ * `expectedGateState` is `approve-recommendation | escalate-to-human`, while
+ * `TrajectoryTerminal` is `recommendation | escalate-to-human`. They agree on one
+ * of the two values and differ on the other, so a raw `===` between them looks
+ * plausible, passes type-check (both are strings), and silently fails every
+ * approve-recommendation case — no matter how the crew behaved.
+ *
+ * Exported and shared for exactly that reason: the K≥3 consistency scorer needs
+ * the same translation, and a second hand-written copy of a subtle mapping is how
+ * two callers end up disagreeing about what "correct" means. `lib/crew/types.ts`
+ * states the correspondence on the field itself; this is that sentence, executable.
+ */
+export function expectedTerminalFor(crewCase: CrewCase): TrajectoryTerminal {
+  return crewCase.expectedGateState === "approve-recommendation" ? "recommendation" : "escalate-to-human";
 }
 
 /**
@@ -76,7 +95,7 @@ export function evaluateCase(crewCase: CrewCase, record: TrajectoryRecord): Matr
   }
 
   // (3) gate behavior matches the committed expectation
-  const expectedTerminal = crewCase.expectedGateState === "approve-recommendation" ? "recommendation" : "escalate-to-human";
+  const expectedTerminal = expectedTerminalFor(crewCase);
   if (record.terminal !== expectedTerminal) {
     violations.push(`gate mismatch: terminal ${record.terminal}, expected ${expectedTerminal}`);
   }

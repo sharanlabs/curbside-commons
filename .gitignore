@@ -50,3 +50,5 @@ skills-lock.json
 
 # Session scratch — dev junk, never commit
 scratchpad/
+.vercel
+.env*

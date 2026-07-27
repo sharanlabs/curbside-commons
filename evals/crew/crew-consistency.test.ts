@@ -1,6 +1,8 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import type { CrewCase } from "../../lib/crew/types.ts";
+import { expectedTerminalFor } from "./harness.ts";
 import {
   evaluateFloors,
   modalTerminal,
@@ -8,6 +10,8 @@ import {
   type Rep,
   type RepRow,
 } from "./l1-consistency.ts";
+
+const LIVE_CASES_DIR = join(process.cwd(), "evals", "crew", "cases-live");
 
 /**
  * L-1 CONSISTENCY SCORER — exercised against SYNTHETIC reps, before any real
@@ -220,9 +224,64 @@ describe("consistency scorer — reads the REAL committed L-1 matrix shape", () 
     expect(r.terminalFlipRate).toBe(0);
   });
 
-  it("the registration document exists and states the run is NOT YET RUN", () => {
+  it("the registration document exists, keeps K=3, and records the executed run", () => {
     const doc = readFileSync(join(process.cwd(), "docs", "l1-consistency-preregistration.md"), "utf8");
-    expect(doc).toContain("NOT YET RUN");
     expect(doc).toContain("K = 3");
+    // The run happened 2026-07-27, so "NOT YET RUN" would now be a false claim on
+    // the very document that governs the claim. The floors above it are unchanged.
+    expect(doc).not.toContain("NOT YET RUN");
+    expect(doc).toContain("EXECUTED 2026-07-27");
+  });
+});
+
+/**
+ * THE VOCABULARY TOOTH — added 2026-07-27 after the mapping bit for real.
+ *
+ * `expectedGateState` (approve-recommendation | escalate-to-human) and
+ * `TrajectoryTerminal` (recommendation | escalate-to-human) agree on one value and
+ * differ on the other. A raw `===` between them therefore type-checks, looks
+ * right, passes the escalate cases, and fails every approve-recommendation case
+ * NO MATTER WHAT THE CREW DID.
+ *
+ * That is exactly what the first K=3 scoring run did: it reported C-5 as 9/20 —
+ * precisely the 9 escalate cases — against a crew that was in fact 20/20. It was
+ * caught only because six floors read a perfect 0.0000 while the seventh read
+ * 9/20, which is not a result a real system produces.
+ *
+ * These assertions make that class of error loud instead of plausible.
+ */
+describe("expectedGateState → terminal mapping (the two vocabularies are NOT interchangeable)", () => {
+  const liveCases = (): CrewCase[] =>
+    readdirSync(LIVE_CASES_DIR)
+      .filter((f) => f.endsWith(".case.json"))
+      .sort()
+      .map((f) => JSON.parse(readFileSync(join(LIVE_CASES_DIR, f), "utf8")) as CrewCase);
+
+  it("translates both gate states into the terminal vocabulary", () => {
+    expect(expectedTerminalFor({ expectedGateState: "approve-recommendation" } as CrewCase)).toBe("recommendation");
+    expect(expectedTerminalFor({ expectedGateState: "escalate-to-human" } as CrewCase)).toBe("escalate-to-human");
+  });
+
+  it("the mapping is LOAD-BEARING — it is not an identity function", () => {
+    // If this ever became a no-op the shared helper would be pointless and a raw
+    // comparison would be harmless. It is not: one of the two values is renamed.
+    // This is the assertion that says "you cannot skip the translation".
+    const raw = "approve-recommendation";
+    expect(expectedTerminalFor({ expectedGateState: raw } as CrewCase)).not.toBe(raw);
+  });
+
+  it("every committed live case maps to a LAWFUL terminal, never a gate-state string", () => {
+    // The generic catch: any expectation that is not a lawful terminal can never
+    // be matched by a real record, so a floor built on it is unpassable by
+    // construction — a broken gauge wearing the costume of a strict bar.
+    const lawful = new Set(["recommendation", "escalate-to-human"]);
+    const cases = liveCases();
+    expect(cases.length).toBeGreaterThan(0);
+    for (const c of cases) {
+      expect(lawful.has(expectedTerminalFor(c)), c.caseId).toBe(true);
+    }
+    // And the split is genuinely mixed, so the tooth exercises BOTH branches.
+    const mapped = cases.map((c) => expectedTerminalFor(c));
+    expect(new Set(mapped).size).toBe(2);
   });
 });

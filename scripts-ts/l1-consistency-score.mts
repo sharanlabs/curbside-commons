@@ -30,7 +30,9 @@
  */
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { expectedTerminalFor } from "../evals/crew/harness.ts";
 import { evaluateFloors, scoreConsistency, type Rep, type RepRow } from "../evals/crew/l1-consistency.ts";
+import type { CrewCase } from "../lib/crew/types.ts";
 
 const GOLD_DIR = join(process.cwd(), "evals", "crew", "gold");
 const CONSISTENCY_DIR = join(GOLD_DIR, "consistency");
@@ -98,13 +100,20 @@ const reps: Rep[] = files.map((f) => {
 });
 
 // ---- C-5 expectations come from the COMMITTED case files, never re-typed here ----
+//
+// The translation MATTERS and is imported, not rewritten. `expectedGateState` is
+// `approve-recommendation | escalate-to-human`; `terminal` is
+// `recommendation | escalate-to-human`. Comparing them raw type-checks (both are
+// strings), agrees on escalate-to-human, and silently fails all 11
+// approve-recommendation cases REGARDLESS OF CREW BEHAVIOUR — the first scoring
+// run of 2026-07-27 did exactly that and reported C-5 as 9/20 against a crew that
+// was in fact 20/20. A floor no possible behaviour can clear is not a strict bar,
+// it is a broken gauge, and it was caught because six floors read a perfect 0.0000
+// while the seventh read 9/20: an internally impossible result.
 const expectedByCaseId: Record<string, string> = {};
 for (const f of readdirSync(LIVE_CASES_DIR).filter((n) => n.endsWith(".case.json")).sort()) {
-  const c = JSON.parse(readFileSync(join(LIVE_CASES_DIR, f), "utf8")) as {
-    caseId: string;
-    expectedGateState: string;
-  };
-  expectedByCaseId[c.caseId] = c.expectedGateState;
+  const c = JSON.parse(readFileSync(join(LIVE_CASES_DIR, f), "utf8")) as CrewCase;
+  expectedByCaseId[c.caseId] = expectedTerminalFor(c);
 }
 
 // ---- score ----

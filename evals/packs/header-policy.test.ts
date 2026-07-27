@@ -40,10 +40,17 @@ interface VercelHeaderRule {
   headers: Array<{ key: string; value: string }>;
 }
 
-function config(): { headers?: VercelHeaderRule[]; outputDirectory?: string } {
+function config(): {
+  headers?: VercelHeaderRule[];
+  outputDirectory?: string;
+  framework?: string | null;
+  cleanUrls?: boolean;
+} {
   return JSON.parse(readFileSync(VERCEL_JSON, "utf8")) as {
     headers?: VercelHeaderRule[];
     outputDirectory?: string;
+    framework?: string | null;
+    cleanUrls?: boolean;
   };
 }
 
@@ -78,6 +85,37 @@ describe("header policy — vercel.json is exactly the adopted 2026-07-12 policy
 
   it("the config points at the static export the policy applies to", () => {
     expect(config().outputDirectory).toBe("out");
+  });
+
+  it("does NOT pair outputDirectory with the nextjs framework preset — that combination fails the deploy", () => {
+    // Found by an actual deploy on 2026-07-27, not by reading the file. The old
+    // config set BOTH `framework: "nextjs"` and `outputDirectory: "out"`. Each key
+    // is individually valid, which is why every in-repo shape check passed; together
+    // they are contradictory. `framework: nextjs` runs Vercel's Next.js builder,
+    // which looks for `routes-manifest.json`, and `outputDirectory: out` aims that
+    // builder at the `output: "export"` folder, where no manifest exists:
+    //   Error: The file "/vercel/path0/out/routes-manifest.json" couldn't be found.
+    //
+    // This is the `public/_headers` lesson one level up. That file was Cloudflare
+    // syntax Vercel never read; this was Vercel syntax Vercel read and rejected.
+    // Both looked correct in-repo, and only the live host could say otherwise —
+    // so the assertion is pinned to the deploy outcome, not to a preference.
+    const framework = config().framework;
+    expect(framework === null || framework === undefined).toBe(true);
+  });
+
+  it("sets cleanUrls — without it every extensionless route 404s on the live host", () => {
+    // Also found by deploying, 2026-07-27. With `framework: null` Vercel serves
+    // `out/` as plain static files. Next's `output: "export"` emits `report.html`,
+    // not `report/index.html` (trailingSlash is unset), so `/report` resolves to
+    // nothing: the first deploy returned 200 on `/` and 404 on /report, /fees,
+    // /playground, /proof and /docs — five of six surfaces dead.
+    //
+    // Worth stating why no existing test caught it: C10 walks `out/` recursively
+    // and every in-repo check verifies the FILES EXIST. None of them verify that
+    // the HOST maps a URL to a file. The export was complete and correct while the
+    // site was broken, and only a live request could distinguish the two.
+    expect(config().cleanUrls).toBe(true);
   });
 
   it("the policy record exists and names the CSP deferral", () => {
