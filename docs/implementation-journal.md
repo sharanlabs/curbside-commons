@@ -779,3 +779,68 @@ row through `evaluateCase` and stayed green.
 Gate: `npm run verify` exit 0, **1516 passed / 8 skipped**. Codex xhigh adversarial gate DISPATCHED on the fixes
 (brief attacks the four load-bearing claims, incl. whether the scorer correction is rationalized);
 **verdict pending at this sync** — it lands in the decision log when it returns.
+
+## 2026-07-27 · session 36 — the showcase became a tool, and the tool needed the engine to stop over-claiming first
+
+The owner looked at three screenshots of their own landing page and said: *why is there a showcase piece, I want a working website where I will upload test files.* They were right, and the diagnosis was sharper than "it needs upload." Every interactive element on that page is staged. The receipt replays. "Break the feed yourself" runs real arithmetic — against one hardcoded number. And the hero's own invitation, "Try it on a feed", was an anchor to `#try`: the toy further down the same page. The site invited you to try a feed and then took you somewhere that cannot accept one.
+
+**What the build revealed before it started.** Planning to let a reader supply their own catalog, I read `runListingsVerification` and found `matchingMode: "synthetic-controlled"` and `simulated: true` compiled into every report it builds — while the report TYPE declares `simulated` a `boolean`. Every caller in existence fed the committed corpus, so the labels had never been wrong. They would become wrong the instant an uploaded catalog arrived: a reader's real records stamped as simulated, and shared-synthetic-id matching asserted over ids we never minted.
+
+This is the seventh instance of one shape in three sessions. Session 34 recorded it four times; session 35 twice, including a comment of mine claiming a containment guarantee the code did not implement. *A claim broader than the thing backing it.* The instructive part is where it was hiding: not in a claim someone wrote, but in a **default that was true of every case that had existed so far.** Hardcoding was correct when written. What made it a defect was a new caller — and nothing in the type system, the tests, or the 101 existing `simulated` assertions could notice, because they all exercised the case where the default was right. The lesson worth keeping: **a constant that is true of every current caller is not a fact, it is an unexamined assumption with good luck.** The tell is a type that permits variation where the code permits none.
+
+**The design review, which the owner asked for separately and which turned out to be the same finding.** Six `.pg-*` rules had zero references in any component — orphans from a playground rebuilt around them in session 30. One of them, `.pg-sec`, declared a 980px column. The page renders inside `.ds-wrap` at 1180-1720px. That gap *was* the owner's "check the spacing": the surface was authored for a container it no longer occupies, sitting in the layout like a borrowed part. Same root cause as the labels — something correct when written, left unexamined when the world around it moved.
+
+**Three defects only looking could find.** After the suites were green I built the page and looked at it. The disabled run button read as a low-contrast *enabled* button, not an unavailable one. Its helper note said the same sentence whether the button worked or not. The result panel's full-width rule read as a page divider. No test failed on any of these, and no test could have: they are all "the page is technically correct and communicates the wrong thing." Session 35 paid for this lesson at the deploy layer — in-repo checks verify files exist, never that the host maps a URL, never that a reader can read it. It generalizes past deployment.
+
+**And one the product caught on me.** My first end-to-end fixture — a feed and a record I wrote to be faithful — returned a MODIFIER-AMBIG finding instead of PASS. The reflex is to relax the assertion. I probed the engine instead: a single-variation item's expected title omits the variant label, so naming it "Regular" in the feed while the record calls the variation "Regular" is a genuine identity ambiguity. **The engine was right and my fixture was lying.** Fixed the fixture. A test failure is a hypothesis about the code, not a verdict on it.
+
+**One deletion worth naming.** `PlaygroundClient.tsx` became orphaned when the workbench replaced it, but two honesty guards still read it — the C10 prose scan and the zero-network import walk. Deleting the file without rebinding them would have left both reporting green over a surface that no longer ships, which is worse than having no guard: a green light nobody has any reason to doubt. They now read `AuditWorkbench.tsx` and `FileDrop.tsx`.
+
+**What is not proven.** A Codex cross-model gate has not run on this work. Slice 1 changed the honesty core, and I wrote it, found the original defect, and ruled my own repair sound — maker-judging-maker, the precise condition session 35's carried-forward lesson says to gate. Until it runs, the strongest honest statement is that every check I know how to write passes.
+
+## 2026-07-27 · session 36, part two — the cross-model gate found the error I could not
+
+I attacked my own work first. Six claims, executable tests rather than argument, four defects
+found — including one where the provenance decision mislabelled our own committed corpus as the
+reader's real data. I fixed them, ran every gate green, and wrote it up.
+
+Then the Codex pass returned and **three of those four fixes were still wrong.**
+
+The one worth keeping is not any individual bug. It is *why* self-attack could not reach it. I had
+been treating `matchingMode` as a statement about who owns the data. It is not — `report-view.ts`
+decodes `real-world` as *"identifiers do not line up, so matches were made by resolution"*, and this
+engine's reference only ever performs exact shared-id lookup. So my "honest" label asserted a
+matching mechanism that never ran. I removed one false claim and installed another in its place,
+then tested the new one thoroughly against the wrong definition.
+
+Every test I wrote was downstream of the misunderstanding. A test can only check the thing you
+think you are checking. **Self-review finds bugs in what you built; cross-review finds bugs in what
+you believed** — and the second class cannot surface by trying harder alone, because the belief is
+the thing doing the looking.
+
+The second correction was subtler and cost me a rewrite. My fix compared catalog *content* instead
+of object identity. The gate showed it fails both directions: change only `asOf` and the corpus
+still reads as ours; reorder identical items and it reads as the reader's. I had improved the
+inference rather than noticing that **inference was the error**. Provenance is a fact about the
+action someone took, not a property of the bytes they handed you — no amount of looking at a
+document tells you who supplied it. The fix was to delete the cleverness and carry the origin.
+
+And a plain one: my fix was a **half-fix**. I corrected the report header and left the UI reading
+"is this slot non-empty," so loading the sample catalog printed *"your own records"* beside a
+report correctly labelled otherwise. The screen and the header stating different facts about the
+same run — the exact shape this product exists to catch, on the page that catches it.
+
+**On the three I deferred.** I first recorded F-8, F-9 and the P3s as OPEN, reasoning that
+engine-level verdict changes deserve their own slice with their own gate. That reasoning was right
+about process and wrong about timing, and I want the correction on record rather than the original
+judgement. F-8 is a *silent miss*: a merchant who renames an id and simultaneously serves a hidden
+item got one finding about the id and **nothing about the hidden item** — the more serious half,
+absent. Leaving a known silent miss in place while shipping a tool that invites strangers to audit
+their own data is not a deferral; it is a decision to ship a verifier that does not verify. They
+were reproduced red and fixed.
+
+The check that made the engine change safe: after fixing, I re-derived the committed drifted feed
+directly. Still exactly 16 findings, same rule set. The fix adds detection *only where a defect was
+previously escaping*. That is the shape an engine change should have, and it is worth demanding
+explicitly — a change that alters counts on known-good data is telling you something either about
+the change or about the data, and you want to know which before you ship it.

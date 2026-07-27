@@ -1921,3 +1921,33 @@ Task type: gated execution of two owner-authorized items (deploy + owner-armed l
 - **One self-inflicted defect caught and corrected on the record:** the first scoring pass reported C-5 9/20 / DEFERRED because my CLI compared two different vocabularies. See the journal entry — this is the session's main lesson.
 - **Harness event, raw:** one auto-mode classifier outage blocked a Bash call (`claude-sonnet-5[1m] is temporarily unavailable, so auto mode cannot determine the safety of Bash right now`); retried clean on the owner's `resume`. Background fan-out deliberately NOT used (session-34's five-dead-workflow lesson) — work ran inline or in chained background shells.
 - **Gates:** `npm run verify` exit 0 at **1516 passed + 8 skipped** (start 1511; +5 teeth, each red-green proven). Prevent-repeat checklist run — see the journal entry for the per-box answers.
+
+## 2026-07-27 — session 36: /playground rebuilt as the two-file audit workbench (owner commission)
+
+**Task type** implementation (product surface + engine honesty) · **stage** execution · **risk** HIGH (touches the C3/C10 honesty labeling RULES §4 protects) · **mode** full · **effort** xhigh (ultracode; owner-set) · **Codex review** REQUIRED, pending (see below) · **human approval** commit/push/deploy = owner word.
+
+**Owner words honoured:** "why there is a showcase piece i WANT WORKING WEBSITE WHERE I WILL UPLOAD TEST FILES" · "check the space, design, end to end in detail" · "review the whole design. check the spacing" · "check end to end" · "Yes go for all" · "full permission granted."
+
+**Skills used:** `superpowers:test-driven-development` (every slice red before green), `superpowers:verification-before-completion` (no claim without the command output behind it), `superpowers:systematic-debugging` (the MODIFIER-AMBIG fixture — probed the engine rather than weakening the test), `screenshot-critique` discipline (looked at the built page; three defects no test could see).
+
+**Slices, in dependency order:** (1) `ListingsRunProvenance` — the C3/C10 labels became an optional parameter defaulting to today's values; (2) `parseCatalogText` — the truth side gained the feed side's refusal discipline; (3) `FileDrop` — drag-drop/browse/paste over a native file input, two channels for content vs failure; (4) `AuditWorkbench` + the page rebuild + the four design/spacing fixes; (5) the hero CTA repointed to the tool.
+
+**Validation:** `npm run verify` exit 0 · vitest **1556 passed + 8 skipped** (baseline 1534) · playwright dev **48 passed / 1 skipped** · playwright **artifact** (static export — the mode that ships) **48 passed / 1 skipped** · axe **8/8 zero WCAG A/AA violations** · C10 green · golden byte-equality untouched · import-walk zero-network guard extended to the new closure.
+
+**Artifacts:** `components/playground/AuditWorkbench.tsx`, `components/playground/FileDrop.tsx` (commit) · `evals/packs/listings-provenance-labels.test.ts`, `evals/packs/catalog-parse.test.ts` (commit) · `components/playground/PlaygroundClient.tsx` DELETED (orphaned; guards rebound to the shipping surface) · screenshots (scratchpad, not committed).
+
+**Open:** Codex cross-model gate on this work — slice 1 changed the honesty core and I am maker-judging-maker on it, which is exactly the condition session 35's lesson names. Tree uncommitted.
+
+### 2026-07-27 — session 36 part two: cross-model gate closure
+
+**Task type** adjudication + engine fix · **risk** HIGH (engine verdict semantics) · **mode** full · **effort** xhigh · **Codex review** RAN → valid BLOCK, all 16 closed · **approval** commit/push = owner word.
+
+**Gate:** `gpt-5.6-sol` @ high, read-only, via `codex-guarded`. Verdict BLOCK: 9 P1 · 5 P2 · 2 P3. Adjudicated primary-model-final — every finding reproduced before fixing; none accepted on authority, none refused on ego. Two harness failures recorded raw (startup-contract pause; `--cd` invalid on `exec resume`), no silent retries.
+
+**Closed:** all 16, including the four I had first deferred (F-8, F-9, F-15, F-16). F-8 was a silent miss — a hidden item sold under a renamed id escaped every rule — which is why it could not wait for its own slice.
+
+**New engine rule:** `LST-IDENT-TITLE-AMBIGUOUS` (an ambiguous title is no longer reported as a non-existent item).
+
+**Validation:** verify exit 0 · vitest **1574 + 8 skipped** · e2e dev 49/1 · e2e **artifact** 49/1 · axe 8/8 · C10 green · **committed corpus re-derived at exactly 16 findings, unchanged**.
+
+**Records:** `docs/reviews/codex-2026-07-27-s36-gate.md` (adjudication) · `codex-2026-07-27-s36-gate-raw.txt` (9,064 lines verbatim) · `adversarial-2026-07-27-s36-upload.md` (my own pass).
