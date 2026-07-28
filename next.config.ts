@@ -1,28 +1,44 @@
 import type { NextConfig } from "next";
 import { execSync } from "node:child_process";
+import { resolveSourceSha } from "./lib/build-provenance.ts";
 
 /**
  * Build provenance injection (plan v3.3 E1a; consumed by lib/build-info.ts and
- * rendered in the site footer). Precedence: explicit BUILD_SOURCE_SHA /
- * BUILD_TIMESTAMP_UTC env (the clean-room PRE-GATE build sets these) → live git
- * (with an honest "+dirty" marker) → empty (build-info falls back to the
- * labeled "untracked build" line rather than fabricating provenance).
+ * rendered in the site footer). The DECISION lives in lib/build-provenance.ts
+ * so it is testable; this function only supplies the environment and the git
+ * probe. Precedence: BUILD_SOURCE_SHA (clean-room PRE-GATE) → the host's
+ * authoritative commit → local git with an honest "+dirty" marker → empty
+ * (build-info renders "untracked build" rather than fabricating provenance).
+ *
+ * The host tier was added 2026-07-27 after the first git-triggered deploy
+ * published `(+dirty)` for a clean commit: `git status` was being asked about
+ * our working tree inside a build container that is not our working tree.
  */
 function resolveBuildProvenance(): { sha: string; timeUtc: string } {
   const timeUtc = process.env.BUILD_TIMESTAMP_UTC ?? new Date().toISOString();
-  if (process.env.BUILD_SOURCE_SHA) return { sha: process.env.BUILD_SOURCE_SHA, timeUtc };
-  try {
-    const sha = execSync("git rev-parse HEAD", { stdio: ["ignore", "pipe", "ignore"] })
-      .toString()
-      .trim();
-    const dirty =
-      execSync("git status --porcelain", { stdio: ["ignore", "pipe", "ignore"] })
-        .toString()
-        .trim().length > 0;
-    return { sha: dirty ? `${sha}+dirty` : sha, timeUtc };
-  } catch {
-    return { sha: "", timeUtc };
-  }
+  const sha = resolveSourceSha(process.env, {
+    headSha: () => {
+      try {
+        return execSync("git rev-parse HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+          .toString()
+          .trim();
+      } catch {
+        return null;
+      }
+    },
+    isDirty: () => {
+      try {
+        return (
+          execSync("git status --porcelain", { stdio: ["ignore", "pipe", "ignore"] })
+            .toString()
+            .trim().length > 0
+        );
+      } catch {
+        return false;
+      }
+    },
+  });
+  return { sha, timeUtc };
 }
 
 const buildProvenance = resolveBuildProvenance();
