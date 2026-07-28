@@ -22,7 +22,7 @@ import {
  * Every figure derives from the fee data layer (committed goldens + registry).
  */
 export const metadata: Metadata = {
-  title: "Fee audit — a statement read against the law",
+  title: "Fee rules — a statement read against the law",
   description:
     "One delivery-platform statement, checked line by line against NYC Administrative Code §20-563.3 — the four caps, the category lock, the refund window — with the statement line, the clause, the rule, and the arithmetic attached to every finding.",
 };
@@ -227,15 +227,18 @@ export default function FeesPage() {
         </Reveal>
       </section>
 
-      {/* ===== DOOR — continue to 03 (D5-corrected copy) ===== */}
+      {/* ===== DOOR — to the TOOL. It pointed at /playground while promising
+               "audit your own feed", which after the 2026-07-28 rename is the
+               DEMO page: the label and the destination disagreed, the same
+               shape as the /proof door caught in the same pass. ===== */}
       <section className="sect sect-last ds-wrap">
         <Reveal>
-          <Link className="door" href="/playground">
+          <Link className="door" href="/">
             <span>
               <span className="d-eyebrow">NEXT</span>
-              <span className="d-title">Try it live</span>
+              <span className="d-title">Audit your own feed</span>
               <span className="d-sub">
-                The feed bench — run the same engine on a marketplace feed, in your browser.
+                Drag in your two files, or run the sample pair. Nothing leaves the page.
               </span>
             </span>
             <span className="d-arrow" aria-hidden="true">

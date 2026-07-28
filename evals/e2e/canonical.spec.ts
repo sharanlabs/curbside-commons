@@ -6,13 +6,17 @@ import { test, expect } from "@playwright/test";
  * (playwright.config.ts) and artifact mode (playwright.artifact.config.ts). A
  * behavior that only holds in dev is a defect.
  *
- * Supersedes the retired v8 console contract (7-chapter landing arc, Evidence
- * Bench, Coverage tablist, Method words, the /eval dashboard, /demo copy, and
- * the 8-tab nav). The v9 site is one continuing case across four numbered
- * chapters — 01 /report · 02 /fees · 03 /playground · 04 /proof — plus the
- * /docs reference and the /legacy archive. Every rendered figure derives from
- * the engine (lib/landing/specimen.ts): 16 findings, 11 error, 5 warn; the
- * NYC fee split 17 = 11 + 6; the ×100 price specimen $2,150.00 vs $21.50.
+ * REWRITTEN 2026-07-28. This header used to describe "one continuing case
+ * across four numbered chapters — 01 /report · 02 /fees · 03 /playground ·
+ * 04 /proof". That grammar is gone: the site is a TOOL that opens on the
+ * workbench, plus named supporting destinations (Example report · Fee rules ·
+ * How it works · Proof) and the /docs reference and /legacy archive. A comment
+ * describing a structure the code no longer has is the same defect the product
+ * itself exists to catch — a claim broader than the thing backing it.
+ *
+ * Every rendered figure still derives from the engine (lib/landing/specimen.ts):
+ * 16 findings, 11 error, 5 warn; the NYC fee split 17 = 11 + 6; the ×100 price
+ * specimen $2,150.00 vs $21.50.
  */
 
 /* ============================ THE LANDING ============================ */
@@ -78,7 +82,7 @@ test("landing leads with the working tool, then explains itself", async ({ page 
   await expect(fees).toContainText("applies 17 codified rules");
   await expect(fees).toContainText("11 checkable from the statement itself");
   await expect(fees).toContainText("6 that need outside evidence");
-  await expect(fees.getByRole("link", { name: /Open the fee audit/ })).toHaveAttribute(
+  await expect(fees.getByRole("link", { name: /Open the fee rules/ })).toHaveAttribute(
     "href",
     "/fees",
   );
@@ -494,4 +498,38 @@ test.describe("no-JS completeness (SSR floors)", () => {
       "16 findings — 11 error · 5 warn · 0 info",
     );
   });
+});
+
+test("every door's label agrees with where it actually goes", async ({ page }) => {
+  // TWO DOORS DISAGREED WITH THEMSELVES after the 2026-07-28 rename: /proof
+  // said "BACK TO THE TOOL" and went to /report, and /fees promised "audit your
+  // own feed" while pointing at /playground — which is now the DEMO page, not
+  // the tool. Both are the same defect class this repo keeps meeting: a surface
+  // that is technically correct and communicates the wrong thing. A rename
+  // always leaves these behind, and nothing else in the suite looks for them.
+  test.slow();
+  const promisesTheTool = /audit your own feed/i;
+  for (const route of ["/fees", "/proof", "/playground"]) {
+    await page.goto(route);
+    const doors = page.locator("a.door");
+    const count = await doors.count();
+    for (let i = 0; i < count; i++) {
+      const door = doors.nth(i);
+      const label = (await door.innerText()).replace(/\s+/g, " ").trim();
+      if (!promisesTheTool.test(label)) continue;
+      await expect(door, `${route}: a door promising the tool must GO to it`).toHaveAttribute(
+        "href",
+        "/",
+      );
+    }
+  }
+
+  // And no door may advertise a destination name the site no longer uses.
+  for (const route of ["/", "/report", "/fees", "/proof", "/playground", "/docs"]) {
+    await page.goto(route);
+    const main = await page.locator("main").innerText();
+    for (const retired of ["Try it live", "CONTINUE ·", "CASE 001"]) {
+      expect(main, `${route} still advertises the retired name "${retired}"`).not.toContain(retired);
+    }
+  }
 });

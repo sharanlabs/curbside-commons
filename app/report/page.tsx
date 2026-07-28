@@ -146,7 +146,7 @@ export default function ReportPage() {
           <Link className="door" href="/fees">
             <span>
               <span className="d-eyebrow">NEXT</span>
-              <span className="d-title">The fee audit</span>
+              <span className="d-title">Fee rules</span>
               <span className="d-sub">
                 The statement, checked against the law. New York City alone.
               </span>

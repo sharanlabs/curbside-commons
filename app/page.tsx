@@ -175,7 +175,7 @@ export default function Landing() {
               and say so.
             </p>
             <Link className="go" href="/fees">
-              Open the fee audit{" "}
+              Open the fee rules{" "}
               <span className="arr" aria-hidden="true">
                 &rarr;
               </span>
