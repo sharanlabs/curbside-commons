@@ -62,6 +62,13 @@ export interface FileDropProps {
   readonly status: SlotStatus | null;
   readonly onLoadSample: () => void;
   readonly sampleLabel: string;
+  /**
+   * Save this slot's sample to disk. Optional: a slot without one simply omits
+   * the control. Exists because "I want a ready-to-use website to upload test
+   * files" needs FILES — loading the sample inline exercises the engine but
+   * never the upload path, and left a reader with nothing to drag.
+   */
+  readonly onDownloadSample?: () => void;
 }
 
 /** Refuse implausibly large files before reading them into memory. */
@@ -79,6 +86,7 @@ export function FileDrop({
   status,
   onLoadSample,
   sampleLabel,
+  onDownloadSample,
 }: FileDropProps) {
   const [dragging, setDragging] = useState(false);
   const inputId = useId();
@@ -163,9 +171,21 @@ export function FileDrop({
           <span className="fd-cta">Choose a file</span>
           <span className="fd-or">or drag it here</span>
         </label>
-        <button type="button" className="fd-sample" onClick={onLoadSample}>
-          {sampleLabel}
-        </button>
+        <span className="fd-sample-row">
+          <button type="button" className="fd-sample" onClick={onLoadSample}>
+            {sampleLabel}
+          </button>
+          {/* "Upload test files" needs FILES. Loading the sample inline proves
+              the engine works but never exercises the upload path, and a reader
+              who wants to try dragging something in had nothing to drag
+              (2026-07-28). Saved from the same bytes the inline button loads,
+              so the two can never describe different samples. */}
+          {onDownloadSample !== undefined && (
+            <button type="button" className="fd-dl" onClick={onDownloadSample}>
+              or download it to test uploading
+            </button>
+          )}
+        </span>
       </div>
 
       {fileName !== null && <p className="fd-file">{fileName}</p>}

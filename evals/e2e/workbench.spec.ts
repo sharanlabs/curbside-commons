@@ -235,3 +235,39 @@ test("a verdict offers a way forward, and 'audit another pair' really resets", a
     await expect(slot.locator("textarea")).toHaveValue("");
   }
 });
+
+test("the sample pair can be DOWNLOADED, and it is the same bytes the inline button loads", async ({
+  page,
+}) => {
+  // NEW 2026-07-28. "A ready-to-use website to upload test files" needs FILES.
+  // Loading the sample inline exercises the engine but never the upload path,
+  // so a reader who wanted to try dragging something in had nothing to drag.
+  // The tooth that matters is not "a download happens" — it is that the file
+  // and the inline sample are the SAME sample. Two sources for one specimen is
+  // how a tool ends up demonstrating something other than what it audits.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  for (const [label, fileName] of [
+    ["The feed", "sample-feed.json"],
+    ["The record", "sample-catalog.json"],
+  ] as const) {
+    const slot = page.locator(".fd-slot", { hasText: label });
+
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      slot.getByRole("button", { name: /download it to test uploading/ }).click(),
+    ]);
+    expect(download.suggestedFilename()).toBe(fileName);
+    const stream = await download.createReadStream();
+    const chunks: Buffer[] = [];
+    for await (const c of stream) chunks.push(c as Buffer);
+    const downloaded = Buffer.concat(chunks).toString("utf8");
+
+    // Now load the SAME sample inline and compare the textarea's bytes.
+    await slot.getByRole("button", { name: /^Use the sample/ }).click();
+    const inline = await slot.locator("textarea").inputValue();
+    expect(downloaded, `${fileName} must match the inline sample byte for byte`).toBe(inline);
+    expect(() => JSON.parse(downloaded), `${fileName} must be valid JSON`).not.toThrow();
+  }
+});

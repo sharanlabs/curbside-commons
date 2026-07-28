@@ -166,17 +166,20 @@ export function AuditWorkbench() {
     invalidate();
   }
 
-  function downloadReport() {
-    if (run === null) return;
-    const blob = new Blob([`${JSON.stringify(run.report, null, 2)}\n`], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
+  /** Save text to a file in the reader's browser. Object-URL only — no network
+   *  leg, so the "nothing leaves this page" promise covers downloads too. */
+  function saveTextFile(text: string, fileName: string) {
+    const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = "curbside-commons-report.json";
+    a.download = fileName;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function downloadReport() {
+    if (run === null) return;
+    saveTextFile(`${JSON.stringify(run.report, null, 2)}\n`, "curbside-commons-report.json");
   }
 
   const counts = run ? severityCounts(run.report) : null;
@@ -205,6 +208,7 @@ export function AuditWorkbench() {
           status={feed.status}
           onLoadSample={() => feedText(sampleFeedText(), "sample-feed.json", "sample")}
           sampleLabel="Use the sample feed"
+          onDownloadSample={() => saveTextFile(sampleFeedText(), "sample-feed.json")}
         />
         <FileDrop
           title="The record"
@@ -226,6 +230,7 @@ export function AuditWorkbench() {
           status={record.status}
           onLoadSample={() => recordText(catalogSampleText(), "sample-catalog.json", "sample")}
           sampleLabel="Use the sample catalog"
+          onDownloadSample={() => saveTextFile(catalogSampleText(), "sample-catalog.json")}
         />
       </div>
 
