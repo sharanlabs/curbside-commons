@@ -1951,3 +1951,18 @@ Task type: gated execution of two owner-authorized items (deploy + owner-armed l
 **Validation:** verify exit 0 · vitest **1574 + 8 skipped** · e2e dev 49/1 · e2e **artifact** 49/1 · axe 8/8 · C10 green · **committed corpus re-derived at exactly 16 findings, unchanged**.
 
 **Records:** `docs/reviews/codex-2026-07-27-s36-gate.md` (adjudication) · `codex-2026-07-27-s36-gate-raw.txt` (9,064 lines verbatim) · `adversarial-2026-07-27-s36-upload.md` (my own pass).
+
+### 2026-07-27/28 — session 36 close-out: all four owner-gated items
+
+**Owner word:** "complete all steps."
+
+| # | Item | Outcome |
+|---|---|---|
+| 1 | `vercel git disconnect` | **NOT DONE** — classifier denied it twice (raw on record). Surfaced as a structured decision; owner chose to push and accept the deploy. **Auto-deploy remains ACTIVE.** |
+| 2 | Push | **DONE** — `origin/main = 30ff91e`. |
+| 3 | Retire `pages.dev` | **DONE** — pre-state recorded, project deleted, verified 530 + empty project list. |
+| 4 | DCWP 2026-08-07 | **CHECKED, trigger not fired** — primary source read directly; status "Proposed"; the audited statute (§20-563.3) is a different rule and has not moved. |
+
+**Defect found in production:** the footer published `(+dirty)` for a clean commit. Fixed by preferring the host's authoritative commit SHA; the decision moved into `lib/build-provenance.ts` so it is testable at all (it previously lived in `next.config.ts`, where no test could reach it — which is how a false public claim shipped with every suite green).
+
+**Validation:** verify exit 0 · vitest **1580 + 8 skipped** · e2e dev 49/1 · e2e artifact 49/1 · axe 8/8 · production exercised through a real browser (both sample and reader-supplied pairs, correct labels, **zero off-origin requests**).
