@@ -114,8 +114,13 @@ test("the tool opens the page \u2014 both drop zones sit above the fold", async 
   for (const label of ["The feed", "The record"]) {
     const slot = page.locator(".fd-slot", { hasText: label });
     await expect(slot).toBeVisible();
-    const box = await slot.boundingBox();
-    expect(box, `${label} slot must render`).not.toBeNull();
+    // Measure `.fd-zone`, the actual drop target — NOT `.fd-slot`, which also
+    // contains the title and hint above it. Measuring the slot would let added
+    // header copy sink the real drop zone past the fold while the assertion
+    // still passed: a test that holds while the requirement it names breaks.
+    const zone = slot.locator(".fd-zone");
+    const box = await zone.boundingBox();
+    expect(box, `${label} drop zone must render`).not.toBeNull();
     expect(box!.y, `${label} drop zone must start within the first screen`).toBeLessThan(900);
   }
 
