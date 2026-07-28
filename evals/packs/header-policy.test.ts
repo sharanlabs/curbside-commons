@@ -40,18 +40,17 @@ interface VercelHeaderRule {
   headers: Array<{ key: string; value: string }>;
 }
 
-function config(): {
+type VercelConfigShape = {
   headers?: VercelHeaderRule[];
   outputDirectory?: string;
   framework?: string | null;
   cleanUrls?: boolean;
-} {
-  return JSON.parse(readFileSync(VERCEL_JSON, "utf8")) as {
-    headers?: VercelHeaderRule[];
-    outputDirectory?: string;
-    framework?: string | null;
-    cleanUrls?: boolean;
-  };
+  /** Automatic git deployments — `false` disables them for every branch. */
+  git?: { deploymentEnabled?: boolean | Record<string, boolean> };
+};
+
+function config(): VercelConfigShape {
+  return JSON.parse(readFileSync(VERCEL_JSON, "utf8")) as VercelConfigShape;
 }
 
 describe("header policy — vercel.json is exactly the adopted 2026-07-12 policy", () => {
@@ -105,6 +104,28 @@ describe("header policy — vercel.json is exactly the adopted 2026-07-12 policy
     // package.json and re-invoke the builder that failed here — with this test
     // still green. Cross-model gate finding, 2026-07-27.
     expect(config().framework).toBeNull();
+  });
+
+  it("disables automatic git deployments — push and deploy must be two acts, not one", () => {
+    // WHY THIS IS A TEST AND NOT A SETTING (2026-07-28, owner: "fix the vercel
+    // git disconnect"). `vercel link` connected GitHub auto-deploy as a SIDE
+    // EFFECT in session 35 — the owner had explicitly chosen the CLI-login path,
+    // so the GitHub route was the option NOT picked. From that moment `git push`
+    // and `deploy` were the SAME action, collapsing two separately-owner-gated
+    // acts into one, and nothing in the repo recorded it. It was found by
+    // querying the Vercel API, not by reading anything here.
+    //
+    // `git.deploymentEnabled: false` turns off automatic deployments for ALL
+    // branches (Vercel git-configuration docs, verified 2026-07-28). It is
+    // preferred over `vercel git disconnect` for a reason beyond the classifier
+    // denial: the CLI command mutates invisible ACCOUNT state that no reviewer
+    // can see and no test can assert, whereas this lives in the repo, ships in
+    // the diff, and is pinned right here. A guarantee you cannot read is a
+    // guarantee you are trusting rather than holding.
+    //
+    // The link itself is deliberately LEFT CONNECTED: it is what lets a deploy
+    // be triggered on purpose. What is removed is the automatic trigger.
+    expect(config().git?.deploymentEnabled).toBe(false);
   });
 
   it("sets cleanUrls — without it every non-root extensionless route 404s on the live host", () => {
