@@ -272,18 +272,12 @@ export const SPECIMEN_ITEM = {
   label: itemLabelFor(price.referenceRowId), // e.g. Crispy Calamari (Small)
 } as const;
 
-/** The in-browser one-rule bench (Home "Break the feed yourself"): the REAL
-    rule arithmetic runs locally against this record value. */
-export const TRY_BENCH = {
-  recordCents, // 2150
-  servedDefault: String(raw), // "2150" — the feed's claim, the opening state
-  truePrice: recordDollars, // "21.50"
-  plainMismatch: "24.00", // a preset that disagrees without the ×100 signature —
-  // illustrative INPUT to the real rule (not a figure read from any record)
-  ruleId: price.ruleId, // LST-PRICE-CENTS-AS-DECIMAL
-  recordRow: `${BENCH.record.field} · ${recordCents}¢ = ${BENCH.record.money}`,
-  servedRow: `${BENCH.claim.field} · ${BENCH.claim.unit}`,
-} as const;
+/* TRY_BENCH removed 2026-07-28 with the Home "Break the feed yourself" bench.
+   That surface mirrored ONE price rule in page-local code and needed an
+   equivalence pack (landing-trybench-equivalence.test.ts, also removed) to
+   prove the mirror still agreed with the engine. The workbench that replaced
+   it runs the REAL engine on the reader's own two files, so the mirror is not
+   simplified — it is gone, and the mirror-drift defect class with it. */
 
 /** PINNED trust figure (spec §2 beat 7 TRUST, owner-approved 2026-07-17: the
     "1,200+ tests" plot point; v9 mockup renders the same figure). Pinned like

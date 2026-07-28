@@ -17,26 +17,25 @@ import { test, expect } from "@playwright/test";
 
 /* ============================ THE LANDING ============================ */
 
-test("landing tells the truth-audit story: metadata, H1, the section arc, the case files", async ({
-  page,
-}) => {
+test("landing leads with the working tool, then explains itself", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
 
-  // v9 metadata + hero headline (W3 verbatim, both lines).
-  await expect(page).toHaveTitle(/Dinner can be ordered while you sleep\. What the agent read needs proof\./);
+  // Metadata now says what the page DOES. The H1 keeps the adopted hero lines.
+  await expect(page).toHaveTitle(/audit a marketplace feed against the merchant's records/i);
   const h1 = page.getByRole("heading", { level: 1 });
   await expect(h1).toContainText("Dinner can be ordered while you sleep.");
   await expect(h1).toContainText("What the agent read needs proof.");
 
-  // The five story beats render as <h2>, IN ORDER (independent visibility
-  // checks would let any permutation pass — assert the exact sequence).
+  // The five beats render as <h2>, IN ORDER. The tool comes FIRST and the
+  // explanatory scene follows it — a diagram belongs after the thing it
+  // explains. Independent visibility checks would let any permutation pass.
   const h2Sequence = await page.locator("main h2").allTextContents();
   expect(h2Sequence).toEqual([
+    "Audit a feed.",
+    "A claim is checked before the order is placed.",
     "The check runs in the open.",
-    "One held claim opens a case.",
-    "Break the feed yourself.",
-    "Different roles need the same proof.",
+    "Two kinds of claim.",
     "The same input, the same receipt, every time.",
   ]);
 
@@ -45,58 +44,79 @@ test("landing tells the truth-audit story: metadata, H1, the section arc, the ca
   await expect(proofBar).toContainText("HOLD");
   await expect(proofBar).toContainText("THE MENU: 2150");
   await expect(proofBar).toContainText("THE MERCHANT RECORD: 21.50");
-  await expect(proofBar).toContainText("100× THE RECORD");
+  await expect(proofBar).toContainText("100\u00d7 THE RECORD");
 
-  // The examination receipt (the turn) carries the derived case + arithmetic.
+  // The examination receipt carries the derived finding + arithmetic. The
+  // "CASE 001" prefix is gone: a case number that never changes is somebody
+  // else's case, and it was one of the markers that made this read as a
+  // display piece rather than a tool.
   const receipt = page.locator("article.receipt").first();
-  await expect(receipt).toContainText("CURBSIDE COMMONS · EXAMINATION RECEIPT");
-  await expect(receipt).toContainText("CASE 001 · FINDING 11/16");
-  await expect(receipt).toContainText("2150.00 × 100 = 215,000¢");
+  await expect(receipt).toContainText("CURBSIDE COMMONS \u00b7 EXAMINATION RECEIPT");
+  await expect(receipt).toContainText("FINDING 11 OF 16");
+  await expect(receipt).not.toContainText("CASE 001");
+  await expect(receipt).toContainText("2150.00 \u00d7 100 = 215,000\u00a2");
   await expect(receipt.locator(".stamp")).toHaveText("HOLD");
 
-  // The case file — FILE A (listings, anywhere in the US) + FILE B (NYC fees).
-  const fileA = page.locator("section.file").first();
-  await expect(fileA).toContainText("FILE A");
-  await expect(fileA.getByRole("heading", { name: "The listings file" })).toBeVisible();
-  await expect(fileA).toContainText("16 findings: 11 errors and 5 warnings");
-  await expect(fileA.getByRole("link", { name: /Open the listings audit/ })).toHaveAttribute(
+  // What it checks: two plain cards. The FILE A / FILE B tab cuts and the big
+  // stat rows are gone; the figures survive INSIDE the prose, still derived.
+  const listings = page.locator("section.file").first();
+  await expect(listings).not.toContainText("FILE A");
+  await expect(listings.getByRole("heading", { name: "What the listing says" })).toBeVisible();
+  await expect(listings).toContainText("16 findings \u2014 11 errors and 5 warnings");
+  await expect(listings.getByRole("link", { name: /See the worked example/ })).toHaveAttribute(
     "href",
     "/report",
   );
-  const fileB = page.locator("section.file.law");
-  await expect(fileB).toContainText("FILE B");
-  await expect(fileB.getByRole("heading", { name: "The fee-law file" })).toBeVisible();
-  // The 17 = 11 + 6 fee split, from the figure block (the load-bearing figures;
-  // NOTE the adjacent prose renders "17codified" with a missing space — a minor
-  // product defect reported to the caller, not asserted here).
-  const figs = fileB.locator(".figs");
-  await expect(figs).toContainText("17");
-  await expect(figs).toContainText("RULES");
-  await expect(figs).toContainText("FROM THE STATEMENT");
-  await expect(figs).toContainText("NEED EVIDENCE");
-  await expect(fileB.getByRole("link", { name: /Open the fee audit/ })).toHaveAttribute(
+  const fees = page.locator("section.file.law");
+  await expect(fees).not.toContainText("FILE B");
+  await expect(fees.getByRole("heading", { name: "What the fee statement says" })).toBeVisible();
+  // The 17 = 11 + 6 split, in prose. Asserted with the spaces, because a
+  // rewrite of this page rendered "17codified": JSX trims the lines of a text
+  // node and rejoins them, so a space sitting after a }} can vanish even
+  // though the source plainly contains it. Nothing else in the suite can see
+  // that class of defect.
+  await expect(fees).toContainText("applies 17 codified rules");
+  await expect(fees).toContainText("11 checkable from the statement itself");
+  await expect(fees).toContainText("6 that need outside evidence");
+  await expect(fees.getByRole("link", { name: /Open the fee audit/ })).toHaveAttribute(
     "href",
     "/fees",
   );
 
-  // Why it matters — the seats + the empty-seat wedge (as-of mid-2026, no overclaim).
-  const emptySeat = page.locator(".empty-seat");
-  await expect(emptySeat).toContainText("AS OF MID-2026");
-  await expect(emptySeat).toContainText(
-    "No named product independently verifies the feed against the merchant’s records.",
-  );
-
-  // Trust facts — deterministic · the pinned test figure · the published DEFER.
+  // Trust facts \u2014 deterministic \u00b7 the pinned test figure \u00b7 the published DEFER.
   const trust = page.locator(".trust");
   await expect(trust).toContainText("DETERMINISTIC");
   await expect(trust).toContainText("1,200+");
-  await expect(trust).toContainText("AUTOMATED TESTS");
+  await expect(trust).toContainText("automated tests compare the engine");
   await expect(trust.getByText("DEFER", { exact: true })).toBeVisible();
 
-  // The door to chapter 01 — a REAL route link (D3: no "sample" residue).
-  const door = page.getByRole("link", { name: /CONTINUE · 01/ });
-  await expect(door).toHaveAttribute("href", "/report");
-  await expect(door).toContainText("The listings audit");
+  // The audience eyebrow and the three-seat band are gone (owner, 2026-07-28):
+  // both were positioning copy, never a next step.
+  await expect(page.locator(".cs-eyebrow")).toHaveCount(0);
+  await expect(page.locator(".seats")).toHaveCount(0);
+  await expect(page.getByText("FOR MERCHANTS")).toHaveCount(0);
+});
+
+test("the tool opens the page \u2014 both drop zones sit above the fold", async ({ page }) => {
+  // THE CONTRACT THAT KEPT REGRESSING. Session 36 built the workbench and put
+  // it in section four of page three, ~2990px down; the owner returned with the
+  // same complaint. Reachability is not the requirement \u2014 ARRIVAL is. This
+  // pins the requirement itself rather than a proxy for it, at the 1280px
+  // desktop floor this site is designed for.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  for (const label of ["The feed", "The record"]) {
+    const slot = page.locator(".fd-slot", { hasText: label });
+    await expect(slot).toBeVisible();
+    const box = await slot.boundingBox();
+    expect(box, `${label} slot must render`).not.toBeNull();
+    expect(box!.y, `${label} drop zone must start within the first screen`).toBeLessThan(900);
+  }
+
+  // And the run control is on the page without hunting for it.
+  await expect(page.getByRole("button", { name: "Run the audit" })).toBeVisible();
 });
 
 test("landing footer: disclaimer-free, honest, and exactly the three chrome links", async ({
@@ -142,27 +162,12 @@ test("landing footer: disclaimer-free, honest, and exactly the three chrome link
   await expect(footerNav.getByRole("link", { name: "GitHub", exact: true })).toBeVisible();
 });
 
-test("landing Try bench runs the real one-rule check live on the served price", async ({ page }) => {
-  await page.goto("/");
-  const input = page.getByLabel("SERVED PRICE (EDIT ME)");
-  const verdict = page.locator("#try-verdict");
-
-  // The opening state is the feed's claim — held at ×100 (the cents-as-decimal drift).
-  await expect(verdict.locator(".v-chip")).toContainText("HELD");
-
-  // The true price agrees with the record — the verdict flips to PASS.
-  await input.fill("21.50");
-  await expect(verdict.locator(".v-chip")).toHaveText("PASS");
-  await expect(verdict).toHaveClass(/pass/);
-
-  // A preset restores the drift; the chip reads the ×100 factor the engine derived.
-  await page.getByRole("button", { name: /the feed's claim/ }).click();
-  await expect(verdict.locator(".v-chip")).toContainText("HELD ×100");
-
-  // A non-price value gets an honest refusal, never a verdict.
-  await input.fill("not a price");
-  await expect(verdict.locator(".v-chip")).toHaveText("NOT A PRICE");
-});
+/* The landing "Break the feed yourself" TryBench test was retired 2026-07-28
+ * together with the component. It mirrored ONE price rule in page-local code
+ * and needed an equivalence pack to prove the mirror still matched the engine.
+ * The workbench above runs the REAL engine on the reader's own two files, so
+ * the mirror is not simplified \u2014 it is gone, and with it the entire class of
+ * mirror-drift defect the pack existed to catch. */
 
 test("commons scene: reduced motion settles complete; the pause control is real (WCAG 2.2.2)", async ({
   page,
@@ -173,14 +178,13 @@ test("commons scene: reduced motion settles complete; the pause control is real 
   await expect(page.locator(".cs-status-live")).toContainText(
     "SCENE SETTLED · ORDER PLACED WITH PROOF",
   );
-  // The primary CTA runs the check; the secondary is a native link to the
-  // WORKING TOOL. It pointed at "#try" — the one-number bench further down this
-  // same page — until 2026-07-27, so a reader who clicked "try it on a feed"
-  // never reached anything that takes a feed. The destination is the contract.
-  await expect(page.getByRole("button", { name: "Watch the check" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Try it on a feed" })).toHaveAttribute(
+  // The primary CTA runs the check. The secondary is a native link — it now
+  // goes to the worked report, because the tool it used to advertise is on
+  // this page, above this band.
+  await expect(page.getByRole("button", { name: "Watch a claim get held" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "See a full worked report" })).toHaveAttribute(
     "href",
-    "/playground",
+    "/report",
   );
 });
 
@@ -196,24 +200,29 @@ test("commons scene pause/play genuinely toggles the motion loop", async ({ page
 
 /* ============================== THE NAV ============================== */
 
-test("nav = one continuing case across four numbered chapters; each reachable with aria-current", async ({
+test("nav = named destinations, no chapter numerals; each reachable with aria-current", async ({
   page,
 }) => {
-  test.slow(); // dev mode compiles + client-navigates four chapters in one run
+  test.slow(); // dev mode compiles + client-navigates every destination in one run
   await page.goto("/");
-  const nav = page.getByRole("navigation", { name: "Chapters" });
+  const nav = page.getByRole("navigation", { name: "Sections" });
 
   // No retired v8 tabs survive.
   await expect(nav.getByRole("link", { name: "Console", exact: true })).toHaveCount(0);
   await expect(nav.getByRole("link", { name: "Evidence", exact: true })).toHaveCount(0);
 
-  const chapters: Array<[string, string, RegExp]> = [
-    ["/report", "Listings audit", /What the feed claims vs\. what the records say\./],
-    ["/fees", "Fee audit", /A fee statement,/],
-    ["/playground", "Try it live", /Verify a feed/],
+  // AND no chapter numerals return. Numbered destinations tell a visitor this
+  // is a document to be read in order (owner, 2026-07-28).
+  await expect(nav.locator(".num")).toHaveCount(0);
+  await expect(nav).not.toContainText(/\b0[1-4]\b/);
+
+  const destinations: Array<[string, string, RegExp]> = [
+    ["/report", "Example report", /What the feed claims vs\. what the records say\./],
+    ["/fees", "Fee rules", /A fee statement,/],
+    ["/playground", "How it works", /The engine,/],
     ["/proof", "Proof", /Every verdict is scored once/],
   ];
-  for (const [href, label, h1] of chapters) {
+  for (const [href, label, h1] of destinations) {
     const link = nav.locator(`a[href="${href}"]`);
     await expect(link).toHaveCount(1);
     await expect(link).toContainText(label);
@@ -224,22 +233,33 @@ test("nav = one continuing case across four numbered chapters; each reachable wi
     });
     await expect(nav.locator(`a[href="${href}"]`)).toHaveAttribute("aria-current", "page");
   }
+
+  // Home is the tool, and it is exact-match only — "/" prefix-matches every
+  // route, so a naive check would light every destination at once.
+  await page.goto("/report");
+  await expect(nav.locator('a[href="/"]')).not.toHaveAttribute("aria-current", "page");
+  await page.goto("/");
+  await expect(nav.locator('a[href="/"]')).toHaveAttribute("aria-current", "page");
 });
 
-test("the CASE 001 readout speaks the instrument's voice on every route", async ({ page }) => {
+test("the nav readout states something true of the route you are on", async ({ page }) => {
   test.slow(); // seven full-navigation route loads in one run (dev compile)
+  // Was "CASE 001 · <FILE> · …" on every route: a case number that never
+  // changes, describing somebody else's data. On the tool it now states the
+  // promise a visitor most needs before dropping a file in.
   const routes: Array<[string, RegExp]> = [
-    ["/", /CASE 001 · CLAIM HELD · 16 FINDINGS/],
-    ["/report", /CASE 001 · FILE A · FAIL · 11 ERR · 5 WARN/],
-    ["/fees", /CASE 001 · FILE B · FEE AUDIT/],
-    ["/playground", /CASE 001 · BENCH · IN YOUR BROWSER/],
-    ["/proof", /CASE 001 · LOGBOOK · THE PROOF/],
-    ["/docs", /CASE 001 · REFERENCE · THE METHOD/],
-    ["/legacy", /CASE 001 · ARCHIVE · LEGACY MODULE/],
+    ["/", /RUNS IN YOUR BROWSER · NOTHING IS UPLOADED/],
+    ["/report", /EXAMPLE REPORT · FAIL · 11 ERR · 5 WARN/],
+    ["/fees", /FEE RULES · NEW YORK CITY/],
+    ["/playground", /HOW IT WORKS · RUNS IN YOUR BROWSER/],
+    ["/proof", /PROOF · EVERY SCORE, MISSES KEPT IN/],
+    ["/docs", /REFERENCE · WHAT IS REAL, WHAT IS INVENTED/],
+    ["/legacy", /ARCHIVE · LEGACY MODULE/],
   ];
   for (const [path, readout] of routes) {
     await page.goto(path);
     await expect(page.locator(".nav-case")).toContainText(readout, { timeout: 15_000 });
+    await expect(page.locator(".nav-case")).not.toContainText("CASE 001");
   }
 });
 
@@ -271,8 +291,8 @@ test("report: the chapter head, the ×100 jewel, and the sixteen-row ledger", as
   // The benched finding is marked on the receipt above.
   await expect(page.locator("ol.idx-list > li.bench")).toContainText("ON THE RECEIPT ABOVE");
 
-  // The door continues to chapter 02.
-  const door = page.getByRole("link", { name: /CONTINUE · 02/ });
+  // The door continues to the fee rules.
+  const door = page.getByRole("link", { name: /NEXT/ }).first();
   await expect(door).toHaveAttribute("href", "/fees");
 });
 
@@ -347,10 +367,9 @@ test("proof: the logbook masthead, the calibration plate, the crew, and the door
   await expect(page.locator("ol.checks > li.check")).toHaveCount(7);
 
   // The doors: back to 01, plus the /docs reference line.
-  await expect(page.getByRole("link", { name: /BACK TO THE START · 01/ })).toHaveAttribute(
-    "href",
-    "/report",
-  );
+  // The last door goes to the TOOL, not back into the narrative: after the
+  // evidence, the next useful act is running it on your own feed.
+  await expect(page.getByRole("link", { name: /BACK TO THE TOOL/ })).toHaveAttribute("href", "/");
   await expect(page.locator(".docs-line").getByRole("link", { name: "Documentation" })).toHaveAttribute(
     "href",
     "/docs",
@@ -426,7 +445,7 @@ test("old dashboard URLs meta-refresh to /proof; /demo to the front page; /audit
 test.describe("no-JS completeness (SSR floors)", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("landing opens complete without scripting: hero + held try-bench verdict", async ({
+  test("landing opens complete without scripting, and the tool says so honestly", async ({
     page,
   }) => {
     await page.goto("/");
@@ -436,8 +455,25 @@ test.describe("no-JS completeness (SSR floors)", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "Dinner can be ordered while you sleep.",
     );
-    // The SSR try-bench verdict renders the feed's held claim (no dead editable form).
-    await expect(page.locator("#try-verdict .v-chip")).toContainText("HELD");
+
+    // THE FLOOR THAT MOVED, NOT THE FLOOR THAT WENT AWAY. This used to assert
+    // the try-bench's SSR verdict. That bench is gone, and the page now opens
+    // on a tool that genuinely CANNOT work without scripting — the whole audit
+    // runs client-side. So the floor becomes: no dead controls, and the reason
+    // stated in words. A drop zone that silently does nothing is worse than one
+    // that is honest about needing JS.
+    await expect(page.getByRole("button", { name: "Run the audit" })).toBeHidden();
+    await expect(page.locator(".wb-slots")).toBeHidden();
+    await expect(
+      page.getByText(/runs entirely in your browser and needs scripting turned on/),
+    ).toBeVisible();
+    // And it must not imply a server is involved — the promise survives no-JS.
+    await expect(page.getByText(/Nothing runs on a server either way/)).toBeVisible();
+
+    // The explanatory half of the page still opens complete: the receipt is
+    // SSR-settled, so a no-JS reader still learns what the product does.
+    await expect(page.locator("article.receipt").first()).toContainText("FINDING 11 OF 16");
+    await expect(page.locator(".pb-bar")).toContainText("HOLD");
   });
 
   test("fees renders every example month without scripting; the month tabs are hidden", async ({

@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
  */
 
 export type TurnReceiptData = {
-  caseLine: string; // CASE 001 · FINDING 11/16
+  caseLine: string; // e.g. FINDING 11 OF 16
   claim: { field: string; unit: string; claimId: string };
   record: { field: string; cents: string; money: string };
   rule: { id: string; plain: string };
@@ -203,9 +203,9 @@ export function TurnSection({ data }: { data: TurnReceiptData }) {
             <span className="rc-attach">CLAIM · RECORD · RULE — KEPT ATTACHED</span>
           </div>
         </article>
-        <p className="acc r rc-acc" aria-hidden="true">
-          SPECIMEN — EXAMINATION RECEIPT · PAPER · CASE 001
-        </p>
+        {/* "SPECIMEN — … · CASE 001" removed 2026-07-28: specimen-and-case-number
+            is the register of a display cabinet, and the owner's read of the
+            site was exactly that. The receipt speaks for itself. */}
       </div>
     </div>
   );

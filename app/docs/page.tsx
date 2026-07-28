@@ -34,7 +34,7 @@ export default function DocsPage() {
               describes the parts and how a claim becomes a receipt.
             </p>
             <p className="acc r" style={{ marginTop: 26 }} aria-hidden="true">
-              CURBSIDE COMMONS · REFERENCE · NOT A CHAPTER
+              CURBSIDE COMMONS · REFERENCE
             </p>
           </Reveal>
         </section>
@@ -118,7 +118,7 @@ export default function DocsPage() {
                 <text className="a-title" x="920" y="456" fontSize="15">The n8n lane</text>
                 <text className="a-sub" x="920" y="478">workflow</text>
               </svg>
-              <figcaption className="acc">FIG. — FEEDS AND STATEMENTS · CORE · FOUR SURFACES</figcaption>
+              <figcaption className="acc">FEEDS AND STATEMENTS · CORE · FOUR SURFACES</figcaption>
             </figure>
           </Reveal>
         </section>
@@ -345,7 +345,7 @@ npm run verify`}</pre>
           <Reveal>
             <p className="prose">
               <Link href="/">&larr; Return to the site</Link> — the case starts at the front
-              page, and the evidence lives in <Link href="/proof">chapter 04, Proof</Link>.
+              page, and the evidence lives in <Link href="/proof">Proof</Link>.
             </p>
           </Reveal>
         </section>

@@ -198,7 +198,7 @@ export function TryLiveBench() {
     if (scenario === "sample")
       return (
         <>
-          The verdict above is the reference result, recomputed here. It matches the chapter 01
+          The verdict above is the reference result, recomputed here. It matches the example
           ledger, finding for finding.
           <br />
           For each finding, the receipt below keeps the claim, the asserted value, the reference row, and the rule together.
@@ -330,7 +330,7 @@ export function TryLiveBench() {
               </p>
               <p className="fixedrow">
                 <span>RUN</span>
-                <span className="fr-v">the run behind the chapter 01 ledger</span>
+                <span className="fr-v">the run behind the example ledger</span>
               </p>
             </div>
           )}
@@ -506,7 +506,7 @@ export function TryLiveBench() {
                     {verdict} — {report === null ? "no run — awaiting a plain decimal amount" : tallyLine(report)}
                     <small>
                       {scenario === "sample"
-                        ? "the reference result, recomputed here · matches the chapter 01 ledger"
+                        ? "the reference result, recomputed here · matches the example ledger"
                         : "computed live on this page by the real engine"}
                     </small>
                   </span>
@@ -535,7 +535,7 @@ export function TryLiveBench() {
             </div>
           </article>
           <p className="acc r rc-acc" aria-hidden="true">
-            SPECIMEN — BENCH RECEIPT · PAPER ·{" "}
+            BENCH RECEIPT ·{" "}
             {scenario === "sample" ? "REFERENCE RUN" : "READER EDIT"}
           </p>
         </div>

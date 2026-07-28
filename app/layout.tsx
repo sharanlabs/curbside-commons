@@ -1,22 +1,36 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Onest, JetBrains_Mono } from "next/font/google";
+import { Nunito, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { BUILD_INFO } from "@/lib/build-info";
 import { PLATFORM_NAME } from "@/lib/product";
 import { COVERAGE } from "@/lib/landing/specimen";
 import "./globals.css";
 
-// Self-hosted via next/font/google (no render-blocking <link>, no inline data-URI).
-// Two-voice system (storyboard adoption, decision-log 2026-07-15): Onest — one
-// variable rounded-sans (100..900) carrying BOTH display and body voices (the
-// refined Prismatic Passline storyboard uses no serif) — plus JetBrains Mono for
-// tabular ledger numerals / field keys / verdict labels / uppercase eyebrows
-// (kept over the storyboard's system-mono stack for cross-OS consistency).
+// Self-hosted via next/font/google. IMPORTANT — what "self-hosted" means here:
+// the font files are fetched at BUILD time and served from our own origin, so
+// the RUNTIME promise (no off-origin requests, nothing leaves the page) holds
+// exactly as before. The build machine needs to reach Google Fonts; the reader's
+// browser never does.
+//
+// Two-voice system: Nunito — one variable sans (200..1000, wght axis) carrying
+// BOTH display and body voices — plus JetBrains Mono for tabular ledger numerals
+// / field keys / verdict labels / uppercase eyebrows.
+//
+// NUNITO REPLACED ONEST 2026-07-28 (owner: "enhance the typography ... looks too
+// thin, need a premium curvy type one"; six candidates were rendered in the
+// site's own hero copy and the OWNER PICKED THIS ONE). Nunito is the most
+// literally curved of the candidates — every stroke ends in a rounded terminal
+// rather than a flat cut, which is the "curvy" read, and its 200..1000 axis
+// leaves plenty of headroom above the weights this site now sets. Availability
+// and the variable wght axis were verified against the INSTALLED font manifest
+// (node_modules/next/dist/compiled/@next/font/dist/google/font-data.json), not
+// recalled — and the repo declares no weight below 400 anywhere, comfortably
+// inside Nunito's 200 floor, so nothing falls back to a synthesised weight.
 // Exposed as CSS variables consumed in globals.css as --font-sans / --font-mono;
-// the --serif/--display token NAMES survive in globals.css but resolve to Onest.
-const onest = Onest({
+// the --serif/--display token NAMES survive in globals.css but resolve to this.
+const nunito = Nunito({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -80,7 +94,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${onest.variable} ${jetbrainsMono.variable}`}
+      className={`${nunito.variable} ${jetbrainsMono.variable}`}
     >
       <body>
         <a href="#main-content" className="ds-skip">

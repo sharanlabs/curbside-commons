@@ -157,6 +157,15 @@ export function AuditWorkbench() {
     }
   }
 
+  /** Clear both slots and the verdict — the "run another" path. Without it the
+   *  only way back to an empty bench was a page reload, which a reader has no
+   *  reason to guess (walkthrough review, 2026-07-28). */
+  function startOver() {
+    setFeed(EMPTY);
+    setRecord(EMPTY);
+    invalidate();
+  }
+
   function downloadReport() {
     if (run === null) return;
     const blob = new Blob([`${JSON.stringify(run.report, null, 2)}\n`], {
@@ -346,6 +355,25 @@ export function AuditWorkbench() {
               against.
             </p>
           )}
+
+          {/* WHAT NOW. A verdict with no next move is where the old surface
+              stopped, and it is the step the owner named explicitly in the
+              walkthrough review (2026-07-28). Three real continuations: keep
+              the evidence, run again, or go read what the rules actually say. */}
+          <nav className="wb-next" aria-label="Next steps">
+            <button type="button" className="lp-btn ghost" onClick={startOver}>
+              Audit another pair
+            </button>
+            <a className="wb-next-link" href="/report">
+              See a full worked report
+            </a>
+            <a className="wb-next-link" href="/playground">
+              How the rules are applied
+            </a>
+            <a className="wb-next-link" href="/docs">
+              What is real, what is invented
+            </a>
+          </nav>
         </section>
       )}
     </div>

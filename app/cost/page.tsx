@@ -3,7 +3,7 @@ import Link from "next/link";
 
 /**
  * Redirect stub (build piece 2, 2026-07-20; spec §12 — the /eval /metrics /cost
- * dashboard set merged into /proof, chapter 04). Static-export-safe: a
+ * dashboard set merged into /proof). Static-export-safe: a
  * client-side <meta refresh> (no server redirect) preserves the old URL.
  * Pattern: app/audit/page.tsx (S5 precedent).
  */
@@ -17,7 +17,7 @@ export default function CostMoved() {
     <main className="ds-data ds-wrap ds-view">
       <meta httpEquiv="refresh" content="0;url=/proof" />
       <p className="ds-note">
-        This page moved to <Link href="/proof">/proof</Link> — chapter 04, the instrument&rsquo;s
+        This page moved to <Link href="/proof">/proof</Link> — the instrument&rsquo;s
         logbook, where the cost ledger and the zero-cost enforcement records now live.
       </p>
     </main>

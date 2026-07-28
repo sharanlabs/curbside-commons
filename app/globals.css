@@ -17,9 +17,9 @@
      2026-07-16), white-on-fill 8.04:1 AA.
    • SEVERITY triad kept (shape + word), MOTION tokens added, 8px spacing kept.
    • RADII/ELEVATION (storyboard): --r-card/--r-ctrl/--r-chip + --elev-1/2/3.
-   Fonts self-host via next/font/google (app/layout.tsx): Onest → --font-sans (one
+   Fonts self-host via next/font/google (app/layout.tsx): Nunito → --font-sans (one
    variable rounded-sans carrying display AND body; the storyboard uses no serif —
-   the --serif/--display token NAMES survive and resolve to Onest), JetBrains Mono
+   the --serif/--display token NAMES survive and resolve to Nunito), JetBrains Mono
    → --font-mono (kept over the storyboard's system-mono stack for cross-OS
    consistency; recorded adaptation).
 
@@ -81,9 +81,9 @@
   --maxw: 1180px;
 
   /* type — font stacks resolve to the self-hosted next/font CSS vars (layout.tsx:
-     Onest → --font-sans, JetBrains Mono → --font-mono), each with cross-OS
+     Nunito → --font-sans, JetBrains Mono → --font-mono), each with cross-OS
      fallbacks. */
-  --ff-sans: var(--font-sans), "Onest", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ff-sans: var(--font-sans), "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
   --ff-mono: var(--font-mono), ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
 
   /* ==== SITE DESIGN LAYER (redesign, 2026-07-14) — additive site-scoped tokens
@@ -140,10 +140,10 @@
   --warn-ink: #9c3d06; /* 6.81:1 */
 
   /* display stack — the storyboard uses NO serif: token NAMES kept (wordmark +
-     headline consumers), values resolve to Onest (rounded sans display voice).
+     headline consumers), values resolve to Nunito (rounded sans display voice).
      Display headings compensate with heavier weight + tighter tracking. */
-  --serif: var(--font-sans), "Onest", ui-rounded, system-ui, sans-serif;
-  --display: var(--font-sans), "Onest", ui-rounded, system-ui, sans-serif;
+  --serif: var(--font-sans), "Nunito", ui-rounded, system-ui, sans-serif;
+  --display: var(--font-sans), "Nunito", ui-rounded, system-ui, sans-serif;
 
   /* radii + elevation (storyboard adoption 2026-07-15) — soft cards over the
      former near-flat 6px system; shadows stay faint-on-white, three tiers. */
@@ -244,7 +244,7 @@ body {
   min-height: 68px;
   padding: 10px clamp(18px, 4vw, 36px);
 }
-/* Storyboard brand lockup (adoption 2026-07-15): gradient C-mark + Onest
+/* Storyboard brand lockup (adoption 2026-07-15): gradient C-mark + Nunito
    wordmark, matching the hero title's gradient phrase family. Static mark —
    identical under reduced-motion and no-JS. */
 .site-brand {
@@ -1123,8 +1123,13 @@ body {
   background: rgba(61, 92, 235, 0.5);
 }
 .lp-h2 {
-  /* storyboard section-heading scale (adoption 2026-07-15) */
-  font-size: clamp(28px, 3.3vw, 48px);
+  /* Section-heading scale, RETUNED 2026-07-28. Was clamp(28px, 3.3vw, 48px):
+     42px at 1280 and 47.5px at 1440, which is poster scale, not page scale —
+     it beat the page's own H1 at every desktop width AND it was one of the
+     reasons the site read as something to be looked at rather than used. A
+     section heading that shouts as loud as the headline flattens the hierarchy
+     and eats the vertical room the tool now needs above the fold. */
+  font-size: clamp(25px, 2.5vw, 35px);
   font-weight: 545;
   line-height: 1.07;
   letter-spacing: -0.038em;
@@ -1784,8 +1789,8 @@ body {
    is kept so every consumer follows) — used on the masthead rule · finding index
    numerals, NEVER on severity. Severity carries its own three marks (error / warn /
    info) kept perceptually far from the brand, always paired with a square shape +
-   word. Display headings adopt the site display voice (Onest, storyboard adoption
-   2026-07-15); body + receipts adopt Onest / JetBrains Mono. Honesty freeze-reversal (Slice D,
+   word. Display headings adopt the site display voice (Nunito, storyboard adoption
+   2026-07-15); body + receipts adopt Nunito / JetBrains Mono. Honesty freeze-reversal (Slice D,
    decision-log 2026-07-14): the SIMULATED banner was removed — the page is
    disclaimer-free (no false claim; C10 green).
    Contrast recomputed on #FFFFFF (ratios in the token comments below).
@@ -1810,7 +1815,7 @@ body {
   /* font stacks now adopt the self-hosted site fonts (Onest display + body,
      JetBrains mono) so the report matches the site register; kept self-defined
      so nothing here falls through to :root. */
-  --serif: var(--font-sans), "Onest", ui-rounded, system-ui, sans-serif;
+  --serif: var(--font-sans), "Nunito", ui-rounded, system-ui, sans-serif;
   --ledger-sans: var(--font-sans), "Onest", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
   --ledger-mono: var(--font-mono), ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo,
     monospace;
@@ -3697,6 +3702,23 @@ body {
   font-size: 14.5px;
 }
 
+/* Next steps after a verdict (2026-07-28). Uses the --s* scale rather than
+   hand-typed pixels — the mixed-units finding from the session-36 review. */
+.wb-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s5);
+  margin-top: var(--s6);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--rule);
+}
+.wb-next-link {
+  font-size: 14px;
+  color: var(--iris-ink);
+  text-underline-offset: 3px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wb-finding,
   .fd-zone,
@@ -5087,6 +5109,72 @@ body {
 }
 .sect-last {
   padding-bottom: 100px;
+}
+
+/* ---------- TOOL-FIRST HOME (2026-07-28) ---------------------------------- *
+ * The lead deliberately does NOT take `.cs-hero`'s `min-height: 100vh`. That
+ * rule is why the workbench could never reach the first screen while the scene
+ * was the hero — the burial was structural. Sized so the H1, the lede and the
+ * first drop zone are all above a 900px fold at the 1280px desktop floor.
+ * Authored for `.ds-wrap` (--maxw 1180px, 1420px wide) — a surface written for
+ * a container it does not occupy is the spacing defect of session 36.         */
+.home-lead {
+  background: var(--bg);
+  /* Tightened with the display scale: every pixel spent here is a pixel the
+     drop zones do not get on the first screen. */
+  padding: clamp(20px, 3vh, 38px) 0 0;
+}
+.home-lead .cs-copy {
+  padding-bottom: 0;
+}
+/* The lead's H1 carries the page; the animation delays that staggered the old
+   hero's eyebrow → H1 → lede are gone with the eyebrow.
+
+   THE SCALE IS RAISED HERE, and it is a fix rather than a preference.
+   `.cs-h1` is clamp(31px, 3vw, 43px) while `.lp-h2` is clamp(28px, 3.3vw,
+   48px) — so at EVERY desktop width the section headings were LARGER than the
+   page's own H1. That inversion was survivable while the H1 sat alone in a
+   100vh hero with no heading near it; now "Audit a feed." sits directly
+   beneath it and the page visibly announced its second-level heading louder
+   than its first. Measured, not eyeballed: 38.4px vs 42.24px at 1280.
+   Scoped to `.home-lead` so the other surfaces' `.cs-h1` uses are untouched. */
+.home-lead .cs-h1 {
+  margin-top: 0;
+  font-size: clamp(33px, 3.3vw, 46px);
+}
+.home-lead .cs-lede {
+  margin-top: 22px;
+  /* `balance` over `pretty` here: this is a short centred block where even
+     line lengths matter more than widow control, and Nunito's wider bowls
+     changed where the old copy broke. */
+  text-wrap: balance;
+  max-width: 62ch;
+}
+
+.sect-tool {
+  padding: clamp(30px, 4vh, 46px) 0 0;
+}
+.tool-h2 {
+  margin-top: 0;
+}
+.tool-foot {
+  max-width: 78ch;
+}
+
+/* The scene band, now an explanatory figure rather than the hero: its heading
+   is an H2, so it must not wear H1 scale. */
+.sect-scene {
+  padding-bottom: 0;
+}
+.scene-h2 {
+  font-size: clamp(26px, 2.2vw, 34px);
+  margin-top: 0;
+}
+.sect-scene + .cs-hero {
+  min-height: 0;
+}
+.sect-scene + .cs-hero .cs-copy {
+  padding-top: 0;
 }
 
 /* ---------- HERO band additions (rails · ticks · order ring · lighting) ----- */
@@ -8832,4 +8920,111 @@ body {
 .p2-lede,
 .lede {
   color: var(--graphite);
+}
+
+/* ==========================================================================
+   WEIGHT PASS (2026-07-28, owner: "the typography ... looks too thin").
+   Onest is a VARIABLE face (100..900, wght axis — verified against
+   node_modules/next/dist/compiled/@next/font/dist/google/font-data.json, not
+   recalled), so every step below is a real interpolation, not a synthetic
+   bold and not an extra file to download.
+   Two levers, because thinness is only half weight:
+     1. WEIGHT — display +60..80, body 400 -> 460, mono chrome +60..100.
+     2. CONTRAST — body copy sat on --muted (6.59:1). Thin strokes in a light
+        grey read lighter than the same strokes in near-black, so body prose
+        moves to --graphite (8.31:1). Both already clear WCAG AA; this raises
+        the floor rather than approaching it, so the axe run must stay 0.
+   Deliberately NOT touched: the ember/gold lamp voices and the verdict stamps
+   (already 700+), and .rc-* receipt internals, which are meant to read as
+   machine output rather than prose.
+   ========================================================================== */
+/* Nunito-calibrated. The weights below were first set against Gabarito; at an
+   identical numeric weight Nunito's rounded, more even strokes read optically
+   LIGHTER, so every display step gains ~60 and body gains 40. The owner's
+   complaint was thinness, and handing back a face thinner than the one they
+   rejected would answer the letter of "curvy" and miss the point. Nunito's
+   axis runs to 1000, so this is still well inside real interpolation. */
+/* SPECIFICITY, not source order, decides these — and getting it wrong is why
+   the "display tier" block ~60 lines above has been silently DEAD for landing
+   headings since it was written. `.lp-main h1, .lp-main h2, …` (line ~1077)
+   scores (0,1,1); a bare `.cs-h1` scores (0,1,0) and loses no matter how much
+   later it appears. Its comment says it adds weight; the cascade discards it.
+   Every display selector below is therefore ELEMENT-QUALIFIED (`h1.cs-h1`) so
+   it scores (0,1,1) and wins the tie on order, or (0,2,0) and wins outright.
+   Verified by reading getComputedStyle in a real browser, not by screenshot —
+   the rendered difference between 600 and 740 is subtle enough to eyeball
+   wrong, and the first attempt at this block did exactly that. */
+h2.lp-h2,
+h2.tool-h2,
+.lp-main h2,
+.p2-main h2,
+.p3-main h2 {
+  font-weight: 720;
+}
+h1.cs-h1,
+h1.p2-h1,
+h2.scene-h2,
+.lp-main h1,
+.p2-main h1,
+.p3-main h1,
+.p4-hero .cs-h1 {
+  font-weight: 740;
+}
+.pr-lead {
+  font-weight: 720;
+}
+.fm-title,
+.door .d-title {
+  font-weight: 760;
+}
+h3.file-h3,
+.bpanel h3,
+.builder h3,
+.seat h3,
+.file h3,
+.lp-main h3,
+.p2-main h3,
+.p3-main h3 {
+  font-weight: 760;
+}
+
+/* body tier: heavier AND darker */
+body,
+.lp-main p,
+.cs-lede,
+.p2-lede,
+.lede,
+.lp-foot,
+.lp-ptext,
+.file .d,
+.trust .fact .d,
+.wb-prov,
+.wb-plain,
+.tool-foot {
+  font-weight: 500;
+}
+.lp-foot,
+.lp-ptext,
+.file .d,
+.trust .fact .d,
+.tool-foot,
+.wb-prov {
+  color: var(--graphite);
+}
+
+/* mono chrome: eyebrows, nav, captions and field keys carry the instrument
+   voice at small sizes, where a light weight disappears first */
+.site-navlink {
+  font-weight: 620;
+}
+.nav-case,
+.acc,
+.tab2,
+.wb-next-link {
+  font-weight: 650;
+}
+.wb-meta dt,
+.wb-receipts dt,
+.fd-slot .fd-title {
+  font-weight: 650;
 }

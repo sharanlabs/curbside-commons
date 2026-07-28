@@ -168,7 +168,7 @@ export function CalibrationPlate({ data }: { data: CalibrationPlateData }) {
       </div>
       <div className="cal-foot">
         <p className="acc" aria-hidden="true">
-          SPECIMEN — CALIBRATION RECORD · FEE-LINE CLASSIFIER
+          CALIBRATION RECORD · FEE-LINE CLASSIFIER
         </p>
         {replayable && (
           <button type="button" className="lp-btn ghost" onClick={animate}>

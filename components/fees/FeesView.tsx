@@ -74,7 +74,7 @@ function Receipt({ row, full, staged }: { row: FeeFindingRow; full: boolean; sta
       <div className="rc-head">
         <p className="rc-title">EXAMINATION RECEIPT · FEE AUDIT</p>
         <p className="rc-case">
-          FILE B · {row.severity.toUpperCase()}{" "}
+          FEE RULE · {row.severity.toUpperCase()}{" "}
           {staged ? <span className="f-mark">STAGED ABOVE</span> : null}
         </p>
       </div>
@@ -227,8 +227,8 @@ export function FeesView() {
             )}
             <p className="rc-acc acc r" aria-hidden="true">
               {view.rows.length > 0
-                ? `SPECIMEN — ${view.rows.length === 1 ? "ONE RECEIPT" : "RECEIPTS"} · PAPER · FILE B`
-                : "SPECIMEN — A CLEAN MONTH · FILE B"}
+                ? `${view.rows.length === 1 ? "ONE RECEIPT" : "RECEIPTS"} · FEE AUDIT`
+                : "A CLEAN MONTH · FEE AUDIT"}
             </p>
           </article>
         );

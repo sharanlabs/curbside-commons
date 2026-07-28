@@ -145,7 +145,7 @@ export default function ProofPage() {
       <section className="p4-hero ds-wrap" aria-labelledby="proof-h1">
         <p className="cs-eyebrow">
           <span className="cs-eyebrow-dot" aria-hidden="true" />
-          CHAPTER FOUR <b>·</b> PROOF
+          PROOF <b>·</b> THE LOGBOOK
         </p>
         <h1 className="cs-h1" id="proof-h1">
           Every verdict is scored once, against a bar set in advance.
@@ -318,7 +318,7 @@ export default function ProofPage() {
         </Reveal>
         <Reveal>
           <p className="acc r" aria-hidden="true">
-            FIG. 01 — DEFERRED, WITH FULL FINISH
+            DEFERRED, WITH FULL FINISH
           </p>
         </Reveal>
       </section>
@@ -507,7 +507,7 @@ export default function ProofPage() {
               <p className="cap">CASE-REPORT FINDINGS</p>
               <p className="d">
                 {spelledCap(ENGINE.demoErrors)} error and {spelled(ENGINE.demoWarns)} warn, in the
-                chapter 01 case report.
+example report.
               </p>
             </div>
             <div className="fact">
@@ -552,20 +552,20 @@ export default function ProofPage() {
         </Reveal>
         <Reveal>
           <p className="acc r" aria-hidden="true">
-            FIG. 02 — THE ONE-PASS RULE
+            THE ONE-PASS RULE
           </p>
         </Reveal>
       </section>
 
-      {/* ===== CLOSE — the door back to 01 ===== */}
+      {/* ===== CLOSE — the door back to the tool ===== */}
       <section className="sect sect-last ds-wrap">
         <Reveal>
-          <Link className="door" href="/report">
+          <Link className="door" href="/">
             <span>
-              <span className="d-eyebrow">BACK TO THE START · 01</span>
-              <span className="d-title">The case begins again</span>
+              <span className="d-eyebrow">BACK TO THE TOOL</span>
+              <span className="d-title">Audit your own feed</span>
               <span className="d-sub">
-                The listings audit, where the first receipt was written.
+                Drag in your two files, or run the sample pair. Nothing leaves the page.
               </span>
             </span>
             <span className="d-arrow" aria-hidden="true">

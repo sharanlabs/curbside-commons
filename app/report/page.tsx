@@ -18,7 +18,7 @@ import { ARITH, BENCH, COVERAGE, FINDINGS_INDEX } from "@/lib/landing/specimen";
  * this sample" residue). ONE-CASE grammar (owner ruling 2026-07-20): CASE 001.
  */
 export const metadata: Metadata = {
-  title: "01 · Listings audit — what the feed claims vs. what the records say",
+  title: "Example report — what the feed claims vs. what the records say",
   description:
     "A delivery-marketplace feed checked line by line against the merchant's own catalog: sixteen findings, each keeping the claim beside the record that answered it. Deterministic; zero AI calls.",
 };
@@ -41,7 +41,7 @@ export default function ReportPage() {
     <main className="lp-main p2-main">
       <section className="p2-head sect ds-wrap" aria-labelledby="p2-h1">
         <Reveal>
-          <p className="lp-eyebrow">01 · LISTINGS AUDIT</p>
+          <p className="lp-eyebrow">EXAMPLE REPORT · LISTINGS</p>
           <span className="lp-sec-rule" aria-hidden="true" />
           <h1 className="p2-h1" id="p2-h1">
             What the feed claims vs. what the records say.
@@ -76,7 +76,7 @@ export default function ReportPage() {
             }}
           />
           <p className="acc r" aria-hidden="true" style={{ marginTop: 12 }}>
-            FIG. 02 — ONE NUMBER, TWO READINGS
+            ONE NUMBER, TWO READINGS
           </p>
         </Reveal>
       </section>
@@ -145,7 +145,7 @@ export default function ReportPage() {
         <Reveal>
           <Link className="door" href="/fees">
             <span>
-              <span className="d-eyebrow">CONTINUE · 02</span>
+              <span className="d-eyebrow">NEXT</span>
               <span className="d-title">The fee audit</span>
               <span className="d-sub">
                 The statement, checked against the law. New York City alone.

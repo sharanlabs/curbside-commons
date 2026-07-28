@@ -31,13 +31,19 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 type CycleKind = "pass" | "hold";
 
 export type CommonsSceneProps = {
-  children: ReactNode; // eyebrow + H1 + lede (server-rendered copy)
+  children: ReactNode; // heading + copy for this band (server-rendered)
   ctaPrimary: string; // runs the HOLD cycle — "Watch the check"
   ctaSecondary: string; // native anchor label — "Try it on a feed"
   /** Where the secondary CTA goes. Defaults to the working tool, not an
    *  on-page anchor: a reader who clicks "try it on a feed" should land
    *  somewhere that takes a feed (2026-07-27). */
   ctaSecondaryHref?: string;
+  /** The id of the heading that names this band. Was hardcoded to the page
+   *  H1 back when the scene WAS the hero; it is now an explanatory band that
+   *  sits below the tool (2026-07-28), so the label has to travel with it —
+   *  a section pointing at a heading in a different section is a lie the
+   *  accessibility tree repeats to every screen-reader user. */
+  labelledBy?: string;
 };
 
 /* v9 clock (ms of scene time). */
@@ -86,6 +92,7 @@ export function CommonsScene({
   ctaPrimary,
   ctaSecondary,
   ctaSecondaryHref = "/playground",
+  labelledBy = "hero-h1",
 }: CommonsSceneProps) {
   const [status, setStatus] = useState(ASSEMBLE_STATUS);
   const [statusColor, setStatusColor] = useState(GRAY);
@@ -557,7 +564,7 @@ export function CommonsScene({
   };
 
   return (
-    <section className="cs-hero" aria-labelledby="hero-h1">
+    <section className="cs-hero" aria-labelledby={labelledBy}>
       <div className="cs-copy">{children}</div>
 
       <div className="cs-ctas cs-ctas-live" style={{ margin: "40px auto 0" }}>
@@ -615,9 +622,9 @@ export function CommonsScene({
             pointerEvents: "none",
           }}
         />
-        <p className="acc cs-acc" aria-hidden="true">
-          FIG. 01 — CURBSIDE COMMONS · ORDER IN FLIGHT
-        </p>
+        {/* The "FIG. 01 — …" plate that sat here was removed 2026-07-28: a
+            figure number tells a reader they are looking at an exhibit. The
+            scene explains a working check, so it gets no placard. */}
 
         <div ref={stageRef} style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
           {/* machined rails the travelers ride */}

@@ -1,37 +1,43 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "@/components/landing/Reveal";
-import { AuditWorkbench } from "@/components/playground/AuditWorkbench";
 import { TryLiveBench, CATALOG_RECORDS } from "@/components/playground/TryLiveBench";
 import { SOR_CATALOG } from "@/components/playground/verify-in-browser";
 
 /**
- * 03 Try it live (build piece 3, 2026-07-20; design source
- * `mockups/takeover-03-try-2026-07-18.html`, ADOPTED SHA adaee213…). The
- * reader-operated bench: preset edits run the REAL engine on this page
- * (live beyond the mockup's replays — recorded deviation), the bench terms
- * state the pinned world, the receipt prints, and the paste leg below takes
- * a whole feed of your own. Door to 04.
+ * How it works — the demonstration bench (was "03 Try it live"; design source
+ * `mockups/takeover-03-try-2026-07-18.html`, ADOPTED SHA adaee213…). Preset
+ * edits run the REAL engine on this page, the bench terms state the pinned
+ * world, and the receipt prints.
+ *
+ * THE UPLOAD TOOL WAS REMOVED FROM THIS PAGE 2026-07-28 and now lives at the
+ * top of `/`. It sat here as section four of five, ~2990px down behind the
+ * chapter head, the bench, the receipt and the terms — which is why the owner
+ * still could not find it after session 36 built it. Two pages offering the
+ * same upload would also be two surfaces free to drift; this repo has already
+ * shipped that defect once (a retired host serving an older `/playground`, so
+ * two live sites disagreed about what the product IS). One tool, one place.
  */
 export const metadata: Metadata = {
-  title: "Try it live — verify a feed in your browser",
+  title: "How it works — the audit engine, running in your browser",
   description:
-    "The same deterministic engine that wrote the chapter 01 ledger, running in your browser: edit the feed, watch the verdict answer, keep the receipt. No AI calls, no network requests — nothing you type leaves the page.",
+    "The same deterministic engine that audits your files, shown on a pinned sample: edit the feed, watch the verdict answer, keep the receipt. No AI calls, no network requests — nothing you type leaves the page.",
 };
 
 export default function PlaygroundPage() {
   return (
     <main className="p3-main">
-      {/* ===== CHAPTER HEAD ===== */}
+      {/* ===== HEAD ===== */}
       <section className="p2-head ds-wrap" aria-labelledby="p3-h1">
-        <p className="lp-eyebrow">03 · TRY IT LIVE</p>
+        <p className="lp-eyebrow">HOW IT WORKS</p>
         <span className="lp-sec-rule" aria-hidden="true" />
         <h1 className="p2-h1" id="p3-h1">
-          Verify a feed <span className="lit">in your browser</span>
+          The engine, <span className="lit">shown on a sample</span>
         </h1>
         <p className="p2-lede">
-          The same deterministic engine that produced the chapter 01 ledger runs here. No AI
-          calls. $0 to run. No network requests during a run — nothing pasted leaves the page.
+          This is the same deterministic engine that runs on your own files, working on a fixed
+          sample so you can watch each rule fire. No AI calls. $0 to run. No network requests
+          during a run — nothing typed leaves the page.
         </p>
         <p className="p2-chips">
           <span className="schip live">DETERMINISTIC</span>
@@ -98,35 +104,40 @@ export default function PlaygroundPage() {
             <p>
               The bench above checks against the sample catalog of {CATALOG_RECORDS} records.{" "}
               <b>An item outside those records reads as unknown or missing.</b> That is the
-              verifier being honest, not broken — and it is the reason the tool below takes your
-              record file too, so your own items are checked against your own catalog.
+              verifier being honest, not broken — and it is why auditing your own feed takes your
+              record file too, so your items are checked against your catalog.
             </p>
           </div>
         </Reveal>
-        <Reveal>
-          <p className="acc r" aria-hidden="true" style={{ marginTop: 12 }}>
-            FIG. 01 — THE BENCH TERMS · PINNED WORLD
-          </p>
-        </Reveal>
       </section>
 
-      {/* ===== BRING YOUR OWN FILES — the working tool ===== */}
-      <section className="sect ds-wrap" aria-labelledby="paste-h2">
+      {/* ===== BACK TO THE TOOL — this page demonstrates; the home page runs ===== */}
+      <section className="sect ds-wrap" aria-labelledby="own-h2">
         <Reveal>
-          <p className="lp-eyebrow">BRING YOUR OWN FILES</p>
+          <p className="lp-eyebrow">YOUR OWN FILES</p>
           <span className="lp-sec-rule" aria-hidden="true" />
-          <h2 className="lp-h2" id="paste-h2">
-            Audit your own feed.
+          <h2 className="lp-h2" id="own-h2">
+            Run this on your feed.
           </h2>
           <p className="lp-foot">
-            Upload two files — the feed an agent reads, and the merchant record it should agree
-            with. Drag them in, choose them, or paste them. The engine checks every claim against
-            your records line by line, in this tab, and hands back a report you can download. Leave
-            the record empty and your feed is checked against the sample catalog instead.
+            The bench above is pinned to a sample so every rule is visible. To audit your own data,
+            the tool takes two files — the feed an agent reads and the merchant record it should
+            agree with — and checks every claim in your browser, exactly as shown here.
           </p>
         </Reveal>
         <Reveal>
-          <AuditWorkbench />
+          <Link className="door" href="/">
+            <span>
+              <span className="d-eyebrow">THE TOOL</span>
+              <span className="d-title">Audit your own feed</span>
+              <span className="d-sub">
+                Drag in your two files, or run the sample pair. Nothing leaves the page.
+              </span>
+            </span>
+            <span className="d-arrow" aria-hidden="true">
+              &rarr;
+            </span>
+          </Link>
         </Reveal>
       </section>
 
@@ -135,12 +146,12 @@ export default function PlaygroundPage() {
         <Reveal>
           <Link className="door" href="/proof">
             <span>
-              <span className="d-eyebrow">CONTINUE · 04</span>
+              <span className="d-eyebrow">EVIDENCE</span>
               <span className="d-title">Proof</span>
               <span className="d-sub">The instrument&rsquo;s logbook — every score, misses kept in.</span>
             </span>
             <span className="d-arrow" aria-hidden="true">
-              →
+              &rarr;
             </span>
           </Link>
         </Reveal>

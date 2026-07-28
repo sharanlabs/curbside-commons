@@ -44,7 +44,7 @@ export default function FeesPage() {
     <main className="p2-main">
       {/* ===== CHAPTER HEAD ===== */}
       <section className="p2-head ds-wrap" aria-labelledby="fee-h1">
-        <p className="lp-eyebrow">02 · FEE AUDIT</p>
+        <p className="lp-eyebrow">FEE RULES · NEW YORK CITY</p>
         <span className="lp-sec-rule" aria-hidden="true" />
         <h1 className="p2-h1" id="fee-h1">
           A fee statement, <span className="lit">read against the law.</span>
@@ -103,7 +103,7 @@ export default function FeesPage() {
         </Reveal>
         <Reveal>
           <p className="acc r" aria-hidden="true" style={{ marginTop: 12 }}>
-            FIG. 03 — THE FOUR CAPS · §20-563.3
+            THE FOUR CAPS · §20-563.3
           </p>
         </Reveal>
       </section>
@@ -115,7 +115,7 @@ export default function FeesPage() {
         </Reveal>
         <Reveal>
           <p className="acc r" aria-hidden="true" style={{ marginTop: 12 }}>
-            FIG. 04 — THE OVERRUN, MEASURED
+            THE OVERRUN, MEASURED
           </p>
         </Reveal>
       </section>
@@ -198,7 +198,7 @@ export default function FeesPage() {
         </div>
         <Reveal>
           <p className="acc r" aria-hidden="true" style={{ marginTop: 12 }}>
-            FIG. 05 — THE PROOF BOUNDARY · {FEE_BOUNDARY.executable} / {FEE_BOUNDARY.external}
+            THE PROOF BOUNDARY · {FEE_BOUNDARY.executable} / {FEE_BOUNDARY.external}
           </p>
         </Reveal>
       </section>
@@ -222,7 +222,7 @@ export default function FeesPage() {
         </Reveal>
         <Reveal>
           <p className="acc r" aria-hidden="true" style={{ marginTop: 12 }}>
-            SPECIMEN — AUDIT INSTRUMENT · LOCAL ARITHMETIC
+            AUDIT INSTRUMENT · LOCAL ARITHMETIC
           </p>
         </Reveal>
       </section>
@@ -232,7 +232,7 @@ export default function FeesPage() {
         <Reveal>
           <Link className="door" href="/playground">
             <span>
-              <span className="d-eyebrow">CONTINUE · 03</span>
+              <span className="d-eyebrow">NEXT</span>
               <span className="d-title">Try it live</span>
               <span className="d-sub">
                 The feed bench — run the same engine on a marketplace feed, in your browser.

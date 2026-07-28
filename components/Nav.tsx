@@ -6,22 +6,24 @@ import { usePathname } from "next/navigation";
 import { PLATFORM_NAME } from "@/lib/product";
 
 /**
- * Site nav — the v9 takeover header (build piece 1, 2026-07-20; design source
- * `mockups/takeover-v9-home-listings-2026-07-17.html`, ADOPTED; spec §1).
- * Brand lockup (the ONE blue→gold mark, D6 ruling) + four numbered chapters +
- * the case-status readout speaking in the instrument's voice.
+ * Site nav — brand lockup (the ONE blue→gold mark, D6 ruling) + named
+ * destinations + a readout that describes the page you are on.
  *
- * ONE CONTINUING CASE (owner ruling 2026-07-20): every readout opens CASE 001;
- * chapters are files of that case, never their own case numbers.
- * D6 lamp voice: gold = held status · ember = the FAIL verdict · graphite =
- * neutral chrome. Blue is never a lamp.
- * D3: no parked/sample tooltips — all four chapters are live routes.
+ * DE-NUMBERED 2026-07-28 (owner: *"the website looks like a display piece with
+ * numbers"*). The chapter numerals `01`–`04` and the standing `CASE 001`
+ * readout were the loudest carriers of that read: numbered chapters tell a
+ * visitor this is a document to be read in order, and a case number that never
+ * changes is somebody else's case, pinned to the wall. Destinations are now
+ * named for what they are, and the readout states something TRUE OF THE ROUTE
+ * — on the tool, the promise that matters (it runs locally and uploads
+ * nothing); elsewhere, what that page holds.
+ *
+ * D6 lamp voice survives: gold = held status · ember = the FAIL verdict ·
+ * graphite = neutral chrome. Blue is never a lamp.
  *
  * Readout FIGURES arrive as props from the server layout (derived in
  * lib/landing/specimen.ts from the engine's own report — never hand-typed).
- * The readout words are chrome (the instrument narrating), present tense.
- * Desktop-only bar (owner word 2026-07-15): the four-link chapter row fits the
- * 1280px floor, so the old <900px hamburger is retired with the 8-tab nav.
+ * Desktop-only bar (owner word 2026-07-15).
  */
 
 export type NavReadoutFigures = {
@@ -30,11 +32,12 @@ export type NavReadoutFigures = {
   warns: number;
 };
 
-const CHAPTERS = [
-  { num: "01", label: "Listings audit", href: "/report" },
-  { num: "02", label: "Fee audit", href: "/fees" },
-  { num: "03", label: "Try it live", href: "/playground" },
-  { num: "04", label: "Proof", href: "/proof" },
+const DESTINATIONS = [
+  { label: "Audit", href: "/" },
+  { label: "Example report", href: "/report" },
+  { label: "Fee rules", href: "/fees" },
+  { label: "How it works", href: "/playground" },
+  { label: "Proof", href: "/proof" },
 ] as const;
 
 type Readout = { lamp: "gold" | "ember" | "graphite"; parts: Array<string | { b: string }> };
@@ -43,14 +46,14 @@ function readoutFor(pathname: string, f: NavReadoutFigures): Readout {
   if (pathname.startsWith("/report")) {
     return {
       lamp: "ember",
-      parts: ["CASE 001 · ", { b: "FILE A" }, ` · FAIL · ${f.errors} ERR · ${f.warns} WARN`],
+      parts: [{ b: "EXAMPLE REPORT" }, ` · FAIL · ${f.errors} ERR · ${f.warns} WARN`],
     };
   }
   if (pathname.startsWith("/fees")) {
-    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "FILE B" }, " · FEE AUDIT"] };
+    return { lamp: "graphite", parts: [{ b: "FEE RULES" }, " · NEW YORK CITY"] };
   }
   if (pathname.startsWith("/playground")) {
-    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "BENCH" }, " · IN YOUR BROWSER"] };
+    return { lamp: "graphite", parts: [{ b: "HOW IT WORKS" }, " · RUNS IN YOUR BROWSER"] };
   }
   if (
     pathname.startsWith("/proof") ||
@@ -58,17 +61,20 @@ function readoutFor(pathname: string, f: NavReadoutFigures): Readout {
     pathname.startsWith("/metrics") ||
     pathname.startsWith("/cost")
   ) {
-    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "LOGBOOK" }, " · THE PROOF"] };
+    return { lamp: "graphite", parts: [{ b: "PROOF" }, " · EVERY SCORE, MISSES KEPT IN"] };
   }
   if (pathname.startsWith("/legacy")) {
-    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "ARCHIVE" }, " · LEGACY MODULE"] };
+    return { lamp: "graphite", parts: [{ b: "ARCHIVE" }, " · LEGACY MODULE"] };
   }
   if (pathname.startsWith("/docs")) {
-    return { lamp: "graphite", parts: ["CASE 001 · ", { b: "REFERENCE" }, " · THE METHOD"] };
+    return { lamp: "graphite", parts: [{ b: "REFERENCE" }, " · WHAT IS REAL, WHAT IS INVENTED"] };
   }
+  // The tool. The readout states the promise a visitor most needs to believe
+  // before dropping a file in — and it is the one the import-graph guard and a
+  // live zero-off-origin-request check both back.
   return {
     lamp: "gold",
-    parts: ["CASE 001 · ", { b: "CLAIM HELD" }, ` · ${f.findingsTotal} FINDINGS`],
+    parts: [{ b: "RUNS IN YOUR BROWSER" }, " · NOTHING IS UPLOADED"],
   };
 }
 
@@ -146,18 +152,21 @@ export function Nav({ figures }: { figures: NavReadoutFigures }) {
           <span className="site-brand-word">{PLATFORM_NAME}</span>
         </Link>
 
-        <nav className="site-nav-links" aria-label="Chapters">
-          {CHAPTERS.map((c) => {
-            const active = pathname === c.href || pathname.startsWith(`${c.href}/`);
+        <nav className="site-nav-links" aria-label="Sections">
+          {DESTINATIONS.map((d) => {
+            // "/" would prefix-match every route, so home is exact-only.
+            const active =
+              d.href === "/"
+                ? pathname === "/"
+                : pathname === d.href || pathname.startsWith(`${d.href}/`);
             return (
               <Link
-                key={c.href}
-                href={c.href}
+                key={d.href}
+                href={d.href}
                 aria-current={active ? "page" : undefined}
                 className="site-navlink"
               >
-                <span className="num">{c.num}</span>
-                {c.label}
+                {d.label}
               </Link>
             );
           })}

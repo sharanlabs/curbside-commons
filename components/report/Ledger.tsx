@@ -42,7 +42,7 @@ export function Ledger({ rows }: { rows: LedgerRow[] }) {
     <>
       <div className="idx-tools">
         <p className="acc r" aria-hidden="true">
-          REGISTER — {rows.length} ROWS · CASE 001
+          REGISTER — {rows.length} ROWS
         </p>
         <div className="flt-row" role="group" aria-label="Filter findings by severity">
           {filters.map((f) => (

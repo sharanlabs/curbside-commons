@@ -71,9 +71,11 @@ test("/fees renders the drifted month end-to-end: verdict, named receipt, bounda
   await expect(
     drifted.getByText('"Combined service + delivery bundle" · order ORD-3 · $1.50'),
   ).toBeVisible();
-  // The verdict is a stamp, not prose — the paper receipt says FILE B, not a case number.
+  // The verdict is a stamp, not prose. The receipt names the RULE it applied;
+  // the "FILE B" case-file grammar went with the de-numbering (2026-07-28).
   await expect(drifted.locator(".rc-stamp .stamp").first()).toContainText("VIOLATION");
-  await expect(drifted.locator(".rc-case").first()).toContainText("FILE B");
+  await expect(drifted.locator(".rc-case").first()).toContainText("FEE RULE");
+  await expect(drifted).not.toContainText("FILE B");
   await expect(drifted).not.toContainText("CASE 002");
 
   // The 11 / 6 boundary — honestly-unresolved lanes.
