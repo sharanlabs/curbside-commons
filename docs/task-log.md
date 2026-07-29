@@ -1966,3 +1966,28 @@ Task type: gated execution of two owner-authorized items (deploy + owner-armed l
 **Defect found in production:** the footer published `(+dirty)` for a clean commit. Fixed by preferring the host's authoritative commit SHA; the decision moved into `lib/build-provenance.ts` so it is testable at all (it previously lived in `next.config.ts`, where no test could reach it — which is how a false public claim shipped with every suite green).
 
 **Validation:** verify exit 0 · vitest **1580 + 8 skipped** · e2e dev 49/1 · e2e artifact 49/1 · axe 8/8 · production exercised through a real browser (both sample and reader-supplied pairs, correct labels, **zero off-origin requests**).
+
+### 2026-07-29 — Session 38: the session-37 cross-model gate (BLOCK → 7 findings, all fixed)
+
+- **Skills used:** `/claude-os` (front door, resume triage). Codex via `~/claude-os/bin/codex-guarded` (shared-seat mutex, `--sandbox read-only`).
+- **Startup contract:** RULES · CLAUDE · PROJECT_STATE · CURRENT_TASK · HANDOFF · playbook · `git status` · `git log -8`. Baseline **re-derived, not quoted** (verify exit 0 · vitest 1573+8 · e2e artifact 52+1).
+- **Seat smoke-test before gate spend** (memory `always-verify-codex-seat`): `gpt-5.6-sol` → `gpt-5 OK`. Two non-blocking warnings recorded raw.
+- **Gate run 1 (`xhigh`, background): KILLED, zero output** — log was the echoed prompt alone. Recorded, not silently retried.
+- **Gate runs 2–3 (`high`, inline, scoped by file):** test integrity → 3 findings; shipping surface → BLOCK, 4 findings.
+- **7 findings fixed.** 3 test-integrity (each proven by mutation), 4 shipping-surface. **2 reviewer fixes refuted on measurements** (fold geometry; Onest-era tracking).
+- **Blast radius correction:** gate cited 3 sites for the false claim; case-insensitive sweep found **8** (a capitalised rendered chip + a phrase broken across a newline).
+- **3 tests were pinning the false claim** — corrected to assert the true wording AND `.not.toMatch` the retired one.
+- **New teeth:** declared door spec (6 routes) · `/legacy` link-walk (DOM-derived, 200 + real body) · inverted overclaim guards ×2.
+- **Gates:** verify exit 0 · vitest 1573+8 · e2e dev 53+1 · e2e ARTIFACT 53+1 · axe 8/8.
+- **Record:** `docs/reviews/codex-2026-07-28-s38-gate.md`. **Decision row:** 2026-07-29.
+- **Open:** push · deploy (the overclaim is live in prod until then) · `AGENTS.md:7` reviewer-entry fix.
+
+### 2026-07-29 — Session 38 (cont.): end-to-end walkthrough (owner: "also to show the end to end demonstration, slack, all those involved")
+
+- **Built:** `scripts-ts/walkthrough-end-to-end.mts` (`npm run walkthrough`) — one command carrying ONE audit across every surface: inputs → engine + receipts → conformance-vs-truth → NYC fee audit → **Slack payload** → **email message** → surface map. 7 steps, exit 0.
+- **Sends nothing, and that is ENFORCED not promised.** Calls the same builders as the owner-armed one-shots, prints instead of transmitting. New tooth `evals/packs/walkthrough-zero-egress.test.ts` walks the script's real import graph (56 modules) against the fail-closed ALLOWLIST; asserts the walk actually reached `slack.ts` + `email.ts` (a clean result over an untraversed graph proves nothing). **Red-green:** appending one `globalThis.fetch` turns it red; restored → green.
+- **Three of my own assumptions were refused by the code, each recorded in-file rather than silently fixed:** `check_feed` requires `surface` (registry refused, named the missing property); the tool envelope is FLAT with a canonical STRING payload, not a nested `report`; the email meta takes `date` (caller-supplied for determinism) and no `to`/`from`.
+- **One display defect I introduced and caught:** a blanket `_` strip rewrote `service_and_delivery` → `serviceanddelivery` in the Slack preview — *a preview that quietly rewrites the data it previews is worse than no preview*. Now strips only paired wrapping markers.
+- **One claim of mine corrected:** I wrote that the email builder "does not address" a message; it does — with RFC 2606 `.example` reserved domains, so the message is valid and undeliverable at once. Comment fixed to say what is true.
+- **Docs:** `docs/how-to-test.md` gains a "60-second version" section.
+- **Gates:** verify exit 0 · vitest **1574 + 8 skipped** (+1 tooth).
