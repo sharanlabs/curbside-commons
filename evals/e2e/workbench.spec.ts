@@ -30,6 +30,40 @@ async function fillSlot(page: import("@playwright/test").Page, label: string, te
   await slot.locator("textarea").fill(text);
 }
 
+/**
+ * A FAITHFUL one-row pair: a feed and a record that agree in every field the
+ * engine checks, so PASS is the only honest verdict. Held here as ONE fixture
+ * used by both tests that need it — two copies of the same specimen is how a
+ * suite ends up proving something about a pair that no longer matches itself.
+ *
+ * The variant label must agree with the record's variation name or the identity
+ * rule fires (correctly), which is what makes PASS meaningful rather than lucky.
+ */
+const FAITHFUL_FEED = JSON.stringify({
+  spec: "acp-product-feed/extract-2026-07-02",
+  items: [
+    {
+      item_id: "sku-1",
+      title: "House Focaccia",
+      price: "9.00",
+      currency: "USD",
+      availability: "in_stock",
+      variant_dict: { variation: "Regular" },
+    },
+  ],
+});
+
+const FAITHFUL_RECORD = JSON.stringify({
+  asOf: "2026-07-03T00:00:00Z",
+  items: [
+    {
+      id: "item-1",
+      name: "House Focaccia",
+      variations: [{ id: "sku-1", name: "Regular", priceCents: 900, stock: "in_stock" }],
+    },
+  ],
+});
+
 test("the workbench reproduces the golden verdict from the sample pair", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
@@ -53,41 +87,8 @@ test("uploading your own record side changes the verdict AND its label", async (
   // possible honest verdict is PASS. This is the proof that the reader's
   // catalog is genuinely the truth side — against the shipped sample catalog
   // this same feed would report a ghost row plus five missing ones.
-  await fillSlot(
-    page,
-    "The feed",
-    JSON.stringify({
-      spec: "acp-product-feed/extract-2026-07-02",
-      items: [
-        {
-          item_id: "sku-1",
-          title: "House Focaccia",
-          price: "9.00",
-          currency: "USD",
-          availability: "in_stock",
-          // The variant label must agree with the record's variation name, or
-          // the identity rule fires — correctly. This pair is faithful in
-          // EVERY field the engine checks, which is what makes PASS the only
-          // honest verdict and the test meaningful.
-          variant_dict: { variation: "Regular" },
-        },
-      ],
-    }),
-  );
-  await fillSlot(
-    page,
-    "The record",
-    JSON.stringify({
-      asOf: "2026-07-03T00:00:00Z",
-      items: [
-        {
-          id: "item-1",
-          name: "House Focaccia",
-          variations: [{ id: "sku-1", name: "Regular", priceCents: 900, stock: "in_stock" }],
-        },
-      ],
-    }),
-  );
+  await fillSlot(page, "The feed", FAITHFUL_FEED);
+  await fillSlot(page, "The record", FAITHFUL_RECORD);
   await page.getByRole("button", { name: "Run the audit" }).click();
 
   const result = page.getByRole("region", { name: "Audit result" });
@@ -210,7 +211,26 @@ test("a verdict offers a way forward, and 'audit another pair' really resets", a
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
 
-  await page.getByRole("button", { name: "Use the sample feed" }).click();
+  // BOTH slots are filled BY HAND, and the first cut of this test did not do
+  // that — it clicked "Use the sample feed" alone. `canRun` is
+  // `feed.text.trim().length > 0` (AuditWorkbench.tsx:186), so the record side
+  // is OPTIONAL: its textarea stayed "" for the whole run, and the post-reset
+  // assertion that it equals "" was therefore already true BEFORE the reset.
+  // Deleting `setRecord(EMPTY)` from `startOver` left this test green —
+  // demonstrated by mutation, not argued. A slot must be DIRTY before "it was
+  // cleared" asserts anything at all. (Cross-model gate, 2026-07-28.)
+  await fillSlot(page, "The feed", FAITHFUL_FEED);
+  await fillSlot(page, "The record", FAITHFUL_RECORD);
+
+  // The precondition is ASSERTED, not assumed — it is the half that was
+  // missing, and a precondition you trust is how the hole got here.
+  for (const label of ["The feed", "The record"]) {
+    await expect(
+      page.locator(".fd-slot", { hasText: label }).locator("textarea"),
+      `${label} must be dirty before the reset, or clearing it proves nothing`,
+    ).not.toHaveValue("");
+  }
+
   await page.getByRole("button", { name: "Run the audit" }).click();
   const result = page.getByRole("region", { name: "Audit result" });
   await expect(result).toBeVisible();

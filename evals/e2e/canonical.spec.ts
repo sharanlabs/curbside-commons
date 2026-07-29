@@ -121,11 +121,36 @@ test("the tool opens the page \u2014 both drop zones sit above the fold", async 
     const zone = slot.locator(".fd-zone");
     const box = await zone.boundingBox();
     expect(box, `${label} drop zone must render`).not.toBeNull();
-    expect(box!.y, `${label} drop zone must start within the first screen`).toBeLessThan(900);
+    // WHOLLY above the fold, not merely starting above it. `y < 900` was the
+    // original assertion and it is weaker than the requirement it names: a zone
+    // beginning at 880 is 'above the fold' by that measure while being almost
+    // entirely below it. Measured today the zones run 657.5 → 871.7, so the
+    // stricter reading holds with ~28px of headroom and costs nothing.
+    expect(
+      box!.y + box!.height,
+      `${label} drop zone must sit ENTIRELY within the first screen`,
+    ).toBeLessThanOrEqual(900);
   }
 
-  // And the run control is on the page without hunting for it.
-  await expect(page.getByRole("button", { name: "Run the audit" })).toBeVisible();
+  // The run control sits BELOW the fold, and that is by design — it follows
+  // both drop zones (measured: button top 970.5 vs record zone bottom 871.7).
+  // The previous assertion here was `toBeVisible()`, which in Playwright means
+  // "has a box and is not hidden" and says NOTHING about the viewport; paired
+  // with a comment claiming the control was reachable "without hunting for it",
+  // it read as a fold guarantee it never made. What is actually true, and worth
+  // pinning, is that the button is the NEXT thing after the zones rather than
+  // buried further down the page. (Cross-model gate, 2026-07-28.)
+  const runBtn = page.getByRole("button", { name: "Run the audit" });
+  await expect(runBtn).toBeVisible();
+  const btnBox = await runBtn.boundingBox();
+  const recordZone = await page
+    .locator(".fd-slot", { hasText: "The record" })
+    .locator(".fd-zone")
+    .boundingBox();
+  expect(
+    btnBox!.y - (recordZone!.y + recordZone!.height),
+    "the run control must follow the drop zones immediately, not sit further down the page",
+  ).toBeLessThan(200);
 });
 
 test("landing footer: disclaimer-free, honest, and exactly the three chrome links", async ({
@@ -513,19 +538,54 @@ test("every door's label agrees with where it actually goes", async ({ page }) =
   // that is technically correct and communicates the wrong thing. A rename
   // always leaves these behind, and nothing else in the suite looks for them.
   test.slow();
-  const promisesTheTool = /audit your own feed/i;
-  for (const route of ["/fees", "/proof", "/playground"]) {
+
+  // THE DENOMINATOR COMES FROM HERE, NOT FROM THE PAGE. The first cut of this
+  // test filtered doors by `/audit your own feed/i` and checked three routes.
+  // Both halves of that were wrong, and provably so: the very defect it was
+  // written for — /fees reading "Try it live" while pointing at /playground —
+  // does NOT contain that phrase, so the filter skipped it. What actually
+  // caught that one was the retired-name sweep below, keyed to a dead NAME
+  // rather than to label-vs-destination agreement. A door renamed to any other
+  // wording and repointed anywhere passed green, and /report was never visited
+  // at all.
+  //
+  // This repo has already paid for this exact shape once: a completeness check
+  // that takes its denominator from the OBSERVATIONS can only ever confirm what
+  // is present (session 35 — the scorer that certified a 19-case run complete).
+  // So the full set of doors is DECLARED, and the page is checked against it.
+  // Adding a door, deleting one, renaming one, or repointing one all fail here.
+  const DOORS: Readonly<Record<string, ReadonlyArray<{ title: string; href: string }>>> = {
+    "/": [],
+    "/report": [{ title: "Fee rules", href: "/fees" }],
+    "/fees": [{ title: "Audit your own feed", href: "/" }],
+    "/proof": [{ title: "Audit your own feed", href: "/" }],
+    "/playground": [
+      { title: "Audit your own feed", href: "/" },
+      { title: "Proof", href: "/proof" },
+    ],
+    "/docs": [],
+  };
+
+  for (const [route, expected] of Object.entries(DOORS)) {
     await page.goto(route);
     const doors = page.locator("a.door");
-    const count = await doors.count();
-    for (let i = 0; i < count; i++) {
+
+    // Count first: a door the specification does not know about is exactly the
+    // residue a rename leaves behind, and it is invisible to any per-door loop.
+    await expect(doors, `${route}: door COUNT disagrees with the specification`).toHaveCount(
+      expected.length,
+    );
+
+    for (let i = 0; i < expected.length; i++) {
       const door = doors.nth(i);
-      const label = (await door.innerText()).replace(/\s+/g, " ").trim();
-      if (!promisesTheTool.test(label)) continue;
-      await expect(door, `${route}: a door promising the tool must GO to it`).toHaveAttribute(
-        "href",
-        "/",
-      );
+      await expect(
+        door.locator(".d-title"),
+        `${route} door ${i}: label drifted from the specification`,
+      ).toHaveText(expected[i].title);
+      await expect(
+        door,
+        `${route} door ${i} says "${expected[i].title}" — it must GO to ${expected[i].href}`,
+      ).toHaveAttribute("href", expected[i].href);
     }
   }
 
