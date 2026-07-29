@@ -24,6 +24,7 @@
     "check:fees": "node bin/check.mjs fees fixtures/synthetic-restaurant/fees/statement.drifted.json",
     "check:fees:clean": "node bin/check.mjs fees fixtures/synthetic-restaurant/fees/statement.faithful.json",
     "demo": "node bin/check.mjs demo",
+    "walkthrough": "npx tsx scripts-ts/walkthrough-end-to-end.mts",
     "mcp": "node bin/mcp-server.mjs",
     "mcp:record-transcript": "node evals/mcp/record-transcript.mjs",
     "fixtures:wedge": "node scripts-ts/generate-wedge-fixtures.mts",
