@@ -84,3 +84,30 @@ test("the /legacy/ skeleton serves every moved surface under the provenance bann
   await page.goto("/legacy/cost");
   await expect(page.getByText("$0.00").first()).toBeVisible();
 });
+
+test("every link the /legacy archive OFFERS actually resolves", async ({ page }) => {
+  // WHY THIS EXISTS. The archive nav advertised "Merchants" → /legacy/merchant,
+  // which 404s: the only route beneath it is /legacy/merchant/[id], so no index
+  // page has ever existed there. The test above could not see it, because it
+  // checks a LIST OF ROUTES WRITTEN IN THIS FILE rather than the links the page
+  // actually offers — so a link to a route nobody listed was unreachable by the
+  // assertion as well as by the reader. Same denominator-from-the-observations
+  // shape this repo has now recorded three times.
+  //
+  // This walks the DOM instead: whatever the archive links to must serve.
+  await page.goto("/legacy");
+  const hrefs = await page.locator("main a[href^='/legacy']").evaluateAll((els) =>
+    els.map((e) => (e as HTMLAnchorElement).getAttribute("href")!),
+  );
+  expect(hrefs.length, "the archive nav should offer several destinations").toBeGreaterThan(3);
+
+  for (const href of hrefs) {
+    const res = await page.goto(href);
+    expect(res?.status(), `${href} is advertised on /legacy but does not serve`).toBe(200);
+    // A 200 that renders the 404 body is the same lie with a better status code.
+    await expect(
+      page.getByText("Legacy activation module", { exact: false }).first(),
+      `${href} served, but is not a legacy page`,
+    ).toBeVisible();
+  }
+});

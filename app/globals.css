@@ -8897,15 +8897,29 @@ body {
   font-optical-sizing: auto;
 }
 
-/* display tier: a touch more weight + tighter tracking = premium contrast */
+/* DISPLAY TIER — HISTORICAL, AND MOSTLY INERT. READ BEFORE EDITING.
+   Written for Onest (replaced by Nunito 2026-07-28) and dead from the day it
+   shipped: every selector here is a BARE class at (0,1,0), while `.lp-main h1,
+   h2…` (line ~1077) scores (0,1,1) and wins regardless of source order.
+   Session 37 diagnosed that and restored the WEIGHT half ~line 8985; the
+   `letter-spacing` half was left behind, so this comment promised "tighter
+   tracking" the cascade has never delivered (cross-model gate, 2026-07-28).
+
+   NOT resurrected, deliberately. These values were calibrated against a face
+   the site no longer uses, and they have never once rendered — so the owner's
+   approved design (Nunito, recalibrated weights) is the design WITHOUT them.
+   Applying them now would be a typography change dressed as a bug fix.
+   What is genuinely live is per-surface and intentional: `h1.p2-h1` -0.03em
+   (5913) and `.p4-hero .cs-h1` -0.028em (6596). Only the LANDING fell through
+   to the generic -0.012em, and it is set explicitly below.
+
+   Kept as the record of what was intended, and inert by design. */
 .lp-h2 {
   font-weight: 590;
-  letter-spacing: -0.042em;
 }
 .cs-h1,
 .p2-h1 {
   font-weight: 600;
-  letter-spacing: -0.034em;
 }
 .p4-hero .cs-h1 {
   font-weight: 600;
@@ -8990,6 +9004,22 @@ h2.scene-h2,
 .p3-main h1,
 .p4-hero .cs-h1 {
   font-weight: 740;
+}
+/* The landing's own display tracking, set where it actually WINS. Measured
+   before and after rather than read off the stylesheet (the session-37
+   lesson): the landing headings computed -0.012em — the generic body value
+   from `.lp-main h1` (1077) — while every sibling surface carries deliberate
+   display tracking of its own (`h1.p2-h1` -0.03em, `.p4-hero .cs-h1` -0.028em).
+   The landing was the ONLY display surface with no considered value, because
+   the block that meant to give it one never applied.
+   -0.028em matches /proof rather than the retired Onest-era -0.034em: at 740
+   weight in Nunito the tighter figure closes the rounder bowls too far, and
+   the point is to bring the landing in line with the site, not to reintroduce
+   a number calibrated for a font this site no longer loads. */
+h1.cs-h1,
+h2.scene-h2,
+.lp-main h1 {
+  letter-spacing: -0.028em;
 }
 .pr-lead {
   font-weight: 720;
