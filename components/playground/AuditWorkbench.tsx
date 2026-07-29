@@ -292,7 +292,7 @@ export function AuditWorkbench() {
           <p className="wb-prov">
             {run.feedRows} feed rows checked against {run.recordRows}{" "}
             {run.origin.catalog === "reader" ? "of your own records" : "sample records"}, computed
-            in your browser just now — no AI calls, no network requests, nothing left this page.
+            in your browser just now — no AI calls, and nothing you uploaded left this page.
             {run.origin.catalog === "sample" &&
               " Items outside the sample records honestly read as unknown or missing."}
           </p>

@@ -16,7 +16,7 @@ key/target to exercise end-to-end · **[BUILD]** planned but not yet wired for a
 
 | # | Layer | Tech | How it's tested | Status |
 |---|---|---|---|---|
-| 1 | **Website** | Next.js static export, React | Playwright e2e (47) + deployed + 7-route smoke | **[GREEN]** live at curbside-commons.pages.dev |
+| 1 | **Website** | Next.js static export, React | Playwright e2e (47) + deployed + 7-route smoke | **[GREEN]** live at curbside-commons.vercel.app |
 | 2 | **Verifier engine** | TypeScript, deterministic | vitest unit + byte-frozen goldens | **[GREEN]** (in the 1286-test suite) |
 | 3 | **CLI** | `bin/check.mjs` | evals + `npm run demo`/`check:fees` | **[GREEN]** |
 | 4 | **MCP server** | `@modelcontextprotocol/sdk`, stdio | mcp evals (conformance, invalid-input, path-traversal, import-walk) | **[GREEN]** |

@@ -407,7 +407,7 @@ export function TryLiveBench() {
           )}
           <p className="bench3-note">
             Every preset runs the real engine in your browser, on the lines shown. Nothing typed
-            here is sent anywhere; the page makes no network requests.
+            here is sent anywhere.
           </p>
         </div>
 

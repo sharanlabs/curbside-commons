@@ -2,9 +2,9 @@
 
 /**
  * Fee playground client (NYC showcase N2) — paste a fee statement, run the real
- * audit engine in this browser tab, read the receipts. No network requests, no
- * AI calls, nothing leaves the page (components/fees/audit-in-browser.ts is the
- * whole bridge; its import closure is walked fail-closed by the pack tests).
+ * audit engine in this browser tab, read the receipts. No AI calls, and nothing
+ * you enter leaves the page (components/fees/audit-in-browser.ts is the whole
+ * bridge; its import closure is walked fail-closed by the pack tests).
  */
 import { useState } from "react";
 import NumberFlow from "@number-flow/react";
@@ -144,7 +144,7 @@ export function FeePlaygroundClient() {
             ) : (
               <>
                 Computed in your browser just now by the same deterministic audit — no AI calls,
-                no network requests, nothing left this page. The caps are the codified NYC
+                and nothing you entered left this page. The caps are the codified NYC
                 &sect;20-563.3 rules; your statement was read exactly as written.
               </>
             )}

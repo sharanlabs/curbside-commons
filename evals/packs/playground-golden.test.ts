@@ -323,9 +323,26 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     expect(pageSrc).not.toMatch(/Not\s+affiliated with/i);
   });
 
-  it("the page states the no-AI / no-network boundary", () => {
+  it("the page states the no-AI / data-stays-here boundary at the strength the code supports", () => {
     expect(pageSrc).toMatch(/No AI calls/i);
-    expect(pageSrc).toMatch(/no network requests/i);
+    // WAS `/no network requests/i` until 2026-07-28. That claim was FALSE and
+    // this assertion was PINNING it: measured against the built export, `/`
+    // makes 12 post-load requests — Next `<Link>` viewport prefetch pulling RSC
+    // route payloads for /docs and /legacy/console. Off-origin count: 0.
+    //
+    // The two claims come apart, and only one is true. Nothing the reader
+    // uploads or types ever leaves the browser (FileReader in, Blob URL out,
+    // zero off-origin traffic) — but the PAGE plainly makes requests, for its
+    // own routes. The site now says the true half.
+    //
+    // The banned pattern is asserted alongside the required one so the retired
+    // overclaim cannot quietly return: a test that only checks for the new
+    // wording would stay green if the old sentence were added back beside it.
+    expect(pageSrc).toMatch(/nothing you type leaves your browser/i);
+    expect(
+      pageSrc,
+      "the retired overclaim 'no network requests' is measurably false — see docs/reviews/codex-2026-07-28-s38-gate.md",
+    ).not.toMatch(/no network requests/i);
   });
 
   it("the noscript fallback exists and cites the real tally (jargon-free, no repo path)", () => {

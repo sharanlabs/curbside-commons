@@ -21,7 +21,7 @@ import { SOR_CATALOG } from "@/components/playground/verify-in-browser";
 export const metadata: Metadata = {
   title: "How it works — the audit engine, running in your browser",
   description:
-    "The same deterministic engine that audits your files, shown on a pinned sample: edit the feed, watch the verdict answer, keep the receipt. No AI calls, no network requests — nothing you type leaves the page.",
+    "The same deterministic engine that audits your files, shown on a pinned sample: edit the feed, watch the verdict answer, keep the receipt. No AI calls — nothing you type leaves your browser.",
 };
 
 export default function PlaygroundPage() {
@@ -36,14 +36,14 @@ export default function PlaygroundPage() {
         </h1>
         <p className="p2-lede">
           This is the same deterministic engine that runs on your own files, working on a fixed
-          sample so you can watch each rule fire. No AI calls. $0 to run. No network requests
-          during a run — nothing typed leaves the page.
+          sample so you can watch each rule fire. No AI calls. $0 to run. The audit itself makes
+          no requests — nothing typed leaves your browser.
         </p>
         <p className="p2-chips">
           <span className="schip live">DETERMINISTIC</span>
           <span className="schip">NO AI CALLS</span>
           <span className="schip">$0 TO RUN</span>
-          <span className="schip">NO NETWORK REQUESTS</span>
+          <span className="schip">NOTHING LEAVES YOUR BROWSER</span>
         </p>
       </section>
 

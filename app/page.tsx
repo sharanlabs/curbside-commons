@@ -44,7 +44,7 @@ import {
 export const metadata = {
   title: "Curbside Commons — audit a marketplace feed against the merchant's records",
   description:
-    "Upload a feed and the merchant records it should agree with. Every claim is checked line by line in your browser, and you get a verdict and a downloadable report. No AI calls, no network requests.",
+    "Upload a feed and the merchant records it should agree with. Every claim is checked line by line in your browser, and you get a verdict and a downloadable report. No AI calls, and nothing you upload leaves your browser.",
 };
 
 const RECEIPT: TurnReceiptData = {

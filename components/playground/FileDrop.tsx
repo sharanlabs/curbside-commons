@@ -4,9 +4,13 @@
  * One upload slot — drag-drop, click-to-browse, or paste (owner commission
  * 2026-07-27, "a working website where I will upload test files").
  *
- * THE PROMISE THIS COMPONENT MUST NOT BREAK. /playground states on its face:
- * "No network requests — nothing pasted leaves the page." A file input keeps
- * that promise only if the file is read LOCALLY. `FileReader` is a browser API
+ * THE PROMISE THIS COMPONENT MUST NOT BREAK. The site states on its face that
+ * nothing you upload or type leaves your browser. (It used to say "no network
+ * requests", which was measurably FALSE — the page itself prefetches its own
+ * routes; retired 2026-07-28, see docs/reviews/codex-2026-07-28-s38-gate.md.
+ * The promise that matters — and the one this component holds — was always
+ * about the reader's DATA, not about the page's own traffic.) A file input
+ * keeps that promise only if the file is read LOCALLY. `FileReader` is a browser API
  * that never touches the network, and this module imports nothing that could:
  * evals/packs/import-walk-guard.test.ts walks the import graph of the
  * playground closure and asserts no node:fs and no fetch reaches it. The

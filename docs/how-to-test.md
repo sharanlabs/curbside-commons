@@ -6,8 +6,36 @@ what the tool *should* find — so you (or anyone) can confirm the checker actua
 works. Everything is **simulated data checked against real codified NYC law**; the
 tool sends nothing anywhere and never claims to touch a real platform.
 
-- **Live site:** https://curbside-commons.pages.dev
+- **Live site:** https://curbside-commons.vercel.app
 - **Local (if you cloned the repo):** `npm run dev` → http://localhost:3000
+
+---
+
+## The 60-second version — one command, every surface
+
+If you want the whole thing demonstrated end to end rather than testing surfaces
+one at a time:
+
+```bash
+npm run walkthrough
+```
+
+It carries **one audit** from raw feed all the way to the messages a human would
+receive, printing what each surface actually produces: the two inputs → the
+deterministic engine and its receipts → conformance-vs-truth → the NYC fee audit
+→ **the Slack message** → **the email** → where else the same engine runs.
+
+**It sends nothing.** The Slack and email steps call the *same builders* the
+owner-armed one-shots call, then print the payload instead of transmitting it —
+so you can see exactly what *would* be delivered while nothing is. That is not a
+promise in a comment: `evals/packs/walkthrough-zero-egress.test.ts` walks the
+script's entire import graph (56 modules) against an **allowlist** and fails if
+any network capability appears. Proven both directions — adding a single `fetch`
+turns it red.
+
+A real send is a separate, deliberate act under eight written controls
+(`docs/plan-a3-delivery-safety.md`) and has only ever gone to the owner's own
+channel and inbox.
 
 ---
 
@@ -17,9 +45,9 @@ This is the strongest "test it yourself" surface: the **rules are fixed law**, s
 only supply a statement.
 
 **On the live site:**
-1. Go to **`/fees`** (https://curbside-commons.pages.dev/fees).
+1. Go to **`/fees`** (https://curbside-commons.vercel.app/fees).
 2. Either click **"load the example statement"**, or paste the test statement below into the box.
-3. Watch it audit against NYC Administrative Code §20-563.3 — in your browser, no network.
+3. Watch it audit against NYC Administrative Code §20-563.3 — in your browser; the statement you paste is never sent anywhere.
 
 **Test data — a RIGGED statement (should FAIL with violations).** Copy this whole block:
 
@@ -61,7 +89,7 @@ the fees under cap, or locally run the clean file (below). Every fee within cap 
 ## Test B — the price / "×100" check (edit any number, watch it re-check live)
 
 **On the live site:**
-1. Go to **`/playground`** (https://curbside-commons.pages.dev/playground).
+1. Go to **`/playground`** (https://curbside-commons.vercel.app/playground).
 2. Pick **"Edit one served price yourself"** and type any price into the box.
 3. It re-runs the real check as you type. Try these:
    - Type **`2150`** → the tool reads it as $2,150 but the merchant's true price is $21.50 → **HELD ×100** (the classic cents-as-decimal error: 215,000¢ ≠ 2,150¢).
@@ -112,5 +140,5 @@ npm shortcuts: `npm run check:fees` · `npm run check:fees:clean` · `npm run de
 ## What to expect (so you can tell it's working, not faked)
 
 - The **rigged** inputs produce **findings with receipts** (the claim, the record, the rule, the arithmetic). The **clean** inputs produce a **PASS with zero findings**. Same input → same result, every time (it's deterministic).
-- Everything runs **in your browser or your terminal** — the page makes **no network requests** (you can watch the network tab).
+- Everything runs **in your browser or your terminal** — **nothing you upload or type leaves your browser** (you can watch the network tab: the audit itself makes no requests at all, and the only traffic you will see is the site fetching its own pages).
 - It's **simulated data audited against real codified NYC law** (§20-563.3 / Local Law 79 of 2025). It is **not** legal advice, computes no penalties, and never claims real platform access.

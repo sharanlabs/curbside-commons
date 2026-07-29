@@ -17,9 +17,18 @@ test("the how-it-works head states the deterministic, zero-cost, offline posture
   await expect(page.getByRole("heading", { level: 1 })).toContainText("The engine");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("shown on a sample");
   const chips = page.locator(".p2-chips");
-  for (const chip of ["DETERMINISTIC", "NO AI CALLS", "$0 TO RUN", "NO NETWORK REQUESTS"]) {
+  // "NO NETWORK REQUESTS" until 2026-07-28 — a claim measured FALSE against the
+  // built export (the page prefetches its own routes; off-origin count is 0, so
+  // what is true is that the READER'S DATA never moves). This assertion was one
+  // of THREE pinning the overclaim, which is why the correction had to land in
+  // the tests and the copy together. See docs/reviews/codex-2026-07-28-s38-gate.md.
+  for (const chip of ["DETERMINISTIC", "NO AI CALLS", "$0 TO RUN", "NOTHING LEAVES YOUR BROWSER"]) {
     await expect(chips.getByText(chip, { exact: true })).toBeVisible();
   }
+  await expect(
+    chips,
+    "the retired overclaim must not return alongside the corrected chip",
+  ).not.toContainText("NO NETWORK REQUESTS");
 });
 
 test("the reader-operated bench recomputes the committed feed live; edits move the tally", async ({
