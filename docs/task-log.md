@@ -1991,3 +1991,20 @@ Task type: gated execution of two owner-authorized items (deploy + owner-armed l
 - **One claim of mine corrected:** I wrote that the email builder "does not address" a message; it does — with RFC 2606 `.example` reserved domains, so the message is valid and undeliverable at once. Comment fixed to say what is true.
 - **Docs:** `docs/how-to-test.md` gains a "60-second version" section.
 - **Gates:** verify exit 0 · vitest **1574 + 8 skipped** (+1 tooth).
+
+### 2026-07-29 — Session 38 (cont.): post-push verification sweep (owner: "any additional evaluation or checks left?")
+
+Ran everything a check could reach, including the two suites `verify` excludes:
+
+- **`test:legacy`** — **306 passed + 5 skipped** (30 files). Not in `verify`; unrun all session until now.
+- **`test:ucp-oracle`** — **33/35 agree · 0 disagree**; 2 documented `LST-CONF-FORMAT` divergences (the root-caused 2020-12 format-annotation fork).
+- **CLI, all five paths** — rigged fixtures **exit 1**, clean fixtures **exit 0**, conformance **0**. The CI contract holds in both directions, which a one-sided check would not show.
+- **MCP over stdio** — `initialize` OK, protocol **2025-11-25**, 7 tools listed. No automated suite drives the real server binary end to end.
+- **Production** — 7/7 routes 200 · all five security headers **on a subpath** · unknown path 404.
+- **`npm run walkthrough`** — 7 steps, exit 0.
+
+**THE SWEEP CONFIRMED ONE THING IS STILL WRONG, by fetching it rather than inferring it:** all three `no network requests` instances are **live on `/playground`** in production (`b2f781f`); the fix is committed at `2e2c439` and undeployed. **Worth recording the shape:** the landing-page fetch came back clean, so a sweep that stopped at `/` would have read as "fixed" — the same lesson session 35 paid for when a root-only smoke test called a five-route outage a clean deploy. Check the surface the claim lives on.
+
+**13 skipped tests are owner-armed live-AI harnesses** (Gemini/Groq, real spend against the $5 cap) — skipped by design, not coverage gaps.
+
+**Remaining, both owner-gated:** the deploy (`npx vercel --prod`) · a second cross-model gate pass over session 38's OWN fixes (session 35's lesson: *gate the fixes, not just the features*).
