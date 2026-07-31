@@ -120,3 +120,43 @@ Binding constraints from the repo's own record: self-hosted via `next/font/googl
 5. **R-6, R-7.** Polish.
 
 Nothing here touches the engine, the honesty gates, or the reported numbers.
+
+---
+
+## Addendum — `/interaction-design` motion + state audit (same day)
+
+**Trigger:** owner invoked `/interaction-design` after the design review. Same measured method; the independent design subagent died on a seat error (*"Not logged in · Please run /login"*, raw on record, not retried) so this ran inline.
+
+### The motion layer is largely healthy — measured, and worth saying plainly
+
+| check | result | verdict |
+|---|---|---|
+| `transition: all` | **0** uses | clean — properties are always listed |
+| bare `outline: none` | **0** | clean — focus is never destroyed |
+| `focus-visible` rules | 22 | present across controls |
+| `prefers-reduced-motion` blocks | 16, **global animation kill confirmed** | every one of the 17 keyframes has a reduced-motion story |
+| easing | one 5-token family (`--ease`, `-arrival`, `-field`, `-enter`, `-exit`) | systematic, Material-adapted |
+| durations | dominated by 0.12–0.5s | inside the 100–500ms guideline band |
+| `will-change` | 0 | correctly absent (no speculative promotion) |
+| disabled primary button | bg + color + border + `cursor: not-allowed` | correct pattern |
+
+This layer does **not** have R-2's problem: motion went through a design pass (session 29's storyboard work) and it shows. No fixes recommended here for their own sake.
+
+### I-1 (MEDIUM) — "Choose a file" has no pointer hover cue
+
+`.fd-cta` (the primary affordance of each upload slot) lights up on **keyboard** focus (`globals.css:3439`, via the input's `focus-visible`) but has **no `:hover`** — while its two sibling controls do (`.fd-sample:hover` 3467, `.fd-dl:hover` 3734). A mouse user pointing at the most important control in each slot gets no feedback; the *less* important controls respond. Inverted affordance weight. One rule fixes it (underline shift or the same color lift `.fd-sample` uses).
+
+*Process note, recorded because the method is the message: my first grep reported all four controls hover-less — a mis-built pattern. Verified before claiming; three of the four "missing" states exist. A finding that survives its own re-check is the only kind worth shipping.*
+
+### I-2 (LOW) — duplicate `@keyframes stamp-neq`
+
+Defined byte-identically at `globals.css:6014` and `:7584` (jewel vs fjewel copies). Not a behavior bug — identical stops — but it is R-3's dead-weight class inside the motion layer. Fold into the R-3 cleanup.
+
+### I-3 (LOW) — the section rule animates `width`
+
+`globals.css:1744`: `.ds-reveal.in .lp-sec-rule { transition: width 0.42s }` on a 44px hairline. Layout-property animation; paint cost trivial at this size, but `transform: scaleX()` is the idiomatic form and the sheet's only layout-prop transition. One-line change whenever the file is next open.
+
+### Deliberately NOT recommended
+
+- **No spinner/skeleton for the audit run.** The run is synchronous and in-tab; parsing measured 50–203ms even at 22 MB (the vuln-scan's own numbers). A loading state for a sub-250ms operation is motion for its own sake.
+- **No entrance choreography for the workbench.** The tool is the page's job; making a reader wait through a reveal to reach an input would spend goodwill on decoration.
