@@ -159,12 +159,19 @@ export function Nav({ figures }: { figures: NavReadoutFigures }) {
               d.href === "/"
                 ? pathname === "/"
                 : pathname === d.href || pathname.startsWith(`${d.href}/`);
+            // N-1 (design direction S4, 2026-07-31): the bar carries ONE
+            // emphasized action — the product's own verb, "Audit". The other
+            // four destinations stay quiet links; the 2026 nav-as-funnel
+            // pattern and the devtool-landing research both put a single
+            // unmistakable action in the bar. Styling only: the label, the
+            // destination and the e2e-pinned names are untouched.
+            const action = d.href === "/";
             return (
               <Link
                 key={d.href}
                 href={d.href}
                 aria-current={active ? "page" : undefined}
-                className="site-navlink"
+                className={`site-navlink${action ? " nav-action" : ""}`}
               >
                 {d.label}
               </Link>

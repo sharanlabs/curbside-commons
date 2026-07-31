@@ -327,6 +327,27 @@ body {
     0 1px 3px rgba(18, 20, 28, 0.08),
     0 0 0 1px rgba(61, 92, 235, 0.3); /* N3 canon: active-ring alpha .3 */
 }
+/* N-1 (design direction S4, 2026-07-31): the bar's ONE emphasized action.
+   "Audit" is the product's verb and its destination; it carries the accent
+   fill the primary buttons already own (brand use of the fixed palette —
+   #2438d6 carries white at 8.04:1). The doubled selector outranks the
+   generic aria-current white-pill treatment, because when the reader is ON
+   the tool the pill stays the action; location is marked by the ring the
+   active state already uses elsewhere (--accent-line), and aria-current is
+   still set for assistive tech. */
+.site-navlink.nav-action,
+.site-navlink.nav-action:hover,
+.site-navlink.nav-action[aria-current="page"] {
+  background: var(--accent);
+  color: #fff;
+}
+.site-navlink.nav-action:hover {
+  background: var(--accent-hi);
+}
+.site-navlink.nav-action[aria-current="page"] {
+  box-shadow: 0 0 0 3px var(--accent-line);
+}
+
 /* v9 chapter numerals inside the nav links (takeover build 2026-07-20). */
 .site-navlink .num {
   font-family: var(--ff-mono);
@@ -352,6 +373,16 @@ body {
   align-items: center;
   gap: 8px;
   white-space: nowrap;
+  /* N-3 (S4, 2026-07-31): the readout is the nav's genuinely live instrument
+     — route-aware, engine-derived figures, lamp semantics — and it read as
+     loose text. It now sits in the site's existing hairline capsule (the
+     cs-pause / cs-zones vocabulary): a physical readout window, no glow, no
+     new colors. */
+  border: 1px solid #ecedf0;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0 14px;
+  min-height: 34px;
 }
 .nav-case .lamp {
   width: 6px;
