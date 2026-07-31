@@ -111,7 +111,19 @@ Point-in-time handoff for the next session. Overwrite the top block each time a 
 > **EVERY ITEM FROM `docs/assessment-2026-07-30-estate-revaluation.md` IS CLOSED.**
 >
 > **OPEN — two, both needing something this seat cannot reach:**
-> ① **The Codex smoke probe.** Blocked by TWO things (⑩ above): the read-only `~/.codex/` — which `CODEX_HOME` solved — and the network allowlist, which it cannot. Both Codex API hosts return `000` from here. **A `/sandbox` widening must cover `chatgpt.com`, not just the config dir.** Simplest path is the one-liner in ⑩ run outside the sandbox. Until it runs, "the gate is runnable again" stays inferred.
+> ① **The Codex smoke probe — one command, and it writes its own record.**
+>
+> ```
+> ! ./scripts/codex-probe.sh
+> ```
+>
+> Run it on a shell outside the agent sandbox. It probes the seat, prints the raw output, and writes `docs/reviews/codex-seat-probe-<stamp>.md` with the verdict, the raw text verbatim, and the context measurement that motivated it — **whichever way it goes**. A failed probe is a real finding, so the script records the failure rather than inviting a retry; per the standing rule it never silently retries, downgrades, or switches accounts.
+>
+> No follow-up needed from the agent afterward. **This was built rather than described** because the probe is the one goal item this seat cannot reach: `chatgpt.com` is blocked (verified with a control — permitted hosts return real status codes, Codex's return `000`) and `codex doctor` independently reports *"ChatGPT base URL … connect failed (required)"*. Attempting it again from here would repeat a verified negative.
+>
+> Its script-level behaviour was exercised end to end here: it correctly detected the sandbox failure, captured the raw error, and wrote a well-formed record. **That dry-run artifact was deleted** — it recorded the sandbox block, not a seat verdict, and leaving it would have looked like the probe had run. `docs/reviews/` contains zero probe records, which is the honest state.
+>
+> **Until it runs, "the gate is runnable again" stays inferred.**
 > ② **A network-capable `npm run verify`.** `honesty-c10` has not scanned this session's source changes because the build needs `fonts.googleapis.com`. The gate is *freshness-refusing by design* (session 16 fixed it from fail-open-stale), so it is correctly declining to scan a stale `out/` rather than reporting a false green. It simply has not run.
 >
 > **Partially discharged from here, and the limit stated exactly.** The reason C10 matters for this session is that the new refusal strings in `verify-in-browser.ts` **ship in the client bundle**. So C10's eight `BANNED_CLAIMS` patterns were applied directly to the two changed source files: **no hits**, with a control confirming the patterns still match a planted claim (`"the page shows real-time DoorDash data"` → true) — a scan that only ever returns clean proves nothing. The new strings are plain product voice, no lab vocabulary, no platform claim.
