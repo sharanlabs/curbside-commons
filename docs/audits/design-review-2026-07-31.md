@@ -160,3 +160,21 @@ Defined byte-identically at `globals.css:6014` and `:7584` (jewel vs fjewel copi
 
 - **No spinner/skeleton for the audit run.** The run is synchronous and in-tab; parsing measured 50–203ms even at 22 MB (the vuln-scan's own numbers). A loading state for a sub-250ms operation is motion for its own sake.
 - **No entrance choreography for the workbench.** The tool is the page's job; making a reader wait through a reveal to reach an input would spend goodwill on decoration.
+
+---
+
+## Orchestrator review of the Fable redesign pass (same day) — VERDICT: SHIP
+
+Nine commits (`37323e7` → `bc6bab7`), reviewed against the Fable-equivalence bar. Gates re-run by this seat, not trusted: **tsc 0 · eslint 0 · vitest 1457 + 8 skipped** (honesty-c10 excluded — needs a network build, standing disclosure).
+
+**Invariants verified measurably:** `app/layout.tsx` untouched (fonts) · every added hex pre-exists in the sheet (`#2438d6` = the brand ultramarine reused for N-1's action fill; `#ecedf0` 3→4 occurrences — reuse, not a new hue) · "Nothing you load leaves this page" present verbatim, retired phrase count 0 · all five pinned H2 texts byte-identical · nav labels/hrefs untouched (N-1 is a className only) · type hierarchy recomputed: H1 48.6/54/54 vs H2 32/35/35 at 1280/1440/1728 — the research's oversized-type license taken WITHOUT re-inverting session 37's fix.
+
+**A reviewer false-alarm worth keeping:** the pinned text "A claim is checked before the order is placed." matched nothing in a line-grep — because it is split across a `<span>`. Session 38's split-node lesson, recurring on the REVIEWER'S side. The text is byte-identical; the rail holds. A finding that dies under its own re-check is the process working.
+
+**Litmus 7/7 YES** (brand in first screen · one anchor — the centred hero-object · scannable by the five-H2 narrative · one job per section after D-6/S2 · cards = the interaction itself · motion serves hierarchy, no theatrics · premium on hairlines, shadows only where elevation is meant). **Hard-rejection sweep: none apply** — and N-1+S3 close the one that loomed ("strong headline with no clear action").
+
+**The pass's own honest misses, accepted as recorded:** the stacked sample/download pair tops out at ~32px hit area without recomposing the slot (recorded, not faked) · `.cs-pause` at 38px near-miss · R-3 correctly deferred to a reachability-proofed pass · fold verified by arithmetic only (zones ≈802px at 1280×900, run-gap ≈81px < 200) — **the e2e suite must confirm on the next network-capable run.**
+
+**Process finding adopted as a rail (the agent's HIGH):** `canonical.spec.ts` pins the five-H2 sequence AND the nav labels with `toEqual` — any future redesign brief must list these as rails first. Neither input audit had flagged it.
+
+**Still open after this pass:** e2e + honesty-c10 on a network-capable build · R-3 purge (268 orphans + `.cs-acc`) · the three-"or"s copy nit · deploy (owner word).
