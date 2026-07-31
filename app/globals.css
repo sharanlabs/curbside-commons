@@ -3533,12 +3533,17 @@ body {
 }
 
 /* --- run --- */
+/* R-5/D-4 (2026-07-31): the run row is a centred COLUMN on the hero axis —
+   note above button, so the reading order is zones → what is missing (or
+   what will happen) → the control. The old row set the page's primary action
+   beside its own instruction like a caption. */
 .wb-run {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--s4);
-  flex-wrap: wrap;
+  gap: var(--s3);
   margin-top: var(--s5);
+  text-align: center;
 }
 .wb-run-note,
 .wb-hint {
@@ -5139,64 +5144,89 @@ body {
   padding-bottom: clamp(72px, 10vh, 100px);
 }
 
-/* ---------- TOOL-FIRST HOME (2026-07-28 · one-spine 2026-07-31) ------------ *
+/* ---------- HERO ZONE — one centred object (S1, 2026-07-31) ---------------- *
  * The lead deliberately does NOT take `.cs-hero`'s `min-height: 100vh`. That
  * rule is why the workbench could never reach the first screen while the scene
  * was the hero — the burial was structural. Sized so the H1, the lede and the
  * first drop zone are all above a 900px fold at the 1280px desktop floor.
  *
- * ONE SPINE (design review R-1/D-1, 2026-07-31). `.cs-copy` was the only
- * `text-align: center` left in the landing chain, so the first viewport ran
- * three alignment systems: a centred 62ch column, then a left H2, then a
- * full-width grid. Centred display type earns its space when it owns the
- * screen; with the 100vh band gone it just floated. The LEFT system wins —
- * it is the page's dominant existing alignment — so the lead now sits ON
- * `.ds-wrap` (the container it was only ever sized against; session 36's
- * lesson) and the H1, lede, H2 and drop zones share one rail. The scene band
- * below keeps its centred composition deliberately: it is a figure that owns
- * its full band, and its artwork is symmetric about its own centre.          */
+ * THE AXIS (R-1/D-1 → design direction S1). The first viewport used to run
+ * three alignment systems: a centred 62ch column, a left H2, a full-width
+ * grid. R-1 settled on ONE axis; the research pass (Evil Martians devtool
+ * study + the 2026 live-embed pattern) settled WHICH: this product is a
+ * narrow-scope utility whose hero visual is the live instrument itself, and
+ * the winning composition for exactly that shape is a centred hero with the
+ * embed inside the announcement. So the hero zone is centred top to bottom —
+ * H1 → lede → nameplate → promise → zones → run — while the content sections
+ * below keep the site's left eyebrow-rule-H2 grammar, and the scene band
+ * stays a centred figure. One axis per zone, page-wide.                      */
 .home-lead {
   background: var(--bg);
-  /* Absorbs the top padding the removed `.cs-copy` wrapper carried (was
-     3vh + 5vh across two boxes); still — every pixel spent here is a pixel
-     the drop zones do not get on the first screen. */
+  text-align: center;
+  /* Every pixel spent here is a pixel the drop zones do not get on the
+     first screen. */
   padding: clamp(40px, 6vh, 64px) 0 0;
 }
-/* The lead's H1 carries the page; the animation delays that staggered the old
-   hero's eyebrow → H1 → lede are gone with the eyebrow.
-
-   THE SCALE IS RAISED HERE, and it is a fix rather than a preference.
-   `.cs-h1` is clamp(31px, 3vw, 43px) while `.lp-h2` is clamp(28px, 3.3vw,
-   48px) — so at EVERY desktop width the section headings were LARGER than the
-   page's own H1. That inversion was survivable while the H1 sat alone in a
-   100vh hero with no heading near it; now "Audit a feed." sits directly
-   beneath it and the page visibly announced its second-level heading louder
-   than its first. Measured, not eyeballed: 38.4px vs 42.24px at 1280.
-   Scoped to `.home-lead` so the other surfaces' `.cs-h1` uses are untouched. */
+/* THE SCALE. The landing H1 adopts `p2-h1`'s existing display scale — the
+   2026 oversized-type pattern executed with a scale this site already owns
+   rather than a new one. Hierarchy holds at every desktop width: 48.6px at
+   1280 against `.lp-h2`'s 32px and `.scene-h2`'s 28.2px, so the session-37
+   inversion cannot recur. Scoped to `.home-lead`; other `.cs-h1` surfaces
+   are untouched. */
 .home-lead .cs-h1 {
   margin-top: 0;
-  font-size: clamp(33px, 3.3vw, 46px);
+  font-size: clamp(36px, 3.8vw, 54px);
 }
 .home-lead .cs-lede {
-  margin-top: 18px;
-  /* Base `.cs-lede` sets `text-wrap: pretty`, which is the right tool for a
-     left-set paragraph; the `balance` override that lived here was a
-     centred-block decision and left with the centring (R-1). */
+  margin: 18px auto 0;
+  /* `balance` over `pretty`: a short centred block where even line lengths
+     matter more than widow control. */
+  text-wrap: balance;
   max-width: 62ch;
 }
 
 .sect-tool {
-  /* Raised with R-2's rhythm retune: the tool section was the second-most
-     compressed band on the page. The extra room is paid for by R-1 (two
-     stacked lead paddings collapsed into one) and D-6 (the tool-foot wall
-     shortened), so the drop zones keep their 900px-fold headroom at 1280. */
-  padding: clamp(36px, 5vh, 52px) 0 0;
+  /* The instrument half of the hero object: centred axis, tightened seam to
+     the lead above (they read as one composition). The card interiors return
+     to left — a report and a form read left; the AXIS is carried by the
+     nameplate, the promise line, the symmetric grid and the run column. */
+  text-align: center;
+  padding: clamp(28px, 4vh, 44px) 0 0;
 }
-.tool-h2 {
+.sect-tool .wb {
+  text-align: left;
+}
+/* "Audit a feed." — the instrument's NAMEPLATE. It stays a real H2 (the
+   canonical e2e pins the five-H2 sequence by textContent, which uppercase
+   transformation does not alter) but leaves the display tier: at display
+   scale it competed with the H1 one viewport-line above it. The register is
+   the site's existing mono label voice (LABEL REGISTER v2), with the
+   eyebrow's rotated diamond tick as its existing mark. */
+h2.tool-h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin-top: 0;
+  font-family: var(--ff-mono);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  max-width: none;
+}
+h2.tool-h2::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  transform: rotate(45deg);
+  background: rgba(61, 92, 235, 0.5);
 }
 .tool-foot {
-  max-width: 78ch;
+  /* Two load-bearing ideas — the check and the promise (D-6). The wall this
+     replaces carried five; the slots themselves demonstrate the other three. */
+  margin: 12px auto 0;
+  max-width: 56ch;
 }
 
 /* The scene band, now an explanatory figure rather than the hero: its heading

@@ -235,15 +235,17 @@ export function AuditWorkbench() {
       </div>
 
       <div className="wb-run">
-        <button type="button" className="lp-btn primary" onClick={runAudit} disabled={!canRun}>
-          Run the audit
-        </button>
         {/* Three states, three different sentences. A note that reads the same
             whether or not the button works tells the reader nothing about why
             it is waiting (screenshot review, 2026-07-27). */}
         {/* Reads from the slot's recorded SOURCE, not from "is it non-empty" —
             the same proxy the gate caught in the result panel (finding 4). With
             the sample catalog loaded, "your own records" was simply false. */}
+        {/* The note sits ABOVE the button (R-5/D-4, 2026-07-31): the page's
+            primary action is disabled at first paint, and its instruction used
+            to trail it like a caption. Reading order is now zones → what is
+            missing (or what will happen) → the control — the state is
+            explained before it is met, for pointer and screen-reader alike. */}
         <p className="wb-run-note">
           {!canRun
             ? "Add a feed to run the audit — the record side is optional."
@@ -251,6 +253,9 @@ export function AuditWorkbench() {
               ? "Your feed will be checked against your own records."
               : "Your feed will be checked against the sample catalog shipped with this site."}
         </p>
+        <button type="button" className="lp-btn primary" onClick={runAudit} disabled={!canRun}>
+          Run the audit
+        </button>
       </div>
 
       {/* No-JS: the whole workbench runs in the reader's browser. Without

@@ -67,12 +67,12 @@ const RECEIPT: TurnReceiptData = {
 export default function Landing() {
   return (
     <main className="lp-main">
-      {/* ===== LEAD — what this is, in one breath. Deliberately NOT a full
-               viewport: the instrument below has to reach the first screen.
-               ONE SPINE (design review R-1, 2026-07-31): the lead sits on the
-               same `.ds-wrap` rail as everything below it — the `.cs-copy`
-               centred wrapper was the hero's composition, kept after the hero's
-               viewport was (correctly) taken away. ===== */}
+      {/* ===== HERO ZONE — one centred object: the announcement and the
+               instrument (design direction S1, 2026-07-31; Evil Martians
+               study: for a narrow-scope utility the winning hero visual is
+               the live product embed, and hero + embed read as ONE object).
+               Deliberately NOT a full viewport: the drop zones stay wholly
+               above a 900px fold at 1280 (canonical.spec contract). ===== */}
       <section className="home-lead ds-wrap" aria-labelledby="hero-h1">
         <h1 id="hero-h1" className="cs-h1">
           Dinner can be ordered while you sleep.
@@ -85,17 +85,19 @@ export default function Landing() {
         </p>
       </section>
 
-      {/* ===== THE INSTRUMENT — the working tool, first screen ===== */}
+      {/* ===== THE INSTRUMENT — the hero's embed. "Audit a feed." is the
+               instrument's NAMEPLATE (mono label register, uppercase via CSS
+               so the pinned H2 text is unchanged), not a second display voice
+               fighting the H1. The 78ch instruction wall is reduced to its two
+               load-bearing ideas (D-6): the slots themselves demonstrate
+               drag / choose / paste / samples. ===== */}
       <section className="sect-tool ds-wrap" id="audit" aria-labelledby="audit-h2">
         <h2 className="lp-h2 tool-h2" id="audit-h2">
           Audit a feed.
         </h2>
         <p className="lp-foot tool-foot">
-          Drop in the feed an agent reads and the merchant record it should agree with — drag them
-          in, choose them, or paste them. Every claim is checked against your records line by line,
-          in this tab, and you get a report you can download.{" "}
-          <b>Nothing you load leaves this page.</b> No files of your own? Load the sample pair and
-          run it.
+          Every claim is checked line by line, in this tab, and you get a report you can
+          download. <b>Nothing you load leaves this page.</b>
         </p>
         <AuditWorkbench />
       </section>
