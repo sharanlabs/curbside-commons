@@ -4,9 +4,15 @@
 
 ## Start here
 
-1. Read `RULES.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/task-log.md`.
+1. Read `RULES.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, `HANDOFF.md`, `docs/task-log.md`. Read them in full — they are **held under 250 KB by a test** (`evals/packs/startup-contract-budget.test.ts`), down from ~1.31 MB before 2026-07-31.
 2. Run `git status`.
 3. Summarize current phase, active task, changed files, unfinished work, risks, and the next safest step — then wait for human approval before continuing.
+
+**Cost note — the archive is not part of step 1.** Closed-session history lives in `docs/archive/2026-07-31-state-docs/` (1.19 MB, byte-exact). It is provenance, not state: the default is that you do not need it, and opening it is a deliberate choice for a specific question you cannot answer from the five docs above. This is a default, not a restriction — `RULES.md` §15 governs the contract and nothing here narrows it.
+
+Why the default is worth honoring: this read list stood at ~1.31 MB until 2026-07-31 and **three cross-model review runs died on it** (sessions 34, 36, 38), the last burning 20+ minutes at `xhigh` and returning only the echoed prompt. The instruction was never wrong; the volume was. If you are reviewing a scoped change, the five docs plus the files in your diff are normally the whole brief.
+
+**If the budget test fails, archive — do not raise the limit.** Move closed sessions into `docs/archive/` the way the 2026-07-31 pass did. Raising the number is the decision that produced 1.31 MB in the first place.
 
 ## How the project runs
 
