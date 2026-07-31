@@ -102,11 +102,15 @@ export default function Landing() {
         <AuditWorkbench />
       </section>
 
-      {/* ===== HOW THE CHECK WORKS — the scene, relocated below the thing it
-               explains (it used to be the full-height hero) ===== */}
+      {/* ===== WHAT HAPPENS TO A CLAIM — the scene, relocated below the thing
+               it explains (it used to be the full-height hero). RENAMED from
+               "HOW THE CHECK WORKS" 2026-07-31 (nav finding N-2): it collided
+               word-for-word with the nav's "How it works", which points at
+               /playground — same words, two destinations. The nav label is
+               e2e-pinned; the eyebrow yields. ===== */}
       <section className="sect ds-wrap sect-scene" aria-labelledby="scene-h2">
         <Reveal>
-          <p className="lp-eyebrow">HOW THE CHECK WORKS</p>
+          <p className="lp-eyebrow">WHAT HAPPENS TO A CLAIM</p>
           <span className="lp-sec-rule" aria-hidden="true" />
         </Reveal>
       </section>

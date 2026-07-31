@@ -4728,7 +4728,12 @@ body {
 }
 .cs-status {
   position: absolute;
-  left: 56px;
+  /* On the CONTENT RAIL, not the viewport edge (R-4/D-3, 2026-07-31): the
+     owner's screenshot showed the status label clipped at the left edge.
+     max() means the label can only ever move INWARD from the old 56px, so
+     the clip cannot recur at any supported width — and the band's HUD chrome
+     now shares the rail the page's copy sits on. */
+  left: max(56px, calc((100% - var(--maxw)) / 2 + 32px));
   bottom: 16px;
   display: inline-flex;
   align-items: center;
@@ -4750,7 +4755,8 @@ body {
 }
 .cs-pause {
   position: absolute;
-  right: 56px;
+  /* Mirrors .cs-status: HUD chrome on the content rail (R-4). */
+  right: max(56px, calc((100% - var(--maxw)) / 2 + 32px));
   bottom: 10px;
   display: inline-flex;
   align-items: center;
@@ -5243,6 +5249,14 @@ h2.tool-h2::before {
 }
 .sect-scene + .cs-hero .cs-copy {
   padding-top: 0;
+}
+/* The band was the page's 100vh hero in session 36; as an explanatory figure
+   it no longer needs hero-scale internal air (R-4/D-3). The station geometry
+   is proportional (28%-70% of band height), so trimming the floor tightens
+   the dead space above and below the artwork evenly. The generic 340px floor
+   stays for any surface where the scene IS the hero. */
+.sect-scene + .cs-hero .cs-band {
+  min-height: 300px;
 }
 
 /* ---------- HERO band additions (rails · ticks · order ring · lighting) ----- */
