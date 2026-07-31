@@ -5329,31 +5329,21 @@ body {
 .sect-tool .wb {
   text-align: left;
 }
-/* "Audit a feed." — the instrument's NAMEPLATE. It stays a real H2 (the
-   canonical e2e pins the five-H2 sequence by textContent, which uppercase
-   transformation does not alter) but leaves the display tier: at display
-   scale it competed with the H1 one viewport-line above it. The register is
-   the site's existing mono label voice (LABEL REGISTER v2), with the
-   eyebrow's rotated diamond tick as its existing mark. */
+/* "Audit a feed." — set in the DISPLAY tier, deliberately.
+   HISTORY (owner reversal, 2026-07-31): the redesign's S1 demoted this H2 to a
+   13px mono uppercase "nameplate" so it would not compete with the H1 one
+   viewport-line above. The owner refused the register the same day — "no
+   instrument type fonts. use premium sophisticated fonts" — so it returns to
+   the site's own premium display voice (`lp-h2`: Nunito, weight-carried).
+   The H1→H2 step stays unambiguous by SIZE (48.6→~30px at 1280), which is
+   how a display system separates ranks; the mono label voice remains for
+   DATA — ledger figures, rule ids, receipts — never for headings.
+   Slightly under the sibling lp-h2 scale: this H2 sits one viewport-line
+   below the H1, and the hero object must read as one thing, not two rivals. */
 h2.tool-h2 {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   margin-top: 0;
-  font-family: var(--ff-mono);
-  font-size: 13px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--graphite);
+  font-size: clamp(23px, 2.2vw, 30px);
   max-width: none;
-}
-h2.tool-h2::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  flex: none;
-  transform: rotate(45deg);
-  background: rgba(61, 92, 235, 0.5);
 }
 .tool-foot {
   /* Two load-bearing ideas — the check and the promise (D-6). The wall this

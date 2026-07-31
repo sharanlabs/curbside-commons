@@ -85,12 +85,12 @@ export default function Landing() {
         </p>
       </section>
 
-      {/* ===== THE INSTRUMENT — the hero's embed. "Audit a feed." is the
-               instrument's NAMEPLATE (mono label register, uppercase via CSS
-               so the pinned H2 text is unchanged), not a second display voice
-               fighting the H1. The 78ch instruction wall is reduced to its two
-               load-bearing ideas (D-6): the slots themselves demonstrate
-               drag / choose / paste / samples. ===== */}
+      {/* ===== THE INSTRUMENT — the hero's embed. "Audit a feed." is set in
+               the premium display voice at a sub-H1 size (owner, 2026-07-31:
+               "no instrument type fonts" — the short-lived mono nameplate is
+               reverted; mono stays for DATA, never headings). The 78ch
+               instruction wall is reduced to its two load-bearing ideas (D-6):
+               the slots themselves demonstrate drag / choose / paste / samples. ===== */}
       <section className="sect-tool ds-wrap" id="audit" aria-labelledby="audit-h2">
         <h2 className="lp-h2 tool-h2" id="audit-h2">
           Audit a feed.
