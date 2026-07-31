@@ -68,19 +68,21 @@ export default function Landing() {
   return (
     <main className="lp-main">
       {/* ===== LEAD — what this is, in one breath. Deliberately NOT a full
-               viewport: the instrument below has to reach the first screen. ===== */}
-      <section className="home-lead" aria-labelledby="hero-h1">
-        <div className="cs-copy">
-          <h1 id="hero-h1" className="cs-h1">
-            Dinner can be ordered while you sleep.
-            <br />
-            <span className="cs-h1-lit">What the agent read needs proof.</span>
-          </h1>
-          <p className="cs-lede">
-            Curbside Commons checks a marketplace feed against the merchant&rsquo;s own records and
-            reports every claim that disagrees. Bring your two files, or run the samples.
-          </p>
-        </div>
+               viewport: the instrument below has to reach the first screen.
+               ONE SPINE (design review R-1, 2026-07-31): the lead sits on the
+               same `.ds-wrap` rail as everything below it — the `.cs-copy`
+               centred wrapper was the hero's composition, kept after the hero's
+               viewport was (correctly) taken away. ===== */}
+      <section className="home-lead ds-wrap" aria-labelledby="hero-h1">
+        <h1 id="hero-h1" className="cs-h1">
+          Dinner can be ordered while you sleep.
+          <br />
+          <span className="cs-h1-lit">What the agent read needs proof.</span>
+        </h1>
+        <p className="cs-lede">
+          Curbside Commons checks a marketplace feed against the merchant&rsquo;s own records and
+          reports every claim that disagrees. Bring your two files, or run the samples.
+        </p>
       </section>
 
       {/* ===== THE INSTRUMENT — the working tool, first screen ===== */}

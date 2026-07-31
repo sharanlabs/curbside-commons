@@ -5132,21 +5132,28 @@ body {
   padding-bottom: 100px;
 }
 
-/* ---------- TOOL-FIRST HOME (2026-07-28) ---------------------------------- *
+/* ---------- TOOL-FIRST HOME (2026-07-28 · one-spine 2026-07-31) ------------ *
  * The lead deliberately does NOT take `.cs-hero`'s `min-height: 100vh`. That
  * rule is why the workbench could never reach the first screen while the scene
  * was the hero — the burial was structural. Sized so the H1, the lede and the
  * first drop zone are all above a 900px fold at the 1280px desktop floor.
- * Authored for `.ds-wrap` (--maxw 1180px, 1420px wide) — a surface written for
- * a container it does not occupy is the spacing defect of session 36.         */
+ *
+ * ONE SPINE (design review R-1/D-1, 2026-07-31). `.cs-copy` was the only
+ * `text-align: center` left in the landing chain, so the first viewport ran
+ * three alignment systems: a centred 62ch column, then a left H2, then a
+ * full-width grid. Centred display type earns its space when it owns the
+ * screen; with the 100vh band gone it just floated. The LEFT system wins —
+ * it is the page's dominant existing alignment — so the lead now sits ON
+ * `.ds-wrap` (the container it was only ever sized against; session 36's
+ * lesson) and the H1, lede, H2 and drop zones share one rail. The scene band
+ * below keeps its centred composition deliberately: it is a figure that owns
+ * its full band, and its artwork is symmetric about its own centre.          */
 .home-lead {
   background: var(--bg);
-  /* Tightened with the display scale: every pixel spent here is a pixel the
-     drop zones do not get on the first screen. */
-  padding: clamp(20px, 3vh, 38px) 0 0;
-}
-.home-lead .cs-copy {
-  padding-bottom: 0;
+  /* Absorbs the top padding the removed `.cs-copy` wrapper carried (was
+     3vh + 5vh across two boxes); still — every pixel spent here is a pixel
+     the drop zones do not get on the first screen. */
+  padding: clamp(40px, 6vh, 64px) 0 0;
 }
 /* The lead's H1 carries the page; the animation delays that staggered the old
    hero's eyebrow → H1 → lede are gone with the eyebrow.
@@ -5164,11 +5171,10 @@ body {
   font-size: clamp(33px, 3.3vw, 46px);
 }
 .home-lead .cs-lede {
-  margin-top: 22px;
-  /* `balance` over `pretty` here: this is a short centred block where even
-     line lengths matter more than widow control, and Nunito's wider bowls
-     changed where the old copy broke. */
-  text-wrap: balance;
+  margin-top: 18px;
+  /* Base `.cs-lede` sets `text-wrap: pretty`, which is the right tool for a
+     left-set paragraph; the `balance` override that lived here was a
+     centred-block decision and left with the centring (R-1). */
   max-width: 62ch;
 }
 
