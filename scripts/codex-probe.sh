@@ -31,15 +31,43 @@ mkdir -p docs/reviews
 echo "Probing the Codex seat (config: $(grep -E '^model' ~/.codex/config.toml 2>/dev/null | head -1))..."
 echo
 
-RAW="$(codex exec --sandbox read-only \
-  'Reply with exactly: SEAT_OK <your model name>. Nothing else.' 2>&1)"
+# `< /dev/null` is load-bearing. Invoked from a shell whose stdin stays open
+# (a `!` command inside an agent session, a CI step, a pipe), `codex exec`
+# prints "Reading additional input from stdin..." and waits forever for input
+# that never arrives. It looks identical to a slow probe and it never finishes.
+# Observed 2026-07-31 when the owner ran the model-override probe by hand.
+#
+# Pinning the model here rather than trusting config.toml, for the reason this
+# script exists: the 16:47Z probe found the seat answering GPT-5.4 while
+# `~/.codex/config.toml` declared `gpt-5.6-sol`. Config states intent; only the
+# reply states fact. Owner directive 2026-07-31: use only gpt-5.6-sol.
+RAW="$(codex exec -c model='"gpt-5.6-sol"' --sandbox read-only \
+  'Reply with exactly: SEAT_OK <your model name>. Nothing else.' < /dev/null 2>&1)"
 CODE=$?
 
 if printf '%s' "$RAW" | grep -q "SEAT_OK"; then
-  VERDICT="SEAT_OK — the seat answered"
-  MEANING="The Codex seat is reachable and responding. Combined with the context
-measurement below, the claim \"the cross-model gate is runnable again\" is now
-**demonstrated**, not inferred."
+  # Answering is not enough. The 16:47Z probe returned SEAT_OK from GPT-5.4
+  # while config.toml declared gpt-5.6-sol -- so a bare SEAT_OK check would
+  # have reported success on the very mismatch this script exists to find.
+  if printf '%s' "$RAW" | grep -qiE "5\.6"; then
+    VERDICT="SEAT_OK — the seat answered, and it is 5.6"
+    MEANING="The Codex seat is reachable, responding, and reports a 5.6 model,
+matching the owner's 2026-07-31 directive (\"use only gpt 5.6 sol\") and the
+\`model\` pin in this script. The claim \"the cross-model gate is runnable
+again\" is **demonstrated**, not inferred."
+  else
+    VERDICT="SEAT ANSWERED, BUT NOT ON 5.6 — model mismatch"
+    MEANING="The seat is reachable, so the gate can run. **But it did not answer
+as a 5.6 model**, despite this script pinning \`-c model='\"gpt-5.6-sol\"'\`.
+
+That means the override is not taking effect — most likely the account does not
+serve \`gpt-5.6-sol\`, so \`~/.codex/config.toml\`'s declaration is aspirational
+rather than descriptive. **This is seat provisioning: an owner action.** Do not
+silently retry, downgrade, or switch accounts.
+
+Until it is resolved, any review recorded as running on \`gpt-5.6-sol\` should
+be treated as **UNVERIFIED** unless its own probe named the model."
+  fi
 else
   VERDICT="NO ANSWER — exit ${CODE}"
   MEANING="The seat did NOT answer. This is a real finding, not a retry prompt.
