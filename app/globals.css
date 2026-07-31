@@ -5124,12 +5124,19 @@ body {
   color: #1c2ba8;
 }
 
-/* v9 section rhythm — no border-top (the v9 page breathes on whitespace) */
+/* v9 section rhythm — no border-top (the v9 page breathes on whitespace).
+   RETUNED 2026-07-31 (design review R-2): the two sections a reader meets
+   first were viewport-responsive clamps while everything below them sat at a
+   flat 100px — the most compressed spacing on the page exactly where first
+   impressions form, and 2-3x breathing room everywhere else. One rhythm
+   logic now: every section clamps on viewport height the way the lead does,
+   keeping the 100px ceiling on tall screens and compressing in step on
+   short ones instead of inverting. */
 .sect {
-  padding: 100px 0 0;
+  padding: clamp(72px, 10vh, 100px) 0 0;
 }
 .sect-last {
-  padding-bottom: 100px;
+  padding-bottom: clamp(72px, 10vh, 100px);
 }
 
 /* ---------- TOOL-FIRST HOME (2026-07-28 · one-spine 2026-07-31) ------------ *
@@ -5179,7 +5186,11 @@ body {
 }
 
 .sect-tool {
-  padding: clamp(30px, 4vh, 46px) 0 0;
+  /* Raised with R-2's rhythm retune: the tool section was the second-most
+     compressed band on the page. The extra room is paid for by R-1 (two
+     stacked lead paddings collapsed into one) and D-6 (the tool-foot wall
+     shortened), so the drop zones keep their 900px-fold headroom at 1280. */
+  padding: clamp(36px, 5vh, 52px) 0 0;
 }
 .tool-h2 {
   margin-top: 0;
