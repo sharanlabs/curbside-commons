@@ -56,6 +56,19 @@ Point-in-time handoff for the next session. Overwrite the top block each time a 
 >
 > **F-1 (LOW) FIXED — one step deeper than the scan recommended.** The bound moved INTO the two parsers, the seam where the file route and the paste route converge, so the rule is applied **once by construction** rather than by two callers agreeing. `FileDrop` derives `MAX_BYTES` from the shared `MAX_INPUT_CHARS`; its `file.size` check stays, being the only one that can refuse a file *without reading it into memory*. **Refuses, never truncates** — and says so, so a reader cannot assume a partial verdict. 5 teeth including one that fails if `FileDrop` re-declares a numeric cap (the drift shape that caused F-1).
 >
+> **⑩ᴄ THE HOST IS REACHABLE — THE BLOCK IS THE BASH SANDBOX SPECIFICALLY, NOT A DEAD ROUTE.** Final check, and it changes which remedy is right. WebFetch is not bound by the Bash sandbox, so it was pointed at Codex's exact required endpoint:
+>
+> | path | result |
+> |---|---|
+> | Bash `curl https://chatgpt.com` | **`000`** — connection refused by the sandbox |
+> | WebFetch `https://chatgpt.com/backend-api/` | **`403 Forbidden`** — host reachable, rejects an unauthenticated request |
+>
+> **A 403 is a live server answering.** The route exists and the endpoint is up; what is blocked is Bash's egress, which is where `codex` runs. So this is not a network outage, a VPN issue, or a dead endpoint — every alternative `codex doctor` suggested is ruled out.
+>
+> **Consequence for the remedy:** `/sandbox` widening to allow `chatgpt.com` **should** work, because the only thing standing between `codex` and a live server is the Bash allowlist. That is now evidence rather than assumption. The owner-run script remains the simpler path.
+>
+> An API-key auth path was considered and **not pursued**: reading credential locations is blocked by Law 11 (`.env` read → refused, correctly), and routing around a credential guard to satisfy a goal item would be the wrong trade — the same reasoning that kept `auth.json` uncopied.
+>
 > **⑩ᴃ THE CLAIM ITSELF, MEASURED PROPERLY — AND THE BYTE COUNT WAS THE WRONG UNIT ALL ALONG.** The probe is still the only thing that *demonstrates* the gate runs. But the claim underneath it can be measured far better than "1.31 MB → 95 KB", and doing so changes what we know:
 >
 > | | before archive | now |
