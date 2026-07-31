@@ -1,5 +1,12 @@
 # Task Log
 
+## 2026-07-31 — SESSION 40, DESIGN ARC (Opus 5 orchestrating, Fable 5 senior designer): end-to-end redesign, reviewed, verified rendered
+
+- **Arc:** owner screenshots → measured audits (design-review + interaction addendum) → live research (Evil Martians 100-page study + 2026 trend currency, which REVERSED the audit's left-align lean) → Fable senior-designer pass, 9 slices, direction doc first → orchestrator review (gates re-run, invariants measured, litmus 7/7, verdict SHIP) → owner reversal on the mono nameplate ("no instrument type fonts") applied same-hour → **owner-run `npm run verify && npx playwright test`: exit 0 · build 61 pages · full vitest 1610+8 (honesty-c10 INCLUDED, scanning the redesign) · e2e 53+1.** The two review disclosures (fold by arithmetic only; C10 unscanned) are both closed rendered.
+- **Owner decisions recorded:** Nunito permanent (picked from the rendered 5-direction slate) · colors original (R-6/R-7 refused) · no instrument fonts on headings (nameplate reverted to display voice same day) · premium-modern-futuristic-2026 register.
+- **Process catches worth keeping:** canonical.spec pins the five-H2 sequence AND nav labels — rails for any future redesign brief (the agent's HIGH, adopted) · a pinned H2 "vanished" under a line-grep because JSX splits it across a span — session 38's lesson recurring on the REVIEWER's side · the agent's first NBSP edit corrupted exact-match editing (byte-wise verification, never visual).
+- **Open, all owner-side or deferred with reason:** deploy (`npx vercel --prod` — production still serves `fb6c327`, the whole redesign is undeployed) · R-3 dead-CSS purge behind a reachability proof · three-"or"s copy nit · Codex 5.6-sol pin retest.
+
 > **Archive pointer (2026-07-31).** Entries older than 2026-07-15 → `docs/archive/2026-07-31-state-docs/task-log-2026-06-02--2026-07-15.md`, byte-exact.
 
 ## 2026-07-31 — SESSION 40 (Opus 5, effort high): state-doc archive (finding 2), push, live-check handover
