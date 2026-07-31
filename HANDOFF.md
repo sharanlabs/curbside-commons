@@ -8,7 +8,23 @@ Point-in-time handoff for the next session. Overwrite the top block each time a 
 >
 > **① PUSH — DONE.** `858fb17` pushed; `main == origin/main`. The owner's "safe now" rests entirely on one key, so it was checked before acting rather than accepted: `vercel.json` → `git.deploymentEnabled: false` at HEAD. Push shipped code and triggered no deploy.
 >
-> **② PRODUCTION ROUTES — VERIFIED. HEADERS — STILL NOT.** Seven live fetches via WebFetch (not bound by the Bash sandbox), 2026-07-31: `/report` *"What the feed claims vs. what the records say."* · `/fees` *"A fee statement, read against the law."* · `/proof` *"PROOF · THE LOGBOOK"* · `/docs` *"How the instrument works."* · `/legacy` *"Legacy activation module"* · `/playground` *"HOW IT WORKS · RUNS IN YOUR BROWSER"* — all real content, plus **a nonsense path returning a genuine HTTP 404**. That control is what makes the six meaningful: without it, "six pages rendered" is also consistent with a host serving one fallback for every path. Session 35's failure mode (host serves `/`, 404s the rest) is **ruled out**. `/playground` independently re-confirms finding 1: the retired phrase is absent; it reads *"The audit itself makes no requests — nothing typed leaves your browser."*
+> **② PRODUCTION ROUTES AND HEADERS — BOTH VERIFIED. THE LAST OPEN ITEM IS CLOSED.**
+>
+> **Headers (2026-07-31, owner ran the `curl -sSI` via `!`; sandbox blocked it here with `X-Proxy-Error: blocked-by-allowlist`, raw on record, bypass flag not used).** All five present **on a subpath** (`/playground`, not `/` — the case session 35's lesson is about), each compared against `vercel.json` rather than eyeballed:
+>
+> | header | live | matches `vercel.json` |
+> |---|---|---|
+> | `x-content-type-options` | `nosniff` | ✅ |
+> | `x-frame-options` | `DENY` | ✅ |
+> | `referrer-policy` | `no-referrer` | ✅ |
+> | `permissions-policy` | `camera=(), microphone=(), geolocation=()` | ✅ |
+> | `strict-transport-security` | `max-age=63072000; includeSubDomains; preload` | added by Vercel, not in `vercel.json` |
+>
+> **`Content-Security-Policy` is correctly ABSENT.** Its deferral is part of the adopted policy (`evals/packs/header-policy.test.ts`:7,76) — a CSP appearing without a new reviewed decision would be a **failure, not an upgrade**. Recorded so a future reader does not "fix" it.
+>
+> **The four-point post-deploy verify from the assessment is now complete:** 6/6 routes 200 ✅ · five headers on a subpath ✅ · retired phrase → 0 ✅ · footer provenance clean ✅.
+>
+> **(Original item, superseded — kept because it records what was blocked and why:)** Seven live fetches via WebFetch (not bound by the Bash sandbox), 2026-07-31: `/report` *"What the feed claims vs. what the records say."* · `/fees` *"A fee statement, read against the law."* · `/proof` *"PROOF · THE LOGBOOK"* · `/docs` *"How the instrument works."* · `/legacy` *"Legacy activation module"* · `/playground` *"HOW IT WORKS · RUNS IN YOUR BROWSER"* — all real content, plus **a nonsense path returning a genuine HTTP 404**. That control is what makes the six meaningful: without it, "six pages rendered" is also consistent with a host serving one fallback for every path. Session 35's failure mode (host serves `/`, 404s the rest) is **ruled out**. `/playground` independently re-confirms finding 1: the retired phrase is absent; it reads *"The audit itself makes no requests — nothing typed leaves your browser."*
 >
 > **The five security headers remain genuinely unverified** — WebFetch returns rendered markdown, not response headers, and the Vercel MCP session expired mid-check (raw error on record). No tool available to this seat returns response headers. **Do not record headers as passing.** The one-liner below still needs to run; only its `curl -sSI` half is now outstanding.
 >
@@ -30,7 +46,15 @@ Point-in-time handoff for the next session. Overwrite the top block each time a 
 >
 > **⑦ THE GUARD GAP I NAMED, CLOSED (owner: "complete all the open").** The first budget test covered the startup list only, leaving `decision-log.md` + `implementation-journal.md` *tidied but not held* — the exact mistake the file exists to stop repeating. A fourth tooth now holds them under **400 KB** (deliberately looser: nothing must read them to begin work, so growth costs less; currently 198,434 B). Red-green proven: +250 KB → red at 448,445 B with the archive-by-date instruction in the message; restore sha256-verified.
 >
-> **OPEN, in order:** ① **the `curl -sSI` header check only** — routes are now verified, headers are not, and no tool in this seat returns response headers · ② finding 4 — mutation pass quantifying what fraction of the guards survive their behaviour being broken. Finding 3 (`/vuln-scan` over `FileDrop`/`parseCatalogText`) ran this session — see `docs/security/vuln-scan-2026-07-31-upload-surface.md`. A live Codex smoke probe would be stronger proof that the cross-model gate is runnable again than the byte-count inference is.
+> **⑧ PUSH — DONE.** `c11afe4` → `origin/main`; `behind 0 / ahead 0`. Auto-deploy stays off (`vercel.json` → `git.deploymentEnabled: false`), so this shipped code and triggered no deploy. **Production still serves `fb6c327`** — the archive/guard/scan work is docs + tests only and does not need a deploy; the next deploy should carry a reason of its own.
+>
+> **NOTHING IS BLOCKED. Every item from `docs/assessment-2026-07-30-estate-revaluation.md` is closed except finding 4.**
+>
+> **OPEN, owner's pick — none urgent:**
+> ① **Finding 4** — the mutation pass: what fraction of the 1578 guards still pass with the behaviour they protect deliberately broken. The largest remaining item and worth a fresh session; this project has already produced five known instances of "it passes anyway."
+> ② **A live Codex smoke probe** — the one soft claim left. That the cross-model gate is runnable again is *inferred from a byte count*, not demonstrated. A probe would settle it, and it is cheap.
+> ③ **The `RULES.md` §9 decision** — back-fill sessions 29–39, amend the rule, or accept the gap as history. Owner-only; see the standing note in `docs/task-log.md`.
+> ④ **The F-1 LOW fix** — apply `MAX_BYTES` to the paste path so both doors share one limit (`docs/security/vuln-scan-2026-07-31-upload-surface.md`). Small, and the record says truncation is the wrong shape.
 >
 > **▶▶ RESUME PROMPT (paste verbatim in a FRESH session):** *"Resume Curbside Commons session 41. Run the Mandatory Startup Contract — the four state docs are now ~59 KB total after the 2026-07-31 archive, so read them in full; do NOT read `docs/archive/`. First: confirm whether the production routes + headers one-liner in HANDOFF.md ② was ever run, and if not, hand it to me again. Then take assessment finding 3 — `/vuln-scan` (read-only: no building, running, or network) over the upload surface, `components/playground/FileDrop.tsx` and `parseCatalogText`, writing `VULN-FINDINGS.{json,md}`. Do not start finding 4 until 3 is triaged."*
 >
