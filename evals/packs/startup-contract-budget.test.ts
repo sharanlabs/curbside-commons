@@ -133,6 +133,42 @@ describe("startup-contract budget", () => {
     ).toBeLessThan(RECORD_BUDGET_BYTES);
   });
 
+  it("the read list fits a reviewer's context window — the thing that actually broke", () => {
+    /**
+     * Bytes were always a proxy. What killed sessions 34, 36 and 38 was
+     * CONTEXT: a reviewer ordered to read the startup contract before doing
+     * anything could not fit it in a context window at all.
+     *
+     * Measured at `858fb17` (the commit before the archive), the five docs came
+     * to **~312,000 tokens** — 156% of a 200k window. Session 38's log
+     * estimated "~140k"; the real figure was 2.2x that. That is why the run
+     * returned a log containing only the echoed prompt: the context was
+     * exhausted before any work could begin. It was not slow, it was
+     * arithmetically impossible.
+     *
+     * This asserts the property that makes the gate runnable — the read list
+     * plus a scoped diff has to leave most of the window for actual reasoning.
+     * ~4 chars/token is the standard English-prose approximation; exactness is
+     * not the point when the failure was off by 56 percentage points.
+     */
+    const CHARS_PER_TOKEN = 4;
+    const REVIEWER_BUDGET_TOKENS = 60_000; // ~30% of a 200k window
+
+    const tokens = STARTUP_DOCS.reduce((n, d) => n + sizeOf(d) / CHARS_PER_TOKEN, 0);
+
+    expect(
+      Math.round(tokens),
+      `The startup read list is ~${Math.round(tokens).toLocaleString()} tokens, over the ` +
+        `${REVIEWER_BUDGET_TOKENS.toLocaleString()}-token reviewer budget.\n\n` +
+        `This is the measurement that matters more than the byte count. Before ` +
+        `2026-07-31 these docs were ~312,000 tokens — 156% of a 200k context ` +
+        `window — so a reviewer instructed to read them first could not start at ` +
+        `all. Three cross-model gate runs died that way (sessions 34, 36, 38).\n\n` +
+        `Archive closed sessions into docs/archive/. Do not raise this budget: a ` +
+        `reviewer that spends its window on history has none left for the diff.`,
+    ).toBeLessThan(REVIEWER_BUDGET_TOKENS);
+  });
+
   it("the archive it points at exists and is not itself in the read list", () => {
     const archive = "docs/archive/2026-07-31-state-docs";
     expect(statSync(join(REPO, archive)).isDirectory()).toBe(true);

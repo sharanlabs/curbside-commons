@@ -56,6 +56,21 @@ Point-in-time handoff for the next session. Overwrite the top block each time a 
 >
 > **F-1 (LOW) FIXED — one step deeper than the scan recommended.** The bound moved INTO the two parsers, the seam where the file route and the paste route converge, so the rule is applied **once by construction** rather than by two callers agreeing. `FileDrop` derives `MAX_BYTES` from the shared `MAX_INPUT_CHARS`; its `file.size` check stays, being the only one that can refuse a file *without reading it into memory*. **Refuses, never truncates** — and says so, so a reader cannot assume a partial verdict. 5 teeth including one that fails if `FileDrop` re-declares a numeric cap (the drift shape that caused F-1).
 >
+> **⑩ᴃ THE CLAIM ITSELF, MEASURED PROPERLY — AND THE BYTE COUNT WAS THE WRONG UNIT ALL ALONG.** The probe is still the only thing that *demonstrates* the gate runs. But the claim underneath it can be measured far better than "1.31 MB → 95 KB", and doing so changes what we know:
+>
+> | | before archive | now |
+> |---|---:|---:|
+> | startup read list | **~312,000 tokens** | **~31,000 tokens** |
+> | share of a 200k context window | **156%** | **15%** |
+>
+> **The gate did not die of slowness. It was arithmetically impossible.** A reviewer ordered to read the startup contract before doing anything could not fit it in a context window *at all* — which is exactly why session 38's run returned a log containing only the echoed prompt. The context was gone before any work could begin. Session 38's own log estimated "~140k tokens of state docs"; the measured figure at `858fb17` was **2.2× that**.
+>
+> **A full scoped review now fits with room to think:** startup docs (~31k) + every `.ts`/`.tsx` file this session touched (~12.4k) = **~43k tokens, 21% of a 200k window** (33% of a 128k one). Before, the docs *alone* were 156% — no diff, no reasoning, no room for either.
+>
+> Pinned by a fifth tooth in `evals/packs/startup-contract-budget.test.ts` at a **60k-token reviewer budget** (~30% of a 200k window), red-green proven at 63,974 tokens. Bytes were always a proxy; this asserts the property that actually failed.
+>
+> **This is still not the probe.** It proves the *obstacle is gone*, not that the seat answers. Those are different claims and the record keeps them apart.
+>
 > **⑩ᴀ CODEX'S OWN DIAGNOSTIC CONFIRMS IT — `codex doctor` RUNS LOCALLY AND NEEDS NO NETWORK.** The probe still cannot run, but this is no longer only my inference: Codex's own health check reaches the same verdict independently.
 >
 > **First, a control I initially skipped.** My `000` result proved nothing until I checked what a *permitted* host returns: `api.anthropic.com → 404`, `github.com → 200`, `registry.npmjs.org → 200` versus `chatgpt.com → 000`, `api.openai.com → 000`. Real status codes from allowed hosts, connection-refused from Codex's. **The block is specific, not `curl` failing generally** — the same "a check that only ever returns one answer proves nothing" rule this session applied to the C10 scan and the mutation pass.
