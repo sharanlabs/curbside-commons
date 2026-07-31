@@ -82,7 +82,11 @@ Point-in-time handoff for the next session. Overwrite the top block each time a 
 >
 > **OPEN — two, both needing something this seat cannot reach:**
 > ① **The Codex smoke probe.** Blocked by TWO things (⑩ above): the read-only `~/.codex/` — which `CODEX_HOME` solved — and the network allowlist, which it cannot. Both Codex API hosts return `000` from here. **A `/sandbox` widening must cover `chatgpt.com`, not just the config dir.** Simplest path is the one-liner in ⑩ run outside the sandbox. Until it runs, "the gate is runnable again" stays inferred.
-> ② **A network-capable `npm run verify`.** `honesty-c10` has not scanned this session's source changes because the build needs `fonts.googleapis.com`. Nothing suggests a problem — the C10 gate is *freshness-refusing by design* (session 16 fixed it from fail-open-stale), so it is correctly refusing to scan a stale `out/` rather than reporting a false green. It simply has not run.
+> ② **A network-capable `npm run verify`.** `honesty-c10` has not scanned this session's source changes because the build needs `fonts.googleapis.com`. The gate is *freshness-refusing by design* (session 16 fixed it from fail-open-stale), so it is correctly declining to scan a stale `out/` rather than reporting a false green. It simply has not run.
+>
+> **Partially discharged from here, and the limit stated exactly.** The reason C10 matters for this session is that the new refusal strings in `verify-in-browser.ts` **ship in the client bundle**. So C10's eight `BANNED_CLAIMS` patterns were applied directly to the two changed source files: **no hits**, with a control confirming the patterns still match a planted claim (`"the page shows real-time DoorDash data"` → true) — a scan that only ever returns clean proves nothing. The new strings are plain product voice, no lab vocabulary, no platform claim.
+>
+> **This is NOT the gate having run.** C10 scans the normalized visible text of every built `out/**/*.html`, which catches rendered output and composition this source-level check cannot see. What was tested is the specific hazard this session introduced; what remains untested is everything else the gate covers. Run `npm run verify` on a network-capable shell to close it properly.
 >
 > **Not open, recorded as decisions:** the §9 amendment (evidence gathered, owner-gated) · making the mutation harness a standing CI gate (a separate call with its own maintenance cost) · deploying (this session changed docs, tests and one shared constant; the next deploy should carry a reason of its own).
 >
