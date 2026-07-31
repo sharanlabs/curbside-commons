@@ -230,6 +230,21 @@ export default function Landing() {
             </p>
           </Reveal>
         </div>
+        {/* ===== THE CLOSE (design direction S3, 2026-07-31). The research
+             order wants trust then a final action; the pinned H2 sequence
+             keeps trust last, so trust IS the closing beat and ends on the
+             action. Specific verbs, existing button vocabulary, no new copy
+             claims: back up to the instrument, or to the honesty ledger. ===== */}
+        <Reveal>
+          <div className="lp-cta-row lp-cta-close">
+            <a className="lp-btn primary" href="#audit">
+              Audit a feed
+            </a>
+            <Link className="lp-btn ghost" href="/docs">
+              What is real, what is invented
+            </Link>
+          </div>
+        </Reveal>
       </section>
     </main>
   );
