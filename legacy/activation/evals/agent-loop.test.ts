@@ -20,6 +20,8 @@
  *    green in the same suite (the loop adds no business logic to the deterministic tools).
  */
 import { writeFileSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, expect } from "vitest";
 import { NoObjectGeneratedError } from "ai";
 import { normalizeRow } from "@/legacy/activation/lib/core/pipeline";
@@ -627,8 +629,11 @@ describe("R-LOOP-6 — the trajectory freezes to a $0 fixture and renders the se
     });
     const roundTripped = JSON.parse(JSON.stringify(snap));
     expect(roundTripped).toEqual(snap); // pure data — freezes cleanly to a fixture
-    writeFileSync("/tmp/agent-loop.snapshot.json", JSON.stringify(snap, null, 2)); // prove a real freeze ($0, /tmp only)
-    const reread = JSON.parse(readFileSync("/tmp/agent-loop.snapshot.json", "utf8"));
+    // Freeze to the OS temp dir, never a hardcoded "/tmp": a fixed absolute path is
+    // unwritable under a sandboxed run (EPERM) and is shared across concurrent runs.
+    const snapshotPath = join(tmpdir(), "agent-loop.snapshot.json");
+    writeFileSync(snapshotPath, JSON.stringify(snap, null, 2)); // prove a real freeze ($0, temp only)
+    const reread = JSON.parse(readFileSync(snapshotPath, "utf8"));
     expect(reread.servedMode).toBe("REPLAY");
     expect(reread.trajectory.some((s: { phase: string }) => s.phase === "reflect")).toBe(true);
   });

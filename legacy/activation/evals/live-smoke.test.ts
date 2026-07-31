@@ -1,4 +1,6 @@
 import { writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, expect } from "vitest";
 import { liveAiEnabled } from "@/lib/server/env-flags";
 import { runCore } from "@/legacy/activation/lib/core/pipeline";
@@ -39,7 +41,7 @@ describe.skipIf(!live)("LIVE Gemini batch (key-gated; bills a few cents)", () =>
       modes: rows.reduce<Record<string, number>>((a, r) => ((a[r.mode] = (a[r.mode] ?? 0) + 1), a), {}),
       gate: rows.reduce<Record<string, number>>((a, r) => ((a[r.gatekeeper] = (a[r.gatekeeper] ?? 0) + 1), a), {}),
     };
-    writeFileSync("/tmp/live-batch-result.json", JSON.stringify({ summary, rows }, null, 2) + "\n");
+    writeFileSync(join(tmpdir(), "live-batch-result.json"), JSON.stringify({ summary, rows }, null, 2) + "\n");
 
     expect(batch.totalCostUsd).toBeLessThanOrEqual(5);
     expect(batch.processed).toBeGreaterThan(0);

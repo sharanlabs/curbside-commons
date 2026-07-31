@@ -46,6 +46,8 @@
  * targeted than the strong baseline AND converges where the baseline would not — see docs/a3-7-live-run-status.md).
  */
 import { writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, expect } from "vitest";
 import { REFERENCE_PLATFORM_NAME } from "@/legacy/activation/lib/core/constants";
 import { groqLiveEnabled, liveAiEnabled } from "@/lib/server/env-flags";
@@ -353,7 +355,7 @@ describe.skipIf(!live)(
           tune_items: tuneItems,
           test_items: testItems,
         };
-        writeFileSync("/tmp/agent-loop-selfcorrect.snapshot.json", JSON.stringify(report, null, 2));
+        writeFileSync(join(tmpdir(), "agent-loop-selfcorrect.snapshot.json"), JSON.stringify(report, null, 2));
         writeFileSync("lib/data/agent-loop.snapshot.json", JSON.stringify(report, null, 2));
 
         console.log("LIVE A3-7 CROSS-FAMILY SELF-CORRECTION (Gemini drafter, Groq critics):");

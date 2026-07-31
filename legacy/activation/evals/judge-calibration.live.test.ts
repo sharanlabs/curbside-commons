@@ -1,4 +1,6 @@
 import { writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, expect } from "vitest";
 import { judgeLiveEnabled } from "@/lib/server/env-flags";
 import { runGatekeeper } from "@/legacy/activation/lib/agents/gatekeeper";
@@ -156,7 +158,7 @@ describe.skipIf(!live)("LIVE judge calibration — Groq gpt-oss-120b cross-famil
         items: perItem,
       };
 
-      writeFileSync("/tmp/judge-calibration.snapshot.json", JSON.stringify(report, null, 2));
+      writeFileSync(join(tmpdir(), "judge-calibration.snapshot.json"), JSON.stringify(report, null, 2));
       writeFileSync("lib/data/judge-calibration.snapshot.json", JSON.stringify(report, null, 2));
 
       // ── PLUMBING asserts only (quality thresholds are eval-locked at P4 on the frozen report) ──

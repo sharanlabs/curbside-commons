@@ -13,6 +13,8 @@
  * strategy/tone prose is CAPTURED here as samples for that future judge.
  */
 import { writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, expect } from "vitest";
 import { normalizeRow } from "@/legacy/activation/lib/core/pipeline";
 import type { Merchant, MerchantInput } from "@/legacy/activation/lib/core/types";
@@ -132,7 +134,7 @@ describe.skipIf(!live)("LIVE A3-2b — the Strategist clears the anti-theater fl
         },
         rows,
       };
-      writeFileSync("/tmp/strategist-confirmatory.snapshot.json", JSON.stringify(report, null, 2));
+      writeFileSync(join(tmpdir(), "strategist-confirmatory.snapshot.json"), JSON.stringify(report, null, 2));
       writeFileSync("lib/data/strategist-confirmatory.snapshot.json", JSON.stringify(report, null, 2));
 
       console.log("LIVE A3-2b STRATEGIST FLOOR (Groq gpt-oss-120b, $0):");
