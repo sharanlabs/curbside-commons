@@ -56,7 +56,22 @@ Point-in-time handoff for the next session. Overwrite the top block each time a 
 >
 > **F-1 (LOW) FIXED — one step deeper than the scan recommended.** The bound moved INTO the two parsers, the seam where the file route and the paste route converge, so the rule is applied **once by construction** rather than by two callers agreeing. `FileDrop` derives `MAX_BYTES` from the shared `MAX_INPUT_CHARS`; its `file.size` check stays, being the only one that can refuse a file *without reading it into memory*. **Refuses, never truncates** — and says so, so a reader cannot assume a partial verdict. 5 teeth including one that fails if `FileDrop` re-declares a numeric cap (the drift shape that caused F-1).
 >
-> **⑩ THE CODEX SMOKE PROBE CANNOT RUN FROM THIS SEAT — TWO INDEPENDENT BLOCKS, BOTH VERIFIED. The soft claim is STILL SOFT.**
+> **⑩ᴀ CODEX'S OWN DIAGNOSTIC CONFIRMS IT — `codex doctor` RUNS LOCALLY AND NEEDS NO NETWORK.** The probe still cannot run, but this is no longer only my inference: Codex's own health check reaches the same verdict independently.
+>
+> **First, a control I initially skipped.** My `000` result proved nothing until I checked what a *permitted* host returns: `api.anthropic.com → 404`, `github.com → 200`, `registry.npmjs.org → 200` versus `chatgpt.com → 000`, `api.openai.com → 000`. Real status codes from allowed hosts, connection-refused from Codex's. **The block is specific, not `curl` failing generally** — the same "a check that only ever returns one answer proves nothing" rule this session applied to the C10 scan and the mutation pass.
+>
+> **`codex doctor` (v0.144.0), the two findings that are REAL:**
+> - `✗ reachability` — *"ChatGPT base URL `https://chatgpt.com/backend-api/` connect failed (required)"*. Codex names the exact endpoint and marks it **required**. This is the binding blocker, stated by the tool rather than deduced by me.
+> - `⚠ rollouts` — **966 active files, 1.78 GB** in `~/.codex/`. Unrelated to this project; flagged because it is real and the owner would want to know.
+>
+> **Three findings that are sandbox ARTIFACTS, not defects — checked rather than repeated:**
+> - `✗ auth  "stored credentials could not be read"` — `auth.json` is in the sandbox's explicit **deny-list**. The credentials exist; this seat may not read them.
+> - `✗ state "state database integrity check failed"` — **not corruption.** Opened the SQLite files read-only directly: `logs_2.sqlite → integrity_check: ok`, while `state_5.sqlite`/`goals_1.sqlite` return *"unable to open database file"*. That is the sandbox denying access, which `doctor` cannot distinguish from damage. **Do not act on this as corruption** — moving a healthy database aside on a false alarm is the more expensive mistake.
+> - `⚠ websocket` — same network block, different transport.
+>
+> `✗ install` (npm prefix mismatch) is real but pre-existing and unrelated.
+>
+> **⑩ THE SMOKE PROBE CANNOT RUN FROM THIS SEAT — TWO INDEPENDENT BLOCKS, BOTH VERIFIED. The soft claim is STILL SOFT.**
 >
 > Four attempts, escalating, each block confirmed by direct test rather than inferred:
 > 1. `codex-guarded` → failed creating `~/.codex/.run-lock`.
