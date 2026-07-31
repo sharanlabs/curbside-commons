@@ -1766,14 +1766,10 @@ body {
   .lp-hero-seal .d3 {
     animation-delay: 1.1s;
   }
-  /* section-rule expands from 0 → 44px as its block reveals */
-  .ds-reveal .lp-sec-rule {
-    width: 0;
-  }
-  .ds-reveal.in .lp-sec-rule {
-    width: 44px;
-    transition: width 0.42s var(--ease) 0.12s;
-  }
+  /* The section-rule's reveal is the rule-x scaleX animation (~line 1580) —
+     a second, width-based path lived here until 2026-07-31 (I-3): it was the
+     sheet's only layout-property transition, it ran ON TOP of the scaleX
+     animation, and transform is the idiomatic form for a 44px hairline. */
   @keyframes lp-drawline {
     to {
       stroke-dashoffset: 0;
@@ -1800,10 +1796,8 @@ body {
   .lp-card:hover {
     transform: none;
   }
-  .lp-sec-rule {
-    width: 44px;
-    transition: none;
-  }
+  /* (The .lp-sec-rule width fixup that lived here countered the width:0
+     reveal path removed 2026-07-31 — base width is 44px everywhere now.) */
 }
 
 /* ============================================================================
@@ -2335,9 +2329,9 @@ body {
     transform: none !important;
     transition: none !important;
   }
-  .ds-reveal .lp-sec-rule {
-    width: 44px !important;
-  }
+  /* (The .lp-sec-rule width rescue that lived here countered the width:0
+     reveal path removed 2026-07-31; base width is 44px everywhere now, and
+     an animation mid-flight is already covered by the transform rescue.) */
   /* the Evidence Bench's replay-dim stages read fully lit on paper */
   .eb-corr,
   .eb-rule,
@@ -3477,6 +3471,14 @@ body {
   color: var(--signal-text);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+/* I-1 (interaction audit, 2026-07-31): the slot's PRIMARY affordance lit up
+   on keyboard focus but gave a mouse no feedback while its two lesser
+   siblings (.fd-sample, .fd-dl) both hover — inverted affordance weight.
+   The cue is typographic (underline weight), because the palette is fixed
+   and the control is already at the signal ink. */
+.fd-label:hover .fd-cta {
+  text-decoration-thickness: 2px;
 }
 .fd-or {
   font-size: 13px;
@@ -7673,12 +7675,10 @@ h1.p2-h1 {
 .js .fjewel.run .fj-gt {
   animation: stamp-neq 0.5s var(--ease-arrival, cubic-bezier(0, 0, 0.2, 1)) 1s both;
 }
-@keyframes stamp-neq {
-  0% { opacity: 0; transform: scale(1.7); }
-  60% { opacity: 1; transform: scale(0.92); }
-  82% { transform: scale(1.06); }
-  100% { opacity: 1; transform: scale(1); }
-}
+/* @keyframes stamp-neq is defined ONCE, in the jewel block (~line 6030) —
+   a byte-identical fjewel copy lived here until 2026-07-31 (I-2): identical
+   today, but two definitions of one name are a trap, because an edit to
+   either silently loses to whichever the cascade reads last. */
 .fjewel .fj-seal {
   display: inline-block;
   margin-top: 34px;
