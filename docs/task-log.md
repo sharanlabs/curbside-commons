@@ -38,11 +38,33 @@
 - **Push DONE.** `c11afe4` → `origin/main`, behind 0 / ahead 0. Auto-deploy remains off, so code shipped and nothing deployed; production still serves `fb6c327`, which is correct — this session changed docs and tests only.
 - **State of the assessment:** findings 1, 2 and 3 closed; finding 4 (the mutation pass) is the only one left, and it is not blocked by anything.
 
+### Fourth pass (same session, owner `/goal`: "go ahead finish it") — all four remaining items
+
+- **F-1 (LOW) FIXED.** The size cap moved INTO the two parsers, where the file route and the paste route converge — so the rule is applied once rather than by two callers agreeing to apply it. `FileDrop` now derives `MAX_BYTES` from the shared `MAX_INPUT_CHARS` instead of holding its own literal. **Refuses, never truncates:** a truncated document would produce a verdict about something the reader never supplied. 5 teeth (`evals/packs/input-size-cap.test.ts`), including one that fails if `FileDrop` ever re-declares a numeric cap — the drift shape that caused F-1. Both mutations proven red; both restores sha256-verified.
+- **FINDING 4 — THE MUTATION PASS: 8/10 → 10/10.** Record + committed harness: `docs/quality/mutation-pass-2026-07-31.md`, `docs/quality/mutate.py`. Ten mutants **declared before any run** (denominator from the specification, never the observations — session 35's rule), each asserted to match its site exactly once before being applied. **My first draft failed that check on 5 of 10 patterns** — I had guessed at the engine's internals instead of reading them; the check caught it and the run never happened on a bad set. **Eight killed immediately**, including the product's founding defect (drop the `/100` in cents→decimal → 33 tests caught it). **TWO SURVIVED:** the non-UTC `asOf` guard and the non-USD currency guard — both added by session 38's gate, both correct, and **deleting either left all 1,578 tests green**. Cause is precise and is not carelessness: several tests *set* `currency: "USD"` and a valid `asOf`, but **none ever hands the parser a bad one** — *a field every fixture supplies correctly is a field whose validator is never exercised*, the same shape as session 38's tautological reset assertion. Closed with 14 teeth (`evals/packs/catalog-guard-survivors.test.ts`) asserting the refusal AND its reason; re-run kills both (4 and 5 tests). Every mutated file verified byte-exact after the run.
+- **CODEX SMOKE PROBE — COULD NOT RUN, and the reason is environmental.** `codex-guarded` failed on its lock file and bare `codex` failed identically: `~/.codex/` is **read-only under the sandbox** (`touch` → `Operation not permitted`, verified directly). Codex needs to write its own session state there. Raw errors on record; the bypass flag stayed retired. **So the claim "the cross-model gate is runnable again" remains INFERRED from the byte count, not demonstrated** — see the standing note in `HANDOFF.md`. It needs an owner-run probe or a `/sandbox` widening.
+- **§9 RESOLVED** — see the standing note below. Accept the gap; do not back-fill; the amendment case is now evidenced but stays owner-gated.
+- **Gates: tsc 0 · eslint 0 · vitest 1445 + 8 skipped** across 118 files (from 1431/117 at this pass's start; +14 survivor teeth). `honesty-c10` excluded and disclosed: it shells out to `npm run build`, which fetches `fonts.googleapis.com`, outside the sandbox allowlist — confirmed by running the build directly and reading the error, not assumed.
+
 ## STANDING NOTE — `RULES.md` §9 has been unmet since session 29
 
 Sessions **29 through 39 wrote no `docs/task-log.md` entry at all**. §9 makes one a condition of "done", so eleven sessions closed without meeting it. Their record is not lost — it lives in `PROJECT_STATE.md`, `HANDOFF.md` (both now archived under `docs/archive/2026-07-31-state-docs/`) and `docs/reviews/` — but it is not *here*, which is where §9 says to look.
 
-**Deliberately not back-filled.** Reconstructing eleven entries from other documents would produce something that reads as contemporaneous record and is not. The gap is recorded instead of papered over. Owner's call whether to back-fill, amend §9, or accept the gap as history.
+**Deliberately not back-filled.** Reconstructing eleven entries from other documents would produce something that reads as contemporaneous record and is not. The gap is recorded instead of papered over.
+
+### RESOLVED 2026-07-31 (owner delegated the call: "go ahead finish it") — ACCEPT THE GAP, DO NOT BACK-FILL, DO NOT AMEND §9 YET
+
+The measurement that decided it: **those same sessions wrote 44 rows to `docs/decision-log.md`** in the 2026-07-20→31 window. They were not undocumented. The record went somewhere — just not where §9 points.
+
+That reframes the gap. It is not eleven careless sessions; it is **a rule that lost to a better-fitting habit**. Eleven sessions independently reached for the same alternative surface, which is evidence about the *rule's* fit, not about the sessions' diligence. As the work moved from small reviewable slices (which a task log suits) to long single-goal sessions (which a decision row suits), the log stopped matching the shape of the work.
+
+**Three options, and why each lands where it does:**
+
+- **Back-fill — rejected.** It would manufacture eleven contemporaneous-looking records after the fact. A log whose entries were written by a later session reading other documents is not a log; it is a reconstruction wearing a log's format. It would also make the §9 metric read as satisfied while nothing about the practice changed — the "claim broader than the thing backing it" shape this repo has caught seven times.
+- **Amend §9 — premature, and not mine.** §9 is in `RULES.md`, the constitution, which `RULES.md` §5 and this project's own doctrine put behind owner sign-off. The delegation was to resolve the open item, not to edit the rulebook. The evidence for an amendment is now gathered and recorded here; the amendment itself waits for the owner.
+- **Accept and record — taken.** The gap stands as history, with its cause named and the evidence attached.
+
+**What this changes going forward:** nothing silently. Sessions 40's three passes all wrote task-log entries, so the rule is being met now. If a future session again finds a decision row is the better home, that is the signal to bring the §9 amendment to the owner with this note as its evidence — rather than to quietly skip the log a twelfth time.
 
 ## 2026-07-20 — SESSION 28 (Fable 5 primary, effort high): PRE-BUILD INSPECTION STAGE — Fable design audit + sol end-to-end language pass over the five adopted mockups
 

@@ -51,6 +51,23 @@ in `onText`, so both doors share one limit, and refuse with the existing error c
 silently truncating. Truncation would be the worse bug: it would produce a *verdict* on a document
 the reader never supplied, which is the precise class this product exists to catch.
 
+### F-1 FIXED, same day (2026-07-31, owner: "go ahead finish it")
+
+Applied one step deeper than recommended above. Rather than adding a second check in `onText`, the
+bound moved **into the two parsers** (`MAX_INPUT_CHARS`, `verify-in-browser.ts`) — the seam where
+the file route and the paste route converge. That way the rule is applied **once**, by construction,
+instead of by two callers agreeing to apply it. `FileDrop` now derives its `MAX_BYTES` from the
+shared constant rather than declaring its own literal; its `file.size` check stays, because it is
+the only one that can refuse a file *without reading it into memory*.
+
+Refusal, not truncation, as argued above — and the refusal says so explicitly, so a reader cannot
+assume a partial verdict covered everything they pasted.
+
+**5 teeth** (`evals/packs/input-size-cap.test.ts`), including one that fails if `FileDrop` ever
+re-declares a numeric cap — the drift shape that *caused* F-1. Both mutation directions proven red;
+both restores sha256-verified. The bound is also pinned by the mutation pass as M09/M10
+(`docs/quality/mutation-pass-2026-07-31.md`), both killed.
+
 ---
 
 ## Classes tested and found CLEAN

@@ -35,6 +35,7 @@
  * verdict confuses them.
  */
 import { useId, useRef, useState } from "react";
+import { MAX_INPUT_CHARS } from "./verify-in-browser";
 
 export type SlotStatus =
   | { readonly kind: "ok"; readonly summary: string }
@@ -75,8 +76,22 @@ export interface FileDropProps {
   readonly onDownloadSample?: () => void;
 }
 
-/** Refuse implausibly large files before reading them into memory. */
-const MAX_BYTES = 5 * 1024 * 1024;
+/**
+ * Refuse implausibly large files BEFORE reading them into memory.
+ *
+ * Deliberately the same number the parsers enforce on pasted text
+ * (`MAX_INPUT_CHARS`, verify-in-browser.ts) rather than a second copy of it:
+ * the cap used to live only here, so the identical document was refused as a
+ * file and accepted as a paste (F-1,
+ * docs/security/vuln-scan-2026-07-31-upload-surface.md). Two constants that
+ * both mean "the limit" drift apart the first time one is tuned.
+ *
+ * This check stays because it is the only one that can refuse a file WITHOUT
+ * reading it — `file.size` is known before `FileReader` runs, so a huge file
+ * never enters memory at all. The parser-side bound catches the paste route
+ * and anything that reaches a parser another way; this catches it earlier.
+ */
+const MAX_BYTES = MAX_INPUT_CHARS;
 
 export function FileDrop({
   title,

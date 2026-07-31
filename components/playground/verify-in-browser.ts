@@ -103,6 +103,38 @@ export type ParseResult =
   | { readonly ok: false; readonly error: string };
 
 /**
+ * The most text either parser will read — the same ceiling `FileDrop` applies
+ * to a chosen file (FileDrop.tsx:79), enforced here so BOTH doors share it.
+ *
+ * WHY IT MOVED HERE (F-1, docs/security/vuln-scan-2026-07-31-upload-surface.md).
+ * The 5 MB cap used to live only on the file path, so the identical document
+ * was refused as a file and accepted as a paste. A limit one door enforces and
+ * the other does not is a limit on one door. Both routes converge on these two
+ * functions, so this is the seam where the rule can only be applied once.
+ *
+ * WHY IT REFUSES RATHER THAN TRUNCATES. Truncating would hand the engine a
+ * document the reader never wrote and return a VERDICT on it — a confident
+ * answer about the wrong input, which is precisely the defect class this
+ * product exists to catch. Refusal says plainly that nothing ran.
+ *
+ * The bound is generous on purpose: parsing is linear (measured 0.10-0.40 µs
+ * per item from 25k to 200k items) and 22 MB parses in ~200 ms, so this is a
+ * runaway brake protecting the reader's own tab, not a size preference. It is
+ * measured in UTF-16 code units — `String.length`, what the browser actually
+ * holds in memory — not bytes on disk.
+ */
+export const MAX_INPUT_CHARS = 5 * 1024 * 1024;
+
+/** Shared refusal so both parsers state the limit identically. */
+function tooLargeError(what: string, chars: number): string {
+  return (
+    `This ${what} is ${(chars / 1024 / 1024).toFixed(1)} MB of text — larger than the ` +
+    `${MAX_INPUT_CHARS / 1024 / 1024} MB this tab will read. It was not truncated: a partial ` +
+    `document would produce a verdict about something you did not supply.`
+  );
+}
+
+/**
  * Parse pasted text as an ACP feed — honest, specific failures; never a fake
  * verdict. Mirrors the CLI's shape check (cli.ts checks `Array.isArray(items)`
  * on the SOR; the feed-side equivalent here).
@@ -110,6 +142,9 @@ export type ParseResult =
 export function parseAcpFeedText(text: string): ParseResult {
   if (!text.trim()) {
     return { ok: false, error: "The paste box is empty — paste an ACP feed JSON document first." };
+  }
+  if (text.length > MAX_INPUT_CHARS) {
+    return { ok: false, error: tooLargeError("feed", text.length) };
   }
   let raw: unknown;
   try {
@@ -283,6 +318,9 @@ function reservedIdProblem(id: string): string | null {
 export function parseCatalogText(text: string): CatalogParseResult {
   if (!text.trim()) {
     return { ok: false, error: "The catalog is empty — upload or paste a merchant catalog first." };
+  }
+  if (text.length > MAX_INPUT_CHARS) {
+    return { ok: false, error: tooLargeError("catalog", text.length) };
   }
   let raw: unknown;
   try {
