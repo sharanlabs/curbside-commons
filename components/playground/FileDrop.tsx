@@ -125,7 +125,9 @@ export function FileDrop({
     onReadStart();
     if (file.size > MAX_BYTES) {
       onReadError(
-        `${file.name} is ${(file.size / 1024 / 1024).toFixed(1)} MB — larger than the 5 MB this tab will read.`,
+        // \u00A0 between value and unit: the pair never breaks across lines
+        // (polish pass, 2026-07-31).
+        `${file.name} is ${(file.size / 1024 / 1024).toFixed(1)}\u00A0MB — larger than the 5\u00A0MB this tab will read.`,
       );
       return;
     }

@@ -315,6 +315,14 @@ body {
     box-shadow 200ms var(--ease-arrival),
     transform 200ms var(--ease-arrival);
 }
+/* Hit area (polish pass, 2026-07-31): the pill renders ~32px tall inside a
+   68px bar; the pseudo-element takes the target past 40px vertically without
+   touching layout. Horizontal stays 0 — the links sit 4px apart. */
+.site-navlink::after {
+  content: "";
+  position: absolute;
+  inset: -4px 0;
+}
 .site-navlink:hover {
   color: var(--accent);
   transform: translateY(-1px);
@@ -1205,6 +1213,16 @@ body {
   line-height: 1.55;
   color: var(--body);
   max-width: 70ch;
+  /* Polish pass 2026-07-31 (better-typography): descriptions wrap pretty —
+     ledes already do; footnote-tier prose was the gap. */
+  text-wrap: pretty;
+}
+.lp-ptext,
+.file .d,
+.trust .fact .d,
+.fd-hint,
+.wb-run-note {
+  text-wrap: pretty;
 }
 .lp-mark {
   color: var(--signal-text);
@@ -1273,7 +1291,9 @@ body {
   transform: translateY(-1px);
 }
 .lp-btn.primary:active {
-  transform: translateY(0) scale(0.985);
+  /* Press scale is 0.96 site-wide on real buttons (polish pass 2026-07-31,
+     better-ui): 0.985 was too subtle to register as tactile feedback. */
+  transform: translateY(0) scale(0.96);
 }
 .lp-btn.ghost {
   background: rgba(255, 255, 255, 0.7);
@@ -1285,7 +1305,7 @@ body {
   color: var(--accent);
 }
 .lp-btn.ghost:active {
-  transform: scale(0.985);
+  transform: scale(0.96);
 }
 .lp-btn .lp-ic {
   transition: transform 0.16s var(--ease);
@@ -3426,7 +3446,12 @@ body {
   gap: var(--s3);
   padding: var(--s7) var(--s5);
   border: 1px dashed var(--rule-3);
-  border-radius: var(--r-ctrl);
+  /* Concentric radii (polish pass, 2026-07-31): nested inside .fd-slot
+     (--r-card 16px) behind 24px of padding, the inner radius must sit BELOW
+     outer-minus-padding territory, not near the outer value — 12px inside
+     16px read subtly off. --r-chip is the existing token on the right side
+     of that line. */
+  border-radius: var(--r-chip);
   background: var(--bg-2);
   text-align: center;
   transition:
@@ -3485,6 +3510,7 @@ body {
   color: var(--muted);
 }
 .fd-sample {
+  position: relative;
   font-family: var(--ff-mono);
   font-size: 11.5px;
   letter-spacing: 0.04em;
@@ -3495,10 +3521,24 @@ body {
   border-radius: var(--r-pill);
   padding: var(--s1) var(--s3);
   cursor: pointer;
-  transition: border-color 160ms var(--ease-field);
+  transition:
+    border-color 160ms var(--ease-field),
+    transform 120ms var(--ease-field);
+}
+/* Hit-area extension (polish pass 2026-07-31): the pill renders ~22px tall.
+   The pseudo-element widens the target without moving a pixel of layout;
+   the row gap below is split with .fd-dl's extension so the two targets
+   can never overlap. */
+.fd-sample::after {
+  content: "";
+  position: absolute;
+  inset: -5px 0;
 }
 .fd-sample:hover {
   border-color: var(--rule-3);
+}
+.fd-sample:active {
+  transform: scale(0.96);
 }
 .fd-sample:focus-visible {
   outline: 2px solid var(--signal);
@@ -3516,6 +3556,10 @@ body {
   margin-top: var(--s2);
   font-size: 13px;
   line-height: 1.55;
+  /* Changing figures set in Nunito ("N rows read") hold column when the
+     count changes (polish pass; the mono-set ledger figures were already
+     tabular by face). */
+  font-variant-numeric: tabular-nums;
 }
 .fd-status.ok {
   color: var(--muted);
@@ -3533,6 +3577,9 @@ body {
   font-size: 13px;
   color: var(--muted);
   cursor: pointer;
+  /* Hit area: a bare 13px summary line is a ~20px target; block padding
+     lifts it past 32px (polish pass, 2026-07-31). */
+  padding: 6px 0;
 }
 .fd-paste > summary:focus-visible {
   outline: 2px solid var(--signal);
@@ -3644,6 +3691,9 @@ body {
 .wb-tally {
   font-size: 15px;
   color: var(--ink-2);
+  /* Changing Nunito figures (finding/error/warn counts) hold column across
+     re-runs (polish pass, 2026-07-31). */
+  font-variant-numeric: tabular-nums;
 }
 .wb-dl {
   margin-left: auto;
@@ -3654,6 +3704,8 @@ body {
   font-size: 14px;
   line-height: 1.6;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  text-wrap: pretty;
 }
 .wb-meta {
   display: flex;
@@ -3755,9 +3807,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
+  /* 7px → 10px (polish pass): room for the two stacked controls' hit-area
+     extensions to split without overlapping. */
+  gap: 10px;
 }
 .fd-dl {
+  position: relative;
   background: none;
   border: 0;
   padding: 0;
@@ -3768,21 +3823,60 @@ body {
   color: var(--muted);
   text-decoration: underline;
   text-underline-offset: 3px;
+  transition: transform 120ms var(--ease-field);
+}
+/* ~16px rendered; extends up into its half of the row gap and freely down
+   into the zone's 48px bottom padding. */
+.fd-dl::after {
+  content: "";
+  position: absolute;
+  inset: -4px 0 -12px;
 }
 .fd-dl:hover {
   color: var(--iris-ink);
+}
+.fd-dl:active {
+  transform: scale(0.96);
 }
 .wb-next-link {
   font-size: 14px;
   color: var(--iris-ink);
   text-underline-offset: 3px;
 }
+/* Underline finish on the underlined controls (polish pass, better-typography):
+   thickness and position from the font's own metrics; skip-ink is the UA
+   default. Explicit offsets above still win where set. */
+.fd-cta,
+.fd-dl,
+.wb-next-link {
+  text-underline-position: from-font;
+  text-decoration-thickness: from-font;
+}
+/* Control LABELS are not content — an accidental drag-select on a button is
+   noise. Scoped to controls only: findings, figures and receipts stay
+   selectable, because this is an evidence tool. */
+.lp-btn,
+.fd-label,
+.fd-sample,
+.fd-dl,
+.fd-paste > summary,
+.cs-pause {
+  user-select: none;
+  -webkit-user-select: none;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .wb-finding,
   .fd-zone,
-  .fd-sample {
+  .fd-sample,
+  .fd-dl {
     transition: none;
+  }
+  .lp-btn.primary:active,
+  .lp-btn.ghost:active,
+  .fd-sample:active,
+  .fd-dl:active {
+    transform: none;
   }
 }
 
