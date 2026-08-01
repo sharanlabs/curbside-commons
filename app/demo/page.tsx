@@ -20,7 +20,7 @@ export default function DemoMoved() {
       <p className="ds-note">
         This page folded into the <Link href="/">front page</Link> — the examined claim now opens
         the story there, and the full audit lives in{" "}
-        <Link href="/report">the example listings report</Link>.
+        <Link href="/report">the listings report</Link>.
       </p>
     </main>
   );

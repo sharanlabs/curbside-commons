@@ -203,7 +203,7 @@ export function FileDrop({
               so the two can never describe different samples. */}
           {onDownloadSample !== undefined && (
             <button type="button" className="fd-dl" onClick={onDownloadSample}>
-              or download it to test uploading
+              Download it to test uploading
             </button>
           )}
         </span>
@@ -221,7 +221,7 @@ export function FileDrop({
       )}
 
       <details className="fd-paste">
-        <summary>or paste it as text</summary>
+        <summary>Paste it as text</summary>
         <label className="fd-paste-label" htmlFor={areaId}>
           {textareaLabel}
         </label>

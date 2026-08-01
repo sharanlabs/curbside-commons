@@ -34,7 +34,7 @@ export type NavReadoutFigures = {
 
 const DESTINATIONS = [
   { label: "Audit", href: "/" },
-  { label: "Example report", href: "/report" },
+  { label: "Report", href: "/report" },
   { label: "Fee rules", href: "/fees" },
   { label: "How it works", href: "/playground" },
   { label: "Proof", href: "/proof" },
@@ -46,7 +46,7 @@ function readoutFor(pathname: string, f: NavReadoutFigures): Readout {
   if (pathname.startsWith("/report")) {
     return {
       lamp: "ember",
-      parts: [{ b: "EXAMPLE REPORT" }, ` · FAIL · ${f.errors} ERR · ${f.warns} WARN`],
+      parts: [{ b: "AUDIT REPORT" }, ` · FAIL · ${f.errors} ERR · ${f.warns} WARN`],
     };
   }
   if (pathname.startsWith("/fees")) {

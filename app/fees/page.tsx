@@ -123,14 +123,14 @@ export default function FeesPage() {
       {/* ===== THE EXAMPLE MONTHS ===== */}
       <section className="sect ds-wrap" aria-labelledby="months-h2">
         <Reveal>
-          <p className="lp-eyebrow">THE EXAMPLE MONTHS</p>
+          <p className="lp-eyebrow">THE MONTHS ON RECORD</p>
           <span className="lp-sec-rule" aria-hidden="true" />
           <h2 className="lp-h2" id="months-h2">
-            Four example months, one law.
+            Four months, one law.
           </h2>
           <p className="lp-foot">
             The same {spelled(FEE_BOUNDARY.executable)} statement-readable rules run against four
-            example months. One fails after the window closes. One passes clean. One is cured by a refund
+            months. One fails after the window closes. One passes clean. One is cured by a refund
             that arrived in time, and one waits, conditional, while its window is still open —{" "}
             <em>the window is part of the law, not a loophole.</em>
           </p>
@@ -212,7 +212,7 @@ export default function FeesPage() {
             Audit a statement in your browser.
           </h2>
           <p className="lp-foot">
-            Load the example statement — or paste one in its shape, meta block and lines — and run
+            Load the bundled statement — or paste one in its shape, meta block and lines — and run
             the audit. The checks are the real rule arithmetic, computed locally on the lines you
             supply. Nothing is sent anywhere.
           </p>
@@ -238,7 +238,7 @@ export default function FeesPage() {
               <span className="d-eyebrow">NEXT</span>
               <span className="d-title">Audit your own feed</span>
               <span className="d-sub">
-                Drag in your two files, or run the sample pair. Nothing leaves the page.
+                Drag in your two files, or run the bundled pair. Nothing leaves the page.
               </span>
             </span>
             <span className="d-arrow" aria-hidden="true">

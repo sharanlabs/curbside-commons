@@ -88,7 +88,7 @@ test("/fees renders the drifted month end-to-end: verdict, named receipt, bounda
 test("the four example months carry their four legal outcomes (month tabs)", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/fees");
-  const tabs = page.getByRole("group", { name: "Example month" });
+  const tabs = page.getByRole("group", { name: "Month" });
   // The visible month after paging (exactly one is not hidden).
   const active = page.locator("#fee-report .fee-month:not([hidden])");
 
@@ -136,7 +136,7 @@ test("print floor: the viewed example month is visible on paper (D-1)", async ({
 test("the paste leg audits the sample statement to the reference result, live", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/fees");
-  await page.getByRole("button", { name: "Load the example statement" }).click();
+  await page.getByRole("button", { name: "Load the bundled statement" }).click();
   await page.getByRole("button", { name: "Audit this statement" }).click();
   const result = page.getByRole("region", { name: "Fee audit result" });
   await expect(result.getByText("FAIL", { exact: true })).toBeVisible();
@@ -149,7 +149,7 @@ test("paste-leg receipt cells hold a readable measure — no ribbon collapse", a
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/fees");
-  await page.getByRole("button", { name: "Load the example statement" }).click();
+  await page.getByRole("button", { name: "Load the bundled statement" }).click();
   await page.getByRole("button", { name: "Audit this statement" }).click();
   const cells = page.locator(".pg-result .pg-receipts dd");
   const n = await cells.count();
@@ -166,7 +166,7 @@ test("edited statements yield engine-derived verdict changes — input-sensitivi
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/fees");
-  await page.getByRole("button", { name: "Load the example statement" }).click();
+  await page.getByRole("button", { name: "Load the bundled statement" }).click();
   // Bring every delivery fee under the 15% monthly cap: the tally must move.
   const edited = await page.evaluate(() => {
     const ta = document.getElementById("fee-statement") as HTMLTextAreaElement;
@@ -210,7 +210,7 @@ test("the paste-leg tally is a live NumberFlow instrument with the sentence inta
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/fees");
-  await page.getByRole("button", { name: "Load the example statement" }).click();
+  await page.getByRole("button", { name: "Load the bundled statement" }).click();
   await page.getByRole("button", { name: "Audit this statement" }).click();
   const result = page.getByRole("region", { name: "Fee audit result" });
   const tally = result.locator(".pg-tally");

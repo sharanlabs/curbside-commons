@@ -81,7 +81,7 @@ export default function Landing() {
         </h1>
         <p className="cs-lede">
           Curbside Commons checks a marketplace feed against the merchant&rsquo;s own records and
-          reports every claim that disagrees. Bring your two files, or run the samples.
+          reports every claim that disagrees. Bring your two files, or run the bundled pair.
         </p>
       </section>
 
@@ -160,13 +160,13 @@ export default function Landing() {
             <p className="tab2">LISTINGS &middot; ANYWHERE IN THE US</p>
             <h3>What the listing says</h3>
             <p className="d">
-              Price, availability, and whether the item exists at all. The worked example carries{" "}
+              Price, availability, and whether the item exists at all. The bundled run carries{" "}
               {COVERAGE.findingsTotal} findings — {COVERAGE.errors} errors and {COVERAGE.warns}{" "}
               warnings: ghost items, hidden items, stale promises, and a sale price above the regular
               price.
             </p>
             <Link className="go" href="/report">
-              See the worked example{" "}
+              See the full report{" "}
               <span className="arr" aria-hidden="true">
                 &rarr;
               </span>

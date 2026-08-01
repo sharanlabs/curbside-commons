@@ -77,7 +77,7 @@ export function FeePlaygroundClient() {
           className="pg-input"
           spellCheck={false}
           value={text}
-          placeholder='Paste a monthly fee-statement document here — a JSON object with "meta" and "lines" — or load the example statement and edit it.'
+          placeholder='Paste a monthly fee-statement document here — a JSON object with "meta" and "lines" — or load the bundled statement and edit it.'
           onChange={(e) => {
             setText(e.target.value);
             setTextIsSample(false);
@@ -88,7 +88,7 @@ export function FeePlaygroundClient() {
             Audit this statement
           </button>
           <button type="button" className="lp-btn ghost" onClick={loadSample}>
-            Load the example statement
+            Load the bundled statement
           </button>
         </div>
         <noscript>
@@ -103,11 +103,11 @@ export function FeePlaygroundClient() {
           />
           <p className="pg-hint">
             The pasted-statement audit runs entirely in your browser and needs scripting turned
-            on; the four example months above are available either way.
+            on; the four months above are available either way.
           </p>
         </noscript>
         <p className="pg-hint pg-tip">
-          Tip: load the example statement, change one fee amount or a refund date, and audit again — the
+          Tip: load the bundled statement, change one fee amount or a refund date, and audit again — the
           verdicts move with your edit. The audit is deterministic: the same statement always
           produces the same result.
         </p>
@@ -137,9 +137,9 @@ export function FeePlaygroundClient() {
           <p className="pg-prov">
             {run.source === "sample" ? (
               <>
-                This is the sample statement — the audit above is the reference result for it,
+                This is the bundled statement — the audit above is the reference result for it,
                 recomputed in your browser just now, so it always matches the &ldquo;Over the
-                caps&rdquo; example month rendered above.
+                caps&rdquo; month rendered above.
               </>
             ) : (
               <>

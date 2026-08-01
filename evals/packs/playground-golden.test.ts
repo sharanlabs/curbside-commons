@@ -314,7 +314,7 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     // records", because the page now ALSO takes the reader's own records — a
     // single fixed "reference world" stopped being true of every run on it.
     expect(pageSrc).toMatch(/HONEST BOUNDARY/);
-    expect(pageSrc).toMatch(/checks against the sample catalog/);
+    expect(pageSrc).toMatch(/checks against the bundled catalog/);
     expect(pageSrc).toMatch(/reads as unknown or missing/);
     // No lab-words / removed disclaimer leak onto the public page.
     expect(pageSrc).not.toMatch(/\bsimulated\b/i);
@@ -367,7 +367,7 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     // unlabelled verdict is the one thing this surface may never produce.
     expect(clientSrc).toMatch(/computed\s*\n?\s*in your browser/i);
     expect(clientSrc).toMatch(/of your own records/);
-    expect(clientSrc).toMatch(/sample records/);
+    expect(clientSrc).toMatch(/bundled records/);
     expect(clientSrc).toMatch(/unknown or missing/);
     // Both provenance phrases must read from the recorded ACTION, never from a
     // "is this slot non-empty" proxy — the bug gate finding 4 named.
@@ -408,6 +408,6 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     expect(clientSrc).toMatch(/sampleFeedText\(\), "sample-feed\.json", "sample"/);
     expect(clientSrc).toMatch(/catalogSampleText\(\), "sample-catalog\.json", "sample"/);
     expect(clientSrc).toMatch(/feed side/);
-    expect(clientSrc).toMatch(/sample feed/);
+    expect(clientSrc).toMatch(/bundled feed/);
   });
 });

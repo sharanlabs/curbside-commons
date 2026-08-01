@@ -21,7 +21,7 @@ import { SOR_CATALOG } from "@/components/playground/verify-in-browser";
 export const metadata: Metadata = {
   title: "How it works — the audit engine, running in your browser",
   description:
-    "The same deterministic engine that audits your files, shown on a pinned sample: edit the feed, watch the verdict answer, keep the receipt. No AI calls — nothing you type leaves your browser.",
+    "The same deterministic engine that audits your files, shown on a pinned feed: edit the feed, watch the verdict answer, keep the receipt. No AI calls — nothing you type leaves your browser.",
 };
 
 export default function PlaygroundPage() {
@@ -32,11 +32,11 @@ export default function PlaygroundPage() {
         <p className="lp-eyebrow">HOW IT WORKS</p>
         <span className="lp-sec-rule" aria-hidden="true" />
         <h1 className="p2-h1" id="p3-h1">
-          The engine, <span className="lit">shown on a sample</span>
+          The engine, <span className="lit">shown on a pinned feed</span>
         </h1>
         <p className="p2-lede">
           This is the same deterministic engine that runs on your own files, working on a fixed
-          sample so you can watch each rule fire. No AI calls. $0 to run. The audit itself makes
+          feed so you can watch each rule fire. No AI calls. $0 to run. The audit itself makes
           no requests — nothing typed leaves your browser.
         </p>
         <p className="p2-chips">
@@ -102,7 +102,7 @@ export default function PlaygroundPage() {
           <div className="p3-boundary">
             <span className="basof">THE HONEST BOUNDARY</span>
             <p>
-              The bench above checks against the sample catalog of {CATALOG_RECORDS} records.{" "}
+              The bench above checks against the bundled catalog of {CATALOG_RECORDS} records.{" "}
               <b>An item outside those records reads as unknown or missing.</b> That is the
               verifier being honest, not broken — and it is why auditing your own feed takes your
               record file too, so your items are checked against your catalog.
@@ -120,7 +120,7 @@ export default function PlaygroundPage() {
             Run this on your feed.
           </h2>
           <p className="lp-foot">
-            The bench above is pinned to a sample so every rule is visible. To audit your own data,
+            The bench above is pinned to a fixed feed so every rule is visible. To audit your own data,
             the tool takes two files — the feed an agent reads and the merchant record it should
             agree with — and checks every claim in your browser, exactly as shown here.
           </p>
@@ -131,7 +131,7 @@ export default function PlaygroundPage() {
               <span className="d-eyebrow">THE TOOL</span>
               <span className="d-title">Audit your own feed</span>
               <span className="d-sub">
-                Drag in your two files, or run the sample pair. Nothing leaves the page.
+                Drag in your two files, or run the bundled pair. Nothing leaves the page.
               </span>
             </span>
             <span className="d-arrow" aria-hidden="true">

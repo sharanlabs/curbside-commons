@@ -11,7 +11,7 @@
  *    appears in the rendered drifted view with the expected rule id, claim id,
  *    and verdict (the dashboard-evidence source-binding pattern).
  * 4. VIEW-MODEL BINDING — the rendered tallies/verdicts equal the goldens for
- *    all four example months; statement-line receipts resolve.
+ *    all four months; statement-line receipts resolve.
  * 5. BOUNDARY SET-LOCK — the rendered 11/6 lanes are exactly FEE_RULES +
  *    NON_STATEMENT_CHECKABLE (a registry change without a display row fails).
  * 6. FRESHNESS BINDING — the as-of date the page renders is carried by the
@@ -321,8 +321,8 @@ describe("prose-figure drift-lock (headline words ride the engine values — bat
     }
   });
 
-  it('"Four example months" matches the committed corpus (fees page, until piece 3)', () => {
-    expect(feesPageSrc).toMatch(/Four example months/);
+  it('"Four months" matches the committed corpus (fees page, until piece 3)', () => {
+    expect(feesPageSrc).toMatch(/Four months/);
     expect(FEE_CASES.length).toBe(4);
   });
 });

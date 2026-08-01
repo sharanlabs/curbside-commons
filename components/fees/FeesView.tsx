@@ -146,7 +146,7 @@ export function FeesView() {
 
   return (
     <div className="fee-months" id="fee-report">
-      <div className="mtabs" role="group" aria-label="Example month">
+      <div className="mtabs" role="group" aria-label="Month">
         {CASE_ORDER.map((key) => {
           const c = FEE_CASES.find((x) => x.key === key)!;
           return (

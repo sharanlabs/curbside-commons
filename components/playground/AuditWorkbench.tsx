@@ -207,7 +207,7 @@ export function AuditWorkbench() {
           fileName={feed.fileName}
           status={feed.status}
           onLoadSample={() => feedText(sampleFeedText(), "sample-feed.json", "sample")}
-          sampleLabel="Use the sample feed"
+          sampleLabel="Use the bundled feed"
           onDownloadSample={() => saveTextFile(sampleFeedText(), "sample-feed.json")}
         />
         <FileDrop
@@ -229,7 +229,7 @@ export function AuditWorkbench() {
           fileName={record.fileName}
           status={record.status}
           onLoadSample={() => recordText(catalogSampleText(), "sample-catalog.json", "sample")}
-          sampleLabel="Use the sample catalog"
+          sampleLabel="Use the bundled catalog"
           onDownloadSample={() => saveTextFile(catalogSampleText(), "sample-catalog.json")}
         />
       </div>
@@ -240,7 +240,7 @@ export function AuditWorkbench() {
             it is waiting (screenshot review, 2026-07-27). */}
         {/* Reads from the slot's recorded SOURCE, not from "is it non-empty" —
             the same proxy the gate caught in the result panel (finding 4). With
-            the sample catalog loaded, "your own records" was simply false. */}
+            the bundled catalog loaded, "your own records" was simply false. */}
         {/* The note sits ABOVE the button (R-5/D-4, 2026-07-31): the page's
             primary action is disabled at first paint, and its instruction used
             to trail it like a caption. Reading order is now zones → what is
@@ -251,7 +251,7 @@ export function AuditWorkbench() {
             ? "Add a feed to run the audit — the record side is optional."
             : record.text.trim() && record.source === "reader"
               ? "Your feed will be checked against your own records."
-              : "Your feed will be checked against the sample catalog shipped with this site."}
+              : "Your feed will be checked against the bundled catalog shipped with this site."}
         </p>
         <button type="button" className="lp-btn primary" onClick={runAudit} disabled={!canRun}>
           Run the audit
@@ -292,14 +292,14 @@ export function AuditWorkbench() {
 
           {/* Every phrase here reads from `run.origin` — the recorded ACTION —
               so the prose and the report header can never disagree. They did:
-              clicking "use the sample catalog" put "your own records" on screen
+              clicking "use the bundled catalog" put "your own records" on screen
               beside a report correctly labelled otherwise (gate finding 4). */}
           <p className="wb-prov">
             {run.feedRows} feed rows checked against {run.recordRows}{" "}
-            {run.origin.catalog === "reader" ? "of your own records" : "sample records"}, computed
+            {run.origin.catalog === "reader" ? "of your own records" : "bundled records"}, computed
             in your browser just now — no AI calls, and nothing you uploaded left this page.
             {run.origin.catalog === "sample" &&
-              " Items outside the sample records honestly read as unknown or missing."}
+              " Items outside the bundled records honestly read as unknown or missing."}
           </p>
 
           <dl className="wb-meta">
@@ -317,13 +317,13 @@ export function AuditWorkbench() {
             <div>
               <dt>feed side</dt>
               <dd className="wb-mono">
-                {run.origin.feed === "reader" ? "your upload" : "sample feed"}
+                {run.origin.feed === "reader" ? "your upload" : "bundled feed"}
               </dd>
             </div>
             <div>
               <dt>record side</dt>
               <dd className="wb-mono">
-                {run.origin.catalog === "reader" ? "your upload" : "sample catalog"}
+                {run.origin.catalog === "reader" ? "your upload" : "bundled catalog"}
               </dd>
             </div>
           </dl>

@@ -9,7 +9,7 @@ import { test, expect } from "@playwright/test";
  * REWRITTEN 2026-07-28. This header used to describe "one continuing case
  * across four numbered chapters — 01 /report · 02 /fees · 03 /playground ·
  * 04 /proof". That grammar is gone: the site is a TOOL that opens on the
- * workbench, plus named supporting destinations (Example report · Fee rules ·
+ * workbench, plus named supporting destinations (Report · Fee rules ·
  * How it works · Proof) and the /docs reference and /legacy archive. A comment
  * describing a structure the code no longer has is the same defect the product
  * itself exists to catch — a claim broader than the thing backing it.
@@ -251,7 +251,7 @@ test("nav = named destinations, no chapter numerals; each reachable with aria-cu
   await expect(nav).not.toContainText(/\b0[1-4]\b/);
 
   const destinations: Array<[string, string, RegExp]> = [
-    ["/report", "Example report", /What the feed claims vs\. what the records say\./],
+    ["/report", "Report", /What the feed claims vs\. what the records say\./],
     ["/fees", "Fee rules", /A fee statement,/],
     ["/playground", "How it works", /The engine,/],
     ["/proof", "Proof", /Every verdict is scored once/],
@@ -283,7 +283,7 @@ test("the nav readout states something true of the route you are on", async ({ p
   // promise a visitor most needs before dropping a file in.
   const routes: Array<[string, RegExp]> = [
     ["/", /RUNS IN YOUR BROWSER · NOTHING IS UPLOADED/],
-    ["/report", /EXAMPLE REPORT · FAIL · 11 ERR · 5 WARN/],
+    ["/report", /AUDIT REPORT · FAIL · 11 ERR · 5 WARN/],
     ["/fees", /FEE RULES · NEW YORK CITY/],
     ["/playground", /HOW IT WORKS · RUNS IN YOUR BROWSER/],
     ["/proof", /PROOF · EVERY SCORE, MISSES KEPT IN/],

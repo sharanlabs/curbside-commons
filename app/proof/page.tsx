@@ -504,10 +504,10 @@ export default function ProofPage() {
                   <CountFig to={ENGINE.demoFindings} text={String(ENGINE.demoFindings)} />
                 </span>
               </p>
-              <p className="cap">CASE-REPORT FINDINGS</p>
+              <p className="cap">AUDIT REPORT FINDINGS</p>
               <p className="d">
                 {spelledCap(ENGINE.demoErrors)} error and {spelled(ENGINE.demoWarns)} warn, in the
-example report.
+audit report.
               </p>
             </div>
             <div className="fact">
@@ -565,7 +565,7 @@ example report.
               <span className="d-eyebrow">BACK TO THE TOOL</span>
               <span className="d-title">Audit your own feed</span>
               <span className="d-sub">
-                Drag in your two files, or run the sample pair. Nothing leaves the page.
+                Drag in your two files, or run the bundled pair. Nothing leaves the page.
               </span>
             </span>
             <span className="d-arrow" aria-hidden="true">
