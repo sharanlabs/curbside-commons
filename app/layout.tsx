@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Nunito, JetBrains_Mono } from "next/font/google";
+import { Onest, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { BUILD_INFO } from "@/lib/build-info";
 import { PLATFORM_NAME } from "@/lib/product";
@@ -14,23 +14,24 @@ import "./globals.css";
 // exactly as before. The build machine needs to reach Google Fonts; the reader's
 // browser never does.
 //
-// Two-voice system: Nunito — one variable sans (200..1000, wght axis) carrying
+// Two-voice system: Onest — one variable sans (100..900, wght axis) carrying
 // BOTH display and body voices — plus JetBrains Mono for tabular ledger numerals
 // / field keys / verdict labels / uppercase eyebrows.
 //
-// NUNITO REPLACED ONEST 2026-07-28 (owner: "enhance the typography ... looks too
-// thin, need a premium curvy type one"; six candidates were rendered in the
-// site's own hero copy and the OWNER PICKED THIS ONE). Nunito is the most
-// literally curved of the candidates — every stroke ends in a rounded terminal
-// rather than a flat cut, which is the "curvy" read, and its 200..1000 axis
-// leaves plenty of headroom above the weights this site now sets. Availability
-// and the variable wght axis were verified against the INSTALLED font manifest
+// ONEST RESTORED 2026-07-31 by owner word ("USE this font throughout", pointing
+// at the v8 hero mockup whose embedded @font-face is Onest; confirmed via
+// structured ask: "Onest throughout"). This REVERSES the 2026-07-28 Nunito pick
+// — see docs/decision-log.md 2026-07-31 for the reversal record. Availability
+// and the variable wght axis (100..900, normal style only) were verified against
+// the INSTALLED font manifest
 // (node_modules/next/dist/compiled/@next/font/dist/google/font-data.json), not
-// recalled — and the repo declares no weight below 400 anywhere, comfortably
-// inside Nunito's 200 floor, so nothing falls back to a synthesised weight.
+// recalled — the repo declares no weight below 400 and none above 900, inside
+// Onest's axis, so nothing falls back to a synthesised weight. Weight/tracking
+// calibration was moved back to Onest-era values in the same change (the Nunito
+// values were deliberately bumped because Nunito reads optically lighter).
 // Exposed as CSS variables consumed in globals.css as --font-sans / --font-mono;
 // the --serif/--display token NAMES survive in globals.css but resolve to this.
-const nunito = Nunito({
+const onest = Onest({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -40,6 +41,22 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   display: "swap",
 });
+
+// The page declares its own ground colour to the browser CHROME, not just to
+// itself. Without this, a browser running a dark system theme tints the strip
+// above the page — tab bar, or the safe-area fill on iOS — with its own dark
+// default, and the site appears to open on a navy band it does not paint. The
+// owner saw exactly that on /report and reasonably read it as a design defect.
+//
+// `colorScheme: "light"` is the matching half: globals.css already declares
+// `color-scheme: light` (~line 36), but the CSS declaration only reaches form
+// controls and scrollbars once the stylesheet parses. The meta tag reaches the
+// browser first, so the two together close the gap before first paint rather
+// than after it.
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  colorScheme: "light",
+};
 
 export const metadata: Metadata = {
   // metadataBase = the LIVE deploy target.
@@ -94,7 +111,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${nunito.variable} ${jetbrainsMono.variable}`}
+      className={`${onest.variable} ${jetbrainsMono.variable}`}
     >
       <body>
         <a href="#main-content" className="ds-skip">

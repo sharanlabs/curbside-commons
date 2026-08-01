@@ -17,9 +17,9 @@
      2026-07-16), white-on-fill 8.04:1 AA.
    • SEVERITY triad kept (shape + word), MOTION tokens added, 8px spacing kept.
    • RADII/ELEVATION (storyboard): --r-card/--r-ctrl/--r-chip + --elev-1/2/3.
-   Fonts self-host via next/font/google (app/layout.tsx): Nunito → --font-sans (one
-   variable rounded-sans carrying display AND body; the storyboard uses no serif —
-   the --serif/--display token NAMES survive and resolve to Nunito), JetBrains Mono
+   Fonts self-host via next/font/google (app/layout.tsx): Onest → --font-sans (one
+   variable neutral grotesque carrying display AND body; the storyboard uses no serif —
+   the --serif/--display token NAMES survive and resolve to Onest), JetBrains Mono
    → --font-mono (kept over the storyboard's system-mono stack for cross-OS
    consistency; recorded adaptation).
 
@@ -81,9 +81,9 @@
   --maxw: 1180px;
 
   /* type — font stacks resolve to the self-hosted next/font CSS vars (layout.tsx:
-     Nunito → --font-sans, JetBrains Mono → --font-mono), each with cross-OS
+     Onest → --font-sans, JetBrains Mono → --font-mono), each with cross-OS
      fallbacks. */
-  --ff-sans: var(--font-sans), "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ff-sans: var(--font-sans), "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
   --ff-mono: var(--font-mono), ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
 
   /* ==== SITE DESIGN LAYER (redesign, 2026-07-14) — additive site-scoped tokens
@@ -140,10 +140,10 @@
   --warn-ink: #9c3d06; /* 6.81:1 */
 
   /* display stack — the storyboard uses NO serif: token NAMES kept (wordmark +
-     headline consumers), values resolve to Nunito (rounded sans display voice).
+     headline consumers), values resolve to Onest (neutral grotesque display voice).
      Display headings compensate with heavier weight + tighter tracking. */
-  --serif: var(--font-sans), "Nunito", ui-rounded, system-ui, sans-serif;
-  --display: var(--font-sans), "Nunito", ui-rounded, system-ui, sans-serif;
+  --serif: var(--font-sans), "Onest", system-ui, sans-serif;
+  --display: var(--font-sans), "Onest", system-ui, sans-serif;
 
   /* radii + elevation (storyboard adoption 2026-07-15) — soft cards over the
      former near-flat 6px system; shadows stay faint-on-white, three tiers. */
@@ -244,7 +244,7 @@ body {
   min-height: 68px;
   padding: 10px clamp(18px, 4vw, 36px);
 }
-/* Storyboard brand lockup (adoption 2026-07-15): gradient C-mark + Nunito
+/* Storyboard brand lockup (adoption 2026-07-15): gradient C-mark + Onest
    wordmark, matching the hero title's gradient phrase family. Static mark —
    identical under reduced-motion and no-JS. */
 .site-brand {
@@ -1834,8 +1834,8 @@ body {
    is kept so every consumer follows) — used on the masthead rule · finding index
    numerals, NEVER on severity. Severity carries its own three marks (error / warn /
    info) kept perceptually far from the brand, always paired with a square shape +
-   word. Display headings adopt the site display voice (Nunito, storyboard adoption
-   2026-07-15); body + receipts adopt Nunito / JetBrains Mono. Honesty freeze-reversal (Slice D,
+   word. Display headings adopt the site display voice (Onest, storyboard adoption
+   2026-07-15); body + receipts adopt Onest / JetBrains Mono. Honesty freeze-reversal (Slice D,
    decision-log 2026-07-14): the SIMULATED banner was removed — the page is
    disclaimer-free (no false claim; C10 green).
    Contrast recomputed on #FFFFFF (ratios in the token comments below).
@@ -1860,8 +1860,8 @@ body {
   /* font stacks now adopt the self-hosted site fonts (Onest display + body,
      JetBrains mono) so the report matches the site register; kept self-defined
      so nothing here falls through to :root. */
-  --serif: var(--font-sans), "Nunito", ui-rounded, system-ui, sans-serif;
-  --ledger-sans: var(--font-sans), "Onest", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: var(--font-sans), "Onest", system-ui, sans-serif;
+  --ledger-sans: var(--font-sans), "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
   --ledger-mono: var(--font-mono), ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo,
     monospace;
 
@@ -3556,7 +3556,7 @@ body {
   margin-top: var(--s2);
   font-size: 13px;
   line-height: 1.55;
-  /* Changing figures set in Nunito ("N rows read") hold column when the
+  /* Changing figures set in Onest ("N rows read") hold column when the
      count changes (polish pass; the mono-set ledger figures were already
      tabular by face). */
   font-variant-numeric: tabular-nums;
@@ -3691,7 +3691,7 @@ body {
 .wb-tally {
   font-size: 15px;
   color: var(--ink-2);
-  /* Changing Nunito figures (finding/error/warn counts) hold column across
+  /* Changing Onest figures (finding/error/warn counts) hold column across
      re-runs (polish pass, 2026-07-31). */
   font-variant-numeric: tabular-nums;
 }
@@ -5334,7 +5334,7 @@ body {
    13px mono uppercase "nameplate" so it would not compete with the H1 one
    viewport-line above. The owner refused the register the same day — "no
    instrument type fonts. use premium sophisticated fonts" — so it returns to
-   the site's own premium display voice (`lp-h2`: Nunito, weight-carried).
+   the site's own premium display voice (`lp-h2`: Onest, weight-carried).
    The H1→H2 step stays unambiguous by SIZE (48.6→~30px at 1280), which is
    how a display system separates ranks; the mono label voice remains for
    DATA — ledger figures, rule ids, receipts — never for headings.
@@ -9069,52 +9069,31 @@ h1.p2-h1 {
    already carried by LABEL REGISTER v2.
    ========================================================================== */
 
+/* INERT ON BOTH FACES, KEPT AS A NO-OP RATHER THAN A CLAIM. `font-optical-sizing`
+   needs an `opsz` axis; the installed manifest gives Onest and Nunito a `wght`
+   axis and nothing else, so this has never done anything on either. Left in
+   place because it costs nothing and is correct the day a face with `opsz`
+   arrives — but it must not be counted as a lever any premium-pass comment is
+   pulling. (Found by the 2026-07-31 blindspot audit of the Onest reversal.) */
 body {
   font-optical-sizing: auto;
 }
 
-/* DISPLAY TIER — HISTORICAL, AND MOSTLY INERT. READ BEFORE EDITING.
-   Written for Onest (replaced by Nunito 2026-07-28) and dead from the day it
-   shipped: every selector here is a BARE class at (0,1,0), while `.lp-main h1,
-   h2…` (line ~1077) scores (0,1,1) and wins regardless of source order.
-   Session 37 diagnosed that and restored the WEIGHT half ~line 8985; the
-   `letter-spacing` half was left behind, so this comment promised "tighter
-   tracking" the cascade has never delivered (cross-model gate, 2026-07-28).
+/* DISPLAY TIER — DELETED 2026-07-31, AND THE REASON MATTERS MORE THAN THE RULES.
+   A block of bare-class weight/tracking declarations lived here (.lp-h2 590,
+   .cs-h1/.p2-h1 600, .pr-lead 590, .fm-title 640/-0.022em, h3 tier 650/-0.016em).
+   It was DEAD from the day it shipped — every selector scored (0,1,0) against
+   `.lp-main h1, h2…` (~1077) at (0,1,1), which wins regardless of source order —
+   so not one of those values ever rendered. Sessions 37 and 38 diagnosed that and
+   deliberately kept the block as a record of intent.
 
-   NOT resurrected, deliberately. These values were calibrated against a face
-   the site no longer uses, and they have never once rendered — so the owner's
-   approved design (Nunito, recalibrated weights) is the design WITHOUT them.
-   Applying them now would be a typography change dressed as a bug fix.
-   What is genuinely live is per-surface and intentional: `h1.p2-h1` -0.03em
-   (5913) and `.p4-hero .cs-h1` -0.028em (6596). Only the LANDING fell through
-   to the generic -0.012em, and it is set explicitly below.
-
-   Kept as the record of what was intended, and inert by design. */
-.lp-h2 {
-  font-weight: 590;
-}
-.cs-h1,
-.p2-h1 {
-  font-weight: 600;
-}
-.p4-hero .cs-h1 {
-  font-weight: 600;
-}
-.pr-lead {
-  font-weight: 590;
-}
-.fm-title,
-.door .d-title {
-  font-weight: 640;
-  letter-spacing: -0.022em;
-}
-.bpanel h3,
-.builder h3,
-.seat h3,
-.file h3 {
-  font-weight: 650;
-  letter-spacing: -0.016em;
-}
+   It is deleted now because ONEST CAME BACK (owner, 2026-07-31) and that flipped
+   it from an inert record into a live hazard. Those are the PRE-weight-pass Onest
+   values — the ones the owner was looking at when they said the typography "looks
+   too thin." A future reader would find a block labelled "written for Onest" in a
+   site that once again loads Onest, resurrect it in good faith, and reintroduce
+   the exact complaint the weight pass below exists to answer.
+   git history holds the values; this comment holds the reason. */
 
 /* instrument figures: tabular, slashed-zero mono for the ledger voice */
 .run-fig,
@@ -9149,12 +9128,26 @@ body {
    (already 700+), and .rc-* receipt internals, which are meant to read as
    machine output rather than prose.
    ========================================================================== */
-/* Nunito-calibrated. The weights below were first set against Gabarito; at an
-   identical numeric weight Nunito's rounded, more even strokes read optically
-   LIGHTER, so every display step gains ~60 and body gains 40. The owner's
-   complaint was thinness, and handing back a face thinner than the one they
-   rejected would answer the letter of "curvy" and miss the point. Nunito's
-   axis runs to 1000, so this is still well inside real interpolation. */
+/* ONEST-calibrated (2026-07-31 reversal). The numbers below moved DOWN by 60 on
+   every display step and 40 on body, which is precisely the adjustment the
+   Nunito swap had added and this reversal removes.
+
+   Why the numbers cannot simply travel with the face: at an identical numeric
+   weight Nunito's rounded, more even strokes read optically LIGHTER than Onest's
+   flat-cut grotesque ones, which is why the swap raised them. Carrying 740 onto
+   Onest would not preserve the approved design — it would overweight every
+   heading on the site, the mirror image of the "too thin" complaint that started
+   this block. The reversal target is confirmed by this block's own header, which
+   records the original Onest weight pass as "body 400 -> 460": body lands back on
+   460 by arithmetic and by the record, independently.
+
+   Onest's axis runs 100..900 (verified against the installed font manifest), so
+   700 is a real interpolation, not a synthetic bold.
+
+   HONEST LIMIT: this is arithmetic, not a rendered check. The sandbox cannot
+   launch a browser (Chromium Mach-port denied, raw on record), so no
+   getComputedStyle pass backs these the way session 37's did. The battery must
+   render before this is called verified. */
 /* SPECIFICITY, not source order, decides these — and getting it wrong is why
    the "display tier" block ~60 lines above has been silently DEAD for landing
    headings since it was written. `.lp-main h1, .lp-main h2, …` (line ~1077)
@@ -9170,7 +9163,7 @@ h2.tool-h2,
 .lp-main h2,
 .p2-main h2,
 .p3-main h2 {
-  font-weight: 720;
+  font-weight: 660;
 }
 h1.cs-h1,
 h1.p2-h1,
@@ -9179,7 +9172,7 @@ h2.scene-h2,
 .p2-main h1,
 .p3-main h1,
 .p4-hero .cs-h1 {
-  font-weight: 740;
+  font-weight: 680;
 }
 /* The landing's own display tracking, set where it actually WINS. Measured
    before and after rather than read off the stylesheet (the session-37
@@ -9188,21 +9181,30 @@ h2.scene-h2,
    display tracking of its own (`h1.p2-h1` -0.03em, `.p4-hero .cs-h1` -0.028em).
    The landing was the ONLY display surface with no considered value, because
    the block that meant to give it one never applied.
-   -0.028em matches /proof rather than the retired Onest-era -0.034em: at 740
-   weight in Nunito the tighter figure closes the rounder bowls too far, and
-   the point is to bring the landing in line with the site, not to reintroduce
-   a number calibrated for a font this site no longer loads. */
+   -0.028em is KEPT under the Onest restoration, but its original justification
+   is retired as false. That argument read "at 740 weight in Nunito the tighter
+   figure closes the rounder bowls too far ... a number calibrated for a font
+   this site no longer loads" — and every clause of it is now wrong: the weight
+   is 680, the face is Onest, Onest's bowls are not the rounder ones, and the
+   site loads Onest again, which makes -0.034em its number rather than a
+   foreigner's. The value survives on a DIFFERENT and better ground: /proof's
+   `.p4-hero .cs-h1` and `/docs`'s `.sect h2` both carry -0.028em and both were
+   set during the Onest era (blame: 617ca43, 2026-07-21), so the landing is in
+   line with its Onest siblings, not with a Nunito compromise.
+   -0.034em remains UNVALIDATED — it lived only in the dead display-tier block
+   and never rendered once, so choosing it would be adopting a number no one
+   has seen. Not a defect; an open question for a rendered comparison. */
 h1.cs-h1,
 h2.scene-h2,
 .lp-main h1 {
   letter-spacing: -0.028em;
 }
 .pr-lead {
-  font-weight: 720;
+  font-weight: 660;
 }
 .fm-title,
 .door .d-title {
-  font-weight: 760;
+  font-weight: 700;
 }
 h3.file-h3,
 .bpanel h3,
@@ -9212,7 +9214,7 @@ h3.file-h3,
 .lp-main h3,
 .p2-main h3,
 .p3-main h3 {
-  font-weight: 760;
+  font-weight: 700;
 }
 
 /* body tier: heavier AND darker */
@@ -9228,7 +9230,7 @@ body,
 .wb-prov,
 .wb-plain,
 .tool-foot {
-  font-weight: 500;
+  font-weight: 460;
 }
 .lp-foot,
 .lp-ptext,
@@ -9242,16 +9244,69 @@ body,
 /* mono chrome: eyebrows, nav, captions and field keys carry the instrument
    voice at small sizes, where a light weight disappears first */
 .site-navlink {
-  font-weight: 620;
+  font-weight: 560;
 }
 .nav-case,
 .acc,
 .tab2,
 .wb-next-link {
-  font-weight: 650;
+  font-weight: 590;
 }
 .wb-meta dt,
 .wb-receipts dt,
 .fd-slot .fd-title {
-  font-weight: 650;
+  font-weight: 590;
+}
+
+/* ==========================================================================
+   MASTHEAD BALANCE — /report at wide viewports (2026-07-31, owner: "check the
+   whole design ... reorient the layout based on the context and live evidence").
+
+   MEASURED, not eyeballed. At 2000px the container is --maxw 1180px (the 1420
+   and 1720 steps do not arrive until 2200px and 3400px), and inside that column
+   `h1.p2-h1` caps at 20ch and `.p2-lede` at 62ch — together about half the
+   column. The finding card directly beneath fills all 1180. So the page stacks
+   two different layouts: a half-width masthead on top of a full-width figure,
+   which is exactly the void the owner photographed to the right of the lede.
+
+   The fix does not widen the text. Text measure is correct at 62ch and stretching
+   it would trade a layout problem for a readability one. What was wrong is that
+   the verdict chips — the most scannable content the page owns — were spending
+   themselves as a fifth stacked row UNDER the lede, leaving the right half empty.
+   Moved into a second column they close the void with real content, and the
+   masthead reads as one object: subject left, verdict right, the way an audit
+   report cover actually resolves.
+
+   Below 1080px nothing changes: when the column is narrow the stack is correct,
+   and the chips wrap as they always did.
+
+   NOT VISUALLY VERIFIED FROM THIS SEAT — the sandbox refuses to launch Chromium
+   (Mach-port rendezvous denied) or bind a port (listen EPERM), both raw on
+   record. The geometry above is computed from the stylesheet and the built
+   export. The e2e battery must render it before this is called done.
+   ========================================================================== */
+@media (min-width: 1080px) {
+  .p2-head .ds-reveal {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: clamp(40px, 5vw, 88px);
+    align-items: start;
+  }
+  /* Rows 1-4 are the text stack, in source order. */
+  .p2-head .ds-reveal > .lp-eyebrow,
+  .p2-head .ds-reveal > .lp-sec-rule,
+  .p2-head .ds-reveal > .p2-h1,
+  .p2-head .ds-reveal > .p2-lede {
+    grid-column: 1;
+  }
+  /* Beside the title and lede (rows 3-4), settling on the lede's last line so
+     the two blocks share a baseline instead of floating apart. */
+  .p2-head .ds-reveal > .p2-status {
+    grid-column: 2;
+    grid-row: 3 / span 2;
+    align-self: end;
+    justify-content: flex-end;
+    margin: 0;
+    max-width: 24ch;
+  }
 }
