@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curbside Commons — three open decisions, 2026-07-31</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Tokens transcribed from app/globals.css — not re-invented. */
+:root{
+  --bg:#ffffff; --bg-2:#fbfbfc; --bg-3:#f3f4f8;
+  --ink:#12141c; --ink-2:#22252f; --body:#3b3f4b; --graphite:#4a4e5a; --muted:#585d69; --faint:#6a6e7a;
+  --rule:rgba(18,20,28,.09); --rule-2:rgba(18,20,28,.15);
+  --accent:#2438d6; --accent-hi:#25329a; --accent-soft:rgba(61,92,235,.055); --accent-line:rgba(61,92,235,.22);
+  --ember:#b42318; --ember-soft:rgba(180,35,24,.07); --gold:#ffb020; --gold-text:#9c6208;
+  --ok:#067647; --ok-soft:rgba(6,118,71,.09);
+  --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
+  --r-card:16px; --r-ctrl:12px; --r-chip:9px; --r-pill:999px;
+  --ff:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--body);font-family:var(--ff);font-weight:460;
+  font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+
+header.top{padding:56px 0 0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.1em;
+  color:var(--graphite);text-transform:uppercase;margin:0}
+.rule{display:block;width:44px;height:2px;background:var(--accent);margin:14px 0 22px;border-radius:2px}
+h1{font-size:clamp(33px,5.4vw,52px);line-height:1.07;font-weight:680;letter-spacing:-.028em;
+  color:var(--ink);margin:0;max-width:22ch;text-wrap:balance}
+.lede{margin:18px 0 0;max-width:62ch;color:var(--body);text-wrap:pretty}
+.meta{margin:26px 0 0;display:flex;gap:10px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.09em;
+  border:1px solid var(--rule-2);border-radius:var(--r-pill);padding:5px 13px;color:var(--graphite)}
+.chip--live{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
+
+section.d{padding:72px 0 0}
+h2{font-size:clamp(25px,2.5vw,34px);line-height:1.12;font-weight:660;letter-spacing:-.026em;
+  color:var(--ink);margin:0 0 6px;max-width:24ch}
+.sub{margin:0 0 28px;color:var(--muted);max-width:64ch;font-size:16px}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:860px){.opts{grid-template-columns:1fr}}
+.opt{border:1px solid var(--rule);border-radius:var(--r-card);padding:24px;background:var(--bg-2);
+  transition:border-color .24s var(--ease),box-shadow .24s var(--ease),transform .24s var(--ease);
+  display:flex;flex-direction:column}
+.opt:hover{border-color:var(--rule-2);transform:translateY(-2px);
+  box-shadow:0 10px 28px rgba(18,20,28,.06)}
+.opt[data-picked="1"]{border-color:var(--accent);background:var(--accent-soft);
+  box-shadow:0 0 0 1px var(--accent) inset}
+.tag{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.11em;
+  color:var(--graphite);margin:0 0 8px}
+.opt h3{font-size:19px;font-weight:700;letter-spacing:-.016em;color:var(--ink);margin:0 0 10px;line-height:1.25}
+.opt p{margin:0 0 14px;font-size:15px;line-height:1.6}
+.opt ul{margin:0 0 16px;padding-left:18px;font-size:14.5px;line-height:1.62}
+.opt li{margin:0 0 5px}
+.verdict{margin-top:auto;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;
+  padding:9px 12px;border-radius:var(--r-chip);display:inline-block}
+.v-ok{background:var(--ok-soft);color:var(--ok)}
+.v-no{background:var(--ember-soft);color:var(--ember)}
+.v-open{background:var(--bg-3);color:var(--graphite)}
+.v-cost{background:var(--gold-soft,rgba(255,176,32,.12));color:var(--gold-text)}
+button.pick{margin-top:14px;font-family:var(--ff);font-size:14px;font-weight:600;
+  border:1px solid var(--rule-2);background:#fff;color:var(--ink);border-radius:var(--r-pill);
+  padding:9px 18px;cursor:pointer;min-height:44px;
+  transition:background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease)}
+button.pick:hover{border-color:var(--accent);color:var(--accent)}
+button.pick{background:var(--bg-3)}
+button.pick:active{transform:scale(.96)}
+button.pick:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt[data-picked="1"] button.pick{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* Fold schematic — TO SCALE, deliberately schematic, never a fake screenshot. */
+.sch{margin:26px 0 0;border:1px solid var(--rule);border-radius:var(--r-ctrl);padding:20px;background:#fff}
+.sch-h{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.09em;color:var(--graphite);margin:0 0 14px}
+.bars{position:relative;height:264px;padding-bottom:34px;background:
+  repeating-linear-gradient(to bottom,transparent 0,transparent 22px,var(--rule) 22px,var(--rule) 23px);
+  border-radius:8px;overflow:hidden}
+.band{position:absolute;left:0;right:0;border-radius:5px;font-family:var(--mono);font-size:10px;
+  font-weight:600;letter-spacing:.06em;color:#fff;padding:3px 8px;white-space:nowrap;overflow:hidden}
+.b-nav{background:var(--graphite)}
+.b-lead{background:var(--muted)}
+.b-tool{background:var(--accent)}
+.b-zone{background:var(--accent-hi)}
+.b-run{background:var(--gold);border:1px solid var(--gold-text)}
+.b-hero{background:var(--ember)}
+.fold{position:absolute;left:0;right:0;height:0;border-top:2px dashed var(--ember)}
+.fold span{position:absolute;right:0;top:-17px;font-family:var(--mono);font-size:10px;
+  font-weight:600;color:var(--ember);background:#fff;padding:0 5px}
+.legend{margin:12px 0 0;font-size:13.5px;color:var(--muted);line-height:1.6;max-width:68ch}
+.band-cap{margin:10px 0 0;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.06em;color:var(--gold-text)}
+code{font-family:var(--mono);font-size:.9em;background:var(--bg-3);border-radius:4px;padding:1px 5px;color:var(--ink-2)}
+
+.note{margin:20px 0 0;border-left:2px solid var(--rule-2);padding:2px 0 2px 16px;
+  font-size:14.5px;line-height:1.65;color:var(--muted);max-width:68ch}
+.note b{color:var(--ink-2);font-weight:660}
+
+.out{max-width:var(--maxw);margin:76px auto 0;border:1px solid var(--rule);border-radius:var(--r-card);
+  padding:28px;background:var(--bg-2)}
+.out h2{margin-bottom:10px}
+pre{font-family:var(--mono);font-size:12.5px;line-height:1.65;background:#fff;border:1px solid var(--rule);
+  border-radius:var(--r-ctrl);padding:18px;overflow-x:auto;color:var(--ink-2);white-space:pre-wrap;margin:16px 0 0}
+footer{padding:56px 0 80px;margin-top:56px;border-top:1px solid var(--rule);
+  font-size:13.5px;color:var(--faint);line-height:1.7}
+footer .wrap{max-width:calc(68ch + 64px)}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important;animation-duration:.01ms !important}}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <p class="eyebrow">Decision board · 2026-07-31 · session 41</p>
+  <span class="rule"></span>
+  <h1>Three decisions that are yours, with the evidence attached.</h1>
+  <p class="lede">Everything else from today's design arc is applied and gated. These three were
+  deliberately left alone because each one touches the first screen or a pinned test contract.
+  Each panel states what was measured, what it costs, and what I'd do — then you pick.</p>
+  <p class="meta">
+    <span class="chip chip--live">Production serves 9a8beed — which is <b>Nunito</b>, not this tree</span>
+    <span class="chip">Onest restored · uncommitted</span>
+    <span class="chip">vitest 1610 pass · 8 skip · <b>1 FAIL</b> (honesty-c10, needs network)</span>
+    <span class="chip">Nothing rendered by the agent</span>
+  </p>
+</div></header>
+
+<main>
+<section class="d" aria-labelledby="d1"><div class="wrap">
+  <h2 id="d1">1 · The instrument arrives without its verb</h2>
+  <p class="sub">Found twice by different methods — session 40 called it “the primary action is disabled by default, with its instruction as a caption”; a later audit re-derived it from geometry without seeing that. <b>Correction: hours apart, not months</b> — both are 2026-07-31, so this is weaker corroboration than first written, though still two methods rather than one.</p>
+
+  <div class="sch">
+    <p class="sch-h">First screen at 1280 × 900 — vertical axis to scale, schematic (not a screenshot)</p>
+    <div class="bars" id="bars1">
+      <div class="band b-nav"   style="top:0;height:17px">nav 69px</div>
+      <div class="band b-lead"  style="top:19px;height:44px">hero copy</div>
+      <div class="band b-tool"  style="top:65px;height:22px">“Audit a feed.” + promise line</div>
+      <div class="band b-zone"  style="top:89px;height:104px">the two drop zones — end ≈ 754–773px</div>
+      <div class="band b-run"   style="top:229px;height:5px" aria-label="run control"></div>
+      <p class="band-cap">run control ≈ 898–917px — its low end is <b>2px</b> past the fold</p>
+      <div class="fold" style="top:230px"><span>fold 900px</span></div>
+    </div>
+    <p class="legend">The zones clear the fold comfortably. The <b>run control does not</b> — and neither does the sentence explaining why it is disabled. <b>But read the margin honestly:</b> this estimate’s low end is 898px against a 900px fold, so decision 1 currently rests on <b>2px inside an unrendered number</b>. One run of <code>canonical.spec.ts</code> replaces the estimate with a fact.</p>
+  </div>
+
+  <div class="opts" style="margin-top:24px">
+    <div class="opt" data-q="fold" data-a="reclaim">
+      <p class="tag">OPTION A · RECOMMENDED</p>
+      <h3>Reclaim 26–50px so the verb lands on screen one</h3>
+      <p>Any two of three gives 26 / 40 / 50px; <b>17px is the minimum needed to clear 900px.</b> All existing tokens, no new design:</p>
+      <ul>
+        <li><code>.home-lead</code> padding-top → <code>clamp(28px,4vh,44px)</code> — <b>−18px</b></li>
+        <li><code>.wb</code> margin-top <code>--s5</code> → <code>--s4</code> — <b>−8px</b></li>
+        <li><code>.fd-zone</code> padding <code>--s7</code> → <code>--s6</code> — <b>−32px</b></li>
+      </ul>
+      <span class="verdict v-ok">Converts two empty boxes into a complete instrument</span>
+      <button class="pick" type="button">Choose this</button>
+    </div>
+    <div class="opt" data-q="fold" data-a="keep">
+      <p class="tag">OPTION B</p>
+      <h3>Leave it — the run control follows the zones by design</h3>
+      <p>The current placement is deliberate and test-documented: the button follows both zones
+      rather than competing with them for the first screen.</p>
+      <ul>
+        <li>Zero risk to a pinned contract</li>
+        <li>Costs nothing to defer until a render confirms the real number</li>
+        <li>Keeps the hero copy breathing at its current rhythm</li>
+      </ul>
+      <span class="verdict v-open">Defensible — the defect is discoverability, not correctness</span>
+      <button class="pick" type="button">Choose this</button>
+    </div>
+  </div>
+
+  <p class="note"><b>Honest limit, corrected by a fact-check.</b> These figures are <b>computed, never rendered</b> — the sandbox refuses to launch a browser. An earlier draft of this board called the gap a “~19px residual”; that was wrong. 19px is the <i>width of the computed headroom band</i>. The real divergence from the one measurement ever recorded here (871.7px, <code>canonical.spec.ts:136</code>) is <b>~99–118px</b> — roughly five times what was claimed. And the zone bottom is computed at <code>canonical.spec.ts:130</code> and <b>asserted</b> at <code>:132</code>: never printed, but not discarded. Running that spec prints the real number.</p>
+</div></section>
+
+<section class="d" aria-labelledby="d2"><div class="wrap">
+  <h2 id="d2">2 · The nav's one emphasized action is a no-op</h2>
+  <p class="sub"><code>Nav.tsx:168</code> marks <code>href === "/"</code> as the filled ultramarine pill.
+  On the landing page that is the most visually dominant control on screen, and it links to the page
+  you are already on — while also carrying <code>aria-current="page"</code>.</p>
+
+  <div class="opts">
+    <div class="opt" data-q="nav" data-a="retarget">
+      <p class="tag">OPTION A · RECOMMENDED</p>
+      <h3>Point it at <code>#audit</code></h3>
+      <p>On the landing it scrolls to the workbench; from any other route it navigates home and lands
+      on the tool. The label and destination name stay exactly as pinned.</p>
+      <ul>
+        <li>The loudest control on the page starts doing something</li>
+        <li><code>#audit</code> already exists on the section — <b>but note:</b> <code>app/page.tsx:240</code> shows the landing already has its own primary CTA pointing at <code>#audit</code>, so retargeting duplicates an existing control rather than adding a destination</li>
+      </ul>
+      <span class="verdict v-cost">Has a cost — not a warning: touches canonical.spec.ts:274-276</span>
+      <button class="pick" type="button">Choose this</button>
+    </div>
+    <div class="opt" data-q="nav" data-a="keep">
+      <p class="tag">OPTION B</p>
+      <h3>Leave it — the pill is a home affordance, not a CTA</h3>
+      <p>Reading it as "you are here, highlighted" rather than "click me" makes the current behaviour
+      correct, and the <code>aria-current</code> contract stays untouched.</p>
+      <ul>
+        <li>No test churn on a contract that guards real behaviour</li>
+        <li>The page's real CTA is the workbench itself, directly below</li>
+      </ul>
+      <span class="verdict v-open">Costs nothing; the defect is cosmetic emphasis</span>
+      <button class="pick" type="button">Choose this</button>
+    </div>
+  </div>
+</div></section>
+
+<section class="d" aria-labelledby="d3"><div class="wrap">
+  <h2 id="d3">3 · The hero fork — resolved, on softer grounds than first stated</h2>
+  <p class="sub">You posted the old v8 centred hero approvingly today. The current design opens
+  directly on the workbench, which you demanded in session 37. Both are your words. They conflict —
+  but only one of them can actually be built.</p>
+
+  <div class="sch">
+    <p class="sch-h">What the v8 hero costs — same frame, vertical axis to scale</p>
+    <div class="bars">
+      <div class="band b-nav"  style="top:0;height:17px">nav 69px</div>
+      <div class="band b-hero" style="top:19px;height:211px">v8 hero — .cs-hero min-height: calc(100vh − 68px) = 832px</div>
+      <div class="fold" style="top:230px"><span>fold 900px</span></div>
+    </div>
+    <p class="legend">The v8 hero consumes <b>832 of the 900px</b> before a drop zone can exist. The fold contract — zones entirely above 900px at 1280 — is a pinned regression test (<code>canonical.spec.ts:129-132</code>), not a preference. The height is an editable constant, so this is a <b>cost</b>, not an impossibility — but paying it means abandoning what made the v8 hero the v8 hero.</p>
+  </div>
+
+  <div class="opts" style="margin-top:24px">
+    <div class="opt" data-q="hero" data-a="workbench">
+      <p class="tag">OPTION A · RECOMMENDED — AND ALREADY BUILT</p>
+      <h3>Keep workbench-first</h3>
+      <p>Three independent reasons, strongest first:</p>
+      <ul>
+        <li>The alternative costs 832 of 900px before a drop zone exists — so it cannot satisfy the pinned fold contract <i>while keeping the v8 hero’s defining full-viewport height</i>. Not "impossible": <code>globals.css:5364</code> already zeroes that min-height elsewhere. But zeroing it is no longer the v8 hero.</li>
+        <li>Workbench-first was stated twice, <b>with a diagnosis attached</b>; the v8 repost carried no instruction</li>
+        <li><b>The H1 text is byte-identical in both versions</b> (md5-verified against <code>85cba2e^</code>) — so the announcement you liked already ships. <b>An earlier draft added “and ships larger now (48.64 vs 42.24px)” — withdrawn as false:</b> 42.24px was <code>.lp-h2</code>, a section heading, not the H1. Against the v8 <i>mockup</i> you reposted (53.76px) it ships <b>smaller</b>. Counter-evidence, surfaced rather than buried.</li>
+      </ul>
+      <span class="verdict v-ok">Nothing to build — this is the current state</span>
+      <button class="pick" type="button">Confirm this</button>
+    </div>
+    <div class="opt" data-q="hero" data-a="scene">
+      <p class="tag">OPTION B · THE REAL SIGNAL IN THE REPOST</p>
+      <h3>Keep workbench-first, but bring the scene artwork up</h3>
+      <p>What v8 had that screen one lacks is not the message — it is the animated scene as a
+      visual anchor. That does not require restoring the hero; the scene still exists lower down.</p>
+      <ul>
+        <li>Would need its own pass, and costs first-screen height</li>
+        <li>Directly competes with decision 1 for the same pixels</li>
+      </ul>
+      <span class="verdict v-open">Worth a separate look — not a same-day change</span>
+      <button class="pick" type="button">Choose this</button>
+    </div>
+  </div>
+</div></section>
+
+<section class="out"><div class="wrap">
+  <h2>Your decisions</h2>
+  <p class="sub" style="margin-bottom:0">Pick above, then paste this block back into the session.</p>
+  <pre id="summary" role="status" aria-live="polite">Nothing chosen yet.</pre>
+  <p style="margin:16px 0 0;display:flex;gap:10px">
+    <button class="pick" type="button" id="copy" style="margin-top:0">Copy</button>
+    <button class="pick" type="button" id="clear" style="margin-top:0">Clear all</button>
+  </p>
+</div></section>
+
+</main>
+
+<footer><div class="wrap">
+  Tokens transcribed from <code>app/globals.css</code>; schematics are to scale and deliberately
+  schematic — no screenshot on this page is real, because none was taken. Onest loads from Google
+  Fonts here because this is a local design artifact, not the shipped site, whose fonts are
+  self-hosted and make no off-origin request. Geometry is computed, not rendered.
+</div></footer>
+
+<script>
+(function(){
+  var KEY='cc-decisions-2026-07-31';
+  var picks = JSON.parse(localStorage.getItem(KEY) || '{}');
+  var labels = {
+    fold:{reclaim:'RECLAIM 26-50px so the run verb lands on screen one',keep:'KEEP current placement (run control follows the zones)'},
+    nav:{retarget:'RETARGET the nav pill to #audit (accepts the e2e change)',keep:'KEEP the nav pill as a home affordance'},
+    hero:{workbench:'CONFIRM workbench-first (current state, no build)',scene:'WORKBENCH-FIRST + bring the scene artwork up (separate pass)'}
+  };
+  function render(){
+    document.querySelectorAll('.opt').forEach(function(o){
+      var on = picks[o.dataset.q]===o.dataset.a;
+      o.dataset.picked = on ? '1' : '0';
+      var b=o.querySelector('button.pick'), t=o.querySelector('.tag');
+      /* Selection must not be carried by colour alone (WCAG 1.4.1) — the label
+         and the tag change too, and the button reports its own state. */
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if(!b.dataset.rest) b.dataset.rest = b.textContent;
+      b.textContent = on ? 'Selected' : b.dataset.rest;
+      if(!t.dataset.rest) t.dataset.rest = t.textContent;
+      t.textContent = on ? '\u2713 SELECTED' : t.dataset.rest;
+    });
+    var lines=[];
+    ['fold','nav','hero'].forEach(function(q,i){
+      var a=picks[q];
+      lines.push((i+1)+'. '+(a ? labels[q][a] : '\u2014 not decided \u2014'+(q==='hero'?' (workbench-first stands as the current build)':'')));
+    });
+    var any = picks.fold||picks.nav||picks.hero;
+    document.getElementById('summary').textContent = any
+      ? 'Curbside Commons \u2014 owner decisions, 2026-07-31\n\n'+lines.join('\n')+
+        '\n\nApply these, then run npm run verify + the e2e battery.'
+      : 'Nothing chosen yet.';
+  }
+  document.querySelectorAll('.opt button.pick').forEach(function(b){
+    b.addEventListener('click',function(){
+      var o=b.closest('.opt');
+      picks[o.dataset.q]=o.dataset.a;
+      localStorage.setItem(KEY,JSON.stringify(picks));
+      render();
+    });
+  });
+  document.getElementById('copy').addEventListener('click',function(){
+    var t=document.getElementById('summary').textContent, btn=this;
+    navigator.clipboard.writeText(t).then(function(){
+      btn.textContent='Copied'; setTimeout(function(){btn.textContent='Copy';},1600);
+    },function(){ btn.textContent='Select it manually'; });
+  });
+  document.getElementById('clear').addEventListener('click',function(){
+    picks={}; localStorage.removeItem(KEY); render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

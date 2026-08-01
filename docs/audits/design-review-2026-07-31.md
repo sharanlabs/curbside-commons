@@ -173,8 +173,113 @@ Nine commits (`37323e7` → `bc6bab7`), reviewed against the Fable-equivalence b
 
 **Litmus 7/7 YES** (brand in first screen · one anchor — the centred hero-object · scannable by the five-H2 narrative · one job per section after D-6/S2 · cards = the interaction itself · motion serves hierarchy, no theatrics · premium on hairlines, shadows only where elevation is meant). **Hard-rejection sweep: none apply** — and N-1+S3 close the one that loomed ("strong headline with no clear action").
 
-**The pass's own honest misses, accepted as recorded:** the stacked sample/download pair tops out at ~32px hit area without recomposing the slot (recorded, not faked) · `.cs-pause` at 38px near-miss · R-3 correctly deferred to a reachability-proofed pass · fold verified by arithmetic only (zones ≈802px at 1280×900, run-gap ≈81px < 200) — **the e2e suite must confirm on the next network-capable run.**
+**The pass's own honest misses, accepted as recorded:** the stacked sample/download pair tops out at ~32px hit area without recomposing the slot (recorded, not faked) · `.cs-pause` at 38px near-miss · R-3 correctly deferred to a reachability-proofed pass · fold verified by arithmetic only (zones ≈802px at 1280×900, run-gap ≈81px < 200 — **stale, corrected 2026-07-31**: 81px omits `.fd-paste`, and cannot explain the one rendered fact on record (button top 970.5 vs zone bottom 871.7 = **98.8px**, `canonical.spec.ts:136`)) — **the e2e suite must confirm on the next network-capable run.**
 
 **Process finding adopted as a rail (the agent's HIGH):** `canonical.spec.ts` pins the five-H2 sequence AND the nav labels with `toEqual` — any future redesign brief must list these as rails first. Neither input audit had flagged it.
 
 **Still open after this pass:** e2e + honesty-c10 on a network-capable build · R-3 purge (268 orphans + `.cs-acc`) · the three-"or"s copy nit · deploy (owner word).
+
+---
+
+## Addendum — session 41 re-evaluation (Onest reversal + `/interaction-design`, same day)
+
+**Trigger:** owner, after the deploy — *"invoke all the design plugins, skills and subagents to reevaluate it, blindspots, gaps, passes"*, then `/interaction-design`. Two independent read-only agents plus an inline motion pass. No browser rendered: Chromium is Mach-port denied and ports are EPERM in this sandbox (raw on record, four approaches tried).
+
+### The finding that reverses a claim I had recorded
+
+I warned in the handoff that the Onest swap endangered the fold, because 58 `max-width: *ch` boxes resolve against the font's own `'0'` advance and I believed Onest's was narrower. **Measured, it is the opposite.** Both variable TTFs were parsed directly (`hmtx` + `HVAR` delta-sets), cross-checked against Next's bundled capsize table to within 0.1%:
+
+| | Nunito | Onest | Δ |
+|---|---|---|---|
+| `'0'` advance @ wght 460 (**the `ch` unit**) | 0.6000 em | **0.6640 em** | **+10.7%** |
+| frequency-weighted average advance | 0.4633 em | 0.4790 em | +3.4% |
+| avg ÷ `'0'` | 0.7722 | **0.7214** | **−6.6%** |
+
+Every `ch` box grows 10.7% while the text inside grows 3.4%, so roughly **6.6% more characters fit per line**. No `ch`-capped box gains a line; `.cs-lede` *loses* one (3 → 2, −28.9px). **The swap moves the fold in the safe direction.**
+
+**And the "28px of margin" I was protecting does not exist.** That figure (`canonical.spec.ts:127`, 871.7 ≤ 900) was recorded on 2026-07-29 against a layout containing a `.cs-copy` wrapper and a 78ch instruction wall — both deleted by S1 earlier today. Computed headroom on the current tree is ~127–146px. *A geometry contract's recorded number expires when the geometry changes; the comment survives the layout it measured.*
+
+### The hero fork, resolved on arithmetic rather than taste
+
+One branch cannot be built without abandoning what defines it. The v8 hero is `<CommonsScene>`, and `.cs-hero` carries `min-height: calc(100vh - 68px)` — **832px consumed at 1280×900** against a 900px fold ceiling that `canonical.spec.ts:104-137` pins. Message-first-as-v8-hero cannot satisfy a contract the direction doc lists as untouchable.
+
+Two supporting facts. The workbench-first demand was stated twice in the owner's own words *with a diagnosis attached* ("the website looks like a display piece with numbers … I want ready to use website to upload test files") and then encoded as a regression test; the v8 repost carries no instruction. And **the H1 is byte-identical in both versions** — what the owner was admiring in that screenshot already ships, at 48.64px rather than v8's 42.24px. What v8 had that screen one lacks is the scene artwork as an anchor, and the scene still exists; it moved, it did not die.
+
+### Interaction + state findings (ranked, all unrendered)
+
+1. **The instrument arrives without its verb.** At 1280×900 the first screen shows two empty dashed boxes; the run control (`AuditWorkbench.tsx:256`) is `disabled` at first paint *and* below the fold (button-top ≈970 vs zone-bottom ≈872 on the old measurement), and the sentence explaining why — *"Add a feed to run the audit"* — sits below the fold with it. For a tool whose stated purpose is uploading test files, the missing word on arrival is "run." Reclaiming ~20–40px above the zones (any two of: `.home-lead` padding-top −18px, `.wb` margin-top −8px, `.fd-zone` padding −32px) puts the whole instrument on screen one. **Not applied — it is the owner's first screen.**
+2. **The nav's one emphasized action is a no-op on `/`.** `Nav.tsx:168` marks `href === "/"` as the filled ultramarine pill, so on the landing the most visually dominant control on the page navigates nowhere, while also carrying `aria-current="page"`. **Not applied:** `canonical.spec.ts:274-276` pins `a[href="/"]` for the `aria-current` contract, so retargeting it to `/#audit` is a test-touching change and belongs with the owner's fork decision.
+3. **`.fd-hint` is the fragile above-fold box, and no `ch` analysis would find it** — `globals.css:3433` sets no max-width, so it fills its cell (496px) and the record hint measures 426.8px = **86.1%** under Onest. A few more characters wraps it and pushes both drop zones down ~21px. The one above-fold text box with no `ch` cap at all.
+4. **`tabular-nums` on sans-set figures is an untested inheritance.** `.fd-status` and `.wb-tally` assert changing counts "hold column"; those were authored and checked under Nunito and have never rendered under Onest, and whether Onest ships `tnum` is not determinable from this seat. Check after rebuild: render the tally at 1 / 8 / 11 / 88 and confirm the digits do not shift.
+5. **`.lp-h2` carries the file's tightest tracking (−0.038em) at its smallest display tier.** Approved under Onest at 42px; since then the size was cut to `clamp(25px,2.5vw,35px)` and the weight raised, so the same number now lands ~10px smaller and 60 heavier than when anyone last looked at it. Tighter tracking hurts more as size drops — the likeliest place the restored face reads wrong.
+6. **`/docs` sits outside the weight pass entirely** — `.docs-main h1` and `.docs-main .sect h2` are both **560** against 680/660 everywhere else. The "too thin" complaint that produced the weight pass was made *against Onest*, and the fix never reached this page, so restoring Onest restores that exact thinness. Pre-existing, not caused by the reversal.
+7. **Two chrome elements sit below the 12px caption floor** — `.nav-case` 10.5px, `.fd-sample` 11.5px. Both clear contrast; noted because `.fd-sample` ("USE THE BUNDLED FEED") is the fastest path a first-time visitor has to a verdict.
+
+### Checked and cleared, so they are not re-raised
+
+`@keyframes stamp-neq` is defined **once** — a `grep -o` counted the comment asserting that as a second definition, and the duplicate was a false positive; session 40's I-2 holds. **118 transition/animation declarations animate zero layout properties** (no width/height/top/left/margin/padding), so I-3 holds. **24 `prefers-reduced-motion` blocks.** Zero keyframes referenced-but-undefined, zero defined-but-unreferenced. Weight reversal proven complete 1:1 against `85cba2e` (nine weights added, nine reversed). No synthesized-weight risk (all declared weights inside both axes). Slashed-zero unaffected (all six selectors resolve to JetBrains Mono).
+
+### Corrected in the file as a result
+
+The landing's tracking comment argued for `-0.028em` on Nunito grounds that are now false on every clause; the value is kept on the better ground that /proof and /docs carry the same figure *from the Onest era*, and `-0.034em` is recorded as unvalidated rather than retired. `font-optical-sizing: auto` is labelled inert — neither face has an `opsz` axis, so it has never done anything and must not be counted as a lever. The file header's "rounded-sans" descriptor now reads "neutral grotesque."
+
+---
+
+## SYNTHESIS — five reporting passes collapsed into one resolution list (session 41 close)
+
+Owner: *"complete all the plugins have reported their results synthesize together … resolve it."*
+Reporting sources: session-40 design review (R-1…R-7) · `/interaction-design` · the landing
+end-to-end UX agent · the Onest-reversal blindspot audit · `/ce-frontend-design` Module C litmus.
+
+**Mode, established before any opinion was applied:** `/ce-frontend-design` Layer 0 returns
+**Existing system** on 7 of 7 signal categories (116 design tokens · a two-voice self-hosted
+font system · 11 motion tokens · a 10-step spacing scale · DESIGN.md · 8 pinned design e2e
+specs · 8 shared components). Under that skill's own authority hierarchy its aesthetic
+opinions **yield** to the established system; only Module C (make it belong), the copy,
+accessibility and verification layers apply. No aesthetic direction was imposed.
+
+### Two things reported as signals that are NOT findings — recorded so they are not re-raised
+
+1. **"36 interactive elements, 23 focus rules" is a false alarm.** `globals.css:800` carries a
+   bare `:focus-visible { outline: 2px solid var(--signal) }`, which applies to every element
+   in the document. The floor is met by construction, not by enumeration.
+2. **The cards litmus ("22 card radii, 1 interactive") used a bad denominator.** `--r-card` is
+   a *radius token*, not a card treatment, and this product's panels are report surfaces, not
+   clickable units. The real question — would removing a panel's border and shadow hurt
+   comprehension — is a judgment call on about three surfaces, not an audit of 22. No card
+   audit was opened on that number.
+
+### The strongest finding is the one that surfaced TWICE, independently
+
+**The instrument arrives without its verb.** Session 40's R-5 recorded it as *"the page's
+primary action is disabled by default, with its instruction as a caption."* Today's landing
+agent re-derived it from geometry without seeing R-5: at 1280×900 the run control is `disabled`
+at first paint **and** below the fold, together with the sentence explaining why. Two
+passes hours apart on the SAME DAY by different methods, same defect (an earlier draft said 'months apart' — false; every session-40 commit is dated 2026-07-31). That is much stronger
+evidence than either alone, and it is why this sits at the top of the owner-gated list rather
+than in the deferred pile.
+
+### Resolution
+
+**Applied this session (all verified: tsc 0 · eslint 0 · vitest 1610 + 8 skipped):**
+Onest restored with weights reversed −60/−40 · production register across 12 files ·
+`viewport.themeColor` + `colorScheme` · two-column `/report` masthead at ≥1080px ·
+the three-"or" stack reduced to one · three false statements corrected in `globals.css`
+(the Nunito-grounded tracking argument, the inert `font-optical-sizing` claim, the
+"rounded-sans" descriptor) · the dead display-tier block deleted as a live trap.
+
+**Owner-gated — deliberately NOT applied.** Every one touches the first screen or a pinned
+contract, and the owner owns both:
+1. The fold reclaim that would put the run verb on screen one (~20–40px above the zones).
+2. The nav's emphasized action, which is a no-op on `/` (`canonical.spec.ts:274-276` pins
+   `a[href="/"]` for the `aria-current` contract, so retargeting is test-touching).
+3. The hero fork — **resolved on arithmetic, awaiting the word**: workbench-first wins because
+   the v8 branch cannot satisfy the 900px fold ceiling (`.cs-hero` alone consumes 832px).
+
+**Deferred with a stated reason:** R-3 dead-CSS (a build-hash proof is meaningless while the
+chrome is being rewritten) · `/docs` headings at 560 (pre-existing, outside the reversal's
+scope) · `.lp-h2` tracking and `tabular-nums` under Onest (both need a render this seat cannot
+produce) · the unvalidated `-0.034em` landing alternative.
+
+**No further code changes in this pass, and that is the correct outcome** — the synthesis was
+the deliverable. What remains is a render, and three decisions that are the owner's.

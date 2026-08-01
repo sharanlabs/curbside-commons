@@ -109,6 +109,20 @@ Standing operating policy set by the owner. It **refines** `RULES.md`; if it eve
 
 Before acting on owner input, apply the **Prompt Intake Protocol** (`docs/prompt-intake-protocol.md`; `RULES.md` §16): preserve the owner's raw words verbatim, reconstruct the true intent, and synthesize an effective prompt aligned to the current model + playbook — **without diluting or summarizing**. Default to **silent** intent-capture; surface a structured interpretation or a confirm only when the request is **ambiguous or consequential**. Raw input is authoritative; surface added assumptions explicitly; when unsure, ask.
 
+## Design System
+
+`DESIGN.md` is the design source of truth. **Read it before any visual or UI change** —
+typography, color, spacing, layout, motion and the owner-fixed decisions all live there,
+transcribed from `app/globals.css` rather than restated from memory.
+
+Two things it carries that are easy to get wrong and expensive to get wrong:
+**weight numbers are calibrated to the current typeface and do not travel with a face swap**,
+and **`ch`-based measure caps silently re-measure the whole site when the font changes**.
+
+Do not deviate from a decision listed under "Settled by owner word" without a new owner word.
+`RULES.md` still wins over `DESIGN.md` on any conflict, and the honesty bar (§4) binds every
+design choice.
+
 ## Reference reading (when relevant to the task)
 
 `README.md` (esp. its **Lineage** section), `docs/PLAIN-ENGLISH.md`, `docs/SHOWCASE.md`, `docs/HOW-THIS-WAS-BUILT.md`, `docs/dual-model-workflow.md`, `docs/decision-log.md`, `docs/enterprise-delivery-playbook.md`.
