@@ -32,13 +32,21 @@ export type NavReadoutFigures = {
   warns: number;
 };
 
-const DESTINATIONS = [
-  { label: "Audit", href: "/" },
+/**
+ * `match` exists because a destination's ROUTE and its LINK TARGET came apart
+ * (owner, 2026-07-31): "Audit" navigates to `/#audit` — the instrument itself —
+ * while the route it represents is still `/`. Everything that asks "are we
+ * there?" (aria-current, the emphasized-action styling) must key off `match`,
+ * never off `href`; `usePathname()` never returns a hash, so keying off `href`
+ * would silently switch aria-current off forever.
+ */
+const DESTINATIONS: ReadonlyArray<{ label: string; href: string; match?: string }> = [
+  { label: "Audit", href: "/#audit", match: "/" },
   { label: "Report", href: "/report" },
   { label: "Fee rules", href: "/fees" },
   { label: "How it works", href: "/playground" },
   { label: "Proof", href: "/proof" },
-] as const;
+];
 
 type Readout = { lamp: "gold" | "ember" | "graphite"; parts: Array<string | { b: string }> };
 
@@ -154,18 +162,27 @@ export function Nav({ figures }: { figures: NavReadoutFigures }) {
 
         <nav className="site-nav-links" aria-label="Sections">
           {DESTINATIONS.map((d) => {
+            // Route match, NOT link target — see the DESTINATIONS note.
             // "/" would prefix-match every route, so home is exact-only.
+            const route = d.match ?? d.href;
             const active =
-              d.href === "/"
+              route === "/"
                 ? pathname === "/"
-                : pathname === d.href || pathname.startsWith(`${d.href}/`);
+                : pathname === route || pathname.startsWith(`${route}/`);
             // N-1 (design direction S4, 2026-07-31): the bar carries ONE
             // emphasized action — the product's own verb, "Audit". The other
             // four destinations stay quiet links; the 2026 nav-as-funnel
             // pattern and the devtool-landing research both put a single
-            // unmistakable action in the bar. Styling only: the label, the
-            // destination and the e2e-pinned names are untouched.
-            const action = d.href === "/";
+            // unmistakable action in the bar.
+            //
+            // RETARGETED 2026-07-31 (owner word, session 42): it used to point
+            // at "/", so on the landing page the site's most dominant control
+            // navigated nowhere. It now points at `/#audit` — the instrument —
+            // which is a real action from every route including this one. The
+            // brand lockup above still carries plain "home". This DOES move the
+            // destination and it DOES change an e2e-pinned selector
+            // (`canonical.spec.ts` aria-current contract); both moved with it.
+            const action = route === "/";
             return (
               <Link
                 key={d.href}

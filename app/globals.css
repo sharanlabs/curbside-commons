@@ -342,7 +342,10 @@ body {
    generic aria-current white-pill treatment, because when the reader is ON
    the tool the pill stays the action; location is marked by the ring the
    active state already uses elsewhere (--accent-line), and aria-current is
-   still set for assistive tech. */
+   still set for assistive tech.
+   RETARGETED 2026-07-31 (owner word): the pill points at `/#audit`, the
+   instrument itself, not at "/". The styling below is unchanged — what moved
+   is that on the landing page this control is no longer a no-op. */
 .site-navlink.nav-action,
 .site-navlink.nav-action:hover,
 .site-navlink.nav-action[aria-current="page"] {

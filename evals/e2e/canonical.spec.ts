@@ -270,10 +270,25 @@ test("nav = named destinations, no chapter numerals; each reachable with aria-cu
 
   // Home is the tool, and it is exact-match only — "/" prefix-matches every
   // route, so a naive check would light every destination at once.
+  //
+  // The Audit link TARGETS `/#audit` (owner word 2026-07-31: the emphasized
+  // pill used to point at "/", so on the landing page it navigated nowhere)
+  // while the ROUTE it represents is still "/". aria-current must follow the
+  // route, not the href — pin both facts, because keying the component off the
+  // href is exactly the regression this asserts against.
+  //
+  // The positive count comes FIRST and is what makes the zero mean anything: a
+  // bare `toHaveCount(0)` also passes on an empty nav, a renamed landmark, or a
+  // locator that resolves to nothing — the survivor shape the mutation pass
+  // exists to catch.
+  await expect(nav.getByRole("link")).toHaveCount(5);
+  const audit = nav.locator('a[href="/#audit"]');
+  await expect(audit).toHaveCount(1);
+  await expect(nav.locator('a[href="/"]')).toHaveCount(0);
   await page.goto("/report");
-  await expect(nav.locator('a[href="/"]')).not.toHaveAttribute("aria-current", "page");
+  await expect(audit).not.toHaveAttribute("aria-current", "page");
   await page.goto("/");
-  await expect(nav.locator('a[href="/"]')).toHaveAttribute("aria-current", "page");
+  await expect(audit).toHaveAttribute("aria-current", "page");
 });
 
 test("the nav readout states something true of the route you are on", async ({ page }) => {

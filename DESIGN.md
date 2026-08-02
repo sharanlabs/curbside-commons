@@ -29,7 +29,8 @@ changing anything.
 | **Original colors** — ultramarine accent, the lamp scheme | 2026-07-31 | R-6 (H1 gradient recolor) refused; R-7 (palette inventory) dead. |
 | **No instrument fonts on headings** | 2026-07-31 | Mono is for DATA. A mono nameplate shipped briefly and was reverted. |
 | **Production register** — no "example/sample" captioning | 2026-07-31 | Words stating what the data *is* became "bundled" (still true). |
-| **Workbench-first landing** | 2026-07-28 | Restated by measurement 2026-07-31: the v8 hero cannot satisfy the fold contract. |
+| **Workbench-first landing** | 2026-07-28, **re-confirmed 2026-07-31** | The hero fork is closed by owner word, not by inference. The measurement agrees: the v8 hero's `min-height: calc(100vh - 68px)` = 832px at 1280×900 cannot satisfy the 900px fold contract. |
+| **The nav pill targets `/#audit`, not `/`** | 2026-07-31 | The bar's one emphasized action was a no-op on the landing page. It now points at the instrument. `aria-current` follows the ROUTE (`match: "/"`), never the href — `usePathname()` has no hash. |
 
 ## Typography
 
@@ -185,8 +186,9 @@ document to read in order) · decorative stats · any copy implying real platfor
 
 1. **The instrument arrives without its verb** — at 1280×900 the run control is `disabled` at
    first paint *and* below the fold, along with the sentence explaining why.
-2. **The nav's one emphasized action is a no-op on `/`** — `Nav.tsx` marks `href === "/"` as the
-   filled pill. Retargeting it touches a pinned `aria-current` contract.
+2. ~~**The nav's one emphasized action is a no-op on `/`**~~ — **RESOLVED 2026-07-31 by owner
+   word.** Retargeted to `/#audit`; the pinned `aria-current` contract moved with it and gained
+   two teeth. See the settled-by-owner table.
 3. **`.fd-hint` has no `ch` cap** and runs at ~86% of its cell; a few more characters wraps it
    and pushes both drop zones down ~21px.
 4. **`tabular-nums` on sans-set figures** (`.fd-status`, `.wb-tally`) was calibrated under
@@ -195,11 +197,22 @@ document to read in order) · decorative stats · any copy implying real platfor
 6. **`.lp-h2` tracking** (`-0.038em`) was approved at 42px and now renders ~10px smaller and
    60 heavier.
 7. **Dead CSS** — 268 orphan candidates await a real reachability proof (never a grep).
+8. **`#audit` has no `scroll-margin-top`** — the `scroll-margin-top: 128px` rule at
+   `globals.css:2554` is scoped to `.ds-data` descendants, and the landing's
+   `<section id="audit">` is not one, so a jump lands the heading under the ~68px sticky nav.
+   **Pre-existing, not introduced** by the pill retarget (`app/page.tsx:240` already carries an
+   `href="#audit"` button) — but **the cross-route hash path is genuinely new, not merely more
+   travelled**: that button scrolls within the same document, while the pill now arrives from
+   `/report`, `/fees`, `/playground` and `/proof` as a route change *plus* a hash, where Next
+   applies the hash to a fresh document against its own scroll restoration. Different code path,
+   never exercised. A one-line CSS fix, deliberately not bundled into a decision-2 diff.
+   **Unrendered**, like everything else on this list.
 
 ## Decisions log
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-07-31 | Nav pill retargeted `/` → `/#audit`; workbench-first confirmed; fold reclaim held | Owner word on all three decision-board forks. The pill was the site's most dominant control and navigated nowhere on the landing page. |
 | 2026-07-31 | DESIGN.md created | The system lived only in 9,200 lines of CSS and a dated review doc; every session re-derived it. |
 | 2026-07-31 | Onest restored, weights recalibrated −60/−40 | Owner word. Numbers do not travel with a face. |
 | 2026-07-31 | Production register adopted | Owner word; "sample" kept as "bundled" wherever it stated fact. |
