@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Curbside Commons — the spine and the shelf</title>
+<!-- Onest + JetBrains Mono are the product's own faces (owner-fixed). Fetched
+     from Google Fonts because this is a standalone file; offline it falls back
+     to system-ui, which is close enough in register to read correctly. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     Tokens transcribed from DESIGN.md / app/globals.css.
+     Nothing here proposes a new visual value. The surface is settled;
+     this document designs the SEQUENCE.
+     ============================================================ */
+  :root {
+    --ff-sans: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --ff-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --ink: #12141c;
+    --ink-2: #22252f;
+    --body: #3b3f4b;
+    --graphite: #4a4e5a;
+    --muted: #585d69;
+    --faint: #6a6e7a;
+
+    --bg: #ffffff;
+    --bg-2: #fbfbfc;
+    --bg-3: #f3f4f8;
+
+    --rule: rgba(18, 20, 28, 0.09);
+    --rule-2: rgba(18, 20, 28, 0.15);
+    --rule-3: rgba(18, 20, 28, 0.24);
+
+    --accent: #2438d6;
+    --accent-hi: #25329a;
+    --accent-tint: rgba(36, 56, 214, 0.055);
+    --accent-line: rgba(36, 56, 214, 0.22);
+
+    --ember: #b42318;
+    --gold: #ffb020;
+    --gold-text: #9c6208;
+    --azure: #1f8fff;
+
+    --r-card: 16px;
+    --r-ctrl: 12px;
+    --r-chip: 9px;
+    --r-pill: 999px;
+
+    --maxw: 1180px;
+    --gutter: 32px;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-2: 240ms;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { color-scheme: light; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--body);
+    font-family: var(--ff-sans);
+    font-size: 17px;
+    font-weight: 460;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-wrap: pretty;
+  }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+
+  /* ---------- type ---------- */
+
+  h1, h2, h3 { margin: 0; color: var(--ink); text-wrap: balance; }
+  h1 { font-size: clamp(34px, 4.4vw, 52px); font-weight: 680; letter-spacing: -0.028em; line-height: 1.08; }
+  h2 { font-size: clamp(25px, 2.5vw, 35px); font-weight: 660; letter-spacing: -0.03em; line-height: 1.15; }
+  h3 { font-size: 19px; font-weight: 700; letter-spacing: -0.014em; line-height: 1.3; }
+  p { margin: 0; }
+
+  .eyebrow {
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    font-weight: 590;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    margin: 0 0 10px;
+  }
+
+  .lede { font-size: 19px; line-height: 1.6; color: var(--body); max-width: 62ch; }
+  .note { font-size: 15px; line-height: 1.65; color: var(--muted); }
+  .mono { font-family: var(--ff-mono); font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; }
+
+  a { color: var(--accent); text-underline-offset: 3px; }
+
+  /* ---------- masthead ---------- */
+
+  .mast {
+    border-bottom: 1px solid var(--rule-2);
+    padding: 68px 0 40px;
+    background:
+      linear-gradient(180deg, var(--bg-2), var(--bg));
+  }
+  .mast .lede { margin-top: 20px; }
+
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--ff-mono);
+    font-size: 10.5px;
+    font-weight: 590;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-pill);
+    padding: 5px 13px 5px 10px;
+    margin-bottom: 22px;
+    background: var(--bg);
+  }
+  .lamp {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.16);
+  }
+
+  /* ---------- fixed constraints strip ---------- */
+
+  .fixed {
+    margin-top: 34px;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-card);
+    background: var(--bg-2);
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 22px;
+    align-items: baseline;
+  }
+  .fixed dt {
+    font-family: var(--ff-mono);
+    font-size: 10.5px; font-weight: 590; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--faint);
+    white-space: nowrap;
+  }
+  .fixed dd { margin: 0; font-size: 15px; color: var(--graphite); }
+
+  /* ---------- sections ---------- */
+
+  section.band { padding: 74px 0; border-bottom: 1px solid var(--rule); }
+  section.band:last-of-type { border-bottom: 0; }
+  .band > .wrap > h2 { margin-bottom: 14px; }
+  .band > .wrap > .lede { margin-bottom: 38px; }
+
+  /* ---------- the spine ---------- */
+
+  .spine {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-card);
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .beat {
+    padding: 24px 22px 26px;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+  .beat:last-child { border-right: 0; }
+  .beat-k {
+    font-family: var(--ff-mono);
+    font-size: 10.5px; font-weight: 590; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent);
+    display: block; margin-bottom: 12px;
+  }
+  .beat h3 { margin-bottom: 8px; }
+  .beat .q {
+    font-size: 15px; color: var(--body); font-style: italic;
+    margin-bottom: 14px;
+  }
+  .beat .d { font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+  .beat .where {
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--rule);
+    font-family: var(--ff-mono); font-size: 11.5px; color: var(--graphite);
+  }
+  .beat.is-gap { background: var(--accent-tint); }
+  .beat.is-gap .beat-k::after {
+    content: " · the gap";
+    color: var(--ember);
+  }
+
+  /* ---------- before / after ---------- */
+
+  .toggle {
+    display: inline-flex;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-pill);
+    padding: 3px;
+    margin-bottom: 26px;
+    background: var(--bg-2);
+  }
+  .toggle button {
+    font: inherit;
+    font-size: 14px;
+    font-weight: 560;
+    color: var(--graphite);
+    background: transparent;
+    border: 0;
+    border-radius: var(--r-pill);
+    padding: 7px 18px;
+    cursor: pointer;
+    transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+  }
+  .toggle button[aria-pressed="true"] {
+    background: var(--accent);
+    color: #fff;
+  }
+  .toggle button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .screens { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+  @media (max-width: 900px) { .screens { grid-template-columns: 1fr; } }
+
+  .screen h3 { margin-bottom: 6px; }
+  .screen > .note { margin-bottom: 16px; }
+
+  .viewport {
+    aspect-ratio: 1280 / 900;
+    border: 1px solid var(--rule-3);
+    border-radius: var(--r-ctrl);
+    background: var(--bg);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .below {
+    border: 1px dashed var(--rule-2);
+    border-top: 0;
+    border-radius: 0 0 var(--r-ctrl) var(--r-ctrl);
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 6px, rgba(18,20,28,0.028) 6px, rgba(18,20,28,0.028) 12px
+    );
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  /* The fold IS the bottom edge of the viewport frame above it — the marker
+     labels that line, it does not sit below a gap. Negative top margin pulls
+     it flush so the geometry cannot be misread. */
+  .foldmark {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--ff-mono); font-size: 10.5px; font-weight: 590;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--ember);
+    margin: 0;
+    padding: 5px 2px 5px;
+    background: var(--bg);
+  }
+  .foldmark::after {
+    content: ""; flex: 1; height: 1px;
+    background: repeating-linear-gradient(90deg, var(--ember) 0 5px, transparent 5px 10px);
+    opacity: 0.5;
+  }
+
+  .blk {
+    border: 1px solid var(--rule);
+    border-radius: 7px;
+    background: var(--bg-2);
+    padding: 7px 10px;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--graphite);
+  }
+  .blk b { color: var(--ink-2); font-weight: 620; }
+  .blk.navbar {
+    border: 0; border-bottom: 1px solid var(--rule-2);
+    border-radius: 0; background: var(--bg);
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--ff-mono); font-size: 10.5px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--faint);
+    padding: 9px 12px;
+  }
+  .blk.hero { border: 0; background: transparent; padding: 14px 12px 6px; }
+  .blk.hero b { font-size: 15px; font-weight: 680; letter-spacing: -0.02em; color: var(--ink); }
+  .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px; }
+  .zone {
+    border: 1.5px dashed var(--rule-3);
+    border-radius: 9px;
+    padding: 9px 10px;
+    background: var(--bg);
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .zone .zt { color: var(--ink-2); font-weight: 620; font-size: 12px; display: block; }
+  .zone .lead-act { color: var(--ink-2); font-weight: 560; }
+  .zone .sub-act { color: var(--faint); }
+  .zone .dead { color: var(--ember); }
+  .runrow { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+  .pill {
+    align-self: flex-start;
+    border-radius: var(--r-pill);
+    padding: 6px 15px;
+    font-size: 12px;
+    font-weight: 560;
+  }
+  .pill.live { background: var(--accent); color: #fff; }
+  .pill.dead { background: var(--bg-3); color: var(--faint); border: 1px solid var(--rule); }
+  .spacer { flex: 1; }
+
+  .verdictblk {
+    border: 1px solid var(--accent-line);
+    background: var(--accent-tint);
+    border-radius: 9px;
+    padding: 8px 10px;
+    font-size: 11.5px;
+    color: var(--ink-2);
+  }
+  .verdictblk .v {
+    font-family: var(--ff-mono); font-weight: 600; color: var(--ember);
+    letter-spacing: 0.06em;
+  }
+
+  .cost {
+    margin-top: 16px;
+    display: flex; align-items: baseline; gap: 10px;
+    font-size: 14.5px; color: var(--graphite);
+  }
+  .cost .n {
+    font-family: var(--ff-mono); font-size: 21px; font-weight: 600;
+    color: var(--ink); font-variant-numeric: tabular-nums;
+  }
+  .cost .n.good { color: var(--accent); }
+
+  /* ---------- moves table ---------- */
+
+  .moves { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .moves th {
+    text-align: left;
+    font-family: var(--ff-mono);
+    font-size: 10.5px; font-weight: 590; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--faint);
+    padding: 0 16px 10px 0;
+    border-bottom: 1px solid var(--rule-2);
+    vertical-align: bottom;
+  }
+  .moves td {
+    padding: 16px 16px 16px 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--body);
+  }
+  .moves td:first-child { width: 30%; }
+  .moves td:nth-child(2) { width: 8%; }
+  .moves td:nth-child(3) { width: 24%; }
+  .moves .mv { color: var(--ink); font-weight: 620; display: block; margin-bottom: 3px; }
+  .chip {
+    display: inline-block;
+    font-family: var(--ff-mono);
+    font-size: 10.5px; font-weight: 590; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: 1px solid var(--accent-line);
+    color: var(--accent);
+    background: var(--accent-tint);
+    border-radius: var(--r-chip);
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+  code {
+    font-family: var(--ff-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    background: var(--bg-3);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 2px 5px;
+    display: inline-block;
+  }
+  pre {
+    margin: 0;
+    font-family: var(--ff-mono);
+    font-size: 11.5px;
+    line-height: 1.65;
+    color: var(--ink-2);
+    background: var(--bg-3);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 10px 12px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* ---------- nav sequence ---------- */
+
+  .navdemo {
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-card);
+    background: var(--bg);
+    padding: 22px;
+    margin-bottom: 14px;
+  }
+  .navdemo + .navdemo { margin-top: 22px; }
+  .navbar-x {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 12px 14px;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-ctrl);
+    background: var(--bg-2);
+  }
+  .nlink {
+    font-size: 13px; font-weight: 560; color: var(--muted);
+    padding: 6px 12px; border-radius: var(--r-pill);
+  }
+  .nlink.action { background: var(--accent); color: #fff; font-weight: 590; }
+  .ndiv { width: 1px; align-self: stretch; background: var(--rule-2); margin: 0 6px; }
+  .nbeat {
+    font-family: var(--ff-mono); font-size: 9.5px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--faint);
+    display: block; text-align: center; margin-top: 4px;
+  }
+  .ncol { display: flex; flex-direction: column; }
+
+  .refused {
+    border-left: 2px solid var(--ember);
+    padding: 4px 0 4px 16px;
+    margin-top: 26px;
+    font-size: 15px;
+    color: var(--body);
+  }
+  .refused b { color: var(--ember); font-weight: 620; }
+
+  /* ---------- callout ---------- */
+
+  .callout {
+    border: 1px solid var(--accent-line);
+    background: var(--accent-tint);
+    border-radius: var(--r-card);
+    padding: 24px 26px;
+  }
+  .callout h3 { margin-bottom: 8px; }
+  .callout p + p { margin-top: 12px; }
+
+  .asks { margin: 0; padding: 0; list-style: none; }
+  .asks li {
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 0;
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .asks li:last-child { border-bottom: 0; }
+  .asks .k {
+    font-family: var(--ff-mono); font-size: 13px; font-weight: 600;
+    color: var(--accent); padding-top: 2px;
+  }
+  .asks .t { color: var(--ink); font-weight: 620; display: block; margin-bottom: 3px; }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    border-top: 1px solid var(--rule-2);
+    background: var(--bg-2);
+    padding: 40px 0 60px;
+  }
+  .rungs { margin: 18px 0 0; padding: 0; list-style: none; font-size: 14.5px; }
+  .rungs li { padding: 7px 0; border-bottom: 1px solid var(--rule); color: var(--graphite); }
+  .rungs li:last-child { border-bottom: 0; }
+  .rungs b { color: var(--ink); font-weight: 620; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <p class="stamp"><span class="lamp" aria-hidden="true"></span>Design brief · sequence, not surface · 2026-07-31</p>
+    <h1>The spine and the shelf.</h1>
+    <p class="lede">
+      Curbside Commons has five destinations presented as peers and an instrument that opens
+      with two empty boxes. It has a sequence — it just isn&rsquo;t shaped like one. This
+      document designs that sequence and proposes nothing about the surface.
+    </p>
+
+    <dl class="fixed">
+      <dt>Fixed</dt>
+      <dd>Onest display + body · JetBrains Mono for data only · ultramarine <span class="mono">#2438d6</span> as the single accent · light only · workbench-first · production register · desktop only · 1180px centred column.</dd>
+      <dt>Pinned</dt>
+      <dd>Nav labels and the five landing H2s are held by regression tests. Any move that touches them is an owner decision, and every such move below says so.</dd>
+      <dt>Out of scope</dt>
+      <dd>Visual refresh. Not one colour, weight, radius or face is proposed here.</dd>
+    </dl>
+  </div>
+</header>
+
+<!-- ================= THE SPINE ================= -->
+<section class="band">
+  <div class="wrap">
+    <p class="eyebrow">The spine</p>
+    <h2>Four beats. Every surface belongs to exactly one.</h2>
+    <p class="lede">
+      The visitor asks four questions in a fixed order. Today the site answers all four
+      simultaneously and lets them choose. That is the whole defect.
+    </p>
+
+    <div class="spine">
+      <div class="beat is-gap">
+        <span class="beat-k">Beat 1 · Show me</span>
+        <h3>Make it do something</h3>
+        <p class="q">&ldquo;What is this thing?&rdquo;</p>
+        <p class="d">
+          The instrument demonstrates itself on the bundled pair before it asks for
+          anything. One control, on screen, with a consequence the visitor can see.
+        </p>
+        <p class="where">hero &middot; workbench</p>
+      </div>
+      <div class="beat">
+        <span class="beat-k">Beat 2 · Read it</span>
+        <h3>The verdict is the destination</h3>
+        <p class="q">&ldquo;What did it find?&rdquo;</p>
+        <p class="d">
+          Findings with the arithmetic attached — and the provenance of the data sitting
+          inside the verdict, not one route away from it.
+        </p>
+        <p class="where">wb-result &middot; /report</p>
+      </div>
+      <div class="beat">
+        <span class="beat-k">Beat 3 · Trust it</span>
+        <h3>Reachable from the claim</h3>
+        <p class="q">&ldquo;Why should I believe it?&rdquo;</p>
+        <p class="d">
+          The rule a finding cites, and the scoring behind the engine, are reached
+          <em>from that finding</em> — not by returning to the bar and guessing.
+        </p>
+        <p class="where">/fees &middot; /proof</p>
+      </div>
+      <div class="beat">
+        <span class="beat-k">Beat 4 · Do it</span>
+        <h3>Now bring yours</h3>
+        <p class="q">&ldquo;With my own data?&rdquo;</p>
+        <p class="d">
+          The upload is the <em>second</em> offer. It arrives after the instrument has
+          earned the commitment, which is the only order that makes sense.
+        </p>
+        <p class="where">wb-slots</p>
+      </div>
+    </div>
+
+    <p class="note" style="margin-top:22px; max-width:74ch">
+      Beats 2, 3 and 4 are largely built. Beat 1 is where the sequence breaks, and it breaks
+      before the visitor has done anything — which is why it costs more than its size suggests.
+    </p>
+  </div>
+</section>
+
+<!-- ================= THE FIRST SCREEN ================= -->
+<section class="band">
+  <div class="wrap">
+    <p class="eyebrow">Beat 1, measured</p>
+    <h2>The one action available produces feedback you cannot see.</h2>
+    <p class="lede">
+      Read from source, not rendered. Block heights below are indicative; the fold line is the
+      real thing — a pinned contract at 900px, 1280 wide.
+    </p>
+
+    <div class="toggle" role="group" aria-label="Compare first screens">
+      <button type="button" id="btn-now" aria-pressed="true">As it ships</button>
+      <button type="button" id="btn-next" aria-pressed="false">Proposed</button>
+    </div>
+
+    <div class="screens">
+      <!-- ---------- AS IT SHIPS ---------- -->
+      <div class="screen" id="s-now">
+        <h3>As it ships</h3>
+        <p class="note">A visitor with no files. Each zone leads with the action they cannot take.</p>
+
+        <div class="viewport">
+          <div class="blk navbar"><span>Curbside Commons</span><span>Audit &nbsp;Report &nbsp;Fee rules &nbsp;How it works &nbsp;Proof</span></div>
+          <div class="blk hero">
+            <b>Dinner can be ordered while you sleep.</b><br />
+            What the agent read needs proof.
+          </div>
+          <div class="blk hero" style="padding-top:2px">
+            Curbside Commons checks a marketplace feed against the merchant&rsquo;s own records…
+            <em>Bring your two files, or run the bundled pair.</em>
+          </div>
+          <div class="blk hero" style="padding-bottom:2px"><b style="font-size:13px">Audit a feed.</b></div>
+          <div class="zones">
+            <div class="zone">
+              <span class="zt">The feed</span>
+              <span class="lead-act">Choose a file</span> <span class="sub-act">/ or drag it here</span><br />
+              <span class="sub-act">Use the bundled feed</span>
+            </div>
+            <div class="zone">
+              <span class="zt">The record</span>
+              <span class="lead-act">Choose a file</span> <span class="sub-act">/ or drag it here</span><br />
+              <span class="sub-act">Use the bundled catalog</span>
+            </div>
+          </div>
+          <div class="spacer"></div>
+        </div>
+        <p class="foldmark">Fold &middot; 900px</p>
+        <div class="below">
+          <div class="blk">&ldquo;Add a feed to run the audit — the record side is optional.&rdquo;</div>
+          <div class="pill dead">Run the audit &nbsp;·&nbsp; disabled</div>
+        </div>
+
+        <p class="cost">
+          <span class="n">4</span>
+          <span>acts to a verdict — spot the third affordance, click it, scroll, click Run.
+          The click&rsquo;s entire consequence happens below the fold.</span>
+        </p>
+      </div>
+
+      <!-- ---------- PROPOSED ---------- -->
+      <div class="screen" id="s-next">
+        <h3>Proposed</h3>
+        <p class="note">The control is never dead, and it is on screen one. Nothing else moves.</p>
+
+        <div class="viewport">
+          <div class="blk navbar"><span>Curbside Commons</span><span>Audit &nbsp;Report &nbsp;Fee rules &nbsp;Proof &nbsp;How it works</span></div>
+          <div class="blk hero">
+            <b>Dinner can be ordered while you sleep.</b><br />
+            What the agent read needs proof.
+          </div>
+          <div class="blk hero" style="padding-top:2px">
+            …<em>Bring your two files, or run the bundled pair.</em>
+          </div>
+          <div class="blk hero" style="padding-bottom:2px"><b style="font-size:13px">Audit a feed.</b></div>
+          <div class="zones">
+            <div class="zone">
+              <span class="zt">The feed</span>
+              <span class="lead-act">Use the bundled feed</span><br />
+              <span class="sub-act">Choose a file / or drag it here</span>
+            </div>
+            <div class="zone">
+              <span class="zt">The record</span>
+              <span class="lead-act">Use the bundled catalog</span><br />
+              <span class="sub-act">Choose a file / or drag it here</span>
+            </div>
+          </div>
+          <div class="runrow">
+            <div class="blk" style="border:0;background:transparent;padding:0 0 2px">
+              &ldquo;Runs the bundled pair — nothing you load leaves this page.&rdquo;
+            </div>
+            <span class="pill live">Run the bundled pair</span>
+          </div>
+        </div>
+        <p class="foldmark">Fold &middot; 900px</p>
+        <div class="below">
+          <div class="verdictblk">
+            <span class="v">FAIL</span> &nbsp;— the result lands here, its top edge inside screen one.
+          </div>
+        </div>
+
+        <p class="cost">
+          <span class="n good">1</span>
+          <span>act to a verdict. The control carries a verb at first paint, so there is
+          no disabled state to explain and no invisible state change.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THE MOVES ================= -->
+<section class="band">
+  <div class="wrap">
+    <p class="eyebrow">The moves</p>
+    <h2>Seven, each with the assertion that would defend it.</h2>
+    <p class="lede">
+      This project already pins design decisions as regression tests — the fold contract is one.
+      Every move below is written so it can join them.
+    </p>
+
+    <table class="moves">
+      <thead>
+        <tr><th>Move</th><th>Beat</th><th>What it costs the visitor</th><th>How it is verified</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <span class="mv">M1 · The run control is never disabled</span>
+            Empty state reads <b>Run the bundled pair</b>; once a feed is present it reads
+            <b>Run the audit</b>. One control, two labels, always a verb.
+          </td>
+          <td><span class="chip">1</span></td>
+          <td>Removes 2 acts and the entire disabled state. No new chrome.</td>
+          <td><pre>await expect(
+  page.getByRole('button',
+    { name: /^Run the/ })
+).toBeEnabled();</pre></td>
+        </tr>
+        <tr>
+          <td>
+            <span class="mv">M2 · The run row sits on screen one</span>
+            Reclaim ~20–40px above the zones. <b>Owner decision 1, currently undecided</b> —
+            and M1 buys nothing without it.
+          </td>
+          <td><span class="chip">1</span></td>
+          <td>Nothing. It is the precondition that makes M1 visible.</td>
+          <td><pre>const b = await run.boundingBox();
+expect(b.y + b.height)
+  .toBeLessThanOrEqual(900);</pre></td>
+        </tr>
+        <tr>
+          <td>
+            <span class="mv">M3 · The zone leads with the openable door</span>
+            Measured, not judged: <span class="mono">.fd-cta</span> &ldquo;Choose a file&rdquo; is
+            <b>15px / 560 / accent / underlined</b>; <span class="mono">.fd-sample</span> &ldquo;Use
+            the bundled feed&rdquo; is <b>11.5px mono uppercase in <span class="mono">--muted</span></b>.
+            The hierarchy is inverted against the only door a first-time visitor can open. Swap the
+            two while the slot is empty; swap back once a file is present.
+          </td>
+          <td><span class="chip">1</span></td>
+          <td>Removes the discovery cost — the loudest thing offered becomes the one that works.</td>
+          <td><pre>const acts = zone
+  .getByRole('button');
+await expect(acts.first())
+  .toHaveText(/bundled/);</pre></td>
+        </tr>
+        <tr>
+          <td>
+            <span class="mv">M4 · The verdict states what is invented</span>
+            The result panel already names its sources (<span class="mono">feed side: bundled feed</span>).
+            Add one sentence: the rule and the arithmetic are real, the merchant is not — with the
+            route to the full statement.
+          </td>
+          <td><span class="chip">2</span></td>
+          <td>Zero acts. It is where they already are.</td>
+          <td><pre>await expect(result
+  .getByRole('link',
+    { name: /what is real/i })
+).toBeVisible();</pre></td>
+        </tr>
+        <tr>
+          <td>
+            <span class="mv">M5 · A finding reaches its rule</span>
+            A fee finding cites a codified rule. That citation becomes the route into
+            <span class="mono">/fees</span>, deep-linked to the rule itself.
+          </td>
+          <td><span class="chip">3</span></td>
+          <td>Removes a return-to-the-bar-and-guess trip.</td>
+          <td><pre>await expect(finding
+  .locator('a[href^="/fees"]'))
+  .toHaveCount(1);</pre></td>
+        </tr>
+        <tr>
+          <td>
+            <span class="mv">M6 · The upload is the second offer</span>
+            After a bundled run completes, the slots lead with <b>now try your own</b>. Before
+            one, they lead with the demonstration.
+          </td>
+          <td><span class="chip">4</span></td>
+          <td>Nothing added; the sequence is simply put in order.</td>
+          <td><pre>await run.click();
+await expect(zone)
+  .toContainText(/your own/);</pre></td>
+        </tr>
+        <tr>
+          <td>
+            <span class="mv">M7 · The shelf carries the spine&rsquo;s order</span>
+            Verb separated from shelf by a hairline; shelf ordered Report → Fee rules → Proof →
+            How it works. <b>Reordering is an owner decision</b> until the pinned nav test is
+            read for order-dependence.
+          </td>
+          <td><span class="chip">2–4</span></td>
+          <td>Nothing. It changes what the bar <em>means</em>, not what it costs.</td>
+          <td><pre>await expect(
+  nav.getByRole('link')
+).toHaveText([
+ 'Audit','Report','Fee rules',
+ 'Proof','How it works']);</pre></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= THE NAV ================= -->
+<section class="band">
+  <div class="wrap">
+    <p class="eyebrow">The shelf</p>
+    <h2>One verb, then a shelf that is in order.</h2>
+    <p class="lede">
+      The bar has one emphasized action as of tonight. What it still lacks is any signal that
+      the other four are a sequence rather than a menu.
+    </p>
+
+    <div class="navdemo">
+      <p class="eyebrow" style="color:var(--faint)">As it ships — five peers, one of them filled</p>
+      <div class="navbar-x">
+        <span class="nlink action">Audit</span>
+        <span class="nlink">Report</span>
+        <span class="nlink">Fee rules</span>
+        <span class="nlink">How it works</span>
+        <span class="nlink">Proof</span>
+      </div>
+    </div>
+
+    <div class="navdemo">
+      <p class="eyebrow" style="color:var(--accent)">Proposed — the verb, a hairline, then the shelf in spine order</p>
+      <div class="navbar-x">
+        <span class="ncol"><span class="nlink action">Audit</span><span class="nbeat">the verb</span></span>
+        <span class="ndiv" aria-hidden="true"></span>
+        <span class="ncol"><span class="nlink">Report</span><span class="nbeat">read it</span></span>
+        <span class="ncol"><span class="nlink">Fee rules</span><span class="nbeat">trust it</span></span>
+        <span class="ncol"><span class="nlink">Proof</span><span class="nbeat">trust it</span></span>
+        <span class="ncol"><span class="nlink">How it works</span><span class="nbeat">explains it</span></span>
+      </div>
+      <p class="note" style="margin-top:16px">
+        The beat labels above are annotation for this document — they do not ship. The shipping
+        signal is the hairline and the order. Position is already carried by the live route
+        readout, which states something true of every route; extending it to state position
+        would change e2e-pinned text and is therefore an owner decision, not a design one.
+      </p>
+    </div>
+
+    <p class="refused">
+      <b>Refused, and worth recording:</b> the obvious way to show sequence in a nav is to number
+      it. This site was de-numbered by owner word on 2026-07-28 — numerals told visitors it was a
+      document to be read in order. Numbering the bar would reintroduce exactly the read that
+      decision removed. Order is carried by position and grouping, never by digits.
+    </p>
+  </div>
+</section>
+
+<!-- ================= DEPENDENCY ================= -->
+<section class="band">
+  <div class="wrap">
+    <div class="callout">
+      <h3>The finding this document exists to surface</h3>
+      <p>
+        <b>M1 and M2 are one move, not two.</b> Giving the run control a live verb at first paint
+        (M1) does nothing if the control is below the fold, because the visitor never sees it.
+        Reclaiming the fold (M2) does little on its own, because what it reveals is a disabled
+        button and a sentence explaining why it cannot be used.
+      </p>
+      <p>
+        M2 is owner decision 1, and it came back <span class="mono">— not decided —</span>. It was
+        presented as a spacing question worth about 2px of argument. It is not: it is the
+        precondition for the site&rsquo;s first screen having a working verb. That reframing is
+        the one thing here that should change how the decision gets made.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ASKS ================= -->
+<section class="band">
+  <div class="wrap">
+    <p class="eyebrow">What this does not decide</p>
+    <h2>Four owner calls, none of them taken here.</h2>
+
+    <ul class="asks">
+      <li>
+        <span class="k">A</span>
+        <span><span class="t">The fold reclaim, reframed</span>
+        Not spacing polish — the precondition for beat 1. Same change, different question.</span>
+      </li>
+      <li>
+        <span class="k">B</span>
+        <span><span class="t">Whether the shelf may be reordered</span>
+        The nav test pins labels; whether it pins <em>order</em> needs reading before anyone moves a link.</span>
+      </li>
+      <li>
+        <span class="k">C</span>
+        <span><span class="t">The sentence at the verdict</span>
+        M4 adds copy to an honesty-gated surface. It must state a fact about the data, never caption
+        the site as a demo — the distinction the production-register sweep already drew.</span>
+      </li>
+      <li>
+        <span class="k">D</span>
+        <span><span class="t">The sixty-second sentence</span>
+        What should a visitor be able to say after a minute here? Every move above is
+        justified against an answer that has not been written down yet.</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="eyebrow">Evidence status</p>
+    <p class="note" style="max-width:74ch">
+      Every claim carries a rung. <b>This document is rung 1 — it was rendered and inspected at
+      1280&times;900.</b> The site it describes is not: <span class="mono">out/</span> was built at
+      15:15, before the Onest reversal, and still carries the retired &ldquo;Example report&rdquo;
+      label — so rendering it would measure the previous design, not this one.
+    </p>
+    <ul class="rungs">
+      <li><b>Rung 1 · rendered measurement</b> — this document. Chromium launches under
+        <span class="mono">--single-process</span>; the multi-process spawn was the blocker two
+        sessions hit. Ports still refuse to bind (<span class="mono">EPERM</span>), so no dev
+        server and no e2e run — but a page can be served from disk by request interception.</li>
+      <li><b>Rung 2 · pinned in CI</b> — the fold contract, the H2 order, the nav contract. The seven assertions above are written to join this rung.</li>
+      <li><b>Rung 3 · read from source</b> — the affordance order inside each slot and its measured type scale, <span class="mono">canRun</span> requiring only the feed, the provenance already present in the result panel. This is where the diagnosis sits.</li>
+      <li><b>Rung 4 · computed from the stylesheet</b> — the fold arithmetic and the block heights in the comparison above. Indicative, not measured against a live build.</li>
+      <li><b>Rung 5 · judgment</b> — the four beats, the ordering, and every word of the recommendation.</li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var now = document.getElementById('s-now');
+    var next = document.getElementById('s-next');
+    var bNow = document.getElementById('btn-now');
+    var bNext = document.getElementById('btn-next');
+
+    // Side-by-side is the default on a wide screen — the toggle exists so a
+    // narrower window can hold one at a time without either being cropped.
+    function apply(mode) {
+      var single = window.matchMedia('(max-width: 900px)').matches;
+      if (!single) { now.hidden = false; next.hidden = false; }
+      else { now.hidden = mode !== 'now'; next.hidden = mode !== 'next'; }
+      bNow.setAttribute('aria-pressed', String(mode === 'now'));
+      bNext.setAttribute('aria-pressed', String(mode === 'next'));
+      try { localStorage.setItem('cc-spine-mode', mode); } catch (e) {}
+    }
+
+    var saved = 'now';
+    try { saved = localStorage.getItem('cc-spine-mode') || 'now'; } catch (e) {}
+
+    bNow.addEventListener('click', function () { apply('now'); });
+    bNext.addEventListener('click', function () { apply('next'); });
+    window.addEventListener('resize', function () {
+      apply(bNext.getAttribute('aria-pressed') === 'true' ? 'next' : 'now');
+    });
+    apply(saved);
+  })();
+</script>
+
+</body>
+</html>
