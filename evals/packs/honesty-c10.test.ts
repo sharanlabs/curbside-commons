@@ -129,6 +129,12 @@ const scannedFiles = [
   // (session-32 email-HTML slice; the s30 grill lesson — new surfaces join the scan).
   join(root, "lib", "delivery", "slack.ts"),
   join(root, "lib", "delivery", "email.ts"),
+  // The `.eml` composition, extracted 2026-08-02 so the site's DELIVERY station
+  // renders the builder's own strings instead of retyping them. It holds the
+  // banner, verdict line, and body a RECIPIENT reads — the s30 lesson ("new
+  // surfaces join the scan") applies to a file that inherits recipient-facing
+  // prose just as much as to one that invents it.
+  join(root, "lib", "delivery", "email-message.ts"),
   join(root, "lib", "delivery", "email-html.ts"),
   ...demoScanned,
 ];

@@ -27,16 +27,30 @@
  * ZERO NETWORK, STILL. Every byte is read with FileReader and verified in this
  * tab. Nothing is uploaded anywhere — "upload" here means "into the page", and
  * the import-graph guard proves the closure cannot reach a network at all.
+ *
+ * WHAT MOVED, AND WHAT DID NOT (walkthrough redesign, 2026-08-02). The page is
+ * now six stations, and the verdict belongs to a station of its own — so the
+ * RESULT RENDERING left this file for `components/landing/VerdictSlab.tsx`. The
+ * ENGINE WIRING did not move and was not duplicated: this component still holds
+ * the only parse, the only `verifyAcpFeed` call, and the only definition of what
+ * a run means. It publishes the outcome on the run bus; the ticker, the slab and
+ * the delivery station read it. One owner, several readers.
+ *
+ * THE CONTROL IS NEVER DEAD. It used to be `disabled` until a feed arrived,
+ * which put the page's primary verb out of reach at first paint (DESIGN.md open
+ * item 1). With empty slots it now reads "Run the bundled pair" and a click
+ * loads the bundled pair and runs it — the door and the verb agree, so a
+ * first-time reader can see the whole instrument work in one click.
  */
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { VerifierReport } from "@/lib/verifier-core/report";
 import type { SyntheticCatalog } from "@/lib/packs/listings/types";
+import { deriveChecks, publishRun, IDLE_RUN } from "@/components/landing/run-bus";
 import { FileDrop, type SlotStatus } from "./FileDrop";
 import type { RunOrigin } from "./verify-in-browser";
 import {
   SOR_CATALOG,
   catalogSampleText,
-  cleanFindingFor,
   parseAcpFeedText,
   parseCatalogText,
   sampleFeedText,
@@ -58,30 +72,45 @@ interface SlotState {
 
 const EMPTY: SlotState = { text: "", fileName: null, status: null, source: "reader" };
 
-interface RunState {
-  readonly report: VerifierReport;
-  readonly origin: RunOrigin;
-  readonly feedRows: number;
-  readonly recordRows: number;
+
+/** Reduced motion is read at click time — the reader can change it mid-session. */
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 }
 
-function severityCounts(report: VerifierReport) {
-  const counts = { error: 0, warn: 0, info: 0 };
-  for (const f of report.findings) counts[f.severity] += 1;
-  return counts;
-}
+/** Stagger the ticker uses per line, and the tail it settles after. */
+const TICK_MS = 150;
+const TICK_TAIL_MS = 250;
 
 export function AuditWorkbench() {
   const [feed, setFeed] = useState<SlotState>(EMPTY);
   const [record, setRecord] = useState<SlotState>(EMPTY);
-  const [run, setRun] = useState<RunState | null>(null);
+  const [hasRun, setHasRun] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
+  /**
+   * Monotonic run counter — the same shape `FileDrop` uses for out-of-order
+   * `FileReader` results, and here for the same reason.
+   *
+   * The ticker's settle is a TIMER, so a run publishes "running" now and "done"
+   * about a second later. Without a token, this sequence resurrects a dead
+   * verdict: run → (before the timer fires) edit the feed → `invalidate()`
+   * publishes IDLE → the stale timer fires and republishes the OLD result,
+   * which is now sitting beside inputs that never produced it. That is exactly
+   * the stale-verdict hazard the invalidate rule exists to prevent, arriving
+   * through the back door the animation opened.
+   */
+  const generation = useRef(0);
 
   /** Any new input invalidates the verdict on screen — a stale verdict beside
    *  changed inputs is a lie the reader has no way to detect. */
   function invalidate() {
-    setRun(null);
+    generation.current += 1;
+    setHasRun(false);
     setRunError(null);
+    publishRun(IDLE_RUN);
   }
 
   function feedText(text: string, fileName: string | null, source: "sample" | "reader" = "reader") {
@@ -118,10 +147,24 @@ export function AuditWorkbench() {
     });
   }
 
-  function runAudit() {
-    invalidate();
-    const parsedFeed = parseAcpFeedText(feed.text);
+  /**
+   * Run one audit from EXPLICIT text, never from state.
+   *
+   * The bundled-pair path fills both slots and runs in the same click, and React
+   * state is not readable until the next render — so reading `feed.text` here
+   * would audit the PREVIOUS contents. Passing the bytes in is what makes the
+   * one-click path correct rather than accidentally-correct.
+   */
+  function execute(
+    feedSrc: { text: string; source: "sample" | "reader" },
+    recordSrc: { text: string; source: "sample" | "reader" },
+  ) {
+    const token = ++generation.current;
+    setRunError(null);
+    const parsedFeed = parseAcpFeedText(feedSrc.text);
     if (!parsedFeed.ok) {
+      setHasRun(false);
+      publishRun(IDLE_RUN);
       setRunError(`The feed could not be read. ${parsedFeed.error}`);
       return;
     }
@@ -130,36 +173,74 @@ export function AuditWorkbench() {
     // records we ship", which is the honest default and stays labelled as such.
     let catalog: SyntheticCatalog = SOR_CATALOG;
     // Origin comes from the SLOT, not from the parsed bytes: an empty slot is
-    // the sample, a filled one is whatever action filled it.
+    // the bundled catalog, a filled one is whatever action filled it.
     let catalogOrigin: RunOrigin["catalog"] = "sample";
-    if (record.text.trim()) {
-      const parsedCatalog = parseCatalogText(record.text);
+    if (recordSrc.text.trim()) {
+      const parsedCatalog = parseCatalogText(recordSrc.text);
       if (!parsedCatalog.ok) {
+        setHasRun(false);
+        publishRun(IDLE_RUN);
         setRunError(`The record could not be read. ${parsedCatalog.error}`);
         return;
       }
       catalog = parsedCatalog.catalog;
-      catalogOrigin = record.source;
+      catalogOrigin = recordSrc.source;
     }
-    const origin: RunOrigin = { feed: feed.source, catalog: catalogOrigin };
+    const origin: RunOrigin = { feed: feedSrc.source, catalog: catalogOrigin };
 
+    let report: VerifierReport;
     try {
-      setRun({
-        report: verifyAcpFeed(parsedFeed.feed, catalog, origin),
-        origin,
-        feedRows: parsedFeed.feed.items.length,
-        recordRows: catalog.items.length,
-      });
+      report = verifyAcpFeed(parsedFeed.feed, catalog, origin);
     } catch (e) {
+      setHasRun(false);
+      publishRun(IDLE_RUN);
       setRunError(
         `The verifier could not process this pair: ${e instanceof Error ? e.message : String(e)}`,
       );
+      return;
     }
+
+    const checks = deriveChecks(
+      report,
+      parsedFeed.feed.items.map((i) => i.item_id),
+    );
+    const settled = {
+      phase: "done" as const,
+      report,
+      origin,
+      feedRows: parsedFeed.feed.items.length,
+      recordRows: catalog.items.length,
+      checks,
+      error: null,
+    };
+    setHasRun(true);
+
+    // The verdict is already computed — the engine is synchronous. The RUNNING
+    // window exists so the ticker can narrate the checks and the process strip
+    // can show the run happening; it never gates the result, which is why the
+    // report travels in the running snapshot too.
+    if (prefersReducedMotion()) {
+      publishRun(settled);
+      return;
+    }
+    publishRun({ ...settled, phase: "running" });
+    window.setTimeout(() => {
+      // A run the reader has already invalidated must never come back.
+      if (token !== generation.current) return;
+      publishRun(settled);
+    }, checks.length * TICK_MS + TICK_TAIL_MS);
   }
 
-  /** Clear both slots and the verdict — the "run another" path. Without it the
-   *  only way back to an empty bench was a page reload, which a reader has no
-   *  reason to guess (walkthrough review, 2026-07-28). */
+  /** The bundled pair, loaded and run in one click — the empty-slot path. */
+  function runBundledPair() {
+    const feedSrc = sampleFeedText();
+    const recordSrc = catalogSampleText();
+    feedText(feedSrc, "bundled-feed.json", "sample");
+    recordText(recordSrc, "bundled-catalog.json", "sample");
+    execute({ text: feedSrc, source: "sample" }, { text: recordSrc, source: "sample" });
+  }
+
+  /** Clear both slots and the verdict — the "run another" path. */
   function startOver() {
     setFeed(EMPTY);
     setRecord(EMPTY);
@@ -177,20 +258,16 @@ export function AuditWorkbench() {
     URL.revokeObjectURL(url);
   }
 
-  function downloadReport() {
-    if (run === null) return;
-    saveTextFile(`${JSON.stringify(run.report, null, 2)}\n`, "curbside-commons-report.json");
-  }
-
-  const counts = run ? severityCounts(run.report) : null;
-  const canRun = feed.text.trim().length > 0;
+  const loaded = feed.text.trim().length > 0;
+  const runLabel = hasRun ? "Run again" : loaded ? "Run the audit" : "Run the bundled pair";
 
   return (
-    <div className="wb">
-      <div className="wb-slots">
+    <div className="wb wk-wb">
+      <div className="wk-zones">
         <FileDrop
-          title="The feed"
-          hint="What is served to the agent — the claims being made."
+          side="The feed"
+          sideNote="what an agent reads"
+          title="A published menu feed"
           textareaLabel="Feed JSON"
           value={feed.text}
           onText={feedText}
@@ -206,13 +283,14 @@ export function AuditWorkbench() {
           onReadStart={invalidate}
           fileName={feed.fileName}
           status={feed.status}
-          onLoadSample={() => feedText(sampleFeedText(), "sample-feed.json", "sample")}
-          sampleLabel="Use the bundled feed"
-          onDownloadSample={() => saveTextFile(sampleFeedText(), "sample-feed.json")}
+          onLoadSample={() => feedText(sampleFeedText(), "bundled-feed.json", "sample")}
+          sampleLabel="Load the bundled feed"
+          onDownloadSample={() => saveTextFile(sampleFeedText(), "bundled-feed.json")}
         />
         <FileDrop
-          title="The record"
-          hint="The merchant's own catalog — what the claims are checked against."
+          side="The record"
+          sideNote="the merchant’s truth"
+          title="The system of record"
           textareaLabel="Catalog JSON"
           value={record.text}
           onText={recordText}
@@ -228,41 +306,42 @@ export function AuditWorkbench() {
           onReadStart={invalidate}
           fileName={record.fileName}
           status={record.status}
-          onLoadSample={() => recordText(catalogSampleText(), "sample-catalog.json", "sample")}
-          sampleLabel="Use the bundled catalog"
-          onDownloadSample={() => saveTextFile(catalogSampleText(), "sample-catalog.json")}
+          onLoadSample={() => recordText(catalogSampleText(), "bundled-catalog.json", "sample")}
+          sampleLabel="Load the bundled catalog"
+          onDownloadSample={() => saveTextFile(catalogSampleText(), "bundled-catalog.json")}
         />
       </div>
 
-      <div className="wb-run">
-        {/* Three states, three different sentences. A note that reads the same
-            whether or not the button works tells the reader nothing about why
-            it is waiting (screenshot review, 2026-07-27). */}
-        {/* Reads from the slot's recorded SOURCE, not from "is it non-empty" —
-            the same proxy the gate caught in the result panel (finding 4). With
-            the bundled catalog loaded, "your own records" was simply false. */}
-        {/* The note sits ABOVE the button (R-5/D-4, 2026-07-31): the page's
-            primary action is disabled at first paint, and its instruction used
-            to trail it like a caption. Reading order is now zones → what is
-            missing (or what will happen) → the control — the state is
-            explained before it is met, for pointer and screen-reader alike. */}
-        <p className="wb-run-note">
-          {!canRun
-            ? "Add a feed to run the audit — the record side is optional."
-            : record.text.trim() && record.source === "reader"
-              ? "Your feed will be checked against your own records."
-              : "Your feed will be checked against the bundled catalog shipped with this site."}
-        </p>
-        <button type="button" className="lp-btn primary" onClick={runAudit} disabled={!canRun}>
-          Run the audit
+      <div className="wk-runrow">
+        <button
+          type="button"
+          className="wk-run"
+          onClick={() =>
+            loaded
+              ? execute(
+                  { text: feed.text, source: feed.source },
+                  { text: record.text, source: record.source },
+                )
+              : runBundledPair()
+          }
+        >
+          {runLabel}
         </button>
+        <p className="wk-run-hint">
+          <b>Runs in this tab.</b> Nothing you load leaves this page.
+        </p>
+        {loaded && (
+          <button type="button" className="wk-clear" onClick={startOver}>
+            Clear both slots
+          </button>
+        )}
       </div>
 
       {/* No-JS: the whole workbench runs in the reader's browser. Without
           scripting there is nothing to run, so dead controls are hidden and the
           requirement is stated plainly (the v9 defect class, session 26). */}
       <noscript>
-        <style dangerouslySetInnerHTML={{ __html: ".wb-slots,.wb-run{display:none}" }} />
+        <style dangerouslySetInnerHTML={{ __html: ".wk-zones,.wk-runrow{display:none}" }} />
         <p className="wb-hint">
           The audit runs entirely in your browser and needs scripting turned on. Nothing runs on a
           server either way.
@@ -273,118 +352,6 @@ export function AuditWorkbench() {
         <div className="wb-error" role="alert">
           <strong>No verdict.</strong> {runError}
         </div>
-      )}
-
-      {run !== null && counts !== null && (
-        <section className="wb-result" aria-label="Audit result">
-          <header className="wb-verdict-head">
-            <p className={run.report.ok ? "wb-verdict ok" : "wb-verdict fail"}>
-              {run.report.ok ? "PASS" : "FAIL"}
-            </p>
-            <p className="wb-tally">
-              {run.report.findings.length} finding{run.report.findings.length === 1 ? "" : "s"} —{" "}
-              {counts.error} error · {counts.warn} warn · {counts.info} info
-            </p>
-            <button type="button" className="lp-btn ghost wb-dl" onClick={downloadReport}>
-              Download the report
-            </button>
-          </header>
-
-          {/* Every phrase here reads from `run.origin` — the recorded ACTION —
-              so the prose and the report header can never disagree. They did:
-              clicking "use the bundled catalog" put "your own records" on screen
-              beside a report correctly labelled otherwise (gate finding 4). */}
-          <p className="wb-prov">
-            {run.feedRows} feed rows checked against {run.recordRows}{" "}
-            {run.origin.catalog === "reader" ? "of your own records" : "bundled records"}, computed
-            in your browser just now — no AI calls, and nothing you uploaded left this page.
-            {run.origin.catalog === "sample" &&
-              " Items outside the bundled records honestly read as unknown or missing."}
-          </p>
-
-          <dl className="wb-meta">
-            <div>
-              <dt>spec version</dt>
-              <dd className="wb-mono">{run.report.specVersion}</dd>
-            </div>
-            <div>
-              <dt>matching</dt>
-              {/* The C3 label describes the MECHANISM (exact shared-id lookup),
-                  never who owns the data — the distinction gate finding 2
-                  corrected. Ownership is the two rows beside it. */}
-              <dd className="wb-mono">{run.report.matchingMode}</dd>
-            </div>
-            <div>
-              <dt>feed side</dt>
-              <dd className="wb-mono">
-                {run.origin.feed === "reader" ? "your upload" : "bundled feed"}
-              </dd>
-            </div>
-            <div>
-              <dt>record side</dt>
-              <dd className="wb-mono">
-                {run.origin.catalog === "reader" ? "your upload" : "bundled catalog"}
-              </dd>
-            </div>
-          </dl>
-
-          {run.report.findings.length > 0 ? (
-            <ol className="wb-findings">
-              {run.report.findings.map((f) => (
-                <li key={`${f.claim.id}:${f.ruleId}:${f.claim.field}`} className="wb-finding">
-                  <p className="wb-plain">
-                    <span className={`wb-sev ${f.severity}`}>{f.severity}</span>{" "}
-                    {cleanFindingFor(run.origin, f.plainLine ?? "")}
-                  </p>
-                  <dl className="wb-receipts">
-                    <div>
-                      <dt>claim</dt>
-                      <dd className="wb-mono">
-                        {f.claim.id} · {f.claim.field}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>asserted</dt>
-                      <dd className="wb-mono">{JSON.stringify(f.claim.value)}</dd>
-                    </div>
-                    <div>
-                      <dt>checked against</dt>
-                      <dd className="wb-mono">{f.referenceRowId}</dd>
-                    </div>
-                    <div>
-                      <dt>rule</dt>
-                      <dd className="wb-mono">{f.ruleId}</dd>
-                    </div>
-                  </dl>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="wb-clean">
-              No drift detected — every claim in this feed agrees with the records it was checked
-              against.
-            </p>
-          )}
-
-          {/* WHAT NOW. A verdict with no next move is where the old surface
-              stopped, and it is the step the owner named explicitly in the
-              walkthrough review (2026-07-28). Three real continuations: keep
-              the evidence, run again, or go read what the rules actually say. */}
-          <nav className="wb-next" aria-label="Next steps">
-            <button type="button" className="lp-btn ghost" onClick={startOver}>
-              Audit another pair
-            </button>
-            <a className="wb-next-link" href="/report">
-              See a full worked report
-            </a>
-            <a className="wb-next-link" href="/playground">
-              How the rules are applied
-            </a>
-            <a className="wb-next-link" href="/docs">
-              What is real, what is invented
-            </a>
-          </nav>
-        </section>
       )}
     </div>
   );

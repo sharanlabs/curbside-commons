@@ -144,13 +144,42 @@ describe("A3 email builder — goldens + invariants", () => {
 });
 
 describe("A3 import/network boundary — builders are JSON-in/JSON-out, transport-free", () => {
-  const files = ["lib/delivery/slack.ts", "lib/delivery/email.ts", "lib/delivery/email-html.ts"];
+  /**
+   * `email-message.ts` JOINED THIS SET 2026-08-02, when the `.eml` builder's
+   * composition (verdict line, body text, subject, placeholder addresses,
+   * header guard) was extracted so the site's DELIVERY station could render the
+   * same strings without pulling in the `Buffer`-based encoders. Every check in
+   * this suite now runs over it too — the extraction moved recipient-facing text
+   * into a new file, and text outside the boundary suite is text outside the
+   * guarantee.
+   */
+  const files = [
+    "lib/delivery/slack.ts",
+    "lib/delivery/email.ts",
+    "lib/delivery/email-message.ts",
+    "lib/delivery/email-html.ts",
+  ];
 
-  it("delivery modules import node builtins only (no engine, no registry, no SDK, no transport)", () => {
+  /**
+   * THE RULE CHANGED SHAPE, NOT STRENGTH. It used to read "must import nothing
+   * at all", which was a proxy for the real guarantee: a builder can reach no
+   * engine, no registry, no SDK, and above all no transport. A sibling import
+   * inside `lib/delivery/` cannot smuggle any of those in, because every sibling
+   * is ITSELF in `files` and therefore subject to every check here — so the
+   * closure is audited, not merely the entry point. What is still forbidden, and
+   * now stated directly: any import that escapes this directory.
+   */
+  it("delivery modules import only audited delivery siblings (no engine, no registry, no SDK, no transport)", () => {
+    const audited = new Set(files.map((f) => f.replace("lib/delivery/", "./")));
     for (const f of files) {
       const text = readFileSync(join(process.cwd(), f), "utf8");
       const specs = [...text.matchAll(/from\s+["']([^"']+)["']/g)].map((m) => m[1]);
-      expect(specs, `${f} must import nothing at all (pure builders)`).toStrictEqual([]);
+      for (const spec of specs) {
+        expect(
+          audited.has(spec),
+          `${f} imports "${spec}" — a delivery builder may reach nothing outside the audited delivery closure`,
+        ).toBe(true);
+      }
     }
   });
 
@@ -164,9 +193,21 @@ describe("A3 import/network boundary — builders are JSON-in/JSON-out, transpor
     }
   });
 
-  it("both builders carry the SIMULATED literal (C10 discipline extended over delivery templates)", () => {
+  /**
+   * Asserted over each builder's CLOSURE (own source + its audited siblings)
+   * rather than per-file, because the `.eml` builder's banner text now lives in
+   * the composition module it imports. Per-file, this tooth would have gone red
+   * for a refactor that changed no emitted byte — and the temptation would have
+   * been to delete it. The guarantee it actually encodes is "the banner is in
+   * the source that builds this message", and that is what it now checks.
+   */
+  it("every builder's source closure carries the SIMULATED literal (C10 discipline over delivery templates)", () => {
     for (const f of files) {
-      expect(readFileSync(join(process.cwd(), f), "utf8")).toContain("SIMULATED");
+      const own = readFileSync(join(process.cwd(), f), "utf8");
+      const siblings = [...own.matchAll(/from\s+["']\.\/([^"']+)["']/g)].map((m) =>
+        readFileSync(join(process.cwd(), "lib", "delivery", m[1]), "utf8"),
+      );
+      expect([own, ...siblings].some((t) => t.includes("SIMULATED")), f).toBe(true);
     }
   });
 });

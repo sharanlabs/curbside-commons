@@ -21,136 +21,202 @@ import { test, expect } from "@playwright/test";
 
 /* ============================ THE LANDING ============================ */
 
-test("landing leads with the working tool, then explains itself", async ({ page }) => {
+test("landing carries one run through six named stations", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
 
-  // Metadata now says what the page DOES. The H1 keeps the adopted hero lines.
+  // Metadata says what the page DOES. The H1 keeps the adopted hero lines.
   await expect(page).toHaveTitle(/audit a marketplace feed against the merchant's records/i);
   const h1 = page.getByRole("heading", { level: 1 });
   await expect(h1).toContainText("Dinner can be ordered while you sleep.");
   await expect(h1).toContainText("What the agent read needs proof.");
 
-  // The five beats render as <h2>, IN ORDER. The tool comes FIRST and the
-  // explanatory scene follows it — a diagram belongs after the thing it
-  // explains. Independent visibility checks would let any permutation pass.
+  // THE PROCESS STRIP — six stations, named and in order, with NO numerals.
+  // Numbered stations would tell a visitor this is a document to be read in
+  // order, which is the read the 2026-07-28 de-numbering removed sitewide.
+  const strip = page.getByRole("navigation", { name: "Stations" });
+  await expect(strip.getByRole("link")).toHaveCount(6);
+  expect(await strip.getByRole("link").allTextContents()).toEqual([
+    "Inputs",
+    "Run",
+    "Verdict",
+    "Fees",
+    "Delivery",
+    "Proof",
+  ]);
+  await expect(strip).not.toContainText(/\d/);
+  for (const id of ["audit", "run", "verdict", "fees", "delivery", "proof"]) {
+    await expect(page.locator(`section#${id}`)).toHaveCount(1);
+  }
+
+  // The stations render as <h2>, IN ORDER. Independent visibility checks would
+  // let any permutation pass. INPUTS carries the H1 and RUN's heading is the
+  // ticker's own head, so four H2s remain — the run's consequences.
   const h2Sequence = await page.locator("main h2").allTextContents();
   expect(h2Sequence).toEqual([
-    "Audit a feed.",
-    "A claim is checked before the order is placed.",
-    "The check runs in the open.",
-    "Two kinds of claim.",
+    "Findings, with the arithmetic attached.",
+    "The fee statement, read against the law.",
+    "What a human would receive.",
     "The same input, the same receipt, every time.",
   ]);
 
-  // The proof-object bar renders the REAL held-claim specimen (no invented values).
-  const proofBar = page.locator(".pb-bar");
-  await expect(proofBar).toContainText("HOLD");
-  await expect(proofBar).toContainText("THE MENU: 2150");
-  await expect(proofBar).toContainText("THE MERCHANT RECORD: 21.50");
-  await expect(proofBar).toContainText("100\u00d7 THE RECORD");
-
-  // The examination receipt carries the derived finding + arithmetic. The
-  // "CASE 001" prefix is gone: a case number that never changes is somebody
-  // else's case, and it was one of the markers that made this read as a
-  // display piece rather than a tool.
-  const receipt = page.locator("article.receipt").first();
-  await expect(receipt).toContainText("CURBSIDE COMMONS \u00b7 EXAMINATION RECEIPT");
-  await expect(receipt).toContainText("FINDING 11 OF 16");
-  await expect(receipt).not.toContainText("CASE 001");
-  await expect(receipt).toContainText("2150.00 \u00d7 100 = 215,000\u00a2");
-  await expect(receipt.locator(".stamp")).toHaveText("HOLD");
-
-  // What it checks: two plain cards. The FILE A / FILE B tab cuts and the big
-  // stat rows are gone; the figures survive INSIDE the prose, still derived.
-  const listings = page.locator("section.file").first();
-  await expect(listings).not.toContainText("FILE A");
-  await expect(listings.getByRole("heading", { name: "What the listing says" })).toBeVisible();
-  await expect(listings).toContainText("16 findings \u2014 11 errors and 5 warnings");
-  await expect(listings.getByRole("link", { name: /See the worked example/ })).toHaveAttribute(
-    "href",
-    "/report",
+  // STATION 2 · RUN — idle, the ticker explains what the check IS.
+  await expect(page.locator(".wk-ticker")).toContainText("The check, line by line");
+  await expect(page.locator(".wk-ticker-idle")).toContainText(
+    /matched to the record it should agree with/,
   );
-  const fees = page.locator("section.file.law");
-  await expect(fees).not.toContainText("FILE B");
-  await expect(fees.getByRole("heading", { name: "What the fee statement says" })).toBeVisible();
-  // The 17 = 11 + 6 split, in prose. Asserted with the spaces, because a
-  // rewrite of this page rendered "17codified": JSX trims the lines of a text
-  // node and rejoins them, so a space sitting after a }} can vanish even
-  // though the source plainly contains it. Nothing else in the suite can see
-  // that class of defect.
-  await expect(fees).toContainText("applies 17 codified rules");
-  await expect(fees).toContainText("11 checkable from the statement itself");
-  await expect(fees).toContainText("6 that need outside evidence");
-  await expect(fees.getByRole("link", { name: /Open the fee rules/ })).toHaveAttribute(
+
+  // STATION 3 · VERDICT — the slab opens on the BUNDLED pair's committed
+  // verdict, so the page tells its whole story before a reader runs anything.
+  // Every figure derives from the engine (lib/landing/specimen.ts): 16 findings,
+  // 11 errors, 5 warnings, 25 feed rows.
+  const slab = page.locator(".wk-slab");
+  await expect(slab).toHaveAttribute("data-live", "false");
+  await expect(slab.locator(".wk-verdict-word")).toHaveText("FAIL");
+  const tally = slab.locator(".wk-tally");
+  await expect(tally).toContainText("16");
+  await expect(tally).toContainText("11");
+  await expect(tally).toContainText("5");
+  await expect(tally).toContainText("25");
+  await expect(slab.locator(".wk-prov")).toContainText("feed side: bundled feed");
+  await expect(slab.locator(".wk-prov")).toContainText("record side: bundled catalog");
+  // The honesty sentence is part of the object, and its link is reachable.
+  await expect(slab.locator(".wk-real")).toContainText(
+    "The rules and the arithmetic are real; the merchant is invented.",
+  );
+  await expect(slab.locator(".wk-real").getByRole("link")).toHaveAttribute("href", "/docs");
+  // Two receipts, each citing the rule it stands on and deep-linking to it.
+  await expect(slab.locator(".wk-receipt")).toHaveCount(2);
+  const chips = slab.locator(".wk-rc-rule");
+  await expect(chips).toHaveCount(2);
+  for (const href of await chips.evaluateAll((els) => els.map((e) => e.getAttribute("href")))) {
+    expect(["/report", "/fees"]).toContain(href);
+  }
+  // Idle carries no "Download the report" — there is no run of the reader's to keep.
+  await expect(slab.getByRole("button", { name: "Download the report" })).toHaveCount(0);
+
+  // STATION 4 · FEES — the 17 = 11 + 6 split, derived, rendered as counts.
+  const feesStation = page.locator("section#fees");
+  await expect(feesStation).toContainText("17");
+  await expect(feesStation).toContainText("11");
+  await expect(feesStation).toContainText("6");
+  await expect(feesStation.getByRole("link", { name: /Open the fee rules/ })).toHaveAttribute(
     "href",
     "/fees",
   );
 
-  // Trust facts \u2014 deterministic \u00b7 the pinned test figure \u00b7 the published DEFER.
+  // STATION 5 · DELIVERY — two artifacts, both stamped BUILT NOT SENT, and the
+  // Slack payload leading with the BUILDER's own SIMULATED banner (never a
+  // string retyped into JSX — evals/packs/landing-delivery-egress.test.ts pins
+  // that the component cannot contain a copy of it).
+  const artifacts = page.locator(".wk-artifact");
+  await expect(artifacts).toHaveCount(2);
+  await expect(page.locator(".wk-stamp")).toHaveCount(2);
+  for (const stamp of await page.locator(".wk-stamp").allTextContents()) {
+    expect(stamp).toBe("Built, not sent");
+  }
+  await expect(artifacts.first()).toContainText("Slack message");
+  await expect(artifacts.first().locator(".wk-sk-banner")).toContainText("SIMULATED DATA");
+  await expect(artifacts.nth(1)).toContainText("RFC 5322");
+  // RFC 2606 reserved placeholders only — a valid message that can never resolve.
+  await expect(artifacts.nth(1).locator(".wk-em-heads")).toContainText("sender.example");
+  await expect(artifacts.nth(1).locator(".wk-em-heads")).toContainText("recipient.example");
+  await expect(artifacts.nth(1).locator(".wk-em-heads")).toContainText("[SIMULATED]");
+  await expect(page.locator(".wk-delivery-note")).toContainText("Nothing is transmitted.");
+
+  // STATION 6 · PROOF — deterministic · the pinned test figure · the published DEFER.
   const trust = page.locator(".trust");
   await expect(trust).toContainText("DETERMINISTIC");
   await expect(trust).toContainText("1,200+");
   await expect(trust).toContainText("automated tests compare the engine");
   await expect(trust.getByText("DEFER", { exact: true })).toBeVisible();
 
-  // The audience eyebrow and the three-seat band are gone (owner, 2026-07-28):
-  // both were positioning copy, never a next step.
+  // The retired landing furniture is gone: the scene, the examination receipt,
+  // and the proof-object bar all left this page with the redesign.
   await expect(page.locator(".cs-eyebrow")).toHaveCount(0);
   await expect(page.locator(".seats")).toHaveCount(0);
-  await expect(page.getByText("FOR MERCHANTS")).toHaveCount(0);
+  await expect(page.locator("article.receipt")).toHaveCount(0);
+  await expect(page.locator(".pb-bar")).toHaveCount(0);
 });
 
-test("the tool opens the page \u2014 both drop zones sit above the fold", async ({ page }) => {
-  // THE CONTRACT THAT KEPT REGRESSING. Session 36 built the workbench and put
-  // it in section four of page three, ~2990px down; the owner returned with the
-  // same complaint. Reachability is not the requirement \u2014 ARRIVAL is. This
-  // pins the requirement itself rather than a proxy for it, at the 1280px
-  // desktop floor this site is designed for.
+test("the instrument opens the page — drop zones AND the run control sit above the fold", async ({
+  page,
+}) => {
+  // THE CONTRACT THAT KEPT REGRESSING. Reachability is not the requirement —
+  // ARRIVAL is. This pins the requirement itself at the 1280px desktop floor
+  // this site is designed for.
+  //
+  // STRENGTHENED 2026-08-02: the RUN CONTROL now has to clear the fold too. It
+  // used to sit below it by design and be `disabled` at first paint, so the
+  // page's primary verb arrived out of reach and switched off (DESIGN.md open
+  // item 1). The control is never disabled now — with empty slots it reads
+  // "Run the bundled pair" — so "can a reader see it and press it without
+  // scrolling?" became a real question, and this is the answer.
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
 
-  for (const label of ["The feed", "The record"]) {
-    const slot = page.locator(".fd-slot", { hasText: label });
-    await expect(slot).toBeVisible();
-    // Measure `.fd-zone`, the actual drop target — NOT `.fd-slot`, which also
-    // contains the title and hint above it. Measuring the slot would let added
-    // header copy sink the real drop zone past the fold while the assertion
-    // still passed: a test that holds while the requirement it names breaks.
-    const zone = slot.locator(".fd-zone");
-    const box = await zone.boundingBox();
-    expect(box, `${label} drop zone must render`).not.toBeNull();
-    // WHOLLY above the fold, not merely starting above it. `y < 900` was the
-    // original assertion and it is weaker than the requirement it names: a zone
-    // beginning at 880 is 'above the fold' by that measure while being almost
-    // entirely below it. Measured today the zones run 657.5 → 871.7, so the
-    // stricter reading holds with ~28px of headroom and costs nothing.
+  const zones = page.locator(".wk-zone");
+  await expect(zones).toHaveCount(2);
+  for (let i = 0; i < 2; i++) {
+    const box = await zones.nth(i).boundingBox();
+    expect(box, `drop zone ${i} must render`).not.toBeNull();
+    // WHOLLY above the fold, not merely starting above it: a zone beginning at
+    // 880 is 'above the fold' by the weaker reading while being almost entirely
+    // below it.
     expect(
       box!.y + box!.height,
-      `${label} drop zone must sit ENTIRELY within the first screen`,
+      `drop zone ${i} must sit ENTIRELY within the first screen`,
     ).toBeLessThanOrEqual(900);
   }
 
-  // The run control sits BELOW the fold, and that is by design — it follows
-  // both drop zones (measured: button top 970.5 vs record zone bottom 871.7).
-  // The previous assertion here was `toBeVisible()`, which in Playwright means
-  // "has a box and is not hidden" and says NOTHING about the viewport; paired
-  // with a comment claiming the control was reachable "without hunting for it",
-  // it read as a fold guarantee it never made. What is actually true, and worth
-  // pinning, is that the button is the NEXT thing after the zones rather than
-  // buried further down the page. (Cross-model gate, 2026-07-28.)
-  const runBtn = page.getByRole("button", { name: "Run the audit" });
+  const runBtn = page.getByRole("button", { name: "Run the bundled pair" });
   await expect(runBtn).toBeVisible();
+  await expect(runBtn).toBeEnabled();
   const btnBox = await runBtn.boundingBox();
-  const recordZone = await page
-    .locator(".fd-slot", { hasText: "The record" })
-    .locator(".fd-zone")
-    .boundingBox();
+  expect(btnBox, "the run control must render").not.toBeNull();
   expect(
-    btnBox!.y - (recordZone!.y + recordZone!.height),
-    "the run control must follow the drop zones immediately, not sit further down the page",
-  ).toBeLessThan(200);
+    btnBox!.y + btnBox!.height,
+    "the run control must sit ENTIRELY within the first screen",
+  ).toBeLessThanOrEqual(900);
+});
+
+test("one click on the empty bench runs the bundled pair end to end", async ({ page }) => {
+  // The empty-slot path IS the bundled run: the door and the verb agree, so a
+  // first-time reader sees the whole instrument work without supplying a file.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  const slab = page.locator(".wk-slab");
+  await expect(slab).toHaveAttribute("data-live", "false");
+
+  await page.getByRole("button", { name: "Run the bundled pair" }).click();
+
+  // The run is the reader's now, and the slab says so.
+  await expect(slab).toHaveAttribute("data-live", "true");
+  await expect(slab.locator(".wk-verdict-word")).toHaveText("FAIL");
+  await expect(slab.locator(".wk-prov-line")).toContainText("computed in your browser just now");
+  await expect(slab.locator(".wk-prov-line")).toContainText("bundled records");
+  await expect(slab.getByRole("button", { name: "Download the report" })).toBeVisible();
+
+  // Both slots filled themselves, and the control offers the next run.
+  await expect(page.locator(".wk-zone.is-filled")).toHaveCount(2);
+  await expect(page.getByRole("button", { name: "Run again" })).toBeVisible();
+
+  // The ticker settled on the REAL tally, and every streamed line is a check
+  // that genuinely ran — HELD lines carry the rule id the engine cited.
+  const ticker = page.locator(".wk-ticker");
+  await expect(ticker.locator(".wk-ticker-sum")).toContainText("every claim checked");
+  await expect(ticker.locator(".wk-ticker-sum")).toContainText("16 findings");
+  await expect(ticker.locator(".wk-tk-line")).not.toHaveCount(0);
+  for (const held of await ticker.locator(".wk-tk-v.held").all()) {
+    await expect(held).toHaveText("HELD");
+  }
+
+  // The delivery artifacts rebuilt from THIS run and still lead with the banner.
+  await expect(page.locator(".wk-artifact").first().locator(".wk-sk-banner")).toContainText(
+    "SIMULATED DATA",
+  );
 });
 
 test("landing footer: disclaimer-free, honest, and exactly the three chrome links", async ({
@@ -203,34 +269,6 @@ test("landing footer: disclaimer-free, honest, and exactly the three chrome link
  * the mirror is not simplified \u2014 it is gone, and with it the entire class of
  * mirror-drift defect the pack existed to catch. */
 
-test("commons scene: reduced motion settles complete; the pause control is real (WCAG 2.2.2)", async ({
-  page,
-}) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  // Under reduced motion the scene opens on its settled state — order placed, proof attached.
-  await expect(page.locator(".cs-status-live")).toContainText(
-    "SCENE SETTLED · ORDER PLACED WITH PROOF",
-  );
-  // The primary CTA runs the check. The secondary is a native link — it now
-  // goes to the worked report, because the tool it used to advertise is on
-  // this page, above this band.
-  await expect(page.getByRole("button", { name: "Watch a claim get held" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "See a full worked report" })).toHaveAttribute(
-    "href",
-    "/report",
-  );
-});
-
-test("commons scene pause/play genuinely toggles the motion loop", async ({ page }) => {
-  // Motion allowed (default) — the loop runs, so the control reads "Pause motion".
-  await page.goto("/");
-  const pause = page.getByRole("button", { name: "Pause motion" });
-  await expect(pause).toBeVisible();
-  await pause.click();
-  await expect(page.getByRole("button", { name: "Play motion" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Pause motion" })).toHaveCount(0);
-});
 
 /* ============================== THE NAV ============================== */
 
@@ -511,18 +549,39 @@ test.describe("no-JS completeness (SSR floors)", () => {
     // runs client-side. So the floor becomes: no dead controls, and the reason
     // stated in words. A drop zone that silently does nothing is worse than one
     // that is honest about needing JS.
-    await expect(page.getByRole("button", { name: "Run the audit" })).toBeHidden();
-    await expect(page.locator(".wb-slots")).toBeHidden();
+    await expect(page.getByRole("button", { name: "Run the bundled pair" })).toBeHidden();
+    await expect(page.locator(".wk-zones")).toBeHidden();
     await expect(
       page.getByText(/runs entirely in your browser and needs scripting turned on/),
     ).toBeVisible();
     // And it must not imply a server is involved — the promise survives no-JS.
     await expect(page.getByText(/Nothing runs on a server either way/)).toBeVisible();
 
-    // The explanatory half of the page still opens complete: the receipt is
-    // SSR-settled, so a no-JS reader still learns what the product does.
-    await expect(page.locator("article.receipt").first()).toContainText("FINDING 11 OF 16");
-    await expect(page.locator(".pb-bar")).toContainText("HOLD");
+    // THE FLOOR MOVED AGAIN, AND ROSE (2026-08-02). It used to rest on the
+    // examination receipt and the proof bar, both of which left this page with
+    // the redesign. What replaces them is stronger: every station downstream of
+    // the tool has a complete IDLE state built on the SERVER from the bundled
+    // pair's committed report, so a reader without scripting still gets the
+    // whole story — the verdict, its receipts, and the messages a human would
+    // receive — rather than a page of empty cards.
+    // The RUN station is labelled by the ticker's own head, which is a client
+    // component — so the label only exists if that component SSRs. Pinned here
+    // because a section whose `aria-labelledby` points at nothing is an
+    // accessible-name failure that only shows up without scripting.
+    await expect(page.locator("#run-h")).toHaveCount(1);
+    await expect(page.locator("section#run")).toHaveAttribute("aria-labelledby", "run-h");
+
+    const slab = page.locator(".wk-slab");
+    await expect(slab).toHaveAttribute("data-live", "false");
+    await expect(slab.locator(".wk-verdict-word")).toHaveText("FAIL");
+    await expect(slab.locator(".wk-tally")).toContainText("16");
+    await expect(slab.locator(".wk-receipt")).toHaveCount(2);
+    await expect(slab.locator(".wk-real")).toContainText("the merchant is invented");
+    // The delivery artifacts are server-built, so they survive no-JS intact —
+    // including the builder's own banner.
+    await expect(page.locator(".wk-artifact")).toHaveCount(2);
+    await expect(page.locator(".wk-sk-banner")).toContainText("SIMULATED DATA");
+    await expect(page.locator(".wk-em-heads")).toContainText("sender.example");
   });
 
   test("fees renders every example month without scripting; the month tabs are hidden", async ({

@@ -9313,3 +9313,829 @@ body,
     max-width: 24ch;
   }
 }
+
+/* ============================================================================
+   THE WALKTHROUGH — one run, carried to the end (2026-08-02)
+
+   Design source: mockups/walkthrough-one-run-2026-08-02.html, rendered and
+   fold-verified at 1280x900 before this port. Every value below is transcribed
+   from that file; the palette, faces, radii and easings are the existing
+   tokens, unchanged (owner: "let color palette be the same").
+
+   WHY EVERY CLASS CARRIES A `wk-` PREFIX. The mockup names its classes `.door`,
+   `.run`, `.receipt`, `.zone`, `.trust`. Three of those already exist in this
+   stylesheet and two are pinned by e2e contracts — `a.door` with its `.d-title`
+   is asserted across five routes, and `article.receipt` carries the /report
+   examination receipt. Porting the mockup's names verbatim would silently
+   restyle other pages. The prefix keeps the mockup's VALUES while leaving every
+   existing surface untouched.
+
+   PROOF reuses `.trust` / `.fact` deliberately: that band is unchanged from the
+   previous landing, so a second copy of it under a new name would be two things
+   to keep in agreement.
+
+   MOTION: transform and opacity only, like the rest of this file. The
+   reduced-motion resolution at the end is scoped to `wk-` surfaces — a global
+   `* { transition: none }` would reach 9,000 lines of unrelated rules.
+   ========================================================================== */
+
+/* ---------- the process strip: six stations, one thin line ---------------- */
+
+.wk-strip {
+  position: sticky;
+  top: 68px; /* the nav's min-height — the two bars stack, never overlap */
+  z-index: 39; /* below the nav's 40 */
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+}
+.wk-strip-in {
+  display: flex;
+  align-items: stretch;
+  height: 34px;
+}
+.wk-st {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-family: var(--ff-mono);
+  font-size: 9.5px;
+  font-weight: 590;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  text-decoration: none;
+  position: relative;
+  transition: color var(--dur-2) var(--ease);
+}
+.wk-st:hover { color: var(--ink-2); }
+.wk-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rule-3);
+  transition:
+    background var(--dur-2) var(--ease),
+    box-shadow var(--dur-2) var(--ease);
+}
+.wk-st::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-3) var(--ease-arrival);
+}
+.wk-st.is-here { color: var(--ink-2); }
+.wk-st.is-here .wk-dot {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-tint);
+}
+.wk-st.is-here::after { transform: scaleX(1); }
+.wk-st.is-done { color: var(--graphite); }
+.wk-st.is-done .wk-dot { background: var(--accent); }
+.wk-st.is-run .wk-dot { animation: wk-pulse 900ms var(--ease) infinite; }
+@keyframes wk-pulse {
+  0%,
+  100% { box-shadow: 0 0 0 0 rgba(36, 56, 214, 0.28); }
+  50% { box-shadow: 0 0 0 5px rgba(36, 56, 214, 0.06); }
+}
+
+/* Every station is a jump target under 102px of sticky chrome (nav 68 + strip
+   34). Without this the heading lands underneath both bars — DESIGN.md open
+   item 8, which six anchors would have turned from a latent defect into a
+   visible one on every click. */
+.wk-main section[id] { scroll-margin-top: 114px; }
+
+/* ---------- station 1 · inputs ------------------------------------------- */
+
+.wk-s-inputs { padding: clamp(30px, 4.5vh, 44px) 0 0; }
+.wk-main .wk-h1 {
+  font-size: clamp(33px, 3.4vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -0.028em;
+  font-weight: 680;
+  margin: 0;
+  text-align: left;
+  animation: none; /* the instrument arrives, it does not perform */
+}
+.wk-main .wk-lede {
+  font-size: 17.5px;
+  line-height: 1.6;
+  font-weight: 460;
+  color: var(--body);
+  max-width: 62ch;
+  margin: 14px 0 0;
+  text-align: left;
+  animation: none;
+}
+
+.wk-wb { margin-top: clamp(20px, 3.2vh, 30px); }
+.wk-zones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.wk-zone {
+  border: 1.5px dashed var(--rule-3);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+  padding: 18px 22px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition:
+    border-color var(--dur-2) var(--ease),
+    background var(--dur-2) var(--ease);
+}
+.wk-zone:hover,
+.wk-zone.is-drag { border-color: var(--accent-line); }
+.wk-zone.is-filled {
+  border-style: solid;
+  border-color: var(--accent-line);
+  background: var(--bg);
+}
+.wk-zone-k {
+  width: 100%;
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 590;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 6px;
+}
+.wk-zone-k .side {
+  color: var(--faint);
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+.wk-zone-t {
+  font-size: 16.5px;
+  font-weight: 620;
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+
+/* The LOUD door — the one a first-time visitor can open. */
+.wk-door {
+  align-self: flex-start;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 590;
+  color: var(--accent);
+  background: var(--accent-tint);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-ctrl);
+  padding: 9px 16px;
+  cursor: pointer;
+  transition:
+    background var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
+}
+.wk-door:hover {
+  background: rgba(36, 56, 214, 0.09);
+  border-color: var(--accent);
+}
+.wk-door:active { transform: translateY(1px); }
+.wk-door:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* The quiet secondary — a real <input type=file> behind its own label. */
+.wk-quiet {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.wk-quiet-label {
+  color: var(--graphite);
+  font-weight: 560;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.wk-quiet-label:hover { color: var(--ink); }
+.wk-quiet-or { color: var(--muted); }
+/* The input keeps a focus ring via its label — it is visually hidden, never
+   removed from the accessibility tree. */
+.wk-zone .fd-input:focus-visible + .wk-quiet-label {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.wk-chipfile {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ff-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: var(--bg-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-chip);
+  padding: 8px 12px;
+  margin-top: 10px;
+}
+.wk-ok-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+}
+.wk-chip-meta { color: var(--muted); }
+
+.wk-paste {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.wk-paste > summary {
+  cursor: pointer;
+  color: var(--graphite);
+}
+
+.wk-runrow {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.wk-run {
+  font: inherit;
+  font-size: 15.5px;
+  font-weight: 590;
+  color: #ffffff;
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--r-pill);
+  padding: 12px 26px;
+  cursor: pointer;
+  transition:
+    background var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
+}
+.wk-run:hover { background: var(--accent-hi); }
+.wk-run:active { transform: translateY(1px); }
+.wk-run:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wk-run-hint { font-size: 14px; color: var(--muted); margin: 0; }
+.wk-run-hint b { color: var(--graphite); font-weight: 590; }
+.wk-clear {
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.wk-clear:hover { color: var(--ink); }
+
+/* ---------- station 2 · run — the ticker --------------------------------- */
+
+.wk-s-run { padding: clamp(40px, 6vh, 60px) 0 0; }
+.wk-ticker {
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-card);
+  background: var(--bg);
+  overflow: hidden;
+}
+.wk-ticker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 590;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.wk-live { color: var(--accent); }
+.wk-ticker-body {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 14px 18px;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.wk-tk-line {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  color: var(--graphite);
+  margin: 0;
+  opacity: 0;
+  transform: translateY(5px);
+  transition:
+    opacity var(--dur-2) var(--ease-arrival),
+    transform var(--dur-2) var(--ease-arrival);
+}
+.wk-tk-line.is-in { opacity: 1; transform: none; }
+.wk-tk-id { color: var(--muted); min-width: 16ch; }
+.wk-tk-what { flex: 1; }
+.wk-tk-v { font-weight: 600; letter-spacing: 0.06em; }
+.wk-tk-v.ok { color: var(--ok); }
+.wk-tk-v.held { color: var(--ember); }
+.wk-ticker-idle {
+  color: var(--muted);
+  font-family: var(--ff-sans);
+  font-size: 14.5px;
+  margin: 0;
+  max-width: 74ch;
+}
+.wk-ticker-idle b { color: var(--graphite); font-weight: 590; }
+.wk-ticker-sum {
+  border-top: 1px solid var(--rule);
+  padding: 11px 18px;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  color: var(--graphite);
+}
+
+/* ---------- station 3 · verdict — the slab ------------------------------- */
+
+.wk-s-verdict { padding: clamp(48px, 7vh, 72px) 0 0; }
+.wk-slab {
+  margin-top: 26px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-card);
+  background: var(--bg);
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(18, 20, 28, 0.03),
+    0 8px 28px rgba(18, 20, 28, 0.04);
+}
+.wk-slab-top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 28px;
+  align-items: center;
+  padding: 26px 30px;
+  border-bottom: 1px solid var(--rule);
+  background: linear-gradient(180deg, var(--bg-2), var(--bg));
+}
+.wk-verdict-mark {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+}
+.wk-verdict-lamp {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.wk-verdict-lamp.fail {
+  background: var(--ember);
+  box-shadow: 0 0 0 4px var(--ember-tint);
+}
+.wk-verdict-lamp.ok {
+  background: var(--ok);
+  box-shadow: 0 0 0 4px rgba(6, 118, 71, 0.08);
+}
+.wk-verdict-word {
+  font-family: var(--ff-mono);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.wk-verdict-word.fail { color: var(--ember); }
+.wk-verdict-word.ok { color: var(--ok); }
+.wk-tally { display: flex; gap: 32px; }
+.wk-tally div { line-height: 1.3; }
+.wk-n {
+  font-family: var(--ff-mono);
+  font-size: 23px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  display: block;
+}
+.wk-n.err { color: var(--ember); }
+.wk-n.wrn { color: var(--gold-text); }
+.wk-k {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 590;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.wk-slab-cta {
+  font-size: 14px;
+  font-weight: 590;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.wk-slab-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.wk-prov {
+  padding: 13px 30px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  color: var(--graphite);
+  background: var(--bg-2);
+}
+.wk-real {
+  font-family: var(--ff-sans);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: auto;
+}
+.wk-real a { color: var(--graphite); }
+
+.wk-receipts { display: grid; grid-template-columns: 1fr 1fr; }
+.wk-receipt {
+  padding: 24px 30px 26px;
+  border-right: 1px solid var(--rule);
+}
+.wk-receipt:last-child { border-right: 0; }
+.wk-rc-head { margin: 0 0 12px; }
+.wk-rc-rule {
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 590;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  background: var(--accent-tint);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-chip);
+  padding: 3px 8px;
+  display: inline-block;
+  text-decoration: none;
+}
+.wk-rc-rule:hover { border-color: var(--accent); }
+.wk-rc-sev {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  margin-left: 8px;
+  color: var(--graphite);
+}
+.wk-rc-sev.error { color: var(--ember); }
+.wk-rc-sev.warn { color: var(--gold-text); }
+.wk-main .wk-receipt h3 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.014em;
+  line-height: 1.35;
+  margin: 0 0 12px;
+  color: var(--ink);
+}
+.wk-rc-math {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  font-family: var(--ff-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  background: var(--bg-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-chip);
+  padding: 12px 15px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.wk-lbl { color: var(--faint); }
+.wk-bad { color: var(--ember); font-weight: 600; }
+.wk-clean {
+  padding: 24px 30px 26px;
+  font-size: 15px;
+  color: var(--body);
+  margin: 0;
+}
+
+/* ---------- station 4 · fees --------------------------------------------- */
+
+.wk-s-fees { padding: clamp(56px, 8vh, 84px) 0 0; }
+.wk-fees-grid {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.wk-fee-card {
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-card);
+  background: var(--bg);
+  padding: 22px 24px;
+}
+.wk-fee-card.finding { border-color: var(--ember-line); }
+.wk-fee-k {
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 590;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  margin: 0 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.wk-fee-sev { color: var(--ember); }
+.wk-main .wk-fee-card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.014em;
+  margin: 0 0 8px;
+}
+.wk-fee-card .d {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}
+.wk-fee-counts { display: flex; gap: 26px; margin-top: 14px; }
+.wk-fee-counts .wk-n { font-size: 19px; }
+.wk-k2 {
+  font-family: var(--ff-mono);
+  font-size: 9.5px;
+  font-weight: 590;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+/* ---------- station 5 · delivery — built, not sent ------------------------ */
+
+.wk-s-delivery { padding: clamp(56px, 8vh, 84px) 0 0; }
+.wk-artifacts {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.wk-artifact {
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-card);
+  background: var(--bg);
+  overflow: hidden;
+}
+.wk-art-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-2);
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  font-weight: 590;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+/* The gold stamp — held status, never a verdict lamp (D6: blue is never a lamp,
+   and gold at 1.83:1 is unusable as text, so the -text token carries it). */
+.wk-stamp {
+  font-family: var(--ff-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--gold-text);
+  border: 1px solid rgba(156, 98, 8, 0.35);
+  border-radius: var(--r-chip);
+  padding: 3px 8px;
+  background: rgba(255, 176, 32, 0.07);
+  white-space: nowrap;
+}
+/* The artifacts render EVERY block the builder emits, so a long report makes a
+   long card. Capping the height and scrolling keeps the two cards balanced
+   without the page ever showing a subset while claiming to show the payload. */
+.wk-art-body {
+  padding: 18px 20px 20px;
+  max-height: 420px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.wk-sk-banner {
+  font-size: 13px;
+  font-weight: 620;
+  color: var(--ink-2);
+  padding: 10px 13px;
+  background: var(--bg-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-chip);
+  margin: 0 0 12px;
+}
+.wk-sk-header {
+  font-size: 16.5px;
+  font-weight: 680;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+.wk-sk-verdict {
+  display: block;
+  font-size: 14px;
+  font-weight: 590;
+  color: var(--ink-2);
+  margin-bottom: 2px;
+}
+.wk-sk-sub {
+  display: block;
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.wk-sk-div {
+  display: block;
+  height: 1px;
+  background: var(--rule-2);
+  margin: 12px 0;
+}
+.wk-sk-finding {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--body);
+  margin: 0 0 10px;
+}
+.wk-sev { font-weight: 620; color: var(--ember); }
+.wk-ids {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+.wk-sk-more { font-size: 13px; color: var(--muted); font-style: italic; margin: 0 0 10px; }
+.wk-sk-ctx {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  color: var(--faint);
+}
+.wk-em-heads {
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  line-height: 1.8;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-2);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+.wk-h { color: var(--faint); }
+.wk-em-body {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--graphite);
+  white-space: pre-wrap;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.wk-art-foot {
+  border-top: 1px solid var(--rule);
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--bg-2);
+}
+.wk-delivery-note {
+  margin-top: 18px;
+  font-size: 14.5px;
+  color: var(--muted);
+  max-width: 74ch;
+}
+.wk-delivery-note b { color: var(--graphite); font-weight: 590; }
+
+/* ---------- narrow screens ------------------------------------------------ */
+
+@media (max-width: 900px) {
+  .wk-zones,
+  .wk-fees-grid,
+  .wk-artifacts,
+  .wk-receipts { grid-template-columns: 1fr; }
+  .wk-receipt { border-right: 0; border-bottom: 1px solid var(--rule); }
+  .wk-receipt:last-child { border-bottom: 0; }
+  .wk-slab-top { grid-template-columns: 1fr; gap: 18px; }
+  .wk-strip { display: none; } /* the bar is a desktop affordance (owner, 2026-07-15) */
+  .wk-main section[id] { scroll-margin-top: 80px; }
+}
+
+/* ---------- reduced motion ------------------------------------------------
+   Scoped to this surface. Every animated `wk-` element resolves to its SETTLED
+   state — the ticker lines are present rather than hidden, which is the whole
+   point: the information never depends on the animation having run. */
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-st,
+  .wk-dot,
+  .wk-st::after,
+  .wk-door,
+  .wk-run,
+  .wk-zone,
+  .wk-tk-line {
+    transition: none;
+  }
+  .wk-st.is-run .wk-dot { animation: none; }
+  .wk-tk-line { opacity: 1; transform: none; }
+}
+
+/* The run's provenance sentence, beneath the strip it qualifies. */
+.wk-prov-line {
+  padding: 14px 30px 16px;
+  margin: 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 88ch;
+}
+
+/* The slab's action cluster — keep-the-evidence beside the worked-report door. */
+.wk-slab-acts {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.wk-dl { white-space: nowrap; }
+
+/* The complete findings list — folded, so the tally is always itemisable. */
+.wk-all {
+  border-top: 1px solid var(--rule);
+  padding: 14px 30px 18px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.wk-all > summary {
+  cursor: pointer;
+  color: var(--graphite);
+  font-weight: 560;
+}
+.wk-all-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.wk-all-list > li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+.wk-all-list > li:last-child { border-bottom: 0; }
+.wk-all-sev {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  padding-top: 4px;
+}
+.wk-all-sev.error { color: var(--ember); }
+.wk-all-sev.warn { color: var(--gold-text); }
+.wk-all-plain { color: var(--body); line-height: 1.55; }
+.wk-all-ids {
+  grid-column: 2;
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  color: var(--faint);
+  overflow-wrap: anywhere;
+}

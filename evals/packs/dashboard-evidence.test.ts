@@ -176,7 +176,11 @@ describe("E1a evidence — $0 enforcement claims name real, biting test files", 
       if (proof.enforcedBy.includes("crew-import-walk")) {
         expect(src).toContain("banned LLM/network pattern");
       } else {
-        expect(src).toContain("must import nothing at all (pure builders)");
+        // Reworded 2026-08-02 when the `.eml` composition was extracted so the
+        // site could render the builder's own strings: a delivery builder may
+        // now import an AUDITED delivery sibling, and nothing else. The cited
+        // enforcement is the same boundary, stated as the closure it always was.
+        expect(src).toContain("may reach nothing outside the audited delivery closure");
       }
     },
   );

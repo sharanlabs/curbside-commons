@@ -301,6 +301,18 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     "utf8",
   );
   const dropSrc = readFileSync(join(root, "components", "playground", "FileDrop.tsx"), "utf8");
+  /**
+   * REBOUND AGAIN 2026-08-02 (the walkthrough redesign). The landing became six
+   * stations and the verdict got one of its own, so the RESULT RENDERING — the
+   * provenance sentence, the origin-derived labels, the tally — moved out of
+   * `AuditWorkbench` into `VerdictSlab`. The guards below follow it. The same
+   * rule as the 2026-07-27 rebinding applies and is worth restating: a honesty
+   * guard aimed at a component that no longer renders the thing it guards is
+   * worse than no guard, because it reports green over an unexamined surface.
+   * Not one invariant is dropped here — each is asserted against whichever file
+   * now carries the words it is about.
+   */
+  const slabSrc = readFileSync(join(root, "components", "landing", "VerdictSlab.tsx"), "utf8");
 
   // The public copy is disclaimer-free and jargon-free: the honest boundary is
   // stated in plain product language ("illustrative"), NOT with lab-words or a
@@ -365,21 +377,28 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     // the record side is now a CHOICE. Whichever way the reader goes, the
     // result must say which records the verdict was reached against — an
     // unlabelled verdict is the one thing this surface may never produce.
-    expect(clientSrc).toMatch(/computed\s*\n?\s*in your browser/i);
-    expect(clientSrc).toMatch(/of your own records/);
-    expect(clientSrc).toMatch(/bundled records/);
-    expect(clientSrc).toMatch(/unknown or missing/);
+    // The verdict rendering now lives in VerdictSlab (2026-08-02) — same
+    // sentences, same guarantee, one file over.
+    expect(slabSrc).toMatch(/computed\s*\n?\s*in\s*\n?\s*your browser/i);
+    expect(slabSrc).toMatch(/of your own records/);
+    expect(slabSrc).toMatch(/bundled records/);
+    expect(slabSrc).toMatch(/unknown or missing/);
     // Both provenance phrases must read from the recorded ACTION, never from a
-    // "is this slot non-empty" proxy — the bug gate finding 4 named.
-    expect(clientSrc).toMatch(/run\.origin\.catalog === "reader"/);
-    expect(clientSrc).toMatch(/run\.origin\.feed === "reader"/);
+    // "is this slot non-empty" proxy — the bug gate finding 4 named. The run is
+    // read off the run bus now, so the expression is `origin.*` rather than
+    // `run.origin.*`; what is pinned is that the ORIGIN decides the wording.
+    expect(slabSrc).toMatch(/origin\.catalog === "reader"/);
+    expect(slabSrc).toMatch(/origin\.feed === "reader"/);
+    // And the slab is a READER of the run, never a second engine call — the
+    // one-owner rule the redesign turns on.
+    expect(slabSrc).not.toMatch(/verifyAcpFeed\(/);
     // No lab-words on any public surface. The predecessor guard banned the
     // WHOLE WORD `simulated`, and an earlier version of this rebound tooth
     // narrowed it to `simulated: true` — which would have let the bare word
     // back onto a shipping surface. Caught by diffing old assertions against
     // new (claim-F attack, 2026-07-27); the original breadth is restored, and
     // this comment exists so the next narrowing has to be deliberate.
-    for (const src of [clientSrc, dropSrc]) {
+    for (const src of [clientSrc, dropSrc, slabSrc]) {
       expect(src).not.toMatch(/\bsimulated\b/i);
       expect(src).not.toMatch(/\bsynthetic\b/i);
     }
@@ -393,9 +412,12 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     // catalog through rather than falling back to the compiled-in one.
     expect(clientSrc).toMatch(/verifyAcpFeed\(parsedFeed\.feed, catalog, origin\)/);
     // Provenance is carried, not inferred: the origin passed to the engine is
-    // built from slot state, and the slot records the action that filled it.
-    expect(clientSrc).toMatch(/catalogOrigin = record\.source/);
-    expect(clientSrc).toMatch(/feed: feed\.source/);
+    // built from the SLOT's recorded source, and the slot records the action
+    // that filled it. The run now takes its two sides as explicit arguments
+    // (`feedSrc`/`recordSrc`) so the one-click bundled path cannot read stale
+    // React state — the identifiers moved, the guarantee did not.
+    expect(clientSrc).toMatch(/catalogOrigin = recordSrc\.source/);
+    expect(clientSrc).toMatch(/feed: feedSrc\.source/);
   });
 
   it("FEED origin is distinguished, not just record origin", () => {
@@ -405,9 +427,14 @@ describe("playground honesty labels (de-jargon Slice E — disclaimer-free + hon
     // 16). It is restored: both sides carry an origin, the sample-feed button
     // records "sample", and the result panel renders a `feed side` row that the
     // e2e asserts. This tooth exists so the next lapse has to be deliberate.
-    expect(clientSrc).toMatch(/sampleFeedText\(\), "sample-feed\.json", "sample"/);
-    expect(clientSrc).toMatch(/catalogSampleText\(\), "sample-catalog\.json", "sample"/);
-    expect(clientSrc).toMatch(/feed side/);
-    expect(clientSrc).toMatch(/bundled feed/);
+    // The bundled files are named in the PRODUCTION register (owner, 2026-07-31:
+    // words stating what the data IS became "bundled"), and they must never cite
+    // an internal fixture name — hence `bundled-feed.json`, not the repo's own
+    // `acp-feed.drifted.json`.
+    expect(clientSrc).toMatch(/sampleFeedText\(\), "bundled-feed\.json", "sample"/);
+    expect(clientSrc).toMatch(/catalogSampleText\(\), "bundled-catalog\.json", "sample"/);
+    // The `feed side` row moved to the slab with the rest of the result.
+    expect(slabSrc).toMatch(/feed side/);
+    expect(slabSrc).toMatch(/bundled feed/);
   });
 });

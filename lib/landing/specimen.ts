@@ -15,9 +15,19 @@
  * data never bundles into the browser.
  */
 
+import acpFeed from "@/fixtures/synthetic-restaurant/acp-feed.drifted.json";
 import expectedAcpReport from "@/fixtures/synthetic-restaurant/expected-report.acp.json";
 import sorCatalog from "@/fixtures/synthetic-restaurant/sor.catalog.json";
 import { ENGINE } from "@/lib/dashboard/evidence";
+import {
+  buildDeliveryArtifacts,
+  type DeliveryArtifacts,
+} from "@/lib/landing/delivery-artifacts";
+import {
+  toVerdictView,
+  type VerdictReportLike,
+  type VerdictView,
+} from "@/lib/landing/verdict-view";
 
 type Finding = {
   claim: { id: string; source: string; field: string; value: unknown };
@@ -278,6 +288,60 @@ export const SPECIMEN_ITEM = {
    prove the mirror still agreed with the engine. The workbench that replaced
    it runs the REAL engine on the reader's own two files, so the mirror is not
    simplified — it is gone, and the mirror-drift defect class with it. */
+
+/* ============================================================================
+   WALKTHROUGH STATIONS (2026-08-02) — the figures and artifacts the six-station
+   landing renders before a reader has run anything. Same contract as everything
+   above: READ or COMPUTED from the committed record, never hand-typed.
+   ========================================================================== */
+
+/** Row counts for the two bundled inputs, read from the fixtures themselves. */
+export const BUNDLED_PAIR = {
+  feedRows: (acpFeed as { items: unknown[] }).items.length, // 25
+  recordRows: sorItems.length, // 12
+} as const;
+
+/**
+ * The canonical string the delivery builders consume. The engine's own committed
+ * report IS the canonical document — the builders take a JSON string and read
+ * `ok` + `findings[]` from it, which is exactly this file's shape (the same
+ * consumption discipline `scripts-ts/walkthrough-end-to-end.mts` uses when it
+ * feeds them `callTool(...).canonical`).
+ */
+const bundledCanonical = JSON.stringify(expectedAcpReport);
+
+/**
+ * The DATE IS AN INPUT, never a clock read — the builders' explicit contract, so
+ * that one report always produces one set of bytes. Pinned here for the idle
+ * artifacts; a live run passes its own fixed date the same way.
+ */
+export const DELIVERY_DATE = "Sat, 01 Aug 2026 12:00:00 +0000";
+
+/**
+ * What the delivery station shows before a run: the two messages built from the
+ * bundled pair's committed report. Built on the SERVER — this module is a server
+ * module by contract (see the header), so the fixtures and the engine
+ * measurables never reach the browser bundle; the component receives these as
+ * plain serializable props.
+ */
+export const DELIVERY_IDLE: DeliveryArtifacts = buildDeliveryArtifacts(bundledCanonical, {
+  tool: "check_feed",
+  subject: "bundled pair (simulated)",
+  date: DELIVERY_DATE,
+});
+
+/**
+ * The verdict slab's idle state — the bundled pair's committed report, through
+ * the SAME view function a live run goes through (`toVerdictView`). The page can
+ * therefore never describe the bundled run in words the reader's own run would
+ * not also produce.
+ */
+export const VERDICT_IDLE: VerdictView = toVerdictView({
+  report: expectedAcpReport as VerdictReportLike,
+  rows: BUNDLED_PAIR.feedRows,
+  feedSide: "bundled feed",
+  recordSide: "bundled catalog",
+});
 
 /** PINNED trust figure (spec §2 beat 7 TRUST, owner-approved 2026-07-17: the
     "1,200+ tests" plot point; v9 mockup renders the same figure). Pinned like

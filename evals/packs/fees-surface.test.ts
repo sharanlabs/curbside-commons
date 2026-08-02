@@ -288,11 +288,22 @@ describe("prose-figure drift-lock (headline words ride the engine values — bat
   // must NOT hand-type the figures those identifiers carry. (The fees page
   // keeps its spelled-out lock until piece 3 rebuilds it.)
   it("landing figure prose is derivation-only: derived identifiers present", () => {
-    expect(landingSrc).toMatch(/COVERAGE\.findingsTotal/);
-    expect(landingSrc).toMatch(/COVERAGE\.errors/);
-    expect(landingSrc).toMatch(/COVERAGE\.warns/);
+    // UPDATED 2026-08-02 (the walkthrough redesign). The finding/error/warning
+    // tally left the landing's PROSE and became the verdict slab's tally, which
+    // reads `VERDICT_IDLE` — itself computed in lib/landing/specimen.ts from the
+    // committed golden through the same view function a live run uses. So the
+    // identifiers this lock names moved; what it enforces did not, and the
+    // hand-typed-figure ban below (which still covers "16 findings", "11
+    // errors", "5 warnings") is the half that would catch a regression anyway.
+    expect(landingSrc).toMatch(/VERDICT_IDLE/);
     expect(landingSrc).toMatch(/COVERAGE\.feeRulesTotal/);
+    expect(landingSrc).toMatch(/COVERAGE\.feeExecutable/);
     expect(landingSrc).toMatch(/COVERAGE\.feeExternal/);
+    expect(landingSrc).toMatch(/TRUST_TESTS\.figure/);
+    // The tally the slab renders is derived, and derived from THIS golden.
+    const specimenSrc = readFileSync(join(root, "lib", "landing", "specimen.ts"), "utf8");
+    expect(specimenSrc).toMatch(/VERDICT_IDLE: VerdictView = toVerdictView\(/);
+    expect(specimenSrc).toMatch(/report: expectedAcpReport/);
     expect(goldenAcp.findings.length).toBe(16);
     expect(NON_STATEMENT_CHECKABLE.size).toBe(6);
   });

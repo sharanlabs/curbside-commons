@@ -14,6 +14,22 @@ import { test, expect } from "@playwright/test";
  * changing both verdict AND label, edits moving the receipts, garbage yielding
  * an honest error, and a verdict never outliving its inputs) are properties of
  * the engine and the component, not of the page that hosts them.
+ *
+ * REBOUND 2026-08-02 (the walkthrough redesign). The landing became six
+ * stations, so the workbench kept the INPUTS and the verdict moved to a slab of
+ * its own. Two consequences run through every test below:
+ *
+ *   1. The slab is ALWAYS present — it opens on the bundled pair's committed
+ *      verdict. So "is there a result?" is no longer `toHaveCount(0)`; it is
+ *      `data-live`, which says whether the verdict on screen is the reader's own
+ *      run or the page's opening state. Every stale-verdict assertion now checks
+ *      that the slab fell BACK to the bundled state, which is strictly more than
+ *      the old absence check could see.
+ *   2. The run control is never disabled. With empty slots it reads "Run the
+ *      bundled pair" and running IS loading the bundled pair.
+ *
+ * Not one invariant is dropped. Each is asserted against the surface that now
+ * carries it.
  */
 
 /**
@@ -22,12 +38,20 @@ import { test, expect } from "@playwright/test";
  * slot would close what the first opened. Open only when it is shut.
  */
 async function fillSlot(page: import("@playwright/test").Page, label: string, text: string) {
-  const slot = page.locator(".fd-slot", { hasText: label });
-  const details = slot.locator("details.fd-paste");
+  const slot = page.locator(".wk-zone", { hasText: label });
+  const details = slot.locator("details.wk-paste");
   if (!(await details.evaluate((d: HTMLDetailsElement) => d.open))) {
-    await slot.getByText("or paste it as text").click();
+    // Click the <summary> element itself rather than matching its words: the
+    // summary's copy is product copy and has been reworded twice, and a helper
+    // that breaks on a copy edit fails every test for the wrong reason.
+    await details.locator("summary").click();
   }
   await slot.locator("textarea").fill(text);
+}
+
+/** The verdict slab, only while it is showing the READER's own run. */
+function liveSlab(page: import("@playwright/test").Page) {
+  return page.locator('.wk-slab[data-live="true"]');
 }
 
 /**
@@ -68,15 +92,22 @@ test("the workbench reproduces the golden verdict from the sample pair", async (
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
 
-  await page.getByRole("button", { name: "Use the sample feed" }).click();
-  await page.getByRole("button", { name: "Run the audit" }).click();
+  await page.getByRole("button", { name: "Load the bundled feed" }).click();
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
 
-  const result = page.getByRole("region", { name: "Audit result" });
-  await expect(result.getByText("FAIL", { exact: true })).toBeVisible();
-  await expect(result.getByText(/16 findings — 11 error · 5 warn · 0 info/)).toBeVisible();
-  await expect(result.getByText("LST-EXIST-GHOST").first()).toBeVisible();
-  // With no record uploaded, the run must SAY it used the sample records.
-  await expect(result.getByText(/sample records/).first()).toBeVisible();
+  const result = liveSlab(page);
+  await expect(result.locator(".wk-verdict-word")).toHaveText("FAIL");
+  // The golden tally, now rendered as the slab's four figures.
+  const tally = result.locator(".wk-tally");
+  await expect(tally).toContainText("16");
+  await expect(tally).toContainText("11");
+  await expect(tally).toContainText("5");
+  // The complete findings list itemises the tally it advertises, so a specific
+  // rule the golden contains must be findable on screen — not merely counted.
+  await expect(result.locator(".wk-all-list > li")).toHaveCount(16);
+  await expect(result.locator(".wk-all")).toContainText("LST-EXIST-GHOST");
+  // With no record uploaded, the run must SAY it used the bundled records.
+  await expect(result.locator(".wk-prov-line")).toContainText("bundled records");
 });
 
 test("uploading your own record side changes the verdict AND its label", async ({ page }) => {
@@ -89,10 +120,10 @@ test("uploading your own record side changes the verdict AND its label", async (
   // this same feed would report a ghost row plus five missing ones.
   await fillSlot(page, "The feed", FAITHFUL_FEED);
   await fillSlot(page, "The record", FAITHFUL_RECORD);
-  await page.getByRole("button", { name: "Run the audit" }).click();
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
 
-  const result = page.getByRole("region", { name: "Audit result" });
-  await expect(result.getByText("PASS", { exact: true })).toBeVisible();
+  const result = liveSlab(page);
+  await expect(result.locator(".wk-verdict-word")).toHaveText("PASS");
   await expect(result.getByText(/No drift detected/)).toBeVisible();
   // THE HONESTY TEETH. Corrected after the cross-model gate (findings 2 + 4):
   // the C3 label describes the MATCHING MECHANISM, not who owns the data.
@@ -100,17 +131,17 @@ test("uploading your own record side changes the verdict AND its label", async (
   // decodes "real-world" as "identifiers do not line up … matched by
   // resolution" — so labelling a reader's run real-world would assert a
   // mechanism that never ran. Ownership is carried by the two origin rows.
-  await expect(result.getByText(/of your own records/)).toBeVisible();
-  await expect(result.getByText("synthetic-controlled", { exact: true })).toBeVisible();
-  await expect(result.getByText("your upload").first()).toBeVisible();
+  await expect(result.locator(".wk-prov-line")).toContainText("of your own records");
+  await expect(result.locator(".wk-prov")).toContainText("matching: synthetic-controlled");
+  await expect(result.locator(".wk-prov")).toContainText("your upload");
 
   // And the record-side row must track the ACTION, not "is this slot filled".
   // Loading the SAMPLE catalog previously printed "your own records" beside a
   // report correctly labelled otherwise — screen and header disagreeing.
-  await page.getByRole("button", { name: "Use the sample catalog" }).click();
-  await page.getByRole("button", { name: "Run the audit" }).click();
-  await expect(result.getByText(/sample records/)).toBeVisible();
-  await expect(result.getByText("sample catalog", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Load the bundled catalog" }).click();
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
+  await expect(result.locator(".wk-prov-line")).toContainText("bundled records");
+  await expect(result.locator(".wk-prov")).toContainText("record side: bundled catalog");
 });
 
 test("edits move the receipts — input-sensitivity evidence of live computation", async ({
@@ -118,10 +149,10 @@ test("edits move the receipts — input-sensitivity evidence of live computation
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await page.getByRole("button", { name: "Use the sample feed" }).click();
-  const result = page.getByRole("region", { name: "Audit result" });
+  await page.getByRole("button", { name: "Load the bundled feed" }).click();
+  const result = liveSlab(page);
 
-  const feedArea = page.locator(".fd-slot", { hasText: "The feed" }).locator("textarea");
+  const feedArea = page.locator(".wk-zone", { hasText: "The feed" }).locator("textarea");
   await fillSlot(page, "The feed", await feedArea.inputValue());
 
   // Edit 1: plant an arbitrary price — the receipts must echo it back.
@@ -131,8 +162,10 @@ test("edits move the receipts — input-sensitivity evidence of live computation
     return JSON.stringify(feed, null, 2);
   });
   await feedArea.fill(edit1);
-  await page.getByRole("button", { name: "Run the audit" }).click();
-  await expect(result.getByText("FAIL", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
+  await expect(result.locator(".wk-verdict-word")).toHaveText("FAIL");
+  // The planted value is echoed back by the evidence — receipts or the full
+  // list, whichever holds it; what matters is that the run READ it.
   await expect(result.getByText(/8642\.31/).first()).toBeVisible();
 
   // Edit 2: drop all rows but the first — the completeness sweep catches it.
@@ -142,10 +175,10 @@ test("edits move the receipts — input-sensitivity evidence of live computation
     return JSON.stringify(feed, null, 2);
   });
   await feedArea.fill(edit2);
-  await page.getByRole("button", { name: "Run the audit" }).click();
-  await expect(result.getByText("FAIL", { exact: true })).toBeVisible();
-  // Dropping rows DOES change the tally — the golden's exact tally must be gone.
-  await expect(result.getByText(/16 findings — 11 error · 5 warn · 0 info/)).toHaveCount(0);
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
+  await expect(result.locator(".wk-verdict-word")).toHaveText("FAIL");
+  // Dropping rows DOES change the tally — the golden's 16 findings must be gone.
+  await expect(result.locator(".wk-all-list > li")).not.toHaveCount(16);
   await expect(result.getByText(/missing from the feed/).first()).toBeVisible();
 });
 
@@ -157,23 +190,26 @@ test("a verdict never outlives the inputs that produced it", async ({ page }) =>
   // or a failed file read.
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const result = page.getByRole("region", { name: "Audit result" });
+  const result = liveSlab(page);
 
-  await page.getByRole("button", { name: "Use the sample feed" }).click();
-  await page.getByRole("button", { name: "Run the audit" }).click();
+  await page.getByRole("button", { name: "Load the bundled feed" }).click();
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
   await expect(result).toBeVisible();
 
-  // Editing the FEED clears it.
+  // Editing the FEED clears it — the slab falls BACK to the bundled verdict
+  // rather than standing beside inputs that no longer produced it.
   await fillSlot(page, "The feed", '{"items":[]}');
   await expect(result).toHaveCount(0);
+  await expect(page.locator(".wk-slab")).toHaveAttribute("data-live", "false");
 
-  await page.getByRole("button", { name: "Use the sample feed" }).click();
-  await page.getByRole("button", { name: "Run the audit" }).click();
+  await page.getByRole("button", { name: "Load the bundled feed" }).click();
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
   await expect(result).toBeVisible();
 
   // So does touching the RECORD — the side that changes what the verdict MEANS.
-  await page.getByRole("button", { name: "Use the sample catalog" }).click();
+  await page.getByRole("button", { name: "Load the bundled catalog" }).click();
   await expect(result).toHaveCount(0);
+  await expect(page.locator(".wk-slab")).toHaveAttribute("data-live", "false");
 });
 
 test("garbage input yields an honest error and no verdict, on either side", async ({ page }) => {
@@ -181,29 +217,29 @@ test("garbage input yields an honest error and no verdict, on either side", asyn
   await page.goto("/");
 
   await fillSlot(page, "The feed", "this is not a feed {{{");
-  await page.getByRole("button", { name: "Run the audit" }).click();
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
   const alert = page.locator('div.wb-error[role="alert"]');
   await expect(alert).toContainText("No verdict.");
   await expect(alert).toContainText("Not valid JSON");
-  await expect(page.getByRole("region", { name: "Audit result" })).toHaveCount(0);
+  await expect(liveSlab(page)).toHaveCount(0);
 
   // A structurally broken row reaches the SAME honest path, naming the row.
   await fillSlot(page, "The feed", '{"items":[null]}');
-  await page.getByRole("button", { name: "Run the audit" }).click();
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
   await expect(alert).toContainText("items[0]");
-  await expect(page.getByRole("region", { name: "Audit result" })).toHaveCount(0);
+  await expect(liveSlab(page)).toHaveCount(0);
 
   // And so does a broken RECORD — a good feed plus an unreadable catalog must
   // never fall back to the sample records and report a verdict anyway.
-  await page.getByRole("button", { name: "Use the sample feed" }).click();
+  await page.getByRole("button", { name: "Load the bundled feed" }).click();
   await fillSlot(page, "The record", '{"asOf":"2026-07-03T00:00:00Z","items":[{"id":"x"}]}');
-  await page.getByRole("button", { name: "Run the audit" }).click();
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
   await expect(alert).toContainText("The record could not be read");
   await expect(alert).toContainText("items[0]");
-  await expect(page.getByRole("region", { name: "Audit result" })).toHaveCount(0);
+  await expect(liveSlab(page)).toHaveCount(0);
 });
 
-test("a verdict offers a way forward, and 'audit another pair' really resets", async ({ page }) => {
+test("a verdict offers a way forward, and clearing the bench really resets", async ({ page }) => {
   // NEW 2026-07-28. The old surface stopped at a verdict and a download button:
   // the only route back to an empty bench was a page reload, which no reader has
   // a reason to guess. "Where do I go next" was one of the five steps the owner
@@ -212,9 +248,8 @@ test("a verdict offers a way forward, and 'audit another pair' really resets", a
   await page.goto("/");
 
   // BOTH slots are filled BY HAND, and the first cut of this test did not do
-  // that — it clicked "Use the sample feed" alone. `canRun` is
-  // `feed.text.trim().length > 0` (AuditWorkbench.tsx:186), so the record side
-  // is OPTIONAL: its textarea stayed "" for the whole run, and the post-reset
+  // that — it clicked the feed's bundled door alone. The record side is
+  // OPTIONAL, so its textarea stayed "" for the whole run, and the post-reset
   // assertion that it equals "" was therefore already true BEFORE the reset.
   // Deleting `setRecord(EMPTY)` from `startOver` left this test green —
   // demonstrated by mutation, not argued. A slot must be DIRTY before "it was
@@ -226,32 +261,34 @@ test("a verdict offers a way forward, and 'audit another pair' really resets", a
   // missing, and a precondition you trust is how the hole got here.
   for (const label of ["The feed", "The record"]) {
     await expect(
-      page.locator(".fd-slot", { hasText: label }).locator("textarea"),
+      page.locator(".wk-zone", { hasText: label }).locator("textarea"),
       `${label} must be dirty before the reset, or clearing it proves nothing`,
     ).not.toHaveValue("");
   }
 
-  await page.getByRole("button", { name: "Run the audit" }).click();
-  const result = page.getByRole("region", { name: "Audit result" });
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
+  const result = liveSlab(page);
   await expect(result).toBeVisible();
 
-  const next = page.getByRole("navigation", { name: "Next steps" });
-  await expect(next.getByRole("link", { name: "See a full worked report" })).toHaveAttribute(
+  // The ways forward now live ON the verdict: keep the evidence, read a full
+  // worked report, or go read what is real. The old "Next steps" nav is gone
+  // with the result panel that hosted it; every destination it carried survives.
+  await expect(result.getByRole("button", { name: "Download the report" })).toBeVisible();
+  await expect(result.getByRole("link", { name: /See a full worked report/ })).toHaveAttribute(
     "href",
     "/report",
   );
-  await expect(next.getByRole("link", { name: "What is real, what is invented" })).toHaveAttribute(
-    "href",
-    "/docs",
-  );
+  await expect(result.locator(".wk-real").getByRole("link")).toHaveAttribute("href", "/docs");
 
   // The reset must clear BOTH slots, not just the verdict — a half-cleared
   // bench would run the old feed against nothing and call it a new audit.
-  await next.getByRole("button", { name: "Audit another pair" }).click();
+  await page.getByRole("button", { name: "Clear both slots" }).click();
   await expect(result).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Run the audit" })).toBeDisabled();
+  await expect(page.locator(".wk-slab")).toHaveAttribute("data-live", "false");
+  // The control is never disabled — an empty bench offers the bundled run.
+  await expect(page.getByRole("button", { name: "Run the bundled pair" })).toBeEnabled();
   for (const label of ["The feed", "The record"]) {
-    const slot = page.locator(".fd-slot", { hasText: label });
+    const slot = page.locator(".wk-zone", { hasText: label });
     await expect(slot.locator("textarea")).toHaveValue("");
   }
 });
@@ -269,10 +306,12 @@ test("the sample pair can be DOWNLOADED, and it is the same bytes the inline but
   await page.goto("/");
 
   for (const [label, fileName] of [
-    ["The feed", "sample-feed.json"],
-    ["The record", "sample-catalog.json"],
+    ["The feed", "bundled-feed.json"],
+    ["The record", "bundled-catalog.json"],
   ] as const) {
-    const slot = page.locator(".fd-slot", { hasText: label });
+    const slot = page.locator(".wk-zone", { hasText: label });
+    // The download shares one disclosure with the paste box; open it first.
+    await slot.locator("details.wk-paste > summary").click();
 
     const [download] = await Promise.all([
       page.waitForEvent("download"),
@@ -285,7 +324,7 @@ test("the sample pair can be DOWNLOADED, and it is the same bytes the inline but
     const downloaded = Buffer.concat(chunks).toString("utf8");
 
     // Now load the SAME sample inline and compare the textarea's bytes.
-    await slot.getByRole("button", { name: /^Use the sample/ }).click();
+    await slot.getByRole("button", { name: /^Load the bundled/ }).click();
     const inline = await slot.locator("textarea").inputValue();
     expect(downloaded, `${fileName} must match the inline sample byte for byte`).toBe(inline);
     expect(() => JSON.parse(downloaded), `${fileName} must be valid JSON`).not.toThrow();

@@ -28,55 +28,36 @@
  * extra mail headers into the message gets refused loudly.
  */
 
-export const EMAIL_FROM_PLACEHOLDER = "truth-audit@sender.example";
-export const EMAIL_TO_PLACEHOLDER = "merchant-ops@recipient.example";
+/**
+ * COMPOSITION vs ENCODING (2026-08-02). Everything a recipient READS — the
+ * verdict line, the body text, the subject, the placeholder addresses, and the
+ * header-injection guard — now lives in `email-message.ts`, which touches no
+ * Node global. This module keeps what genuinely needs `Buffer`: the
+ * quoted-printable and base64 ENCODERS, and the MIME assembly around them.
+ *
+ * The split exists because the site's DELIVERY station renders the readable
+ * message (headers + body) in the browser, and a second copy of that
+ * composition in a React component is precisely the drift `email-text.ts` was
+ * extracted to prevent. Same strings, one source; the committed golden
+ * (`evals/delivery/gold/email-fees-drifted.golden.eml`) pins both halves.
+ */
+import {
+  assertHeaderSafe,
+  buildEmailReportBodyText,
+  emlSubjectLine,
+  EMAIL_FROM_PLACEHOLDER,
+  EMAIL_TO_PLACEHOLDER,
+  EML_FINDINGS_CAP,
+  type EmailReportMeta,
+} from "./email-message.ts";
+
+// Re-exported so existing importers (tests, the L-2 one-shot) keep their paths.
+export { EMAIL_FROM_PLACEHOLDER, EMAIL_TO_PLACEHOLDER, EML_FINDINGS_CAP };
+export type { EmailReportMeta };
+
 const MIME_BOUNDARY = "commerce-truth-audit-boundary-0000000000000000"; // fixed: determinism over cleverness
 const MAX_ENCODED_LINE = 76;
 
-/**
- * Computed plural suffix (the c8c91a0 copy standard — no literal "(s)" forms).
- *
- * SCOPE, decided 2026-07-25 (capability sweep finding #5): this standard binds
- * the EMAIL lane only — this module and `email-html.ts`/`email-text.ts`, which
- * hold zero literal "(s)" forms. The Slack builder deliberately keeps "(s)"
- * (`slack.ts` headline/summary/truncation rows) because those exact strings are
- * frozen into the committed Slack goldens, which are bound to the 2026-07-21
- * DELIVERED record — regenerating them to satisfy a copy preference would edit
- * the byte record of a real owner-armed send, which this project does not do for
- * cosmetics. The standard was previously stated as if it were repo-wide while
- * being violated one module over with no gate either way; it is now scoped in
- * prose AND enforced mechanically for the lane it actually governs
- * (`evals/delivery/email-text.test.ts`, the copy-standard tooth).
- * Revisit trigger: if the Slack goldens are ever regenerated for a substantive
- * reason, migrate the three "(s)" sites in the same change.
- */
-const plural = (n: number): string => (n === 1 ? "" : "s");
-
-/**
- * Findings rendered in full before the explicit "…and N more" row. Promoted from
- * two bare `20` literals 2026-07-25 (capability sweep finding #4) so the
- * truncation test binds the CONSTANT rather than a magic number — the shape
- * `EMAIL_HTML_FINDINGS_CAP` already had.
- */
-export const EML_FINDINGS_CAP = 20;
-
-export interface EmailReportMeta {
-  readonly tool: string;
-  readonly subject: string;
-  /** RFC 5322 date string, caller-supplied for determinism (e.g. "Mon, 06 Jul 2026 12:00:00 +0000"). */
-  readonly date: string;
-}
-
-/** Reject CR/LF/control chars and non-ASCII in any header-bound value (header-injection guard). */
-function assertHeaderSafe(field: string, value: string): string {
-  if (value.length === 0) throw new Error(`delivery/email: header field "${field}" must be non-empty`);
-  if (/[\r\n]/.test(value)) throw new Error(`delivery/email: header field "${field}" contains CR/LF — header injection refused`);
-  if (/[\u0000-\u001f\u007f]/.test(value)) throw new Error(`delivery/email: header field "${field}" contains control characters — refused`);
-  if (/[^ -~]/.test(value)) {
-    throw new Error(`delivery/email: header field "${field}" contains non-ASCII — use an ASCII value (RFC 2047 encoding is out of scope for this builder)`);
-  }
-  return value;
-}
 
 /** Quoted-printable encode (RFC 2045): UTF-8 bytes, soft line breaks at ≤76 chars, deterministic. */
 export function quotedPrintable(text: string): string {
@@ -114,30 +95,6 @@ export function base64Wrapped(text: string): string {
   return lines.join("\r\n");
 }
 
-interface ParsedForDelivery {
-  readonly ok: boolean;
-  readonly findings: ReadonlyArray<{ readonly id: string; readonly severity: string; readonly plainLine: string }>;
-}
-
-function parseCanonical(canonical: string): ParsedForDelivery {
-  const raw = JSON.parse(canonical) as { ok?: unknown; findings?: unknown };
-  if (typeof raw.ok !== "boolean" || !Array.isArray(raw.findings)) {
-    throw new Error("delivery/email: canonical payload is not a decision-grade report (boolean ok + findings[] required)");
-  }
-  return {
-    ok: raw.ok,
-    findings: raw.findings.map((f: unknown, i: number) => {
-      const ff = f as { claim?: { id?: unknown }; severity?: unknown; plainLine?: unknown };
-      if (typeof ff.claim?.id !== "string") throw new Error(`delivery/email: finding[${i}] lacks claim.id`);
-      return {
-        id: ff.claim.id,
-        severity: typeof ff.severity === "string" ? ff.severity : "unknown",
-        plainLine: typeof ff.plainLine === "string" ? ff.plainLine : "",
-      };
-    }),
-  };
-}
-
 /**
  * Build one complete RFC 5322 message (multipart/mixed: quoted-printable text
  * summary + base64 report.json attachment). Pure and deterministic given
@@ -145,44 +102,15 @@ function parseCanonical(canonical: string): ParsedForDelivery {
  */
 export function buildEmailReportMessage(canonical: string, meta: EmailReportMeta): string {
   const subject = assertHeaderSafe("subject", meta.subject);
-  const tool = assertHeaderSafe("tool", meta.tool);
   const date = assertHeaderSafe("date", meta.date);
-  const report = parseCanonical(canonical);
-  const verdictLine = report.ok
-    ? `PASS - no violations (${report.findings.length} non-gating finding${plural(report.findings.length)})`
-    : `FAIL - violations present (${report.findings.length} finding${plural(report.findings.length)})`;
-
-  const bodyText = [
-    // Template v2 (2026-07-10, plan v3.3 S4b): name migrated → "Curbside Commons"
-    // (decision-log row precedes this edit; goldens regenerated under the allowlist).
-    "SIMULATED DATA - Curbside Commons demonstration output.",
-    "Not real merchant data, not legal advice.",
-    "",
-    `Result: ${verdictLine}`,
-    `Tool: ${tool} (deterministic engine, $0 offline)`,
-    "",
-    ...report.findings.slice(0, EML_FINDINGS_CAP).map((f) => `- [${f.severity}] ${f.plainLine} (${f.id})`),
-    ...(report.findings.length > EML_FINDINGS_CAP
-      ? [
-          `...and ${report.findings.length - EML_FINDINGS_CAP} more finding${plural(report.findings.length - EML_FINDINGS_CAP)} - full report attached.`,
-        ]
-      : []),
-    "",
-    // Evidence pointer + footer — copy-coherent with the v5 HTML/one-shot halves
-    // (design source mockups/email-v5-light-tweakable-2026-07-22.html). Non-ASCII
-    // here (em-dash, §) is quoted-printable-encoded on the wire, so the message
-    // stays 7-bit ASCII. Structure (plain-text .eml) is deliberately unchanged.
-    "Attached report.json has the full audit — every claim, rule, and calculation. Re-runs reproduce it byte for byte.",
-    "",
-    "One-time demonstration send. Not a subscription.",
-    "Simulated data checked against real NYC law (§20-563.3 / Local Law 79 of 2025). Not legal advice. No real platform access.",
-  ].join("\n");
+  // Composition lives in email-message.ts — the site renders the SAME strings.
+  const bodyText = buildEmailReportBodyText(canonical, meta);
 
   const lines = [
     `Date: ${date}`,
     `From: Curbside Commons (simulated) <${EMAIL_FROM_PLACEHOLDER}>`,
     `To: <${EMAIL_TO_PLACEHOLDER}>`,
-    `Subject: [SIMULATED] Truth-audit result: ${subject}`,
+    `Subject: ${emlSubjectLine(subject)}`,
     "MIME-Version: 1.0",
     `Content-Type: multipart/mixed; boundary="${MIME_BOUNDARY}"`,
     "",

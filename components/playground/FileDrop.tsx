@@ -42,10 +42,12 @@ export type SlotStatus =
   | { readonly kind: "error"; readonly message: string };
 
 export interface FileDropProps {
-  /** Slot heading — "The feed" / "The record". */
+  /** Which side of the audit this slot is — "The feed" / "The record". */
+  readonly side: string;
+  /** The quiet gloss beside it — "what an agent reads". */
+  readonly sideNote: string;
+  /** What the slot wants, named as a thing — "A published menu feed". */
   readonly title: string;
-  /** One line saying what this side IS, in the site's plain voice. */
-  readonly hint: string;
   /** Accessible name for the paste textarea. */
   readonly textareaLabel: string;
   /** Current text held by the slot (lifted state: the parent owns the run). */
@@ -94,8 +96,9 @@ export interface FileDropProps {
 const MAX_BYTES = MAX_INPUT_CHARS;
 
 export function FileDrop({
+  side,
+  sideNote,
   title,
-  hint,
   textareaLabel,
   value,
   onText,
@@ -143,42 +146,55 @@ export function FileDrop({
     reader.readAsText(file);
   }
 
-  return (
-    <div className="fd-slot">
-      <div className="fd-head">
-        <p className="fd-title" id={titleId}>
-          {title}
-        </p>
-        <p className="fd-hint" id={`${titleId}-hint`}>
-          {hint}
-        </p>
-      </div>
+  const filled = fileName !== null;
 
-      {/* The drag surface decorates a real control; the <label> reaches the
-          native input, so a keyboard user takes the same path a mouse does. */}
-      <div
-        className={`fd-zone${dragging ? " is-drag" : ""}${fileName !== null ? " is-filled" : ""}`}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragging(false);
-          const file = e.dataTransfer.files?.[0];
-          if (file) readFile(file);
-        }}
-      >
+  /* THE LOUD DOOR LEADS (walkthrough redesign, 2026-08-02). The bundled pair is
+     the one door a first-time visitor can open without having a feed of their
+     own, so it is the emphasized control and "Choose a file / or drag it here"
+     is the quiet secondary beneath it. The ORDER changed; nothing was removed —
+     the native file input, the drag surface, the paste route, and the download
+     are all still here, because each is somebody's only way in. */
+  return (
+    <div
+      className={`wk-zone${dragging ? " is-drag" : ""}${filled ? " is-filled" : ""}`}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragging(true);
+      }}
+      onDragLeave={() => setDragging(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragging(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) readFile(file);
+      }}
+    >
+      <p className="wk-zone-k" id={titleId}>
+        <span>{side}</span>
+        <span className="side">{sideNote}</span>
+      </p>
+      <p className="wk-zone-t" id={`${titleId}-hint`}>
+        {title}
+      </p>
+
+      {!filled && (
+        <button type="button" className="wk-door" onClick={onLoadSample}>
+          {sampleLabel}
+        </button>
+      )}
+
+      {/* The native input stays mounted whether or not the slot is filled, so a
+          reader can replace one side without clearing the other. */}
+      <p className="wk-quiet">
         <input
           id={inputId}
           className="fd-input"
           type="file"
           accept="application/json,.json,text/plain,.txt"
-          /* Both slots' inputs read "Choose a file or drag it here" from their
-             label alone, so a screen-reader control list could not tell the
-             feed input from the record one (gate finding 13). The slot title
-             joins the accessible name, and the hint becomes its description. */
+          /* Both slots' inputs read "Choose a file" from their label alone, so a
+             screen-reader control list could not tell the feed input from the
+             record one (gate finding 13). The slot's side joins the accessible
+             name, and the title becomes its description. */
           aria-labelledby={`${titleId} ${inputId}-label`}
           aria-describedby={`${titleId}-hint`}
           onChange={(e) => {
@@ -188,40 +204,39 @@ export function FileDrop({
             e.target.value = "";
           }}
         />
-        <label className="fd-label" id={`${inputId}-label`} htmlFor={inputId}>
-          <span className="fd-cta">Choose a file</span>
-          <span className="fd-or">or drag it here</span>
+        <label className="wk-quiet-label" id={`${inputId}-label`} htmlFor={inputId}>
+          {filled ? "Choose a different file" : "Choose a file"}
         </label>
-        <span className="fd-sample-row">
-          <button type="button" className="fd-sample" onClick={onLoadSample}>
-            {sampleLabel}
-          </button>
-          {/* "Upload test files" needs FILES. Loading the sample inline proves
-              the engine works but never exercises the upload path, and a reader
-              who wants to try dragging something in had nothing to drag
-              (2026-07-28). Saved from the same bytes the inline button loads,
-              so the two can never describe different samples. */}
-          {onDownloadSample !== undefined && (
-            <button type="button" className="fd-dl" onClick={onDownloadSample}>
-              Download it to test uploading
-            </button>
+        {!filled && <span className="wk-quiet-or"> / or drag it here</span>}
+      </p>
+
+      {filled && (
+        <span className="wk-chipfile">
+          <span className="wk-ok-dot" aria-hidden="true" />
+          {fileName}
+          {status !== null && status.kind === "ok" && (
+            <span className="wk-chip-meta"> · {status.summary}</span>
           )}
         </span>
-      </div>
-
-      {fileName !== null && <p className="fd-file">{fileName}</p>}
-
-      {status !== null && (
-        <p
-          className={`fd-status ${status.kind}`}
-          role={status.kind === "error" ? "alert" : undefined}
-        >
-          {status.kind === "ok" ? status.summary : status.message}
-        </p>
       )}
 
-      <details className="fd-paste">
-        <summary>Paste it as text</summary>
+      {status !== null && status.kind === "error" && (
+        <p className="fd-status error" role="alert">
+          {status.message}
+        </p>
+      )}
+      {/* A pasted slot has no file name, so its parsed row count would otherwise
+          go unreported — the one state the chip above cannot cover. */}
+      {!filled && status !== null && status.kind === "ok" && (
+        <p className="fd-status ok">{status.summary}</p>
+      )}
+
+      {/* One disclosure, two routes in. The download used to sit in the open
+          beside the sample button; folding it under the paste box would have
+          hidden it from the reader who most needs it — someone looking for a
+          FILE to drag — so the summary names both. */}
+      <details className="wk-paste">
+        <summary>Paste it, or download a copy</summary>
         <label className="fd-paste-label" htmlFor={areaId}>
           {textareaLabel}
         </label>
@@ -232,6 +247,16 @@ export function FileDrop({
           value={value}
           onChange={(e) => onText(e.target.value, null)}
         />
+        {/* "Upload test files" needs FILES. Loading the bundled pair inline
+            proves the engine works but never exercises the upload path, and a
+            reader who wants to try dragging something in had nothing to drag
+            (2026-07-28). Saved from the same bytes the inline door loads, so the
+            two can never describe different data. */}
+        {onDownloadSample !== undefined && (
+          <button type="button" className="fd-dl" onClick={onDownloadSample}>
+            Download it to test uploading
+          </button>
+        )}
       </details>
     </div>
   );

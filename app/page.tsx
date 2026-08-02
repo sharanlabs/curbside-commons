@@ -1,251 +1,238 @@
 import Link from "next/link";
 import { Reveal } from "@/components/landing/Reveal";
-import { CommonsScene } from "@/components/landing/CommonsScene";
-import { TurnSection, type TurnReceiptData } from "@/components/landing/TurnSection";
+import { ProcessStrip } from "@/components/landing/ProcessStrip";
+import { RunTicker } from "@/components/landing/RunTicker";
+import { VerdictSlab } from "@/components/landing/VerdictSlab";
+import { DeliverySection } from "@/components/landing/DeliverySection";
 import { AuditWorkbench } from "@/components/playground/AuditWorkbench";
 import {
-  ARITH,
-  BENCH,
   COVERAGE,
-  PROOF_BAR,
-  SPECIMEN_ITEM,
+  DELIVERY_DATE,
+  DELIVERY_IDLE,
   TRUST_TESTS,
+  VERDICT_IDLE,
 } from "@/lib/landing/specimen";
 
 /**
- * Home — the working tool (2026-07-28, owner: *"the website looks like a
- * display piece with numbers … I want ready to use website to upload test
- * files and check how it is working. Reevaluate the whole design walkthrough
- * from start"*).
+ * Home — ONE RUN, CARRIED TO THE END (walkthrough redesign, 2026-08-02; design
+ * source `mockups/walkthrough-one-run-2026-08-02.html`, rendered and
+ * fold-verified before this port).
  *
- * WHAT CHANGED AND WHY. Session 36 built the two-file workbench and put it in
- * section four of page three; the owner returned with the same complaint. The
- * defect was never the tool — it was the ORDER. Measured before this rewrite:
- * `/` was 4924px tall and contained no upload affordance at all, and the tool
- * on `/playground` began ~2990px down behind four exhibit sections. `.cs-hero`
- * is `min-height: calc(100vh - 68px)`, so while the scene was the hero NOTHING
- * else could reach the first screen — the burial was structural, not editorial.
+ * WHAT CHANGED AND WHY. The previous landing handed over the instrument and then
+ * explained it, which was right as far as it went — but it STOPPED at the
+ * verdict. A reader who ran the tool saw a tally and a list of findings, and
+ * nothing about what happens next. Meanwhile the CLI walkthrough had been
+ * carrying the same run all the way to the Slack payload and the email message
+ * for weeks, and none of that was on the site.
  *
- * So the page is inverted: state what this is, hand over the instrument, and
- * only then explain it. The scene and the receipt are not deleted — a diagram
- * belongs after the thing it explains, not in front of it.
+ * So the page is now the run itself, in six stations: the two INPUTS, the RUN as
+ * it happens, the VERDICT with its receipts, the FEES reading of the same run,
+ * the DELIVERY artifacts a human would receive, and the PROOF that the whole
+ * thing is deterministic. A process strip under the nav names the stations and
+ * tracks where you are.
  *
- * REMOVED, on the owner's word: the audience eyebrow and the three-seat
- * "who keeps the receipt" band (both were positioning copy, not a next step);
- * the one-field "break the feed yourself" bench, which the real workbench
- * directly above now supersedes — a toy standing where the tool should be is
- * what made this read as an exhibit; and the case-file register (FILE A/FILE B
- * tab cuts, CASE 001, FIG captions, CONTINUE · 01 doors, the big stat rows).
+ * WHAT LEFT THIS PAGE: `CommonsScene` and `TurnSection`. The scene explained
+ * what happens to a claim, and the turn showed one finding's arithmetic — both
+ * jobs the VERDICT slab's receipts now do with the reader's OWN run rather than
+ * with a diagram. Neither file is deleted; the components remain in the repo.
  *
- * Every count still derives from lib/landing/specimen.ts — the prose-figure
- * lock in evals/packs/fees-surface.test.ts bans hand-typed engine figures here,
- * and that constraint outlives the redesign.
+ * STATE OWNERSHIP. `AuditWorkbench` is still the only thing that parses input or
+ * calls the verifier. The ticker, the slab, and the delivery station READ that
+ * run from `components/landing/run-bus.ts`. One engine call, several readers.
+ *
+ * FIGURES. Every count still derives from `lib/landing/specimen.ts` — the
+ * prose-figure lock in `evals/packs/fees-surface.test.ts` bans hand-typed engine
+ * figures in this file, and that constraint outlives this redesign. The delivery
+ * artifacts are built on the SERVER by the real builders, so the fixtures and
+ * the engine measurables never reach the browser bundle.
  */
 export const metadata = {
   title: "Curbside Commons — audit a marketplace feed against the merchant's records",
   description:
-    "Upload a feed and the merchant records it should agree with. Every claim is checked line by line in your browser, and you get a verdict and a downloadable report. No AI calls, and nothing you upload leaves your browser.",
-};
-
-const RECEIPT: TurnReceiptData = {
-  caseLine: `FINDING ${BENCH.finding.index} OF ${BENCH.finding.total}`,
-  claim: { field: BENCH.claim.field, unit: BENCH.claim.unit, claimId: BENCH.finding.claimId },
-  record: { field: BENCH.record.field, cents: BENCH.record.cents, money: BENCH.record.money },
-  rule: { id: BENCH.rule.id, plain: BENCH.rule.plain },
-  claimDollars: ARITH.claimDollars,
-  claimCents: ARITH.claimCents,
-  recordCents: ARITH.recordCents,
-  severity: BENCH.finding.severity,
-  findingIndex: String(Number(BENCH.finding.index)),
-  findingTotal: BENCH.finding.total,
-  remainingErrors: COVERAGE.errors - 1,
-  warns: COVERAGE.warns,
-  itemLabel: SPECIMEN_ITEM.label,
-  served: String(ARITH.served),
+    "Upload a feed and the merchant records it should agree with. Every claim is checked line by line in your browser, and you see the verdict, the fee reading, and the exact messages a human would receive. No AI calls, and nothing you upload leaves your browser.",
 };
 
 export default function Landing() {
   return (
-    <main className="lp-main">
-      {/* ===== HERO ZONE — one centred object: the announcement and the
-               instrument (design direction S1, 2026-07-31; Evil Martians
-               study: for a narrow-scope utility the winning hero visual is
-               the live product embed, and hero + embed read as ONE object).
-               Deliberately NOT a full viewport: the drop zones stay wholly
-               above a 900px fold at 1280 (canonical.spec contract). ===== */}
-      <section className="home-lead ds-wrap" aria-labelledby="hero-h1">
-        <h1 id="hero-h1" className="cs-h1">
-          Dinner can be ordered while you sleep.
-          <br />
-          <span className="cs-h1-lit">What the agent read needs proof.</span>
-        </h1>
-        <p className="cs-lede">
-          Curbside Commons checks a marketplace feed against the merchant&rsquo;s own records and
-          reports every claim that disagrees. Bring your two files, or run the bundled pair.
-        </p>
-      </section>
-
-      {/* ===== THE INSTRUMENT — the hero's embed. "Audit a feed." is set in
-               the premium display voice at a sub-H1 size (owner, 2026-07-31:
-               "no instrument type fonts" — the short-lived mono nameplate is
-               reverted; mono stays for DATA, never headings). The 78ch
-               instruction wall is reduced to its two load-bearing ideas (D-6):
-               the slots themselves demonstrate drag / choose / paste / samples. ===== */}
-      <section className="sect-tool ds-wrap" id="audit" aria-labelledby="audit-h2">
-        <h2 className="lp-h2 tool-h2" id="audit-h2">
-          Audit a feed.
-        </h2>
-        <p className="lp-foot tool-foot">
-          Every claim is checked line by line, in this tab, and you get a report you can
-          download. <b>Nothing you load leaves this page.</b>
-        </p>
-        <AuditWorkbench />
-      </section>
-
-      {/* ===== WHAT HAPPENS TO A CLAIM — the scene, relocated below the thing
-               it explains (it used to be the full-height hero). RENAMED from
-               "HOW THE CHECK WORKS" 2026-07-31 (nav finding N-2): it collided
-               word-for-word with the nav's "How it works", which points at
-               /playground — same words, two destinations. The nav label is
-               e2e-pinned; the eyebrow yields. ===== */}
-      <section className="sect ds-wrap sect-scene" aria-labelledby="scene-h2">
-        <Reveal>
-          <p className="lp-eyebrow">WHAT HAPPENS TO A CLAIM</p>
-          <span className="lp-sec-rule" aria-hidden="true" />
-        </Reveal>
-      </section>
-      <CommonsScene
-        ctaPrimary="Watch a claim get held"
-        ctaSecondary="See a full worked report"
-        ctaSecondaryHref="/report"
-        labelledBy="scene-h2"
-      >
-        <h2 id="scene-h2" className="cs-h1 scene-h2">
-          A claim is checked <span className="cs-h1-lit">before the order is placed.</span>
-        </h2>
-        <p className="cs-lede">
-          An ordering agent reads the feed and builds a basket. Each claim it read is matched to the
-          merchant&rsquo;s record, the rule is applied, and a claim that disagrees is held — with the
-          arithmetic attached.
-        </p>
-      </CommonsScene>
-
-      {/* ===== THE RECEIPT — what a single finding actually contains ===== */}
-      <section className="sect ds-wrap" id="turn" aria-labelledby="turn-h2">
-        <TurnSection data={RECEIPT} />
-        <Reveal>
-          <div className="pb-bar" aria-label="The held claim, as a proof object">
-            <span aria-hidden="true" className="pb-dot" />
-            <code className="pb-line">
-              {PROOF_BAR.verdict} &nbsp;&middot;&nbsp; <b>THE MENU:</b> {PROOF_BAR.menuValue}{" "}
-              &nbsp;&middot;&nbsp; <i>THE MERCHANT RECORD:</i> {PROOF_BAR.recordValue}{" "}
-              &nbsp;&middot;&nbsp; CLAIM: {PROOF_BAR.factor} THE RECORD
-            </code>
-            <span className="pb-flag">{PROOF_BAR.verdict}</span>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* ===== WHAT IT CHECKS — two plain doors (was FILE A / FILE B) ===== */}
-      <section className="sect ds-wrap" aria-labelledby="world-h2">
-        <Reveal>
-          <p className="lp-eyebrow">WHAT IT CHECKS</p>
-          <span className="lp-sec-rule" aria-hidden="true" />
-          <h2 className="lp-h2" id="world-h2">
-            Two kinds of claim.
-          </h2>
-        </Reveal>
-        <div className="files">
-          <Reveal as="section" className="file">
-            <p className="tab2">LISTINGS &middot; ANYWHERE IN THE US</p>
-            <h3>What the listing says</h3>
-            <p className="d">
-              Price, availability, and whether the item exists at all. The bundled run carries{" "}
-              {COVERAGE.findingsTotal} findings — {COVERAGE.errors} errors and {COVERAGE.warns}{" "}
-              warnings: ghost items, hidden items, stale promises, and a sale price above the regular
-              price.
-            </p>
-            <Link className="go" href="/report">
-              See the full report{" "}
-              <span className="arr" aria-hidden="true">
-                &rarr;
-              </span>
-            </Link>
-          </Reveal>
-          <Reveal as="section" className="file law">
-            <p className="tab2">DELIVERY FEES &middot; NEW YORK CITY</p>
-            <h3>What the fee statement says</h3>
-            <p className="d">
-              New York City caps delivery fees. The audit applies {COVERAGE.feeRulesTotal}{" "}
-              codified rules from New York City Administrative Code &sect;20-563.3 —{" "}
-              {COVERAGE.feeExecutable}{" "}
-              checkable from the statement itself, {COVERAGE.feeExternal} that need outside evidence
-              and say so.
-            </p>
-            <Link className="go" href="/fees">
-              Open the fee rules{" "}
-              <span className="arr" aria-hidden="true">
-                &rarr;
-              </span>
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ===== WHY TRUST IT ===== */}
-      <section className="sect sect-last ds-wrap" aria-labelledby="trust-h2">
-        <Reveal>
-          <p className="lp-eyebrow">WHY TRUST THE VERDICT</p>
-          <span className="lp-sec-rule" aria-hidden="true" />
-          <h2 className="lp-h2" id="trust-h2">
-            The same input, the same receipt, every time.
-          </h2>
-          <p className="lp-foot">
-            Verdicts are deterministic. No model is in the loop when a claim is judged. Failures are
-            reported, not hidden.
+    <>
+      <ProcessStrip />
+      <main className="lp-main wk-main">
+        {/* ===== STATION 1 · INPUTS — the announcement and the instrument, as
+                 one object. Deliberately NOT a full viewport: both drop zones
+                 AND the run control stay above a 900px fold at 1280 (the
+                 canonical.spec contract). ===== */}
+        <section className="wk-s-inputs ds-wrap" id="audit" aria-labelledby="hero-h1">
+          <h1 id="hero-h1" className="cs-h1 wk-h1">
+            Dinner can be ordered while you sleep.
+            <br />
+            <span className="cs-h1-lit">What the agent read needs proof.</span>
+          </h1>
+          <p className="cs-lede wk-lede">
+            Curbside Commons checks a marketplace feed against the merchant&rsquo;s own records and
+            reports every claim that disagrees — then shows you exactly what would be delivered, and
+            to whom.
           </p>
-        </Reveal>
-        <div className="trust">
-          <Reveal className="fact">
-            <p className="fig">1 = 1</p>
-            <p className="cap">DETERMINISTIC</p>
-            <p className="d">A verdict is exact rule logic, byte for byte. No model decides it.</p>
+          <AuditWorkbench />
+        </section>
+
+        {/* ===== STATION 2 · RUN — the check, narrated from the real result ===== */}
+        <section className="wk-s-run ds-wrap" id="run" aria-labelledby="run-h">
+          <RunTicker />
+        </section>
+
+        {/* ===== STATION 3 · VERDICT — the slab, with the arithmetic attached ===== */}
+        <section className="wk-s-verdict ds-wrap" id="verdict" aria-labelledby="verdict-h2">
+          <Reveal>
+            <p className="lp-eyebrow">THE VERDICT</p>
+            <span className="lp-sec-rule" aria-hidden="true" />
+            <h2 className="lp-h2" id="verdict-h2">
+              Findings, with the arithmetic attached.
+            </h2>
           </Reveal>
-          <Reveal className="fact">
-            <p className="fig">
-              <span className="accent">{TRUST_TESTS.figure}</span>
-            </p>
-            <p className="cap">AUTOMATED TESTS</p>
-            <p className="d">
-              {TRUST_TESTS.plain.charAt(0).toUpperCase() + TRUST_TESTS.plain.slice(1)}{" "}
-              compare the engine&rsquo;s output with the results it has committed to.
+          <VerdictSlab idle={VERDICT_IDLE} />
+        </section>
+
+        {/* ===== STATION 4 · FEES — the same run, read against the law ===== */}
+        <section className="wk-s-fees ds-wrap" id="fees" aria-labelledby="fees-h2">
+          <Reveal>
+            <p className="lp-eyebrow">THE LAW</p>
+            <span className="lp-sec-rule" aria-hidden="true" />
+            <h2 className="lp-h2" id="fees-h2">
+              The fee statement, read against the law.
+            </h2>
+            <p className="lp-foot">
+              New York City caps delivery fees. The same run reads a fee statement against the
+              codified rules of Administrative Code &sect;20-563.3 — and every finding cites the rule
+              it stands on.
             </p>
           </Reveal>
-          <Reveal className="fact">
-            <p className="fig">DEFER</p>
-            <p className="cap">ON THE RECORD</p>
-            <p className="d">
-              Where evidence fell short of a pre-registered floor, the label says so. A
-              first-attempt DEFER stays published.
-            </p>
-          </Reveal>
-        </div>
-        {/* ===== THE CLOSE (design direction S3, 2026-07-31). The research
-             order wants trust then a final action; the pinned H2 sequence
-             keeps trust last, so trust IS the closing beat and ends on the
-             action. Specific verbs, existing button vocabulary, no new copy
-             claims: back up to the instrument, or to the honesty ledger. ===== */}
-        <Reveal>
-          <div className="lp-cta-row lp-cta-close">
-            <a className="lp-btn primary" href="#audit">
-              Audit a feed
-            </a>
-            <Link className="lp-btn ghost" href="/docs">
-              What is real, what is invented
-            </Link>
+          <div className="wk-fees-grid">
+            <Reveal as="section" className="wk-fee-card finding">
+              <p className="wk-fee-k">
+                <span>A held charge</span>
+                <span className="wk-fee-sev">ERROR</span>
+              </p>
+              <h3>A fee above the cap</h3>
+              <p className="d">
+                The statement&rsquo;s delivery fee exceeds what the ordinance permits for the
+                order&rsquo;s subtotal. The finding names the charge, the cap, and the difference —
+                and links the rule text itself.
+              </p>
+              <Link className="go" href="/fees">
+                Read the rule it cites{" "}
+                <span className="arr" aria-hidden="true">
+                  &rarr;
+                </span>
+              </Link>
+            </Reveal>
+            <Reveal as="section" className="wk-fee-card">
+              <p className="wk-fee-k">
+                <span>The rulebook</span>
+              </p>
+              <h3>Codified, and honest about reach</h3>
+              <p className="d">
+                Rules that can be checked from the statement itself are checked. Rules that need
+                outside evidence say so — a limit stated is a limit kept.
+              </p>
+              <div className="wk-fee-counts">
+                <div>
+                  <span className="wk-n">{COVERAGE.feeRulesTotal}</span>
+                  <span className="wk-k2">Rules codified</span>
+                </div>
+                <div>
+                  <span className="wk-n">{COVERAGE.feeExecutable}</span>
+                  <span className="wk-k2">Checkable here</span>
+                </div>
+                <div>
+                  <span className="wk-n">{COVERAGE.feeExternal}</span>
+                  <span className="wk-k2">Need evidence</span>
+                </div>
+              </div>
+              <Link className="go" href="/fees">
+                Open the fee rules{" "}
+                <span className="arr" aria-hidden="true">
+                  &rarr;
+                </span>
+              </Link>
+            </Reveal>
           </div>
-        </Reveal>
-      </section>
-    </main>
+        </section>
+
+        {/* ===== STATION 5 · DELIVERY — built by the real builders, never sent.
+                 The artifacts are constructed on the server for the idle state
+                 and rebuilt in the browser after a run; no transport exists on
+                 this page, and an import-graph eval proves it. ===== */}
+        <section className="wk-s-delivery ds-wrap" id="delivery" aria-labelledby="delivery-h2">
+          <Reveal>
+            <p className="lp-eyebrow">DELIVERY</p>
+            <span className="lp-sec-rule" aria-hidden="true" />
+            <h2 className="lp-h2" id="delivery-h2">
+              What a human would receive.
+            </h2>
+            <p className="lp-foot">
+              A verdict that stays on a screen changes nothing. The run builds the two messages an
+              operations channel would get — and shows them to you here instead of sending them,
+              because this page has no way to send anything.
+            </p>
+          </Reveal>
+          <DeliverySection idle={DELIVERY_IDLE} date={DELIVERY_DATE} />
+          <p className="wk-delivery-note">
+            <b>Nothing is transmitted.</b> These artifacts are built by the same code paths an
+            owner-armed, one-shot demonstration uses — but no send transport is wired into this
+            site. You are looking at the end of the pipeline, on paper.
+          </p>
+        </section>
+
+        {/* ===== STATION 6 · PROOF ===== */}
+        <section className="sect sect-last ds-wrap" id="proof" aria-labelledby="trust-h2">
+          <Reveal>
+            <p className="lp-eyebrow">WHY TRUST THE VERDICT</p>
+            <span className="lp-sec-rule" aria-hidden="true" />
+            <h2 className="lp-h2" id="trust-h2">
+              The same input, the same receipt, every time.
+            </h2>
+            <p className="lp-foot">
+              Verdicts are deterministic. No model is in the loop when a claim is judged. Failures
+              are reported, not hidden.
+            </p>
+          </Reveal>
+          <div className="trust">
+            <Reveal className="fact">
+              <p className="fig">1 = 1</p>
+              <p className="cap">DETERMINISTIC</p>
+              <p className="d">A verdict is exact rule logic, byte for byte. No model decides it.</p>
+            </Reveal>
+            <Reveal className="fact">
+              <p className="fig">
+                <span className="accent">{TRUST_TESTS.figure}</span>
+              </p>
+              <p className="cap">AUTOMATED TESTS</p>
+              <p className="d">
+                {TRUST_TESTS.plain.charAt(0).toUpperCase() + TRUST_TESTS.plain.slice(1)}{" "}
+                compare the engine&rsquo;s output with the results it has committed to.
+              </p>
+            </Reveal>
+            <Reveal className="fact">
+              <p className="fig">DEFER</p>
+              <p className="cap">ON THE RECORD</p>
+              <p className="d">
+                Where evidence fell short of a pre-registered floor, the label says so. A
+                first-attempt DEFER stays published.
+              </p>
+            </Reveal>
+          </div>
+          <Reveal>
+            <div className="lp-cta-row lp-cta-close">
+              <a className="lp-btn primary" href="#audit">
+                Audit a feed
+              </a>
+              <Link className="lp-btn ghost" href="/docs">
+                What is real, what is invented
+              </Link>
+            </div>
+          </Reveal>
+        </section>
+      </main>
+    </>
   );
 }
