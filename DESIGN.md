@@ -31,6 +31,7 @@ changing anything.
 | **Production register** — no "example/sample" captioning | 2026-07-31 | Words stating what the data *is* became "bundled" (still true). |
 | **Workbench-first landing** | 2026-07-28, **re-confirmed 2026-07-31** | The hero fork is closed by owner word, not by inference. The measurement agrees: the v8 hero's `min-height: calc(100vh - 68px)` = 832px at 1280×900 cannot satisfy the 900px fold contract. |
 | **The nav pill targets `/#audit`, not `/`** | 2026-07-31 | The bar's one emphasized action was a no-op on the landing page. It now points at the instrument. `aria-current` follows the ROUTE (`match: "/"`), never the href — `usePathname()` has no hash. |
+| **The walkthrough landing** — six stations, end to end | 2026-08-02 | Owner reopened layout/sections/motion ("whole layout … from dropping files till slack email"; palette explicitly unchanged). INPUTS · RUN · VERDICT · FEES · DELIVERY · PROOF, bound by a process strip; run control never disabled and on screen one; DELIVERY renders the real Slack/email payloads BUILT NOT SENT. Source of truth: `mockups/walkthrough-one-run-2026-08-02.html`, rendered + fold-verified. |
 
 ## Typography
 
@@ -153,10 +154,21 @@ so the Onest restoration fits ~6.6% *more* characters per line.
 
 ### The fold contract
 
-The workbench drop zones must sit **entirely above a 900px fold at 1280px** width
-(`evals/e2e/canonical.spec.ts`). The run control deliberately follows below. Any change to
-first-screen spacing, type size, or face must be re-measured against this — it is a pinned
-regression test, not a guideline.
+The workbench drop zones **and the run control** must sit entirely above a 900px fold at
+1280px width (`evals/e2e/canonical.spec.ts`; strengthened 2026-08-02 — the mockup measured
+zones-bottom 560px / run-bottom 626px against the shipped 970px). Any change to first-screen
+spacing, type size, or face must be re-measured against this — it is a pinned regression
+test, not a guideline.
+
+### The landing is six stations (2026-08-02)
+
+INPUTS (`#audit`) · RUN (ticker) · VERDICT (slab) · FEES · DELIVERY (Slack + email
+artifacts, built by `lib/delivery/*` builders, never sent — the SIMULATED banner arrives
+from the builder's own first block, never retyped in JSX) · PROOF. A sticky process strip
+under the nav carries the sequence in words, never numerals (de-numbered by owner word).
+All new classes are `wk-`-prefixed; every station section carries
+`scroll-margin-top: 114px` for the sticky chrome. Run state is published on a typed bus
+(`components/landing/run-bus.ts`); `AuditWorkbench` stays the single owner of run state.
 
 ## Motion
 
@@ -184,8 +196,9 @@ document to read in order) · decorative stats · any copy implying real platfor
 
 ## Known open items (recorded, not fixed)
 
-1. **The instrument arrives without its verb** — at 1280×900 the run control is `disabled` at
-   first paint *and* below the fold, along with the sentence explaining why.
+1. ~~**The instrument arrives without its verb**~~ — **RESOLVED 2026-08-02** by the
+   walkthrough redesign: the run control is never disabled ("Run the bundled pair" when
+   empty — a click loads the pair and runs it) and sits on screen one.
 2. ~~**The nav's one emphasized action is a no-op on `/`**~~ — **RESOLVED 2026-07-31 by owner
    word.** Retargeted to `/#audit`; the pinned `aria-current` contract moved with it and gained
    two teeth. See the settled-by-owner table.
@@ -197,21 +210,22 @@ document to read in order) · decorative stats · any copy implying real platfor
 6. **`.lp-h2` tracking** (`-0.038em`) was approved at 42px and now renders ~10px smaller and
    60 heavier.
 7. **Dead CSS** — 268 orphan candidates await a real reachability proof (never a grep).
-8. **`#audit` has no `scroll-margin-top`** — the `scroll-margin-top: 128px` rule at
-   `globals.css:2554` is scoped to `.ds-data` descendants, and the landing's
-   `<section id="audit">` is not one, so a jump lands the heading under the ~68px sticky nav.
-   **Pre-existing, not introduced** by the pill retarget (`app/page.tsx:240` already carries an
-   `href="#audit"` button) — but **the cross-route hash path is genuinely new, not merely more
-   travelled**: that button scrolls within the same document, while the pill now arrives from
-   `/report`, `/fees`, `/playground` and `/proof` as a route change *plus* a hash, where Next
-   applies the hash to a fresh document against its own scroll restoration. Different code path,
-   never exercised. A one-line CSS fix, deliberately not bundled into a decision-2 diff.
-   **Unrendered**, like everything else on this list.
+8. ~~**`#audit` has no `scroll-margin-top`**~~ — **RESOLVED 2026-08-02**: every landing
+   station section carries `scroll-margin-top: 114px` (nav 68 + strip 34 + breathing room).
+   The cross-route hash path (`/report` → `/#audit`) remains unrendered from this seat.
+9. **The walkthrough redesign has never been rendered as the app** (2026-08-02) — the mockup
+   was rendered and measured; the Next port is verified by type/lint/unit gates only. First
+   network-capable run: `npm run verify && npx playwright test`. `layout-sanity.spec.ts` is a
+   plausible first-run red (`MIN_TEXT_WIDTH 120` vs `.wk-tk-id` ≈115px at 12px mono) — read
+   it before changing either side.
+10. **`.wk-strip { top: 68px }` is a fourth hardcoded copy of the nav height** — matched the
+   existing idiom rather than tokenised; a nav-height change now silently overlaps the strip.
 
 ## Decisions log
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-08-02 | Six-station walkthrough landing; DELIVERY station added; run control never disabled; fold contract strengthened to include the run control | Owner word: reassess the whole layout/UX end to end, "from dropping files till slack email", minimalist premium 2026, palette unchanged. Design authored by the session seat (owner: "Fable as the designer advisor"), rendered + measured before the port; Opus built from the mockup. |
 | 2026-07-31 | Nav pill retargeted `/` → `/#audit`; workbench-first confirmed; fold reclaim held | Owner word on all three decision-board forks. The pill was the site's most dominant control and navigated nowhere on the landing page. |
 | 2026-07-31 | DESIGN.md created | The system lived only in 9,200 lines of CSS and a dated review doc; every session re-derived it. |
 | 2026-07-31 | Onest restored, weights recalibrated −60/−40 | Owner word. Numbers do not travel with a face. |

@@ -186,3 +186,12 @@ That reframes the gap. It is not eleven careless sessions; it is **a rule that l
 - **LOCKED STACK:** chip `FOR MERCHANTS · PLATFORMS · AGENT OPERATORS` · H1 `Proof, / before your agent buys.` (gradient one-line-verified ×3 widths) · sol sub · CTAs unchanged.
 - **Owner spacing catch — zones:** the scene-zone pill row sat in the copy stack under the CTAs and read as a second navigation → moved INSIDE the scene band (bottom-center, beside status + pause; overlap-measured ×3 widths, press-tested; the placement rule added to the Claude Design prompt).
 - **Final artifact:** QA **53/53** · C10 129/129 (mockup pack) · SHA `5f4df0e518a890b643b1caef9a9417a8fdbb787b72c6e714ac670d84ef4bd1f7`; brief card rev 5 pushed to the design project (written:1 ×3 this continuation). All state docs + README synced.
+
+## 2026-08-02 — Session 43: end-to-end walkthrough redesign (design → build → ship arc)
+Skills/estate: /claude-os front door · design authored inline (mockup, rendered at
+1280×900 via --single-process Chromium) · Opus subagent build from packet (375k tokens) ·
+Fable diff-level review · sol consult blocked by sandbox (000 both hosts), handed to owner.
+Commits: session-42 slice (e95d1f5), design brief (7ed0ddf), mockup (0edccb8), port (next).
+Gates re-run independently: tsc 0 · eslint 0 · vitest 1630 passed + 8 skipped · honesty-c10
+= disclosed font-host block. Unrendered: the app port (mockup rendered; port needs the
+owner-side battery).
