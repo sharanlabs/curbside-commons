@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Curbside Commons — one run, carried to the end</title>
+<!--
+  ONE RUN, CARRIED TO THE END — the end-to-end walkthrough experience.
+  Design session 2026-08-02 (owner: reassess the whole layout/UX "from dropping
+  files till slack email", minimalist premium 2026, palette unchanged).
+
+  This file IS the proposed landing page, as a working prototype:
+  · six stations — INPUTS · RUN · VERDICT · FEES · DELIVERY · PROOF —
+    bound by a process strip under the nav;
+  · the run control is live at first paint (M1) and on screen one (M2);
+  · the bundled pair is the loud door in each slot (M3);
+  · the run drives the page: ticker → verdict → auto-advance;
+  · the DELIVERY station is new — the built Slack payload and email message,
+    rendered as artifacts, stamped BUILT NOT SENT (the CLI walkthrough's
+    story, brought onto the site);
+  · every figure is the real bundled-pair figure (16 findings · 11 errors ·
+    5 warns · 25 feed rows · 12 catalog items · 17 fee rules 11/6 · the
+    $2,150.00 vs $21.50 specimen) — nothing invented;
+  · tokens transcribed from DESIGN.md / app/globals.css — palette, faces,
+    weights, radii, easings all unchanged (owner: "Let color palette be the
+    same").
+
+  Honesty (RULES.md §4): simulated data throughout; the Slack artifact leads
+  with the builder's own SIMULATED banner (lib/delivery/slack.ts enforces it);
+  the email uses the @example placeholders; no transport exists on this page.
+  Fonts fetched from Google because this is a standalone file; offline it
+  falls back to system-ui, close enough in register to read correctly.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ff-sans: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --ff-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --ink: #12141c;
+    --ink-2: #22252f;
+    --body: #3b3f4b;
+    --graphite: #4a4e5a;
+    --muted: #585d69;
+    --faint: #6a6e7a;
+
+    --bg: #ffffff;
+    --bg-2: #fbfbfc;
+    --bg-3: #f3f4f8;
+
+    --rule: rgba(18, 20, 28, 0.09);
+    --rule-2: rgba(18, 20, 28, 0.15);
+    --rule-3: rgba(18, 20, 28, 0.24);
+
+    --accent: #2438d6;
+    --accent-hi: #25329a;
+    --accent-tint: rgba(36, 56, 214, 0.055);
+    --accent-line: rgba(36, 56, 214, 0.22);
+
+    --ember: #b42318;
+    --ember-tint: rgba(180, 35, 24, 0.06);
+    --ember-line: rgba(180, 35, 24, 0.25);
+    --gold: #ffb020;
+    --gold-text: #9c6208;
+    --ok: #067647;
+
+    --r-card: 16px;
+    --r-ctrl: 12px;
+    --r-chip: 9px;
+    --r-pill: 999px;
+
+    --maxw: 1180px;
+    --gutter: 32px;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-arrival: cubic-bezier(0, 0, 0.2, 1);
+    --ease-field: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur-1: 150ms;
+    --dur-2: 240ms;
+    --dur-3: 350ms;
+    --dur-reveal: 460ms;
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--body);
+    font-family: var(--ff-sans);
+    font-size: 17px;
+    font-weight: 460;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-wrap: pretty;
+  }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+
+  h1, h2, h3 { margin: 0; color: var(--ink); text-wrap: balance; }
+  h1 { font-size: clamp(33px, 4.6vw, 50px); font-weight: 680; letter-spacing: -0.028em; line-height: 1.08; }
+  h2 { font-size: clamp(25px, 2.5vw, 35px); font-weight: 660; letter-spacing: -0.03em; line-height: 1.15; }
+  h3 { font-size: 19px; font-weight: 700; letter-spacing: -0.014em; line-height: 1.3; }
+  p { margin: 0; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+
+  .lede { font-size: 18px; line-height: 1.6; color: var(--body); max-width: 62ch; }
+  .note { font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+  .eyebrow {
+    font-family: var(--ff-mono);
+    font-size: 11px; font-weight: 590; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--graphite);
+    margin: 0 0 10px;
+  }
+  .mono { font-family: var(--ff-mono); }
+
+  /* ============ NAV — the verb, a hairline, then the shelf ============ */
+
+  .nav {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .nav-in {
+    height: 64px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .brand {
+    font-weight: 680; letter-spacing: -0.02em; font-size: 17px;
+    color: var(--ink); text-decoration: none;
+    margin-right: auto;
+  }
+  .nlink {
+    font-size: 13.5px; font-weight: 560; color: var(--muted);
+    text-decoration: none;
+    padding: 7px 13px; border-radius: var(--r-pill);
+    transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+  }
+  .nlink:hover { color: var(--ink); background: var(--bg-3); }
+  .nlink.action {
+    background: var(--accent); color: #fff; font-weight: 590;
+  }
+  .nlink.action:hover { background: var(--accent-hi); }
+  .ndiv { width: 1px; height: 22px; background: var(--rule-2); margin: 0 8px; }
+
+  /* ============ THE PROCESS STRIP — six stations, one thin line ============ */
+
+  .strip {
+    position: sticky; top: 64px; z-index: 39;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .strip-in {
+    display: flex; align-items: stretch;
+    height: 34px;
+  }
+  .st {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    font-family: var(--ff-mono);
+    font-size: 9.5px; font-weight: 590; letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    text-decoration: none;
+    position: relative;
+    transition: color var(--dur-2) var(--ease);
+  }
+  .st .dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--rule-3);
+    transition: background var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+  }
+  .st::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 2px; background: var(--accent);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform var(--dur-3) var(--ease-arrival);
+  }
+  .st.is-here { color: var(--ink-2); }
+  .st.is-here .dot { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+  .st.is-here::after { transform: scaleX(1); }
+  .st.is-done { color: var(--graphite); }
+  .st.is-done .dot { background: var(--accent); }
+  .st.is-run .dot { animation: pulse 900ms var(--ease) infinite; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(36, 56, 214, 0.28); }
+    50% { box-shadow: 0 0 0 5px rgba(36, 56, 214, 0.06); }
+  }
+
+  /* ============ STATION 1 · INPUTS (screen one) ============ */
+
+  .s-inputs { padding: clamp(30px, 4.5vh, 48px) 0 0; }
+  .s-inputs .lede { margin-top: 14px; }
+  .h1-lit { color: var(--accent); }
+
+  .wb { margin-top: clamp(22px, 3.5vh, 34px); }
+  .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .zone {
+    border: 1.5px dashed var(--rule-3);
+    border-radius: var(--r-card);
+    background: var(--bg-2);
+    padding: 20px 22px 18px;
+    min-height: 148px;
+    display: flex; flex-direction: column;
+    transition: border-color var(--dur-2) var(--ease), background var(--dur-2) var(--ease);
+  }
+  .zone:hover { border-color: var(--accent-line); }
+  .zone.is-filled {
+    border-style: solid; border-color: var(--accent-line);
+    background: var(--bg);
+  }
+  .zone-k {
+    font-family: var(--ff-mono);
+    font-size: 10.5px; font-weight: 590; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--graphite);
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .zone-k .side { color: var(--faint); letter-spacing: 0.08em; }
+  .zone-t { font-size: 16.5px; font-weight: 620; color: var(--ink-2); margin-bottom: 10px; }
+
+  /* The loud door is the one a first-time visitor can open (M3). */
+  .door {
+    align-self: flex-start;
+    font: inherit; font-size: 15px; font-weight: 590;
+    color: var(--accent);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--r-ctrl);
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+  }
+  .door:hover { background: rgba(36, 56, 214, 0.09); border-color: var(--accent); }
+  .door:active { transform: translateY(1px); }
+  .door:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .quiet-door {
+    margin-top: 10px;
+    font-size: 13px; color: var(--muted);
+  }
+  .quiet-door button {
+    font: inherit; color: var(--graphite); font-weight: 560;
+    background: none; border: 0; padding: 0;
+    text-decoration: underline; text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .quiet-door button:hover { color: var(--ink); }
+
+  /* A filled slot becomes a file chip — the state is the material. */
+  .chipfile {
+    display: none;
+    align-items: center; gap: 10px;
+    font-family: var(--ff-mono); font-size: 12.5px; font-weight: 500;
+    color: var(--ink-2);
+    background: var(--bg-3);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-chip);
+    padding: 8px 12px;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity var(--dur-3) var(--ease-arrival), transform var(--dur-3) var(--ease-arrival);
+  }
+  .zone.is-filled .chipfile { display: inline-flex; opacity: 1; transform: none; }
+  .zone.is-filled .door, .zone.is-filled .quiet-door { display: none; }
+  .chipfile .ok-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
+  .chipfile .meta { color: var(--muted); }
+
+  .runrow {
+    margin-top: 16px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .run {
+    font: inherit; font-size: 15.5px; font-weight: 590;
+    color: #fff; background: var(--accent);
+    border: 0; border-radius: var(--r-pill);
+    padding: 12px 26px;
+    cursor: pointer;
+    transition: background var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+  }
+  .run:hover { background: var(--accent-hi); }
+  .run:active { transform: translateY(1px); }
+  .run:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .run-hint { font-size: 14px; color: var(--muted); }
+  .run-hint b { color: var(--graphite); font-weight: 590; }
+
+  /* ============ STATION 2 · RUN — the ticker ============ */
+
+  .s-run { padding: clamp(40px, 6vh, 60px) 0 0; }
+  .ticker {
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-card);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .ticker-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--ff-mono);
+    font-size: 10.5px; font-weight: 590; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--graphite);
+  }
+  .ticker-head .live { color: var(--accent); display: none; }
+  .ticker.is-live .ticker-head .live { display: inline; }
+  .ticker-body {
+    font-family: var(--ff-mono);
+    font-size: 12px; line-height: 1.5;
+    padding: 14px 18px;
+    min-height: 132px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .tk-line {
+    display: flex; gap: 12px; align-items: baseline;
+    color: var(--graphite);
+    opacity: 0; transform: translateY(5px);
+    transition: opacity var(--dur-2) var(--ease-arrival), transform var(--dur-2) var(--ease-arrival);
+  }
+  .tk-line.is-in { opacity: 1; transform: none; }
+  .tk-line .id { color: var(--muted); min-width: 8ch; }
+  .tk-line .what { flex: 1; }
+  .tk-line .v { font-weight: 600; letter-spacing: 0.06em; }
+  .tk-line .v.ok { color: var(--ok); }
+  .tk-line .v.held { color: var(--ember); }
+  .ticker-idle {
+    color: var(--muted); font-family: var(--ff-sans); font-size: 14.5px;
+  }
+  .ticker-sum {
+    display: none;
+    border-top: 1px solid var(--rule);
+    padding: 11px 18px;
+    font-family: var(--ff-mono); font-size: 11.5px; color: var(--graphite);
+  }
+  .ticker.is-done .ticker-sum { display: block; }
+
+  /* ============ STATION 3 · VERDICT — the most designed object ============ */
+
+  .s-verdict { padding: clamp(48px, 7vh, 72px) 0 0; }
+  .slab {
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-card);
+    background: var(--bg);
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(18, 20, 28, 0.03), 0 8px 28px rgba(18, 20, 28, 0.04);
+  }
+  .slab-top {
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 28px; align-items: center;
+    padding: 26px 30px;
+    border-bottom: 1px solid var(--rule);
+    background: linear-gradient(180deg, var(--bg-2), var(--bg));
+  }
+  .verdict-mark {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .verdict-lamp {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--ember);
+    box-shadow: 0 0 0 4px var(--ember-tint);
+  }
+  .verdict-word {
+    font-family: var(--ff-mono);
+    font-size: 34px; font-weight: 600; letter-spacing: 0.04em;
+    color: var(--ember);
+  }
+  .tally {
+    display: flex; gap: 32px;
+  }
+  .tally div { line-height: 1.3; }
+  .tally .n {
+    font-family: var(--ff-mono); font-size: 23px; font-weight: 600;
+    color: var(--ink); font-variant-numeric: tabular-nums;
+    display: block;
+  }
+  .tally .n.err { color: var(--ember); }
+  .tally .n.wrn { color: var(--gold-text); }
+  .tally .k {
+    font-family: var(--ff-mono); font-size: 10px; font-weight: 590;
+    letter-spacing: 0.13em; text-transform: uppercase; color: var(--faint);
+  }
+  .slab-cta {
+    font-size: 14px; font-weight: 590;
+    color: var(--accent); text-decoration: none;
+    white-space: nowrap;
+  }
+  .slab-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  .prov {
+    padding: 13px 30px;
+    border-bottom: 1px solid var(--rule);
+    display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
+    font-family: var(--ff-mono); font-size: 11.5px; color: var(--graphite);
+    background: var(--bg-2);
+  }
+  .prov .real {
+    font-family: var(--ff-sans); font-size: 13px; color: var(--muted);
+    margin-left: auto;
+  }
+  .prov .real a { color: var(--graphite); }
+
+  .receipts {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  }
+  .receipt {
+    padding: 24px 30px 26px;
+    border-right: 1px solid var(--rule);
+  }
+  .receipt:last-child { border-right: 0; }
+  .rc-rule {
+    font-family: var(--ff-mono);
+    font-size: 10.5px; font-weight: 590; letter-spacing: 0.1em;
+    color: var(--accent);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--r-chip);
+    padding: 3px 8px;
+    display: inline-block;
+    margin-bottom: 12px;
+    text-decoration: none;
+  }
+  .rc-rule:hover { border-color: var(--accent); }
+  .rc-sev {
+    font-family: var(--ff-mono); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.12em; color: var(--ember);
+    margin-left: 8px;
+  }
+  .receipt h3 { font-size: 17px; margin-bottom: 10px; }
+  .rc-math {
+    font-family: var(--ff-mono); font-size: 12.5px; line-height: 1.75;
+    color: var(--ink-2);
+    background: var(--bg-3);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-chip);
+    padding: 12px 15px;
+    margin: 0 0 12px;
+    white-space: pre-wrap;
+  }
+  .rc-math .lbl { color: var(--faint); }
+  .rc-math .bad { color: var(--ember); font-weight: 600; }
+  .receipt .note { font-size: 14px; }
+
+  /* ============ STATION 4 · FEES ============ */
+
+  .s-fees { padding: clamp(56px, 8vh, 84px) 0 0; }
+  .sec-rule {
+    display: block; width: 44px; height: 2px;
+    background: var(--accent); border-radius: 2px;
+    margin: 0 0 18px;
+  }
+  .fees-grid {
+    margin-top: 30px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  .fee-card {
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-card);
+    background: var(--bg);
+    padding: 22px 24px;
+  }
+  .fee-card.finding { border-color: var(--ember-line); background: linear-gradient(180deg, var(--bg), var(--bg)) , var(--bg); }
+  .fee-k {
+    font-family: var(--ff-mono);
+    font-size: 10.5px; font-weight: 590; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--graphite);
+    margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .fee-card h3 { font-size: 17px; margin-bottom: 8px; }
+  .fee-card .d { font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+  .fee-counts {
+    display: flex; gap: 26px; margin-top: 14px;
+  }
+  .fee-counts .n {
+    font-family: var(--ff-mono); font-size: 19px; font-weight: 600;
+    color: var(--ink); font-variant-numeric: tabular-nums; display: block;
+  }
+  .fee-counts .k2 {
+    font-family: var(--ff-mono); font-size: 9.5px; font-weight: 590;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint);
+  }
+  .go {
+    display: inline-block; margin-top: 14px;
+    font-size: 14px; font-weight: 590; color: var(--accent);
+    text-decoration: none;
+  }
+  .go:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ============ STATION 5 · DELIVERY — built, not sent ============ */
+
+  .s-delivery { padding: clamp(56px, 8vh, 84px) 0 0; }
+  .artifacts {
+    margin-top: 30px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    align-items: start;
+  }
+  .artifact {
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-card);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .art-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg-2);
+    font-family: var(--ff-mono);
+    font-size: 10.5px; font-weight: 590; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--graphite);
+  }
+  .stamp-not-sent {
+    font-family: var(--ff-mono);
+    font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em;
+    color: var(--gold-text);
+    border: 1px solid rgba(156, 98, 8, 0.35);
+    border-radius: var(--r-chip);
+    padding: 3px 8px;
+    background: rgba(255, 176, 32, 0.07);
+  }
+  .art-body { padding: 18px 20px 20px; }
+
+  /* Slack payload — rendered in the page's own card language, schematic. */
+  .sk-banner {
+    font-size: 13px; font-weight: 620; color: var(--ink-2);
+    padding: 10px 13px;
+    background: var(--bg-3);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-chip);
+    margin-bottom: 12px;
+  }
+  .sk-header { font-size: 16.5px; font-weight: 680; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 6px; }
+  .sk-verdict { font-size: 14px; font-weight: 590; color: var(--ember); margin-bottom: 2px; }
+  .sk-sub { font-family: var(--ff-mono); font-size: 11.5px; color: var(--muted); margin-bottom: 12px; }
+  .sk-div { height: 1px; background: var(--rule-2); margin: 12px 0; }
+  .sk-finding { font-size: 13.5px; line-height: 1.55; color: var(--body); margin-bottom: 10px; }
+  .sk-finding .sev { font-weight: 620; color: var(--ember); }
+  .sk-finding .ids { font-family: var(--ff-mono); font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+  .sk-more { font-size: 13px; color: var(--muted); font-style: italic; }
+  .sk-ctx {
+    margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--rule);
+    font-family: var(--ff-mono); font-size: 10.5px; color: var(--faint);
+  }
+
+  /* Email — headers then body, as the RFC 5322 message the builder emits. */
+  .em-heads {
+    font-family: var(--ff-mono); font-size: 11.5px; line-height: 1.8;
+    color: var(--ink-2);
+    border-bottom: 1px solid var(--rule-2);
+    padding-bottom: 12px; margin-bottom: 12px;
+  }
+  .em-heads .h { color: var(--faint); }
+  .em-body {
+    font-family: var(--ff-mono); font-size: 12px; line-height: 1.7;
+    color: var(--graphite);
+    white-space: pre-wrap;
+  }
+  .art-foot {
+    border-top: 1px solid var(--rule);
+    padding: 12px 18px;
+    font-size: 13px; color: var(--muted);
+    background: var(--bg-2);
+  }
+  .delivery-note {
+    margin-top: 18px;
+    font-size: 14.5px; color: var(--muted); max-width: 74ch;
+  }
+  .delivery-note b { color: var(--graphite); font-weight: 590; }
+
+  /* ============ STATION 6 · PROOF ============ */
+
+  .s-proof { padding: clamp(56px, 8vh, 84px) 0 clamp(64px, 9vh, 96px); }
+  .trust {
+    margin-top: 30px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  .fact {
+    border-top: 2px solid var(--rule-3);
+    padding: 18px 4px 0;
+  }
+  .fact .fig {
+    font-family: var(--ff-mono); font-size: 27px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.01em;
+  }
+  .fact .fig .accent { color: var(--accent); }
+  .fact .cap {
+    font-family: var(--ff-mono); font-size: 10px; font-weight: 590;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint);
+    margin: 6px 0 8px;
+  }
+  .fact .d { font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+  .close-row {
+    margin-top: 44px;
+    display: flex; gap: 14px; align-items: center;
+  }
+  .btn {
+    font-size: 15px; font-weight: 590; text-decoration: none;
+    border-radius: var(--r-pill); padding: 11px 24px;
+    transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+  }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-hi); }
+  .btn.ghost { color: var(--graphite); border: 1px solid var(--rule-2); }
+  .btn.ghost:hover { color: var(--ink); border-color: var(--rule-3); }
+
+  footer {
+    border-top: 1px solid var(--rule-2);
+    background: var(--bg-2);
+    padding: 28px 0 40px;
+  }
+  footer .note { max-width: none; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  footer a { color: var(--graphite); }
+
+  /* ============ Reveal on scroll — transform/opacity only ============ */
+
+  .rv { opacity: 0; transform: translateY(14px); transition: opacity var(--dur-reveal) var(--ease-arrival), transform var(--dur-reveal) var(--ease-arrival); }
+  .rv.is-in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    .rv, .tk-line { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<nav class="nav" aria-label="Primary">
+  <div class="wrap nav-in">
+    <a class="brand" href="#audit">Curbside Commons</a>
+    <a class="nlink action" href="#audit" aria-current="page">Audit</a>
+    <span class="ndiv" aria-hidden="true"></span>
+    <a class="nlink" href="#verdict">Report</a>
+    <a class="nlink" href="#fees">Fee rules</a>
+    <a class="nlink" href="#delivery">Delivery</a>
+    <a class="nlink" href="#proof">Proof</a>
+  </div>
+</nav>
+
+<!-- ================= PROCESS STRIP ================= -->
+<div class="strip" aria-hidden="false">
+  <div class="wrap strip-in" id="strip">
+    <a class="st is-here" href="#audit" data-st="inputs"><span class="dot"></span>Inputs</a>
+    <a class="st" href="#run" data-st="run"><span class="dot"></span>Run</a>
+    <a class="st" href="#verdict" data-st="verdict"><span class="dot"></span>Verdict</a>
+    <a class="st" href="#fees" data-st="fees"><span class="dot"></span>Fees</a>
+    <a class="st" href="#delivery" data-st="delivery"><span class="dot"></span>Delivery</a>
+    <a class="st" href="#proof" data-st="proof"><span class="dot"></span>Proof</a>
+  </div>
+</div>
+
+<main>
+
+<!-- ================= STATION 1 · INPUTS ================= -->
+<section class="s-inputs wrap" id="audit" aria-labelledby="hero-h1">
+  <h1 id="hero-h1">
+    Dinner can be ordered while you sleep.<br />
+    <span class="h1-lit">What the agent read needs proof.</span>
+  </h1>
+  <p class="lede">
+    Curbside Commons checks a marketplace feed against the merchant&rsquo;s own records and
+    reports every claim that disagrees — then shows you exactly what would be delivered, and to whom.
+  </p>
+
+  <div class="wb">
+    <div class="zones">
+      <div class="zone" id="zone-feed">
+        <p class="zone-k"><span>The feed</span><span class="side">what an agent reads</span></p>
+        <p class="zone-t">A published menu feed</p>
+        <button class="door" type="button" data-load="feed">Load the bundled feed</button>
+        <p class="quiet-door"><button type="button">Choose a file</button> / or drag it here</p>
+        <span class="chipfile"><span class="ok-dot" aria-hidden="true"></span>acp-feed.drifted.json <span class="meta">· 25 rows</span></span>
+      </div>
+      <div class="zone" id="zone-record">
+        <p class="zone-k"><span>The record</span><span class="side">the merchant&rsquo;s truth</span></p>
+        <p class="zone-t">The system of record</p>
+        <button class="door" type="button" data-load="record">Load the bundled catalog</button>
+        <p class="quiet-door"><button type="button">Choose a file</button> / or drag it here</p>
+        <span class="chipfile"><span class="ok-dot" aria-hidden="true"></span>sor.catalog.json <span class="meta">· 12 items</span></span>
+      </div>
+    </div>
+    <div class="runrow">
+      <button class="run" type="button" id="run">Run the bundled pair</button>
+      <p class="run-hint"><b>Runs in this tab.</b> Nothing you load leaves this page.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATION 2 · RUN ================= -->
+<section class="s-run wrap" id="run-s" aria-labelledby="run-h">
+  <div class="ticker" id="ticker">
+    <div class="ticker-head">
+      <span id="run-h">The check, line by line</span>
+      <span class="live">computing &middot; in this tab</span>
+    </div>
+    <div class="ticker-body" id="ticker-body">
+      <p class="ticker-idle" id="ticker-idle">
+        Every claim in the feed is matched to the record it should agree with, and the rule for
+        that field is applied — deterministically, with no model in the loop. Press
+        <b style="color:var(--graphite)">Run</b> to watch it happen.
+      </p>
+    </div>
+    <div class="ticker-sum" id="ticker-sum"></div>
+  </div>
+</section>
+
+<!-- ================= STATION 3 · VERDICT ================= -->
+<section class="s-verdict wrap" id="verdict" aria-labelledby="verdict-h2">
+  <div class="rv">
+    <p class="eyebrow">The verdict</p>
+    <span class="sec-rule" aria-hidden="true"></span>
+    <h2 id="verdict-h2">Findings, with the arithmetic attached.</h2>
+  </div>
+
+  <div class="slab rv" style="margin-top: 26px">
+    <div class="slab-top">
+      <div class="verdict-mark">
+        <span class="verdict-lamp" aria-hidden="true"></span>
+        <span class="verdict-word">FAIL</span>
+      </div>
+      <div class="tally">
+        <div><span class="n">16</span><span class="k">Findings</span></div>
+        <div><span class="n err">11</span><span class="k">Errors</span></div>
+        <div><span class="n wrn">5</span><span class="k">Warnings</span></div>
+        <div><span class="n">25</span><span class="k">Rows read</span></div>
+      </div>
+      <a class="slab-cta" href="#">See the full report &rarr;</a>
+    </div>
+    <div class="prov">
+      <span>feed side: bundled feed</span>
+      <span>record side: bundled catalog</span>
+      <span>spec pinned</span>
+      <span class="real">The rules and the arithmetic are real; the merchant is invented. <a href="#">What is real &rarr;</a></span>
+    </div>
+    <div class="receipts">
+      <div class="receipt">
+        <a class="rc-rule" href="#">LST-PRICE-CENTS-AS-DECIMAL</a><span class="rc-sev">ERROR</span>
+        <h3>A hundredfold price, served as written</h3>
+        <p class="rc-math"><span class="lbl">the feed says</span>   <span class="bad">$2,150.00</span>
+<span class="lbl">the record says</span> 2150&cent; &nbsp;=&nbsp; $21.50
+<span class="lbl">the claim is</span>    <span class="bad">100&times; the record</span></p>
+        <p class="note">Crispy Calamari (Small). The served amount reads the merchant&rsquo;s
+        cents as dollars — an agent building a basket would pay it without blinking.</p>
+      </div>
+      <div class="receipt">
+        <a class="rc-rule" href="#">LST-AVAIL-HIDDEN-SHOWN</a><span class="rc-sev">ERROR</span>
+        <h3>Hidden in the catalog, served to customers</h3>
+        <p class="rc-math"><span class="lbl">the feed says</span>   <span class="bad">available &middot; in stock</span>
+<span class="lbl">the record says</span> hidden by the merchant
+<span class="lbl">the claim is</span>    <span class="bad">not the merchant&rsquo;s word</span></p>
+        <p class="note">The item is hidden in the merchant&rsquo;s own catalog but is being
+        offered anyway — the feed is speaking for a merchant who said no.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATION 4 · FEES ================= -->
+<section class="s-fees wrap" id="fees" aria-labelledby="fees-h2">
+  <div class="rv">
+    <p class="eyebrow">The law</p>
+    <span class="sec-rule" aria-hidden="true"></span>
+    <h2 id="fees-h2">The fee statement, read against the law.</h2>
+    <p class="lede" style="margin-top: 12px">
+      New York City caps delivery fees. The same run reads a fee statement against the
+      codified rules of Administrative Code &sect;20-563.3 — and every finding cites the
+      rule it stands on.
+    </p>
+  </div>
+
+  <div class="fees-grid">
+    <div class="fee-card finding rv">
+      <p class="fee-k"><span>A held charge</span><span style="color:var(--ember)">ERROR</span></p>
+      <h3>A fee above the cap</h3>
+      <p class="d">
+        The statement&rsquo;s delivery fee exceeds what the ordinance permits for the order&rsquo;s
+        subtotal. The finding names the charge, the cap, and the difference — and links the rule
+        text itself.
+      </p>
+      <a class="go" href="#">Read the rule it cites &rarr;</a>
+    </div>
+    <div class="fee-card rv">
+      <p class="fee-k"><span>The rulebook</span></p>
+      <h3>Codified, and honest about reach</h3>
+      <p class="d">
+        Rules that can be checked from the statement itself are checked. Rules that need outside
+        evidence say so — a limit stated is a limit kept.
+      </p>
+      <div class="fee-counts">
+        <div><span class="n">17</span><span class="k2">Rules codified</span></div>
+        <div><span class="n">11</span><span class="k2">Checkable here</span></div>
+        <div><span class="n">6</span><span class="k2">Need evidence</span></div>
+      </div>
+      <a class="go" href="#">Open the fee rules &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATION 5 · DELIVERY ================= -->
+<section class="s-delivery wrap" id="delivery" aria-labelledby="delivery-h2">
+  <div class="rv">
+    <p class="eyebrow">Delivery</p>
+    <span class="sec-rule" aria-hidden="true"></span>
+    <h2 id="delivery-h2">What a human would receive.</h2>
+    <p class="lede" style="margin-top: 12px">
+      A verdict that stays on a screen changes nothing. The run builds the two messages an
+      operations channel would get — and shows them to you here instead of sending them,
+      because this page has no way to send anything.
+    </p>
+  </div>
+
+  <div class="artifacts">
+    <!-- Slack payload -->
+    <div class="artifact rv">
+      <div class="art-head">
+        <span>Slack message &middot; Block Kit payload</span>
+        <span class="stamp-not-sent">Built, not sent</span>
+      </div>
+      <div class="art-body">
+        <p class="sk-banner">🧪 SIMULATED DATA — Curbside Commons demonstration output. Not real merchant data, not legal advice.</p>
+        <p class="sk-header">Truth-audit result: bundled pair (simulated)</p>
+        <p class="sk-verdict">❌ FAIL — violations present (16 findings)</p>
+        <p class="sk-sub">tool: check_feed &middot; deterministic engine &middot; $0 offline</p>
+        <div class="sk-div" aria-hidden="true"></div>
+        <p class="sk-finding">
+          <span class="sev">[error]</span> This item is hidden in the merchant&rsquo;s own catalog
+          but is being served to customers.
+          <span class="ids">finding-001 &middot; rule LST-AVAIL-HIDDEN-SHOWN</span>
+        </p>
+        <p class="sk-finding">
+          <span class="sev">[error]</span> The served price is one hundred times the merchant&rsquo;s
+          recorded price.
+          <span class="ids">finding-004 &middot; rule LST-PRICE-CENTS-AS-DECIMAL</span>
+        </p>
+        <p class="sk-more">&hellip;and 14 more findings — see the full report (never silently dropped).</p>
+        <p class="sk-ctx">SIMULATED &middot; Curbside Commons &middot; recommendations only — the engine decides, humans approve.</p>
+      </div>
+      <div class="art-foot">
+        The exact payload the delivery builder emits — block for block, banner first, by construction.
+      </div>
+    </div>
+
+    <!-- Email message -->
+    <div class="artifact rv">
+      <div class="art-head">
+        <span>Email &middot; RFC 5322 message</span>
+        <span class="stamp-not-sent">Built, not sent</span>
+      </div>
+      <div class="art-body">
+        <div class="em-heads">
+          <span class="h">From:</span> truth-audit@sender.example<br />
+          <span class="h">To:</span> merchant-ops@recipient.example<br />
+          <span class="h">Subject:</span> [SIMULATED] Truth-audit result: bundled pair — FAIL (16 findings)<br />
+          <span class="h">Date:</span> Sat, 01 Aug 2026 12:00:00 +0000
+        </div>
+        <p class="em-body">SIMULATED DATA — Curbside Commons demonstration output.
+Not real merchant data, not legal advice.
+
+VERDICT: FAIL — violations present (16 findings)
+tool: check_feed · deterministic engine · $0 offline
+
+[error] finding-001 · LST-AVAIL-HIDDEN-SHOWN
+  Hidden in the merchant's catalog, served to customers.
+
+[error] finding-004 · LST-PRICE-CENTS-AS-DECIMAL
+  Served price is 100× the merchant's recorded price.
+  …</p>
+      </div>
+      <div class="art-foot">
+        Plain-text first, findings capped and counted, headers injection-guarded — the same
+        message an owner-armed send would carry.
+      </div>
+    </div>
+  </div>
+
+  <p class="delivery-note">
+    <b>Nothing is transmitted.</b> These artifacts are built by the same code paths an
+    owner-armed, one-shot demonstration uses — but no send transport is wired into this site.
+    You are looking at the end of the pipeline, on paper.
+  </p>
+</section>
+
+<!-- ================= STATION 6 · PROOF ================= -->
+<section class="s-proof wrap" id="proof" aria-labelledby="proof-h2">
+  <div class="rv">
+    <p class="eyebrow">Why trust the verdict</p>
+    <span class="sec-rule" aria-hidden="true"></span>
+    <h2 id="proof-h2">The same input, the same receipt, every time.</h2>
+  </div>
+
+  <div class="trust">
+    <div class="fact rv">
+      <p class="fig">1 = 1</p>
+      <p class="cap">Deterministic</p>
+      <p class="d">A verdict is exact rule logic, byte for byte. No model decides it.</p>
+    </div>
+    <div class="fact rv">
+      <p class="fig"><span class="accent">1,200+</span></p>
+      <p class="cap">Automated tests</p>
+      <p class="d">Golden files compare the engine&rsquo;s output with the results it has committed to.</p>
+    </div>
+    <div class="fact rv">
+      <p class="fig">DEFER</p>
+      <p class="cap">On the record</p>
+      <p class="d">Where evidence fell short of a pre-registered floor, the label says so. A first-attempt DEFER stays published.</p>
+    </div>
+  </div>
+
+  <div class="close-row rv">
+    <a class="btn primary" href="#audit">Audit a feed</a>
+    <a class="btn ghost" href="#">What is real, what is invented</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="note">
+      <span>Simulated data throughout &middot; the rules and the arithmetic are real, the merchant is invented.</span>
+      <span><a href="#">What is real, what is invented</a></span>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- station strip: scroll position + run state ---------- */
+  var stations = Array.prototype.slice.call(document.querySelectorAll(".st"));
+  var byName = {};
+  stations.forEach(function (s) { byName[s.getAttribute("data-st")] = s; });
+
+  var anchors = {
+    inputs: document.getElementById("audit"),
+    run: document.getElementById("run-s"),
+    verdict: document.getElementById("verdict"),
+    fees: document.getElementById("fees"),
+    delivery: document.getElementById("delivery"),
+    proof: document.getElementById("proof")
+  };
+
+  function setHere(name) {
+    var seen = true;
+    stations.forEach(function (s) {
+      var n = s.getAttribute("data-st");
+      s.classList.remove("is-here");
+      if (n === name) { s.classList.add("is-here"); seen = false; }
+      s.classList.toggle("is-done", seen && n !== name);
+    });
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        var name = Object.keys(anchors).find(function (k) { return anchors[k] === e.target; });
+        if (name) setHere(name);
+      }
+    });
+  }, { rootMargin: "-45% 0px -50% 0px" });
+  Object.keys(anchors).forEach(function (k) { io.observe(anchors[k]); });
+
+  /* ---------- reveals ---------- */
+  var rio = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add("is-in"); rio.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  Array.prototype.forEach.call(document.querySelectorAll(".rv"), function (el) { rio.observe(el); });
+
+  /* ---------- slots ---------- */
+  var zoneFeed = document.getElementById("zone-feed");
+  var zoneRecord = document.getElementById("zone-record");
+  var runBtn = document.getElementById("run");
+
+  function fill(zone) { zone.classList.add("is-filled"); relabel(); }
+  function armed() {
+    return zoneFeed.classList.contains("is-filled") && zoneRecord.classList.contains("is-filled");
+  }
+  function relabel() {
+    runBtn.textContent = armed() ? "Run the audit" : "Run the bundled pair";
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".door"), function (d) {
+    d.addEventListener("click", function () {
+      fill(d.getAttribute("data-load") === "feed" ? zoneFeed : zoneRecord);
+    });
+  });
+
+  /* ---------- the run ---------- */
+  var ticker = document.getElementById("ticker");
+  var body = document.getElementById("ticker-body");
+  var idle = document.getElementById("ticker-idle");
+  var sum = document.getElementById("ticker-sum");
+  var running = false;
+
+  var LINES = [
+    ["itm_003", "price.amount · 1195 = 1195¢", "ok", "OK"],
+    ["itm_007", "availability · in_stock = in_stock", "ok", "OK"],
+    ["itm_012", "price.amount · 2150 ≠ 2150¢ ($21.50) · LST-PRICE-CENTS-AS-DECIMAL", "held", "HELD"],
+    ["itm_014", "visibility · shown ≠ hidden · LST-AVAIL-HIDDEN-SHOWN", "held", "HELD"],
+    ["itm_016", "state · pre_order ≠ in_stock · LST-AVAIL-STATE", "held", "HELD"],
+    ["itm_019", "sale_price 1499 > regular 1299 · LST-PRICE-SALE-ABOVE", "held", "HELD"],
+    ["itm_021", "checkout ≠ search eligibility · LST-XF-CHECKOUT-SEARCH", "held", "HELD"],
+    ["fee_stmt", "delivery fee vs §20-563.3 cap · NYC-FEE-CAP", "held", "HELD"]
+  ];
+
+  runBtn.addEventListener("click", function () {
+    if (running) return;
+    running = true;
+
+    // A run with empty slots IS the bundled run — the door and the verb agree.
+    if (!armed()) { fill(zoneFeed); fill(zoneRecord); }
+    runBtn.textContent = "Running…";
+
+    var runStation = byName.run;
+    runStation.classList.add("is-run");
+    ticker.classList.add("is-live");
+    idle.style.display = "none";
+
+    // Bring the ticker into view without yanking the page.
+    document.getElementById("run-s").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+
+    var i = 0;
+    var stepMs = reduced ? 0 : 150;
+    function next() {
+      if (i < LINES.length) {
+        var L = LINES[i];
+        var el = document.createElement("p");
+        el.className = "tk-line";
+        el.innerHTML =
+          '<span class="id">' + L[0] + '</span>' +
+          '<span class="what">' + L[1] + "</span>" +
+          '<span class="v ' + L[2] + '">' + L[3] + "</span>";
+        body.appendChild(el);
+        requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("is-in"); }); });
+        i += 1;
+        setTimeout(next, stepMs);
+      } else {
+        finish();
+      }
+    }
+
+    function finish() {
+      runStation.classList.remove("is-run");
+      ticker.classList.remove("is-live");
+      ticker.classList.add("is-done");
+      sum.textContent = "25 rows · every claim checked · 16 findings (11 errors · 5 warnings) · computed in this tab";
+      runBtn.textContent = "Run again";
+      running = false;
+      // The page advances to the verdict — the run's consequence is never off screen.
+      setTimeout(function () {
+        document.getElementById("verdict").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+      }, reduced ? 0 : 350);
+    }
+
+    setTimeout(next, reduced ? 0 : 250);
+  });
+})();
+</script>
+
+</body>
+</html>
