@@ -1943,7 +1943,8 @@ body {
 
 /* ============================================================================
    THE REPORT / DEMO DOCUMENT SYSTEM — re-tokened for the redesign B1 (2026-07-14).
-   Scoped to the two real verifier surfaces (/report + /demo, both mount .rpt-wrap);
+   NOTHING MOUNTS .rpt-wrap TODAY (checked 2026-08-02: no tsx renders it; /demo is
+   deleted, /report was rewritten) — orphan candidate for the R-3 sweep;
    the landing keeps its own system. Spec: docs/design-brief-redesign-2026-07-14.md.
    Lineage: the "Ledger" audit-certificate STRUCTURE (Swiss / International-
    Typographic; flat, no radii / shadows / gradients; the precision of the hairline

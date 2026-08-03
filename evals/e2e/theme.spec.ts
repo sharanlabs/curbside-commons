@@ -88,22 +88,20 @@ test("a stored LIGHT choice wins over a dark system preference", async ({ page }
   await expect.poll(() => bodyBg(page)).toBe(LIGHT_BG);
 });
 
-test("the dark scheme reaches the two element-scoped token blocks", async ({ page }) => {
-  // .rpt-wrap and .docs-main declare their own tokens ON THE ELEMENT, which
-  // beats anything inherited from :root. Without their own dark branches these
-  // two surfaces render a fully light document inside a dark page — the one
-  // failure a :root-only implementation cannot see.
+test("the dark scheme reaches every route, including the element-scoped /docs block", async ({ page }) => {
+  // .docs-main declares its own tokens ON THE ELEMENT, which beats anything
+  // inherited from :root — without its own dark branch it renders a fully
+  // light document inside a dark page. (.rpt-wrap was asserted here first,
+  // but nothing mounts it — dead CSS with a stale comment; /report darkens
+  // via :root, verified rendered 2026-08-02.)
   await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "dark" });
 
-  await page.goto("/report");
-  await expect
-    .poll(() =>
-      page.evaluate(() => {
-        const el = document.querySelector(".rpt-wrap");
-        return el ? getComputedStyle(el).backgroundColor : null;
-      }),
-    )
-    .toBe("rgb(19, 21, 29)"); // --paper re-declared to #13151d
+  for (const route of ["/report", "/fees", "/proof", "/playground"]) {
+    await page.goto(route);
+    await expect
+      .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
+      .toBe("rgb(14, 16, 22)"); // --bg #0e1016
+  }
 
   await page.goto("/docs");
   await expect

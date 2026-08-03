@@ -326,7 +326,12 @@ test("the sample pair can be DOWNLOADED, and it is the same bytes the inline but
     // retries forever while waitForEvent eats the test timeout (CI runs
     // 30773077581 / 30775316940). scroll-padding-top now covers native
     // scrolls; centring makes the spec independent of chrome height.
-    const dlBtn = slot.getByRole("button", { name: /download it to test uploading/ });
+    // /i matters: the accessible name is "Download it…" (capital D). The
+    // case-sensitive regex matched NOTHING for four CI runs while every
+    // theory pointed at scroll geometry and blob-URL races (30773077581 →
+    // 30778517772); the in-seat repro "passed" because it was written with
+    // /i. A locator that cannot match is indistinguishable from a slow one.
+    const dlBtn = slot.getByRole("button", { name: /download it to test uploading/i });
     await dlBtn.evaluate((el) => el.scrollIntoView({ block: "center" }));
     const [download] = await Promise.all([
       page.waitForEvent("download"),
