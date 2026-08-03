@@ -39,6 +39,42 @@ channel and inbox.
 
 ---
 
+## Test 0 — the landing page, drop to delivery (the whole product in one scroll)
+
+Since 2026-08-02 the landing page IS the walkthrough: six stations — INPUTS · RUN ·
+VERDICT · FEES · DELIVERY · PROOF — that carry one audit from your two files to the
+messages a human would receive. Click by click:
+
+1. Open the site (live: https://curbside-commons.vercel.app — or locally `npm run dev`
+   → http://localhost:3000). You land on two labeled slots: **"A published menu feed"**
+   (what an agent reads) and **"The system of record"** (the merchant's truth).
+2. **Fastest path: click "Run the bundled pair"** — it loads the built-in test pair and
+   runs immediately. The run button is never disabled; empty slots just mean it runs
+   the bundled data.
+3. **Or bring the test files yourself:** open a slot's paste area and click
+   **"Download it to test uploading"** — it saves the bundled file
+   (`bundled-feed.json` / `bundled-catalog.json`) from the same bytes the inline
+   loader uses. Drag the files back into the slots or use the file picker. Same
+   engine, now exercising the real upload path. (The save happens in your tab via a
+   blob URL — nothing is fetched from, or sent to, anywhere.)
+4. Watch the **RUN** station: the ticker streams only checks that actually happened —
+   a row shows **HELD** when a real finding exists and **OK** only when that row had
+   zero findings. Nothing in the stream is theater.
+5. The **VERDICT** slab states the outcome with the honesty sentence inside it; the
+   **FEES** station reads the statement against NYC's codified caps (details in Test A).
+6. The **DELIVERY** station is the part to look at twice: the real **Slack Block Kit
+   payload** and the real **RFC 5322 email**, built by the same `lib/delivery/*`
+   builders the CLI calls — stamped **BUILT, NOT SENT**. The SIMULATED banner you see
+   comes from the builder's own output, not from page copy. Nothing is transmitted;
+   the site has no send transport wired into it.
+7. Try the **theme toggle** (right end of the nav): both light and dark are supported,
+   and the whole flow above reads the same in either scheme.
+
+To reset, run the bundled pair again or reload — the page holds no state you can't
+walk back.
+
+---
+
 ## Test A — the fee audit (paste a statement, get it checked against NYC's caps)
 
 This is the strongest "test it yourself" surface: the **rules are fixed law**, so you
