@@ -1,4 +1,18 @@
-# Open Questions
+# Open Questions — HISTORICAL RECORD (pre-pivot), not a live list
+
+> **Status (2026-08-03): this file is ActivationOps-era history and nothing below is an open
+> question for the current product.** Everything after this banner was written for the
+> pre-pivot merchant-onboarding product — Supabase schemas, merchant CSV columns, Slack
+> approval flows, outreach consent rules. The repo pivoted to **Curbside Commons** (a
+> deterministic feed-vs-record and NYC fee-cap verifier) on 2026-07-02; the questions here
+> were resolved, superseded, or made moot by that pivot, and the roadmap several of them
+> point at was deleted on 2026-07-21.
+>
+> It is kept for provenance — the reasoning that produced the ratified Definition of Done is
+> genuinely useful history — and it is **renamed in its own heading** rather than deleted,
+> because a file called "Open Questions" in a public repo is read as a live list by anyone who
+> opens it. **The current live open items are:** `DESIGN.md` § "Known open items" (design) and
+> the `CURRENT_TASK.md` top block (work in flight). Do not plan from this file.
 
 ## Meta / Governance Decisions — resolved by plan reconciliation (2026-06-01)
 

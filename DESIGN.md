@@ -365,6 +365,25 @@ document to read in order) · decorative stats · any copy implying real platfor
     settled) still applies — but nobody has *designed* printing for the new report. Decide
     whether print is a supported surface before promising it anywhere.
 
+14. **There is no phone tier, and the boundary is now measured** (2026-08-03). The
+    stylesheet carries 14 `max-width` breakpoints down to 560px, but nothing had ever
+    been rendered below 1280px. Rendered this session at three widths with the desktop
+    case as a **control** (a red result from an instrument that has not been shown to
+    produce a green one is not evidence): **1280 clean** (`scrollWidth == clientWidth`
+    on all six routes) · **768 clean** · **390 overflows on all six routes**,
+    `scrollWidth` 683 against a 390 client — the page scrolls horizontally by ~293px.
+    The top bleeder on every route is `button.theme-toggle` at right≈683: **the nav row
+    never collapses**, so its natural width sets a floor the whole document inherits.
+    The break is therefore *one component*, not a per-page layout failure — which is
+    also why it is recorded rather than fixed here: a phone tier is a design decision on
+    an owner-fixed design, and the nav is the site's most pinned component
+    (`canonical.spec.ts` holds its link set, `aria-current` contract and pill target).
+    Tap-target sizes below 44px were observed at these widths but are **not** audited —
+    the skip link is deliberately 1px and off-screen, so the minimum is not a finding
+    without attribution. README now states the measured boundary instead of the vaguer
+    "desktop-only". Decide whether phone is a supported surface; if it is, the nav is
+    the first and possibly only thing to change.
+
 ## Decisions log
 
 | Date | Decision | Rationale |
