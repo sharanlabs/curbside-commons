@@ -195,3 +195,11 @@ Commits: session-42 slice (e95d1f5), design brief (7ed0ddf), mockup (0edccb8), p
 Gates re-run independently: tsc 0 · eslint 0 · vitest 1630 passed + 8 skipped · honesty-c10
 = disclosed font-host block. Unrendered: the app port (mockup rendered; port needs the
 owner-side battery).
+
+## 2026-08-02 (late) — Session 43 third arc: dark mode + readout retirement + the regex confession
+Dark scheme (Opus built from computed token table, seat re-gated + rendered both schemes:
+axe 0/0) · nav readout removed by owner word with CSS + keyframes · scroll-padding-top 114
+product fix · the four-run download red = case-sensitive regex (fixed with /i + written
+warning) · theme spec retargeted from dead .rpt-wrap to real surfaces · post-build eval:
+6 routes + 404 × 2 schemes, all probes green. Commits 97f03b6 · 1ae68e0, pushed. CI final
+adjudication in flight at handoff.
