@@ -63,7 +63,9 @@ export default function DocsPage() {
                 </desc>
                 <defs>
                   <marker id="ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                    <path d="M0 0 L10 5 L0 10 z" fill="#4a4e5a" />
+                    {/* the arrowhead follows the ink ramp, not a fixed grey — it is a
+                        marker, so it cannot inherit from the path that uses it */}
+                    <path d="M0 0 L10 5 L0 10 z" className="a-head" />
                   </marker>
                 </defs>
                 <text className="a-lab" x="20" y="92">INPUTS</text>
@@ -89,7 +91,7 @@ export default function DocsPage() {
                 <text className="a-note" x="344" y="382">no model decides a verdict</text>
                 <path className="a-flow" d="M592 278 L648 278" markerEnd="url(#ah)" />
                 <rect className="a-ticket" x="650" y="200" width="176" height="156" rx="6" />
-                <line x1="650" y1="200" x2="826" y2="200" stroke="rgba(58,50,28,.3)" strokeWidth="1.4" strokeDasharray="3 4" />
+                <line x1="650" y1="200" x2="826" y2="200" className="a-tear" strokeWidth="1.4" strokeDasharray="3 4" />
                 <text className="a-tkt" x="668" y="228">RECEIPT</text>
                 <text className="a-field" x="668" y="258">claim</text>
                 <line className="a-hair" x1="668" y1="270" x2="808" y2="270" />

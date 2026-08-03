@@ -335,24 +335,10 @@ test("nav = named destinations, no chapter numerals; each reachable with aria-cu
   await expect(audit).toHaveAttribute("aria-current", "page");
 });
 
-test("the nav readout states something true of the route you are on", async ({ page }) => {
-  test.slow(); // six full-navigation route loads in one run (dev compile)
-  // Was "CASE 001 · <FILE> · …" on every route: a case number that never
-  // changes, describing somebody else's data. On the tool it now states the
-  // promise a visitor most needs before dropping a file in.
-  const routes: Array<[string, RegExp]> = [
-    ["/", /RUNS IN YOUR BROWSER · NOTHING IS UPLOADED/],
-    ["/report", /AUDIT REPORT · FAIL · 11 ERR · 5 WARN/],
-    ["/fees", /FEE RULES · NEW YORK CITY/],
-    ["/playground", /HOW IT WORKS · RUNS IN YOUR BROWSER/],
-    ["/proof", /PROOF · EVERY SCORE, MISSES KEPT IN/],
-    ["/docs", /REFERENCE · WHAT IS REAL, WHAT IS INVENTED/],
-  ];
-  for (const [path, readout] of routes) {
-    await page.goto(path);
-    await expect(page.locator(".nav-case")).toContainText(readout, { timeout: 15_000 });
-    await expect(page.locator(".nav-case")).not.toContainText("CASE 001");
-  }
+test("the nav carries no self-captioning readout — production register (owner word 2026-08-02)", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".nav-case")).toHaveCount(0);
+  await expect(page.locator("nav, header").first()).not.toContainText("RUNS IN YOUR BROWSER");
 });
 
 /* ========================= CHAPTER 01 · REPORT ======================= */

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PLATFORM_NAME } from "@/lib/product";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 /**
  * Site nav — brand lockup (the ONE blue→gold mark, D6 ruling) + named
@@ -26,12 +27,6 @@ import { PLATFORM_NAME } from "@/lib/product";
  * Desktop-only bar (owner word 2026-07-15).
  */
 
-export type NavReadoutFigures = {
-  findingsTotal: number;
-  errors: number;
-  warns: number;
-};
-
 /**
  * `match` exists because a destination's ROUTE and its LINK TARGET came apart
  * (owner, 2026-07-31): "Audit" navigates to `/#audit` — the instrument itself —
@@ -48,37 +43,7 @@ const DESTINATIONS: ReadonlyArray<{ label: string; href: string; match?: string 
   { label: "Proof", href: "/proof" },
 ];
 
-type Readout = { lamp: "gold" | "ember" | "graphite"; parts: Array<string | { b: string }> };
-
-function readoutFor(pathname: string, f: NavReadoutFigures): Readout {
-  if (pathname.startsWith("/report")) {
-    return {
-      lamp: "ember",
-      parts: [{ b: "AUDIT REPORT" }, ` · FAIL · ${f.errors} ERR · ${f.warns} WARN`],
-    };
-  }
-  if (pathname.startsWith("/fees")) {
-    return { lamp: "graphite", parts: [{ b: "FEE RULES" }, " · NEW YORK CITY"] };
-  }
-  if (pathname.startsWith("/playground")) {
-    return { lamp: "graphite", parts: [{ b: "HOW IT WORKS" }, " · RUNS IN YOUR BROWSER"] };
-  }
-  if (pathname.startsWith("/proof")) {
-    return { lamp: "graphite", parts: [{ b: "PROOF" }, " · EVERY SCORE, MISSES KEPT IN"] };
-  }
-  if (pathname.startsWith("/docs")) {
-    return { lamp: "graphite", parts: [{ b: "REFERENCE" }, " · WHAT IS REAL, WHAT IS INVENTED"] };
-  }
-  // The tool. The readout states the promise a visitor most needs to believe
-  // before dropping a file in — and it is the one the import-graph guard and a
-  // live zero-off-origin-request check both back.
-  return {
-    lamp: "gold",
-    parts: [{ b: "RUNS IN YOUR BROWSER" }, " · NOTHING IS UPLOADED"],
-  };
-}
-
-export function Nav({ figures }: { figures: NavReadoutFigures }) {
+export function Nav() {
   const pathname = usePathname();
 
   // White at the top, glass once scrolled (v8→v9 continuity; the no-JS/SSR
@@ -101,7 +66,6 @@ export function Nav({ figures }: { figures: NavReadoutFigures }) {
     };
   }, []);
 
-  const readout = readoutFor(pathname, figures);
 
   return (
     <header className={`site-nav${scrolled ? " is-scrolled" : ""}`}>
@@ -130,7 +94,13 @@ export function Nav({ figures }: { figures: NavReadoutFigures }) {
                 y2="28"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stopColor="#2438d6" />
+                {/* The deep end of the mark goes through a token because it is
+                    the ONE stop that does not survive a dark ground: #2438d6 on
+                    #0e1016 is 2.36:1, so the left half of both arcs and the
+                    upper dot would have gone near-invisible on every route. The
+                    azure and amber stops (5.82:1 / 10.40:1) read on either
+                    ground and stay literal. */}
+                <stop stopColor="var(--brand-deep)" />
                 <stop offset="0.55" stopColor="#1f8fff" />
                 <stop offset="1" stopColor="#ffb020" />
               </linearGradient>
@@ -146,7 +116,7 @@ export function Nav({ figures }: { figures: NavReadoutFigures }) {
               strokeWidth="2.6"
               opacity="0.75"
             />
-            <circle cx="20.8" cy="7.2" r="1.7" fill="#2438d6" />
+            <circle cx="20.8" cy="7.2" r="1.7" fill="var(--brand-deep)" />
             <circle cx="32.6" cy="21.6" r="1.7" fill="#ffb020" />
           </svg>
           <span className="site-brand-word">{PLATFORM_NAME}</span>
@@ -188,17 +158,13 @@ export function Nav({ figures }: { figures: NavReadoutFigures }) {
           })}
         </nav>
 
-        <p className="nav-case" aria-label="Case status">
-          <span
-            className={`lamp${readout.lamp === "gold" ? "" : ` ${readout.lamp}`}`}
-            aria-hidden="true"
-          />
-          {/* Keyed by pathname so the readout re-enters on route change
-              (CSS animation, motion-safe only). */}
-          <span key={pathname} className="nav-case-text">
-            {readout.parts.map((p, i) => (typeof p === "string" ? p : <b key={i}>{p.b}</b>))}
-          </span>
-        </p>
+
+        {/* Scheme control (owner word 2026-08-02): the one piece of chrome
+            that is about the VIEWER rather than the product, at the far edge.
+            The route readout that used to sit here was removed by owner word
+            2026-08-02 ("It should be a proper production website") — a
+            production site does not caption itself in its own header. */}
+        <ThemeToggle />
       </div>
     </header>
   );

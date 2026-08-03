@@ -134,3 +134,24 @@ real a11y defects in the new landing (color-only link, unfocusable scroll region
 fixed; two stale pins (playground H1, folded-evidence visibility), both moved; the
 download red did not reproduce in-seat against the same bytes — a loud precondition
 assertion added so any recurrence fails at the true line.
+
+## 2026-08-02 — Dark mode (owner word) + the readout retired (owner word; §4 register row)
+Owner: "also dark mode for it" — reverses the "Light only" record by the mechanism
+DESIGN.md requires. Design: same roles, re-derived values — every dark ink step computed
+to mirror the light system's role ratios (ink 17.2 vs 18.4 · body 11.4 vs 10.5 · muted
+6.5 vs 6.6; accent text 8.0 vs 8.04), with the structural accent ROLE SPLIT (text #93a2ff
+/ fill #4257e8) that one-token light never needed. Mechanism: token re-declaration under
+prefers-color-scheme + data-theme override, no-flash head script, nav toggle, themeColor
+media pair. Light proven unchanged by inverse-substitution diff against HEAD. Opus built
+(206 consumer literals audited: 178 migrated, 28 left with reasons; found the 2.36:1
+brand-mark defect no gate could see); seat re-gated and rendered both schemes in-seat —
+dark body #0e1016 exact, axe ZERO violations in BOTH schemes. Also owner: "RUNS IN YOUR
+BROWSER · NOTHING IS UPLOADED remove this and also anything it shows a demo website" —
+the nav readout retired entirely (a production site does not caption itself in its own
+header), its CSS and keyframes removed with it, delivery note reworded to production
+voice; §4 carriers untouched (C10 gate green over the fresh export, /docs statement +
+footer link intact, SIMULATED banners stay INSIDE the payload artifacts where the
+builders enforce them). And the persisting CI download red got its product-level fix:
+html scroll-padding-top 114px (native scrolls were landing controls under the sticky
+chrome) + the spec centres the control before clicking. Gates: tsc 0 · eslint 0 ·
+offline build ✓ · vitest 1614 + 8, 0 failed.

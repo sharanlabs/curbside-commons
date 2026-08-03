@@ -51,11 +51,43 @@
   --faint: #6a6e7a; /* 5.09:1 — tertiary; stays ≥4.5:1 (11px consumers) */
 
   /* hairlines — low-alpha ink (rgb of --ink 18,20,28), darkening steps */
-  --rule: rgba(18, 20, 28, 0.09);
-  --rule-2: rgba(18, 20, 28, 0.15);
-  --rule-3: rgba(18, 20, 28, 0.24);
-  --line: rgba(18, 20, 28, 0.12); /* generic hairline (.lp-catch consumed this
-                                     undefined → currentColor before) */
+  --rule: rgba(var(--ink-rgb), 0.09);
+  --rule-2: rgba(var(--ink-rgb), 0.15);
+  --rule-3: rgba(var(--ink-rgb), 0.24);
+  --line: rgba(var(--ink-rgb), 0.12); /* generic hairline (.lp-catch consumed this
+                                          undefined → currentColor before) */
+
+  /* ==== SURFACE + CHANNEL ROLES (dark-scheme introduction, owner word
+     2026-08-02: "also dark mode for it"). Every light value here is BYTE-
+     IDENTICAL to the literal it replaces, so the light scheme renders exactly
+     as it did before; the DARK SCHEME section at the foot of this file
+     re-declares the same names. The rule this encodes: a colour that does not
+     resolve through a token cannot follow the scheme. ==== */
+  --surface: #ffffff; /* panels / cards / inputs standing on the page ground */
+  --surface-raise: #ffffff; /* pressed / selected chips sitting INSIDE a --bg-3 well.
+                               Separate from --surface because in dark the well is
+                               LIGHTER than the panel ground — pointing these at
+                               --surface would invert the raise. */
+  --panel-dark: #12141c; /* the two deliberately-dark panels (.console, .pb-bar).
+                            In dark they lift to --bg-3 so they still read as a
+                            distinct surface rather than merging with the page. */
+  --glass-rgb: 255, 255, 255; /* translucent chrome (scrolled nav, process strip,
+                                 eyebrow pills). Channel token, not a colour, so
+                                 each site keeps its own alpha. */
+  --shadow-rgb: 18, 20, 28; /* every box-shadow / drop-shadow ink */
+
+  /* solid hairlines — three steps, matching the alpha --rule family on white
+     (var(--edge) ≈ 9% ink · var(--edge-2) ≈ 12% · var(--edge-3) ≈ 7%) */
+  --edge: var(--edge); /* card hairline */
+  --edge-2: var(--edge-2); /* control hairline */
+  --edge-3: var(--edge-3); /* chrome divider */
+
+  --on-accent: #ffffff; /* text ON an accent/lamp FILL — white in BOTH schemes,
+                           because the fill under it is dark in both */
+  --on-ink: #ffffff; /* text ON an --ink FILL (.ds-btn.primary, .ds-cta). NOT the
+                        same role as --on-accent: --ink INVERTS between schemes,
+                        so its text has to invert with it or the pill goes blank. */
+  --ink-hi: #000000; /* one step past --ink — the ink-pill hover */
 
   /* THE brand primary — ULTRAMARINE (v8 design adoption, decision-log 2026-07-16:
      the owner's chosen "Curbside Commons Hero v8" palette; one interactive accent
@@ -64,8 +96,8 @@
      white-on-it and it-on-white share the SAME ratio (8.04:1). */
   --signal: #2438d6; /* fills, dots, rules, marks — 8.04:1 */
   --signal-text: #2438d6; /* 8.04:1 on #fff — small labels / interactive text (≥4.5) */
-  --signal-tint: rgba(61, 92, 235, 0.055); /* faint held-row ground (v8 accWash) */
-  --signal-rule: rgba(61, 92, 235, 0.22); /* hairline at signal hue (v8 accPillBorder) */
+  --signal-tint: rgba(var(--accent-rgb), 0.055); /* faint held-row ground (v8 accWash) */
+  --signal-rule: rgba(var(--accent-rgb), 0.22); /* hairline at signal hue (v8 accPillBorder) */
 
   /* spacing — 4px base (Material-adapted 8px grid rides on 8/16/24/32…) */
   --s1: 4px;
@@ -99,10 +131,45 @@
   --wine-500: #3d5ceb; /* = bright ultramarine (v8 accMid) — 5.34:1 */
 
   /* accent aliases (the site shell reads these; = the ultramarine brand primary) */
-  --accent: #2438d6; /* 8.04:1 — carries white text (nav active, primary btn) */
-  --accent-hi: #25329a; /* 10.49:1 — hover / pressed (darker; white text passes) */
-  --accent-soft: rgba(61, 92, 235, 0.055);
-  --accent-line: rgba(61, 92, 235, 0.22);
+  /* THE ROLE SPLIT (2026-08-02). On white ONE ultramarine serves both roles:
+     #2438d6 is 8.04:1 as text AND carries white text at the same 8.04:1. On a
+     near-black ground that stops being true — a text accent must be LIGHT
+     (#93a2ff, 8.02:1) and a filled control must be DARK ENOUGH to carry white
+     (#4257e8: 3.40:1 vs the ground for the ≥3 UI bar, white on it 5.58:1). So
+     the roles are separate TOKENS in both schemes; in light both resolve to the
+     same hex, which is why nothing about the light scheme moves. */
+  --accent: #2438d6; /* TEXT / mark / focus-ring role — 8.04:1 */
+  --accent-fill: #2438d6; /* FILLED-CONTROL role — carries --on-accent */
+  --accent-hi: #25329a; /* 10.49:1 — hover / pressed on a FILL (white text passes) */
+  --link-hi: #1c2ba8; /* 10.71:1 — the ONE link-hover ink (N1 canon) */
+  --brand-deep: #2438d6; /* the deep stop of the brand mark gradient + its upper
+                            registration dot (components/Nav.tsx). Tokenised
+                            2026-08-02: it is the only stop in that mark that does
+                            not survive a dark ground (2.36:1 on #0e1016), and an
+                            aria-hidden decorative SVG is invisible to axe, so
+                            nothing else would have caught it. */
+  --accent-soft: rgba(var(--accent-rgb), 0.055);
+  --accent-line: rgba(var(--accent-rgb), 0.22);
+  --accent-tint: rgba(var(--accent-rgb), 0.055); /* = --accent-soft; the .wk- layer
+                                              consumes this name (see the note in
+                                              the DARK SCHEME section) */
+
+  /* channel tokens — the rgb triples the file's inline rgba() literals used, so
+     an alpha wash follows the scheme without every site re-declaring its alpha */
+  --ink-rgb: 18, 20, 28; /* every ink hairline / alpha wash, including the three
+                            --rule steps. The nav's slightly warmer 23,21,27 was
+                            folded in: at ≤9% over white the two composite to the
+                            same byte. */
+  --azure-rgb: 31, 143, 255;
+  --accent-rgb: 61, 92, 235; /* the bright-ultramarine wash family */
+  --accent-deep-rgb: 36, 56, 214; /* the #2438d6 wash family */
+  --graphite-rgb: 74, 78, 90;
+  --ember-rgb: 180, 35, 24;
+  --gold-rgb: 255, 176, 32;
+  --gold-text-rgb: 156, 98, 8;
+  --error-rgb: 217, 45, 32;
+  --warn-rgb: 181, 71, 8;
+  --ok-rgb: 6, 118, 71;
 
   /* MATERIAL ACCENT FAMILY (storyboard palette, used sparingly). BRIGHT values =
      fills / marks / canvas ONLY (most fail 4.5:1 as text). For TEXT use the *-text
@@ -115,14 +182,27 @@
   --azure: #1f8fff; /* 3.27:1 — fill/mark only (the v8 electric azure) */
   --cyan: #93a8f7; /* 2.29:1 — fill/mark only (v8 accLight) */
   --violet: #3d5ceb; /* = --iris (token name kept; interactive accent) */
-  --ember-soft: rgba(180, 35, 24, 0.07);
-  --gold-soft: rgba(255, 176, 32, 0.12);
+  --ember-soft: rgba(var(--ember-rgb), 0.07);
+  /* --ember-tint / --ember-line / --ember-ink were CONSUMED by the .wk- layer
+     (2026-08-02) and never declared, so five declarations were invalid at
+     computed-value time — `.wk-verdict-lamp.fail`'s ring never painted and
+     `.wk-fee-card.finding` fell through to currentColor. Declared here at the
+     values their siblings already use; recorded as a light-scheme change in
+     DESIGN.md rather than folded in silently. */
+  --ember-tint: rgba(var(--ember-rgb), 0.07);
+  --ember-line: rgba(var(--ember-rgb), 0.22);
+  --ember-ink: #b71f13; /* 6.52:1 — the fallback four sites already carried */
+  --gold-soft: rgba(var(--gold-rgb), 0.12);
   --azure-soft: rgba(31, 143, 255, 0.1);
-  --violet-soft: rgba(61, 92, 235, 0.09);
-  --iris-soft: rgba(61, 92, 235, 0.055);
+  --violet-soft: rgba(var(--accent-rgb), 0.09);
+  --iris-soft: rgba(var(--accent-rgb), 0.055);
   /* DEEP text variants — contrast-darkened, each VERIFIED ≥4.5:1 on #fff */
   --ember-text: #b42318; /* 6.57:1 */
   --gold-text: #9c6208; /* 5.04:1 (bright amber #ffb020 is 1.83:1 — unusable as text) */
+  --gold-ink: #8a5406; /* 6.27:1 — the deeper gold used ON a --gold-soft ground */
+  --stamp-ink: #343741; /* 11.87:1 — the neutral PASS stamp (.vstamp.ok); one step
+                           off --body and kept exact rather than folded into it,
+                           because the stamp is a live surface on /playground */
   --azure-text: #0a45d6; /* 7.41:1 (bright azure #1f8fff is 3.27:1 — unusable as text) */
   --violet-text: #2438d6; /* 8.04:1 (= --iris-ink) */
 
@@ -130,11 +210,11 @@
      the traffic-light gestalt (red/amber/green) reads as a system distinct from the
      four brand hues. Recomputed on #fff. */
   --error: #d92d20; /* 4.83:1 */
-  --error-soft: rgba(217, 45, 32, 0.08);
+  --error-soft: rgba(var(--error-rgb), 0.08);
   --warn: #b54708; /* 5.43:1 */
-  --warn-soft: rgba(181, 71, 8, 0.11);
+  --warn-soft: rgba(var(--warn-rgb), 0.11);
   --ok: #067647; /* 5.69:1 */
-  --ok-soft: rgba(6, 118, 71, 0.09);
+  --ok-soft: rgba(var(--ok-rgb), 0.09);
   /* on-TINT severity inks — used for text on the *-soft grounds */
   --error-ink: #b71f13; /* 6.52:1 */
   --warn-ink: #9c3d06; /* 6.81:1 */
@@ -161,9 +241,9 @@
      along the whole run; the shimmer read is unchanged). */
   --grad-cta: linear-gradient(100deg, #2438d6, #2c4ae2 50%, #2438d6);
 
-  --elev-1: 0 1px 2px rgba(18, 20, 28, 0.05), 0 8px 20px rgba(18, 20, 28, 0.05);
-  --elev-2: 0 2px 7px rgba(18, 20, 28, 0.05), 0 14px 34px rgba(18, 20, 28, 0.08);
-  --elev-3: 0 3px 10px rgba(18, 20, 28, 0.05), 0 24px 54px rgba(18, 20, 28, 0.1);
+  --elev-1: 0 1px 2px rgba(var(--shadow-rgb), 0.05), 0 8px 20px rgba(var(--shadow-rgb), 0.05);
+  --elev-2: 0 2px 7px rgba(var(--shadow-rgb), 0.05), 0 14px 34px rgba(var(--shadow-rgb), 0.08);
+  --elev-3: 0 3px 10px rgba(var(--shadow-rgb), 0.05), 0 24px 54px rgba(var(--shadow-rgb), 0.1);
 
   /* motion — one calm Material-adapted family. --ease kept (14 consumers). */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -219,8 +299,8 @@ body {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: #ffffff;
-  border-bottom: 1px solid rgba(23, 21, 27, 0.055);
+  background: var(--bg);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.055);
   transition:
     background 300ms var(--ease-arrival),
     border-color 300ms var(--ease-arrival),
@@ -228,11 +308,11 @@ body {
 }
 .site-nav.is-scrolled {
   /* rgba(255,255,255,.88) IS the no-support fallback; blur is progressive */
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(var(--glass-rgb), 0.88);
   backdrop-filter: blur(18px) saturate(1.16);
   -webkit-backdrop-filter: blur(18px) saturate(1.16);
-  border-bottom-color: rgba(23, 21, 27, 0.09);
-  box-shadow: 0 8px 30px rgba(23, 21, 27, 0.045);
+  border-bottom-color: rgba(var(--ink-rgb), 0.09);
+  box-shadow: 0 8px 30px rgba(var(--shadow-rgb), 0.045);
 }
 .site-nav-in {
   max-width: var(--maxw);
@@ -280,7 +360,7 @@ body {
 .site-brand-divider {
   width: 1px;
   height: 15px;
-  background: #ecedf0;
+  background: var(--edge-3);
   margin: 0 2px;
 }
 .site-brand-tag {
@@ -330,10 +410,10 @@ body {
 .site-navlink[aria-current="page"] {
   color: var(--accent);
   font-weight: 600;
-  background: #ffffff;
+  background: var(--surface-raise);
   box-shadow:
-    0 1px 3px rgba(18, 20, 28, 0.08),
-    0 0 0 1px rgba(61, 92, 235, 0.3); /* N3 canon: active-ring alpha .3 */
+    0 1px 3px rgba(var(--shadow-rgb), 0.08),
+    0 0 0 1px rgba(var(--accent-rgb), 0.3); /* N3 canon: active-ring alpha .3 */
 }
 /* N-1 (design direction S4, 2026-07-31): the bar's ONE emphasized action.
    "Audit" is the product's verb and its destination; it carries the accent
@@ -349,8 +429,8 @@ body {
 .site-navlink.nav-action,
 .site-navlink.nav-action:hover,
 .site-navlink.nav-action[aria-current="page"] {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent);
 }
 .site-navlink.nav-action:hover {
   background: var(--accent-hi);
@@ -374,61 +454,99 @@ body {
   gap: 4px;
   align-items: center;
 }
-.nav-case {
-  margin: 0 0 0 auto;
-  font-family: var(--ff-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  color: var(--graphite);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-  /* N-3 (S4, 2026-07-31): the readout is the nav's genuinely live instrument
-     — route-aware, engine-derived figures, lamp semantics — and it read as
-     loose text. It now sits in the site's existing hairline capsule (the
-     cs-pause / cs-zones vocabulary): a physical readout window, no glow, no
-     new colors. */
-  border: 1px solid #ecedf0;
-  border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.85);
-  padding: 0 14px;
-  min-height: 34px;
-}
-.nav-case .lamp {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--gold); /* D6: gold = held-STATUS lamp */
-}
-.nav-case .lamp.ember {
-  background: var(--ember); /* D6: ember = the FAIL verdict evidence */
-}
-.nav-case .lamp.graphite {
-  background: var(--graphite); /* D6: graphite = neutral/pass/defer chrome */
-}
-.nav-case b {
-  color: var(--ink);
-  font-weight: 600;
-}
 /* Route-change re-entry for the readout (keyed by pathname in Nav.tsx) —
    motion-safe only; reduced motion renders the new text with no travel. */
 @media (prefers-reduced-motion: no-preference) {
-  .nav-case-text {
-    animation: nav-case-in 0.28s var(--ease-arrival) both;
-  }
-  @keyframes nav-case-in {
-    from {
-      opacity: 0;
-      transform: translateY(5px);
-    }
-  }
+  
 }
 @media (max-width: 1000px) {
-  .nav-case {
-    display: none; /* desktop instrument; below QA widths it yields the row */
+  .theme-toggle {
+    /* the readout carried `margin-left: auto`; with it gone the toggle takes
+       over holding the right edge */
+    margin-left: auto;
   }
 }
+
+/* ----- scheme toggle (owner word 2026-08-02) -------------------------------
+   One icon button in the site's hairline-capsule vocabulary and
+   .cs-pause — a round window rather than a new control shape. Both labels and
+   both glyphs are in the DOM; the pair below hides whichever does not apply, so
+   the button's accessible name and its mark are correct on the FIRST paint,
+   before hydration, and follow a scheme change with no re-render. See
+   components/ThemeToggle.tsx for why the name is not React state. */
+.theme-toggle {
+  margin-left: 10px;
+  flex: none;
+  position: relative; /* the visually-hidden label positions against the button */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--edge-3);
+  border-radius: var(--r-pill);
+  background: rgba(var(--glass-rgb), 0.85);
+  color: var(--graphite);
+  cursor: pointer;
+  transition:
+    color var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
+}
+.theme-toggle:hover {
+  color: var(--ink);
+  border-color: var(--rule-3);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.theme-toggle .tt-mark {
+  width: 17px;
+  height: 17px;
+}
+/* the visually-hidden label. NOT display:none — that would remove it from the
+   accessible name too, which is the one thing it is here to provide. */
+.theme-toggle .tt-say {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+/* light is the base render (and the no-JS / no-preference render) */
+.theme-toggle .tt-say-dark,
+.theme-toggle .tt-mark-dark {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .tt-say-light,
+  :root:not([data-theme="light"]) .theme-toggle .tt-mark-light {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .theme-toggle .tt-say-dark {
+    display: inline;
+  }
+  :root:not([data-theme="light"]) .theme-toggle .tt-mark-dark {
+    display: inline-block;
+  }
+}
+:root[data-theme="dark"] .theme-toggle .tt-say-light,
+:root[data-theme="dark"] .theme-toggle .tt-mark-light {
+  display: none;
+}
+:root[data-theme="dark"] .theme-toggle .tt-say-dark {
+  display: inline;
+}
+:root[data-theme="dark"] .theme-toggle .tt-mark-dark {
+  display: inline-block;
+}
+
 .site-navlink:focus-visible,
 .site-brand:focus-visible {
   outline: 2px solid var(--accent);
@@ -710,17 +828,17 @@ body {
 /* ----- elevation: tinted, restrained (no glow) ------------------------------ */
 .ds-panel {
   border: 1px solid var(--rule-3);
-  background: #fff;
+  background: var(--surface);
   border-radius: 6px;
   overflow: hidden;
   box-shadow:
-    0 1px 2px rgba(16, 16, 22, 0.03),
-    0 12px 28px -18px rgba(16, 16, 22, 0.1);
+    0 1px 2px rgba(var(--shadow-rgb), 0.03),
+    0 12px 28px -18px rgba(var(--shadow-rgb), 0.1);
 }
 .ds-panel-strong {
   box-shadow:
-    0 1px 2px rgba(16, 16, 22, 0.03),
-    0 16px 36px -22px rgba(16, 16, 22, 0.1);
+    0 1px 2px rgba(var(--shadow-rgb), 0.03),
+    0 16px 36px -22px rgba(var(--shadow-rgb), 0.1);
 }
 
 /* ----- buttons -------------------------------------------------------------- */
@@ -733,7 +851,7 @@ body {
   padding: 9px 15px;
   border-radius: 7px;
   border: 1px solid var(--rule-3);
-  background: #fff;
+  background: var(--surface);
   color: var(--ink-2);
   min-height: 36px;
   transition:
@@ -753,11 +871,11 @@ body {
 }
 .ds-btn.primary {
   background: var(--ink);
-  color: #fff;
+  color: var(--on-ink);
   border-color: var(--ink);
 }
 .ds-btn.primary:hover {
-  background: #000;
+  background: var(--ink-hi);
 }
 .ds-btn.hold {
   color: var(--signal-text);
@@ -774,7 +892,7 @@ body {
   align-items: center;
   gap: 10px;
   background: var(--ink);
-  color: #fff;
+  color: var(--on-ink);
   text-decoration: none;
   font-weight: 600;
   font-size: 15px;
@@ -787,7 +905,7 @@ body {
 }
 .ds-cta:hover {
   transform: translateY(-1px);
-  background: #000;
+  background: var(--ink-hi);
 }
 .ds-cta:active {
   transform: translateY(0);
@@ -814,7 +932,7 @@ body {
   left: 16px;
   top: 12px;
   z-index: 50;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--signal);
   padding: 8px 12px;
   border-radius: 6px;
@@ -1162,7 +1280,7 @@ body {
   height: 6px;
   flex: none;
   transform: rotate(45deg);
-  background: rgba(61, 92, 235, 0.5);
+  background: rgba(var(--accent-rgb), 0.5);
 }
 .lp-h2 {
   /* Section-heading scale, RETUNED 2026-07-28. Was clamp(28px, 3.3vw, 48px):
@@ -1283,10 +1401,10 @@ body {
   background: var(--grad-cta);
   background-size: 220% 100%;
   background-position: 0% 50%;
-  color: #fff;
+  color: var(--on-accent);
   box-shadow:
-    0 1px 2px rgba(18, 20, 28, 0.08),
-    0 10px 26px rgba(61, 92, 235, 0.25);
+    0 1px 2px rgba(var(--shadow-rgb), 0.08),
+    0 10px 26px rgba(var(--accent-rgb), 0.25);
 }
 .lp-btn.primary:hover {
   background-position: 95% 50%;
@@ -1299,12 +1417,12 @@ body {
   transform: translateY(0) scale(0.96);
 }
 .lp-btn.ghost {
-  background: rgba(255, 255, 255, 0.7);
-  border-color: #e1e2e7;
+  background: rgba(var(--glass-rgb), 0.7);
+  border-color: var(--edge-2);
   color: var(--body);
 }
 .lp-btn.ghost:hover {
-  border-color: rgba(61, 92, 235, 0.45);
+  border-color: rgba(var(--accent-rgb), 0.45);
   color: var(--accent);
 }
 .lp-btn.ghost:active {
@@ -1384,7 +1502,7 @@ body {
 }
 .lp-panel:hover {
   border-color: var(--accent-line);
-  box-shadow: 0 12px 30px -20px rgba(74, 14, 26, 0.2);
+  box-shadow: 0 12px 30px -20px rgba(var(--shadow-rgb), 0.2);
   transform: translateY(-2px);
 }
 .lp-panel.ours {
@@ -2514,9 +2632,9 @@ body {
   top: 62px;
   z-index: 30;
   margin: 26px 0 6px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(var(--glass-rgb), 0.92);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(23, 21, 27, 0.07);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.07);
 }
 .dsr-list {
   list-style: none;
@@ -2659,7 +2777,7 @@ body {
   color: var(--ink);
 }
 .ds-note.warn {
-  border-color: rgba(181, 71, 8, 0.28);
+  border-color: rgba(var(--warn-rgb), 0.28);
   background: var(--warn-soft);
   color: var(--warn-ink);
 }
@@ -2702,7 +2820,7 @@ body {
 }
 .ds-stat:hover {
   border-color: var(--accent-line);
-  box-shadow: 0 1px 2px rgba(74, 14, 26, 0.06);
+  box-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.06);
 }
 .ds-stat .v {
   font-family: var(--serif);
@@ -2891,7 +3009,7 @@ body {
 }
 .ds-card:hover {
   border-color: var(--accent-line);
-  box-shadow: 0 12px 30px -20px rgba(74, 14, 26, 0.2);
+  box-shadow: 0 12px 30px -20px rgba(var(--shadow-rgb), 0.2);
   transform: translateY(-2px);
 }
 .ds-card.flush {
@@ -3332,12 +3450,12 @@ body {
 
 .pg-wrap { margin-top: 8px; }
 .pg-label { display: block; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-.pg-input { width: 100%; min-height: 260px; resize: vertical; font-family: var(--ff-mono); font-size: 12.5px; line-height: 1.55; padding: 12px; border: 1px solid var(--rule-3); border-radius: 6px; background: #fff; color: inherit; }
+.pg-input { width: 100%; min-height: 260px; resize: vertical; font-family: var(--ff-mono); font-size: 12.5px; line-height: 1.55; padding: 12px; border: 1px solid var(--rule-3); border-radius: 6px; background: var(--surface); color: inherit; }
 .pg-input:focus-visible { outline: 2px solid var(--signal); outline-offset: 1px; }
 .pg-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
 .pg-hint { max-width: 68ch; margin-top: 10px; font-size: 13.5px; color: var(--muted); line-height: 1.6; }
 
-.pg-error { max-width: 68ch; margin-top: 18px; padding: 12px 14px; border: 1px solid var(--error-ink); border-radius: 6px; color: var(--error-ink); font-size: 14.5px; line-height: 1.6; background: #fff; }
+.pg-error { max-width: 68ch; margin-top: 18px; padding: 12px 14px; border: 1px solid var(--error-ink); border-radius: 6px; color: var(--error-ink); font-size: 14.5px; line-height: 1.6; background: var(--surface); }
 
 .pg-result { margin-top: 28px; border-top: 1px solid var(--rule-2); padding-top: 20px; }
 .pg-verdict-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
@@ -3365,7 +3483,7 @@ body {
 .pg-mono { font-family: var(--ff-mono); overflow-wrap: anywhere; }
 
 .pg-findings { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
-.pg-finding { border: 1px solid var(--rule-2); border-radius: 6px; padding: 14px 16px; background: #fff; transition: border-color 160ms ease; }
+.pg-finding { border: 1px solid var(--rule-2); border-radius: 6px; padding: 14px 16px; background: var(--surface); transition: border-color 160ms ease; }
 .pg-finding:hover { border-color: var(--rule-3); }
 .pg-plain { font-size: 14.5px; line-height: 1.55; }
 .pg-sev { display: inline-block; min-width: 44px; margin-right: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
@@ -3413,7 +3531,7 @@ body {
   border: 1px solid var(--rule-2);
   border-radius: var(--r-card);
   padding: var(--s5);
-  background: #fff;
+  background: var(--surface);
 }
 .fd-head {
   margin-bottom: var(--s4);
@@ -3599,7 +3717,7 @@ body {
   padding: var(--s3);
   border: 1px solid var(--rule-3);
   border-radius: var(--r-chip);
-  background: #fff;
+  background: var(--surface);
   color: inherit;
 }
 .fd-area:focus-visible {
@@ -3652,7 +3770,7 @@ body {
   color: var(--error-ink);
   font-size: 14.5px;
   line-height: 1.6;
-  background: #fff;
+  background: var(--surface);
 }
 
 /* --- result --- */
@@ -3664,7 +3782,7 @@ body {
   border: 1px solid var(--rule-2);
   border-radius: var(--r-card);
   padding: var(--s5);
-  background: #fff;
+  background: var(--surface);
 }
 .wb-verdict-head {
   display: flex;
@@ -3736,7 +3854,7 @@ body {
   border: 1px solid var(--rule-2);
   border-radius: var(--r-chip);
   padding: var(--s4);
-  background: #fff;
+  background: var(--surface);
   transition: border-color 160ms var(--ease-field);
 }
 .wb-finding:hover {
@@ -3915,7 +4033,7 @@ body {
   height: 6px;
   flex: none;
   transform: rotate(45deg);
-  background: rgba(61, 92, 235, 0.5);
+  background: rgba(var(--accent-rgb), 0.5);
 }
 /* storyboard rule: a neutral hairline, not a chapter-hued bar */
 .cc-chapter .lp-sec-rule {
@@ -4743,8 +4861,8 @@ body {
   line-height: 1;
   letter-spacing: 0.2em;
   color: var(--graphite);
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid #e1e2e7;
+  background: rgba(var(--glass-rgb), 0.85);
+  border: 1px solid var(--edge-2);
   border-radius: var(--r-pill);
   padding: 9px 18px;
   animation: cs-up 0.7s var(--ease) 0.05s both;
@@ -4801,8 +4919,8 @@ body {
   align-items: center;
   gap: 6px;
   margin: 26px auto 0;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid #ecedf0;
+  background: rgba(var(--glass-rgb), 0.6);
+  border: 1px solid var(--edge-3);
   border-radius: var(--r-pill);
   padding: 4px;
   width: fit-content;
@@ -4831,10 +4949,10 @@ body {
 }
 .cs-zone-btn[aria-pressed="true"] {
   color: var(--accent);
-  background: #ffffff;
+  background: var(--surface-raise);
   box-shadow:
-    0 1px 3px rgba(18, 20, 28, 0.08),
-    0 0 0 1px rgba(61, 92, 235, 0.2);
+    0 1px 3px rgba(var(--shadow-rgb), 0.08),
+    0 0 0 1px rgba(var(--accent-rgb), 0.2);
 }
 .cs-zone-btn:focus-visible,
 .cs-pause:focus-visible {
@@ -4888,8 +5006,8 @@ body {
   font-weight: 500;
   line-height: 1;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid #ecedf0;
+  background: rgba(var(--glass-rgb), 0.85);
+  border: 1px solid var(--edge-3);
   border-radius: var(--r-pill);
   padding: 0 16px;
   min-height: 38px;
@@ -4897,7 +5015,7 @@ body {
   transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
 }
 .cs-pause:hover {
-  border-color: rgba(61, 92, 235, 0.45);
+  border-color: rgba(var(--accent-rgb), 0.45);
   color: var(--accent);
 }
 .cs-station-label {
@@ -4929,8 +5047,8 @@ body {
   margin-top: 8px;
 }
 .tm-card {
-  background: #ffffff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
   padding: 26px;
   display: flex;
@@ -4940,7 +5058,7 @@ body {
 }
 .tm-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 14px 34px rgba(18, 20, 28, 0.08);
+  box-shadow: 0 14px 34px rgba(var(--shadow-rgb), 0.08);
 }
 .tm-card-head {
   display: flex;
@@ -4972,7 +5090,11 @@ body {
   display: flex;
   align-items: center;
   gap: 18px;
-  background: #12141c;
+  /* --panel-dark: #12141c light / #1a1d27 dark. The inks below are literals ON
+     PURPOSE — this bar is dark in BOTH schemes, so inverting them would break it.
+     Ratios are stated against the DARKER of the two grounds, #1a1d27, which is
+     the worse case; on #12141c every step is higher. */
+  background: var(--panel-dark);
   border-radius: 14px;
   padding: 16px 22px;
   overflow: hidden;
@@ -4995,17 +5117,17 @@ body {
   font-weight: 500;
   line-height: 1.7;
   letter-spacing: 0.06em;
-  color: #aeb3c2; /* 8.78:1 on #12141c */
+  color: #aeb3c2; /* 8.03:1 on --panel-dark (worst case #1a1d27) */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .pb-line b {
-  color: #7fb0ff; /* 8.36:1 on #12141c */
+  color: #7fb0ff; /* 7.65:1 on --panel-dark (worst case #1a1d27) */
   font-weight: 500;
 }
 .pb-line i {
-  color: #ffd582; /* 13.21:1 on #12141c */
+  color: #ffd582; /* 12.08:1 on --panel-dark (worst case #1a1d27) */
   font-style: normal;
 }
 .pb-flag {
@@ -5018,7 +5140,7 @@ body {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.18em;
-  color: #ff9d8a; /* ≥4.5:1 on #12141c */
+  color: #ff9d8a; /* 8.36:1 on --panel-dark (worst case #1a1d27) */
   border: 1px solid rgba(255, 157, 138, 0.35);
   border-radius: var(--r-pill);
   padding: 7px 12px;
@@ -5049,21 +5171,21 @@ body {
   border-radius: var(--r-pill);
   border: 1px solid var(--rule-2);
   color: var(--graphite);
-  background: #ffffff;
+  background: var(--surface);
 }
 .fee-vtag.violation {
   color: var(--ember-text);
-  border-color: rgba(180, 35, 24, 0.35);
+  border-color: rgba(var(--ember-rgb), 0.35);
   background: var(--ember-soft);
 }
 .fee-vtag.cured-by-refund {
   color: var(--ok);
-  border-color: rgba(6, 118, 71, 0.3);
+  border-color: rgba(var(--ok-rgb), 0.3);
   background: var(--ok-soft);
 }
 .fee-vtag.conditional-pending-refund-window {
   color: var(--warn-ink);
-  border-color: rgba(181, 71, 8, 0.3);
+  border-color: rgba(var(--warn-rgb), 0.3);
   background: var(--warn-soft);
 }
 .fee-vtag.asserted-passthrough-unverified {
@@ -5108,8 +5230,8 @@ body {
   margin-top: 24px;
 }
 .fee-lane {
-  background: #ffffff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
   padding: 24px;
 }
@@ -5224,7 +5346,15 @@ body {
   --paper: #fdfcf9;
   --paper-rule: rgba(76, 62, 32, 0.14);
   --paper-rule-2: rgba(76, 62, 32, 0.24);
-  --paper-ink: #221e14;
+  --paper-ink: #221e14; /* 16.20:1 on the stock */
+  /* the receipt's own warm ink ramp — was three literals inside .rc-*; tokenised
+     2026-08-02 so the paper material follows the scheme as one material rather
+     than four independent hexes */
+  --paper-strong: #4c4736; /* 9.05:1 — field keys */
+  --paper-muted: #6b5f45; /* 6.11:1 — case line, attachments, small values */
+  --paper-faint: #8a7a55; /* 4.10:1 — accession numerals (mono, ≥16px) */
+  --paper-grain: rgba(76, 62, 32, 0.014); /* the 1-in-3px stock grain */
+  --docs-bg: #fbfaf6; /* /docs ground — the same material, one step cooler */
 }
 
 /* accession provenance label (museum chrome) */
@@ -5254,7 +5384,7 @@ body {
 .lp-main a:not(.lp-btn):hover,
 .p2-main a:not(.lp-btn):not(.door):hover,
 .site-footer-nav a:hover {
-  color: #1c2ba8;
+  color: var(--link-hi);
 }
 
 /* v9 section rhythm — no border-top (the v9 page breathes on whitespace).
@@ -5395,7 +5525,7 @@ h2.tool-h2 {
   width: 16px;
   height: 2px;
   border-radius: 2px;
-  background: rgba(18, 20, 28, 0.12);
+  background: rgba(var(--ink-rgb), 0.12);
   overflow: hidden;
 }
 .cs-ticks i b {
@@ -5407,21 +5537,21 @@ h2.tool-h2 {
   background: var(--accent);
 }
 .cs-ticks i.hold {
-  background: rgba(180, 35, 24, 0.16);
+  background: rgba(var(--ember-rgb), 0.16);
 }
 .cs-ticks i.hold b {
   background: var(--ember);
 }
 .rail {
   fill: none;
-  stroke: rgba(18, 20, 28, 0.1);
+  stroke: rgba(var(--ink-rgb), 0.1);
   stroke-width: 1;
   stroke-dasharray: 2 7;
   stroke-linecap: round;
   transition: stroke 0.45s var(--ease-arrival);
 }
 .rail.on {
-  stroke: rgba(61, 92, 235, 0.42);
+  stroke: rgba(var(--accent-rgb), 0.42);
 }
 .cs-oring {
   position: absolute;
@@ -5430,7 +5560,7 @@ h2.tool-h2 {
   width: 66px;
   height: 66px;
   border-radius: 999px;
-  border: 1px solid rgba(61, 92, 235, 0.55);
+  border: 1px solid rgba(var(--accent-rgb), 0.55);
   opacity: 0;
   pointer-events: none;
 }
@@ -5462,7 +5592,7 @@ h2.tool-h2 {
   background: var(--paper);
   background-image: repeating-linear-gradient(
     0deg,
-    rgba(76, 62, 32, 0.014) 0 1px,
+    var(--paper-grain) 0 1px,
     transparent 1px 3px
   );
   border: 1px solid var(--paper-rule);
@@ -5484,7 +5614,7 @@ h2.tool-h2 {
   height: 10px;
   background: radial-gradient(circle 5px at 5px 0, transparent 5px, var(--paper) 5px) 0 0 / 22px
     10px repeat-x;
-  filter: drop-shadow(0 2px 2px rgba(18, 20, 28, 0.06));
+  filter: drop-shadow(0 2px 2px rgba(var(--shadow-rgb), 0.06));
 }
 .rc-head {
   display: flex;
@@ -5503,7 +5633,7 @@ h2.tool-h2 {
 .rc-case {
   font-size: 10px;
   letter-spacing: 0.12em;
-  color: #6b5f45;
+  color: var(--paper-muted);
   margin: 0;
 }
 .rc-steps {
@@ -5524,14 +5654,14 @@ h2.tool-h2 {
 }
 .rc-num {
   font-size: 10px;
-  color: #8a7a55;
+  color: var(--paper-faint);
   letter-spacing: 0.1em;
 }
 .rc-key {
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #4c4736;
+  color: var(--paper-strong);
 }
 .rc-val {
   font-size: 13px;
@@ -5541,7 +5671,7 @@ h2.tool-h2 {
 .rc-val small {
   display: block;
   font-size: 10.5px;
-  color: #6b5f45;
+  color: var(--paper-muted);
   letter-spacing: 0.04em;
   margin-top: 2px;
 }
@@ -5554,7 +5684,7 @@ h2.tool-h2 {
   animation: neq-flash 0.6s ease both;
 }
 @keyframes neq-flash {
-  0% { background: rgba(180, 35, 24, 0.16); }
+  0% { background: rgba(var(--ember-rgb), 0.16); }
   100% { background: transparent; }
 }
 .rc-stamp {
@@ -5574,13 +5704,13 @@ h2.tool-h2 {
   padding: 6px 14px 6px 16px;
   border-radius: 4px;
   transform: rotate(-2.4deg);
-  background: #fff;
-  box-shadow: inset 0 0 6px rgba(180, 35, 24, 0.12);
+  background: var(--surface);
+  box-shadow: inset 0 0 6px rgba(var(--ember-rgb), 0.12);
 }
 .rc-attach {
   font-size: 9.5px;
   letter-spacing: 0.13em;
-  color: #6b5f45;
+  color: var(--paper-muted);
 }
 .replay {
   margin-top: 22px;
@@ -5661,6 +5791,8 @@ h2.tool-h2 {
   bottom: 0;
   left: -30%;
   width: 22%;
+  /* white-alpha ON AN ALREADY-DARK BAR — NOT --glass-rgb. This film is light in
+     both schemes because the surface under it is dark in both. */
   background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.05), transparent);
   pointer-events: none;
 }
@@ -5683,8 +5815,8 @@ h2.tool-h2 {
 }
 .file {
   position: relative;
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-radius: 0 var(--r-card) var(--r-card) var(--r-card);
   padding: 24px 26px 26px;
   display: flex;
@@ -5694,7 +5826,7 @@ h2.tool-h2 {
 }
 .file:hover {
   transform: translateY(-3px);
-  box-shadow: 0 14px 34px rgba(18, 20, 28, 0.08);
+  box-shadow: 0 14px 34px rgba(var(--shadow-rgb), 0.08);
 }
 .file .tab-cut {
   position: absolute;
@@ -5704,8 +5836,8 @@ h2.tool-h2 {
   display: inline-flex;
   align-items: center;
   padding: 0 16px;
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-bottom: 0;
   border-radius: 10px 10px 0 0;
   font-family: var(--ff-mono);
@@ -5722,7 +5854,7 @@ h2.tool-h2 {
   right: 0;
   bottom: -1px;
   height: 1px;
-  background: #fff;
+  background: var(--surface);
 }
 .file .tab2 {
   display: flex;
@@ -5787,8 +5919,8 @@ h2.tool-h2 {
 
 /* ---------- TRY (the one-rule bench) ---------------------------------------- */
 .try {
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
   box-shadow: var(--elev-1);
   padding: 32px 34px;
@@ -5814,7 +5946,7 @@ h2.tool-h2 {
   padding: 12px 14px;
   border: 1px solid var(--rule-2);
   border-radius: var(--r-ctrl);
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   width: 100%;
   margin-top: 8px;
@@ -5837,15 +5969,15 @@ h2.tool-h2 {
   font-size: 10.5px;
   letter-spacing: 0.08em;
   color: var(--graphite);
-  background: #fff;
-  border: 1px solid #e1e2e7;
+  background: var(--surface);
+  border: 1px solid var(--edge-2);
   border-radius: var(--r-pill);
   padding: 7px 13px;
   cursor: pointer;
   transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s var(--ease);
 }
 .preset:hover {
-  border-color: rgba(61, 92, 235, 0.45);
+  border-color: rgba(var(--accent-rgb), 0.45);
   color: var(--accent);
   transform: translateY(-1px);
 }
@@ -5894,12 +6026,12 @@ h2.tool-h2 {
    mockup's ember here is the recorded defect; the ≠ line inside the verdict
    keeps the ember voice as the violation evidence). */
 .try-verdict.held {
-  border-left-color: rgba(255, 176, 32, 0.55);
+  border-left-color: rgba(var(--gold-rgb), 0.55);
 }
 .try-verdict.held .v-chip {
   background: var(--gold-soft);
   color: var(--gold-text);
-  border: 1px solid rgba(156, 98, 8, 0.35);
+  border: 1px solid rgba(var(--gold-text-rgb), 0.35);
 }
 .try-verdict.pass {
   /* D6 ruling 2026-07-20: graphite = pass — blue is never a lamp. */
@@ -5913,7 +6045,7 @@ h2.tool-h2 {
 .try-verdict.invalid .v-chip {
   background: var(--warn-soft);
   color: var(--warn-ink);
-  border: 1px solid rgba(181, 71, 8, 0.3);
+  border: 1px solid rgba(var(--warn-rgb), 0.3);
 }
 .try-note {
   font-size: 13px;
@@ -5931,15 +6063,15 @@ h2.tool-h2 {
   margin-top: 36px;
 }
 .seat {
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
   padding: 24px 26px;
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
 .seat:hover {
   transform: translateY(-3px);
-  box-shadow: 0 14px 34px rgba(18, 20, 28, 0.08);
+  box-shadow: 0 14px 34px rgba(var(--shadow-rgb), 0.08);
 }
 .seat .who {
   font-family: var(--ff-mono);
@@ -5964,7 +6096,7 @@ h2.tool-h2 {
 .empty-seat {
   margin-top: 36px;
   border: 1px solid var(--signal-rule);
-  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), #fff;
+  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), var(--surface);
   border-radius: var(--r-card);
   padding: 28px 32px;
   display: grid;
@@ -6001,8 +6133,8 @@ h2.tool-h2 {
   margin-top: 36px;
 }
 .fact {
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
   padding: 24px 26px;
 }
@@ -6031,9 +6163,9 @@ h2.tool-h2 {
 }
 .door {
   margin-top: 64px;
-  border: 1px solid #e7e8ed;
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--elev-1);
   padding: 32px 36px;
   display: flex;
@@ -6045,7 +6177,7 @@ h2.tool-h2 {
 }
 a.door:hover {
   transform: translateY(-3px);
-  box-shadow: 0 14px 34px rgba(18, 20, 28, 0.08);
+  box-shadow: 0 14px 34px rgba(var(--shadow-rgb), 0.08);
   border-color: var(--signal-rule);
 }
 .door .d-eyebrow {
@@ -6113,13 +6245,13 @@ h1.p2-h1 {
   flex-wrap: wrap;
 }
 .p2-status .schip {
-  border: 1px solid #e1e2e7;
+  border: 1px solid var(--edge-2);
   border-radius: var(--r-pill);
   padding: 6px 14px;
-  background: #fff;
+  background: var(--surface);
 }
 .p2-status .schip.fail {
-  border-color: rgba(180, 35, 24, 0.3);
+  border-color: rgba(var(--ember-rgb), 0.3);
   color: var(--error-ink);
   background: var(--ember-soft);
   font-weight: 700;
@@ -6127,9 +6259,9 @@ h1.p2-h1 {
 .jewel {
   margin-top: 52px;
   position: relative;
-  border: 1px solid #e7e8ed;
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
-  background: linear-gradient(180deg, #fff, var(--bg-2));
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
   box-shadow: var(--elev-1);
   padding: 48px 48px 44px;
   text-align: center;
@@ -6197,10 +6329,10 @@ h1.p2-h1 {
   font-size: 11px;
   letter-spacing: 0.2em;
   color: var(--error-ink);
-  border: 1px solid rgba(180, 35, 24, 0.35);
+  border: 1px solid rgba(var(--ember-rgb), 0.35);
   border-radius: var(--r-pill);
   padding: 5px 14px;
-  background: #fff;
+  background: var(--surface);
 }
 .jewel.armed .j-seal {
   opacity: 0;
@@ -6256,7 +6388,7 @@ h1.p2-h1 {
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.14em;
-  border: 1px solid #e1e2e7;
+  border: 1px solid var(--edge-2);
   background: none;
   color: var(--graphite);
   border-radius: var(--r-pill);
@@ -6272,10 +6404,10 @@ h1.p2-h1 {
 .flt[aria-pressed="true"] {
   color: var(--accent);
   font-weight: 700;
-  background: #fff;
+  background: var(--surface-raise);
   box-shadow:
-    0 1px 3px rgba(18, 20, 28, 0.08),
-    0 0 0 1px rgba(61, 92, 235, 0.3); /* N3 canon: .3 */
+    0 1px 3px rgba(var(--shadow-rgb), 0.08),
+    0 0 0 1px rgba(var(--accent-rgb), 0.3); /* N3 canon: .3 */
   border-color: transparent;
 }
 .f-head {
@@ -6312,7 +6444,7 @@ h1.p2-h1 {
   display: none;
 }
 .f-row.bench {
-  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), #fff;
+  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), var(--surface);
   border-left: 2px solid var(--iris);
   padding-left: 8px;
 }
@@ -6333,12 +6465,12 @@ h1.p2-h1 {
 .sev.error {
   background: var(--error-soft);
   color: var(--error-ink);
-  border: 1px solid rgba(217, 45, 32, 0.25);
+  border: 1px solid rgba(var(--error-rgb), 0.25);
 }
 .sev.warn {
   background: var(--warn-soft);
   color: var(--warn-ink);
-  border: 1px solid rgba(181, 71, 8, 0.25);
+  border: 1px solid rgba(var(--warn-rgb), 0.25);
 }
 .f-rule {
   font-family: var(--ff-mono);
@@ -6375,7 +6507,7 @@ h1.p2-h1 {
   overflow: visible;
 }
 .m-cell {
-  background: #fff;
+  background: var(--surface);
   padding: 24px 26px;
 }
 .m-cell:first-child {
@@ -6412,14 +6544,14 @@ h1.p2-h1 {
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--rule-2);
   display: grid;
   place-items: center;
   font-family: var(--ff-mono);
   font-size: 11px;
   color: var(--iris-ink);
-  box-shadow: 0 2px 8px rgba(18, 20, 28, 0.07);
+  box-shadow: 0 2px 8px rgba(var(--shadow-rgb), 0.07);
   pointer-events: none;
 }
 
@@ -6533,7 +6665,7 @@ h1.p2-h1 {
   }
   .pb-flag {
     color: var(--error-ink);
-    border-color: rgba(180, 35, 24, 0.35);
+    border-color: rgba(var(--ember-rgb), 0.35);
   }
   .file,
   .try,
@@ -6581,13 +6713,6 @@ h1.p2-h1 {
     font-size: 13.5px;
   }
 }
-.nav-case {
-  font-size: 11.5px;
-  font-weight: 650;
-}
-.nav-case b {
-  font-weight: 800;
-}
 .site-brand {
   font-weight: 650;
 }
@@ -6612,7 +6737,7 @@ h1.p2-h1 {
 .lp-eyebrow::before {
   width: 7px;
   height: 7px;
-  background: rgba(61, 92, 235, 0.65);
+  background: rgba(var(--accent-rgb), 0.65);
 }
 .file .tab-cut {
   font-size: 10.5px;
@@ -6750,8 +6875,8 @@ h1.p2-h1 {
 
 :root {
   --defer: #4a4e5a;
-  --defer-soft: rgba(74, 78, 90, 0.05);
-  --defer-rule: rgba(74, 78, 90, 0.3);
+  --defer-soft: rgba(var(--graphite-rgb), 0.05);
+  --defer-rule: rgba(var(--graphite-rgb), 0.3);
 }
 
 /* --- hero (centered logbook masthead) --- */
@@ -6789,9 +6914,9 @@ h1.p2-h1 {
   max-width: 840px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border: 1px solid #e7e8ed;
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
-  background: linear-gradient(180deg, #fff, var(--bg-2));
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
   box-shadow: var(--elev-1);
   overflow: hidden;
 }
@@ -6852,27 +6977,27 @@ h1.p2-h1 {
 .vd.pass {
   background: var(--accent-soft);
   color: var(--iris-ink);
-  border: 1px solid rgba(61, 92, 235, 0.38);
+  border: 1px solid rgba(var(--accent-rgb), 0.38);
 }
 .vd.pass::before {
-  background: rgba(61, 92, 235, 0.65);
+  background: rgba(var(--accent-rgb), 0.65);
 }
 .vd.defer {
   background: var(--defer-soft);
   color: var(--defer);
-  border: 1px solid rgba(74, 78, 90, 0.4);
+  border: 1px solid rgba(var(--graphite-rgb), 0.4);
 }
 .vd.defer::before {
-  background: rgba(74, 78, 90, 0.55);
+  background: rgba(var(--graphite-rgb), 0.55);
 }
 
 /* --- calibration plate --- */
 .cal {
   margin-top: 48px;
   position: relative;
-  border: 1px solid #e7e8ed;
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
-  background: linear-gradient(180deg, #fff, var(--bg-2));
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
   box-shadow: var(--elev-1);
   padding: 40px clamp(22px, 4vw, 46px) 34px;
 }
@@ -7046,7 +7171,7 @@ h1.p2-h1 {
   margin-top: 24px;
 }
 .mem {
-  background: #fff;
+  background: var(--surface);
   padding: 22px 24px 24px;
   display: flex;
   flex-direction: column;
@@ -7070,12 +7195,12 @@ h1.p2-h1 {
 }
 .mem-kind.agent {
   color: var(--iris-ink);
-  border: 1px solid rgba(61, 92, 235, 0.38);
+  border: 1px solid rgba(var(--accent-rgb), 0.38);
   background: var(--accent-soft);
 }
 .mem-kind.flow {
   color: var(--defer);
-  border: 1px solid rgba(74, 78, 90, 0.4);
+  border: 1px solid rgba(var(--graphite-rgb), 0.4);
   background: var(--defer-soft);
 }
 .mem-d {
@@ -7117,7 +7242,7 @@ h1.p2-h1 {
   margin-top: 28px;
 }
 .mcol {
-  background: #fff;
+  background: var(--surface);
   padding: 22px 24px;
   min-width: 0;
 }
@@ -7152,9 +7277,9 @@ h1.p2-h1 {
 .spec4 {
   margin-top: 28px;
   position: relative;
-  border: 1px solid #e7e8ed;
+  border: 1px solid var(--edge);
   border-radius: 0 var(--r-card) var(--r-card) var(--r-card);
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--elev-1);
   padding: 26px clamp(22px, 3vw, 32px) 28px;
 }
@@ -7166,8 +7291,8 @@ h1.p2-h1 {
   display: inline-flex;
   align-items: center;
   padding: 0 16px;
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-bottom: 0;
   border-radius: 10px 10px 0 0;
   font-family: var(--ff-mono);
@@ -7183,7 +7308,7 @@ h1.p2-h1 {
   right: 0;
   bottom: -1px;
   height: 1px;
-  background: #fff;
+  background: var(--surface);
 }
 .spec4-head {
   display: flex;
@@ -7273,7 +7398,7 @@ h1.p2-h1 {
   margin-top: 28px;
 }
 .proof {
-  background: #fff;
+  background: var(--surface);
   padding: 24px 26px;
   min-width: 0;
 }
@@ -7331,9 +7456,9 @@ h1.p2-h1 {
 .principle {
   margin-top: 44px;
   position: relative;
-  border: 1px solid #e7e8ed;
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
-  background: linear-gradient(180deg, #fff, var(--bg-2));
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
   box-shadow: var(--elev-1);
   padding: 44px clamp(24px, 4vw, 52px);
 }
@@ -7522,7 +7647,7 @@ h1.p2-h1 {
   border: 1px solid var(--signal-rule);
   border-radius: var(--r-pill);
   padding: 8px 16px;
-  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), #fff;
+  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), var(--surface);
 }
 .nyc-line i {
   font-style: normal;
@@ -7543,10 +7668,10 @@ h1.p2-h1 {
   flex-wrap: wrap;
 }
 .p2-chips .schip {
-  border: 1px solid #e1e2e7;
+  border: 1px solid var(--edge-2);
   border-radius: var(--r-pill);
   padding: 6px 14px;
-  background: #fff;
+  background: var(--surface);
 }
 .p2-chips .schip b {
   font-weight: 750;
@@ -7555,7 +7680,7 @@ h1.p2-h1 {
 .p2-chips .schip.live {
   border-color: var(--signal-rule);
   color: var(--iris-ink);
-  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), #fff;
+  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), var(--surface);
   font-weight: 700;
 }
 
@@ -7572,7 +7697,7 @@ h1.p2-h1 {
   overflow: hidden;
 }
 .cap-cell {
-  background: #fff;
+  background: var(--surface);
   padding: 26px 26px 24px;
   position: relative;
 }
@@ -7620,9 +7745,9 @@ h1.p2-h1 {
 .fjewel {
   margin-top: 52px;
   position: relative;
-  border: 1px solid #e7e8ed;
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
-  background: linear-gradient(180deg, #fff, var(--bg-2));
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
   box-shadow: var(--elev-1);
   padding: 48px 48px 44px;
   text-align: center;
@@ -7691,7 +7816,7 @@ h1.p2-h1 {
   top: 0;
   bottom: 0;
   border-radius: 999px 0 0 999px;
-  background: linear-gradient(90deg, #3d5ceb, #2438d6);
+  background: linear-gradient(90deg, var(--iris), var(--accent-fill));
 }
 .fmeter .fm-over {
   position: absolute;
@@ -7765,10 +7890,10 @@ h1.p2-h1 {
   font-weight: 650;
   letter-spacing: 0.2em;
   color: var(--ember-ink, #b71f13);
-  border: 1px solid rgba(180, 35, 24, 0.35);
+  border: 1px solid rgba(var(--ember-rgb), 0.35);
   border-radius: var(--r-pill);
   padding: 5px 14px;
-  background: #fff;
+  background: var(--surface);
 }
 .fjewel .fj-sub {
   font-family: var(--ff-mono);
@@ -7812,7 +7937,7 @@ h1.p2-h1 {
   letter-spacing: 0.13em;
   color: var(--muted);
   background: var(--bg-2);
-  border: 1px solid #e7e8ed;
+  border: 1px solid var(--edge);
   border-radius: 10px 10px 0 0;
   padding: 11px 18px;
   cursor: pointer;
@@ -7823,9 +7948,9 @@ h1.p2-h1 {
   transform: translateY(-1px);
 }
 .mtab[aria-pressed="true"] {
-  background: #fff;
+  background: var(--surface-raise);
   color: var(--ink);
-  border-color: #e1e2e7;
+  border-color: var(--edge-2);
   transform: none;
 }
 .mtab[aria-pressed="true"]::after {
@@ -7835,7 +7960,7 @@ h1.p2-h1 {
   right: 0;
   bottom: -2px;
   height: 3px;
-  background: #fff;
+  background: var(--surface-raise);
 }
 .mtab .mdot {
   width: 6px;
@@ -7845,19 +7970,19 @@ h1.p2-h1 {
 }
 .mdot.ember {
   background: var(--ember);
-  box-shadow: 0 0 8px rgba(180, 35, 24, 0.45);
+  box-shadow: 0 0 8px rgba(var(--ember-rgb), 0.45);
 }
 .mdot.gold {
   background: var(--gold);
-  box-shadow: 0 0 8px rgba(255, 176, 32, 0.55);
+  box-shadow: 0 0 8px rgba(var(--gold-rgb), 0.55);
 }
 .mdot.graphite {
   background: var(--graphite);
 }
 .fee-month {
   position: relative;
-  background: #fff;
-  border: 1px solid #e1e2e7;
+  background: var(--surface);
+  border: 1px solid var(--edge-2);
   border-radius: 0 var(--r-card) var(--r-card) var(--r-card);
   box-shadow: var(--elev-1);
   padding: 34px 36px 38px;
@@ -7873,10 +7998,10 @@ h1.p2-h1 {
   border-top: 2px solid var(--rule-3);
 }
 .fee-month[data-verdict="fail"]::before {
-  border-color: rgba(180, 35, 24, 0.55);
+  border-color: rgba(var(--ember-rgb), 0.55);
 }
 .fee-month[data-verdict="cond"]::before {
-  border-color: rgba(156, 98, 8, 0.6);
+  border-color: rgba(var(--gold-text-rgb), 0.6);
 }
 .fee-month[data-verdict="pass"]::before {
   border-color: var(--signal-rule);
@@ -7923,14 +8048,14 @@ h1.p2-h1 {
   white-space: nowrap;
 }
 .vtag.vio {
-  background: rgba(217, 45, 32, 0.08);
-  color: #b71f13;
-  border: 1px solid rgba(217, 45, 32, 0.28);
+  background: rgba(var(--error-rgb), 0.08);
+  color: var(--ember-ink);
+  border: 1px solid rgba(var(--error-rgb), 0.28);
 }
 .vtag.cond {
-  background: rgba(255, 176, 32, 0.13);
-  color: #8a5406;
-  border: 1px solid rgba(156, 98, 8, 0.35);
+  background: rgba(var(--gold-rgb), 0.13);
+  color: var(--gold-ink);
+  border: 1px solid rgba(var(--gold-text-rgb), 0.35);
 }
 .vtag.cured,
 .vtag.pass {
@@ -7939,9 +8064,9 @@ h1.p2-h1 {
   border: 1px solid var(--rule-2);
 }
 .vtag.flag {
-  background: rgba(181, 71, 8, 0.11);
-  color: #9c3d06;
-  border: 1px solid rgba(181, 71, 8, 0.3);
+  background: rgba(var(--warn-rgb), 0.11);
+  color: var(--warn-ink);
+  border: 1px solid rgba(var(--warn-rgb), 0.3);
 }
 
 /* clean-month pass rows */
@@ -7984,16 +8109,16 @@ h1.p2-h1 {
   grid-column: 1 / -1;
 }
 .stamp.goldst {
-  border-color: #9c6208;
-  color: #8a5406;
-  box-shadow: inset 0 0 6px rgba(156, 98, 8, 0.14);
+  border-color: var(--gold-text);
+  color: var(--gold-ink);
+  box-shadow: inset 0 0 6px rgba(var(--gold-text-rgb), 0.14);
   font-size: 10.5px;
   letter-spacing: 0.14em;
 }
 .stamp.graphitest {
   border-color: var(--graphite);
   color: var(--ink-2);
-  box-shadow: inset 0 0 6px rgba(18, 20, 28, 0.1);
+  box-shadow: inset 0 0 6px rgba(var(--shadow-rgb), 0.1);
   font-size: 10.5px;
   letter-spacing: 0.14em;
 }
@@ -8001,7 +8126,7 @@ h1.p2-h1 {
   color: var(--ember-ink, #b71f13);
 }
 .rc-key.wrn {
-  color: #9c3d06;
+  color: var(--warn-ink);
 }
 .f-mark {
   font-family: var(--ff-mono);
@@ -8013,7 +8138,7 @@ h1.p2-h1 {
   border-radius: var(--r-pill);
   padding: 2px 8px;
   white-space: nowrap;
-  background: #fff;
+  background: var(--surface);
 }
 
 /* --- the boundary panels --- */
@@ -8025,8 +8150,8 @@ h1.p2-h1 {
   align-items: start;
 }
 .bpanel {
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-radius: var(--r-card);
   padding: 28px 30px;
   position: relative;
@@ -8200,8 +8325,8 @@ h1.p2-h1 {
 .pcard {
   position: relative;
   text-align: left;
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-radius: 0 var(--r-card) var(--r-card) var(--r-card);
   padding: 20px 22px;
   cursor: pointer;
@@ -8214,14 +8339,14 @@ h1.p2-h1 {
 }
 .pcard:hover {
   transform: translateY(-3px);
-  box-shadow: 0 14px 34px rgba(18, 20, 28, 0.08);
+  box-shadow: 0 14px 34px rgba(var(--shadow-rgb), 0.08);
 }
 .pcard:active {
   transform: scale(0.98);
 }
 .pcard[aria-pressed="true"] {
   border-color: transparent;
-  box-shadow: 0 1px 3px rgba(18, 20, 28, 0.08), 0 0 0 2px var(--signal-rule);
+  box-shadow: 0 1px 3px rgba(var(--shadow-rgb), 0.08), 0 0 0 2px var(--signal-rule);
 }
 .pcard .ptab {
   position: absolute;
@@ -8231,8 +8356,8 @@ h1.p2-h1 {
   display: inline-flex;
   align-items: center;
   padding: 0 14px;
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-bottom: 0;
   border-radius: 10px 10px 0 0;
   font-family: var(--ff-mono);
@@ -8248,7 +8373,7 @@ h1.p2-h1 {
   right: 0;
   bottom: -1px;
   height: 1px;
-  background: #fff;
+  background: var(--surface);
 }
 .pcard[aria-pressed="true"] .ptab {
   border-color: var(--signal-rule);
@@ -8273,9 +8398,9 @@ h1.p2-h1 {
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.13em;
-  color: #8a5406;
-  border: 1px solid rgba(156, 98, 8, 0.35);
-  background: rgba(255, 176, 32, 0.08);
+  color: var(--gold-ink);
+  border: 1px solid rgba(var(--gold-text-rgb), 0.35);
+  background: rgba(var(--gold-rgb), 0.08);
   border-radius: var(--r-pill);
   padding: 3px 10px;
   margin-top: 2px;
@@ -8289,8 +8414,8 @@ h1.p2-h1 {
 /* --- the bench instrument --- */
 .bench3 {
   position: relative;
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-radius: 0 var(--r-card) var(--r-card) var(--r-card);
   box-shadow: var(--elev-1);
   padding: 32px 34px;
@@ -8308,8 +8433,8 @@ h1.p2-h1 {
   display: inline-flex;
   align-items: center;
   padding: 0 16px;
-  background: #fff;
-  border: 1px solid #e7e8ed;
+  background: var(--surface);
+  border: 1px solid var(--edge);
   border-bottom: 0;
   border-radius: 10px 10px 0 0;
   font-family: var(--ff-mono);
@@ -8325,7 +8450,7 @@ h1.p2-h1 {
   right: 0;
   bottom: -1px;
   height: 1px;
-  background: #fff;
+  background: var(--surface);
 }
 .bench3-form {
   display: grid;
@@ -8344,7 +8469,7 @@ h1.p2-h1 {
   padding: 12px 14px;
   border: 1px solid var(--rule-2);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   width: 100%;
   margin-top: 8px;
@@ -8365,15 +8490,15 @@ h1.p2-h1 {
   font-weight: 650;
   letter-spacing: 0.08em;
   color: var(--graphite);
-  background: #fff;
-  border: 1px solid #e1e2e7;
+  background: var(--surface);
+  border: 1px solid var(--edge-2);
   border-radius: var(--r-pill);
   padding: 7px 13px;
   cursor: pointer;
   transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s var(--ease);
 }
 .b3-preset:hover {
-  border-color: rgba(61, 92, 235, 0.45);
+  border-color: rgba(var(--accent-rgb), 0.45);
   color: var(--accent);
   transform: translateY(-1px);
 }
@@ -8429,7 +8554,7 @@ h1.p2-h1 {
   display: block;
   height: 2px;
   border-radius: 2px;
-  background: rgba(18, 20, 28, 0.12);
+  background: rgba(var(--ink-rgb), 0.12);
   overflow: hidden;
 }
 .bt i b {
@@ -8476,13 +8601,13 @@ h1.p2-h1 {
   transition: border-color 0.3s ease;
 }
 .vpanel.held {
-  border-left-color: rgba(180, 35, 24, 0.4);
+  border-left-color: rgba(var(--ember-rgb), 0.4);
 }
 .vpanel.pass {
-  border-left-color: rgba(74, 78, 90, 0.55);
+  border-left-color: rgba(var(--graphite-rgb), 0.55);
 }
 .vpanel.invalid {
-  border-left-color: rgba(181, 71, 8, 0.4);
+  border-left-color: rgba(var(--warn-rgb), 0.4);
 }
 .vprov {
   font-size: 10px;
@@ -8506,20 +8631,20 @@ h1.p2-h1 {
   padding: 6px 13px 6px 15px;
   border-radius: 4px;
   transform: rotate(-2deg);
-  background: #fff;
-  box-shadow: inset 0 0 6px rgba(180, 35, 24, 0.12);
+  background: var(--surface);
+  box-shadow: inset 0 0 6px rgba(var(--ember-rgb), 0.12);
   font-family: var(--ff-mono);
 }
 .vstamp.ok {
-  border-color: #4a4e5a;
-  color: #343741;
-  box-shadow: inset 0 0 6px rgba(18, 20, 28, 0.1);
+  border-color: var(--graphite);
+  color: var(--stamp-ink);
+  box-shadow: inset 0 0 6px rgba(var(--shadow-rgb), 0.1);
 }
 .vstamp.inv {
-  border-color: rgba(181, 71, 8, 0.6);
-  color: #9c3d06;
+  border-color: rgba(var(--warn-rgb), 0.6);
+  color: var(--warn-ink);
   letter-spacing: 0.12em;
-  box-shadow: inset 0 0 6px rgba(181, 71, 8, 0.1);
+  box-shadow: inset 0 0 6px rgba(var(--warn-rgb), 0.1);
 }
 .vstamp.land {
   animation: vstamp-in 0.55s var(--ease-arrival, cubic-bezier(0, 0, 0.2, 1)) both;
@@ -8556,7 +8681,7 @@ h1.p2-h1 {
 .p3-boundary {
   margin-top: 24px;
   border: 1px solid var(--signal-rule);
-  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), #fff;
+  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), var(--surface);
   border-radius: var(--r-card);
   padding: 28px 32px;
   display: grid;
@@ -8657,10 +8782,10 @@ h1.p2-h1 {
    ========================================================================== */
 
 .docs-main {
-  background: #fbfaf6;
+  background: var(--docs-bg);
   background-image: repeating-linear-gradient(
     0deg,
-    rgba(76, 62, 32, 0.014) 0 1px,
+    var(--paper-grain) 0 1px,
     transparent 1px 3px
   );
   --docs-rule: rgba(58, 50, 28, 0.11);
@@ -8727,7 +8852,7 @@ h1.p2-h1 {
   margin-top: 30px;
   border: 1px solid var(--docs-rule-2);
   border-radius: 16px;
-  background: linear-gradient(180deg, #ffffff, #fdfcf9);
+  background: linear-gradient(180deg, var(--surface), var(--paper));
   box-shadow: var(--elev-1);
   padding: 26px clamp(16px, 3vw, 34px) 20px;
 }
@@ -8745,15 +8870,21 @@ h1.p2-h1 {
 .arch .a-chip { font-family: var(--ff-mono); font-size: 12.5px; fill: var(--ink); }
 .arch .a-field { font-family: var(--ff-mono); font-size: 12px; fill: var(--ink); }
 .arch .a-note { font-family: var(--ff-mono); font-size: 10px; fill: var(--muted); }
-.arch .a-tkt { font-family: var(--ff-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; fill: #221e14; }
-.arch .a-box { fill: #fff; stroke: var(--docs-rule-2); stroke-width: 1.2; }
-.arch .a-core { fill: #fdfcf9; stroke: rgba(36, 56, 214, 0.42); stroke-width: 1.4; }
+.arch .a-tkt { font-family: var(--ff-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; fill: var(--paper-ink); }
+.arch .a-box { fill: var(--surface); stroke: var(--docs-rule-2); stroke-width: 1.2; }
+.arch .a-core { fill: var(--paper); stroke: rgba(var(--accent-deep-rgb), 0.42); stroke-width: 1.4; }
 .arch .a-pack { fill: var(--accent-soft); stroke: var(--signal-rule); stroke-width: 1; }
-.arch .a-ticket { fill: #fdfcf9; stroke: var(--docs-rule-3); stroke-width: 1.1; }
+.arch .a-ticket { fill: var(--paper); stroke: var(--docs-rule-3); stroke-width: 1.1; }
 .arch .a-flow { fill: none; stroke: var(--docs-rule-3); stroke-width: 1.4; }
 .arch .a-bus { fill: none; stroke: var(--docs-rule-2); stroke-width: 1.2; }
 .arch .a-dot { fill: var(--iris, #3d5ceb); }
 .arch .a-hair { stroke: var(--docs-rule-2); stroke-width: 1; }
+/* the two literals that were inline on the SVG in app/docs/page.tsx: a <marker>
+   cannot inherit from the path that references it, so the arrowhead needs its
+   own token, and the receipt's tear line needed the docs rule rather than a
+   fixed warm grey. */
+.arch .a-head { fill: var(--graphite); }
+.arch .a-tear { stroke: var(--docs-rule-3); }
 
 /* iron rule */
 .docs-iron {
@@ -8847,9 +8978,9 @@ h1.p2-h1 {
   line-height: 1.45;
   padding: 5px 10px;
   border-radius: 6px;
-  background: rgba(74, 78, 90, 0.07);
+  background: rgba(var(--graphite-rgb), 0.07);
   color: var(--graphite);
-  border: 1px solid rgba(74, 78, 90, 0.24);
+  border: 1px solid rgba(var(--graphite-rgb), 0.24);
 }
 
 /* automation lane + builders */
@@ -8870,7 +9001,7 @@ h1.p2-h1 {
   border: 1px solid var(--docs-rule-2);
   border-radius: 12px;
   padding: 18px 20px;
-  background: #fff;
+  background: var(--surface);
 }
 .factline .flamp {
   width: 9px;
@@ -8888,7 +9019,7 @@ h1.p2-h1 {
 .builder {
   border: 1px solid var(--docs-rule-2);
   border-radius: 13px;
-  background: #fff;
+  background: var(--surface);
   padding: 24px 26px;
 }
 .builder h3 {
@@ -8949,7 +9080,11 @@ h1.p2-h1 {
   margin-top: 14px;
   border-radius: 13px;
   overflow: hidden;
-  background: #12141c;
+  /* dark in BOTH schemes (--panel-dark: #12141c light / #1a1d27 dark), so the
+     white-alpha chrome and light inks below stay literals — migrating them to the
+     scheme tokens would invert a surface that never inverts. Ratios below are the
+     worst case, on the lighter #1a1d27. */
+  background: var(--panel-dark);
   box-shadow: var(--elev-1);
 }
 .console-bar {
@@ -8974,7 +9109,7 @@ h1.p2-h1 {
   font-size: 10.5px;
   font-weight: 650;
   letter-spacing: 0.16em;
-  color: #8b90a0;
+  color: #8b90a0; /* 5.28:1 on --panel-dark (worst case #1a1d27) */
   text-transform: uppercase;
 }
 .console pre {
@@ -8983,7 +9118,7 @@ h1.p2-h1 {
   font-family: var(--ff-mono);
   font-size: 13.5px;
   line-height: 1.95;
-  color: #cdd3e0;
+  color: #cdd3e0; /* 11.20:1 on --panel-dark (worst case #1a1d27) */
   white-space: pre;
   overflow-x: auto;
 }
@@ -9240,12 +9375,6 @@ body,
 .site-navlink {
   font-weight: 560;
 }
-.nav-case,
-.acc,
-.tab2,
-.wb-next-link {
-  font-weight: 590;
-}
 .wb-meta dt,
 .wb-receipts dt,
 .fd-slot .fd-title {
@@ -9336,7 +9465,7 @@ body,
   position: sticky;
   top: 68px; /* the nav's min-height — the two bars stack, never overlap */
   z-index: 39; /* below the nav's 40 */
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(var(--glass-rgb), 0.95);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--rule);
@@ -9395,8 +9524,8 @@ body,
 .wk-st.is-run .wk-dot { animation: wk-pulse 900ms var(--ease) infinite; }
 @keyframes wk-pulse {
   0%,
-  100% { box-shadow: 0 0 0 0 rgba(36, 56, 214, 0.28); }
-  50% { box-shadow: 0 0 0 5px rgba(36, 56, 214, 0.06); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--accent-deep-rgb), 0.28); }
+  50% { box-shadow: 0 0 0 5px rgba(var(--accent-deep-rgb), 0.06); }
 }
 
 /* Every station is a jump target under 102px of sticky chrome (nav 68 + strip
@@ -9497,7 +9626,7 @@ body,
     transform var(--dur-1) var(--ease);
 }
 .wk-door:hover {
-  background: rgba(36, 56, 214, 0.09);
+  background: rgba(var(--accent-deep-rgb), 0.09);
   border-color: var(--accent);
 }
 .wk-door:active { transform: translateY(1px); }
@@ -9568,8 +9697,8 @@ body,
   font: inherit;
   font-size: 15.5px;
   font-weight: 590;
-  color: #ffffff;
-  background: var(--accent);
+  color: var(--on-accent);
+  background: var(--accent-fill);
   border: 0;
   border-radius: var(--r-pill);
   padding: 12px 26px;
@@ -9673,8 +9802,8 @@ body,
   background: var(--bg);
   overflow: hidden;
   box-shadow:
-    0 1px 2px rgba(18, 20, 28, 0.03),
-    0 8px 28px rgba(18, 20, 28, 0.04);
+    0 1px 2px rgba(var(--shadow-rgb), 0.03),
+    0 8px 28px rgba(var(--shadow-rgb), 0.04);
 }
 .wk-slab-top {
   display: grid;
@@ -9702,7 +9831,7 @@ body,
 }
 .wk-verdict-lamp.ok {
   background: var(--ok);
-  box-shadow: 0 0 0 4px rgba(6, 118, 71, 0.08);
+  box-shadow: 0 0 0 4px rgba(var(--ok-rgb), 0.08);
 }
 .wk-verdict-word {
   font-family: var(--ff-mono);
@@ -9917,10 +10046,10 @@ body,
   font-weight: 600;
   letter-spacing: 0.12em;
   color: var(--gold-text);
-  border: 1px solid rgba(156, 98, 8, 0.35);
+  border: 1px solid rgba(var(--gold-text-rgb), 0.35);
   border-radius: var(--r-chip);
   padding: 3px 8px;
-  background: rgba(255, 176, 32, 0.07);
+  background: rgba(var(--gold-rgb), 0.07);
   white-space: nowrap;
 }
 /* The artifacts render EVERY block the builder emits, so a long report makes a
@@ -10131,4 +10260,351 @@ body,
   font-size: 11px;
   color: var(--faint);
   overflow-wrap: anywhere;
+}
+
+/* ============================================================================
+   DARK SCHEME (owner word 2026-08-02: "also dark mode for it")
+   ----------------------------------------------------------------------------
+   This section supersedes the "Light only" record. It reverses that decision by
+   exactly the mechanism DESIGN.md requires — a new owner word — and nothing
+   about the LIGHT scheme moves: every dark value below is a RE-DECLARATION of a
+   token whose light value is unchanged above.
+
+   THE PRINCIPLE: same roles, re-derived values. The light system's discipline is
+   that every ink step has a verified contrast ratio for the job it does. This
+   mirrors those ROLE ratios rather than inverting hexes — an inverted #12141c is
+   #edebe3, which is a different job at a different ratio. Each number below was
+   COMPUTED (standard WCAG sRGB), not eyeballed.
+
+   THE ROLE SPLIT. On white one ultramarine could do two jobs, because #2438d6 is
+   8.04:1 as text AND carries white at 8.04:1. On near-black that stops being
+   true, so --accent (text/mark/ring) and --accent-fill (filled control) are
+   separate tokens in both schemes — see the :root note.
+
+   TWO SELECTORS, ONE VALUE SET:
+     • @media (prefers-color-scheme: dark) :root:not([data-theme="light"])
+       — no stored choice, so the SYSTEM decides; a stored "light" opts out.
+     • :root[data-theme="dark"]
+       — a stored choice, which wins in both directions.
+   Specificity puts both above the plain :root blocks regardless of order.
+
+   WHY @media screen WRAPS THE WHOLE SECTION: print is always on white paper.
+   Without the wrapper the dark tokens would follow a page into the printer and
+   the existing @media print rules (which hand-set #fff on .docs-main/.console)
+   would be outranked by these higher-specificity selectors. Screen-scoping it
+   means printing from dark mode still prints the light system, unchanged.
+
+   `evals/design/dark-scheme.test.ts` asserts the two blocks declare an IDENTICAL
+   token set at IDENTICAL values — the duplication is deliberate (a CSS custom
+   property cannot be aliased across two selectors without a third), so it is
+   pinned rather than trusted.
+   ========================================================================== */
+
+@media screen {
+  /* ---- the token set. Kept in ONE place; the two selectors below share it. -- */
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+
+    /* ground — a blue-black in the same hue family as the light ink ramp, so the
+       scheme reads as the same instrument under different light, not a new one */
+    --bg: #0e1016;
+    --bg-2: #13151d; /* panels */
+    --bg-3: #1a1d27; /* wells */
+
+    /* ink ramp — each step VERIFIED on #0e1016, mirroring the light ROLE ratios */
+    --ink: #f2f3f8; /* 17.16:1 — headings, hard marks (light: 18.38) */
+    --ink-2: #e3e5ec; /* 15.11:1 — strong text (light: 15.29) */
+    --body: #c5c8d4; /* 11.40:1 — body text (light: 10.51) */
+    --graphite: #abafbe; /* 8.70:1 — labels, values, icon strokes (light: 8.31) */
+    --muted: #9297a7; /* 6.53:1 — secondary (light: 6.59) */
+    --faint: #82879a; /* 5.33:1 on --bg, 4.71:1 on the --bg-3 well — the tertiary
+                         step is LIFTED relative to a naive mirror precisely so it
+                         still clears 4.5 on the lightest ground it lands on */
+
+    /* hairlines — the same 3-step idiom, now white-alpha */
+    --ink-rgb: 242, 243, 248;
+    --rule: rgba(var(--ink-rgb), 0.1);
+    --rule-2: rgba(var(--ink-rgb), 0.16);
+    --rule-3: rgba(var(--ink-rgb), 0.26);
+    --line: rgba(var(--ink-rgb), 0.13);
+
+    /* surfaces */
+    --surface: #13151d; /* = --bg-2: panels stand one step off the ground */
+    --surface-raise: #262a38; /* LIGHTER than the --bg-3 well, so a pressed chip
+                                 still reads as raised rather than recessed */
+    --panel-dark: #1a1d27; /* the console + progress bar lift off #12141c, which
+                              would sit at 1.06:1 against this ground */
+    --glass-rgb: 14, 16, 22; /* translucent chrome darkens instead of lightening */
+    --shadow-rgb: 0, 0, 0; /* an ink shadow is invisible here; depth is carried by
+                              the surface lift + the hairline, and the shadow is
+                              reduced to a near-black seat rather than mud */
+    --edge: rgba(var(--ink-rgb), 0.13);
+    --edge-2: rgba(var(--ink-rgb), 0.17);
+    --edge-3: rgba(var(--ink-rgb), 0.1);
+    --on-accent: #ffffff; /* unchanged — the fill under it is dark in both */
+    --on-ink: #0e1016; /* 17.16:1 — INVERTS, because --ink inverts */
+    --ink-hi: #ffffff;
+
+    /* accent — the role split, both halves computed */
+    --accent: #93a2ff; /* 8.02:1 — text, underlines, chips, marks, focus rings */
+    --accent-fill: #4257e8; /* 3.40:1 vs ground (≥3 UI); white on it 5.58:1 */
+    --accent-hi: #5468f0; /* 4.18:1 vs ground; white on it 4.55:1 — the hover for
+                             fills stays LIGHTER here, the mirror of light's darker */
+    --link-hi: #b8c4ff; /* 11.21:1 — the one link-hover ink */
+    --brand-deep: #93a2ff; /* 8.02:1 — the mark keeps its three-stop identity */
+    --accent-rgb: 147, 162, 255;
+    --accent-deep-rgb: 147, 162, 255; /* both light wash families collapse onto the
+                                         one dark accent — a deep-blue wash on
+                                         near-black carries no information */
+    --accent-soft: rgba(var(--accent-rgb), 0.08);
+    --accent-tint: rgba(var(--accent-rgb), 0.08);
+    --accent-line: rgba(var(--accent-rgb), 0.3);
+    --signal: #93a2ff;
+    --signal-text: #93a2ff;
+    --signal-tint: rgba(var(--accent-rgb), 0.08);
+    --signal-rule: rgba(var(--accent-rgb), 0.3);
+    --iris: #93a2ff;
+    --iris-ink: #93a2ff;
+    --iris-soft: rgba(var(--accent-rgb), 0.08);
+    --violet: #93a2ff;
+    --violet-text: #93a2ff;
+    --violet-soft: rgba(var(--accent-rgb), 0.1);
+    --cyan: #93a8f7; /* 8.32:1 — already a light mark hue; unchanged */
+    --wine-900: #b8c4ff;
+    --wine-800: #b8c4ff;
+    --wine-700: #93a2ff;
+    --wine-600: #93a2ff;
+    --wine-500: #93a2ff;
+
+    /* the lamp system — D6 holds: gold = held, ember = the FAIL verdict, blue is
+       never a lamp. Each lamp is consumed as TEXT far more often than as a fill
+       (--ember alone: 11 `color:` sites in the .wk- layer), so the base token
+       takes the -text value and the few dot/bar fills simply read brighter. */
+    --ember: #ff8a7d; /* 8.32:1 */
+    --ember-text: #ff8a7d;
+    --ember-ink: #ff8a7d;
+    --ember-rgb: 255, 138, 125;
+    --ember-soft: rgba(var(--ember-rgb), 0.1);
+    --ember-tint: rgba(var(--ember-rgb), 0.1);
+    --ember-line: rgba(var(--ember-rgb), 0.28);
+    --gold: #ffb020; /* 10.40:1 — the bright amber already reads on near-black */
+    --gold-text: #e8a83c; /* 9.14:1 */
+    --gold-ink: #e8a83c;
+    --stamp-ink: #d7dae4; /* 13.05:1 on --surface */
+    --gold-rgb: 255, 176, 32;
+    --gold-text-rgb: 232, 168, 60;
+    --gold-soft: rgba(var(--gold-rgb), 0.14);
+    --azure: #1f8fff; /* 5.82:1 — reads as a mark on this ground */
+    --azure-text: #7fb0ff; /* 8.65:1 */
+    --azure-rgb: 31, 143, 255;
+    --azure-soft: rgba(var(--azure-rgb), 0.16);
+
+    /* severity triad — shape + word still carry it; colour never alone */
+    --error: #ff8a7d; /* 8.32:1 */
+    --error-ink: #ff8a7d;
+    --error-rgb: 255, 138, 125;
+    --error-soft: rgba(var(--error-rgb), 0.1);
+    --warn: #e8a83c; /* 9.14:1 */
+    --warn-ink: #e8a83c;
+    --warn-rgb: 232, 168, 60;
+    --warn-soft: rgba(var(--warn-rgb), 0.12);
+    --ok: #4fc08d; /* 8.38:1 */
+    --ok-rgb: 79, 192, 141;
+    --ok-soft: rgba(var(--ok-rgb), 0.1);
+    --defer: #abafbe;
+    --graphite-rgb: 171, 175, 190;
+    --defer-soft: rgba(var(--graphite-rgb), 0.08);
+    --defer-rule: rgba(var(--graphite-rgb), 0.3);
+
+    /* the ONE gradient, re-derived. Display-size text only (≥26px), so the bar is
+       3:1 — every stop clears 8:1 here, comfortably past it. */
+    --grad-phrase: linear-gradient(100deg, #93a2ff, #7fb0ff 60%, #e8a83c);
+    /* CTA gradient — a FILL carrying white: #4257e8 (5.58:1 white) → #5468f0
+       (4.55:1 white) → #4257e8. Both stops clear the 4.5 body bar. */
+    --grad-cta: linear-gradient(100deg, #4257e8, #5468f0 50%, #4257e8);
+
+    /* elevation — reduced, not inverted. Panels separate by surface lift and the
+       white-alpha hairline; the shadow is a seat, not the depth cue. */
+    --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 20px rgba(0, 0, 0, 0.36);
+    --elev-2: 0 2px 7px rgba(0, 0, 0, 0.44), 0 14px 34px rgba(0, 0, 0, 0.42);
+    --elev-3: 0 3px 10px rgba(0, 0, 0, 0.48), 0 24px 54px rgba(0, 0, 0, 0.5);
+
+    /* the paper material — the receipt and /docs are a WARM stock against the cool
+       UI, and that relationship is what has to survive, not the cream itself. A
+       cream slab on near-black glares; a warm-dark stock keeps the contrast of
+       materials while belonging to the scheme. Ratios on #191713. */
+    --paper: #191713;
+    --paper-ink: #ece5d6; /* 14.27:1 */
+    --paper-strong: #d4cbb5; /* 11.09:1 */
+    --paper-muted: #b8ae95; /* 8.12:1 */
+    --paper-faint: #9c927a; /* 5.80:1 */
+    --paper-rule: rgba(236, 229, 214, 0.14);
+    --paper-rule-2: rgba(236, 229, 214, 0.26);
+    --paper-grain: rgba(236, 229, 214, 0.016);
+    --docs-bg: #16150f;
+  }
+
+  /* ---- system preference, no stored choice ---------------------------------
+     A stored "light" opts out via :not([data-theme="light"]); a stored "dark"
+     is already covered by the block above. Values are IDENTICAL to it by
+     construction and pinned by evals/design/dark-scheme.test.ts. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+
+      --bg: #0e1016;
+      --bg-2: #13151d;
+      --bg-3: #1a1d27;
+
+      --ink: #f2f3f8;
+      --ink-2: #e3e5ec;
+      --body: #c5c8d4;
+      --graphite: #abafbe;
+      --muted: #9297a7;
+      --faint: #82879a;
+
+      --ink-rgb: 242, 243, 248;
+      --rule: rgba(var(--ink-rgb), 0.1);
+      --rule-2: rgba(var(--ink-rgb), 0.16);
+      --rule-3: rgba(var(--ink-rgb), 0.26);
+      --line: rgba(var(--ink-rgb), 0.13);
+
+      --surface: #13151d;
+      --surface-raise: #262a38;
+      --panel-dark: #1a1d27;
+      --glass-rgb: 14, 16, 22;
+      --shadow-rgb: 0, 0, 0;
+      --edge: rgba(var(--ink-rgb), 0.13);
+      --edge-2: rgba(var(--ink-rgb), 0.17);
+      --edge-3: rgba(var(--ink-rgb), 0.1);
+      --on-accent: #ffffff;
+      --on-ink: #0e1016;
+      --ink-hi: #ffffff;
+
+      --accent: #93a2ff;
+      --accent-fill: #4257e8;
+      --accent-hi: #5468f0;
+      --link-hi: #b8c4ff;
+      --brand-deep: #93a2ff;
+      --accent-rgb: 147, 162, 255;
+      --accent-deep-rgb: 147, 162, 255;
+      --accent-soft: rgba(var(--accent-rgb), 0.08);
+      --accent-tint: rgba(var(--accent-rgb), 0.08);
+      --accent-line: rgba(var(--accent-rgb), 0.3);
+      --signal: #93a2ff;
+      --signal-text: #93a2ff;
+      --signal-tint: rgba(var(--accent-rgb), 0.08);
+      --signal-rule: rgba(var(--accent-rgb), 0.3);
+      --iris: #93a2ff;
+      --iris-ink: #93a2ff;
+      --iris-soft: rgba(var(--accent-rgb), 0.08);
+      --violet: #93a2ff;
+      --violet-text: #93a2ff;
+      --violet-soft: rgba(var(--accent-rgb), 0.1);
+      --cyan: #93a8f7;
+      --wine-900: #b8c4ff;
+      --wine-800: #b8c4ff;
+      --wine-700: #93a2ff;
+      --wine-600: #93a2ff;
+      --wine-500: #93a2ff;
+
+      --ember: #ff8a7d;
+      --ember-text: #ff8a7d;
+      --ember-ink: #ff8a7d;
+      --ember-rgb: 255, 138, 125;
+      --ember-soft: rgba(var(--ember-rgb), 0.1);
+      --ember-tint: rgba(var(--ember-rgb), 0.1);
+      --ember-line: rgba(var(--ember-rgb), 0.28);
+      --gold: #ffb020;
+      --gold-text: #e8a83c;
+      --gold-ink: #e8a83c;
+      --stamp-ink: #d7dae4;
+      --gold-rgb: 255, 176, 32;
+      --gold-text-rgb: 232, 168, 60;
+      --gold-soft: rgba(var(--gold-rgb), 0.14);
+      --azure: #1f8fff;
+      --azure-text: #7fb0ff;
+      --azure-rgb: 31, 143, 255;
+      --azure-soft: rgba(var(--azure-rgb), 0.16);
+
+      --error: #ff8a7d;
+      --error-ink: #ff8a7d;
+      --error-rgb: 255, 138, 125;
+      --error-soft: rgba(var(--error-rgb), 0.1);
+      --warn: #e8a83c;
+      --warn-ink: #e8a83c;
+      --warn-rgb: 232, 168, 60;
+      --warn-soft: rgba(var(--warn-rgb), 0.12);
+      --ok: #4fc08d;
+      --ok-rgb: 79, 192, 141;
+      --ok-soft: rgba(var(--ok-rgb), 0.1);
+      --defer: #abafbe;
+      --graphite-rgb: 171, 175, 190;
+      --defer-soft: rgba(var(--graphite-rgb), 0.08);
+      --defer-rule: rgba(var(--graphite-rgb), 0.3);
+
+      --grad-phrase: linear-gradient(100deg, #93a2ff, #7fb0ff 60%, #e8a83c);
+      --grad-cta: linear-gradient(100deg, #4257e8, #5468f0 50%, #4257e8);
+
+      --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 20px rgba(0, 0, 0, 0.36);
+      --elev-2: 0 2px 7px rgba(0, 0, 0, 0.44), 0 14px 34px rgba(0, 0, 0, 0.42);
+      --elev-3: 0 3px 10px rgba(0, 0, 0, 0.48), 0 24px 54px rgba(0, 0, 0, 0.5);
+
+      --paper: #191713;
+      --paper-ink: #ece5d6;
+      --paper-strong: #d4cbb5;
+      --paper-muted: #b8ae95;
+      --paper-faint: #9c927a;
+      --paper-rule: rgba(236, 229, 214, 0.14);
+      --paper-rule-2: rgba(236, 229, 214, 0.26);
+      --paper-grain: rgba(236, 229, 214, 0.016);
+      --docs-bg: #16150f;
+    }
+  }
+
+  /* ---- ELEMENT-SCOPED token blocks ------------------------------------------
+     A custom property set ON AN ELEMENT beats anything inherited from :root, so
+     these two blocks would render fully light inside a dark page no matter what
+     the token section above says. They are the single largest leak in the file
+     and have to be re-declared at their own selectors.
+
+     .rpt-wrap keeps ONE --paper token deliberately: it is both the ledger ground
+     AND the text colour on every ink surface (the SIMULATED plaque, the verdict
+     flag). That pairing INVERTS coherently — --paper on --ink is 17.16:1 dark,
+     exactly as it was 18.38:1 light — which is why the one-token design survives
+     the scheme change untouched. */
+  :root[data-theme="dark"] .rpt-wrap {
+    --paper: #13151d;
+    --ink: #f2f3f8;
+    --body: #c5c8d4;
+    --graphite: #abafbe;
+    --hairline: rgba(242, 243, 248, 0.15);
+    --um: #93a2ff; /* 7.68:1 on the ledger ground */
+    --sev-err: #ff8a7d;
+    --sev-warn: #e8a83c;
+    --sev-info: #a5a2ab;
+  }
+  :root[data-theme="dark"] .docs-main {
+    --docs-rule: rgba(236, 229, 214, 0.12);
+    --docs-rule-2: rgba(236, 229, 214, 0.2);
+    --docs-rule-3: rgba(236, 229, 214, 0.32);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .rpt-wrap {
+      --paper: #13151d;
+      --ink: #f2f3f8;
+      --body: #c5c8d4;
+      --graphite: #abafbe;
+      --hairline: rgba(242, 243, 248, 0.15);
+      --um: #93a2ff;
+      --sev-err: #ff8a7d;
+      --sev-warn: #e8a83c;
+      --sev-info: #a5a2ab;
+    }
+    :root:not([data-theme="light"]) .docs-main {
+      --docs-rule: rgba(236, 229, 214, 0.12);
+      --docs-rule-2: rgba(236, 229, 214, 0.2);
+      --docs-rule-3: rgba(236, 229, 214, 0.32);
+    }
+  }
 }

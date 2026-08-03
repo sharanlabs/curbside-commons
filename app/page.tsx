@@ -177,9 +177,8 @@ export default function Landing() {
           </Reveal>
           <DeliverySection idle={DELIVERY_IDLE} date={DELIVERY_DATE} />
           <p className="wk-delivery-note">
-            <b>Nothing is transmitted.</b> These artifacts are built by the same code paths an
-            owner-armed, one-shot demonstration uses — but no send transport is wired into this
-            site. You are looking at the end of the pipeline, on paper.
+            <b>Nothing is transmitted.</b> These artifacts are built by the same code paths a
+            live delivery would use — but no send transport is wired into this site. You are looking at the end of the pipeline, on paper.
           </p>
         </section>
 

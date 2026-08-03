@@ -5,7 +5,6 @@ import { Onest, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { BUILD_INFO } from "@/lib/build-info";
 import { PLATFORM_NAME } from "@/lib/product";
-import { COVERAGE } from "@/lib/landing/specimen";
 import "./globals.css";
 
 // Self-hosted via next/font/google. IMPORTANT — what "self-hosted" means here:
@@ -48,14 +47,22 @@ const jetbrainsMono = JetBrains_Mono({
 // default, and the site appears to open on a navy band it does not paint. The
 // owner saw exactly that on /report and reasonably read it as a design defect.
 //
-// `colorScheme: "light"` is the matching half: globals.css already declares
-// `color-scheme: light` (~line 36), but the CSS declaration only reaches form
-// controls and scrollbars once the stylesheet parses. The meta tag reaches the
-// browser first, so the two together close the gap before first paint rather
-// than after it.
+// `colorScheme` is the matching half: globals.css declares `color-scheme` in CSS,
+// but the CSS declaration only reaches form controls and scrollbars once the
+// stylesheet parses. The meta tag reaches the browser first, so the two together
+// close the gap before first paint rather than after it.
+//
+// TWO SCHEMES from 2026-08-02 (owner word: "also dark mode for it"). `themeColor`
+// becomes a media PAIR rather than one value, so the browser chrome tracks the
+// scheme instead of pinning white — which was the whole point of setting it in
+// the first place. `colorScheme: "light dark"` tells the UA both are supported,
+// so it stops force-darkening and hands form controls / scrollbars to the CSS.
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
-  colorScheme: "light",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1016" },
+  ],
+  colorScheme: "light dark",
 };
 
 export const metadata: Metadata = {
@@ -113,19 +120,34 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       data-scroll-behavior="smooth"
       className={`${onest.variable} ${jetbrainsMono.variable}`}
     >
+      <head>
+        {/* NO-FLASH THEME STAMP. This runs BEFORE first paint, which is the only
+            moment that matters: a stored dark choice applied from an effect
+            would paint the page white first and then swap, and a white flash on
+            a dark page is worse than no dark mode.
+
+            It reads one key and stamps one attribute. It deliberately does NOT
+            resolve the system preference — the stylesheet's
+            `@media (prefers-color-scheme: dark)` branch already handles "no
+            stored choice", so JS only has to express the OVERRIDE. That keeps
+            the no-JS render correct (system preference still wins) instead of
+            silently light.
+
+            Inline and synchronous on purpose — `defer`/`async`/`type=module`
+            would all move it after first paint and defeat it. Static-export
+            safe: no server, no runtime, just a string in the HTML. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{var t=localStorage.getItem("cc-theme");if(t==="dark"||t==="light"){document.documentElement.dataset.theme=t}}catch(e){}',
+          }}
+        />
+      </head>
       <body>
         <a href="#main-content" className="ds-skip">
           Skip to main content
         </a>
-        {/* Readout figures derive from the engine's own report via the landing
-            specimen module (server) — the nav chrome never hand-types a count. */}
-        <Nav
-          figures={{
-            findingsTotal: COVERAGE.findingsTotal,
-            errors: COVERAGE.errors,
-            warns: COVERAGE.warns,
-          }}
-        />
+        <Nav />
         <div id="main-content" tabIndex={-1}>
           {children}
         </div>

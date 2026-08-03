@@ -321,9 +321,16 @@ test("the sample pair can be DOWNLOADED, and it is the same bytes the inline but
     await slot.locator("details.wk-paste > summary").click();
     await expect(slot.locator("details.wk-paste")).toHaveAttribute("open", "");
 
+    // Centre the button first: Playwright's minimal auto-scroll can land it
+    // at the viewport top edge, under the sticky chrome, where the click
+    // retries forever while waitForEvent eats the test timeout (CI runs
+    // 30773077581 / 30775316940). scroll-padding-top now covers native
+    // scrolls; centring makes the spec independent of chrome height.
+    const dlBtn = slot.getByRole("button", { name: /download it to test uploading/ });
+    await dlBtn.evaluate((el) => el.scrollIntoView({ block: "center" }));
     const [download] = await Promise.all([
       page.waitForEvent("download"),
-      slot.getByRole("button", { name: /download it to test uploading/ }).click(),
+      dlBtn.click(),
     ]);
     expect(download.suggestedFilename()).toBe(fileName);
     const stream = await download.createReadStream();
