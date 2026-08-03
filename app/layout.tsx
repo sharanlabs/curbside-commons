@@ -129,13 +129,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div id="main-content" tabIndex={-1}>
           {children}
         </div>
-        {/* v9 takeover footer (spec §1, build piece 1 2026-07-20): Documentation ·
-            Legacy activation · GitHub. Real-product voice (owner directive
-            2026-07-20): the quiet prototype line is retired from the chrome — the
-            honesty statement lives on /docs ("What is real, and what is
-            invented"), linked here; the bright line (no false realness claims,
-            C10) is unchanged. Exactly ONE <footer> (legacy.spec asserts it); the
-            build-provenance + credit lines are kept (honest + professional). */}
+        {/* Site footer. Real-product chrome (owner directive 2026-08-02): the
+            footer carries the product's own surfaces and nothing about how the
+            product was made — the archive door and the source-repository links
+            are gone, and the credit line is plain text rather than a profile
+            link. What stays is load-bearing: the /docs honesty statement ("What
+            is real, and what is invented") must remain reachable from every page
+            (RULES §4(b), red-green in honesty-c10), the credit line, and the
+            build-provenance line. Exactly ONE <footer> on the page
+            (canonical.spec asserts it). The bright line — no false realness
+            claims, C10 — is unchanged. */}
         <footer className="site-footer">
           <div className="site-footer-in">
             <div className="site-footer-lead">
@@ -148,19 +151,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
             <nav className="site-footer-nav" aria-label="Footer">
               <Link href="/docs">Documentation</Link>
-              <Link href="/legacy/console">Legacy activation</Link>
-              <a href="https://github.com/sharanlabs/curbside-commons" rel="noopener">
-                GitHub
-              </a>
             </nav>
             <div className="site-footer-meta">
-              <span className="site-footer-credit">
-                Built and directed by{" "}
-                <a href="https://github.com/sharanlabs" rel="author">
-                  Sharan Kumar
-                </a>
-                .
-              </span>
+              <span className="site-footer-credit">Built and directed by Sharan Kumar.</span>
               {/* E1a honest build-provenance line (injected by next.config.ts). */}
               <span className="site-footer-build">{BUILD_INFO.label}.</span>
             </div>

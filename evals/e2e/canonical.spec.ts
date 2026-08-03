@@ -10,7 +10,7 @@ import { test, expect } from "@playwright/test";
  * across four numbered chapters — 01 /report · 02 /fees · 03 /playground ·
  * 04 /proof". That grammar is gone: the site is a TOOL that opens on the
  * workbench, plus named supporting destinations (Report · Fee rules ·
- * How it works · Proof) and the /docs reference and /legacy archive. A comment
+ * How it works · Proof) and the /docs reference. A comment
  * describing a structure the code no longer has is the same defect the product
  * itself exists to catch — a claim broader than the thing backing it.
  *
@@ -219,14 +219,16 @@ test("one click on the empty bench runs the bundled pair end to end", async ({ p
   );
 });
 
-test("landing footer: disclaimer-free, honest, and exactly the three chrome links", async ({
+test("landing footer: disclaimer-free, honest, and product chrome only", async ({
   page,
 }) => {
   await page.goto("/");
   const footer = page.locator("footer.site-footer");
   await expect(footer).toBeVisible();
   await expect(footer).toContainText("Sharan Kumar");
-  // Exactly one <footer> — the chrome never grows a second (legacy contract).
+  // Exactly one <footer> — the chrome never grows a second. This is the only
+  // remaining carrier of that contract (the legacy suite that also held it was
+  // deleted with the archive routes, 2026-08-02).
   await expect(page.locator("footer")).toHaveCount(1);
 
   const footerText = (await footer.innerText()).toLowerCase();
@@ -249,17 +251,21 @@ test("landing footer: disclaimer-free, honest, and exactly the three chrome link
     expect(footerText, `footer must make no false claim — found "${banned}"`).not.toContain(banned);
   }
 
-  // The footer nav is the three-link real-product chrome, no more, no less.
+  // The footer nav is ONE link: the /docs honesty statement. Owner directive
+  // 2026-08-02 retired the archive door and the source-repository link — the
+  // product stops carrying its own scaffolding. What cannot go is /docs: RULES
+  // §4(b) requires the "what is real, what is invented" statement to stay
+  // reachable from every page's footer.
   const footerNav = page.getByRole("navigation", { name: "Footer" });
-  await expect(footerNav.getByRole("link")).toHaveCount(3);
+  await expect(footerNav.getByRole("link")).toHaveCount(1);
   await expect(footerNav.getByRole("link", { name: "Documentation", exact: true })).toHaveAttribute(
     "href",
     "/docs",
   );
-  await expect(
-    footerNav.getByRole("link", { name: "Legacy activation", exact: true }),
-  ).toHaveAttribute("href", "/legacy/console");
-  await expect(footerNav.getByRole("link", { name: "GitHub", exact: true })).toBeVisible();
+
+  // No page on the site links a source repository or the retired archive.
+  await expect(footer.locator('a[href*="github.com"]')).toHaveCount(0);
+  await expect(footer.locator('a[href^="/legacy"]')).toHaveCount(0);
 });
 
 /* The landing "Break the feed yourself" TryBench test was retired 2026-07-28
@@ -330,7 +336,7 @@ test("nav = named destinations, no chapter numerals; each reachable with aria-cu
 });
 
 test("the nav readout states something true of the route you are on", async ({ page }) => {
-  test.slow(); // seven full-navigation route loads in one run (dev compile)
+  test.slow(); // six full-navigation route loads in one run (dev compile)
   // Was "CASE 001 · <FILE> · …" on every route: a case number that never
   // changes, describing somebody else's data. On the tool it now states the
   // promise a visitor most needs before dropping a file in.
@@ -341,7 +347,6 @@ test("the nav readout states something true of the route you are on", async ({ p
     ["/playground", /HOW IT WORKS · RUNS IN YOUR BROWSER/],
     ["/proof", /PROOF · EVERY SCORE, MISSES KEPT IN/],
     ["/docs", /REFERENCE · WHAT IS REAL, WHAT IS INVENTED/],
-    ["/legacy", /ARCHIVE · LEGACY MODULE/],
   ];
   for (const [path, readout] of routes) {
     await page.goto(path);
@@ -505,26 +510,74 @@ test("docs: the architecture figure, the iron rule, the MCP tool table, and the 
   await expect(statement).toContainText("No real platform feed or statement was audited.");
 });
 
-/* ======================= REDIRECT STUB POLICY ======================= */
+/* ====================== DELETED-ROUTE POLICY ====================== */
 
-test("old dashboard URLs meta-refresh to /proof; /demo to the front page; /audit to /legacy/audit", async ({
-  page,
-}) => {
-  // These stubs use an instant `<meta http-equiv="refresh" content="0;...">`,
-  // which can abort the initial `page.goto` (ERR_ABORTED) when the refresh fires
-  // before the load event — the redirect IS the expected behavior, so tolerate
-  // the aborted navigation and assert on the destination the refresh lands on.
-  for (const from of ["/eval", "/metrics", "/cost"]) {
-    await page.goto(from).catch(() => {});
-    await expect(page).toHaveURL(/\/proof/, { timeout: 10_000 });
+test("every deleted URL serves the site's 404 — no redirect rescues it", async ({ page }) => {
+  test.slow(); // one full navigation per dead route
+
+  // WHAT CHANGED AND WHY. These paths used to be meta-refresh redirect stubs
+  // pointing at /proof, the front page, and the archived activation module. The
+  // owner retired the archive and the scaffolding from the product on
+  // 2026-08-02: git history is the archive, and the site stops carrying its own
+  // build history as chrome. A redirect would have kept that history alive in
+  // the URL space, so none was added — the honest answer to "is this page part
+  // of the product?" is the 404, and this test is what keeps it honest. If a
+  // redirect is ever reintroduced for one of these, this fails.
+  //
+  // VERIFICATION STATUS AT AUTHORING. Every assertion below was validated in
+  // ARTIFACT mode by running scripts-ts/serve-artifact.mts's own resolution
+  // logic over the built out/: all eleven paths fall through to out/404.html at
+  // status 404, the server emits no 3xx (so the URL cannot move), and all six
+  // routes the not-found page offers resolve 200. DEV mode was NOT executed —
+  // the authoring environment could not bind a port — so the dev-server status
+  // code is the one unverified assumption here. If dev diverges, the divergence
+  // itself is the finding: the two configs are supposed to agree.
+  const DELETED = [
+    "/eval",
+    "/metrics",
+    "/cost",
+    "/demo",
+    "/audit",
+    "/console",
+    "/merchant/M001",
+    "/legacy",
+    "/legacy/console",
+    "/legacy/audit",
+    "/legacy/merchant/M001",
+  ];
+
+  for (const path of DELETED) {
+    const response = await page.goto(path);
+    // The URL must not move: a 404 that silently lands somewhere else is a
+    // redirect wearing a different hat.
+    expect(page.url(), `${path} navigated away — something is redirecting it`).toContain(path);
+    if (response) {
+      expect(response.status(), `${path} did not answer 404`).toBe(404);
+    }
+    await expect(
+      page.getByRole("heading", { level: 1 }),
+      `${path} did not render the site's not-found page`,
+    ).toContainText("Nothing is served at this path");
   }
-  await page.goto("/demo").catch(() => {});
+
+  // CONTROL: the same probe on a path that never existed behaves identically,
+  // so the assertions above are testing the 404 and not some deleted-route
+  // special case.
+  const control = await page.goto("/this-path-has-never-existed");
+  if (control) expect(control.status()).toBe(404);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Dinner can be ordered while you sleep.",
-    { timeout: 10_000 },
+    "Nothing is served at this path",
   );
-  await page.goto("/audit").catch(() => {});
-  await expect(page).toHaveURL(/\/legacy\/audit/, { timeout: 10_000 });
+
+  // The not-found page offers only routes that are actually served.
+  const hrefs = await page
+    .locator("main a[href^='/']")
+    .evaluateAll((els) => els.map((e) => e.getAttribute("href") ?? ""));
+  expect(hrefs.length, "the not-found page offers no routes at all").toBeGreaterThan(0);
+  for (const href of hrefs) {
+    const res = await page.request.get(href);
+    expect(res.status(), `the 404 page offers ${href}, which does not serve`).toBe(200);
+  }
 });
 
 /* =========================== NO-JS FLOORS =========================== */
@@ -667,7 +720,14 @@ test("every door's label agrees with where it actually goes", async ({ page }) =
   for (const route of ["/", "/report", "/fees", "/proof", "/playground", "/docs"]) {
     await page.goto(route);
     const main = await page.locator("main").innerText();
-    for (const retired of ["Try it live", "CONTINUE ·", "CASE 001"]) {
+    for (const retired of [
+      "Try it live",
+      "CONTINUE ·",
+      "CASE 001",
+      // Retired with the archive + scaffolding cut (owner directive 2026-08-02).
+      "Legacy activation",
+      "In plain terms:",
+    ]) {
       expect(main, `${route} still advertises the retired name "${retired}"`).not.toContain(retired);
     }
   }

@@ -132,9 +132,21 @@ describe("presentation — robots posture is deliberate and documented", () => {
     expect(ROBOTS).toMatch(/^Allow: \/$/m);
   });
 
-  it("the superseded /legacy archive is disallowed", () => {
-    // An indexed legacy page is how a stale claim outlives its correction.
-    expect(ROBOTS).toMatch(/^Disallow: \/legacy$/m);
+  it("no Disallow names a path the site no longer serves", () => {
+    // The retired route set was deleted on 2026-08-02 and now 404s. A Disallow
+    // rule for a path that does not exist is stale instruction to a crawler —
+    // and it is also the last place a deleted surface can keep advertising
+    // itself. Pin the absence so it cannot creep back with a dead route.
+    // Guard against passing vacuously on an emptied file: the posture must
+    // still be POSITIVELY stated for the absence of a Disallow to mean anything.
+    expect(ROBOTS, "robots.txt states no crawl posture at all").toMatch(/^Allow: \/$/m);
+    const disallowed = [...ROBOTS.matchAll(/^Disallow:\s*(\S+)$/gm)].map((m) => m[1]);
+    for (const dead of ["/legacy", "/eval", "/metrics", "/cost", "/demo", "/audit", "/console", "/merchant"]) {
+      expect(
+        disallowed.some((d) => d === dead || d.startsWith(`${dead}/`)),
+        `robots.txt still names the deleted route ${dead}`,
+      ).toBe(false);
+    }
   });
 
   it("the live surfaces are NOT disallowed", () => {

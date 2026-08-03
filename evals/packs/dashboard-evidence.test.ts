@@ -268,7 +268,7 @@ describe("E1a build-info — injected provenance is honest by construction", () 
 });
 
 describe("batch-C reconciliation — every RUN_RECORDS rendered value is source-bound (mutation-bitten)", () => {
-  // The /cost page renders r.value/r.label directly; a value string nothing
+  // The /proof page renders r.value/r.label directly; a value string nothing
   // re-derives is a fabrication channel (batch-C P1). Each row below binds its
   // rendered tokens to the committed artifact its own provenance names.
 

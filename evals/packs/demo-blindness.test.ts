@@ -10,10 +10,11 @@ import { selectFromSurface } from "@/lib/packs/listings/demo/actor";
  * A transitive import-graph walk from the actor module proves it can NEVER reach
  * the SOR reference resolver (reference.ts) or any SOR fixture — the blindness is
  * the whole point (an agent that could see the records would not need the
- * verifier). The SAME walk also proves the actor path is $0-LLM. A second walk
- * proves the WEB demo-render path imports no LLM/provider/network/fs-engine module
- * (it renders the COMMITTED transcript, exactly like the report page). Both walks
- * use the alias-capable resolver (adopted repo-wide, D1 fold-in advisory ii).
+ * verifier). The SAME walk also proves the actor path is $0-LLM. The walk uses
+ * the alias-capable resolver (adopted repo-wide, D1 fold-in advisory ii).
+ *
+ * A second walk once covered the /demo web render path; see the tombstone at the
+ * foot of this file for why it was retired and where its property now lives.
  */
 
 const root = process.cwd();
@@ -97,47 +98,22 @@ describe("D1 actor SOR-blindness (transitive import graph)", () => {
   });
 });
 
-describe("D1 web demo-render path is provider-free (and renders committed JSON)", () => {
-  const entry = join(root, "app", "demo", "page.tsx");
-  const reached = reachableFrom(entry);
-  const rel = [...reached].map((f) => f.replace(root, ""));
-
-  it("no module reachable from app/demo/page.tsx matches a banned pattern", () => {
-    for (const file of reached) {
-      if (file.endsWith(".json")) continue;
-      for (const spec of importsOf(file)) {
-        for (const pattern of banned) {
-          expect(pattern.test(spec), `banned import "${spec}" in ${file}`).toBe(false);
-        }
-      }
-    }
-  });
-
-  it("no reachable source performs a bare fetch()", () => {
-    for (const file of reached) {
-      if (file.endsWith(".json")) continue;
-      const text = readFileSync(file, "utf8");
-      expect(/(^|[^.\w])fetch\s*\(/.test(text), `bare fetch( reachable in ${file}`).toBe(false);
-    }
-  });
-
-  it("the web path is a redirect stub that pulls no fs-touching engine module", () => {
-    // freeze-reversal 2026-07-20: /demo was rebuilt as a static-export-safe redirect stub
-    // (it folds into / + /report), so the old "renders the COMMITTED transcript" binding is
-    // retired. The stub's actual guarantee: it imports ONLY next primitives (no engine, no
-    // fs-touching module) and its <meta refresh> points to the front page.
-    const entrySrc = readFileSync(entry, "utf8");
-    // the stub redirects to the front page
-    expect(entrySrc).toMatch(/httpEquiv="refresh"/);
-    expect(entrySrc).toMatch(/content="0;url=\/"/);
-    // it imports only next primitives — never the fs-touching engine.
-    for (const spec of importsOf(entry)) {
-      expect(spec.startsWith("next"), `demo stub imports non-next module "${spec}"`).toBe(true);
-    }
-    // ...and the whole reachable closure never pulls the engine (transcript.ts →
-    // conformance.ts → node:fs, or run.ts).
-    expect(rel.some((f) => /demo\/transcript\.ts$/.test(f))).toBe(false);
-    expect(rel.some((f) => /listings\/conformance\.ts$/.test(f))).toBe(false);
-    expect(rel.some((f) => /listings\/run\.ts$/.test(f))).toBe(false);
-  });
-});
+// ---------------------------------------------------------------------------
+// RETIRED 2026-08-02 — "D1 web demo-render path is provider-free".
+//
+// That describe walked the import graph from `app/demo/page.tsx`. The /demo
+// route was a meta-refresh redirect stub, and the stub was deleted along with
+// the rest of the retired route set (real-product voice, owner directive): git
+// history is the archive, and the URL now serves the site's 404. With no entry
+// point the walk has no root, and a rootless walk passes vacuously — which is
+// how a gate rots without anyone noticing, so it is removed rather than left
+// pointing at nothing.
+//
+// The property it guarded is not lost. Egress and provider-freedom on the
+// SERVED surfaces are walked by evals/packs/landing-delivery-egress.test.ts
+// (the landing route the /demo content folded into) and
+// evals/packs/walkthrough-zero-egress.test.ts, both of which use the shared
+// lib/import-walk walker with its own known-positive controls in
+// evals/packs/import-walk-guard.test.ts. The actor SOR-blindness walk above —
+// the D1 contract proper — is untouched and still rooted in a real module.
+// ---------------------------------------------------------------------------

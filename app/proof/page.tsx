@@ -21,7 +21,8 @@ import {
 /**
  * 04 Proof — the instrument's logbook (build piece 2, 2026-07-20; design source
  * `mockups/takeover-04-proof-2026-07-18.html`, ADOPTED SHA b028d8ee…; spec §11).
- * Replaces the /eval /metrics /cost dashboard set (each now a redirect stub).
+ * The single place the instrument's own record is published: evaluation scores,
+ * engine measurables, and the cost ledger, together.
  *
  * ANTI-FABRICATION: every figure on this page derives from
  * lib/dashboard/evidence.ts (computed from committed artifacts, or pinned with
@@ -99,8 +100,9 @@ const CAL_PLATE: CalibrationPlateData = {
   earnedLabel: CALIBRATION.earnedLabel,
 };
 
-// Crew replay console — the pinned ledger row IS the line. Display layer
-// strips the vendor parenthetical (the /cost plainLeg precedent, phase E).
+// Crew replay console — the pinned ledger row IS the line. The display layer
+// strips the vendor parenthetical: the reader is being shown a cost, not a
+// procurement decision.
 const CREW_RECORD = RUN_RECORDS[1];
 const CREW_LINE = CREW_RECORD.value.replace(/\s*\(Groq\)/gi, "");
 const CREW_FLAG = L1.allSafetyPass && L1.allClassMatch && L1.degraded === 0 ? "CLEAN" : "CHECK";
@@ -457,7 +459,7 @@ export default function ProofPage() {
             <span>The one recorded AI-drafting spend, frozen</span>
             <span>
               <b>{RECORDED_LEGACY_GEMINI.totalUsd}</b> drafted · <b>{RECORDED_LEGACY_GEMINI.cap}</b>{" "}
-              hard cap · {RECORDED_LEGACY_GEMINI.provenance.date} · legacy record · no re-spend
+              hard cap · {RECORDED_LEGACY_GEMINI.provenance.date} · no re-spend
             </span>
           </p>
         </Reveal>

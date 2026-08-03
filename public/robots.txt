@@ -7,11 +7,13 @@
 # /docs "what is real" page, and the social card all state
 # prototype-on-simulated-data on their face.
 #
-# /legacy is disallowed because it is superseded material kept for provenance.
-# An indexed legacy page is how a stale claim outlives the correction that
-# replaced it — a search result has no way to know it is reading the archive.
-# It stays reachable for a reader who follows a link; it is not a surface for a
-# crawler that arrives cold.
+# Nothing is disallowed, because nothing superseded is served any more. The
+# archived first-generation module was removed from the site on 2026-08-02 and
+# its URLs now return the site's 404; a Disallow rule naming a path that does
+# not exist is stale instruction, and stale instruction is how a crawler is
+# taught something untrue about a site. If superseded material is ever served
+# again, it gets a Disallow line again — an indexed stale page is how a claim
+# outlives the correction that replaced it.
 #
 # No Sitemap: line — no sitemap route exists, and naming one that 404s is worse
 # than naming none (a crawler reads the dangling reference as a site defect).
@@ -22,5 +24,3 @@
 
 User-agent: *
 Allow: /
-Disallow: /legacy
-Disallow: /legacy/

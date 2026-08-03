@@ -5,25 +5,14 @@ import AxeBuilder from "@axe-core/playwright";
  * RV1 (owner review pick 2026-07-11): automated accessibility layer joining the
  * dual e2e contracts — runs in BOTH modes (dev + artifact) like every contract.
  * axe-core runs fully in-page (no network). Bar: zero WCAG 2.0/2.1 A+AA
- * violations across the canonical v9 surfaces + the legacy module. This
+ * violations across every served surface. This
  * complements — never replaces — the hand-written checks (keyboard toggles,
  * reduced-motion, contrast recomputes).
  */
 
-// v9 takeover surface list (consolidated e2e rewrite, 2026-07-20): the four
-// chapters + /docs + the /legacy archive landing + the legacy console. The
-// retired /eval /metrics /cost /demo dashboards are now redirect stubs and drop
-// off the zero-violation bar.
-const SURFACES = [
-  "/",
-  "/report",
-  "/fees",
-  "/playground",
-  "/proof",
-  "/docs",
-  "/legacy",
-  "/legacy/console",
-] as const;
+// The product's whole surface: the four chapters plus the /docs reference. This
+// list is the site — if a route is added, it joins the zero-violation bar here.
+const SURFACES = ["/", "/report", "/fees", "/playground", "/proof", "/docs"] as const;
 
 for (const path of SURFACES) {
   test(`axe: ${path} has zero WCAG A/AA violations`, async ({ page }) => {

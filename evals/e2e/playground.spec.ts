@@ -15,7 +15,7 @@ test("the how-it-works head states the deterministic, zero-cost, offline posture
 }) => {
   await page.goto("/playground");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("The engine");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("shown on a sample");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("shown on a pinned feed");
   const chips = page.locator(".p2-chips");
   // "NO NETWORK REQUESTS" until 2026-07-28 — a claim measured FALSE against the
   // built export (the page prefetches its own routes; off-origin count is 0, so

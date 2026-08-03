@@ -44,10 +44,14 @@ function demoSources(): string[] {
 }
 
 // de-slop 2026-07-20: DemoView.tsx deleted (route-orphaned since the /demo stub;
-// liveness-proven — no route import). The stub page stays in the scan.
+// liveness-proven — no route import).
+// 2026-08-02: the /demo redirect stub itself was deleted with the rest of the
+// retired route set, so `app/demo/page.tsx` leaves this list — there is no page
+// left to scan. The demo ENGINE sources and the committed transcript goldens
+// stay in the gate: the CLI still emits them, so a viewer-facing string still
+// exists to police. No glob replaces the removed entry.
 const demoScanned = [
   ...demoSources(),
-  join(root, "app", "demo", "page.tsx"),
   join(root, "fixtures", "synthetic-restaurant", "expected-demo.txt"),
   join(root, "fixtures", "synthetic-restaurant", "expected-demo.json"),
 ];
@@ -90,9 +94,10 @@ const siteShell = [
   join(root, "components", "playground", "FileDrop.tsx"),
   join(root, "components", "playground", "verify-in-browser.ts"),
   join(root, "components", "playground", "TryLiveBench.tsx"),
-  // /legacy archive landing (build piece 2, 2026-07-20): the front door to the
-  // archived first-generation module — a viewer-facing prose surface.
-  join(root, "app", "legacy", "page.tsx"),
+  // (The /legacy archive landing was in this list until 2026-08-02, when the
+  // archived module's routes were deleted from the product — git history is the
+  // archive now. Its entry is removed rather than globbed; every remaining
+  // viewer-facing prose surface is still named explicitly below.)
   // Fee surface (NYC showcase N1+N2, 2026-07-16): the /fees page + its view,
   // paste client, data module, and browser seam — same gates.
   join(root, "app", "fees", "page.tsx"),
@@ -188,8 +193,8 @@ describe("C10 platform-claims grep-gate (no real-platform-access claims)", () =>
 
 // ---------------------------------------------------------------------------
 // SITE-WIDE (F-07): the fixed source allowlist above cannot cover every rendered
-// surface (the new landing components, /cost, /eval, /metrics, /legacy/**, the
-// redirect stubs, 404 …). The AUTHORITATIVE site-wide gate scans the NORMALIZED
+// surface (a page composed from components that are not themselves listed, the
+// 404 …). The AUTHORITATIVE site-wide gate scans the NORMALIZED
 // VISIBLE TEXT of every built out/**/*.html — a false claim on ANY route is
 // caught, and a claim split across JSX elements/lines (which a raw-source regex
 // misses, F-08) is rejoined by tag-stripping before the scan. Rendered HTML has
@@ -402,11 +407,21 @@ describe("footer is disclaimer-free + honest (app/layout.tsx, freeze-reversal 20
   });
 
   // HONEST CONTENT that MUST be present.
-  it("the footer carries the author/credit line to the maintainer's profile", () => {
+  // The credit line is PLAIN TEXT as of 2026-08-02: the profile link went with
+  // the rest of the source-repository chrome (real-product voice, owner
+  // directive). The pin moves to the credit ITSELF, which is the honest content
+  // this test exists to protect — a page that names who is responsible for it.
+  // The false-claims teeth below (BANNED_CLAIMS + the planted-claim probe) are
+  // untouched.
+  it("the footer carries the author/credit line", () => {
     expect(/Built and directed by\s+Sharan Kumar/.test(normalized), "author credit missing").toBe(
       true,
     );
-    expect(/github\.com\/sharanlabs/.test(footerRaw), "author profile link missing").toBe(true);
+  });
+
+  it("the footer carries no source-repository or archive chrome", () => {
+    expect(/github\.com/i.test(footerRaw), "footer still links a source repository").toBe(false);
+    expect(/\/legacy/.test(footerRaw), "footer still links the retired archive").toBe(false);
   });
 
   it("the footer carries the honest build-provenance line", () => {

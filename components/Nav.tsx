@@ -63,16 +63,8 @@ function readoutFor(pathname: string, f: NavReadoutFigures): Readout {
   if (pathname.startsWith("/playground")) {
     return { lamp: "graphite", parts: [{ b: "HOW IT WORKS" }, " · RUNS IN YOUR BROWSER"] };
   }
-  if (
-    pathname.startsWith("/proof") ||
-    pathname.startsWith("/eval") ||
-    pathname.startsWith("/metrics") ||
-    pathname.startsWith("/cost")
-  ) {
+  if (pathname.startsWith("/proof")) {
     return { lamp: "graphite", parts: [{ b: "PROOF" }, " · EVERY SCORE, MISSES KEPT IN"] };
-  }
-  if (pathname.startsWith("/legacy")) {
-    return { lamp: "graphite", parts: [{ b: "ARCHIVE" }, " · LEGACY MODULE"] };
   }
   if (pathname.startsWith("/docs")) {
     return { lamp: "graphite", parts: [{ b: "REFERENCE" }, " · WHAT IS REAL, WHAT IS INVENTED"] };

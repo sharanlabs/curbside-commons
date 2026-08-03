@@ -33,13 +33,13 @@ export default function NotFound() {
           </Link>
         </li>
         <li>
-          <Link href="/eval" className="ds-mlink">
-            The evidence dashboard
+          <Link href="/proof" className="ds-mlink">
+            The proof log — every score, misses kept in
           </Link>
         </li>
         <li>
-          <Link href="/legacy/console" className="ds-mlink">
-            The legacy activation module
+          <Link href="/docs" className="ds-mlink">
+            The reference — what is real, and what is invented
           </Link>
         </li>
       </ul>

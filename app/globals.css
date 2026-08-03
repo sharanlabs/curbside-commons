@@ -54,8 +54,8 @@
   --rule: rgba(18, 20, 28, 0.09);
   --rule-2: rgba(18, 20, 28, 0.15);
   --rule-3: rgba(18, 20, 28, 0.24);
-  --line: rgba(18, 20, 28, 0.12); /* generic hairline (.legacy-subnav / .lp-catch
-                                     consumed this undefined → currentColor before) */
+  --line: rgba(18, 20, 28, 0.12); /* generic hairline (.lp-catch consumed this
+                                     undefined → currentColor before) */
 
   /* THE brand primary — ULTRAMARINE (v8 design adoption, decision-log 2026-07-16:
      the owner's chosen "Curbside Commons Hero v8" palette; one interactive accent
@@ -3302,23 +3302,15 @@ body {
 .ds-prov .ds-mono {
   font-size: 11px;
 }
-/* /legacy/** route-group provenance banner (a div, never a footer). */
-.legacy-banner {
-  margin-top: 18px;
-  margin-bottom: -6px;
-}
+/* (.legacy-banner removed 2026-08-02 with the /legacy route group it styled —
+   the archive is git history now, and a rule with no element left to style is
+   weight every page still downloads.) */
 
 /* (the TruthCatch panel styles were removed — superseded by the Evidence Bench,
    whose styles live in the Correspondence landing block at the end of this file) */
 
-/* === RV1 (append-only): legacy sub-nav strip === */
-.legacy-subnav {
-  display: flex;
-  gap: 4px;
-  margin-top: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--line);
-}
+/* (.legacy-subnav removed 2026-08-02 with the /legacy route group — same
+   reason as .legacy-banner above.) */
 
 /* ============================================================
    PLAYGROUND LAYER (owner commission 2026-07-13) — the in-browser
@@ -6567,8 +6559,7 @@ h1.p2-h1 {
    one step larger · meaningfully heavier (Onest/JetBrains Mono are variable
    100–900) · tracking pulled IN as weight goes up · ink lifted one tier ·
    chips filled, not hairline-outlined. Scope: the LIVE new-design chrome (nav,
-   footer, v9 layer, report armature). Legacy/archive surfaces keep their
-   frozen register. New pages (piece 2+) author these values natively.
+   footer, v9 layer, report armature). New pages author these values natively.
    ========================================================================== */
 
 /* --- nav chrome (sample-B exact, owner polish word 2026-07-20) --- */
@@ -9768,7 +9759,9 @@ body,
   color: var(--muted);
   margin-left: auto;
 }
-.wk-real a { color: var(--graphite); }
+/* Underlined, not color-only — axe link-in-text-block (CI run 30773077581):
+   a link distinguishable only by hue fails WCAG 1.4.1 inside body text. */
+.wk-real a { color: var(--graphite); text-decoration: underline; text-underline-offset: 3px; }
 
 .wk-receipts { display: grid; grid-template-columns: 1fr 1fr; }
 .wk-receipt {

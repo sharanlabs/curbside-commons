@@ -110,3 +110,27 @@ unrendered — first network-capable run must execute the battery before the nex
 change. RULES §4 carriers intact: C10 patterns 0 hits over new surfaces with a biting
 control; /docs statement + footer link untouched; a new zero-egress tooth walks the
 delivery components' import graph (22 modules), red-green proven by two mutations.
+
+## 2026-08-02 — Real-product register, sitewide (owner word; RULES §4 register-change row)
+Owner, verbatim intent across three mid-turn directives: "make it real product dont have
+github link and content in legacy activation … this applies to whole website as well."
+Applied: the GitHub links left the footer (credit is plain text); the Legacy activation
+module left the product — app/legacy plus the seven tombstone/legacy routes (audit,
+console, cost, demo, eval, metrics, merchant) deleted, 404 the honest answer, no
+redirects; every "In plain terms:" and "Moved to…" caption swept; robots.txt no longer
+names dead paths. RULES §4 carriers verified, not assumed: the /docs "what is real"
+statement + footer link survive on all 8 remaining pages (exactly one footer each), all
+8 BANNED_PROBES planted-claim controls bite, the rendered C10 scan ran against the fresh
+export. Test pins moved with the cut (footer contract, 404 sweep with a never-existed
+control, retired-name sweep gains "Legacy activation" and "In plain terms:"); legacy-only
+specs deleted; one vacuous-if-kept suite replaced with a tombstone naming where the
+property still lives. Suite: 1604 + 8, 0 failed. Built by an Opus subagent, reviewed and
+re-gated by the session seat (dual-model; sol unreachable from the sandbox, raw 000s on
+record). ALSO: the offline build route discovered and made durable
+(scripts/build-offline.mjs — next/font mock hook + webpack pipeline + real font bytes
+from the repo's own v8 mockup), which is what let the rendered honesty gate run in-seat
+for the first time. CI QA loop closed: run 30773077581's four e2e reds diagnosed — two
+real a11y defects in the new landing (color-only link, unfocusable scroll regions), both
+fixed; two stale pins (playground H1, folded-evidence visibility), both moved; the
+download red did not reproduce in-seat against the same bytes — a loud precondition
+assertion added so any recurrence fails at the true line.

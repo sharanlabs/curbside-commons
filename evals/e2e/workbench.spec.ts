@@ -165,7 +165,10 @@ test("edits move the receipts — input-sensitivity evidence of live computation
   await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
   await expect(result.locator(".wk-verdict-word")).toHaveText("FAIL");
   // The planted value is echoed back by the evidence — receipts or the full
-  // list, whichever holds it; what matters is that the run READ it.
+  // list, whichever holds it; what matters is that the run READ it. The full
+  // list is a fold (CI run 30773077581: present-but-hidden fails toBeVisible),
+  // so open it — the tooth is the echo, not the fold's default state.
+  await result.locator("details.wk-all > summary").click();
   await expect(result.getByText(/8642\.31/).first()).toBeVisible();
 
   // Edit 2: drop all rows but the first — the completeness sweep catches it.
@@ -179,6 +182,7 @@ test("edits move the receipts — input-sensitivity evidence of live computation
   await expect(result.locator(".wk-verdict-word")).toHaveText("FAIL");
   // Dropping rows DOES change the tally — the golden's 16 findings must be gone.
   await expect(result.locator(".wk-all-list > li")).not.toHaveCount(16);
+  await result.locator("details.wk-all > summary").click();
   await expect(result.getByText(/missing from the feed/).first()).toBeVisible();
 });
 
@@ -310,8 +314,12 @@ test("the sample pair can be DOWNLOADED, and it is the same bytes the inline but
     ["The record", "bundled-catalog.json"],
   ] as const) {
     const slot = page.locator(".wk-zone", { hasText: label });
-    // The download shares one disclosure with the paste box; open it first.
+    // The download shares one disclosure with the paste box; open it first —
+    // and ASSERT it opened (CI run 30773077581 timed out downstream of here
+    // with a cause this seat could not reproduce; if it recurs, fail loudly at
+    // the true line, not at waitForEvent).
     await slot.locator("details.wk-paste > summary").click();
+    await expect(slot.locator("details.wk-paste")).toHaveAttribute("open", "");
 
     const [download] = await Promise.all([
       page.waitForEvent("download"),

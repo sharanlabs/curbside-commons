@@ -74,7 +74,7 @@ export function catalogSampleText(): string {
 }
 
 /**
- * Display-layer copy cleanup for rendered finding text (matches /report + /demo).
+ * Display-layer copy cleanup for rendered finding text (matches /report).
  * The illustrative feed's ghost item carries a lab-label inside its own title —
  * a genuine claim value the frozen golden quotes verbatim — so rendered receipts
  * reword it to the site's plain example voice. Serialization (the golden test) is

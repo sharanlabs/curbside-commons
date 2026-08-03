@@ -67,7 +67,7 @@ export function DeliverySection({
           <span>Slack message · Block Kit payload</span>
           <span className="wk-stamp">Built, not sent</span>
         </div>
-        <div className="wk-art-body">
+        <div className="wk-art-body" tabIndex={0} role="region" aria-label="Slack message payload">
           {artifacts.slack.map((row, i) => {
             switch (row.kind) {
               case "banner":
@@ -124,7 +124,7 @@ export function DeliverySection({
           <span>Email · RFC 5322 message</span>
           <span className="wk-stamp">Built, not sent</span>
         </div>
-        <div className="wk-art-body">
+        <div className="wk-art-body" tabIndex={0} role="region" aria-label="Email message">
           <div className="wk-em-heads">
             <span className="wk-h">From:</span> {artifacts.email.from}
             <br />
