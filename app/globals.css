@@ -6,7 +6,7 @@
    rigor, bespoke look). Supersedes the retired single-accent "Oxblood" S1 layer.
 
    RETHEME-IN-PLACE: every :root token NAME is preserved (layout.tsx, Nav, and the
-   per-surface .ds-* / .cp-* / .lp-* / .rpt-* blocks consume them by name and re-skin in
+   per-surface .ds-* / .lp-* / .wk-* blocks consume them by name and re-skin in
    place) — only the VALUES change, plus additive new tokens. The new system:
    • GROUND: pure white #FFFFFF (was off-white #FBFBFD), near-white panels.
    • INK RAMP verified on #fff (ratios in the token comments; standard WCAG sRGB).
@@ -23,13 +23,11 @@
    → --font-mono (kept over the storyboard's system-mono stack for cross-OS
    consistency; recorded adaptation).
 
-   IN LOCKSTEP (insulated from :root, kept value-synced by design): the `.rpt-wrap`
-   report/demo Ledger block (~line 1522) redeclares its OWN --paper/--ink/--body/
-   --graphite/--hairline/--um/--sev-* / --serif/--ledger-* — updated to the same new
-   values below. HONESTY FREEZE-REVERSAL (redesign Slice D, decision-log 2026-07-14):
-   the footer disclosure paragraph and the .rpt-sim SIMULATED banner were REMOVED —
-   the public site is disclaimer-free (adds no false claim; C10 BANNED_CLAIMS stays
-   green). print-color-adjust: exact now rides the verdict flag + severity marks.
+   (The `.rpt-wrap` report/demo Ledger block that kept its own token mirror in
+   lockstep with this section was REMOVED in the R-3 dead-CSS purge, 2026-08-02 —
+   nothing had mounted it since the /report rewrite. Its HONESTY FREEZE-REVERSAL
+   history — the .rpt-sim SIMULATED banner removal, decision-log 2026-07-14 —
+   stands in the record; C10 BANNED_CLAIMS is the enforcement, not page chrome.)
    ========================================================================== */
 
 :root {
@@ -84,9 +82,12 @@
 
   --on-accent: #ffffff; /* text ON an accent/lamp FILL — white in BOTH schemes,
                            because the fill under it is dark in both */
-  --on-ink: #ffffff; /* text ON an --ink FILL (.ds-btn.primary, .ds-cta). NOT the
-                        same role as --on-accent: --ink INVERTS between schemes,
-                        so its text has to invert with it or the pill goes blank. */
+  --on-ink: #ffffff; /* text ON an --ink FILL. NOT the same role as --on-accent:
+                        --ink INVERTS between schemes, so its text has to invert
+                        with it or the pill goes blank. (No consumer since the
+                        legacy .ds-btn/.ds-cta left, R-3 2026-08-02 — kept as
+                        --ink's role pair so any future ink fill follows the
+                        scheme; the dark parity test pins both declarations.) */
   --ink-hi: #000000; /* one step past --ink — the ink-pill hover */
 
   /* THE brand primary — ULTRAMARINE (v8 design adoption, decision-log 2026-07-16:
@@ -111,6 +112,13 @@
   --s9: 88px;
   --s10: 120px;
   --maxw: 1180px;
+
+  /* sticky chrome — the nav bar and the process strip stack; every consumer
+     (nav min-height, strip offset, section scroll-margins) derives from these
+     two so a height change moves the whole stack together (was four hardcoded
+     copies — DESIGN.md open item 10, closed 2026-08-02). */
+  --nav-h: 68px;
+  --strip-h: 34px;
 
   /* type — font stacks resolve to the self-hosted next/font CSS vars (layout.tsx:
      Onest → --font-sans, JetBrains Mono → --font-mono), each with cross-OS
@@ -321,7 +329,7 @@ body {
   flex-wrap: nowrap; /* desktop: one row. <900px wraps the collapsed menu below. */
   align-items: center;
   gap: 4px;
-  min-height: 68px;
+  min-height: var(--nav-h);
   padding: 10px clamp(18px, 4vw, 36px);
 }
 /* Storyboard brand lockup (adoption 2026-07-15): gradient C-mark + Onest
@@ -354,26 +362,6 @@ body {
   .site-navlink {
     padding: 9px 10px;
     font-size: 12.5px;
-  }
-}
-/* v8 brand lockup: hairline divider + mono "PROOF LAYER" tag beside the word. */
-.site-brand-divider {
-  width: 1px;
-  height: 15px;
-  background: var(--edge-3);
-  margin: 0 2px;
-}
-.site-brand-tag {
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.24em;
-  color: var(--faint);
-}
-@media (max-width: 1100px) {
-  .site-brand-divider,
-  .site-brand-tag {
-    display: none; /* keep the widened nav on one row below full desktop */
   }
 }
 .site-navlink {
@@ -453,11 +441,6 @@ body {
   display: flex;
   gap: 4px;
   align-items: center;
-}
-/* Route-change re-entry for the readout (keyed by pathname in Nav.tsx) —
-   motion-safe only; reduced motion renders the new text with no travel. */
-@media (prefers-reduced-motion: no-preference) {
-  
 }
 @media (max-width: 1000px) {
   .theme-toggle {
@@ -621,13 +604,6 @@ body {
   line-height: 1.6;
   color: var(--muted);
 }
-.site-footer-quiet {
-  /* The ONE quiet honesty line (spec §5; v9 canonical wording) — full-width
-     lead row of the meta band, calm and unbannered. */
-  flex-basis: 100%;
-  margin: 0;
-  color: var(--muted);
-}
 .site-footer-credit a {
   color: var(--graphite);
   text-decoration: underline;
@@ -664,75 +640,6 @@ body {
   }
 }
 
-/* ----- type primitives ------------------------------------------------------ */
-
-.ds-mono {
-  font-family: var(--ff-mono);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-}
-.ds-num {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-}
-
-.ds-h1,
-.ds-h2,
-.ds-h3,
-.ds-h4 {
-  color: var(--ink);
-  margin: 0;
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -0.025em;
-  text-wrap: balance;
-}
-.ds-h2 {
-  letter-spacing: -0.028em;
-}
-.ds-h3 {
-  font-weight: 600;
-  letter-spacing: -0.018em;
-}
-.ds-h4 {
-  font-weight: 600;
-  letter-spacing: -0.012em;
-}
-
-.ds-h2big {
-  font-size: clamp(28px, 4vw, 42px);
-  margin-top: 18px;
-}
-
-.ds-lede {
-  font-size: 20px;
-  line-height: 1.5;
-  color: var(--body);
-  max-width: 62ch;
-  letter-spacing: -0.01em;
-}
-.ds-lede em {
-  font-style: normal;
-  color: var(--ink);
-  font-weight: 600;
-}
-
-/* sentence-case mono eyebrow — NOT all-caps (anti-slop) */
-.ds-eyebrow {
-  font-family: var(--ff-mono);
-  font-size: 12.5px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  color: var(--graphite);
-  display: inline-flex;
-  align-items: baseline;
-  gap: 10px;
-}
-.ds-eyebrow .idx {
-  color: var(--signal-text);
-  font-weight: 600;
-}
-
 /* ----- layout rhythm -------------------------------------------------------- */
 
 .ds-wrap {
@@ -744,177 +651,6 @@ body {
   .ds-wrap {
     padding: 0 20px;
   }
-}
-
-.ds-section {
-  padding: var(--s9) 0;
-  border-top: 1px solid var(--rule);
-}
-@media (max-width: 720px) {
-  .ds-section {
-    padding: 64px 0;
-  }
-}
-
-/* ----- THE SIGNATURE PRIMITIVE: hairline-ruled ledger row ------------------- */
-/* field · value · verdict — one container, three roles. Re-used across surfaces. */
-.ds-lrow {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: baseline;
-  column-gap: 16px;
-  padding: 12px 16px;
-  border-top: 1px solid var(--rule);
-  transition: background 0.4s ease;
-}
-.ds-lrow:first-of-type {
-  border-top: none;
-}
-.ds-lrow .lk {
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  color: var(--graphite);
-  letter-spacing: -0.002em;
-  grid-column: 1;
-  min-width: 0;
-}
-.ds-lrow .lv {
-  font-family: var(--ff-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 13px;
-  color: var(--ink);
-  font-weight: 500;
-  grid-column: 2;
-  text-align: right;
-  white-space: nowrap;
-}
-/* absent field — the only red on the record: the data that ISN'T there */
-.ds-lrow.absent .lv {
-  color: var(--signal-text);
-  font-weight: 500;
-}
-/* the cited field gets a gutter mark + tint — NOT a colored left-stripe */
-.ds-lrow.cited {
-  background: var(--bg-2);
-  grid-template-columns: auto 1fr auto;
-  column-gap: 12px;
-}
-.ds-lrow.cited .gut {
-  display: block;
-  grid-column: 1;
-  align-self: center;
-  width: 9px;
-  height: 9px;
-  position: relative;
-}
-.ds-lrow.cited .gut::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  border: 1.5px solid var(--ink);
-}
-.ds-lrow.cited .lk {
-  grid-column: 2;
-  color: var(--ink);
-}
-.ds-lrow.cited .lv {
-  grid-column: 3;
-}
-.ds-lrow .gut {
-  display: none;
-}
-
-/* ----- elevation: tinted, restrained (no glow) ------------------------------ */
-.ds-panel {
-  border: 1px solid var(--rule-3);
-  background: var(--surface);
-  border-radius: 6px;
-  overflow: hidden;
-  box-shadow:
-    0 1px 2px rgba(var(--shadow-rgb), 0.03),
-    0 12px 28px -18px rgba(var(--shadow-rgb), 0.1);
-}
-.ds-panel-strong {
-  box-shadow:
-    0 1px 2px rgba(var(--shadow-rgb), 0.03),
-    0 16px 36px -22px rgba(var(--shadow-rgb), 0.1);
-}
-
-/* ----- buttons -------------------------------------------------------------- */
-.ds-btn {
-  font: inherit;
-  font-size: 13.5px;
-  font-weight: 600;
-  letter-spacing: -0.008em;
-  cursor: pointer;
-  padding: 9px 15px;
-  border-radius: 7px;
-  border: 1px solid var(--rule-3);
-  background: var(--surface);
-  color: var(--ink-2);
-  min-height: 36px;
-  transition:
-    transform 0.12s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
-}
-.ds-btn:hover {
-  border-color: var(--graphite);
-}
-.ds-btn:active {
-  transform: translateY(1px);
-}
-.ds-btn[disabled] {
-  cursor: default;
-  opacity: 0.85;
-}
-.ds-btn.primary {
-  background: var(--ink);
-  color: var(--on-ink);
-  border-color: var(--ink);
-}
-.ds-btn.primary:hover {
-  background: var(--ink-hi);
-}
-.ds-btn.hold {
-  color: var(--signal-text);
-  border-color: var(--signal-rule);
-  background: var(--signal-tint);
-}
-.ds-btn.hold:hover {
-  border-color: var(--signal);
-}
-
-/* primary CTA link — solid ink pill */
-.ds-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--ink);
-  color: var(--on-ink);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 15px;
-  padding: 13px 20px;
-  border-radius: 7px;
-  min-height: 44px;
-  transition:
-    transform 0.15s ease,
-    background 0.15s ease;
-}
-.ds-cta:hover {
-  transform: translateY(-1px);
-  background: var(--ink-hi);
-}
-.ds-cta:active {
-  transform: translateY(0);
-}
-.ds-cta svg {
-  transition: transform 0.2s ease;
-}
-.ds-cta:hover svg {
-  transform: translateX(3px);
 }
 
 /* ----- focus + skip link + reduced motion ----------------------------------- */
@@ -982,241 +718,12 @@ body {
   transition-delay: 0.44s;
 }
 
-/* ----- the CatchPanel centerpiece (cp-*) ------------------------------------ */
-/* SSR renders settled (.cp-settled or .cp-on). Animation only via .cp class
-   without .cp-on (un-resolved), resolved by .cp-on or .cp-settled. */
-.cp-cap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 13px 16px;
-  border-bottom: 1px solid var(--rule-2);
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.005em;
-  color: var(--graphite);
-  background: var(--bg-2);
-}
-.cp-cap-right {
-  color: var(--signal-text);
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-.cp-tick {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--signal);
-  flex: none;
-}
-
-.cp-record {
-  padding: 13px 16px;
-  background: var(--bg-2);
-  border-bottom: 1px solid var(--rule);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: baseline;
-}
-.cp-rlbl {
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  color: var(--graphite);
-  letter-spacing: 0.005em;
-  width: 100%;
-  margin-bottom: 4px;
-}
-/* record fields as hairline chips (Oxblood v2 catch — matches the mockup .rf .f) */
-.cp-rf {
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  color: var(--ink);
-  white-space: nowrap;
-  background: var(--bg);
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  padding: 3px 8px;
-}
-.cp-rf .cp-rk {
-  color: var(--graphite);
-}
-.cp-rf.absent .cp-rv {
-  color: var(--signal-text);
-}
-.cp-rf .cp-rv {
-  font-variant-numeric: tabular-nums;
-}
-
-.cp-draft {
-  padding: 0;
-}
-.cp-claim {
-  padding: 16px 16px;
-  border-top: 1px solid var(--rule);
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.5s ease,
-    transform 0.5s ease,
-    background 0.45s ease;
-}
-.cp-claim:first-child {
-  border-top: none;
-}
-.cp-claim.fail {
-  background: var(--signal-tint);
-}
-.cp-ctext {
-  font-size: 15.5px;
-  line-height: 1.45;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-}
-.cp-verdict {
-  margin-top: 11px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.005em;
-  opacity: 1;
-  transition: opacity 0.35s ease;
-}
-.cp-vcell {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-  padding: 3px 0;
-}
-.cp-vcell.pass {
-  color: var(--ink);
-}
-.cp-vcell.fail {
-  color: var(--signal-text);
-}
-.cp-glyph {
-  width: 15px;
-  height: 15px;
-  flex: none;
-  transform: scale(1);
-  opacity: 1;
-  transition:
-    transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 0.3s ease;
-}
-.cp-cite {
-  color: var(--muted);
-}
-
-.cp-held {
-  padding: 16px 16px;
-  border-top: 1px solid var(--signal-rule);
-  background: var(--signal-tint);
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.5s ease,
-    transform 0.5s ease;
-}
-.cp-held-lbl {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--signal-text);
-  letter-spacing: -0.01em;
-}
-.cp-held .ds-mono {
-  font-size: 11.5px;
-  color: var(--signal-text);
-}
-
-.cp-decide {
-  padding: 14px 16px;
-  border-top: 1px solid var(--rule-2);
-  background: var(--bg-2);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  opacity: 1;
-  transition: opacity 0.5s ease;
-}
-.cp-dnote {
-  font-size: 11px;
-  color: var(--muted);
-  margin-right: auto;
-}
-
-/* Animated (motion-on) state: start un-resolved, resolve in a stagger when .cp-on lands.
-   .cp-settled is the SSR/reduced-motion path and never enters this branch. */
-.cp:not(.cp-settled):not(.cp-on) .cp-claim {
-  opacity: 0;
-  transform: translateY(7px);
-}
-.cp:not(.cp-settled):not(.cp-on) .cp-claim .cp-verdict {
-  opacity: 0;
-}
-.cp:not(.cp-settled):not(.cp-on) .cp-glyph {
-  transform: scale(0.4);
-  opacity: 0;
-}
-.cp:not(.cp-settled):not(.cp-on) .cp-held,
-.cp:not(.cp-settled):not(.cp-on) .cp-decide {
-  opacity: 0;
-}
-.cp:not(.cp-settled):not(.cp-on) .cp-held {
-  transform: translateY(6px);
-}
-
-.cp.cp-on .cp-claim:nth-of-type(1) {
-  transition-delay: 0.05s;
-}
-.cp.cp-on .cp-claim:nth-of-type(2) {
-  transition-delay: 0.55s;
-}
-.cp.cp-on .cp-claim:nth-of-type(3) {
-  transition-delay: 1.1s;
-}
-.cp.cp-on .cp-claim:nth-of-type(1) .cp-verdict {
-  transition-delay: 0.48s;
-}
-.cp.cp-on .cp-claim:nth-of-type(2) .cp-verdict {
-  transition-delay: 1s;
-}
-.cp.cp-on .cp-claim:nth-of-type(3) .cp-verdict {
-  transition-delay: 1.7s;
-}
-.cp.cp-on .cp-held {
-  transition-delay: 2.2s;
-}
-.cp.cp-on .cp-decide {
-  transition-delay: 2.5s;
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .ds-reveal,
   .ds-stagger > * {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
-  .cp .cp-claim,
-  .cp .cp-verdict,
-  .cp .cp-held,
-  .cp .cp-decide,
-  .cp .cp-glyph {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
@@ -1244,21 +751,6 @@ body {
   color: var(--ink);
   margin: 0;
   text-wrap: balance;
-}
-
-/* ----- shared landing atoms ------------------------------------------------- */
-.lp-ic {
-  width: 1.05em;
-  height: 1.05em;
-  flex: none;
-  vertical-align: -2px;
-}
-.lp-si {
-  display: block;
-  width: 26px;
-  height: 26px;
-  color: var(--accent);
-  margin-bottom: 12px;
 }
 .lp-eyebrow {
   /* v9 register (takeover build 2026-07-20, N1 pack): muted ink + the rotated
@@ -1290,43 +782,20 @@ body {
      section heading that shouts as loud as the headline flattens the hierarchy
      and eats the vertical room the tool now needs above the fold. */
   font-size: clamp(25px, 2.5vw, 35px);
-  font-weight: 545;
+  font-weight: 545; /* superseded by the weight pass: h2.lp-h2 = 660 wins on specificity */
   line-height: 1.07;
-  letter-spacing: -0.038em;
+  /* No letter-spacing here ON PURPOSE (open item 6, closed 2026-08-02): a value
+     on this bare-class selector loses to `.lp-main h2` (0,1,1) and never
+     renders — the old -0.038em sat here dead while the headings actually drew
+     the generic -0.012em. The considered value (-0.028em, the landing display
+     voice) is set in the tracking block near the weight pass, where it wins. */
   max-width: 18ch;
   text-wrap: balance;
 }
-.lp-h3 {
-  font-size: 18px;
-  line-height: 1.25;
-}
-.lp-h4 {
-  font-size: 15px;
-  line-height: 1.3;
-}
-.lp-lede {
-  margin: 16px 0 0;
-  font-size: clamp(15.5px, 1.7vw, 17px);
-  line-height: 1.55;
-  color: var(--body);
-  max-width: 56ch;
-  text-wrap: pretty;
-}
-.lp-lede-wide {
-  max-width: 64ch;
-}
-.lp-lede em,
-.lp-foot em,
-.lp-ptext em {
+.lp-foot em {
   font-style: normal;
   font-weight: 600;
   color: var(--ink);
-}
-.lp-ptext {
-  margin: 8px 0 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--body);
 }
 .lp-foot {
   margin: 20px 0 0;
@@ -1338,16 +807,9 @@ body {
      ledes already do; footnote-tier prose was the gap. */
   text-wrap: pretty;
 }
-.lp-ptext,
 .file .d,
-.trust .fact .d,
-.fd-hint,
-.wb-run-note {
+.trust .fact .d {
   text-wrap: pretty;
-}
-.lp-mark {
-  color: var(--signal-text);
-  white-space: nowrap;
 }
 
 /* ----- buttons (wine primary — the ONE accent doing the primary action) ----- */
@@ -1360,11 +822,6 @@ body {
 }
 .lp-cta-close {
   margin-top: 24px;
-}
-.lp-cta-note {
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  color: var(--muted);
 }
 .lp-btn[hidden] {
   /* The recorded v9 defect class (session-25 fix, decision-log 2026-07-17):
@@ -1428,313 +885,15 @@ body {
 .lp-btn.ghost:active {
   transform: scale(0.96);
 }
-.lp-btn .lp-ic {
-  transition: transform 0.16s var(--ease);
-}
-.lp-btn:hover .lp-ic {
-  transform: translateX(2px);
-}
-
-/* ----- HERO ----------------------------------------------------------------- */
-.lp-hero {
-  padding: clamp(48px, 8vw, 92px) 0 clamp(40px, 6vw, 72px);
-}
-.lp-hero-grid {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: clamp(32px, 5vw, 56px);
-  align-items: center;
-}
-@media (max-width: 920px) {
-  .lp-hero-grid {
-    grid-template-columns: 1fr;
-    align-items: start;
-  }
-}
-.lp-hero h1 {
-  font-size: clamp(33px, 5.4vw, 56px);
-  line-height: 1.04;
-  letter-spacing: -0.02em;
-  margin: 0 0 20px;
-  max-width: 18ch;
-}
-.lp-hero .lp-lede {
-  font-size: clamp(16px, 2vw, 19px);
-  max-width: 52ch;
-}
-.lp-hero-aside {
-  position: relative;
-}
-@media (max-width: 920px) {
-  .lp-hero-aside {
-    max-width: 520px;
-  }
-}
-
-/* ----- panels + grids (restrained cards: hairline, tinted hover, no glow) ---- */
-.lp-grid3 {
-  display: grid;
-  gap: 14px;
-  margin-top: 26px;
-}
-.lp-grid2 {
-  display: grid;
-  gap: 14px;
-  margin-top: 24px;
-}
-@media (min-width: 720px) {
-  .lp-grid3 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .lp-grid2 {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.lp-panel {
-  border: 1px solid var(--rule);
-  border-radius: 12px;
-  padding: 22px;
-  background: var(--bg);
-  transition:
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    transform 0.16s var(--ease);
-}
-.lp-panel:hover {
-  border-color: var(--accent-line);
-  box-shadow: 0 12px 30px -20px rgba(var(--shadow-rgb), 0.2);
-  transform: translateY(-2px);
-}
-.lp-panel.ours {
-  border-color: var(--accent-line);
-  background: var(--accent-soft);
-}
-.lp-role {
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.01em;
-  color: var(--graphite);
-  margin-bottom: 10px;
-}
-.lp-panel.ours .lp-role {
-  color: var(--signal-text);
-  font-weight: 600;
-}
-.lp-panel .lp-h3 {
-  margin-bottom: 6px;
-}
-.lp-qh {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 1.32;
-  letter-spacing: -0.012em;
-  color: var(--ink);
-  margin-bottom: 6px;
-}
-
-/* ----- HOW IT WORKS — five stages as a hairline-connected strip -------------- */
-.lp-flow {
-  margin-top: 28px;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  border: 1px solid var(--rule-2);
-  border-radius: 12px;
-  overflow: hidden;
-}
-.lp-step {
-  padding: 20px 18px;
-  border-left: 1px solid var(--rule);
-  background: var(--bg);
-  transition: background 0.16s ease;
-}
-.lp-step:first-child {
-  border-left: none;
-}
-.lp-step.gate {
-  background: var(--accent-soft);
-}
-.lp-sk {
-  display: block;
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-.lp-step.gate .lp-sk {
-  color: var(--signal-text);
-}
-.lp-step .lp-h4 {
-  margin-bottom: 6px;
-}
-@media (max-width: 760px) {
-  .lp-flow {
-    grid-template-columns: 1fr;
-  }
-  .lp-step {
-    border-left: none;
-    border-top: 1px solid var(--rule);
-  }
-  .lp-step:first-child {
-    border-top: none;
-  }
-}
-
-/* ----- CLOSE — honesty note + mono strip ------------------------------------ */
-.lp-note {
-  margin: 26px 0 0;
-  border: 1px solid var(--rule);
-  background: var(--bg-3);
-  border-radius: 10px;
-  padding: 14px 16px;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--body);
-  max-width: 82ch;
-}
-.lp-strip {
-  margin: 16px 0 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--rule);
-  font-size: 11px;
-  line-height: 1.8;
-  letter-spacing: 0.005em;
-  color: var(--faint);
-  max-width: 82ch;
-}
 
 @media (prefers-reduced-motion: reduce) {
-  .lp-btn,
-  .lp-btn .lp-ic,
-  .lp-panel,
-  .lp-step {
+  .lp-btn {
     transition: none;
   }
   /* Codex S2 P3: transitions alone weren't enough — without this the hover
      transforms still MOVE (instantly) under reduced motion. */
-  .lp-btn.primary:hover,
-  .lp-btn:hover .lp-ic,
-  .lp-panel:hover {
+  .lp-btn.primary:hover {
     transform: none;
-  }
-}
-
-/* ============================================================================
-   OXBLOOD LANDING — "GALLERY CARDS B-2" LAYER (S6b, 2026-07-13).
-   The owner-adopted design language from the B-2 gallery-cards sample
-   (committed at a8f6c5f as mockups/variation-b2-gallery-cards-2026-07-13.html,
-   since pruned from the working tree — recoverable from git history), translated onto the
-   canonical landing. Same tokens; B-2 adds the cartographic hero line field +
-   drifting survey line (floor ④), the verifier seal, icon-tile card medallions
-   (floor ⑤), section-rule reveals, and hover micro-transitions (floors ①/②).
-   Pure-white/off-white ground, radii ≤6px, no gradients/glass. ALL added motion
-   is killed under prefers-reduced-motion: reduce (batch-E pattern) — every
-   draw/drift/scroll animation is defined ONLY inside no-preference, so reduce
-   inherits the fully-drawn, static default.
-   ========================================================================== */
-
-/* ----- HERO: relative frame carrying the line field + seal ------------------ */
-.lp-hero {
-  position: relative;
-  overflow: hidden;
-}
-.lp-hero-inner {
-  position: relative;
-  z-index: 1;
-}
-.lp-hero-inner .lp-eyebrow {
-  margin-bottom: 0;
-}
-.lp-hero-inner h1 {
-  margin-top: 20px;
-  max-width: 20ch;
-}
-/* the accented phrase stays on one line on wide screens; on phones it must be
-   allowed to wrap so it isn't clipped by the hero's overflow:hidden frame */
-@media (max-width: 560px) {
-  .lp-hero-inner h1 .lp-mark {
-    white-space: normal;
-  }
-}
-
-/* the cartographic contour field — ink-only line-work, drawn by default */
-.lp-hero-field {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-.lp-hero-field path {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 0;
-}
-.lp-hero-field .f1 {
-  opacity: 0.055;
-}
-.lp-hero-field .f2 {
-  opacity: 0.045;
-}
-.lp-hero-field .f3 {
-  opacity: 0.06;
-}
-.lp-hero-field .f4 {
-  opacity: 0.04;
-}
-.lp-hero-field .f5 {
-  opacity: 0.05;
-}
-.lp-hero-field .f6 {
-  opacity: 0.035;
-}
-.lp-hero-field .survey {
-  stroke: var(--accent);
-  opacity: 0.12;
-  stroke-dasharray: 6 10;
-  stroke-dashoffset: 0;
-}
-.lp-hero-field .ticks path {
-  opacity: 0.1;
-  stroke-width: 1;
-  stroke-dasharray: none;
-}
-
-/* the verifier seal — monoline medallion in the hero corner */
-.lp-hero-seal {
-  position: absolute;
-  right: clamp(16px, 3.5vw, 40px);
-  top: clamp(40px, 6vw, 84px);
-  width: 128px;
-  height: 128px;
-  z-index: 0;
-  pointer-events: none;
-}
-.lp-hero-seal circle,
-.lp-hero-seal path {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 1.6;
-}
-.lp-hero-seal .ringtext {
-  font-family: var(--ff-mono);
-  font-size: 7.5px;
-  letter-spacing: 0.22em;
-  fill: var(--muted);
-  stroke: none;
-}
-.lp-hero-seal .draw {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 0;
-}
-@media (max-width: 1040px) {
-  .lp-hero-seal {
-    display: none;
   }
 }
 
@@ -1760,669 +919,24 @@ body {
   .ds-reveal.in .lp-sec-rule { animation: none; }
 }
 
-/* ----- icon-tile gallery cards (floor ⑤) ------------------------------------ */
-.lp-cardgrid {
-  display: grid;
-  gap: 18px;
-  margin-top: 34px;
-}
-.lp-cardgrid.c3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-.lp-cardgrid.c5 {
-  grid-template-columns: repeat(3, 1fr);
-}
-@media (max-width: 1080px) {
-  .lp-cardgrid.c3,
-  .lp-cardgrid.c5 {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-@media (max-width: 680px) {
-  .lp-cardgrid.c3,
-  .lp-cardgrid.c5 {
-    grid-template-columns: 1fr;
-  }
-}
-.lp-card {
-  position: relative;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  background: var(--bg);
-  padding: 24px 22px;
-  transition:
-    border-color 0.18s var(--ease),
-    transform 0.18s var(--ease);
-}
-.lp-card:hover {
-  border-color: var(--accent-line);
-  transform: translateY(-2px);
-}
-.lp-card.gate {
-  background: var(--accent-soft);
-  border-color: var(--accent-line);
-}
-.lp-card-ic {
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--rule-2);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ink);
-  margin-bottom: 16px;
-  transition:
-    color 0.18s var(--ease),
-    border-color 0.18s var(--ease);
-}
-.lp-cardglyph {
-  display: block;
-  width: 22px;
-  height: 22px;
-}
-.lp-card:hover .lp-card-ic,
-.lp-card.gate .lp-card-ic {
-  color: var(--accent);
-  border-color: var(--accent-line);
-}
-.lp-card-idx {
-  position: absolute;
-  top: 22px;
-  right: 20px;
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  color: var(--muted);
-  border: 1px solid var(--rule);
-  border-radius: 5px;
-  padding: 1px 7px;
-}
-.lp-kicker {
-  display: inline-block;
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.lp-kicker.gate {
-  color: var(--signal-text);
-}
-.lp-card-h3 {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 19px;
-  line-height: 1.25;
-  margin: 8px 0 0;
-  color: var(--ink);
-}
-.lp-card-desc {
-  margin: 10px 0 0;
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: var(--body);
-}
-
 /* (the shown-catch wrapper was removed with TruthCatch — superseded by the Evidence Bench) */
-
-/* ----- motion: draws + drift + reveal, ALL gated to allowed motion ---------- */
-@media (prefers-reduced-motion: no-preference) {
-  /* contour field self-draws in on load; one survey line drifts slowly */
-  .lp-hero-field path {
-    stroke-dashoffset: 1;
-    animation: lp-drawline 5.5s var(--ease) forwards;
-  }
-  .lp-hero-field .f2 {
-    animation-delay: 0.3s;
-  }
-  .lp-hero-field .f3 {
-    animation-delay: 0.6s;
-  }
-  .lp-hero-field .f4 {
-    animation-delay: 0.9s;
-  }
-  .lp-hero-field .f5 {
-    animation-delay: 1.2s;
-  }
-  .lp-hero-field .f6 {
-    animation-delay: 1.5s;
-  }
-  .lp-hero-field .ticks path {
-    stroke-dashoffset: 0;
-    animation: none;
-  }
-  .lp-hero-field .survey {
-    stroke-dashoffset: 0;
-    animation: lp-surveydrift 40s linear infinite;
-  }
-  /* seal self-draws */
-  .lp-hero-seal .draw {
-    stroke-dashoffset: 1;
-    animation: lp-drawline 1.6s var(--ease) forwards;
-  }
-  .lp-hero-seal .d2 {
-    animation-delay: 0.5s;
-  }
-  .lp-hero-seal .d3 {
-    animation-delay: 1.1s;
-  }
-  /* The section-rule's reveal is the rule-x scaleX animation (~line 1580) —
-     a second, width-based path lived here until 2026-07-31 (I-3): it was the
-     sheet's only layout-property transition, it ran ON TOP of the scaleX
-     animation, and transform is the idiomatic form for a 44px hairline. */
-  @keyframes lp-drawline {
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-  @keyframes lp-surveydrift {
-    from {
-      stroke-dashoffset: 0;
-    }
-    to {
-      stroke-dashoffset: -160;
-    }
-  }
-}
 
 /* ----- reduced-motion kill for the B-2 hover/transition micro-motions -------
    (the draw/drift/reveal animations above never apply under reduce; these are
    the transform/transition-bearing rules that need an explicit stop.) --------- */
 @media (prefers-reduced-motion: reduce) {
-  .lp-card,
-  .lp-card-ic {
-    transition: none;
-  }
-  .lp-card:hover {
-    transform: none;
-  }
   /* (The .lp-sec-rule width fixup that lived here countered the width:0
      reveal path removed 2026-07-31 — base width is 44px everywhere now.) */
 }
 
-/* ============================================================================
-   THE REPORT / DEMO DOCUMENT SYSTEM — re-tokened for the redesign B1 (2026-07-14).
-   NOTHING MOUNTS .rpt-wrap TODAY (checked 2026-08-02: no tsx renders it; /demo is
-   deleted, /report was rewritten) — orphan candidate for the R-3 sweep;
-   the landing keeps its own system. Spec: docs/design-brief-redesign-2026-07-14.md.
-   Lineage: the "Ledger" audit-certificate STRUCTURE (Swiss / International-
-   Typographic; flat, no radii / shadows / gradients; the precision of the hairline
-   rules and the spacing IS the design) is RETAINED; the token VALUES move in
-   lockstep to the new site system.
-
-   B1 re-token: off-white ground #FBFBFD → pure white #FFFFFF; the ink ramp moves to
-   the new near-neutral values; the accent → DEEP ember #C0341C (the token NAME --um
-   is kept so every consumer follows) — used on the masthead rule · finding index
-   numerals, NEVER on severity. Severity carries its own three marks (error / warn /
-   info) kept perceptually far from the brand, always paired with a square shape +
-   word. Display headings adopt the site display voice (Onest, storyboard adoption
-   2026-07-15); body + receipts adopt Onest / JetBrains Mono. Honesty freeze-reversal (Slice D,
-   decision-log 2026-07-14): the SIMULATED banner was removed — the page is
-   disclaimer-free (no false claim; C10 green).
-   Contrast recomputed on #FFFFFF (ratios in the token comments below).
-   Desktop web + printable (see the @media print block below). rpt-* / dmo-*.
-   ========================================================================== */
-.rpt-wrap {
-  /* Redesign B1 re-token (2026-07-14): the Ledger STRUCTURE is retained; every local
-     token VALUE is moved IN LOCKSTEP to the new :root system (this block is insulated
-     from :root, so it must mirror by hand). Kept as ONE --paper token so every
-     text-on-ink surface (banner text, verdict flag) follows automatically. Contrast
-     recomputed on the pure-white #ffffff ground (standard WCAG sRGB). */
-  --paper: #ffffff; /* pure-white ground + every text-on-ink surface (banner text, verdict flag) */
-  --ink: #12141c; /* near-black: headline, banner ground, verdict stamp, hard marks — 18.38:1 */
-  --body: #3b3f4b; /* long-form body text — 10.51:1 (sitewide body ramp) */
-  --graphite: #4a4e5a; /* rail captions, labels, secondary mono — 8.31:1 */
-  --hairline: rgba(18, 20, 28, 0.13); /* low-alpha ink modular-grid rules (site --rule family) */
-  --um: #2438d6; /* the accent — ULTRAMARINE (token NAME kept; v8 design adoption
-     2026-07-16, lockstep with :root --accent); --paper on --um = 8.04:1 */
-  --sev-err: #d92d20; /* 4.83:1 — kept perceptually far from the brand via shape + word */
-  --sev-warn: #b54708; /* 5.43:1 — amber */
-  --sev-info: #605c68; /* neutral — 6.51:1 (no info in the fixture; never a brand/alarm hue) */
-  /* font stacks now adopt the self-hosted site fonts (Onest display + body,
-     JetBrains mono) so the report matches the site register; kept self-defined
-     so nothing here falls through to :root. */
-  --serif: var(--font-sans), "Onest", system-ui, sans-serif;
-  --ledger-sans: var(--font-sans), "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --ledger-mono: var(--font-mono), ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo,
-    monospace;
-
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 48px 64px 120px;
-  background: var(--paper);
-  color: var(--body);
-  font-family: var(--ledger-sans);
-  font-size: 15px;
-  line-height: 1.55;
-  letter-spacing: 0;
-}
-
-/* NOTE (redesign Slice D, decision-log 2026-07-14): the .rpt-sim SIMULATED banner
-   and its CSS were removed with the honesty freeze-reversal — the public report/demo
-   pages are disclaimer-free. Print-color-adjust: exact is still carried by the
-   verdict flag (.rpt-verdict-flag) and the severity marks (.rpt-sev::before), which
-   legitimately print colour on ink/tinted grounds. */
-
-/* ---- masthead — flush-left, closed by the single 4px burgundy accent rule ---- */
-.rpt-head {
-  margin-top: 0;
-  padding: 44px 0 30px;
-  border-bottom: 4px solid var(--um);
-}
-.rpt-eyebrow {
-  margin: 0;
-  font-family: var(--ledger-sans);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--graphite);
-}
-.rpt-title {
-  margin: 16px 0 0;
-  /* S3: masthead adopts the site serif per the mockup's report register. */
-  font-family: var(--serif);
-  font-size: clamp(34px, 4.4vw, 52px);
-  font-weight: 600;
-  letter-spacing: -0.012em;
-  line-height: 1.05;
-  color: var(--ink);
-  max-width: 24ch;
-  text-wrap: balance;
-}
-.rpt-intro {
-  margin: 22px 0 0;
-  font-size: 15.5px;
-  line-height: 1.6;
-  color: var(--body);
-  max-width: 68ch;
-}
-
-/* ---- surface toggle — a flush mono tab strip on a hairline; ink underline for
-   the active surface (the burgundy accent is reserved for its three sanctioned roles) -- */
-.rpt-toolbar {
-  display: flex;
-  gap: 0;
-  margin-top: 28px;
-  border-bottom: 1px solid var(--hairline);
-}
-.rpt-tab {
-  font: inherit;
-  font-family: var(--ledger-mono);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  padding: 10px 16px 11px;
-  border: none;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-  background: none;
-  color: var(--graphite);
-  margin-bottom: -1px;
-  transition:
-    color 0.15s ease,
-    border-color 0.15s ease;
-}
-.rpt-tab:first-child {
-  padding-left: 0;
-}
-.rpt-tab:hover {
-  color: var(--ink);
-}
-.rpt-tab.active {
-  color: var(--ink);
-  border-bottom-color: var(--ink);
-}
-
-/* ---- the modular-grid armature: 184px caption rail | continuous hairline | body */
-.rpt-sec {
-  display: grid;
-  grid-template-columns: 184px minmax(0, 1fr);
-  border-top: 1px solid var(--hairline);
-}
-.rpt-toolbar + .rpt-sec {
-  border-top: none;
-}
-.rpt-rail {
-  margin: 0;
-  padding: 30px 20px 30px 0;
-  font-family: var(--ledger-sans);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--graphite);
-}
-.rpt-bodycol {
-  min-width: 0;
-  border-left: 1px solid var(--hairline);
-  padding: 30px 0 34px 40px;
-}
-
-/* ---- verdict — the flag is a solid ink stamp (paper-white text on ink, per the
-   --paper token note); the count is mono; the frozen tally sits on its own ruled
-   row as a single mono line (it is one text node — never split into squares) ---- */
-.rpt-verdict {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  column-gap: 22px;
-  row-gap: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: none;
-}
-.rpt-verdict-flag {
-  font-family: var(--ledger-sans);
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  color: var(--paper);
-  background: var(--ink);
-  padding: 11px 18px;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-.rpt-verdict-count {
-  font-family: var(--ledger-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--ink);
-}
-.rpt-verdict-tally {
-  width: 100%;
-  margin: 20px 0 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--hairline);
-  font-family: var(--ledger-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 12.5px;
-  color: var(--graphite);
-}
-
-/* ---- meta ledger ---- */
-.rpt-meta {
-  margin: 0;
-  border: none;
-  border-radius: 0;
-  overflow: visible;
-}
-.rpt-mrow {
-  display: grid;
-  grid-template-columns: 170px minmax(0, 1fr);
-  gap: 24px;
-  padding: 12px 0;
-  border-top: 1px solid var(--hairline);
-}
-.rpt-mrow:first-child {
-  border-top: none;
-  padding-top: 0;
-}
-.rpt-mrow:last-child {
-  padding-bottom: 0;
-}
-.rpt-mrow dt {
-  font-family: var(--ledger-mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--graphite);
-}
-.rpt-mrow dd {
-  margin: 0;
-  min-width: 0;
-  font-size: 13.5px;
-  color: var(--ink);
-}
-
-/* ---- findings — numbered rows: the plain line leads, four ruled mono receipt
-   columns follow; index numerals wear the burgundy accent ---- */
-.rpt-findings {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: none;
-}
-.rpt-finding {
-  padding: 22px 0 24px;
-  border-top: 1px solid var(--hairline);
-  border-bottom: none;
-}
-.rpt-finding:first-child {
-  padding-top: 0;
-  border-top: none;
-}
-.rpt-finding-lead {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) auto;
-  column-gap: 18px;
-  align-items: baseline;
-}
-.rpt-idx {
-  font-family: var(--ledger-sans);
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  color: var(--um);
-  flex: none;
-}
-.rpt-plain {
-  margin: 0;
-  flex: initial;
-  font-size: 16px;
-  line-height: 1.45;
-  font-weight: 600;
-  letter-spacing: -0.012em;
-  color: var(--ink);
-  max-width: 74ch;
-}
-/* severity — typographic weight + a 9px square mark (no pill, no radius). The
-   square is a ::before so no markup changes and the frozen text nodes stay put. */
-.rpt-sev {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  flex: none;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: none;
-  text-transform: none;
-  white-space: nowrap;
-  font-family: var(--ledger-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-}
-.rpt-sev::before {
-  content: "";
-  width: 9px;
-  height: 9px;
-  flex: none;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-.rpt-sev.error {
-  color: var(--sev-err);
-  font-weight: 700;
-}
-.rpt-sev.error::before {
-  background: var(--sev-err);
-}
-.rpt-sev.warn {
-  color: var(--sev-warn);
-  font-weight: 500;
-}
-.rpt-sev.warn::before {
-  background: var(--sev-warn);
-}
-.rpt-sev.info {
-  color: var(--sev-info);
-  font-weight: 400;
-}
-.rpt-sev.info::before {
-  background: var(--sev-info);
-}
-
-/* the four receipts — held in hairline-separated mono columns, aligned under the
-   plain line (past the 56px numeral column + 18px gap) */
-.rpt-receipts {
-  display: grid;
-  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 0.9fr);
-  gap: 0;
-  margin: 16px 0 0 74px;
-  border-top: 1px solid var(--hairline);
-}
-.rpt-rc {
-  display: block;
-  min-width: 0;
-  padding: 11px 18px 0 0;
-}
-.rpt-rc + .rpt-rc {
-  border-left: 1px solid var(--hairline);
-  padding-left: 18px;
-}
-.rpt-rc dt {
-  margin: 0 0 5px;
-  font-family: var(--ledger-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--graphite);
-}
-.rpt-rc dd {
-  margin: 0;
-  min-width: 0;
-}
-.rpt-mono {
-  font-family: var(--ledger-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 12px;
-  color: var(--ink);
-  overflow-wrap: anywhere;
-}
-/* meta prose sub — grotesk secondary (the plain-language explanation) */
-.rpt-rc-sub {
-  display: block;
-  margin-top: 3px;
-  font-family: var(--ledger-sans);
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--graphite);
-}
-/* fees receipts — "the arithmetic" carries sentence-length evidence, which the
-   shared four-track ledger starves into unreadable ribbons at desktop widths;
-   the fee surface folds to the 2×2 pairing (statement+clause / rule+arithmetic)
-   that the narrow breakpoint and print already use. /report and /demo keep the
-   four-track default (their cells are short ids, tuned for it).
-   Scoped with :where() so the narrow-viewport folds below keep winning. */
-:where(.fee-wrap) .rpt-receipts {
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-}
-:where(.fee-wrap) .rpt-rc:nth-child(odd) {
-  border-left: none;
-  padding-left: 0;
-}
-/* findings claim-value sub — mono tabular (the technical receipt value) */
-.rpt-mono-sub {
-  display: block;
-  margin-top: 3px;
-  font-family: var(--ledger-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 11.5px;
-  line-height: 1.55;
-  color: var(--graphite);
-  overflow-wrap: anywhere;
-}
-
-/* ---- footer — honesty paragraph on the same armature (report: empty rail;
-   demo: a plain ruled block, no rail grid) ---- */
-.rpt-foot {
-  margin: 0;
-  padding: 0;
-  border-top: none;
-}
-.rpt-sec.rpt-foot .rpt-bodycol {
-  padding-bottom: 0;
-}
-.dmo-wrap .rpt-foot {
-  margin-top: 22px;
-  padding-top: 16px;
-  border-top: 1px solid var(--hairline);
-}
-.rpt-foot p {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.65;
-  color: var(--graphite);
-  max-width: 78ch;
-}
-
-/* ---- collapse below the desktop measure — the grid discipline folds to one
-   column (the surface targets desktop web; this only guards narrow viewports) -- */
-@media (max-width: 900px) {
-  .rpt-wrap {
-    padding: 28px 24px 96px;
-  }
-  .rpt-sec {
-    grid-template-columns: 1fr;
-  }
-  .rpt-rail {
-    padding: 22px 0 0;
-  }
-  .rpt-bodycol {
-    border-left: none;
-    padding: 14px 0 28px;
-  }
-  .rpt-finding-lead {
-    grid-template-columns: 44px minmax(0, 1fr);
-  }
-  .rpt-sev {
-    grid-column: 2;
-    justify-self: start;
-    margin-top: 8px;
-  }
-  .rpt-receipts {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    margin-left: 0;
-  }
-  .rpt-rc {
-    padding-top: 12px;
-  }
-  .rpt-rc:nth-child(odd) {
-    border-left: none;
-    padding-left: 0;
-  }
-}
-@media (max-width: 560px) {
-  .rpt-wrap {
-    padding: 20px;
-  }
-  .rpt-receipts {
-    grid-template-columns: 1fr;
-  }
-  .rpt-rc + .rpt-rc {
-    border-left: none;
-    padding-left: 0;
-  }
-  .rpt-mrow {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-}
-
-/* ----- print: one clean report per page. The verdict flag + severity marks keep
-   print-color-adjust: exact so their colour survives the print colour drop. ----- */
+/* ----- print: the site's print pass — chrome hidden, motion settled to its
+   final state. (The retired rpt- ledger's print-color-adjust contract left with
+   that system, R-3 2026-08-02; the current report's marks are border+text and
+   survive the print colour drop without it.) ----- */
 @media print {
   nav,
   footer,
-  .ds-skip,
-  .rpt-toolbar {
+  .ds-skip {
     display: none !important;
   }
   html {
@@ -2431,34 +945,8 @@ body {
   body {
     font-size: 12px;
   }
-  .rpt-wrap {
-    max-width: none;
-    margin: 0;
-    padding: 0;
-  }
   @page {
     margin: 14mm;
-  }
-  /* never split a finding (with its receipts) across a page break */
-  .rpt-finding,
-  .rpt-verdict,
-  .rpt-meta {
-    break-inside: avoid;
-  }
-  /* a rail label (VERDICT / BASIS / FINDINGS) never strands at a page foot,
-     and small sections hold together (oversize sections still break naturally) */
-  .rpt-rail {
-    break-after: avoid;
-  }
-  .rpt-sec {
-    break-inside: avoid;
-  }
-  .rpt-head {
-    break-after: avoid;
-  }
-  /* D1 demo: keep each beat whole across page breaks */
-  .dmo-beat {
-    break-inside: avoid;
   }
   /* Print rescue for motion-gated content (design review 2026-07-16, D-1):
      when motion is allowed, Reveal strips the settled state on mount and
@@ -2474,128 +962,6 @@ body {
   /* (The .lp-sec-rule width rescue that lived here countered the width:0
      reveal path removed 2026-07-31; base width is 44px everywhere now, and
      an animation mid-flight is already covered by the transform rescue.) */
-  /* the Evidence Bench's replay-dim stages read fully lit on paper */
-  .eb-corr,
-  .eb-rule,
-  .eb-math,
-  .eb-break,
-  .eb-delta,
-  .eb-receipt-body {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
-
-/* ============================================================================
-   D1 — the one-page verifier demo (/demo). Reuses the report's Ledger system
-   (rpt-* classes: banner, masthead, findings, receipts) and adds a beat list.
-   Desktop-first, printable. dmo-* namespace.
-   ========================================================================== */
-.dmo-meta {
-  margin-top: 18px;
-}
-.dmo-beats {
-  margin-top: 28px;
-  border-top: 1px solid var(--hairline);
-}
-.dmo-beat {
-  padding: 24px 0;
-  border-bottom: 1px solid var(--hairline);
-}
-.dmo-beat-head {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-}
-.dmo-beat-no {
-  flex: none;
-  font-family: var(--ledger-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--graphite);
-}
-.dmo-beat-title {
-  margin: 0;
-  /* S3: beat titles (mockup h3) adopt the site serif per the report register. */
-  font-family: var(--serif);
-  font-size: 18px;
-  line-height: 1.25;
-  font-weight: 600;
-  letter-spacing: -0.012em;
-  color: var(--ink);
-}
-.dmo-beat-plain {
-  margin: 12px 0 0;
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--ink);
-  max-width: 72ch;
-}
-.dmo-beat-lines {
-  list-style: none;
-  margin: 12px 0 0;
-  padding: 0;
-}
-.dmo-beat-lines li {
-  position: relative;
-  padding-left: 16px;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--body);
-}
-.dmo-beat-lines li::before {
-  content: "·";
-  position: absolute;
-  left: 2px;
-  color: var(--graphite);
-}
-/* demo verdict chips — flat severity marks (no pill / radius), consistent with
-   the report's typographic severity */
-.dmo-verdicts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 24px;
-  margin-top: 14px;
-}
-.dmo-verdict {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: none;
-  font-family: var(--ledger-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-.dmo-verdict::before {
-  content: "";
-  width: 9px;
-  height: 9px;
-  flex: none;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-.dmo-verdict.ok {
-  color: var(--ink);
-}
-.dmo-verdict.ok::before {
-  background: var(--ink);
-}
-.dmo-verdict.flag {
-  color: var(--sev-err);
-  font-weight: 700;
-}
-.dmo-verdict.flag::before {
-  background: var(--sev-err);
-}
-.dmo-findings {
-  margin-top: 16px;
-  border-top: 1px solid var(--hairline);
 }
 
 /* ============================================================================
@@ -2614,7 +980,8 @@ body {
    numbered cards / icon-tiles; radii <= 12px; motion is structural + hover-only
    (reduced-motion-gated below). Desktop web; server-rendered (no entrance
    motion — the surfaces render settled). EVERYTHING is scoped under .ds-data so
-   nothing leaks to the landing (.lp-main) or report/demo (.rpt-wrap) systems.
+   nothing leaks to the landing (.lp-main) system. (Most of this layer left with
+   the legacy routes; what remains serves .ds-data consumers such as /not-found.)
    ========================================================================== */
 
 /* ----- page shell ----------------------------------------------------------- */
@@ -2624,61 +991,10 @@ body {
 .ds-wrap.ds-narrow {
   max-width: 880px;
 }
-
-/* ----- section rail — the "On this page" instrument (session-22 ③, D-2) ----- */
-/* Sticky under the site nav; real anchors; the live position marker is an iris
-   underline (v8 accent), never colour-alone (weight shifts with it). */
-.dsr {
-  position: sticky;
-  top: 62px;
-  z-index: 30;
-  margin: 26px 0 6px;
-  background: rgba(var(--glass-rgb), 0.92);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(var(--ink-rgb), 0.07);
-}
-.dsr-list {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 18px;
-  margin: 0;
-  padding: 8px 0 0;
-}
-.dsr-link {
-  display: inline-block;
-  padding: 6px 2px 10px;
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--muted);
-  border-bottom: 2px solid transparent;
-  transition: color 160ms var(--ease-arrival), border-color 160ms var(--ease-arrival);
-}
-.dsr-link:hover {
-  color: var(--ink);
-}
-.dsr-link:focus-visible {
-  outline: 2px solid var(--iris-ink);
-  outline-offset: 2px;
-}
-.dsr-link[aria-current="location"] {
-  color: var(--ink);
-  font-weight: 600;
-  border-bottom-color: var(--iris-ink);
-}
 /* Jumped-to targets clear the sticky nav + rail. */
 .ds-data h2[id],
-.ds-data section[id],
-.dmo-beat[id] {
+.ds-data section[id] {
   scroll-margin-top: 128px;
-}
-@media print {
-  .dsr {
-    display: none;
-  }
 }
 
 /* serif display headings — the Oxblood register, scoped to data surfaces */
@@ -2708,25 +1024,6 @@ body {
   line-height: 1.3;
 }
 
-/* ----- eyebrow / kicker (console) ------------------------------------------- */
-.ds-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 14px;
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-.ds-kicker svg {
-  width: 15px;
-  height: 15px;
-  flex: none;
-}
-
 /* ----- ledes ---------------------------------------------------------------- */
 .ds-lead {
   margin-top: 14px;
@@ -2752,113 +1049,6 @@ body {
 .ds-lead.tech b,
 .ds-lead.tech strong {
   color: var(--ink-2);
-}
-.ds-runline {
-  margin-top: 8px;
-  font-size: 13px;
-  color: var(--muted);
-  max-width: 72ch;
-}
-
-/* ----- callouts ------------------------------------------------------------- */
-.ds-note {
-  margin-top: 16px;
-  border: 1px solid var(--rule);
-  background: var(--bg-3);
-  border-radius: 10px;
-  padding: 12px 15px;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--ink-2);
-  max-width: 88ch;
-}
-.ds-note b,
-.ds-note strong {
-  font-weight: 600;
-  color: var(--ink);
-}
-.ds-note.warn {
-  border-color: rgba(var(--warn-rgb), 0.28);
-  background: var(--warn-soft);
-  color: var(--warn-ink);
-}
-.ds-note.warn b,
-.ds-note.warn strong {
-  color: var(--warn-ink);
-}
-
-/* ----- stat rail ------------------------------------------------------------ */
-.ds-stats {
-  display: grid;
-  gap: 12px;
-  margin-top: 28px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-@media (min-width: 560px) {
-  .ds-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-@media (min-width: 900px) {
-  .ds-stats.c4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .ds-stats.c5 {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-  .ds-stats.c6 {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-}
-.ds-stat {
-  border: 1px solid var(--rule);
-  border-radius: 12px;
-  padding: 15px 16px;
-  background: var(--bg);
-  transition:
-    border-color 0.16s ease,
-    box-shadow 0.16s ease;
-}
-.ds-stat:hover {
-  border-color: var(--accent-line);
-  box-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.06);
-}
-.ds-stat .v {
-  font-family: var(--serif);
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-.ds-stat .l {
-  margin-top: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-}
-.ds-stat .s {
-  margin-top: 3px;
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--faint);
-}
-.ds-stat.accent {
-  border-color: var(--accent-line);
-  background: var(--accent-soft);
-}
-.ds-stat.accent .v {
-  color: var(--accent);
-}
-
-/* ----- data tables ---------------------------------------------------------- */
-.ds-tbl {
-  margin-top: 14px;
-  border: 1px solid var(--rule);
-  border-radius: 12px;
-  overflow: hidden;
-  overflow-x: auto;
 }
 .ds-data table {
   width: 100%;
@@ -2900,526 +1090,13 @@ body {
   border-color: var(--accent);
 }
 
-/* ----- chips (word-labelled status/risk pills) ------------------------------ */
-.ds-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--ff-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  padding: 4px 9px;
-  /* element-height pill — the sanctioned exception to the ≤12px radius rule,
-     matching the mockup's own .status pill + the S1 .site-status precedent */
-  border-radius: 999px;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-.ds-chip svg {
-  width: 11px;
-  height: 11px;
-  flex: none;
-}
-.ds-chip.ok,
-.ds-chip.low,
-.ds-chip.sent,
-.ds-chip.pass {
-  color: var(--ok);
-  background: var(--ok-soft);
-}
-.ds-chip.warn,
-.ds-chip.medium,
-.ds-chip.held,
-.ds-chip.flagged {
-  color: var(--warn-ink);
-  background: var(--warn-soft);
-}
-.ds-chip.error,
-.ds-chip.high,
-.ds-chip.rejected,
-.ds-chip.blocked,
-.ds-chip.fail {
-  color: var(--error-ink);
-  background: var(--error-soft);
-}
-.ds-chip.neutral {
-  color: var(--graphite);
-  background: var(--bg-3);
-}
-
-/* ----- verdict marks (inline shape + word: PASS/FAIL etc.) ------------------ */
-.ds-verdict {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-.ds-verdict svg {
-  width: 12px;
-  height: 12px;
-  flex: none;
-}
-.ds-verdict.ok {
-  color: var(--ok);
-}
-.ds-verdict.no {
-  color: var(--error);
-}
-.ds-verdict.warn {
-  color: var(--warn);
-}
-
-/* ----- cards + grids (pipeline steps, chart panels, merchant sections) ------ */
-.ds-grid {
-  display: grid;
-  gap: 12px;
-  margin-top: 14px;
-}
-@media (min-width: 640px) {
-  .ds-grid.g2 {
-    grid-template-columns: 1fr 1fr;
-  }
-  .ds-grid.g3 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .ds-grid.g4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (min-width: 900px) {
-  .ds-grid.g3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .ds-grid.g4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-.ds-card {
-  border: 1px solid var(--rule);
-  border-radius: 12px;
-  padding: 18px;
-  background: var(--bg);
-  transition:
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    transform 0.16s var(--ease);
-}
-.ds-card:hover {
-  border-color: var(--accent-line);
-  box-shadow: 0 12px 30px -20px rgba(var(--shadow-rgb), 0.2);
-  transform: translateY(-2px);
-}
-.ds-card.flush {
-  padding: 20px;
-}
-.ds-card-t {
-  font-family: var(--serif);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-}
-.ds-card-p {
-  margin: 6px 0 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--ink-2);
-}
-.ds-card-tech {
-  margin: 6px 0 0;
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  line-height: 1.45;
-  color: var(--muted);
-}
-.ds-stack > * + * {
-  margin-top: 14px;
-}
-.ds-sec-h {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.ds-h2-row {
-  margin-top: 44px;
-  margin-bottom: 4px;
-}
-
-/* ----- metric bars ---------------------------------------------------------- */
-.ds-bar-row + .ds-bar-row {
-  margin-top: 12px;
-}
-.ds-bar-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 13px;
-  margin-bottom: 5px;
-  color: var(--ink-2);
-}
-.ds-bar-top .bv {
-  font-family: var(--ff-mono);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.ds-bar {
-  height: 8px;
-  border-radius: 5px;
-  background: var(--bg-3);
-  overflow: hidden;
-}
-.ds-bar > i {
-  display: block;
-  height: 100%;
-  border-radius: 5px;
-  background: var(--ink);
-}
-.ds-bar.acc > i {
-  background: var(--accent);
-}
-.ds-ratefacts {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 4px 16px;
-  margin: 16px 0 0;
-  font-size: 13px;
-}
-.ds-ratefacts dt {
-  color: var(--muted);
-  margin: 0;
-}
-.ds-ratefacts dd {
-  margin: 0;
-  font-family: var(--ff-mono);
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-2);
-  text-align: right;
-}
-
-/* ----- merchant detail specifics -------------------------------------------- */
-.ds-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--muted);
-  text-decoration: none;
-}
-.ds-back span {
-  border-bottom: 1px solid var(--accent-line);
-  transition: border-color 0.14s ease;
-}
-.ds-back:hover span {
-  border-color: var(--accent);
-}
-.ds-back svg {
-  width: 15px;
-  height: 15px;
-  flex: none;
-}
-.ds-mhead {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 16px 0 6px;
-}
-.ds-msub {
-  margin: 4px 0 0;
-  font-family: var(--ff-mono);
-  font-size: 12.5px;
-  color: var(--muted);
-}
-.ds-fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 20px;
-  margin: 0;
-}
-@media (min-width: 640px) {
-  .ds-fields {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-.ds-field dt {
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 0;
-}
-.ds-field dd {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: var(--ink-2);
-}
-.ds-formula {
-  margin: 12px 0 0;
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  line-height: 1.5;
-  background: var(--bg-2);
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: var(--ink-2);
-}
-.ds-formula .dim {
-  color: var(--muted);
-}
-.ds-sub {
-  margin-top: 14px;
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  background: var(--bg-2);
-  padding: 13px 14px;
-}
-.ds-tags {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-.ds-tag {
-  font-family: var(--ff-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.03em;
-  color: var(--graphite);
-  background: var(--bg-3);
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: 3px 9px;
-}
-.ds-tag.role {
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.ds-draft {
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.ds-draft-sub {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--rule);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-}
-.ds-draft-body {
-  padding: 12px 14px;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--ink-2);
-}
-.ds-claims {
-  list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
-}
-.ds-claims li {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 6px 0;
-  font-size: 13px;
-}
-.ds-code {
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  background: var(--bg-2);
-  border: 1px solid var(--rule);
-  border-radius: 5px;
-  padding: 2px 6px;
-  color: var(--ink-2);
-}
-.ds-flaglist {
-  margin-top: 10px;
-  font-size: 12.5px;
-}
-.ds-flaglist .fl-l {
-  font-weight: 600;
-  color: var(--graphite);
-}
-.ds-flaglist ul {
-  list-style: none;
-  margin: 6px 0 0;
-  padding: 0;
-}
-.ds-flaglist li {
-  position: relative;
-  padding-left: 15px;
-  line-height: 1.5;
-}
-.ds-flaglist li::before {
-  content: "";
-  position: absolute;
-  left: 3px;
-  top: 8px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.ds-flaglist.err {
-  color: var(--error);
-}
-.ds-flaglist.warn {
-  color: var(--warn);
-}
-.ds-meta-line {
-  margin: 12px 0 0;
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  color: var(--muted);
-}
-.ds-judge-h {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px 12px;
-}
-.ds-judge-count {
-  font-size: 13px;
-  color: var(--muted);
-}
-.ds-judge-list {
-  list-style: none;
-  margin: 12px 0 0;
-  padding: 0;
-}
-.ds-judge-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 4px 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-2);
-}
-.ds-judge-list li > svg {
-  width: 13px;
-  height: 13px;
-  flex: none;
-  margin-top: 3px;
-}
-.ds-judge-list .ev {
-  color: var(--muted);
-}
-.ds-judge-list .un {
-  color: var(--error);
-}
-.ds-held {
-  border: 1px solid var(--accent-line);
-  background: var(--accent-soft);
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-.ds-held .h {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--accent);
-}
-.ds-held .h svg {
-  width: 15px;
-  height: 15px;
-  flex: none;
-}
-.ds-held .p {
-  margin: 4px 0 0;
-  font-size: 12.5px;
-  color: var(--ink-2);
-}
-.ds-gate-btns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-.ds-gate-note {
-  margin: 10px 0 0;
-  font-size: 11.5px;
-  color: var(--muted);
-}
-.ds-audit {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.ds-audit li {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  padding: 8px 0;
-  border-top: 1px solid var(--rule);
-  font-size: 12.5px;
-}
-.ds-audit li:first-child {
-  border-top: none;
-}
-.ds-audit .a-actor {
-  width: 92px;
-  flex: none;
-  font-family: var(--ff-mono);
-  color: var(--muted);
-}
-.ds-audit .a-action {
-  width: 132px;
-  flex: none;
-  font-family: var(--ff-mono);
-  color: var(--ink-2);
-}
-.ds-audit .a-detail {
-  flex: 1;
-  min-width: 180px;
-  color: var(--ink-2);
-}
-.ds-good {
-  color: var(--ok);
-}
-
 /* reduced motion — hover transforms/transitions off (data surfaces have no
    entrance motion; these are the only moving parts) */
 @media (prefers-reduced-motion: reduce) {
-  .ds-stat,
-  .ds-card,
   .ds-mlink,
-  .ds-back span,
   .ds-data tbody tr {
     transition: none;
   }
-  .ds-card:hover {
-    transform: none;
-  }
-}
-
-/* === E1a dashboard (append-only) === */
-/* Per-figure provenance line (anti-fabrication surface: file @ freeze-SHA + date). */
-.ds-prov {
-  margin-top: 12px;
-  font-size: 11.5px;
-  line-height: 1.6;
-  color: var(--muted);
-}
-.ds-prov .ds-mono {
-  font-size: 11px;
 }
 /* (.legacy-banner removed 2026-08-02 with the /legacy route group it styled —
    the archive is git history now, and a rule with no element left to style is
@@ -3478,9 +1155,6 @@ body {
   border: 0;
 }
 .pg-prov { max-width: 68ch; margin-top: 12px; font-size: 14px; line-height: 1.6; color: var(--muted); }
-.pg-meta { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 14px; padding: 10px 0; border-top: 1px solid var(--rule-2); border-bottom: 1px solid var(--rule-2); }
-.pg-meta dt { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.pg-meta dd { margin: 2px 0 0; font-size: 12.5px; }
 .pg-mono { font-family: var(--ff-mono); overflow-wrap: anywhere; }
 
 .pg-findings { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
@@ -3495,8 +1169,6 @@ body {
 .pg-receipts dt { font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .pg-receipts dd { margin: 2px 0 0; font-size: 12px; }
 .pg-clean { margin-top: 16px; font-size: 14.5px; }
-.pg-foot-sec { margin-top: 8px; }
-.pg-foot { max-width: 68ch; font-size: 13px; line-height: 1.65; color: var(--muted); border-top: 1px solid var(--rule-2); padding-top: 16px; }
 
 @media (prefers-reduced-motion: reduce) {
   .pg-finding { transition: none; }
@@ -3521,66 +1193,6 @@ body {
 .wb {
   margin-top: var(--s5);
 }
-
-/* --- the two slots --- */
-.wb-slots {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--s5);
-}
-.fd-slot {
-  border: 1px solid var(--rule-2);
-  border-radius: var(--r-card);
-  padding: var(--s5);
-  background: var(--surface);
-}
-.fd-head {
-  margin-bottom: var(--s4);
-}
-.fd-title {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.fd-hint {
-  margin-top: var(--s1);
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: var(--muted);
-}
-
-/* The drop surface: a dashed field that is only ever an ENHANCEMENT over the
-   native file input inside it. */
-.fd-zone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s3);
-  padding: var(--s7) var(--s5);
-  border: 1px dashed var(--rule-3);
-  /* Concentric radii (polish pass, 2026-07-31): nested inside .fd-slot
-     (--r-card 16px) behind 24px of padding, the inner radius must sit BELOW
-     outer-minus-padding territory, not near the outer value — 12px inside
-     16px read subtly off. --r-chip is the existing token on the right side
-     of that line. */
-  border-radius: var(--r-chip);
-  background: var(--bg-2);
-  text-align: center;
-  transition:
-    border-color 160ms var(--ease-field),
-    background 160ms var(--ease-field);
-}
-.fd-zone.is-drag {
-  border-color: var(--signal);
-  border-style: solid;
-  background: var(--signal-tint);
-}
-.fd-zone.is-filled {
-  border-style: solid;
-  border-color: var(--signal-rule);
-}
 /* The input stays in the accessibility tree and remains focusable — visually
    hidden, never display:none, so keyboard and screen-reader users keep it. */
 .fd-input {
@@ -3593,78 +1205,6 @@ body {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
-}
-.fd-label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s1);
-  cursor: pointer;
-}
-.fd-input:focus-visible + .fd-label .fd-cta {
-  outline: 2px solid var(--signal);
-  outline-offset: 3px;
-}
-.fd-cta {
-  font-size: 15px;
-  font-weight: 560;
-  color: var(--signal-text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-/* I-1 (interaction audit, 2026-07-31): the slot's PRIMARY affordance lit up
-   on keyboard focus but gave a mouse no feedback while its two lesser
-   siblings (.fd-sample, .fd-dl) both hover — inverted affordance weight.
-   The cue is typographic (underline weight), because the palette is fixed
-   and the control is already at the signal ink. */
-.fd-label:hover .fd-cta {
-  text-decoration-thickness: 2px;
-}
-.fd-or {
-  font-size: 13px;
-  color: var(--muted);
-}
-.fd-sample {
-  position: relative;
-  font-family: var(--ff-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
-  background: none;
-  border: 1px solid var(--rule-2);
-  border-radius: var(--r-pill);
-  padding: var(--s1) var(--s3);
-  cursor: pointer;
-  transition:
-    border-color 160ms var(--ease-field),
-    transform 120ms var(--ease-field);
-}
-/* Hit-area extension (polish pass 2026-07-31): the pill renders ~22px tall.
-   The pseudo-element widens the target without moving a pixel of layout;
-   the row gap below is split with .fd-dl's extension so the two targets
-   can never overlap. */
-.fd-sample::after {
-  content: "";
-  position: absolute;
-  inset: -5px 0;
-}
-.fd-sample:hover {
-  border-color: var(--rule-3);
-}
-.fd-sample:active {
-  transform: scale(0.96);
-}
-.fd-sample:focus-visible {
-  outline: 2px solid var(--signal);
-  outline-offset: 2px;
-}
-
-.fd-file {
-  margin-top: var(--s3);
-  font-family: var(--ff-mono);
-  font-size: 12.5px;
-  color: var(--ink-2);
-  overflow-wrap: anywhere;
 }
 .fd-status {
   margin-top: var(--s2);
@@ -3680,24 +1220,6 @@ body {
 }
 .fd-status.error {
   color: var(--error-ink);
-}
-
-.fd-paste {
-  margin-top: var(--s4);
-  border-top: 1px solid var(--rule);
-  padding-top: var(--s3);
-}
-.fd-paste > summary {
-  font-size: 13px;
-  color: var(--muted);
-  cursor: pointer;
-  /* Hit area: a bare 13px summary line is a ~20px target; block padding
-     lifts it past 32px (polish pass, 2026-07-31). */
-  padding: 6px 0;
-}
-.fd-paste > summary:focus-visible {
-  outline: 2px solid var(--signal);
-  outline-offset: 2px;
 }
 .fd-paste-label {
   display: block;
@@ -3727,19 +1249,6 @@ body {
 }
 
 /* --- run --- */
-/* R-5/D-4 (2026-07-31): the run row is a centred COLUMN on the hero axis —
-   note above button, so the reading order is zones → what is missing (or
-   what will happen) → the control. The old row set the page's primary action
-   beside its own instruction like a caption. */
-.wb-run {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s3);
-  margin-top: var(--s5);
-  text-align: center;
-}
-.wb-run-note,
 .wb-hint {
   font-size: 13.5px;
   line-height: 1.55;
@@ -3773,158 +1282,6 @@ body {
   line-height: 1.6;
   background: var(--surface);
 }
-
-/* --- result --- */
-/* The result is a NEW panel, not a continuation of the form: it gets the card
-   treatment the slots have, so a full-width hairline never reads as a page
-   divider between two unrelated sections (screenshot review 2026-07-27). */
-.wb-result {
-  margin-top: var(--s7);
-  border: 1px solid var(--rule-2);
-  border-radius: var(--r-card);
-  padding: var(--s5);
-  background: var(--surface);
-}
-.wb-verdict-head {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s4);
-  flex-wrap: wrap;
-}
-.wb-verdict {
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-.wb-verdict.fail {
-  color: var(--error-ink);
-}
-.wb-verdict.ok {
-  color: var(--ink-2);
-}
-.wb-tally {
-  font-size: 15px;
-  color: var(--ink-2);
-  /* Changing Onest figures (finding/error/warn counts) hold column across
-     re-runs (polish pass, 2026-07-31). */
-  font-variant-numeric: tabular-nums;
-}
-.wb-dl {
-  margin-left: auto;
-}
-.wb-prov {
-  max-width: 68ch;
-  margin-top: var(--s3);
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-  text-wrap: pretty;
-}
-.wb-meta {
-  display: flex;
-  gap: var(--s6);
-  flex-wrap: wrap;
-  margin-top: var(--s4);
-  padding: var(--s3) 0;
-  border-top: 1px solid var(--rule-2);
-  border-bottom: 1px solid var(--rule-2);
-}
-.wb-meta dt {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.wb-meta dd {
-  margin: var(--s1) 0 0;
-  font-size: 12.5px;
-}
-.wb-mono {
-  font-family: var(--ff-mono);
-  overflow-wrap: anywhere;
-}
-.wb-findings {
-  list-style: none;
-  margin: var(--s5) 0 0;
-  padding: 0;
-  display: grid;
-  gap: var(--s3);
-}
-.wb-finding {
-  border: 1px solid var(--rule-2);
-  border-radius: var(--r-chip);
-  padding: var(--s4);
-  background: var(--surface);
-  transition: border-color 160ms var(--ease-field);
-}
-.wb-finding:hover {
-  border-color: var(--rule-3);
-}
-.wb-plain {
-  font-size: 14.5px;
-  line-height: 1.55;
-}
-.wb-sev {
-  display: inline-block;
-  min-width: 44px;
-  margin-right: var(--s2);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-.wb-sev.error {
-  color: var(--error-ink);
-}
-.wb-sev.warn {
-  color: var(--warn-ink);
-}
-.wb-sev.info {
-  color: var(--muted);
-}
-.wb-receipts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--s2) var(--s5);
-  margin: var(--s3) 0 0;
-  padding-top: var(--s3);
-  border-top: 1px solid var(--rule-2);
-}
-.wb-receipts dt {
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.wb-receipts dd {
-  margin: var(--s1) 0 0;
-  font-size: 12px;
-}
-.wb-clean {
-  margin-top: var(--s4);
-  font-size: 14.5px;
-}
-
-/* Next steps after a verdict (2026-07-28). Uses the --s* scale rather than
-   hand-typed pixels — the mixed-units finding from the session-36 review. */
-.wb-next {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s3) var(--s5);
-  margin-top: var(--s6);
-  padding-top: var(--s5);
-  border-top: 1px solid var(--rule);
-}
-.fd-sample-row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* 7px → 10px (polish pass): room for the two stacked controls' hit-area
-     extensions to split without overlapping. */
-  gap: 10px;
-}
 .fd-dl {
   position: relative;
   background: none;
@@ -3952,17 +1309,10 @@ body {
 .fd-dl:active {
   transform: scale(0.96);
 }
-.wb-next-link {
-  font-size: 14px;
-  color: var(--iris-ink);
-  text-underline-offset: 3px;
-}
 /* Underline finish on the underlined controls (polish pass, better-typography):
    thickness and position from the font's own metrics; skip-ink is the UA
    default. Explicit offsets above still win where set. */
-.fd-cta,
-.fd-dl,
-.wb-next-link {
+.fd-dl {
   text-underline-position: from-font;
   text-decoration-thickness: from-font;
 }
@@ -3970,25 +1320,17 @@ body {
    noise. Scoped to controls only: findings, figures and receipts stay
    selectable, because this is an evidence tool. */
 .lp-btn,
-.fd-label,
-.fd-sample,
-.fd-dl,
-.fd-paste > summary,
-.cs-pause {
+.fd-dl {
   user-select: none;
   -webkit-user-select: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wb-finding,
-  .fd-zone,
-  .fd-sample,
   .fd-dl {
     transition: none;
   }
   .lp-btn.primary:active,
   .lp-btn.ghost:active,
-  .fd-sample:active,
   .fd-dl:active {
     transform: none;
   }
@@ -4014,42 +1356,6 @@ body {
   font-feature-settings: "tnum" 1;
 }
 
-/* chapter accent scope — NEUTRALIZED to the storyboard model (adoption
-   2026-07-15): ONE interactive accent (iris) across every chapter; ember stays
-   reserved for the verdict/finding semantics inside the bench. The --chapter
-   indirection is kept so any component-level consumer follows coherently. */
-.cc-chapter {
-  --chapter: var(--iris);
-  --chapter-text: var(--iris-ink);
-  --chapter-soft: var(--iris-soft);
-}
-/* storyboard eyebrow: graphite mono + one rotated iris square */
-.cc-chapter .lp-eyebrow {
-  color: var(--muted);
-  letter-spacing: 0.12em;
-}
-.cc-chapter .lp-eyebrow::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  flex: none;
-  transform: rotate(45deg);
-  background: rgba(var(--accent-rgb), 0.5);
-}
-/* storyboard rule: a neutral hairline, not a chapter-hued bar */
-.cc-chapter .lp-sec-rule {
-  border-top-color: var(--rule-3);
-}
-
-/* CTA row — shared by the landing close section (.cc-close-cta pairs with it) */
-.cc-hero-cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  justify-content: center;
-  margin-top: 32px;
-}
-
 
 /* ----- 01 EVIDENCE BENCH: the conservator's examination table --------------- */
 .eb {
@@ -4058,311 +1364,6 @@ body {
   border-radius: 6px;
   background: var(--bg);
   padding: clamp(20px, 3vw, 34px);
-}
-.eb-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px 16px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--rule);
-}
-.eb-kicker {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--graphite);
-}
-.eb-tally {
-  font-size: 12.5px;
-  color: var(--ink-2);
-}
-
-.eb-table {
-  display: grid;
-  grid-template-columns: 1fr minmax(180px, 0.9fr) 1fr;
-  gap: clamp(16px, 3vw, 40px);
-  align-items: start;
-  padding: 28px 0;
-}
-.eb-col {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.eb-claim {
-  align-items: flex-end;
-  text-align: right;
-}
-.eb-record {
-  align-items: flex-start;
-  text-align: left;
-}
-.eb-col-label {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--muted);
-  margin-bottom: 3px;
-}
-.eb-field {
-  font-size: 12.5px;
-  color: var(--graphite);
-}
-.eb-money {
-  position: relative;
-  font-size: clamp(22px, 3.2vw, 30px);
-  font-weight: 600;
-  color: var(--ink);
-  line-height: 1.1;
-}
-.eb-claim .eb-money::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -3px;
-  height: 2px;
-  background: var(--ember);
-  transform: scaleX(0);
-  transform-origin: right;
-}
-.eb-claim .eb-money.is-lit::after {
-  transform: scaleX(1);
-}
-.eb-record .eb-money::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -3px;
-  height: 2px;
-  background: var(--azure);
-  transform: scaleX(0);
-  transform-origin: left;
-}
-.eb-record .eb-money.is-lit::after {
-  transform: scaleX(1);
-}
-.eb-sub {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* central rule axis — correspondence spine + gold rule rail + arithmetic + break */
-.eb-axis {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
-  padding-top: 22px;
-}
-.eb-corr {
-  align-self: center;
-  width: 1px;
-  height: 22px;
-  background: var(--graphite);
-  opacity: 0.15; /* replay-dim: faint until its stage relights */
-}
-.eb-corr.is-lit {
-  opacity: 0.4;
-}
-.eb-rule {
-  border-left: 2px solid var(--gold);
-  padding: 6px 0 6px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  opacity: 0.3; /* replay-dim */
-}
-.eb-rule.is-lit {
-  opacity: 1;
-  transform: none;
-}
-.eb-rule-name {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--gold-text);
-}
-.eb-rule-plain {
-  font-size: 11.5px;
-  color: var(--muted);
-}
-.eb-math {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 12.5px;
-  color: var(--ink-2);
-  opacity: 0.3; /* replay-dim */
-}
-.eb-math.is-lit {
-  opacity: 1;
-  transform: none;
-}
-.eb-break {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--error-ink);
-  opacity: 0.3; /* replay-dim */
-}
-.eb-break.is-lit {
-  opacity: 1;
-  transform: none;
-}
-
-/* the receipt (evidence attached / locked) */
-.eb-receipt {
-  border-top: 1px solid var(--rule);
-  padding-top: 18px;
-}
-.eb-receipt-label {
-  display: inline-block;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--muted);
-}
-.eb-receipt.is-filled .eb-receipt-label {
-  color: var(--ember-text);
-}
-.eb-receipt-body {
-  /* stays in layout during a replay (ships-done contract: zero height delta) —
-     the prior evidence dims to low emphasis while the stages relight */
-  display: block;
-  margin-top: 12px;
-  opacity: 0.35;
-}
-.eb-receipt-body.is-lit {
-  opacity: 1;
-}
-.eb-receipt-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-}
-.eb-sev {
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--error-ink);
-}
-.eb-receipt-rule {
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--graphite);
-}
-.eb-receipt-plain {
-  margin: 8px 0 0;
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--ink);
-}
-.eb-receipt-rows {
-  margin: 14px 0 0;
-  display: grid;
-  gap: 0;
-}
-.eb-receipt-rows > div {
-  display: grid;
-  grid-template-columns: 96px 1fr;
-  gap: 12px;
-  padding: 7px 0;
-  border-top: 1px solid var(--rule);
-}
-.eb-receipt-rows dt {
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.eb-receipt-rows dd {
-  margin: 0;
-  font-size: 12.5px;
-  color: var(--ink-2);
-  overflow-wrap: anywhere;
-}
-.eb-receipt-foot {
-  display: block;
-  margin-top: 12px;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-}
-
-.eb-actions {
-  margin-top: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s4);
-  flex-wrap: wrap;
-}
-
-/* ----- session-21 substance: step-through · provenance · finding browse ·
-   the rendered delta (design review 2026-07-16 D-3/D-4; v8 tokens only) ----- */
-.eb-steps {
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-  flex-wrap: wrap;
-}
-.eb-step {
-  min-height: 40px;
-  padding: 8px 12px;
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  color: var(--graphite);
-  background: var(--bg);
-  border: 1px solid var(--rule-2);
-  border-radius: 4px;
-  cursor: pointer;
-  transition:
-    border-color 0.18s ease,
-    background-color 0.18s ease,
-    color 0.18s ease;
-}
-.eb-step:hover {
-  border-color: var(--rule-3);
-  color: var(--ink-2);
-}
-.eb-step[aria-pressed="true"] {
-  border-color: var(--iris-ink);
-  color: var(--iris-ink);
-  background: var(--accent-soft);
-}
-.eb-step:focus-visible {
-  outline: 2px solid var(--iris-ink);
-  outline-offset: 2px;
-}
-
-.eb-delta {
-  margin: 6px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  opacity: 0.3; /* replay-dim */
-  transition: opacity 0.45s ease;
-}
-.eb-delta.is-lit {
-  opacity: 1;
-}
-.eb-delta-num {
-  font-size: 40px;
-  font-weight: 750;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: var(--error-ink);
-  font-variant-numeric: tabular-nums;
-}
-.eb-delta-cap {
-  font-size: 10.5px;
-  letter-spacing: 0.12em;
-  color: var(--muted);
 }
 
 .eb-browse summary {
@@ -4394,115 +1395,6 @@ body {
   outline: 2px solid var(--iris-ink);
   outline-offset: 2px;
 }
-.eb-browse-list {
-  margin: var(--s3) 0 var(--s1);
-  padding: 0;
-  max-height: 300px;
-  overflow-y: auto;
-  border-top: 1px solid var(--rule);
-}
-.eb-browse-list li {
-  list-style: none;
-  display: grid;
-  grid-template-columns: 30px 56px 1fr;
-  gap: var(--s3);
-  align-items: baseline;
-  padding: 7px var(--s2);
-  border-bottom: 1px solid var(--rule);
-  font-size: 11.5px;
-}
-.eb-browse-list li[aria-current="true"] {
-  background: var(--ember-soft);
-  box-shadow: inset 2px 0 0 var(--ember);
-}
-.eb-browse-idx {
-  color: var(--faint);
-}
-.eb-browse-sev.is-error {
-  color: var(--error-ink);
-  font-weight: 700;
-}
-.eb-browse-sev.is-warn {
-  color: var(--warn-ink);
-  font-weight: 700;
-}
-.eb-browse-line {
-  color: var(--body);
-}
-.eb-browse-line em {
-  font-style: normal;
-  color: var(--ember-text);
-}
-
-.eb-prov {
-  margin-top: var(--s3);
-}
-.eb-prov summary {
-  cursor: pointer;
-  list-style: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 24px;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  color: var(--muted);
-}
-.eb-prov summary::-webkit-details-marker {
-  display: none;
-}
-.eb-prov summary::after {
-  content: "▸";
-  color: var(--faint);
-  transition: transform 0.18s ease;
-}
-.eb-prov[open] summary::after {
-  transform: rotate(90deg);
-}
-.eb-prov summary:focus-visible {
-  outline: 2px solid var(--iris-ink);
-  outline-offset: 2px;
-}
-.eb-prov[open] summary {
-  color: var(--ink-2);
-}
-.eb-prov dl {
-  margin: var(--s2) 0 0;
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 4px var(--s3);
-  font-size: 11.5px;
-}
-.eb-prov dt {
-  color: var(--muted);
-}
-.eb-prov dd {
-  margin: 0;
-  color: var(--graphite);
-  overflow-wrap: anywhere;
-}
-.eb-run:active {
-  transform: translateY(1px);
-}
-.eb-run:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-.eb-run:focus-visible {
-  outline: 2px solid var(--iris-ink);
-  outline-offset: 2px;
-}
-.eb-live {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
 
 /* ----- 02 METHOD: the relationship ----------------------------------------- */
 .mr {
@@ -4512,275 +1404,17 @@ body {
   gap: clamp(24px, 5vw, 64px);
   align-items: start;
 }
-.mr-sentence {
-  margin: 0;
-  font-family: var(--serif);
-  font-size: clamp(21px, 2.6vw, 30px);
-  line-height: 1.34;
-  letter-spacing: -0.012em;
-  color: var(--ink);
-}
-.mr-word {
-  font: inherit;
-  color: var(--muted);
-  background: none;
-  border: 0;
-  padding: 0 1px;
-  cursor: pointer;
-  border-bottom: 2px solid var(--rule-2);
-  transition:
-    color 0.2s var(--ease),
-    border-color 0.2s var(--ease);
-}
-.mr-word:hover {
-  color: var(--ink);
-  border-bottom-color: var(--violet);
-}
-.mr-word[aria-pressed="true"] {
-  color: var(--violet-text);
-  border-bottom-color: var(--violet);
-}
-.mr-word:focus-visible {
-  outline: 2px solid var(--violet-text);
-  outline-offset: 3px;
-  border-radius: 2px;
-}
-.mr-panel {
-  border-left: 2px solid var(--violet);
-  padding: 4px 0 4px 18px;
-  align-self: center;
-}
-.mr-panel-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--violet-text);
-}
-.mr-panel-value {
-  margin: 8px 0 0;
-  font-size: 15px;
-  color: var(--ink);
-  overflow-wrap: anywhere;
-}
-.mr-panel-note {
-  margin: 8px 0 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--body);
-}
 
 /* ----- 03 COVERAGE: the tablist -------------------------------------------- */
 .cv {
   margin-top: 30px;
 }
-.cv-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  border-bottom: 1px solid var(--rule-2);
-}
-.cv-tab {
-  position: relative;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  background: none;
-  border: 0;
-  padding: 12px 14px;
-  cursor: pointer;
-  transition: color 0.18s var(--ease);
-}
-.cv-tab::after {
-  content: "";
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: -1px;
-  height: 2px;
-  background: var(--iris);
-  transform: scaleX(0);
-  transition: transform 0.22s var(--ease);
-}
-.cv-tab:hover {
-  color: var(--ink-2);
-}
-.cv-tab[aria-selected="true"] {
-  color: var(--iris-ink);
-}
-.cv-tab[aria-selected="true"]::after {
-  transform: scaleX(1);
-}
-.cv-tab:focus-visible {
-  outline: 2px solid var(--iris-ink);
-  outline-offset: -2px;
-  border-radius: 3px;
-}
-.cv-panel {
-  padding: 22px 2px 0;
-}
-.cv-panel:focus-visible {
-  outline: 2px solid var(--iris-ink);
-  outline-offset: 4px;
-  border-radius: 4px;
-}
-.cv-panel-body {
-  margin: 0;
-  font-size: clamp(16px, 1.8vw, 18.5px);
-  line-height: 1.6;
-  color: var(--body);
-  max-width: 60ch;
-}
-
-/* ----- 04 LIMITS: sticky thesis + numbered margin notes -------------------- */
-.cc-limits-grid {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: clamp(28px, 6vw, 88px);
-  align-items: start;
-}
-.cc-limits-thesis {
-  position: sticky;
-  top: 96px;
-}
-.cc-limits-notes {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.cc-note {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 18px;
-  padding: 22px 0;
-  border-top: 1px solid var(--rule);
-}
-.cc-note:first-child {
-  border-top: 0;
-  padding-top: 0;
-}
-.cc-note-idx {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--gold-text);
-  padding-top: 3px;
-}
-.cc-note-idx-sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-.cc-note-title {
-  margin: 0;
-  font-family: var(--serif);
-  font-size: 19px;
-  line-height: 1.25;
-  color: var(--ink);
-}
-.cc-note-body {
-  margin: 8px 0 0;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--body);
-  max-width: 56ch;
-}
-
-/* ----- CLOSE --------------------------------------------------------------- */
-.cc-close-cta {
-  margin-top: 26px;
-}
 
 /* ----- responsive ---------------------------------------------------------- */
 @media (max-width: 900px) {
-  .eb-table {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .eb-claim,
-  .eb-record {
-    align-items: flex-start;
-    text-align: left;
-  }
-  .eb-claim .eb-money::after {
-    transform-origin: left;
-  }
-  .eb-axis {
-    padding-top: 4px;
-    order: 2;
-  }
-  .eb-record {
-    order: 3;
-  }
-  .eb-corr {
-    align-self: flex-start;
-    width: 22px;
-    height: 1px;
-  }
   .mr {
     grid-template-columns: 1fr;
     gap: 24px;
-  }
-  .cc-limits-grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-  .cc-limits-thesis {
-    position: static;
-  }
-}
-
-/* ----- motion: staged reveals + hover transitions, gated to allowed motion -- */
-@media (prefers-reduced-motion: no-preference) {
-  .eb-money::after {
-    transition: transform 0.32s var(--ease-arrival);
-  }
-  .eb-corr {
-    transition: opacity 0.3s var(--ease-arrival);
-  }
-  .eb-rule,
-  .eb-math,
-  .eb-break {
-    transition:
-      opacity 0.34s var(--ease-arrival),
-      transform 0.34s var(--ease-arrival);
-  }
-  .eb-receipt-body.is-lit {
-    animation: cc-fade-up 0.42s var(--ease-arrival) both;
-  }
-  .eb-receipt-body.is-lit .eb-receipt-rows > div {
-    animation: cc-fade-up 0.4s var(--ease-arrival) both;
-  }
-  .eb-receipt-body.is-lit .eb-receipt-rows > div:nth-child(1) {
-    animation-delay: 0.06s;
-  }
-  .eb-receipt-body.is-lit .eb-receipt-rows > div:nth-child(2) {
-    animation-delay: 0.12s;
-  }
-  .eb-receipt-body.is-lit .eb-receipt-rows > div:nth-child(3) {
-    animation-delay: 0.18s;
-  }
-  .eb-receipt-body.is-lit .eb-receipt-rows > div:nth-child(4) {
-    animation-delay: 0.24s;
-  }
-  .cv-panel {
-    animation: cc-fade-up 0.28s var(--ease-arrival) both;
-  }
-  @keyframes cc-fade-up {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
   }
 }
 
@@ -4790,27 +1424,9 @@ body {
      STATE, not animation, and must read under reduced motion too. The bench
      still opens complete (SSR stage 6 = everything lit) and a reduced-motion
      replay jumps straight to the settled stage. */
-  .eb-corr,
-  .eb-rule,
-  .eb-math,
-  .eb-break,
-  .eb-delta,
-  .eb-step,
-  .eb-browse summary::after,
-  .eb-prov summary::after {
+  .eb-browse summary::after {
     transform: none;
     transition: none;
-  }
-  .eb-money::after {
-    transition: none;
-  }
-  .mr-word,
-  .cv-tab,
-  .cv-tab::after {
-    transition: none;
-  }
-  .eb-run:active {
-    transform: none;
   }
 }
 
@@ -4826,29 +1442,9 @@ body {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: none; }
 }
-@keyframes cs-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 @keyframes cs-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.45; transform: scale(0.8); }
-}
-.cs-hero {
-  min-height: calc(100vh - 68px);
-  display: flex;
-  flex-direction: column;
-  background: var(--bg);
-  overflow: hidden;
-}
-.cs-copy {
-  text-align: center;
-  max-width: 840px;
-  margin: 0 auto;
-  padding: clamp(32px, 5vh, 60px) 48px 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 .cs-eyebrow {
   /* v9 ghost pill (takeover build 2026-07-20): quiet graphite audience chip on
@@ -4909,183 +1505,15 @@ body {
   text-wrap: pretty;
   animation: cs-up 0.7s var(--ease) 0.2s both;
 }
-.cs-ctas {
-  display: flex;
-  gap: 14px;
-  margin-top: 30px;
-  animation: cs-up 0.7s var(--ease) 0.28s both;
-}
-.cs-zones {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 26px auto 0;
-  background: rgba(var(--glass-rgb), 0.6);
-  border: 1px solid var(--edge-3);
-  border-radius: var(--r-pill);
-  padding: 4px;
-  width: fit-content;
-  animation: cs-fade 0.7s var(--ease) 0.34s both;
-}
-.cs-zone-btn {
-  font-family: var(--ff-sans);
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--muted);
-  background: transparent;
-  border: none;
-  border-radius: var(--r-pill);
-  padding: 9px 16px;
-  cursor: pointer;
-  transition:
-    color 0.2s var(--ease),
-    background 0.2s var(--ease),
-    box-shadow 0.2s var(--ease),
-    transform 0.2s var(--ease);
-}
-.cs-zone-btn:hover {
-  color: var(--accent);
-  transform: translateY(-1px);
-}
-.cs-zone-btn[aria-pressed="true"] {
-  color: var(--accent);
-  background: var(--surface-raise);
-  box-shadow:
-    0 1px 3px rgba(var(--shadow-rgb), 0.08),
-    0 0 0 1px rgba(var(--accent-rgb), 0.2);
-}
-.cs-zone-btn:focus-visible,
-.cs-pause:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-.cs-band {
-  flex: 1;
-  position: relative;
-  min-height: 340px;
-  perspective: 1600px;
-  animation: cs-fade 1s var(--ease) 0.3s both;
-}
-.cs-status {
-  position: absolute;
-  /* On the CONTENT RAIL, not the viewport edge (R-4/D-3, 2026-07-31): the
-     owner's screenshot showed the status label clipped at the left edge.
-     max() means the label can only ever move INWARD from the old 56px, so
-     the clip cannot recur at any supported width — and the band's HUD chrome
-     now shares the rail the page's copy sits on. */
-  left: max(56px, calc((100% - var(--maxw)) / 2 + 32px));
-  bottom: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-.cs-status-dot {
-  width: 6px;
-  height: 6px;
-  flex: none;
-  border-radius: 999px;
-  transition: background 0.3s var(--ease);
-}
-.cs-status-text {
-  font-family: var(--ff-mono);
-  font-size: 10.5px;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.2em;
-}
-.cs-pause {
-  position: absolute;
-  /* Mirrors .cs-status: HUD chrome on the content rail (R-4). */
-  right: max(56px, calc((100% - var(--maxw)) / 2 + 32px));
-  bottom: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--ff-sans);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--muted);
-  background: rgba(var(--glass-rgb), 0.85);
-  border: 1px solid var(--edge-3);
-  border-radius: var(--r-pill);
-  padding: 0 16px;
-  min-height: 38px;
-  cursor: pointer;
-  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
-}
-.cs-pause:hover {
-  border-color: rgba(var(--accent-rgb), 0.45);
-  color: var(--accent);
-}
-.cs-station-label {
-  white-space: nowrap;
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.2em;
-  margin-top: 8px;
-  transition: color 0.3s var(--ease);
-}
 /* Reduced motion: entrance animations settle instantly; the component itself
    renders the completed scene (its own contract) — CSS only kills motion. */
 @media (prefers-reduced-motion: reduce) {
-  .cs-eyebrow, .cs-h1, .cs-lede, .cs-ctas, .cs-zones, .cs-band {
+  .cs-eyebrow, .cs-h1, .cs-lede {
     animation: none;
   }
   .cs-eyebrow-dot {
     animation: none;
   }
-}
-
-/* ----- THREE MOVES cards + PROOF-OBJECT bar (v8 adoption, 2026-07-16) ------- */
-.tm-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  margin-top: 8px;
-}
-.tm-card {
-  background: var(--surface);
-  border: 1px solid var(--edge);
-  border-radius: var(--r-card);
-  padding: 26px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
-}
-.tm-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 34px rgba(var(--shadow-rgb), 0.08);
-}
-.tm-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.tm-num {
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--faint);
-}
-.tm-title {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin: 0;
-}
-.tm-body {
-  font-size: 14.5px;
-  line-height: 1.65;
-  color: var(--muted);
-  text-wrap: pretty;
-  margin: 0;
 }
 .pb-bar {
   display: flex;
@@ -5146,21 +1574,6 @@ body {
   border-radius: var(--r-pill);
   padding: 7px 12px;
 }
-/* chapter link rows (listings / fee-cap / evidence chapters) */
-.ch-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 22px;
-}
-
-/* ----- FEE SURFACE (NYC showcase N1+N2, 2026-07-16) — v8-language additions
-   over the shared rpt-* / pg-* systems. ------------------------------------- */
-.fee-case-plain {
-  font-size: 13.5px;
-  color: var(--muted);
-  margin: 10px 0 0;
-}
 .fee-vtag {
   display: inline-block;
   font-family: var(--ff-mono);
@@ -5194,139 +1607,6 @@ body {
   border-color: rgba(31, 143, 255, 0.35);
   background: var(--azure-soft);
 }
-.fee-provisional {
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--gold-text);
-  margin: 8px 0 0;
-}
-.fee-professional {
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--graphite);
-  margin: 12px 0 0;
-  padding-top: 10px;
-  border-top: 1px solid var(--rule);
-}
-.fee-clean {
-  font-size: 15px;
-  color: var(--ok);
-  font-weight: 550;
-}
-.fee-h2 {
-  font-family: var(--display);
-  font-size: clamp(24px, 2.4vw, 32px);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  font-weight: 560;
-  color: var(--ink);
-  margin: 0 0 12px;
-  text-wrap: balance;
-}
-.fee-lanes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 20px;
-  margin-top: 24px;
-}
-.fee-lane {
-  background: var(--surface);
-  border: 1px solid var(--edge);
-  border-radius: var(--r-card);
-  padding: 24px;
-}
-.fee-lane-title {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin: 0 0 16px;
-}
-.fee-lane-count {
-  font-family: var(--ff-mono);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-}
-.fee-lane-external .fee-lane-count {
-  color: var(--gold-text);
-}
-.fee-rule-list,
-.fee-ext-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-.fee-rule-row {
-  display: grid;
-  grid-template-columns: minmax(120px, auto) 1fr auto;
-  gap: 4px 14px;
-  align-items: baseline;
-  padding: 9px 0;
-  border-top: 1px solid var(--rule);
-  font-size: 13px;
-}
-.fee-rule-id {
-  font-size: 11.5px;
-  color: var(--accent);
-}
-.fee-rule-kind {
-  color: var(--graphite);
-}
-.fee-rule-clause {
-  font-size: 11.5px;
-  color: var(--faint);
-  white-space: nowrap;
-}
-.fee-ext-row {
-  padding: 12px 0;
-  border-top: 1px solid var(--rule);
-}
-.fee-ext-title {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-  margin: 0;
-}
-.fee-ext-plain {
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--muted);
-  margin: 6px 0 0;
-}
-.fee-ext-state {
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--gold-text);
-  margin: 8px 0 0;
-}
-.fee-boundary-sec {
-  margin-top: 8px;
-}
-@media (max-width: 720px) {
-  .fee-rule-row {
-    grid-template-columns: 1fr;
-  }
-}
-.fee-clean-boundary {
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--muted);
-  margin: 10px 0 0;
-}
 
 /* ============================================================================
    TAKEOVER v9 LAYER (build piece 1, 2026-07-20) — the adopted design source
@@ -5342,8 +1622,7 @@ body {
    ========================================================================== */
 
 :root {
-  /* paper material (v9): warm evidence stock for the examination receipt.
-     (.rpt-wrap scopes its OWN --paper locally and is unaffected.) */
+  /* paper material (v9): warm evidence stock for the examination receipt. */
   --paper: #fdfcf9;
   --paper-rule: rgba(76, 62, 32, 0.14);
   --paper-rule-2: rgba(76, 62, 32, 0.24);
@@ -5402,147 +1681,6 @@ body {
 .sect-last {
   padding-bottom: clamp(72px, 10vh, 100px);
 }
-
-/* ---------- HERO ZONE — one centred object (S1, 2026-07-31) ---------------- *
- * The lead deliberately does NOT take `.cs-hero`'s `min-height: 100vh`. That
- * rule is why the workbench could never reach the first screen while the scene
- * was the hero — the burial was structural. Sized so the H1, the lede and the
- * first drop zone are all above a 900px fold at the 1280px desktop floor.
- *
- * THE AXIS (R-1/D-1 → design direction S1). The first viewport used to run
- * three alignment systems: a centred 62ch column, a left H2, a full-width
- * grid. R-1 settled on ONE axis; the research pass (Evil Martians devtool
- * study + the 2026 live-embed pattern) settled WHICH: this product is a
- * narrow-scope utility whose hero visual is the live instrument itself, and
- * the winning composition for exactly that shape is a centred hero with the
- * embed inside the announcement. So the hero zone is centred top to bottom —
- * H1 → lede → nameplate → promise → zones → run — while the content sections
- * below keep the site's left eyebrow-rule-H2 grammar, and the scene band
- * stays a centred figure. One axis per zone, page-wide.                      */
-.home-lead {
-  background: var(--bg);
-  text-align: center;
-  /* Every pixel spent here is a pixel the drop zones do not get on the
-     first screen. */
-  padding: clamp(40px, 6vh, 64px) 0 0;
-}
-/* THE SCALE. The landing H1 adopts `p2-h1`'s existing display scale — the
-   2026 oversized-type pattern executed with a scale this site already owns
-   rather than a new one. Hierarchy holds at every desktop width: 48.6px at
-   1280 against `.lp-h2`'s 32px and `.scene-h2`'s 28.2px, so the session-37
-   inversion cannot recur. Scoped to `.home-lead`; other `.cs-h1` surfaces
-   are untouched. */
-.home-lead .cs-h1 {
-  margin-top: 0;
-  font-size: clamp(36px, 3.8vw, 54px);
-}
-.home-lead .cs-lede {
-  margin: 18px auto 0;
-  /* `balance` over `pretty`: a short centred block where even line lengths
-     matter more than widow control. */
-  text-wrap: balance;
-  max-width: 62ch;
-}
-
-.sect-tool {
-  /* The instrument half of the hero object: centred axis, tightened seam to
-     the lead above (they read as one composition). The card interiors return
-     to left — a report and a form read left; the AXIS is carried by the
-     nameplate, the promise line, the symmetric grid and the run column. */
-  text-align: center;
-  padding: clamp(28px, 4vh, 44px) 0 0;
-}
-.sect-tool .wb {
-  text-align: left;
-}
-/* "Audit a feed." — set in the DISPLAY tier, deliberately.
-   HISTORY (owner reversal, 2026-07-31): the redesign's S1 demoted this H2 to a
-   13px mono uppercase "nameplate" so it would not compete with the H1 one
-   viewport-line above. The owner refused the register the same day — "no
-   instrument type fonts. use premium sophisticated fonts" — so it returns to
-   the site's own premium display voice (`lp-h2`: Onest, weight-carried).
-   The H1→H2 step stays unambiguous by SIZE (48.6→~30px at 1280), which is
-   how a display system separates ranks; the mono label voice remains for
-   DATA — ledger figures, rule ids, receipts — never for headings.
-   Slightly under the sibling lp-h2 scale: this H2 sits one viewport-line
-   below the H1, and the hero object must read as one thing, not two rivals. */
-h2.tool-h2 {
-  margin-top: 0;
-  font-size: clamp(23px, 2.2vw, 30px);
-  max-width: none;
-}
-.tool-foot {
-  /* Two load-bearing ideas — the check and the promise (D-6). The wall this
-     replaces carried five; the slots themselves demonstrate the other three. */
-  margin: 12px auto 0;
-  max-width: 56ch;
-}
-
-/* The scene band, now an explanatory figure rather than the hero: its heading
-   is an H2, so it must not wear H1 scale. */
-.sect-scene {
-  padding-bottom: 0;
-}
-.scene-h2 {
-  font-size: clamp(26px, 2.2vw, 34px);
-  margin-top: 0;
-}
-.sect-scene + .cs-hero {
-  min-height: 0;
-}
-.sect-scene + .cs-hero .cs-copy {
-  padding-top: 0;
-}
-/* The band was the page's 100vh hero in session 36; as an explanatory figure
-   it no longer needs hero-scale internal air (R-4/D-3). The station geometry
-   is proportional (28%-70% of band height), so trimming the floor tightens
-   the dead space above and below the artwork evenly. The generic 340px floor
-   stays for any surface where the scene IS the hero. */
-.sect-scene + .cs-hero .cs-band {
-  min-height: 300px;
-}
-
-/* ---------- HERO band additions (rails · ticks · order ring · lighting) ----- */
-.cs-band .bg-hold {
-  opacity: 0;
-  transition: opacity 0.8s var(--ease-arrival);
-}
-.cs-band.is-hold .bg-hold {
-  opacity: 1;
-}
-.cs-acc {
-  position: absolute;
-  right: 56px;
-  top: 10px;
-}
-.cs-ticks {
-  display: inline-flex;
-  gap: 5px;
-  margin-left: 12px;
-  align-items: center;
-}
-.cs-ticks i {
-  display: block;
-  width: 16px;
-  height: 2px;
-  border-radius: 2px;
-  background: rgba(var(--ink-rgb), 0.12);
-  overflow: hidden;
-}
-.cs-ticks i b {
-  display: block;
-  height: 100%;
-  width: 100%;
-  transform: scaleX(0);
-  transform-origin: left;
-  background: var(--accent);
-}
-.cs-ticks i.hold {
-  background: rgba(var(--ember-rgb), 0.16);
-}
-.cs-ticks i.hold b {
-  background: var(--ember);
-}
 .rail {
   fill: none;
   stroke: rgba(var(--ink-rgb), 0.1);
@@ -5553,41 +1691,6 @@ h2.tool-h2 {
 }
 .rail.on {
   stroke: rgba(var(--accent-rgb), 0.42);
-}
-.cs-oring {
-  position: absolute;
-  left: -8px;
-  top: -8px;
-  width: 66px;
-  height: 66px;
-  border-radius: 999px;
-  border: 1px solid rgba(var(--accent-rgb), 0.55);
-  opacity: 0;
-  pointer-events: none;
-}
-.cs-oring.ping {
-  animation: oring 0.9s var(--ease-arrival) both;
-}
-@keyframes oring {
-  0% { opacity: 0.85; transform: scale(0.66); }
-  100% { opacity: 0; transform: scale(1.28); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .cs-ticks,
-  .cs-oring {
-    display: none;
-  }
-  .cs-order-tick {
-    transition: none !important;
-  }
-}
-
-/* ---------- EXAMINATION RECEIPT (paper material, spring stamp) -------------- */
-.turn-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 500px;
-  gap: 64px;
-  align-items: start;
 }
 .receipt {
   background: var(--paper);
@@ -5681,13 +1784,6 @@ h2.tool-h2 {
   font-weight: 700;
   border-radius: 3px;
 }
-.rc-val .neq.hot {
-  animation: neq-flash 0.6s ease both;
-}
-@keyframes neq-flash {
-  0% { background: rgba(var(--ember-rgb), 0.16); }
-  100% { background: transparent; }
-}
 .rc-stamp {
   margin-top: 18px;
   display: flex;
@@ -5774,9 +1870,6 @@ h2.tool-h2 {
     animation: none;
     opacity: 1;
   }
-  .rc-val .neq.hot {
-    animation: none;
-  }
 }
 .rc-acc {
   margin-top: 12px;
@@ -5829,44 +1922,6 @@ h2.tool-h2 {
   transform: translateY(-3px);
   box-shadow: 0 14px 34px rgba(var(--shadow-rgb), 0.08);
 }
-.file .tab-cut {
-  position: absolute;
-  left: -1px;
-  top: -21px;
-  height: 21px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 16px;
-  background: var(--surface);
-  border: 1px solid var(--edge);
-  border-bottom: 0;
-  border-radius: 10px 10px 0 0;
-  font-family: var(--ff-mono);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--faint);
-  margin: 0;
-}
-.file .tab-cut::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 1px;
-  background: var(--surface);
-}
-.file .tab2 {
-  display: flex;
-  justify-content: flex-end;
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  color: var(--faint);
-  margin: 0;
-}
 .file h3 {
   font-size: 17px;
   font-weight: 600;
@@ -5879,26 +1934,6 @@ h2.tool-h2 {
   line-height: 1.6;
   color: var(--body);
   margin: 0;
-}
-.file .figs {
-  display: flex;
-  gap: 18px;
-  font-family: var(--ff-mono);
-  font-size: 11px;
-  color: var(--graphite);
-  border-top: 1px solid var(--rule);
-  padding-top: 14px;
-  margin: 0;
-}
-.file .figs b {
-  display: block;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-}
-.file.law .figs b.nyc {
-  color: var(--iris-ink);
 }
 .file .go {
   margin-top: auto;
@@ -5930,10 +1965,6 @@ h2.tool-h2 {
   grid-template-columns: minmax(0, 1fr) 380px;
   gap: 44px;
   align-items: start;
-}
-.try-form {
-  display: grid;
-  gap: 14px;
 }
 .try label {
   font-family: var(--ff-mono);
@@ -6005,56 +2036,6 @@ h2.tool-h2 {
   background: var(--bg-2);
   margin: 0;
 }
-.try-verdict {
-  font-family: var(--ff-mono);
-  font-size: 12.5px;
-  line-height: 1.75;
-  border-left: 2px solid var(--rule-3);
-  padding-left: 16px;
-  min-height: 120px;
-  transition: border-color 0.3s ease;
-}
-.try-verdict .v-chip {
-  display: inline-block;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  padding: 3px 10px;
-  border-radius: 5px;
-  margin-bottom: 8px;
-}
-/* D6 ruling (2026-07-20): HELD is a held-STATUS chip → GOLD, not ember (the
-   mockup's ember here is the recorded defect; the ≠ line inside the verdict
-   keeps the ember voice as the violation evidence). */
-.try-verdict.held {
-  border-left-color: rgba(var(--gold-rgb), 0.55);
-}
-.try-verdict.held .v-chip {
-  background: var(--gold-soft);
-  color: var(--gold-text);
-  border: 1px solid rgba(var(--gold-text-rgb), 0.35);
-}
-.try-verdict.pass {
-  /* D6 ruling 2026-07-20: graphite = pass — blue is never a lamp. */
-  border-left-color: var(--rule-3);
-}
-.try-verdict.pass .v-chip {
-  background: var(--bg-3);
-  color: var(--graphite);
-  border: 1px solid var(--rule-2);
-}
-.try-verdict.invalid .v-chip {
-  background: var(--warn-soft);
-  color: var(--warn-ink);
-  border: 1px solid rgba(var(--warn-rgb), 0.3);
-}
-.try-note {
-  font-size: 13px;
-  color: var(--muted);
-  margin: 12px 0 0;
-  max-width: 52ch;
-  font-family: var(--ff-sans);
-}
 
 /* ---------- SEATS · EMPTY SEAT · TRUST · DOOR ------------------------------- */
 .seats {
@@ -6093,39 +2074,6 @@ h2.tool-h2 {
   font-size: 14px;
   line-height: 1.6;
   margin: 0;
-}
-.empty-seat {
-  margin-top: 36px;
-  border: 1px solid var(--signal-rule);
-  background: linear-gradient(0deg, var(--accent-soft), var(--accent-soft)), var(--surface);
-  border-radius: var(--r-card);
-  padding: 28px 32px;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 22px;
-  align-items: start;
-}
-.empty-seat .asof {
-  font-family: var(--ff-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.16em;
-  color: var(--iris-ink);
-  border: 1px solid var(--signal-rule);
-  border-radius: var(--r-pill);
-  padding: 4px 10px;
-  white-space: nowrap;
-  margin-top: 3px;
-}
-.empty-seat p {
-  font-size: 16px;
-  line-height: 1.64;
-  color: var(--ink-2);
-  max-width: 70ch;
-  margin: 0;
-}
-.empty-seat p b {
-  font-weight: 640;
-  color: var(--ink);
 }
 .trust {
   display: grid;
@@ -6558,9 +2506,6 @@ h1.p2-h1 {
 
 /* ---------- responsive (v9 4K ladder + fold points) -------------------------- */
 @media (max-width: 1180px) {
-  .turn-grid {
-    grid-template-columns: 1fr;
-  }
   .try {
     grid-template-columns: 1fr;
   }
@@ -6612,14 +2557,8 @@ h1.p2-h1 {
 @media print {
   .replay,
   .door .d-arrow,
-  .cs-pause,
-  .cs-ticks,
   .flt-row,
-  .presets,
-  .cs-acc {
-    display: none !important;
-  }
-  .cs-ctas .lp-btn.primary {
+  .presets {
     display: none !important;
   }
   .f-row[hidden] {
@@ -6641,12 +2580,6 @@ h1.p2-h1 {
     opacity: 1 !important;
     transform: rotate(-2.4deg) !important;
     animation: none !important;
-  }
-  .cs-hero {
-    min-height: auto;
-  }
-  .cs-band {
-    min-height: 280px;
   }
   .pb-bar {
     background: #fff;
@@ -6673,7 +2606,6 @@ h1.p2-h1 {
   .fact,
   .seat,
   .jewel,
-  .empty-seat,
   .door,
   .receipt,
   .f-row {
@@ -6740,26 +2672,10 @@ h1.p2-h1 {
   height: 7px;
   background: rgba(var(--accent-rgb), 0.65);
 }
-.file .tab-cut {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: var(--muted);
-}
-.file .tab2 {
-  font-size: 11px;
-  font-weight: 700;
-}
-.file .figs {
-  font-size: 11.5px;
-}
 .seat .who {
   font-size: 11.5px;
   font-weight: 750;
   color: var(--ink-2);
-}
-.empty-seat .asof {
-  font-size: 10.5px;
-  font-weight: 700;
 }
 .fact .cap {
   font-size: 11px;
@@ -6785,10 +2701,6 @@ h1.p2-h1 {
 .preset {
   font-size: 11px;
   font-weight: 650;
-}
-.try-verdict .v-chip {
-  font-size: 11.5px;
-  font-weight: 800;
 }
 .rc-title {
   font-size: 11.5px;
@@ -6832,31 +2744,6 @@ h1.p2-h1 {
 .p2-status {
   font-size: 11.5px;
   font-weight: 650;
-}
-
-/* --- report armature --- */
-.rpt-eyebrow {
-  font-size: 12px;
-  font-weight: 750;
-}
-.rpt-tab {
-  font-size: 12.5px;
-  font-weight: 650;
-}
-.rpt-rail {
-  font-size: 11.5px;
-}
-.rpt-mrow dt {
-  font-size: 11.5px;
-  font-weight: 700;
-}
-.rpt-sev {
-  font-size: 11.5px;
-  font-weight: 800;
-}
-.rpt-rc dt {
-  font-size: 10.5px;
-  font-weight: 700;
 }
 
 /* ============================================================================
@@ -8810,7 +4697,9 @@ h1.p2-h1 {
 }
 .docs-main h1 {
   font-size: clamp(30px, 3.4vw, 44px);
-  font-weight: 560;
+  /* joined to the sitewide Onest ladder (H1 = 680) — /docs sat outside the
+     2026-07-31 weight pass at 560 (DESIGN.md open item 5, closed 2026-08-02) */
+  font-weight: 680;
   line-height: 1.08;
   letter-spacing: -0.03em;
   color: var(--ink);
@@ -8820,7 +4709,8 @@ h1.p2-h1 {
 }
 .docs-main .sect h2 {
   font-size: clamp(22px, 2.5vw, 32px);
-  font-weight: 560;
+  /* ladder H2 = 660 (same pass as the h1 above) */
+  font-weight: 660;
   line-height: 1.13;
   letter-spacing: -0.028em;
   color: var(--ink);
@@ -9289,7 +5179,6 @@ body {
    the rendered difference between 600 and 740 is subtle enough to eyeball
    wrong, and the first attempt at this block did exactly that. */
 h2.lp-h2,
-h2.tool-h2,
 .lp-main h2,
 .p2-main h2,
 .p3-main h2 {
@@ -9297,7 +5186,6 @@ h2.tool-h2,
 }
 h1.cs-h1,
 h1.p2-h1,
-h2.scene-h2,
 .lp-main h1,
 .p2-main h1,
 .p3-main h1,
@@ -9325,8 +5213,16 @@ h2.scene-h2,
    and never rendered once, so choosing it would be adopting a number no one
    has seen. Not a defect; an open question for a rendered comparison. */
 h1.cs-h1,
-h2.scene-h2,
 .lp-main h1 {
+  letter-spacing: -0.028em;
+}
+/* The H2s had the same disease one tier down (open item 6, closed 2026-08-02):
+   `.lp-h2`'s own letter-spacing loses to `.lp-main h2` (0,1,1) at ~line 745,
+   so the section headings rendered the generic -0.012em — too LOOSE for the
+   display voice, not the -0.038em the stylesheet appeared to say. Set here,
+   same specificity, later in the file, where it actually wins. */
+h2.lp-h2,
+.lp-main h2 {
   letter-spacing: -0.028em;
 }
 .pr-lead {
@@ -9336,7 +5232,6 @@ h2.scene-h2,
 .door .d-title {
   font-weight: 700;
 }
-h3.file-h3,
 .bpanel h3,
 .builder h3,
 .seat h3,
@@ -9354,20 +5249,13 @@ body,
 .p2-lede,
 .lede,
 .lp-foot,
-.lp-ptext,
 .file .d,
-.trust .fact .d,
-.wb-prov,
-.wb-plain,
-.tool-foot {
+.trust .fact .d {
   font-weight: 460;
 }
 .lp-foot,
-.lp-ptext,
 .file .d,
-.trust .fact .d,
-.tool-foot,
-.wb-prov {
+.trust .fact .d {
   color: var(--graphite);
 }
 
@@ -9375,11 +5263,6 @@ body,
    voice at small sizes, where a light weight disappears first */
 .site-navlink {
   font-weight: 560;
-}
-.wb-meta dt,
-.wb-receipts dt,
-.fd-slot .fd-title {
-  font-weight: 590;
 }
 
 /* ==========================================================================
@@ -9464,7 +5347,7 @@ body,
 
 .wk-strip {
   position: sticky;
-  top: 68px; /* the nav's min-height — the two bars stack, never overlap */
+  top: var(--nav-h); /* the two bars stack, never overlap */
   z-index: 39; /* below the nav's 40 */
   background: rgba(var(--glass-rgb), 0.95);
   backdrop-filter: blur(10px);
@@ -9474,7 +5357,7 @@ body,
 .wk-strip-in {
   display: flex;
   align-items: stretch;
-  height: 34px;
+  height: var(--strip-h);
 }
 .wk-st {
   flex: 1;
@@ -9533,7 +5416,11 @@ body,
    34). Without this the heading lands underneath both bars — DESIGN.md open
    item 8, which six anchors would have turned from a latent defect into a
    visible one on every click. */
-.wk-main section[id] { scroll-margin-top: 114px; }
+.wk-main section[id] {
+  /* nav + strip + breathing room, derived so the chrome heights stay the
+     single source (was a hardcoded 114px) */
+  scroll-margin-top: calc(var(--nav-h) + var(--strip-h) + 12px);
+}
 
 /* ---------- station 1 · inputs ------------------------------------------- */
 
@@ -10569,39 +6456,14 @@ body,
      the token section above says. They are the single largest leak in the file
      and have to be re-declared at their own selectors.
 
-     .rpt-wrap keeps ONE --paper token deliberately: it is both the ledger ground
-     AND the text colour on every ink surface (the SIMULATED plaque, the verdict
-     flag). That pairing INVERTS coherently — --paper on --ink is 17.16:1 dark,
-     exactly as it was 18.38:1 light — which is why the one-token design survives
-     the scheme change untouched. */
-  :root[data-theme="dark"] .rpt-wrap {
-    --paper: #13151d;
-    --ink: #f2f3f8;
-    --body: #c5c8d4;
-    --graphite: #abafbe;
-    --hairline: rgba(242, 243, 248, 0.15);
-    --um: #93a2ff; /* 7.68:1 on the ledger ground */
-    --sev-err: #ff8a7d;
-    --sev-warn: #e8a83c;
-    --sev-info: #a5a2ab;
-  }
+     (The .rpt-wrap block that was re-declared here left with the retired
+     report/demo ledger system — R-3 purge, 2026-08-02.) */
   :root[data-theme="dark"] .docs-main {
     --docs-rule: rgba(236, 229, 214, 0.12);
     --docs-rule-2: rgba(236, 229, 214, 0.2);
     --docs-rule-3: rgba(236, 229, 214, 0.32);
   }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .rpt-wrap {
-      --paper: #13151d;
-      --ink: #f2f3f8;
-      --body: #c5c8d4;
-      --graphite: #abafbe;
-      --hairline: rgba(242, 243, 248, 0.15);
-      --um: #93a2ff;
-      --sev-err: #ff8a7d;
-      --sev-warn: #e8a83c;
-      --sev-info: #a5a2ab;
-    }
     :root:not([data-theme="light"]) .docs-main {
       --docs-rule: rgba(236, 229, 214, 0.12);
       --docs-rule-2: rgba(236, 229, 214, 0.2);

@@ -123,9 +123,11 @@ describe("dark scheme: the two token blocks stay in step", () => {
 
   it("re-declares the ELEMENT-SCOPED token blocks, which :root cannot reach", () => {
     // A custom property set on an element beats anything inherited from :root,
-    // so .rpt-wrap (the /report ledger) and .docs-main would render fully light
-    // inside a dark page unless their own selectors are re-declared.
-    for (const sel of [".rpt-wrap", ".docs-main"]) {
+    // so .docs-main would render fully light inside a dark page unless its own
+    // selector is re-declared. (.rpt-wrap was pinned here too until the R-3
+    // purge, 2026-08-02 — the retired report/demo ledger left the stylesheet,
+    // so asserting its dark branch would pin dead CSS back into the file.)
+    for (const sel of [".docs-main"]) {
       expect(CSS).toContain(`:root[data-theme="dark"] ${sel} {`);
       expect(CSS).toContain(`:root:not([data-theme="light"]) ${sel} {`);
     }

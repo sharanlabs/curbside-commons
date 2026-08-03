@@ -54,13 +54,16 @@ labels, rule IDs, uppercase eyebrows. Ledger columns depend on its tabular figur
 
 | Tier | Weight | Selectors |
 |---|---|---|
-| H1 / display | **680** | `h1.cs-h1`, `h1.p2-h1`, `h2.scene-h2`, `.lp-main h1`, `.p4-hero .cs-h1` |
-| H2 | **660** | `h2.lp-h2`, `.lp-main h2`, `.p2-main h2`, `.p3-main h2` |
-| H3 / titles | **700** | `.fm-title`, `.door .d-title`, `.lp-main h3`, `.p2-main h3` |
+| H1 / display | **680** | `h1.cs-h1`, `h1.p2-h1`, `.lp-main h1`, `.p4-hero .cs-h1`, `.docs-main h1` |
+| H2 | **660** | `h2.lp-h2`, `.lp-main h2`, `.docs-main .sect h2` |
+| H3 / titles | **700** | `.fm-title`, `.door .d-title`, `.lp-main h3` |
 | Lead paragraph | **660** | `.pr-lead` |
 | Body | **460** | `body`, `.cs-lede`, `.lede`, `.lp-foot` |
 | Nav | **560** | `.site-navlink` |
-| Chrome labels | **590** | `.nav-case`, `.acc`, `.tab2`, `.wb-meta dt` |
+| Chrome labels | **590** | `.nav-case`, `.acc`, `.wk-zone-k` |
+
+*(Selector lists refreshed 2026-08-02 after the R-3 purge removed the retired
+surfaces' entries, and `/docs` joined the ladder — open item 5.)*
 
 **WEIGHT NUMBERS DO NOT TRAVEL WITH A TYPEFACE.** These are calibrated for Onest. When the
 site briefly ran Nunito, every display step was **+60** and body **+40**, because Nunito reads
@@ -78,7 +81,9 @@ Fluid via `clamp()`. Display: `clamp(33px, 5.4vw, 56px)` at the largest, steppin
 Body: 17px / 1.7. Chrome labels: 10.5–11.5px.
 
 **Display tracking is per-surface and deliberate**, not global: landing and `/proof` at
-`-0.028em`, `/report` at `-0.03em`. `.lp-h2` carries `-0.038em`, the tightest in the file.
+`-0.028em`, `/report` at `-0.03em`. The landing H2s joined the voice at `-0.028em` on
+2026-08-02 — set in the late-file tracking block where it WINS; a bare-class `.lp-h2`
+value loses to `.lp-main h2` and had been rendering the generic `-0.012em` (open item 6).
 
 ## Color
 
@@ -168,12 +173,12 @@ stamp and the ember FAIL both clear 8:1 on every ground they land on.
 
 **Two things a `:root` switch alone does not reach**, and both were the real work:
 
-1. **Element-scoped token blocks.** `.rpt-wrap` (the `/report` ledger) and `.docs-main` declare
-   custom properties **on the element**, which beats anything inherited from `:root` regardless
-   of specificity. Without their own dark branches they render a fully light document inside a
-   dark page. `.rpt-wrap`'s one-token `--paper` design survives untouched, because it is both
-   the ledger ground *and* the text on every ink surface — the pair inverts coherently
-   (`--paper` on `--ink` is 17.16:1 dark, as it was 18.38:1 light).
+1. **Element-scoped token blocks.** `.docs-main` declares custom properties **on the
+   element**, which beats anything inherited from `:root` regardless of specificity.
+   Without its own dark branch it renders a fully light document inside a dark page.
+   (`.rpt-wrap` was the second such block until the R-3 purge, 2026-08-02 — the retired
+   report/demo ledger left the stylesheet, dark branches included, once it was proven
+   nothing mounts it.)
 2. **Hardcoded literals.** A colour that does not resolve through a token cannot follow the
    scheme. Of the **206 consumer literals** in the stylesheet (the count excludes the `:root`
    ledger, where literals are the point, and the `@media print` block, where white paper is
@@ -276,8 +281,12 @@ INPUTS (`#audit`) · RUN (ticker) · VERDICT (slab) · FEES · DELIVERY (Slack +
 artifacts, built by `lib/delivery/*` builders, never sent — the SIMULATED banner arrives
 from the builder's own first block, never retyped in JSX) · PROOF. A sticky process strip
 under the nav carries the sequence in words, never numerals (de-numbered by owner word).
-All new classes are `wk-`-prefixed; every station section carries
-`scroll-margin-top: 114px` for the sticky chrome. Run state is published on a typed bus
+All new classes are `wk-`-prefixed; every station section carries a scroll-margin
+derived from the sticky chrome. **The chrome heights are tokens** (2026-08-02, open
+item 10): `--nav-h: 68px` and `--strip-h: 34px` drive the nav's `min-height`, the
+strip's `top` and `height`, and the stations' `scroll-margin-top:
+calc(var(--nav-h) + var(--strip-h) + 12px)` — a height change moves the whole
+stack together instead of silently overlapping. Run state is published on a typed bus
 (`components/landing/run-bus.ts`); `AuditWorkbench` stays the single owner of run state.
 
 ## Motion
@@ -312,42 +321,55 @@ document to read in order) · decorative stats · any copy implying real platfor
 2. ~~**The nav's one emphasized action is a no-op on `/`**~~ — **RESOLVED 2026-07-31 by owner
    word.** Retargeted to `/#audit`; the pinned `aria-current` contract moved with it and gained
    two teeth. See the settled-by-owner table.
-3. **`.fd-hint` has no `ch` cap** and runs at ~86% of its cell; a few more characters wraps it
-   and pushes both drop zones down ~21px.
-4. **`tabular-nums` on sans-set figures** (`.fd-status`, `.wb-tally`) was calibrated under
-   Nunito and has never rendered under Onest.
-5. **`/docs` sits outside the weight pass** — its headings are 560 against 680/660 elsewhere.
-6. **`.lp-h2` tracking** (`-0.038em`) was approved at 42px and now renders ~10px smaller and
-   60 heavier.
-7. **Dead CSS** — 268 orphan candidates await a real reachability proof (never a grep).
+3. ~~**`.fd-hint` has no `ch` cap**~~ — **SUPERSEDED 2026-08-02**: the walkthrough rewrite of
+   `FileDrop` retired the selector entirely (`wk-zone-t` carries the hint now); `.fd-hint`
+   left the stylesheet in the R-3 purge.
+4. ~~**`tabular-nums` on sans-set figures never rendered under Onest**~~ — **VERIFIED
+   2026-08-02, rendered in-seat**: with `font-variant-numeric: tabular-nums`, all ten
+   digit-strings measure identically (spread 0px at 13px); without it Onest's figures are
+   proportional (spread 30.75px). The declarations are load-bearing, not decorative.
+5. ~~**`/docs` sits outside the weight pass**~~ — **RESOLVED 2026-08-02**: `.docs-main h1`
+   560 → 680, `.docs-main .sect h2` 560 → 660, joining the sitewide ladder.
+6. ~~**`.lp-h2` tracking**~~ — **RESOLVED 2026-08-02, and the item as recorded was wrong
+   about what rendered**: `.lp-h2`'s own `-0.038em` was dead-by-cascade (`.lp-main h2` at
+   (0,1,1) beat it), so the H2s actually drew the generic `-0.012em` — too loose, not too
+   tight. The rendered check caught it; the considered `-0.028em` is now set in the
+   late-file tracking block at winning specificity, the same fix the H1s got, and the base
+   declaration carries a warning instead of a dead value.
+7. ~~**Dead CSS**~~ — **RESOLVED 2026-08-02 (R-3)**: `scripts/dead-css-audit.mjs` builds the
+   reachability set from the built export's HTML + client chunks + source + tests (token
+   over-approximation — false "used" keeps a rule; only a token absent everywhere kills one),
+   then purges to convergence. 334 dead classes / ~740 selectors removed, `globals.css`
+   272,637 → 180,053 bytes (−34%), `CommonsScene`/`TurnSection` deleted, the `rpt-` ledger
+   (kept alive only by two test pins, both updated) removed. Proof: per-page rendered class
+   profile byte-identical across three rebuilds; every class covered before is covered after.
 8. ~~**`#audit` has no `scroll-margin-top`**~~ — **RESOLVED 2026-08-02**: every landing
-   station section carries `scroll-margin-top: 114px` (nav 68 + strip 34 + breathing room).
-   The cross-route hash path (`/report` → `/#audit`) remains unrendered from this seat.
-9. **The walkthrough redesign has never been rendered as the app** (2026-08-02) — the mockup
-   was rendered and measured; the Next port is verified by type/lint/unit gates only. First
-   network-capable run: `npm run verify && npx playwright test`. `layout-sanity.spec.ts` is a
-   plausible first-run red (`MIN_TEXT_WIDTH 120` vs `.wk-tk-id` ≈115px at 12px mono) — read
-   it before changing either side.
-10. **`.wk-strip { top: 68px }` is a fourth hardcoded copy of the nav height** — matched the
-   existing idiom rather than tokenised; a nav-height change now silently overlaps the strip.
-11. **The dark scheme has never been rendered** (2026-08-02) — every value was computed and the
-    token plumbing is pinned by unit tests against the stylesheet, but Playwright needs a port
-    this seat does not have, so the dark axe pass and `theme.spec.ts` ship **authored, not run**.
-    First network-capable run: `npm run verify && npx playwright test`. Two things axe cannot
-    settle even then: it reports text over a **gradient** as *incomplete* rather than a
-    violation, so `--grad-phrase` on the H1, `.wk-slab-top` and the masthead washes are covered
-    by computing each stop instead (all ≥8:1 against `--bg`); and it never opens `/report` or
-    `/docs` in dark unless the run includes them — `theme.spec.ts` asserts those two computed
-    grounds directly for that reason.
+   station section carries a chrome-derived scroll-margin (see Layout). The cross-route hash
+   path (`/report` → `/#audit`) remains unrendered from this seat.
+9. ~~**The walkthrough redesign has never been rendered as the app**~~ — **RESOLVED
+   2026-08-02**: CI run 30779333064 passed the full rendered battery, and the suite (with the
+   C10 rendered scan) runs in-seat via the offline build route.
+10. ~~**`.wk-strip { top: 68px }` hardcodes the nav height**~~ — **RESOLVED 2026-08-02**:
+   `--nav-h` / `--strip-h` tokens now drive all four former copies (see Layout).
+11. ~~**The dark scheme has never been rendered**~~ — **RESOLVED 2026-08-02** (session 43,
+    third arc): both schemes rendered in-seat, axe zero violations in each; CI's full battery
+    confirmed. The two things axe cannot settle stay covered by computed-stop checks in
+    `theme.spec.ts` (gradient text; `/report` and `/docs` dark grounds asserted directly).
 12. **`lib/delivery/email-html.ts` stays light on purpose** — an email payload is not site
     chrome, and `evals/delivery/delivery.test.ts` pins it light-locked (no
     `prefers-color-scheme` block). If dark email is ever wanted, that pin is the thing to
     revisit first.
+13. **The current `/report` has no print treatment of its own** (2026-08-02) — the old rpt-
+    ledger's `print-color-adjust` contract retired with that surface. Today's report marks
+    are border+text and survive printing, and the sitewide print pass (chrome hidden, motion
+    settled) still applies — but nobody has *designed* printing for the new report. Decide
+    whether print is a supported surface before promising it anywhere.
 
 ## Decisions log
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-08-02 | R-3 dead-CSS purge executed; open items 3–7, 9–11 closed; sticky-chrome heights tokenised (`--nav-h`/`--strip-h`); `/docs` joined the weight ladder; `.lp-h2` tracking joined the landing voice; `tabular-nums` verified load-bearing under Onest (rendered, spread 0 vs 30.75px) | Owner word: "complete all the steps." Purge by reachability (`scripts/dead-css-audit.mjs`) with a rendered-profile proof, never a grep — 334 classes, −34% stylesheet. The rpt- ledger was held in place only by two test pins asserting a surface nothing mounts; the pins moved with the purge, the same pattern as every prior redesign. |
 | 2026-08-02 | Dark scheme shipped; "Light only" retired; accent split into text and fill roles in BOTH schemes; 275 colour literals migrated to tokens | Owner word: *"also dark mode for it"*. The role split is structural, not cosmetic: one ultramarine can serve text and fill on white and cannot on near-black. The literal migration is the part that makes the switch actually work — a colour outside the token system cannot follow a scheme, and the two element-scoped token blocks (`.rpt-wrap`, `.docs-main`) beat `:root` outright. Pinned by `evals/design/dark-scheme.test.ts` + `evals/e2e/theme.spec.ts` + a dark axe pass. |
 | 2026-08-02 | Six-station walkthrough landing; DELIVERY station added; run control never disabled; fold contract strengthened to include the run control | Owner word: reassess the whole layout/UX end to end, "from dropping files till slack email", minimalist premium 2026, palette unchanged. Design authored by the session seat (owner: "Fable as the designer advisor"), rendered + measured before the port; Opus built from the mockup. |
 | 2026-07-31 | Nav pill retargeted `/` → `/#audit`; workbench-first confirmed; fold reclaim held | Owner word on all three decision-board forks. The pill was the site's most dominant control and navigated nowhere on the landing page. |
