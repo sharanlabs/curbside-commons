@@ -254,8 +254,14 @@ export function AuditWorkbench() {
     const a = document.createElement("a");
     a.href = url;
     a.download = fileName;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    // DEFERRED, not synchronous: revoking right after click() races the
+    // browser's fetch of the blob URL — if revoke lands first the download is
+    // silently cancelled. Diagnosed from CI runs 30773077581/30774987483,
+    // where the loaded runner lost the race that a fast machine wins.
+    setTimeout(() => URL.revokeObjectURL(url), 10_000);
   }
 
   const loaded = feed.text.trim().length > 0;
