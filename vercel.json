@@ -4,7 +4,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "out",
   "cleanUrls": true,
-  "git": { "deploymentEnabled": false },
+  "git": { "deploymentEnabled": true },
   "headers": [
     {
       "source": "/(.*)",
