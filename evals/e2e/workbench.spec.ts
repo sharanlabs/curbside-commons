@@ -224,6 +224,17 @@ test("garbage input yields an honest error and no verdict, on either side", asyn
   await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
   const alert = page.locator('div.wb-error[role="alert"]');
   await expect(alert).toContainText("No verdict.");
+  // PIN MOVED 2026-09-01 (S2): the slot now reads two shapes, JSON or a
+  // spreadsheet, and dispatches on content. Text that opens with neither `{`
+  // nor a comma-separated header is told it is NEITHER shape — a more honest
+  // message than the old "Not valid JSON", which presumed the only door. The
+  // property pinned here is unchanged: garbage → an honest error, no verdict.
+  await expect(alert).toContainText("either shape this slot reads");
+  await expect(liveSlab(page)).toHaveCount(0);
+
+  // Malformed JSON that DOES open with `{` still reaches the JSON parser's own message.
+  await fillSlot(page, "The feed", "{ this is not a feed");
+  await page.getByRole("button", { name: /^Run (the audit|the bundled pair|again)$/ }).click();
   await expect(alert).toContainText("Not valid JSON");
   await expect(liveSlab(page)).toHaveCount(0);
 

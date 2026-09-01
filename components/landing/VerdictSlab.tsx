@@ -30,7 +30,7 @@ import { cleanFindingFor } from "@/components/playground/verify-in-browser";
 import { useRun } from "./run-bus";
 
 export function VerdictSlab({ idle }: { readonly idle: VerdictView }) {
-  const { report, origin, feedRows, recordRows } = useRun();
+  const { report, origin, feedRows, recordRows, recordDated } = useRun();
 
   // A live run replaces the bundled view entirely — never merges with it. A
   // tally from one run beside a receipt from another is the exact confusion the
@@ -150,6 +150,18 @@ export function VerdictSlab({ idle }: { readonly idle: VerdictView }) {
             your browser just now — no AI calls, and nothing you uploaded left this page.
             {origin.catalog === "sample" &&
               " Items outside the bundled records honestly read as unknown or missing."}
+            {/* THE ONE DEFAULT THAT CAN MOVE A VERDICT, said aloud. A spreadsheet
+                record with no as_of column is dated the day it was dropped
+                (D-3, owner GO 2026-09-01). The staleness rules read that date
+                as data, so a reader must be able to see where it came from —
+                a silent default here is a verdict about a date nobody chose. */}
+            {recordDated !== null && recordDated.source === "drop-day" && (
+              <>
+                {" "}Your record carried no <code>as_of</code> date, so it was dated{" "}
+                <time dateTime={recordDated.asOf}>{recordDated.asOf.slice(0, 10)}</time> — the day you
+                dropped it; the staleness checks read that date.
+              </>
+            )}
           </>
         ) : (
           <>

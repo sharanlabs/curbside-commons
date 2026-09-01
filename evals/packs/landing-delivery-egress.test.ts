@@ -74,6 +74,18 @@ describe("the landing delivery station is zero-egress by construction", () => {
     ).toEqual([]);
   });
 
+  it("the walk REACHES the spreadsheet door — a green that never visited it would prove nothing about it", () => {
+    // 2026-09-01: the workbench seam now imports the CSV adapters, so they are
+    // inside this closure and inside this tooth. Asserted explicitly, because
+    // a module the walk never sees is a module it cannot police (the vacuous-
+    // pass shape this suite exists to prevent). Both files named, so a future
+    // refactor that drops one from the graph fails here rather than silently
+    // shrinking the guarded set.
+    const { seen } = walkImports(entry, { root: REPO_ROOT, allowPackages });
+    expect([...seen].some((f) => f.endsWith(`playground${"/"}csv-adapters.ts`)), "csv-adapters.ts is outside the walked closure").toBe(true);
+    expect([...seen].some((f) => f.endsWith(`playground${"/"}csv.ts`)), "csv.ts is outside the walked closure").toBe(true);
+  });
+
   it("no transport module is reachable by name from the station", () => {
     const { seen } = walkImports(entry, { root: REPO_ROOT, allowPackages });
     // The one-shot send scripts and any future transport must stay OUTSIDE this

@@ -29,6 +29,14 @@ import type { AcpFeed } from "@/lib/packs/listings/acp-feed";
 import { acpFeedToClaims } from "@/lib/packs/listings/adapters";
 import { runListingsVerification } from "@/lib/packs/listings/run";
 import type { SorItem, SorVariation, SyntheticCatalog } from "@/lib/packs/listings/types";
+import {
+  FEED_TEMPLATE_FILENAME,
+  RECORD_TEMPLATE_FILENAME,
+  catalogToCsv,
+  feedFromCsv,
+  feedToCsv,
+  recordFromCsv,
+} from "@/lib/playground/csv-adapters";
 import type { VerifierReport } from "@/lib/verifier-core/report";
 import sorCatalogJson from "@/fixtures/synthetic-restaurant/browser/sor.catalog.web.json";
 import sampleFeedJson from "@/fixtures/synthetic-restaurant/browser/acp-feed.web.json";
@@ -497,3 +505,103 @@ export function parseCatalogText(text: string): CatalogParseResult {
     },
   };
 }
+
+// ---------------------------------------------------------------------------
+// THE SPREADSHEET DOOR (S2, docs/plan-testable-instrument-2026-09-01.md).
+//
+// Both slots accept either the protocol JSON or a spreadsheet (CSV) in the
+// template's columns. Dispatch is on the CONTENT, not the file extension: a
+// paste has no extension, and a file renamed .txt is still whatever its bytes
+// are. A JSON document begins with `{` (or `[`, which the JSON parsers refuse
+// with their own honest message); anything else is read as a spreadsheet.
+//
+// The size cap is applied HERE, before either branch, for the same reason it
+// moved into the JSON parsers (F-1): a limit one door enforces and another does
+// not is a limit on one door.
+// ---------------------------------------------------------------------------
+
+export type InputFormat = "json" | "csv";
+
+/** Content-based: JSON if the first non-blank character opens an object or array. */
+export function detectInputFormat(text: string): InputFormat {
+  const first = text.replace(/^\uFEFF/, "").trimStart()[0];
+  return first === "{" || first === "[" ? "json" : "csv";
+}
+
+/**
+ * Text that opens with neither `{` nor a comma-separated header row is neither
+ * shape this slot reads. Saying so beats handing the reader a "missing column"
+ * message about a spreadsheet they never made.
+ */
+function neitherShapeError(what: string, templateName: string): string {
+  return (
+    `This does not look like a ${what} in either shape this slot reads: it is not a JSON document ` +
+    `(no opening "{") and its first line is not a row of comma-separated column names. ` +
+    `Download the JSON copy or the spreadsheet template (${templateName}) to see the two shapes.`
+  );
+}
+
+function firstLineHasComma(text: string): boolean {
+  const first = text.replace(/^\uFEFF/, "").split(/\r?\n/).find((l) => l.trim() !== "") ?? "";
+  return first.includes(",");
+}
+
+/** Parse either shape of feed. Empty text falls to the JSON parser for its message. */
+export function parseFeedInput(text: string): ParseResult {
+  if (!text.trim() || detectInputFormat(text) === "json") return parseAcpFeedText(text);
+  if (text.length > MAX_INPUT_CHARS) return { ok: false, error: tooLargeError("feed", text.length) };
+  if (!firstLineHasComma(text)) {
+    return { ok: false, error: neitherShapeError("feed", FEED_TEMPLATE_FILENAME) };
+  }
+  return feedFromCsv(text);
+}
+
+/**
+ * Where the record's date came from — the ONE default that can change a
+ * verdict, so it travels with the parse result and the slab says it aloud.
+ * `record` = the file carried its own date (every JSON catalog does; a sheet
+ * with an `as_of` column does). `drop-day` = the sheet had none, so the record
+ * is dated the day it was supplied (D-3, owner GO 2026-09-01).
+ */
+export type RecordDated = { readonly asOf: string; readonly source: "record" | "drop-day" };
+
+export type RecordParseResult =
+  | { readonly ok: true; readonly catalog: SyntheticCatalog; readonly dated: RecordDated }
+  | { readonly ok: false; readonly error: string };
+
+/**
+ * Parse either shape of record. `today` is the supply instant as an ISO string
+ * — passed in by the caller (the UI reads its clock once, at the click; tests
+ * pass a constant) so this function itself never reads a clock.
+ */
+export function parseRecordInput(text: string, opts: { readonly today: string }): RecordParseResult {
+  if (!text.trim() || detectInputFormat(text) === "json") {
+    const r = parseCatalogText(text);
+    return r.ok ? { ok: true, catalog: r.catalog, dated: { asOf: r.catalog.asOf, source: "record" } } : r;
+  }
+  if (text.length > MAX_INPUT_CHARS) return { ok: false, error: tooLargeError("catalog", text.length) };
+  if (!firstLineHasComma(text)) {
+    return { ok: false, error: neitherShapeError("merchant record", RECORD_TEMPLATE_FILENAME) };
+  }
+  const r = recordFromCsv(text, { today: opts.today });
+  if (!r.ok) return r;
+  return {
+    ok: true,
+    catalog: r.catalog,
+    dated: { asOf: r.catalog.asOf, source: r.asOfSource === "column" ? "record" : "drop-day" },
+  };
+}
+
+/**
+ * The spreadsheet templates, generated at runtime from the same browser
+ * projections the inline doors load — proven byte-identical to the committed
+ * fixtures/synthetic-restaurant/csv/ files by evals/packs/csv-adapters.test.ts,
+ * so the download and the repo can never describe different data.
+ */
+export function feedTemplateText(): string {
+  return feedToCsv(SAMPLE_FEED);
+}
+export function recordTemplateText(): string {
+  return catalogToCsv(SOR_CATALOG);
+}
+export { FEED_TEMPLATE_FILENAME, RECORD_TEMPLATE_FILENAME };

@@ -76,6 +76,13 @@ export interface FileDropProps {
    * never the upload path, and left a reader with nothing to drag.
    */
   readonly onDownloadSample?: () => void;
+  /**
+   * Save this slot's SPREADSHEET template — the bring-your-own-data door
+   * (2026-09-01). The JSON download above lets a reader exercise the upload
+   * path; this one lets a reader who has never seen the protocol shape bring
+   * their own menu: open it in a spreadsheet app, change a cell, drop it back.
+   */
+  readonly onDownloadTemplate?: () => void;
 }
 
 /**
@@ -109,6 +116,7 @@ export function FileDrop({
   onLoadSample,
   sampleLabel,
   onDownloadSample,
+  onDownloadTemplate,
 }: FileDropProps) {
   const [dragging, setDragging] = useState(false);
   const inputId = useId();
@@ -190,7 +198,10 @@ export function FileDrop({
           id={inputId}
           className="fd-input"
           type="file"
-          accept="application/json,.json,text/plain,.txt"
+          /* A spreadsheet saved as CSV is the second shape this slot reads
+             (2026-09-01). Dispatch is on content, not on this list — the list
+             only shapes the picker's default filter. */
+          accept="application/json,.json,text/plain,.txt,text/csv,.csv"
           /* Both slots' inputs read "Choose a file" from their label alone, so a
              screen-reader control list could not tell the feed input from the
              record one (gate finding 13). The slot's side joins the accessible
@@ -255,6 +266,15 @@ export function FileDrop({
         {onDownloadSample !== undefined && (
           <button type="button" className="fd-dl" onClick={onDownloadSample}>
             Download it to test uploading
+          </button>
+        )}
+        {/* The spreadsheet template holds the same menu as the JSON above, in
+            the columns a spreadsheet app can edit — so a reader with no
+            protocol file of their own can still bring their own data. Bytes
+            come from the same projection the inline door loads. */}
+        {onDownloadTemplate !== undefined && (
+          <button type="button" className="fd-dl" onClick={onDownloadTemplate}>
+            Download the spreadsheet template
           </button>
         )}
       </details>

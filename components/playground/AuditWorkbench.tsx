@@ -49,13 +49,19 @@ import { deriveChecks, publishRun, IDLE_RUN } from "@/components/landing/run-bus
 import { FileDrop, type SlotStatus } from "./FileDrop";
 import type { RunOrigin } from "./verify-in-browser";
 import {
+  FEED_TEMPLATE_FILENAME,
+  RECORD_TEMPLATE_FILENAME,
   SOR_CATALOG,
   catalogSampleText,
-  parseAcpFeedText,
-  parseCatalogText,
+  detectInputFormat,
+  feedTemplateText,
+  parseFeedInput,
+  parseRecordInput,
+  recordTemplateText,
   sampleFeedText,
   verifyAcpFeed,
 } from "./verify-in-browser";
+import type { RecordDated } from "./verify-in-browser";
 
 interface SlotState {
   readonly text: string;
@@ -113,9 +119,22 @@ export function AuditWorkbench() {
     publishRun(IDLE_RUN);
   }
 
+  /** "25 rows read" for JSON; a spreadsheet says so, because the slot's file
+   *  name is the only other place the reader could tell which door they used. */
+  function readSummary(text: string, count: number, noun: string): string {
+    return `${count} ${noun} read${detectInputFormat(text) === "csv" ? " from a spreadsheet" : ""}`;
+  }
+
+  /**
+   * The supply instant, read ONCE per parse and only ever used when a
+   * spreadsheet record carries no `as_of` column (D-3). Reading it here rather
+   * than inside the parser keeps the parser clock-free and testable.
+   */
+  const now = () => new Date().toISOString();
+
   function feedText(text: string, fileName: string | null, source: "sample" | "reader" = "reader") {
     invalidate();
-    const parsed = parseAcpFeedText(text);
+    const parsed = parseFeedInput(text);
     setFeed({
       text,
       fileName,
@@ -123,7 +142,7 @@ export function AuditWorkbench() {
       status: !text.trim()
         ? null
         : parsed.ok
-          ? { kind: "ok", summary: `${parsed.feed.items.length} rows read` }
+          ? { kind: "ok", summary: readSummary(text, parsed.feed.items.length, "rows") }
           : { kind: "error", message: parsed.error },
     });
   }
@@ -134,7 +153,7 @@ export function AuditWorkbench() {
     source: "sample" | "reader" = "reader",
   ) {
     invalidate();
-    const parsed = parseCatalogText(text);
+    const parsed = parseRecordInput(text, { today: now() });
     setRecord({
       text,
       fileName,
@@ -142,7 +161,7 @@ export function AuditWorkbench() {
       status: !text.trim()
         ? null
         : parsed.ok
-          ? { kind: "ok", summary: `${parsed.catalog.items.length} items read` }
+          ? { kind: "ok", summary: readSummary(text, parsed.catalog.items.length, "items") }
           : { kind: "error", message: parsed.error },
     });
   }
@@ -161,7 +180,7 @@ export function AuditWorkbench() {
   ) {
     const token = ++generation.current;
     setRunError(null);
-    const parsedFeed = parseAcpFeedText(feedSrc.text);
+    const parsedFeed = parseFeedInput(feedSrc.text);
     if (!parsedFeed.ok) {
       setHasRun(false);
       publishRun(IDLE_RUN);
@@ -172,11 +191,12 @@ export function AuditWorkbench() {
     // An empty record slot is not an error — it means "check against the
     // records we ship", which is the honest default and stays labelled as such.
     let catalog: SyntheticCatalog = SOR_CATALOG;
+    let recordDated: RecordDated = { asOf: SOR_CATALOG.asOf, source: "record" };
     // Origin comes from the SLOT, not from the parsed bytes: an empty slot is
     // the bundled catalog, a filled one is whatever action filled it.
     let catalogOrigin: RunOrigin["catalog"] = "sample";
     if (recordSrc.text.trim()) {
-      const parsedCatalog = parseCatalogText(recordSrc.text);
+      const parsedCatalog = parseRecordInput(recordSrc.text, { today: now() });
       if (!parsedCatalog.ok) {
         setHasRun(false);
         publishRun(IDLE_RUN);
@@ -184,6 +204,7 @@ export function AuditWorkbench() {
         return;
       }
       catalog = parsedCatalog.catalog;
+      recordDated = parsedCatalog.dated;
       catalogOrigin = recordSrc.source;
     }
     const origin: RunOrigin = { feed: feedSrc.source, catalog: catalogOrigin };
@@ -210,6 +231,7 @@ export function AuditWorkbench() {
       origin,
       feedRows: parsedFeed.feed.items.length,
       recordRows: catalog.items.length,
+      recordDated,
       checks,
       error: null,
     };
@@ -249,8 +271,8 @@ export function AuditWorkbench() {
 
   /** Save text to a file in the reader's browser. Object-URL only — no network
    *  leg, so the "nothing leaves this page" promise covers downloads too. */
-  function saveTextFile(text: string, fileName: string) {
-    const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+  function saveTextFile(text: string, fileName: string, type: "application/json" | "text/csv") {
+    const url = URL.createObjectURL(new Blob([text], { type }));
     const a = document.createElement("a");
     a.href = url;
     a.download = fileName;
@@ -274,7 +296,7 @@ export function AuditWorkbench() {
           side="The feed"
           sideNote="what an agent reads"
           title="A published menu feed"
-          textareaLabel="Feed JSON"
+          textareaLabel="Feed — JSON or spreadsheet (CSV)"
           value={feed.text}
           onText={feedText}
           onReadError={(m) => {
@@ -291,13 +313,14 @@ export function AuditWorkbench() {
           status={feed.status}
           onLoadSample={() => feedText(sampleFeedText(), "bundled-feed.json", "sample")}
           sampleLabel="Load the bundled feed"
-          onDownloadSample={() => saveTextFile(sampleFeedText(), "bundled-feed.json")}
+          onDownloadSample={() => saveTextFile(sampleFeedText(), "bundled-feed.json", "application/json")}
+          onDownloadTemplate={() => saveTextFile(feedTemplateText(), FEED_TEMPLATE_FILENAME, "text/csv")}
         />
         <FileDrop
           side="The record"
           sideNote="the merchant’s truth"
           title="The system of record"
-          textareaLabel="Catalog JSON"
+          textareaLabel="Record — JSON or spreadsheet (CSV)"
           value={record.text}
           onText={recordText}
           onReadError={(m) => {
@@ -314,7 +337,8 @@ export function AuditWorkbench() {
           status={record.status}
           onLoadSample={() => recordText(catalogSampleText(), "bundled-catalog.json", "sample")}
           sampleLabel="Load the bundled catalog"
-          onDownloadSample={() => saveTextFile(catalogSampleText(), "bundled-catalog.json")}
+          onDownloadSample={() => saveTextFile(catalogSampleText(), "bundled-catalog.json", "application/json")}
+          onDownloadTemplate={() => saveTextFile(recordTemplateText(), RECORD_TEMPLATE_FILENAME, "text/csv")}
         />
       </div>
 

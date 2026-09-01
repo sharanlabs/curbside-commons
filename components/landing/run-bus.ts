@@ -22,7 +22,7 @@
  */
 import { useSyncExternalStore } from "react";
 import type { VerifierReport } from "@/lib/verifier-core/report";
-import type { RunOrigin } from "@/components/playground/verify-in-browser";
+import type { RecordDated, RunOrigin } from "@/components/playground/verify-in-browser";
 
 /** One line of the ticker — a check that genuinely ran, with its outcome. */
 export interface CheckLine {
@@ -43,6 +43,12 @@ export interface RunSnapshot {
   readonly origin: RunOrigin | null;
   readonly feedRows: number;
   readonly recordRows: number;
+  /**
+   * The record's date and where it came from. A spreadsheet with no `as_of`
+   * column is dated the day it was dropped (D-3); that default can change a
+   * staleness verdict, so the slab must be able to say it. Null until a run.
+   */
+  readonly recordDated: RecordDated | null;
   /** Checks to narrate, derived from the report by the workbench that ran it. */
   readonly checks: readonly CheckLine[];
   readonly error: string | null;
@@ -54,6 +60,7 @@ export const IDLE_RUN: RunSnapshot = {
   origin: null,
   feedRows: 0,
   recordRows: 0,
+  recordDated: null,
   checks: [],
   error: null,
 };
