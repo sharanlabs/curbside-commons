@@ -1,0 +1,28 @@
+﻿item_id,name,variation,price,stock,as_of,group
+item-001-v1,Crispy Calamari,Small,21.5,in stock,2026-07-03T00:00:00Z,item-001
+item-001-v2,Crispy Calamari,Medium,24.5,in stock,2026-07-03T00:00:00Z,item-001
+item-001-v3,Crispy Calamari,Large,27.5,in stock,2026-07-03T00:00:00Z,item-001
+item-002-v1,Garden Salad,Small,22,sold out,2026-07-03T00:00:00Z,item-002
+item-002-v2,Garden Salad,Large,25,hidden,2026-07-03T00:00:00Z,item-002
+item-003-v1,Café Latte,Small,7,in stock,2026-07-03T00:00:00Z,item-003
+item-003-v2,Café Latte,Medium,10,in stock,2026-07-03T00:00:00Z,item-003
+item-003-v3,Café Latte,Large,13,in stock,2026-07-03T00:00:00Z,item-003
+item-004-v1,Jalapeño Poppers,Small,23.5,in stock,2026-07-03T00:00:00Z,item-004
+item-004-v2,Jalapeño Poppers,Medium,26.5,in stock,2026-07-03T00:00:00Z,item-004
+item-004-v3,Jalapeño Poppers,Large,29.5,in stock,2026-07-03T00:00:00Z,item-004
+item-005-v1,Margherita Pizza,Small,19,in stock,2026-07-03T00:00:00Z,item-005
+item-005-v2,Margherita Pizza,Medium,22,in stock,2026-07-03T00:00:00Z,item-005
+item-005-v3,Margherita Pizza,Large,25,in stock,2026-07-03T00:00:00Z,item-005
+item-006-v1,Smoked Brisket Plate,Regular,10,in stock,2026-07-03T00:00:00Z,item-006
+item-007-v1,Pad Thai,Small,17,in stock,2026-07-03T00:00:00Z,item-007
+item-007-v2,Pad Thai,Large,20,hidden,2026-07-03T00:00:00Z,item-007
+item-008-v1,Crème Brûlée,Regular,21,sold out,2026-07-03T00:00:00Z,item-008
+item-009-v1,Lemonade,Small,19,in stock,2026-07-03T00:00:00Z,item-009
+item-009-v2,Lemonade,Medium,22,in stock,2026-07-03T00:00:00Z,item-009
+item-009-v3,Lemonade,Large,25,in stock,2026-07-03T00:00:00Z,item-009
+item-010-v1,Truffle Fries,Small,6,in stock,2026-07-03T00:00:00Z,item-010
+item-010-v2,Truffle Fries,Large,9,in stock,2026-07-03T00:00:00Z,item-010
+item-011-v1,Bánh Mì Sandwich,Small,21,in stock,2026-07-03T00:00:00Z,item-011
+item-011-v2,Bánh Mì Sandwich,Large,24,in stock,2026-07-03T00:00:00Z,item-011
+item-012-v1,Açaí Bowl,Regular,10.5,in stock,2026-07-03T00:00:00Z,item-012
+

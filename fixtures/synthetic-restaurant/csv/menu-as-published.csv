@@ -1,0 +1,26 @@
+item_id,name,variation,price,sale_price,currency,availability,available_from,expires,searchable,buyable,group
+item-001-v1,Crispy Calamari (Small),Small,2150,,USD,in stock,,,yes,yes,item-001
+item-001-v2,Crispy Calamari (Medium),Medium,24.50,,usd,in stock,,,yes,yes,item-001
+item-001-v3,Crispy Calamari (Large),Large,27.50,28.50,USD,in stock,,,yes,yes,item-001
+item-002-v1,Garden Salad (Small),Small,22.00,,USD,out of stock,,,no,yes,item-002
+legacy-pos-4471,Café Latte (Medium),Medium,10.00,,USD,in stock,,,yes,yes,item-003
+item-003-v3,Café Latte (Large),Large,13.00,,USD,in stock,,2026-01-01T00:00:00Z,yes,yes,item-003
+item-004-v1,Jalapeño Poppers (Small),Small,23.50,,USD,pre-order,2026-02-01T00:00:00Z,,yes,yes,item-004
+item-004-v2,Jalapeño Poppers (Medium),Small,26.50,,USD,in stock,,,yes,yes,item-004
+item-004-v3,JalapeÃ±o Poppers (Large),Large,29.50,,USD,in stock,,,yes,yes,item-004
+item-005-v1,Margherita Pizza (Small),Small,19.00,,USD,in stock,,,yes,yes,item-005
+item-005-v2,Margherita…,Medium,22.00,,USD,in stock,,,yes,yes,item-005
+item-005-v3,Margherita Pizza (Large),Large,25.00,,USD,in stock,,,yes,yes,item-005
+item-006-v1,Smoked Brisket Plate,Regular,12.00,,USD,in stock,,,yes,yes,item-006
+item-007-v1,Pad Thai (Small),Small,17.00,,USD,in stock,,,yes,yes,item-007
+item-008-v1,Crème Brûlée,Regular,21.00,,USD,in stock,,,yes,yes,item-008
+item-009-v1,Lemonade (Small),Small,19.00,,USD,in stock,,,yes,yes,item-009
+item-009-v2,Lemonade (Medium),Medium,22.00,,USD,in stock,,,yes,yes,item-009
+item-009-v3,Lemonade (Large),Large,25.00,,USD,in stock,,,yes,yes,item-009
+item-010-v1,Truffle Fries (Small),Small,6.00,,USD,in stock,,,yes,yes,item-010
+item-010-v2,Truffle Fries (Large),Large,9.00,,USD,in stock,,,yes,yes,item-010
+item-011-v1,Bánh Mì Sandwich (Small),Small,21.00,,USD,in stock,,,yes,yes,item-011
+item-011-v2,Bánh Mì Sandwich (Large),Large,24.00,,USD,in stock,,,yes,yes,item-011
+item-012-v1,Açaí Bowl,Regular,10.50,,USD,in stock,,,yes,yes,item-012
+item-002-v2,Garden Salad (Large),Large,25.00,,USD,in stock,,,yes,yes,item-002
+ghost-001,Phantom Platter,Regular,9.99,,USD,in stock,,,yes,yes,ghost-group
