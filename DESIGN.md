@@ -32,6 +32,7 @@ changing anything.
 | **Workbench-first landing** | 2026-07-28, **re-confirmed 2026-07-31** | The hero fork is closed by owner word, not by inference. The measurement agrees: the v8 hero's `min-height: calc(100vh - 68px)` = 832px at 1280×900 cannot satisfy the 900px fold contract. |
 | **The nav pill targets `/#audit`, not `/`** | 2026-07-31 | The bar's one emphasized action was a no-op on the landing page. It now points at the instrument. `aria-current` follows the ROUTE (`match: "/"`), never the href — `usePathname()` has no hash. |
 | **Two schemes** — light and dark, viewer's choice | 2026-08-02 | Owner: *"also dark mode for it"*. This REVERSES the "Light only" record by the mechanism this table exists to require. Same roles, re-derived values — the palette and the lamp scheme are unchanged in light; see "Two schemes" under Color for the dark table and the accent role split. |
+| **Desktop and tablet only — no phone tier** | 2026-09-01 | Owner, asked directly with the measured boundary in front of them (1280 clean · 768 clean · 390 overflows ~293px, nav row never collapses): *"No — desktop/tablet only, state it plainly."* Closes open item 14 as a decision. README states it as a decision, not a gap. |
 | **The walkthrough landing** — six stations, end to end | 2026-08-02 | Owner reopened layout/sections/motion ("whole layout … from dropping files till slack email"; palette explicitly unchanged). INPUTS · RUN · VERDICT · FEES · DELIVERY · PROOF, bound by a process strip; run control never disabled and on screen one; DELIVERY renders the real Slack/email payloads BUILT NOT SENT. Source of truth: `mockups/walkthrough-one-run-2026-08-02.html`, rendered + fold-verified. |
 
 ## Typography
@@ -365,7 +366,10 @@ document to read in order) · decorative stats · any copy implying real platfor
     settled) still applies — but nobody has *designed* printing for the new report. Decide
     whether print is a supported surface before promising it anywhere.
 
-14. **There is no phone tier, and the boundary is now measured** (2026-08-03). The
+14. ~~**There is no phone tier, and the boundary is now measured**~~ — **DECIDED 2026-09-01 by
+    owner word: no phone tier. Desktop and tablet only, stated plainly.** The measurement
+    below stands as the record of the boundary; nothing is fixed because nothing is owed.
+    See the settled-by-owner table. (Original entry, 2026-08-03:) The
     stylesheet carries 14 `max-width` breakpoints down to 560px, but nothing had ever
     been rendered below 1280px. Rendered this session at three widths with the desktop
     case as a **control** (a red result from an instrument that has not been shown to

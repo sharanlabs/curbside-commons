@@ -158,3 +158,31 @@ builders enforce them). And the persisting CI download red got its product-level
 html scroll-padding-top 114px (native scrolls were landing controls under the sticky
 chrome) + the spec centres the control before clicking. Gates: tsc 0 · eslint 0 ·
 offline build ✓ · vitest 1614 + 8, 0 failed.
+
+## 2026-09-01 — The goal re-fixed: build complete → "an instrument a stranger can test, then shown" (owner word)
+Trigger: `/claude-os` triage after 29 idle days (session 46, Fable 5.1). Finding: the only
+ratified definition of done (2026-06-11, "T-003 → Phase 3 → Phase 7") belonged to the
+pre-pivot product; the roadmap it pointed at was deleted 2026-07-21; no completion criteria
+had been written for Curbside Commons, so the project ran on session-by-session words with
+no way to be declared complete. Second finding: an outside visitor could test the instrument
+only on the bundled data in the project's own ACP/UCP JSON shape (`FileDrop` accepts
+`.json`/`.txt`; no restaurant, ops person or reviewer has that file). Owner, verbatim:
+"lets rework and adjust to the right goal and also where user able to test it." Structured
+answers: tester = **both** (guided bundled path first, then bring-your-own-data) · scope =
+**re-fix the goal in the repo AND build the testable input path + on-site guide** · phone
+tier = **no, desktop/tablet only, stated plainly**. DECIDED: the build phase is closed; the
+goal is now the one written in `docs/plan-testable-instrument-2026-09-01.md` ("The goal,
+fixed") — a spreadsheet (CSV) input path per slot, templates pre-filled from the fixture, an
+on-site "Test it yourself" guide whose numbers derive from `fixtures/`, honesty and
+zero-egress properties extended to the new path, then outside testers. Six design decisions
+(D-1..D-6) await owner GO; the plan is owed a Codex cross-check (hosts `000` from the sandbox
+since 2026-07-31 — owner-shell). ALSO DECIDED (owner): DESIGN.md open item 14 closes as a
+decision, not a fix — no phone tier; README states it as a decision. Root-level files from
+the ActivationOps era (`RESUME_PROMPT.txt` 2026-06-22 — which instructed a new session to
+continue a semantic judge for the dead product — `PLAN.md`, `PLAN-REVIEW-LOG.md`,
+`decisions_log.md`, `shared_reasoning.md`) moved byte-exact to
+`docs/archive/2026-09-01-root-era-files/`; only historical docs referenced them.
+Deliberately NOT decided here: a guided form (a spreadsheet is the tool every intended
+tester already has; a form is a later decision if testers ask), any engine change, fuzzy
+matching, live sends. RULES §4 unchanged: simulated data always; the new templates carry
+production-register names, and the SIMULATED labelling stays inside the report/builders.
