@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "@/components/landing/Reveal";
+import { GUIDE } from "@/lib/landing/test-guide";
 
 /**
  * /docs — the reference layer (build piece 3, 2026-07-20; design source
@@ -35,6 +36,142 @@ export default function DocsPage() {
             </p>
             <p className="acc r" style={{ marginTop: 26 }} aria-hidden="true">
               CURBSIDE COMMONS · REFERENCE
+            </p>
+          </Reveal>
+        </section>
+
+        {/* ===== TEST IT YOURSELF =====
+            The on-site guide (S3, docs/plan-testable-instrument-2026-09-01.md).
+            Every figure below is a FIELD of `GUIDE`, derived from the committed
+            fixtures the site runs on — evals/packs/test-guide.test.ts fails if a
+            number is typed here, if the derived figures disagree with a live
+            engine run, or if the one edit this section describes does not do
+            exactly what it says. The section sits first because it is the
+            reason a stranger opens this page. */}
+        <section className="sect" id="test-it" aria-labelledby="test-h2">
+          <Reveal>
+            <p className="lp-eyebrow">TEST IT YOURSELF</p>
+            <span className="lp-sec-rule" aria-hidden="true" />
+            <h2 id="test-h2">Run it yourself, two ways.</h2>
+            <p className="prose">
+              You need no account and no file of your own. The instrument runs inside your browser
+              tab, and nothing you load leaves it. The first path is three clicks on the menu that
+              ships with the project. The second brings a menu of yours in through a spreadsheet.
+              The console is built for desktop and tablet — by decision, it has no phone layout.
+            </p>
+          </Reveal>
+          <Reveal>
+            <div className="docs-guide">
+              <article className="path">
+                <h3>
+                  The bundled pair <span className="path-k">three clicks</span>
+                </h3>
+                <ol className="docs-steps">
+                  <li>
+                    <Link href="/#audit">Open the front page.</Link> The instrument is the first
+                    thing on it: two slots, <b>The feed</b> (what an agent reads) and{" "}
+                    <b>The record</b>
+                    {" (the merchant’s truth)."}
+                  </li>
+                  <li>
+                    Click <b>Run the bundled pair</b>. Both slots fill with the menu that ships with
+                    the project, and the check runs at once.
+                  </li>
+                  <li>Read the verdict under the run — every finding carries its receipt.</li>
+                </ol>
+                <div className="docs-expect">
+                  <p className="k">WHAT YOU SHOULD SEE</p>
+                  <div className="figs" data-guide="bundled">
+                    <div>
+                      <b data-k="verdict">{GUIDE.bundled.verdict}</b>
+                      <span>Verdict</span>
+                    </div>
+                    <div>
+                      <b data-k="findings">{GUIDE.bundled.findings}</b>
+                      <span>Findings</span>
+                    </div>
+                    <div>
+                      <b data-k="errors">{GUIDE.bundled.errors}</b>
+                      <span>Errors</span>
+                    </div>
+                    <div>
+                      <b data-k="warnings">{GUIDE.bundled.warnings}</b>
+                      <span>Warnings</span>
+                    </div>
+                    <div>
+                      <b data-k="rows">{GUIDE.bundled.rowsRead}</b>
+                      <span>Rows read</span>
+                    </div>
+                  </div>
+                  <p>
+                    The verdict names the bundled records as its record side, and the same inputs
+                    give the same figures every time.
+                  </p>
+                </div>
+              </article>
+
+              <article className="path">
+                <h3>
+                  Your own menu <span className="path-k">five steps, one spreadsheet</span>
+                </h3>
+                <ol className="docs-steps">
+                  <li>
+                    Under each slot, open <b>Paste it, or download a copy</b> and click{" "}
+                    <b>Download the spreadsheet template</b>. The feed slot saves{" "}
+                    <code>{GUIDE.templates.feed}</code>, what a marketplace shows; the record slot
+                    saves <code>{GUIDE.templates.record}</code>, what the merchant holds. The two
+                    match on <code>item_id</code>.
+                  </li>
+                  <li>
+                    Open <code>{GUIDE.templates.feed}</code> in Excel, Numbers or Google Sheets.
+                  </li>
+                  <li>
+                    Change one price. Row{" "}
+                    <b data-k="row">{GUIDE.edit.spreadsheetRow}</b>, {GUIDE.edit.name}, sells at{" "}
+                    <code data-k="price">{GUIDE.edit.price}</code> — make it{" "}
+                    <code data-k="new-price">{GUIDE.edit.newPrice}</code>. Save it as CSV.
+                  </li>
+                  <li>
+                    Drop the edited file into <b>The feed</b> and the untouched record file into{" "}
+                    <b>The record</b>. Each slot reports how many rows it read from your
+                    spreadsheet.
+                  </li>
+                  <li>
+                    Click <b>Run the audit</b>.
+                  </li>
+                </ol>
+                <div className="docs-expect">
+                  <p className="k">WHAT YOU SHOULD SEE</p>
+                  <div className="figs" data-guide="edited">
+                    <div>
+                      <b data-k="verdict">{GUIDE.bundled.verdict}</b>
+                      <span>Verdict</span>
+                    </div>
+                    <div>
+                      <b data-k="findings">{GUIDE.afterEdit.findings}</b>
+                      <span>Findings</span>
+                    </div>
+                  </div>
+                  <p>
+                    The {GUIDE.bundled.findings} findings of the bundled menu, plus one new one:{" "}
+                    <code data-k="rule">{GUIDE.afterEdit.ruleId}</code> on{" "}
+                    <code data-k="item">{GUIDE.edit.itemId}</code>, quoting the price you published
+                    against the price on record. Change the cell back, run again, and the count
+                    returns to {GUIDE.bundled.findings}.
+                  </p>
+                </div>
+              </article>
+            </div>
+            <p className="closer stack">
+              <span className="flamp" aria-hidden="true" />
+              <span>
+                Wrong values are never refused — they are the findings. Only a file the engine cannot
+                index is refused, by row: a repeated <code>item_id</code>, a price it cannot read.
+                A record sheet with no <code>as_of</code> column is dated the day you drop it, and
+                the verdict says so. One rule id reads differently from a spreadsheet: a price
+                stored in cents where dollars belong cannot survive a spreadsheet&rsquo;s number
+                cell, so that row is caught as a plain price mismatch instead.
+              </span>
             </p>
           </Reveal>
         </section>

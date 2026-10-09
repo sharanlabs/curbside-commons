@@ -186,3 +186,42 @@ Deliberately NOT decided here: a guided form (a spreadsheet is the tool every in
 tester already has; a form is a later decision if testers ask), any engine change, fuzzy
 matching, live sends. RULES §4 unchanged: simulated data always; the new templates carry
 production-register names, and the SIMULATED labelling stays inside the report/builders.
+
+## 2026-10-09 — The goal re-fixed again: Menu Integrity Crew for US delivery platforms (owner grant; direction set by the orchestrator seat)
+Trigger: session 48 (Fable 5.1 in Cursor, orchestrator/evaluator), owner asked for an end-to-end
+evaluation and then re-aimed the project in four messages: deliver a working demo to the pilot
+project for companies such as DoorDash and Uber; the product is an AI agent / multi-agent /
+automation that resolves one of THEIR real pain points; not operated — test data, shown on need;
+governance model + a specific business delivery point (effect and after, tangible and
+intangible, with cost-benefit); Gemini subscription plus a free open-source equivalent; US only;
+clear setup / structure / framework / methodology; "these floor not ceiling, use own judgement";
+a separate Claude Code CLI seat builds and the owner pastes between seats; and finally *"it is
+completely your own judgement anything can be done with the project."*
+Evaluation findings that drove the direction (full text in CURRENT_TASK session-48 block):
+engine + evidence discipline pilot-grade; no real-data path (exact-id matching, synthetic only);
+menu model retail-shaped (modifierLists carried but never audited); toy scale; single-shot, no
+ledger; production two slices behind main with S3 uncommitted five weeks; the fee audit is
+counterparty-adverse to the named buyer — the feed-truth/agent-pre-flight side is the
+cooperative wedge. Live-verified today: DoorDash Gemini beta 2026-03-03; both platforms state
+the menu/modifier/86 pain in their integration docs; UCP v2026-08-25 current (repo pins
+2026-04-08); UCP Food TC seated 2026-07-16 (Block/Square · DoorDash · Google · Toast · Uber
+Eats), no food schema yet; FTC still at ANPRM. Model layer verified: Gemini free tier =
+3.8-flash / 3.5-flash-lite / 3.1-flash-lite (2.5 restricted to prior users — repo pin stale);
+Google AI Pro does not fund AI Studio keys, carries $10/mo Vertex credit; Groq free tier serves
+gpt-oss-120b/20b + qwen3.8-27b; local = gpt-oss:20b or qwen3:8b via Ollama JSON-schema format.
+DECIDED under the owner's grant: the goal, scope, architecture, roster, governance model,
+delivery point, model tiers, scenario library, methodology, setup, slices S0–S6 and the two-seat
+workflow written in `docs/plan-menu-integrity-crew-2026-10-09.md` are the plan of record. The
+2026-09-01 goal is complete-as-built and superseded. Audience split by incentive: platform /
+sync-vendor deck leads with feed truth + agent pre-flight + partner scorecard; the fee pack is
+demoted to scenario 7 and the merchant/association/regulator deck. Replay by default; live
+owner-armed; Groq gpt-oss-120b live default, Gemini 3.5-flash-lite cross-family judge, ≤ $5
+hard cap retained. Platform-shaped synthetic inputs permitted under the "shaped like the public
+integration docs, not from the platform" label with new C10 probes before any such copy ships.
+Auto-deploy on main (D-4) is RECOMMENDED but NOT applied — it reverses the owner's
+2026-07-28 word pinned in header-policy.test.ts, so it waits for the owner's own word; S0
+deploys through the one-push window. Build is one slice per dispatch packet to the CLI seat; the
+orchestrator reviews the diff in the tree and re-runs gates; nothing is done on a seat's word.
+Still owner actions: commit · push · deploy · arming any live model · the five validation
+conversations · the local-model tier choice (D-6). Owed: Codex cross-check of the plan
+(owner-shell). RULES §4 unchanged.

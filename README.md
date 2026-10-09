@@ -10,6 +10,13 @@ Built and directed by **Sharan Kumar** ([github.com/sharanlabs](https://github.c
 
 ## Try it in 60 seconds
 
+**On the live site, no repo needed** ([curbside-commons.vercel.app](https://curbside-commons.vercel.app), desktop or tablet):
+
+- **The bundled pair, three clicks:** open the front page, click **Run the bundled pair**, read the verdict — **FAIL**, **16 findings — 11 errors, 5 warnings** over 25 rows read, every finding with its receipt.
+- **Your own menu, one spreadsheet:** under each slot open "Paste it, or download a copy" and click **Download the spreadsheet template** — `menu-as-published.csv` (what a marketplace shows) and `menu-record.csv` (what the merchant holds), pre-filled with the same menu and matched on `item_id`. Change one price in a spreadsheet app, save as CSV, drop both files back, click **Run the audit**: the tally moves by exactly the cell you changed. The step-by-step, with the figures you should see, is on the site at `/docs#test-it` and in [docs/how-to-test.md](docs/how-to-test.md); those figures are derived from `fixtures/` by `lib/landing/test-guide.ts` and held equal to a live engine run by a test, never typed by hand.
+
+**From the repo:**
+
 ```bash
 npm ci
 node bin/check.mjs demo                                          # the scripted walkthrough, $0, zero-config
@@ -74,7 +81,7 @@ output of a completed, human-approved audit, never inside it — is in
 
 | Surface | Status |
 | --- | --- |
-| Test suite | `npm run verify` green: **1613 passed + 8 skipped** (re-measured live 2026-09-01; `tsc` 0 · `eslint` 0 in the same run). **All 8 skips are `describe.skipIf(!live)` owner-armed live-network harnesses** — off by default and skipped *identically* locally and in CI, so the counts now match on both. The previous entry documented a one-test local/CI difference caused by a cache-gated embedding check; that lane was **retired 2026-07-26** (it lost to plain BM25 on its own scored run, so the simpler lane ships), which removed the repo's only environment-dependent skip along with it. Its losing scoreboard is kept in `evals/rag/results/` — the capability retired, the evidence did not. |
+| Test suite | `npm run verify` green: **1697 passed + 8 skipped** (re-measured live 2026-09-03; `tsc` 0 · `eslint` 0 in the same run; CI's real-browser Playwright battery 62 passed on `33a75c9`). **All 8 skips are `describe.skipIf(!live)` owner-armed live-network harnesses** — off by default and skipped *identically* locally and in CI, so the counts now match on both. The previous entry documented a one-test local/CI difference caused by a cache-gated embedding check; that lane was **retired 2026-07-26** (it lost to plain BM25 on its own scored run, so the simpler lane ships), which removed the repo's only environment-dependent skip along with it. Its losing scoreboard is kept in `evals/rag/results/` — the capability retired, the evidence did not. |
 | Listings drift taxonomy (8 classes) | **8/8 injected and caught, measured** by the C6 coverage eval; never an "all edge cases" claim |
 | Official-oracle agreement | ajv conformance vs the official `ucp-schema` validator (v1.3.0): **33/35 agree + 2 documented divergences** (the JSON Schema 2020-12 format-assertion fork), 0 disagreements |
 | Fee-line taxonomy (6 classes) | 5/6 deterministic-checkable and caught; relabeling detection routes to the classifier lane below |

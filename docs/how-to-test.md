@@ -50,13 +50,38 @@ messages a human would receive. Click by click:
    (what an agent reads) and **"The system of record"** (the merchant's truth).
 2. **Fastest path: click "Run the bundled pair"** — it loads the built-in test pair and
    runs immediately. The run button is never disabled; empty slots just mean it runs
-   the bundled data.
+   the bundled data. **What you should see:** verdict **FAIL** with
+   **16 findings — 11 errors, 5 warnings** over 25 rows read, and the verdict names
+   the bundled records as its record side. (These figures are derived from
+   `fixtures/synthetic-restaurant/expected-report.acp.json` by `lib/landing/test-guide.ts`
+   and asserted against a live engine run by `evals/packs/test-guide.test.ts`; the
+   on-site guide at `/docs#test-it` renders the same object, so the two cannot drift.)
 3. **Or bring the test files yourself:** open a slot's paste area and click
    **"Download it to test uploading"** — it saves the bundled file
    (`bundled-feed.json` / `bundled-catalog.json`) from the same bytes the inline
    loader uses. Drag the files back into the slots or use the file picker. Same
    engine, now exercising the real upload path. (The save happens in your tab via a
    blob URL — nothing is fetched from, or sent to, anywhere.)
+3b. **Or bring your own menu through a spreadsheet** (since 2026-09-01 — the
+   bring-your-own-data path; on-site guide: `/docs#test-it`). Under each slot, open
+   **"Paste it, or download a copy"** and click **"Download the spreadsheet template"**.
+   The feed slot saves `menu-as-published.csv` (what a marketplace shows); the record
+   slot saves `menu-record.csv` (what the merchant holds). Both hold the bundled menu
+   and match on `item_id`. Open `menu-as-published.csv` in Excel, Numbers or Google
+   Sheets and change one price. For the guided check, edit row 11 — Margherita Pizza (Small) —
+   which sells at 19.00; make it 20.00. Save as CSV, drop the edited file into
+   **The feed** and the untouched `menu-record.csv` into **The record**, and click
+   **Run the audit**. **What you should see:** verdict **FAIL** with
+   **17 findings — the 16 above plus one** new `LST-PRICE-VALUE` on `item-005-v1`,
+   quoting the price you published against the price on record. Change the cell back
+   and the count returns to 16. Two things to know: wrong *values* are never refused —
+   they are the findings; only a file the engine cannot index (a repeated `item_id`, a
+   price it cannot read) is refused, by row. And a record sheet with no `as_of` column is
+   dated the day you drop it — the verdict says so in its provenance line. (One rule id
+   reads differently from a spreadsheet: the bundled feed's cents-as-decimal row
+   `2150` arrives as `2150.00` and is caught as a plain price mismatch,
+   `LST-PRICE-VALUE`, rather than `LST-PRICE-CENTS-AS-DECIMAL` — same row, same
+   severity, same tally; a spreadsheet's number cell cannot carry that defect.)
 4. Watch the **RUN** station: the ticker streams only checks that actually happened —
    a row shows **HELD** when a real finding exists and **OK** only when that row had
    zero findings. Nothing in the stream is theater.

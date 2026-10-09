@@ -43,6 +43,7 @@
  * first-time reader can see the whole instrument work in one click.
  */
 import { useRef, useState } from "react";
+import Link from "next/link";
 import type { VerifierReport } from "@/lib/verifier-core/report";
 import type { SyntheticCatalog } from "@/lib/packs/listings/types";
 import { deriveChecks, publishRun, IDLE_RUN } from "@/components/landing/run-bus";
@@ -366,6 +367,18 @@ export function AuditWorkbench() {
           </button>
         )}
       </div>
+
+      {/* THE SECOND DOOR, named where the first one is (S3, 2026-09-03). A
+          reader with a menu of their own and no protocol file has always had a
+          way in since S2 — but it sat folded under each slot's paste box, and
+          the goal is a stranger who finds it unprompted. One line, under the
+          run control so the fold contract is untouched, pointing at the guide
+          that says what to click and what they will see. */}
+      <p className="wk-sheet-hint">
+        Have a menu of your own? Each slot offers a spreadsheet template under &ldquo;Paste it, or
+        download a copy&rdquo; — download it, change a cell, drop it back.{" "}
+        <Link href="/docs#test-it">Step by step, with what you should see</Link>
+      </p>
 
       {/* No-JS: the whole workbench runs in the reader's browser. Without
           scripting there is nothing to run, so dead controls are hidden and the
