@@ -167,7 +167,7 @@ Plus one realistic-scale fixture under `fixtures/synthetic-restaurant-large/`: ~
 
 ## 12 · Slices (each closes on its own gate; the owner commits)
 
-- **S0 — unblock (owner-shell, same day).** Commit S3 + this plan + the archive · push · one-push deploy window (the `header-policy.test.ts` pattern: flip `git.deploymentEnabled` and the pin in one commit, revert both once live) · four-point verify · D-4 if the owner says so. **The archive half is DONE 2026-10-09 in-session:** session blocks 38–45 (`CURRENT_TASK.md`), 42–45 (`HANDOFF.md`) and every 2026-07 task-log entry moved byte-exact to `docs/archive/2026-10-09-state-docs/`; startup docs 240,874 → 105,353 B; budget test 5/5 green; full suite 1697 + 8 re-run green. SC: production serves S3; budget test green.
+- **S0 — unblock. DONE 2026-10-09 (session 48, orchestrator seat, owner: "go ahead complete what you have proposed").** `a1b05da` (S3 + plan + archive; gates tsc 0 · eslint 0 · 1697 + 8) pushed, no deploy (gate closed) · `56325eb` opened the window → exactly one Vercel deployment `dpl_4KU656YkuGhzLK6HFzDjrfMYoRvc`, READY · `5818c35` closed it, triggered nothing (MCP-verified) · **four-point verify 4/4 on production:** 6/6 routes + 404 control · "Download the spreadsheet template" ×2 · `/docs#test-it` 16 / 11 / 5 / 25 + row 11 / 19.00 · provenance `56325eb` == deployed · four headers + HSTS on `/docs`, CSP absent · CI run 37956794410 adjudicating the 3 never-run e2e (read it before Wave 1 merges anything). D-4 not applied (owner's word pending). Original spec: Commit S3 + this plan + the archive · push · one-push deploy window · four-point verify. **The archive half was done first:** session blocks 38–45 (`CURRENT_TASK.md`), 42–45 (`HANDOFF.md`) and every 2026-07 task-log entry moved byte-exact to `docs/archive/2026-10-09-state-docs/`; startup docs 240,874 → 105,353 B; budget test 5/5 green; full suite 1697 + 8 re-run green. SC: production serves S3; budget test green.
 - **S1 — currency + the menu model (CLI seat, dispatch packet in Appendix A).** Re-pin Gemini models/prices; re-vendor UCP `v2026-08-25` with provenance; project modifier-option price, 86'd-status and hours claims from the Square-shaped record and the feed; three new detectors (`LST-MOD-PRICE-VALUE`, `LST-MOD-MISSING`, `LST-HOURS-WINDOW`) with C6 coverage extended; scenarios 2 and 6 built end to end on the existing crew in replay. SC: coverage eval 11/11 classes injected and caught · golden byte-locks · mutation proof per detector · C10 green · UCP oracle diff re-run.
 - **S2 — the two new seats + the ledger.** Root-cause seat (schema, prompt from the model's official cookbook, deterministic timestamp baseline, pre-registered floors doc, offline replay first); Impact seat (pure arithmetic from the large fixture); `lib/ledger/` append-only JSON-lines with `diff`; scenarios 1, 3, 4 built. SC: root-cause floors doc committed before any live turn · impact figures equal a test's recomputation · ledger egress tooth · `diff` golden.
 - **S3 — platform-shaped adapters + partner scorecard + the id-mapping sheet.** DoorDash-shaped and Uber-shaped menu JSON adapters onto `AcpFeed`/`SyntheticCatalog` (labeled "shaped like"); Order-Errors CSV as a trigger; mapping sheet as a cited reference; scorecard against the published criteria; scenarios 5 and 8 built. SC: round-trip goldens · refusals row-numbered · mapping cited in receipts · C10 probes for affiliation phrasing bite.
@@ -312,6 +312,45 @@ STEPS (each with its exit code in the return packet):
 
 RETURN: the § 13 packet, with the production sha and the CI run id.
 STOP: any step's exit code ≠ 0; CI red you cannot attribute; more than one deployment created in the window.
+```
+
+## Appendix W1b — Dispatch packet S4-docs (Wave 1, lane 2; Sonnet 5.5; runs in parallel with S1 and W1c)
+
+```
+SLICE S4-docs — governance model · model-risk register · pilot kit (writing only; Wave 1 lane 2)
+
+STARTUP: Mandatory Startup Contract; read docs/plan-menu-integrity-crew-2026-10-09.md §§ 1–3, 6, 7, 8, 16, 17, 18 and Appendix B.
+
+OBJECTIVE: Turn plan §§ 6, 7, 8 and 17 into the three repo documents a platform's risk, ops and procurement readers will actually be handed — written in the repo's documentation standard (docs/documentation-standard.md: plain-English first, technical alongside), every figure either sourced with a dated citation or explicitly labeled an assumption, no figure typed that the repo can derive.
+
+ALLOWED FILES (new): docs/governance-model.md · docs/model-risk-register.md · docs/pilot-kit/README.md · docs/pilot-kit/pilot-proposal.md · docs/pilot-kit/data-request-spec.md · docs/pilot-kit/security-one-pager.md · docs/pilot-kit/success-metrics.md (pre-registered, with floors left as "TBD at pilot start — set before the first run") · docs/pilot-kit/demo-script-10min.md · docs/task-log.md (one entry).
+OUT OF SCOPE: everything else — no code, no fixtures, no app/, no state-doc blocks (the orchestrator writes those at wave close).
+
+CONTRACTS: action tiers 0–3 exactly as plan § 6 · the roster and labels exactly as § 5 · model tiers and the "label is per (seat, model)" rule exactly as § 8 · the cost-benefit formula and illustrative fill exactly as § 7, labeled illustrative · RULES §4 on every sentence: synthetic data, "shaped like the public integration docs, not from the platform", no affiliation, no real-impact claim · production register (no "sample"/"demo" captioning).
+
+TESTS FIRST: add docs/governance-model.md, docs/model-risk-register.md and docs/pilot-kit/*.md to the explicit file list of the honesty scan that walks docs (find the suite that lists docs by path — never add a recursive glob) so BANNED_CLAIMS probes run over them; show the red by planting one banned phrase, then remove it.
+
+VERIFY: npx vitest run evals/packs/honesty-c10.test.ts evals/packs/startup-contract-budget.test.ts evals/packs/readme-route-claims.test.ts — exit codes in the return.
+RETURN: § 13 packet. STOP: if any statement needs a fact you cannot source or label as an assumption, write "UNVERIFIED" inline and list it under OPEN.
+```
+
+## Appendix W1c — Dispatch packet scenario briefs + inputs (Wave 1, lane 3; Sonnet 5.5; no new detectors)
+
+```
+SLICE scenarios-w1 — briefs and inputs for scenarios 1, 3, 4, 5, 7 (Wave 1 lane 3)
+
+STARTUP: Mandatory Startup Contract; read plan §§ 4, 9, 10, 11 and Appendix B; read fixtures/README.md and fixtures/synthetic-restaurant/README.md; read lib/landing/test-guide.ts (the derive-never-type pattern).
+
+OBJECTIVE: Create the five scenario folders whose inputs need NO new detector (1 agent-86 · 3 sync-outage · 4 platform-override · 5 partner-onboarding · 7 fee-precheck) under fixtures/scenarios/<id>/ with brief.md · inputs/ · manifest.json, generated from seed by one script, freeze-locked, with a test that (a) regenerates and byte-compares, (b) runs the existing engine on each input pair and asserts the brief's figures equal the run (figures are placeholders the script fills — never typed), (c) scans each brief for register and §4 probes. expected/ holds the engine report only; root-cause/impact/route/turns are LEFT ABSENT with a one-line note (they arrive in S2). Scenarios 2 and 6 belong to the S1 lane — do not create them.
+
+ALLOWED FILES (new): fixtures/scenarios/** (the five ids above only) · scripts-ts/generate-scenarios.mts · evals/packs/scenarios.test.ts · fixtures/scenarios/README.md · docs/task-log.md (one entry).
+OUT OF SCOPE: lib/** · app/** · components/** · fixtures/synthetic-restaurant/** (read-only; derive from it, never edit it) · any detector or rule · state-doc blocks.
+
+CONTRACTS: all inputs reuse the existing AcpFeed / SyntheticCatalog / fee statement shapes (no platform-shaped JSON yet — that is S3); every manifest carries "simulated": true, "shapedLike": null for now, a seed, and the generator version · brief.md structure: Title · The story (≤ 120 words) · What the reviewer will see (figures as {{placeholders}} filled by the script) · Which seats act · What a human signs · scenario 7 uses the existing fees fixtures and the existing fee audit — production register, "compliance pre-check" framing per plan § 2.
+
+TESTS FIRST: scenarios.test.ts is RED before any folder exists (it asserts the five ids); the freeze tooth is proven by a one-byte edit → red → regenerate → green (sha recorded in the test header).
+VERIFY: npm run typecheck && npx vitest run evals/packs/scenarios.test.ts evals/packs/honesty-c10.test.ts — exit codes in the return. Full suite count before → after, accounted.
+RETURN: § 13 packet. STOP: if a scenario's story needs a finding the current detectors cannot produce (e.g., a modifier price), write the brief with that finding marked "arrives in S1/S2" rather than faking it; if any golden under fixtures/synthetic-restaurant changes, stop — you are in the wrong lane.
 ```
 
 ## Appendix A — Dispatch packet S1 (paste into Claude Code CLI after GO)
