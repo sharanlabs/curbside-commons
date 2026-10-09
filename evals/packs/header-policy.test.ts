@@ -125,7 +125,9 @@ describe("header policy — vercel.json is exactly the adopted 2026-07-12 policy
     //
     // The link itself is deliberately LEFT CONNECTED: it is what lets a deploy
     // be triggered on purpose. What is removed is the automatic trigger.
-    expect(config().git?.deploymentEnabled).toBe(false);
+    // DEPLOY WINDOW OPEN (2026-10-09, S0, owner word): flipped to true for exactly one
+    // push; the closing commit restores false and this pin together.
+    expect(config().git?.deploymentEnabled).toBe(true);
   });
 
   it("sets cleanUrls — without it every non-root extensionless route 404s on the live host", () => {
