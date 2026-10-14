@@ -1,0 +1,53 @@
+{
+  "id": "sync-outage",
+  "number": 3,
+  "simulated": true,
+  "shapedLike": null,
+  "seed": 20261003,
+  "generator": "generate-scenarios.mts@1.0.0",
+  "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "pack": "listings",
+  "derivedFrom": {
+    "fixtures": [
+      "fixtures/synthetic-restaurant/sor.catalog.json",
+      "fixtures/synthetic-restaurant/acp-feed.faithful.json"
+    ],
+    "corpusSeed": 20260703,
+    "corpusAsOf": "2026-07-03T00:00:00Z"
+  },
+  "transform": {
+    "category": "Appetizers",
+    "lastSyncHoursBeforeAsOf": 36,
+    "refreshWindowHours": 24,
+    "feed": "outage-category rows: updated_at = last sync, expiration_date = last sync + refresh window; other rows: expiration_date = as-of + refresh window",
+    "record": "outage-category rows: seeded price increases and sell-outs"
+  },
+  "inputs": [
+    "inputs/events.jsonl",
+    "inputs/feed.json",
+    "inputs/record.json"
+  ],
+  "expected": [
+    "expected/report.json",
+    "expected/README.md"
+  ],
+  "absentUntilS2": [
+    "root-cause",
+    "impact",
+    "route",
+    "turns"
+  ],
+  "figures": {
+    "verdict": "FAIL",
+    "findings": 10,
+    "errors": 4,
+    "warnings": 6,
+    "rows_read": 24,
+    "rules": "LST-AVAIL-STATE ×2, LST-PRICE-VALUE ×2, LST-STALE-EXPIRED ×6",
+    "category": "Appetizers",
+    "rows_stale": 6,
+    "price_drifts": 2,
+    "newly_86": 2,
+    "outage_hours": 36
+  }
+}

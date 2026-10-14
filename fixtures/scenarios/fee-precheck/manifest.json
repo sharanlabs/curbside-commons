@@ -1,0 +1,52 @@
+{
+  "id": "fee-precheck",
+  "number": 7,
+  "simulated": true,
+  "shapedLike": null,
+  "seed": 20261007,
+  "generator": "generate-scenarios.mts@1.0.0",
+  "engine": "uc1-rule-table-draft/2026-07-03+NYC§20-563.3+LL79-2025+base-U1-unresolved",
+  "pack": "fees",
+  "derivedFrom": {
+    "fixtures": [
+      "fixtures/synthetic-restaurant/fees/statement.faithful.json"
+    ],
+    "corpusSeed": 20260703,
+    "corpusAsOf": "2026-07-03T00:00:00Z"
+  },
+  "transform": {
+    "base": "fees/statement.faithful.json",
+    "ordersAdded": 5,
+    "defects": [
+      "one transaction fee above the cap",
+      "one transaction fee above the cap with a pass-through asserted",
+      "one line under a non-permitted category"
+    ]
+  },
+  "inputs": [
+    "inputs/events.jsonl",
+    "inputs/statement.json"
+  ],
+  "expected": [
+    "expected/report.json",
+    "expected/README.md"
+  ],
+  "absentUntilS2": [
+    "root-cause",
+    "impact",
+    "route",
+    "turns"
+  ],
+  "figures": {
+    "verdict": "FAIL",
+    "orders": 7,
+    "lines": 22,
+    "findings": 3,
+    "violations": 2,
+    "asserted": 1,
+    "conditional": 0,
+    "cured": 0,
+    "provisional": 2,
+    "rules": "NYC-563.3-c-1 ×1, NYC-563.3-c-2 ×1, NYC-563.3-d-1 ×1"
+  }
+}

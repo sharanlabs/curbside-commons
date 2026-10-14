@@ -1,0 +1,65 @@
+{
+  "id": "platform-override",
+  "number": 4,
+  "simulated": true,
+  "shapedLike": null,
+  "seed": 20261004,
+  "generator": "generate-scenarios.mts@1.0.0",
+  "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "pack": "listings",
+  "derivedFrom": {
+    "fixtures": [
+      "fixtures/synthetic-restaurant/sor.catalog.json",
+      "fixtures/synthetic-restaurant/acp-feed.faithful.json"
+    ],
+    "corpusSeed": 20260703,
+    "corpusAsOf": "2026-07-03T00:00:00Z"
+  },
+  "transform": {
+    "itemsEditedByHand": 6,
+    "kinds": [
+      "name",
+      "description",
+      "active"
+    ],
+    "editHoursBeforeAsOf": 48,
+    "record": "unchanged copy of the base record (it is the newer side)",
+    "feed": "picked items' rows: name, description or availability switched; updated_at = the edit time",
+    "pickedItems": [
+      "item-005",
+      "item-001",
+      "item-006",
+      "item-004",
+      "item-007",
+      "item-009"
+    ]
+  },
+  "inputs": [
+    "inputs/events.jsonl",
+    "inputs/feed.json",
+    "inputs/record.json"
+  ],
+  "expected": [
+    "expected/report.json",
+    "expected/README.md"
+  ],
+  "absentUntilS2": [
+    "root-cause",
+    "impact",
+    "route",
+    "turns"
+  ],
+  "figures": {
+    "verdict": "FAIL",
+    "findings": 10,
+    "errors": 10,
+    "warnings": 0,
+    "rows_read": 24,
+    "rules": "LST-AVAIL-STATE ×4, LST-IDENT-NAME ×6",
+    "items_edited": 6,
+    "name_rows": 6,
+    "active_rows": 4,
+    "description_rows": 4,
+    "override_hours": 48
+  }
+}

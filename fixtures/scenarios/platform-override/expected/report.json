@@ -1,0 +1,138 @@
+{
+  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "matchingMode": "synthetic-controlled",
+  "simulated": true,
+  "findings": [
+    {
+      "claim": {
+        "id": "item-006-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "out_of_stock"
+      },
+      "referenceRowId": "item-006-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"out_of_stock\" but the catalog state is in stock (expected \"in_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-009-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "out_of_stock"
+      },
+      "referenceRowId": "item-009-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"out_of_stock\" but the catalog state is in stock (expected \"in_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-009-v2#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "out_of_stock"
+      },
+      "referenceRowId": "item-009-v2",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"out_of_stock\" but the catalog state is in stock (expected \"in_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-009-v3#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "out_of_stock"
+      },
+      "referenceRowId": "item-009-v3",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"out_of_stock\" but the catalog state is in stock (expected \"in_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-004-v1#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "Jalapeño Poppers Family Size (Small)"
+      },
+      "referenceRowId": "item-004-v1",
+      "ruleId": "LST-IDENT-NAME",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The served name \"Jalapeño Poppers Family Size (Small)\" does not match the catalog name \"Jalapeño Poppers (Small)\"."
+    },
+    {
+      "claim": {
+        "id": "item-004-v2#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "Jalapeño Poppers Family Size (Medium)"
+      },
+      "referenceRowId": "item-004-v2",
+      "ruleId": "LST-IDENT-NAME",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The served name \"Jalapeño Poppers Family Size (Medium)\" does not match the catalog name \"Jalapeño Poppers (Medium)\"."
+    },
+    {
+      "claim": {
+        "id": "item-004-v3#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "Jalapeño Poppers Family Size (Large)"
+      },
+      "referenceRowId": "item-004-v3",
+      "ruleId": "LST-IDENT-NAME",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The served name \"Jalapeño Poppers Family Size (Large)\" does not match the catalog name \"Jalapeño Poppers (Large)\"."
+    },
+    {
+      "claim": {
+        "id": "item-005-v1#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "Margherita Pizza Combo (Small)"
+      },
+      "referenceRowId": "item-005-v1",
+      "ruleId": "LST-IDENT-NAME",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The served name \"Margherita Pizza Combo (Small)\" does not match the catalog name \"Margherita Pizza (Small)\"."
+    },
+    {
+      "claim": {
+        "id": "item-005-v2#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "Margherita Pizza Combo (Medium)"
+      },
+      "referenceRowId": "item-005-v2",
+      "ruleId": "LST-IDENT-NAME",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The served name \"Margherita Pizza Combo (Medium)\" does not match the catalog name \"Margherita Pizza (Medium)\"."
+    },
+    {
+      "claim": {
+        "id": "item-005-v3#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "Margherita Pizza Combo (Large)"
+      },
+      "referenceRowId": "item-005-v3",
+      "ruleId": "LST-IDENT-NAME",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The served name \"Margherita Pizza Combo (Large)\" does not match the catalog name \"Margherita Pizza (Large)\"."
+    }
+  ],
+  "ok": false
+}

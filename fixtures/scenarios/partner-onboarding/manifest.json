@@ -1,0 +1,54 @@
+{
+  "id": "partner-onboarding",
+  "number": 5,
+  "simulated": true,
+  "shapedLike": null,
+  "seed": 20261005,
+  "generator": "generate-scenarios.mts@1.0.0",
+  "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "pack": "listings",
+  "derivedFrom": {
+    "fixtures": [
+      "fixtures/synthetic-restaurant/sor.catalog.json",
+      "fixtures/synthetic-restaurant/acp-feed.faithful.json"
+    ],
+    "corpusSeed": 20260703,
+    "corpusAsOf": "2026-07-03T00:00:00Z"
+  },
+  "transform": {
+    "driftedRowsChosen": 6,
+    "kinds": [
+      "price",
+      "availability",
+      "name"
+    ],
+    "record": "unchanged copy of the base record",
+    "feed": "faithful feed with the chosen rows drifted one way each (price · availability · name)"
+  },
+  "inputs": [
+    "inputs/events.jsonl",
+    "inputs/feed.json",
+    "inputs/record.json"
+  ],
+  "expected": [
+    "expected/report.json",
+    "expected/README.md"
+  ],
+  "absentUntilS2": [
+    "root-cause",
+    "impact",
+    "route",
+    "turns"
+  ],
+  "figures": {
+    "verdict": "FAIL",
+    "findings": 6,
+    "errors": 6,
+    "warnings": 0,
+    "rows_read": 24,
+    "rules": "LST-AVAIL-STATE ×2, LST-IDENT-NAME ×2, LST-PRICE-VALUE ×2",
+    "clean_rows": 18,
+    "drifted_rows": 6,
+    "clean_pct": "75.0%"
+  }
+}

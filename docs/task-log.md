@@ -1,5 +1,12 @@
 # Task Log
 
+## 2026-10-12 — Wave 1 / scenarios-w1 (builder lane 3, Sonnet 5.5, in a worktree on `wave1/w1c-scenarios`)
+
+- **Classification.** Task type: fixtures + generator + test (offline, deterministic; no detector, no `lib/**`). Stage: Wave 1 of the plan of record (`docs/plan-menu-integrity-crew-2026-10-09.md` §9, Appendix W1c; `events.jsonl` per `docs/plan-wave2-gap-sheet-2026-10-12.md` p.2). Risk: low-medium (public-claim surface is the brief prose; scanned). Mode: lightweight loop with the three teeth proven. Effort: medium.
+- **Built.** `fixtures/scenarios/{agent-86,sync-outage,platform-override,partner-onboarding,fee-precheck}/` — `brief.md` · `inputs/` (`feed.json`+`record.json`+`events.jsonl`; `statement.json`+`events.jsonl` for the fee case) · `expected/report.json` (engine report only) + `expected/README.md` · `manifest.json`; `fixtures/scenarios/README.md` (all eight ids; the two S1 ids "built by the S1 lane"); ONE generator `scripts-ts/generate-scenarios.mts` (pure `buildScenarioFiles()`, writes only when run); ONE test `evals/packs/scenarios.test.ts`. Inputs are seeded transformations of `fixtures/synthetic-restaurant` (read-only; not modified). Brief figures are `{{placeholders}}` filled from an engine run and re-derived by separate code in the test. Root-cause / impact / route / turns are absent, with a README note ("arrive in S2").
+- **Teeth.** RED before any folder existed (81 failed · 10 passed) · freeze: one byte in `agent-86/inputs/feed.json` → red → regenerate → green (shas in the test header) · typed digit in `agent-86/brief.md` → red → regenerate → green · events leak (`"root"` as an event target) → red → green.
+- **Not done, on purpose:** commit/push (owner's word) · `build-offline`/C10 on this tree (orchestrator runs it once on the merged tree) · any S2 artifact · scenarios `modifier-drift` / `spec-valid-lie` (S1 lane).
+
 ## 2026-09-03 — SESSION 47 (Cursor Grok 4.6 seat, effort high): "go ahead and do the next step" → CI read, S3 built and rendered
 
 - **Classification.** Task type: implementation on public surfaces (`/docs` guide section · one INPUTS line · `docs/how-to-test.md` · README) + record. Stage: S3 of the owner-approved plan (`docs/plan-testable-instrument-2026-09-01.md`, GO 2026-09-01). Risk: **medium** — public claims about what a tester will see. Mode: full loop where the seat could run it. Effort: high on the derivation (no figure typed), medium on copy. Skills: `claude-os` front door already applied on 09-01; DESIGN.md read before the visual change.

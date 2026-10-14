@@ -1,0 +1,6 @@
+{"at":"2026-06-30T12:00:00Z","actor":"integrator","action":"sync","target":"catalog"}
+{"at":"2026-07-01T12:00:00Z","actor":"integrator","action":"sync","target":"Appetizers"}
+{"at":"2026-07-02T07:12:00Z","actor":"merchant","action":"price_edit","target":"item-001-v3"}
+{"at":"2026-07-02T11:52:00Z","actor":"merchant","action":"86","target":"item-001-v1"}
+{"at":"2026-07-02T16:08:00Z","actor":"merchant","action":"86","target":"item-011-v1"}
+{"at":"2026-07-02T17:39:00Z","actor":"merchant","action":"price_edit","target":"item-011-v2"}
