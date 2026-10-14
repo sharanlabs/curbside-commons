@@ -12,6 +12,7 @@
  * nothing was hand-tampered.
  */
 import type {
+  SorDayOfWeek,
   SorItem,
   SorModifierList,
   SorVariation,
@@ -111,6 +112,53 @@ export function generateCatalog(seed: number, asOf: string): SyntheticCatalog {
     asOf,
     merchantName: "Curbside Commons Test Kitchen (simulated)",
     items,
+  };
+}
+
+/** Category hours for the menu-model record: every day, one window per category
+ * (Mains split lunch / dinner). Local time, "HH:MM:SS". */
+const CATEGORY_HOURS: Readonly<Record<string, readonly (readonly [string, string])[]>> = {
+  Appetizers: [["11:00:00", "22:00:00"]],
+  Mains: [["11:00:00", "15:00:00"], ["17:00:00", "22:00:00"]],
+  Sides: [["11:00:00", "22:00:00"]],
+  Desserts: [["12:00:00", "23:00:00"]],
+  Drinks: [["07:00:00", "23:00:00"]],
+};
+const WEEK: readonly SorDayOfWeek[] = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+/**
+ * The menu-model record (S1-engine): the SAME catalog `generateCatalog` builds
+ * for this seed — items, variations, prices, modifier lists untouched, so the
+ * base PRNG stream and every existing golden stay put — plus the two facts a
+ * restaurant's record carries that the base corpus omits: which modifier
+ * options are 86'd, and the hours each category is sold. Sold-out options come
+ * from a SECOND, independently seeded stream, never the base one.
+ */
+export function generateMenuModelCatalog(seed: number, asOf: string): SyntheticCatalog {
+  const base = generateCatalog(seed, asOf);
+  const rand = mulberry32((seed ^ 0x4d4f4431) >>> 0);
+  const items = base.items.map((item): SorItem => ({
+    ...item,
+    modifierLists: item.modifierLists.map((list) => ({
+      ...list,
+      options: list.options.map((o) => (rand() < 0.15 ? { ...o, soldOut: true } : o)),
+    })),
+  }));
+  return {
+    ...base,
+    generator: { name: "synthetic-restaurant+menu-model", seed, version: "1.1.0" },
+    items,
+    categoryAvailability: CATEGORIES.map((category) => ({
+      category,
+      periods: WEEK.flatMap((day) =>
+        (CATEGORY_HOURS[category] ?? []).map(([start, end], wi) => ({
+          id: `hours-${category.toLowerCase()}-${day.toLowerCase()}-${wi + 1}`,
+          dayOfWeek: day,
+          startLocalTime: start,
+          endLocalTime: end,
+        })),
+      ),
+    })),
   };
 }
 

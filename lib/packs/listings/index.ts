@@ -26,6 +26,26 @@ export const LISTINGS_DRIFT_CLASSES = [
 
 export type ListingsDriftClass = (typeof LISTINGS_DRIFT_CLASSES)[number];
 
+/**
+ * Menu-model drift classes (S1-engine, 2026-10-12). Each is a finer cut of one
+ * taxonomy class above, owned by exactly one rule — so a report's `category`
+ * stays inside the eight, and C6 measures these three by rule id.
+ */
+export const MENU_MODEL_DRIFT_CLASSES = ["modifier-price", "modifier-missing", "hours-window"] as const;
+
+export type MenuModelDriftClass = (typeof MENU_MODEL_DRIFT_CLASSES)[number];
+
+export const MENU_MODEL_RULES: Readonly<
+  Record<
+    MenuModelDriftClass,
+    { readonly ruleId: string; readonly severity: "error" | "warn"; readonly category: ListingsDriftClass }
+  >
+> = {
+  "modifier-price": { ruleId: "LST-MOD-PRICE-VALUE", severity: "error", category: "price" },
+  "modifier-missing": { ruleId: "LST-MOD-MISSING", severity: "error", category: "existence" },
+  "hours-window": { ruleId: "LST-HOURS-WINDOW", severity: "warn", category: "staleness" },
+};
+
 /** Pack descriptor — a real module so evals/packs can assert it loads. */
 export const LISTINGS_PACK = {
   id: "listings",
@@ -36,12 +56,44 @@ export const LISTINGS_PACK = {
 
 // Public pack surface (the CLI entry lives in ./cli.ts and is intentionally NOT
 // re-exported here — it imports node:fs, which the browser-safe barrel avoids).
-export type { SorItem, SorModifierList, SorVariation, SorStockState, SyntheticCatalog } from "./types.ts";
-export { CORPUS_AS_OF, CORPUS_SEED, generateCatalog, mulberry32 } from "./generate.ts";
-export type { AcpAvailability, AcpFeed, AcpFeedItem } from "./acp-feed.ts";
+export type {
+  SorAvailabilityPeriod,
+  SorCategoryAvailability,
+  SorDayOfWeek,
+  SorItem,
+  SorModifierList,
+  SorModifierOption,
+  SorVariation,
+  SorStockState,
+  SyntheticCatalog,
+} from "./types.ts";
+export {
+  CORPUS_AS_OF,
+  CORPUS_SEED,
+  generateCatalog,
+  generateMenuModelCatalog,
+  mulberry32,
+} from "./generate.ts";
+export type {
+  AcpAvailability,
+  AcpFeed,
+  AcpFeedHoursWindow,
+  AcpFeedItem,
+  AcpFeedModifier,
+} from "./acp-feed.ts";
 export { buildFaithfulFeed, centsToDecimal } from "./acp-feed.ts";
+export type { ModifierOptionClaimValue, ModifierSetClaimValue, RecordModifierOption } from "./modifiers.ts";
+export {
+  buildFaithfulMenuFeed,
+  menuModelClaims,
+  minutesOfLocalTime,
+  projectModifier,
+  recordHours,
+  recordModifierOptions,
+  windowLabel,
+} from "./modifiers.ts";
 export type { DriftManifestEntry, DriftSurface, DriftedFeedBundle } from "./drift.ts";
-export { applyCorpusDrift } from "./drift.ts";
+export { applyCorpusDrift, applyMenuModelDrift, applyModifierPriceDrift } from "./drift.ts";
 export type { UcpCatalogItem, UcpCatalogResponseFixture } from "./ucp.ts";
 export { UCP_PINNED_VERSION, buildUcpResponse } from "./ucp.ts";
 export type {
@@ -53,5 +105,5 @@ export type {
 export { buildUcpSearchResponse, ucpSearchResponseToClaims } from "./ucp-wire.ts";
 export { acpFeedToClaims, ucpResponseToClaims } from "./adapters.ts";
 export { expectedTitle, indexCatalog, sorReference } from "./reference.ts";
-export { listingsDetectors, mojibake } from "./detectors.ts";
+export { HOURS_WINDOW_GRACE_MINUTES, hoursWindowDetector, listingsDetectors, mojibake } from "./detectors.ts";
 export { LISTINGS_SPEC_VERSION, runListingsVerification } from "./run.ts";

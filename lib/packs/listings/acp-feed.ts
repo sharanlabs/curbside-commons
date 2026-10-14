@@ -35,6 +35,28 @@ export type AcpAvailability =
   | "backorder"
   | "unknown";
 
+/**
+ * One modifier option as the copy serves it — MENU EXTENSION, not ACP spec
+ * text (the extracted ACP surface has no modifier model; plan §16 records the
+ * public menu APIs that do: items → modifier groups → options). Price is the
+ * option's add-on amount in the same decimal-string form as `price`.
+ */
+export interface AcpFeedModifier {
+  readonly id: string;
+  readonly list_id: string;
+  readonly list_name: string;
+  readonly name: string;
+  readonly price_delta: string;
+  readonly availability: "in_stock" | "out_of_stock";
+}
+
+/** One served hours window — MENU EXTENSION, not ACP spec text. Local time, "HH:MM:SS". */
+export interface AcpFeedHoursWindow {
+  readonly day: string;
+  readonly open: string;
+  readonly close: string;
+}
+
 /** One ACP feed row (extracted required fields + used conditionals/optionals). */
 export interface AcpFeedItem {
   readonly item_id: string;
@@ -65,6 +87,10 @@ export interface AcpFeedItem {
   readonly sale_price?: string;
   readonly expiration_date?: string;
   readonly updated_at?: string;
+  /** Menu extension (see AcpFeedModifier). Absent = the copy makes no modifier claim. */
+  readonly modifiers?: readonly AcpFeedModifier[];
+  /** Menu extension (see AcpFeedHoursWindow). Absent = the copy makes no hours claim. */
+  readonly hours?: readonly AcpFeedHoursWindow[];
 }
 
 /** A full feed document — labeled simulated (C10). */

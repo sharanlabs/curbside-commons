@@ -14,8 +14,16 @@
  */
 import type { Detector } from "../../verifier-core/verify.ts";
 import type { FindingInput } from "../../verifier-core/guard.ts";
-import { centsToDecimal } from "./acp-feed.ts";
+import { centsToDecimal, type AcpFeedHoursWindow } from "./acp-feed.ts";
 import type { AcpInvariantsValue } from "./adapters.ts";
+import {
+  minutesOfLocalTime,
+  recordHours,
+  recordModifierOptions,
+  windowLabel,
+  type ModifierOptionClaimValue,
+  type ModifierSetClaimValue,
+} from "./modifiers.ts";
 import { expectedTitle, type SorTruth } from "./reference.ts";
 
 /** Deterministic mojibake transform (UTF-8 bytes read as Latin-1) — the
@@ -26,6 +34,57 @@ export function mojibake(s: string): string {
 
 function isSorTruth(v: unknown): v is SorTruth {
   return typeof v === "object" && v !== null && "variation" in v && "item" in v;
+}
+
+/**
+ * Sync-window grace for LST-HOURS-WINDOW, in minutes: a served window whose
+ * open AND close each sit within this distance of the record's window is in
+ * sync. A menu sync lands minutes after an hours edit; flagging that lag would
+ * turn every routine edit into a warning, so a timing difference inside the
+ * grace closes itself. A different window count on a day is never inside it.
+ */
+export const HOURS_WINDOW_GRACE_MINUTES = 15;
+
+/** Served windows of one day, ordered by opening time. */
+function windowsOn(day: string, ws: readonly AcpFeedHoursWindow[]): readonly AcpFeedHoursWindow[] {
+  return ws
+    .filter((w) => w.day === day)
+    .slice()
+    .sort((a, b) => minutesOfLocalTime(a.open) - minutesOfLocalTime(b.open));
+}
+
+/** hours — the copy's served windows must match the record's category hours within the grace. */
+export function hoursWindowDetector(graceMinutes: number = HOURS_WINDOW_GRACE_MINUTES): Detector {
+  const near = (a: string, b: string): boolean =>
+    Math.abs(minutesOfLocalTime(a) - minutesOfLocalTime(b)) <= graceMinutes;
+  return (claim, match) => {
+    if (claim.field !== "hours" || !match || !isSorTruth(match.value)) return [];
+    const served = claim.value as readonly AcpFeedHoursWindow[];
+    const category = match.value.item.category;
+    const record = recordHours(match.value.catalog, category);
+    const days = [...new Set([...record.map((w) => w.day), ...served.map((w) => w.day)])];
+    const label = (ws: readonly AcpFeedHoursWindow[]): string => ws.map(windowLabel).join(", ") || "(none)";
+    const diffs: string[] = [];
+    for (const day of days) {
+      const copy = windowsOn(day, served);
+      const truth = windowsOn(day, record);
+      const inSync =
+        copy.length === truth.length &&
+        copy.every((w, i) => near(w.open, truth[i].open) && near(w.close, truth[i].close));
+      if (!inSync) diffs.push(`${day}: copy ${label(copy)} vs catalog ${label(truth)}`);
+    }
+    if (diffs.length === 0) return [];
+    return [
+      {
+        claim,
+        referenceRowId: match.referenceRowId,
+        ruleId: "LST-HOURS-WINDOW",
+        severity: "warn",
+        category: "staleness",
+        plainLine: `The copy's hours for this item do not match the catalog's ${category} hours — ${diffs.join("; ")}.`,
+      },
+    ];
+  };
 }
 
 /** All per-claim rules. Dispatch is by claim.field; unmatched claims are the
@@ -277,4 +336,48 @@ export const listingsDetectors: readonly Detector[] = [
       },
     ];
   },
+
+  // modifier price — a served add-on must cost what the record's option costs.
+  (claim, match) => {
+    if (claim.field !== "modifier.option" || !match || !isSorTruth(match.value)) return [];
+    const served = claim.value as ModifierOptionClaimValue;
+    const rec = recordModifierOptions(match.value.item).find((o) => o.option.id === served.id);
+    if (!rec) return [];
+    const expected = centsToDecimal(rec.option.priceDeltaCents);
+    const actual = String(served.price_delta);
+    if (actual === expected) return [];
+    return [
+      {
+        claim,
+        referenceRowId: rec.option.id,
+        ruleId: "LST-MOD-PRICE-VALUE",
+        severity: "error",
+        category: "price",
+        plainLine: `The "${rec.option.name}" option (${rec.list.name}) is served at +${actual} but the catalog modifier price is +${expected}.`,
+      },
+    ];
+  },
+
+  // modifier existence — every orderable record option must be on the copy's row.
+  // An 86'd option the copy leaves out is not drift: nobody can order it either way.
+  (claim, match) => {
+    if (claim.field !== "modifiers" || !match || !isSorTruth(match.value)) return [];
+    const set = claim.value as ModifierSetClaimValue;
+    const servedIds = new Set(set.served.map((s) => s.id));
+    const servedNames = set.served.map((s) => s.name).join(", ") || "(none)";
+    const rowId = claim.id.split("#")[0];
+    return recordModifierOptions(match.value.item)
+      .filter(({ option }) => option.soldOut !== true && !servedIds.has(option.id))
+      .map(({ list, option }): FindingInput => ({
+        // The copy's implicit claim of omission, per option, so absence carries receipts.
+        claim: { id: `${rowId}#modifier.${option.id}`, source: claim.source, field: "modifier.option", value: false },
+        referenceRowId: option.id,
+        ruleId: "LST-MOD-MISSING",
+        severity: "error",
+        category: "existence",
+        plainLine: `The catalog offers "${option.name}" (+${centsToDecimal(option.priceDeltaCents)}) in "${list.name}" for this item, but the copy's options are [${servedNames}] — it is missing.`,
+      }));
+  },
+
+  hoursWindowDetector(HOURS_WINDOW_GRACE_MINUTES),
 ];

@@ -31,7 +31,16 @@ export interface SorVariation {
 export interface SorModifierOption {
   readonly id: string;
   readonly name: string;
+  /** ≈ CatalogModifier.price_money.amount (USD cents). */
   readonly priceDeltaCents: number;
+  /**
+   * 86'd — the option is sold out while its item stays orderable (≈ Square
+   * ModifierLocationOverrides.sold_out, which Square keeps PER LOCATION and
+   * seller-set; this single-location corpus flattens it to one flag). Absent
+   * means not sold out. Checked against developer.squareup.com
+   * (CatalogModifier · ModifierLocationOverrides), read 2026-10-12.
+   */
+  readonly soldOut?: boolean;
 }
 
 /** A modifier list attached to an item (≈ Square CatalogModifierList subset). */
@@ -51,6 +60,32 @@ export interface SorItem {
   readonly modifierLists: readonly SorModifierList[];
 }
 
+/** Day of week, in the CatalogAvailabilityPeriod vocabulary. */
+export type SorDayOfWeek = "SUN" | "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
+
+/**
+ * One hours window (≈ Square CatalogAvailabilityPeriod: day_of_week ·
+ * start_local_time · end_local_time, partial-time RFC 3339 "HH:MM:SS" local).
+ * Checked against developer.squareup.com (CatalogAvailabilityPeriod, Beta
+ * there), read 2026-10-12.
+ */
+export interface SorAvailabilityPeriod {
+  readonly id: string;
+  readonly dayOfWeek: SorDayOfWeek;
+  readonly startLocalTime: string;
+  readonly endLocalTime: string;
+}
+
+/**
+ * The hours a category is sold (≈ CatalogCategory.availability_period_ids
+ * resolved to their periods). Square attaches periods to the CATEGORY, not the
+ * item — so does this record; an item inherits its category's windows.
+ */
+export interface SorCategoryAvailability {
+  readonly category: string;
+  readonly periods: readonly SorAvailabilityPeriod[];
+}
+
 /** The synthetic restaurant SOR — the truth side of every W1 check. */
 export interface SyntheticCatalog {
   /** Honesty label — always true for this corpus (C10). */
@@ -63,4 +98,9 @@ export interface SyntheticCatalog {
   readonly asOf: string;
   readonly merchantName: string;
   readonly items: readonly SorItem[];
+  /**
+   * Category hours (menu model, 2026-10-12). Optional: a record without it
+   * states no hours, and a served window is then compared against "(none)".
+   */
+  readonly categoryAvailability?: readonly SorCategoryAvailability[];
 }

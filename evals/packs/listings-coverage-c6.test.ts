@@ -5,10 +5,15 @@ import {
   CORPUS_AS_OF,
   CORPUS_SEED,
   LISTINGS_DRIFT_CLASSES,
+  MENU_MODEL_DRIFT_CLASSES,
+  MENU_MODEL_RULES,
   applyCorpusDrift,
+  applyMenuModelDrift,
   buildFaithfulFeed,
+  buildFaithfulMenuFeed,
   buildUcpResponse,
   generateCatalog,
+  generateMenuModelCatalog,
   acpFeedToClaims,
   ucpResponseToClaims,
   runListingsVerification,
@@ -20,6 +25,23 @@ import {
  * (b) % actually caught by the comparator, asserts the achieved floor, and
  * prints the numbers into the test names. A guardrail scan bans "all edge
  * cases"-style overclaims from the corpus and pack sources (C6/C10).
+ *
+ * MENU MODEL (S1-engine, 2026-10-12): three finer classes — modifier-price ·
+ * modifier-missing · hours-window — injected by `applyMenuModelDrift` into the
+ * menu-model copy of the same seeded restaurant and measured BY RULE ID (their
+ * report category stays inside the eight). Headline: 11 classes.
+ *
+ * RED FIRST (recorded 2026-10-12): with the data model, projection and injector
+ * in place but no detector, this file ran 3 failed / 7 passed — "all-class
+ * coverage" (11/11 injected, 8/11 caught), "menu-model per-ENTRY" (menu-001 not
+ * caught) and "exactly one finding per planted entry" (got []).
+ * MUTATION PROOF, one detector at a time (each turned this file 3 failed /
+ * 7 passed at 10/11 caught, then was reverted):
+ *   LST-MOD-PRICE-VALUE — comparison dropped (`if (true || actual === expected)
+ *     return []`): menu-001 not caught.
+ *   LST-MOD-MISSING — `return []` after the field guard: menu-002 not caught.
+ *   LST-HOURS-WINDOW — window comparison dropped (`if (false && !inSync)`):
+ *     menu-003 not caught.
  */
 
 const sor = generateCatalog(CORPUS_SEED, CORPUS_AS_OF);
@@ -96,6 +118,63 @@ describe("C6 measured taxonomy coverage", () => {
       );
       expect(caught, `${e.id} (${e.class} @ ${e.targetFeedItemId}) not caught on its surface(s)`).toBe(true);
     }
+  });
+});
+
+const menuSor = generateMenuModelCatalog(CORPUS_SEED, CORPUS_AS_OF);
+const menuFaithful = buildFaithfulMenuFeed(menuSor);
+const { feed: menuDrifted, manifest: menuManifest } = applyMenuModelDrift(menuFaithful);
+const menuReport = runListingsVerification(acpFeedToClaims(menuDrifted), menuSor);
+const menuInjected = new Set<string>(menuManifest.map((e) => e.menuClass ?? ""));
+const menuCaught = new Set<string>(
+  MENU_MODEL_DRIFT_CLASSES.filter((c) => menuReport.findings.some((f) => f.ruleId === MENU_MODEL_RULES[c].ruleId)),
+);
+
+describe("C6 measured coverage — menu model (modifier price · modifier existence · hours)", () => {
+  const total = LISTINGS_DRIFT_CLASSES.length + MENU_MODEL_DRIFT_CLASSES.length;
+  const injected =
+    LISTINGS_DRIFT_CLASSES.filter((c) => injectedClasses.has(c)).length +
+    MENU_MODEL_DRIFT_CLASSES.filter((c) => menuInjected.has(c)).length;
+  const caught =
+    LISTINGS_DRIFT_CLASSES.filter((c) => caughtClasses.has(c)).length +
+    MENU_MODEL_DRIFT_CLASSES.filter((c) => menuCaught.has(c)).length;
+
+  it(`all-class coverage: ${injected}/${total} injected and ${caught}/${total} caught (8 taxonomy + 3 menu-model)`, () => {
+    expect(injected).toBe(total);
+    expect(caught).toBe(total);
+  });
+
+  it("the faithful menu-model copy is clean — modifiers, 86'd options and hours all agree", () => {
+    expect(runListingsVerification(acpFeedToClaims(menuFaithful), menuSor).findings).toEqual([]);
+  });
+
+  it("the menu-model record really carries what the rules read (options, an 86'd option, hours)", () => {
+    const options = menuSor.items.flatMap((i) => i.modifierLists.flatMap((l) => l.options));
+    expect(options.length).toBeGreaterThan(0);
+    expect(options.some((o) => o.soldOut === true)).toBe(true);
+    expect((menuSor.categoryAvailability ?? []).length).toBeGreaterThan(0);
+  });
+
+  it("menu-model per-ENTRY: every planted entry is caught by its rule, category AND row", () => {
+    for (const e of menuManifest) {
+      const rule = MENU_MODEL_RULES[e.menuClass as keyof typeof MENU_MODEL_RULES];
+      expect(rule, `${e.id} has no menu class`).toBeDefined();
+      expect(e.class).toBe(rule.category);
+      const hit = menuReport.findings.some(
+        (f) =>
+          f.ruleId === rule.ruleId &&
+          f.severity === rule.severity &&
+          f.category === rule.category &&
+          f.claim.id.startsWith(`${e.targetFeedItemId}#`),
+      );
+      expect(hit, `${e.id} (${e.menuClass} @ ${e.targetFeedItemId}) not caught`).toBe(true);
+    }
+  });
+
+  it("menu-model drifted copy yields exactly one finding per planted entry (no collateral)", () => {
+    expect(menuReport.findings.map((f) => f.ruleId).sort()).toEqual(
+      menuManifest.map((e) => MENU_MODEL_RULES[e.menuClass as keyof typeof MENU_MODEL_RULES].ruleId).sort(),
+    );
   });
 });
 
