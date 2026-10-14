@@ -19,8 +19,9 @@
  * every break so the tests know exactly what the verifier must catch.
  */
 import type { AcpFeed, AcpFeedItem } from "./acp-feed.ts";
+import { minutesOfLocalTime } from "./modifiers.ts";
 import type { SyntheticCatalog } from "./types.ts";
-import type { ListingsDriftClass } from "./index.ts";
+import type { ListingsDriftClass, MenuModelDriftClass } from "./index.ts";
 
 /** Which serving surfaces carry a given injected drift (C3 differential). */
 export type DriftSurface = "both" | "acp-only" | "ucp-only";
@@ -42,6 +43,8 @@ export interface DriftManifestEntry {
    * companion entries share their parent's row without weakening the guard.
    */
   readonly sameMutationAs?: string;
+  /** Set on menu-model injections: the finer class, owned by one rule (MENU_MODEL_RULES). */
+  readonly menuClass?: MenuModelDriftClass;
 }
 
 export interface DriftedFeedBundle {
@@ -342,4 +345,117 @@ export function applyCorpusDrift(
     feed: { simulated: true, spec: faithful.spec, items },
     manifest,
   };
+}
+
+/** Minutes since midnight → "HH:MM:SS". */
+function localTimeOf(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`;
+}
+
+/**
+ * Apply the menu-model drift set (S1-engine) to a FAITHFUL MENU-MODEL copy
+ * (`buildFaithfulMenuFeed`). Kept apart from `applyCorpusDrift` on purpose: the
+ * bundled corpus carries no menu-model fields, and its drifted copy, golden
+ * reports and every tally derived from them must not move. One mutation per
+ * row, first match in stable order, throws when a predicate finds no target.
+ * All three ride feed-only fields, so every entry is labeled `acp-only`.
+ */
+export function applyMenuModelDrift(faithful: AcpFeed): DriftedFeedBundle {
+  let items: AcpFeedItem[] = [...faithful.items];
+  const manifest: DriftManifestEntry[] = [];
+  const touched = new Set<string>();
+  // Orderable rows only: drift on a row the copy already marks sold out reaches no order.
+  const firstUntouched = (pred: (r: AcpFeedItem) => boolean, what: string): AcpFeedItem => {
+    const row = items.find((r) => !touched.has(r.item_id) && r.availability === "in_stock" && pred(r));
+    if (!row) throw new Error(`drift injector: no target for ${what}`);
+    return row;
+  };
+
+  // modifier-price — first orderable option with a non-zero add-on price: +$0.50 on the copy.
+  {
+    const t = firstUntouched(
+      (r) => (r.modifiers ?? []).some((m) => m.availability === "in_stock" && Number(m.price_delta) > 0),
+      "modifier-price",
+    );
+    const mods = t.modifiers ?? [];
+    const target = mods.find((m) => m.availability === "in_stock" && Number(m.price_delta) > 0);
+    if (!target) throw new Error("drift injector: no target option for modifier-price");
+    const after = (Number(target.price_delta) + 0.5).toFixed(2);
+    items = replaceRow(items, t.item_id, {
+      modifiers: mods.map((m) => (m.id === target.id ? { ...m, price_delta: after } : m)),
+    });
+    touched.add(t.item_id);
+    manifest.push({
+      id: "menu-001", class: "price", menuClass: "modifier-price", targetFeedItemId: t.item_id,
+      field: `modifiers[${target.id}].price_delta`, before: target.price_delta, after, surfaces: "acp-only",
+      note: "modifier price drift: the copy charges more for an add-on than the record",
+    });
+  }
+
+  // modifier-missing — first untouched row with an orderable option: that option dropped.
+  {
+    const t = firstUntouched(
+      (r) => (r.modifiers ?? []).some((m) => m.availability === "in_stock"),
+      "modifier-missing",
+    );
+    const mods = t.modifiers ?? [];
+    const target = mods.find((m) => m.availability === "in_stock");
+    if (!target) throw new Error("drift injector: no target option for modifier-missing");
+    items = replaceRow(items, t.item_id, { modifiers: mods.filter((m) => m.id !== target.id) });
+    touched.add(t.item_id);
+    manifest.push({
+      id: "menu-002", class: "existence", menuClass: "modifier-missing", targetFeedItemId: t.item_id,
+      field: `modifiers[${target.id}]`, before: "served", after: "(missing from copy)", surfaces: "acp-only",
+      note: "modifier existence drift: an orderable add-on in the record is absent from the copy",
+    });
+  }
+
+  // hours-window — first untouched row with hours: its first window closes an hour late on the copy.
+  {
+    const t = firstUntouched((r) => (r.hours ?? []).length > 0, "hours-window");
+    const hours = t.hours ?? [];
+    const first = hours[0];
+    const after = localTimeOf(minutesOfLocalTime(first.close) + 60);
+    items = replaceRow(items, t.item_id, {
+      hours: hours.map((w, i) => (i === 0 ? { ...w, close: after } : w)),
+    });
+    touched.add(t.item_id);
+    manifest.push({
+      id: "menu-003", class: "staleness", menuClass: "hours-window", targetFeedItemId: t.item_id,
+      field: `hours[0].close`, before: `${first.day} ${first.close}`, after: `${first.day} ${after}`,
+      surfaces: "acp-only",
+      note: "hours drift: the copy still serves a window the record no longer has",
+    });
+  }
+
+  return { feed: { simulated: true, spec: faithful.spec, items }, manifest };
+}
+
+/**
+ * Raise ONE modifier option's add-on price by `deltaCents` on EVERY copy row
+ * that serves it — the shape a single bad modifier-list sync takes, since every
+ * size of an item shares its list. Throws if no row serves the option.
+ */
+export function applyModifierPriceDrift(
+  faithful: AcpFeed,
+  optionId: string,
+  deltaCents: number,
+): DriftedFeedBundle {
+  const manifest: DriftManifestEntry[] = [];
+  const items = faithful.items.map((r): AcpFeedItem => {
+    const target = (r.modifiers ?? []).find((m) => m.id === optionId);
+    if (!target) return r;
+    const after = ((Math.round(Number(target.price_delta) * 100) + deltaCents) / 100).toFixed(2);
+    manifest.push({
+      id: `mod-price-${String(manifest.length + 1).padStart(3, "0")}`, class: "price", menuClass: "modifier-price",
+      targetFeedItemId: r.item_id, field: `modifiers[${optionId}].price_delta`,
+      before: target.price_delta, after, surfaces: "acp-only",
+      note: "modifier price drift: one modifier-list sync carried a stale add-on price to every size",
+    });
+    return { ...r, modifiers: (r.modifiers ?? []).map((m) => (m.id === optionId ? { ...m, price_delta: after } : m)) };
+  });
+  if (manifest.length === 0) throw new Error(`drift injector: no copy row serves option ${optionId}`);
+  return { feed: { simulated: true, spec: faithful.spec, items }, manifest };
 }

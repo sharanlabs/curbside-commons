@@ -26,6 +26,16 @@ import type { SyntheticCatalog } from "./types.ts";
 import { UCP_PINNED_VERSION } from "./ucp.ts";
 
 /** The pinned spec/taxonomy line stamped into every W1 report header (C10). */
+// S1-engine (2026-10-12) added the menu-model detectors (LST-MOD-PRICE-VALUE ·
+// LST-MOD-MISSING · LST-HOURS-WINDOW). The `+menu-model-<date>` segment that
+// names them in this string is DEFERRED to S1.5 on purpose: the segment is
+// embedded in four frozen live-exam goldens (evals/crew/gold/**/l1-live-turns.json)
+// whose lock pins the engine-report hash the seats were examined on. Bumping it
+// here would force a re-pin of a pre-registered record as a merge side-effect;
+// S1.5 bumps it deliberately, regenerates the derived goldens by script, and
+// renders the Intake/Reviewer labels "requalification pending" (decision-log
+// 2026-10-14). Pre-existing feeds carry no menu fields and produce byte-identical
+// reports either way (evals/packs/listings-coverage-c6.test.ts).
 export const LISTINGS_SPEC_VERSION = `taxonomy-v1+acp-extract-2026-07-02+ucp-pin-${UCP_PINNED_VERSION}`;
 
 /**

@@ -17,6 +17,7 @@
  */
 import type { Claim } from "../../verifier-core/index.ts";
 import type { AcpFeed, AcpFeedItem } from "./acp-feed.ts";
+import { menuModelClaims } from "./modifiers.ts";
 import type { UcpCatalogResponseFixture } from "./ucp.ts";
 
 /** Cross-field tuple carried by the per-row `invariants` claim (ACP surface). */
@@ -63,7 +64,7 @@ export function acpFeedToClaims(feed: AcpFeed): readonly Claim[] {
         ? ([["availability_date", r.availability_date ?? null]] as const)
         : []),
       ["invariants", invariants],
-    ]);
+    ]).concat(menuModelClaims(r, "acp-feed"));
   });
 }
 
