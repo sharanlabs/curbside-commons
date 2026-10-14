@@ -1,5 +1,13 @@
 # Task Log
 
+## 2026-10-12 — Wave 1 / S4-docs (Sonnet 5.5, builder lane 2): governance model · model-risk register · pilot kit
+
+- **Classification.** Task type: documentation (public claims, platform-facing). Stage: Wave 1 / S4-docs pulled forward (plan Appendix W1b). Risk: medium (new audience, honesty-dense prose). Mode: lightweight loop, full on honesty. Skills: documentation standard (plain-English first, technical alongside). Effort routed: medium (pattern-following prose; the judgment points are the honesty carriers).
+- **Written (new):** `docs/governance-model.md` · `docs/model-risk-register.md` · `docs/pilot-kit/{README,pilot-proposal,data-request-spec,security-one-pager,success-metrics,demo-script-10min}.md`. Folded in the 2026-10-12 decisions: D-7(a) (synthetic on our side; the platform runs Phase 2 in its own environment; three-mode data path), deterministic route table and DEFER root-cause (gap sheet pages 1–2), NIST AI RMF crosswalk (nist.gov fetched 2026-10-12) with ISO/IEC 42001 explicitly not claimed, register truth on the pre-call-only budget guard and unpinned hosted ids, free-only, US-only.
+- **Test first:** `evals/packs/honesty-c10.test.ts` gains an explicit `pilotDocs` array of the eight paths (no glob), spread into `scannedFiles`. Red proven by planting one banned phrase in a stub; removed; green.
+- **Marked, not faked:** every capability not on `main` at `fac8204` is labeled ARRIVES S<n> or OWED; every un-sourced fact is written UNVERIFIED in place.
+- **Not done, on purpose:** commit · glossary entries (out of lane) · `/pilot` page (S4 surfaces) · state docs (orchestrator, at wave close).
+
 ## 2026-09-03 — SESSION 47 (Cursor Grok 4.6 seat, effort high): "go ahead and do the next step" → CI read, S3 built and rendered
 
 - **Classification.** Task type: implementation on public surfaces (`/docs` guide section · one INPUTS line · `docs/how-to-test.md` · README) + record. Stage: S3 of the owner-approved plan (`docs/plan-testable-instrument-2026-09-01.md`, GO 2026-09-01). Risk: **medium** — public claims about what a tester will see. Mode: full loop where the seat could run it. Effort: high on the derivation (no figure typed), medium on copy. Skills: `claude-os` front door already applied on 09-01; DESIGN.md read before the visual change.

@@ -114,10 +114,29 @@ const siteShell = [
   join(root, "app", "docs", "page.tsx"),
 ];
 
+// Wave 1 / S4-docs (2026-10-12; plan docs/plan-menu-integrity-crew-2026-10-09.md
+// §§ 6, 7, 8, 17, Appendix W1b): the governance model, the model-risk register and
+// the pilot kit are the documents a platform's risk, ops and procurement readers
+// are HANDED — the most claim-dense prose in the repo (partner names, "shaped
+// like" inputs, cost-benefit). Every file is named explicitly; a new pilot-kit
+// document must be added here by hand — never a directory glob — so adding one is
+// a visible decision, not a silent gap.
+const pilotDocs = [
+  join(root, "docs", "governance-model.md"),
+  join(root, "docs", "model-risk-register.md"),
+  join(root, "docs", "pilot-kit", "README.md"),
+  join(root, "docs", "pilot-kit", "pilot-proposal.md"),
+  join(root, "docs", "pilot-kit", "data-request-spec.md"),
+  join(root, "docs", "pilot-kit", "security-one-pager.md"),
+  join(root, "docs", "pilot-kit", "success-metrics.md"),
+  join(root, "docs", "pilot-kit", "demo-script-10min.md"),
+];
+
 const scannedFiles = [
   ...packSources(),
   ...publicProse,
   ...siteShell,
+  ...pilotDocs,
   join(root, "bin", "check.mjs"),
   join(root, "fixtures", "README.md"),
   join(root, "fixtures", "synthetic-restaurant", "README.md"),
