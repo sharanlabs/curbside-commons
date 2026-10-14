@@ -54,18 +54,21 @@ export type AgentRunUsage = {
 };
 
 /**
- * Default GA model. Re-verify at use-time (RULES §6) — never trust this from memory; the
- * preflight below turns a Google retirement into a one-line config bump, not a silent
- * mid-run failure. Override per deployment with GEMINI_MODEL.
+ * Default model: `gemini-3.5-flash-lite`, the cheapest current model that
+ * https://ai.google.dev/gemini-api/docs/models (read 2026-10-12) names for new projects
+ * (priced in pricing.ts, same date). The documented override is `gemini-3.8-flash`, set per
+ * deployment with GEMINI_MODEL (e.g. GEMINI_MODEL=gemini-3.8-flash). Re-verify at use-time
+ * (RULES §6) — never trust this from memory; the preflight below turns a Google retirement
+ * into a one-line config bump, not a silent mid-run failure.
  */
-const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite";
 
-/** The configured model id, resolved once (GEMINI_MODEL override wins, else the GA default). */
+/** The configured model id, resolved once (GEMINI_MODEL override wins, else the default). */
 export function resolvedGeminiModel(): string {
   return process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
 }
 
-/** Normalize "models/gemini-2.5-flash" <-> "gemini-2.5-flash" before comparing. */
+/** Normalize "models/gemini-3.5-flash-lite" <-> "gemini-3.5-flash-lite" before comparing. */
 function bareModelId(id: string): string {
   return id.replace(/^models\//, "").trim();
 }
@@ -158,6 +161,13 @@ const MAX_LIVE_OUTPUT_TOKENS = 4_096;
  * exceeds its reservation). With thinking actually disabled (thinkingBudget=0) real reasoning is 0, so
  * in practice this just makes the reservation conservative. Re-verify the max at use-time if the model
  * id changes.
+ *
+ * UNVERIFIED for the current default `gemini-3.5-flash-lite` (S1-pins, 2026-10-12): 24_576 is the
+ * gemini-2.5-flash figure above, KEPT as an unchanged conservative reservation. The thinking page
+ * (https://ai.google.dev/gemini-api/docs/thinking, read 2026-10-12) lists 3.5-flash-lite as "On
+ * (minimal)" with `thinking_level` minimal|low|medium|high and states max_output_tokens includes
+ * thought tokens — it states no 3.5-flash-lite thinking-token maximum, so this value cannot be
+ * re-derived from official docs today. Owner-gated live exam to confirm before any armed run.
  */
 const MAX_LIVE_REASONING_TOKENS_RESERVED = 24_576;
 
@@ -170,6 +180,13 @@ const MAX_LIVE_REASONING_TOKENS_RESERVED = 24_576;
  * also keeps cost honest — no thinking tokens billed at the output rate. RULES §6 freshness-
  * checked 2026-06-28; the live EFFECT (parse rate recovers) is PENDING — measured at the
  * owner-gated slice-2 run, not yet confirmed.
+ *
+ * UNVERIFIED for the current default `gemini-3.5-flash-lite` (S1-pins, 2026-10-12): the value 0 was
+ * verified for gemini-2.5-flash only. The thinking page (https://ai.google.dev/gemini-api/docs/
+ * thinking, read 2026-10-12) documents `thinking_level` for the 3.x models (3.5-flash-lite default
+ * "minimal") and does not confirm that thinkingBudget=0 is accepted or honored there. KEPT
+ * unchanged on purpose (this slice changes only the model default); whether the 3.x path should use
+ * a thinking level instead is an owner-gated follow-up, to be settled before any armed live run.
  */
 export const LIVE_THINKING_BUDGET_TOKENS = 0;
 

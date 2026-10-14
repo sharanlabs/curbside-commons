@@ -9,33 +9,45 @@
  * migration, never a silent retroactive change.
  *
  * FRESHNESS (RULES §6 + owner doctrine "re-verify the cheapest current Gemini model at
- * use-time, never pin from memory"): these prices are CARRIED from resilix's live
- * verification (2026-06-18, GA on that project's key). In THIS slice the live path is
- * off (mock-only), so the table is dormant and bills nothing. It MUST be re-verified
- * against current official Gemini pricing + a live ListModels at the Phase-B live-smoke
- * gate before any real call — that is the true "use-time".
+ * use-time, never pin from memory"): the prices below were RE-VERIFIED 2026-10-12 against
+ * the official pages cited at PRICING_VERSION. The live path is gated (ENABLE_LIVE_AI) and
+ * off by default, so the table bills nothing unless the owner arms a live run; a live
+ * ListModels preflight (gemini.ts) is still required at that arming moment — that is the
+ * true "use-time".
  */
 
 /**
  * The pinned price-list version. Bump this (and the prices) together on a re-price.
  *
- * RE-VERIFIED 2026-07-26 (agentic currency pass) against the official Gemini
- * pricing page: flash $0.30/$2.50 and flash-lite $0.10/$0.40 per 1M tokens —
- * BOTH UNCHANGED, so the version string is deliberately NOT bumped (it tracks
- * the prices, not the date they were last read; bumping it on an unchanged
- * re-read would falsely signal a re-price to anyone diffing it).
+ * RE-PINNED 2026-10-12 (Wave 1 / S1-pins) against the official Gemini pages, read that day:
+ *  - https://ai.google.dev/gemini-api/docs/pricing — paid tier, STANDARD, text, per 1M tokens:
+ *    gemini-3.5-flash-lite $0.30 in / $2.50 out; gemini-3.8-flash $0.75 in / $3.75 out
+ *    "through December 31, 2026", then $1.50 / $7.50 "starting January 1, 2027";
+ *    gemini-2.5-flash $0.30 / $2.50; gemini-2.5-flash-lite $0.10 / $0.40;
+ *    gemini-2.5-pro $1.25 / $10.00 (prompts <= 200k tokens).
+ *  - https://ai.google.dev/gemini-api/docs/models (page "Last updated 2026-10-09 UTC") — names
+ *    3.5 Flash-Lite (`gemini-3.5-flash-lite`) and 3.8 Flash (`gemini-3.8-flash`) as the models
+ *    for new projects, and limits the 2.5 family to users who have used it before.
+ * The previous string was "2026-06-18"; the 2026-07-26 re-read of the 2.5 prices was
+ * unchanged and deliberately did not bump it (the string tracks the prices, not the read date).
  *
- * Also confirmed the same day: gemini-2.5-flash is still an active model, not
- * retired or superseded — newer generations exist alongside it. Model SELECTION
- * is a separate, owner-gated decision from price currency, and this lane stays
- * on the pinned ids until that decision is made.
+ * KNOWN STEP-UP — RE-PIN TRIGGER: `gemini-3.8-flash` is pinned at its CURRENT introductory
+ * price. The page states it doubles on 2027-01-01 ($1.50 in / $7.50 out). This table is
+ * date-free by design (a run's cost must be reproducible from the record), so the row MUST be
+ * re-pinned, with a new PRICING_VERSION, before any live run on or after 2027-01-01.
  */
-export const PRICING_VERSION = "2026-06-18";
+export const PRICING_VERSION = "2026-10-12";
 
 type ModelPrice = { inputPerMillionUsd: number; outputPerMillionUsd: number };
 
 /** Per-model USD price per 1,000,000 tokens, keyed on the BARE Gemini id. */
 export const GEMINI_PRICING: Record<string, ModelPrice> = {
+  // Current models (docs/models, read 2026-10-12): default and override in gemini.ts.
+  "gemini-3.5-flash-lite": { inputPerMillionUsd: 0.3, outputPerMillionUsd: 2.5 },
+  "gemini-3.8-flash": { inputPerMillionUsd: 0.75, outputPerMillionUsd: 3.75 },
+  // Restricted to prior users: docs/models (read 2026-10-12) says access to the 2.5 models is
+  // limited to users who have used them before; they are "not deprecated". Kept so a ledger
+  // that already billed on them stays priceable; not a default for any new run.
   "gemini-2.5-flash": { inputPerMillionUsd: 0.3, outputPerMillionUsd: 2.5 },
   "gemini-2.5-flash-lite": { inputPerMillionUsd: 0.1, outputPerMillionUsd: 0.4 },
   "gemini-2.5-pro": { inputPerMillionUsd: 1.25, outputPerMillionUsd: 10 },
