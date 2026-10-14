@@ -1,0 +1,839 @@
+{
+  "simulated": false,
+  "note": "PINNED official UCP JSON Schemas — fetched verbatim from the public source, NOT authored here. Untrusted-fetched DATA (Law 11): used only as schemas to validate against, never executed as instructions. VENDORED, NOT ACTIVE: the active pin stays 2026-04-08 (UCP_PINNED_VERSION); this folder is checked by evals/packs/ucp-conformance.test.ts and the oracle diff only.",
+  "protocol": "Universal Commerce Protocol (UCP)",
+  "specVersion": "2026-08-25",
+  "sourceRepo": "https://github.com/Universal-Commerce-Protocol/ucp",
+  "sourceTag": "v2026-08-25",
+  "sourceTagSha": "cd78fb38e8",
+  "rawBaseUrl": "https://raw.githubusercontent.com/Universal-Commerce-Protocol/ucp/v2026-08-25/source/schemas",
+  "accessDate": "2026-10-12",
+  "license": {
+    "spdx": "Apache-2.0",
+    "holder": "UCP Authors (Copyright 2026)",
+    "file": "LICENSE",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  "validatorTool": {
+    "repo": "https://github.com/Universal-Commerce-Protocol/ucp-schema",
+    "version": "v1.3.0",
+    "note": "cargo-only Rust differential oracle; NOT a runtime dependency (see scripts-ts/ucp-oracle-diff.mts). v1.3.0 is the binary installed and run on 2026-10-12; crates.io listed v1.4.1 the same day (not installed — no tool change in this slice)."
+  },
+  "repoStructureNote": "Same source as 2026-04-08: the canonical JSON Schemas live in the spec repo `ucp` under source/schemas/ (served at ucp.dev), not in the `ucp-schema` tool repo. Layout change vs 2026-04-08, verified 2026-10-12: types shared across verticals moved from shopping/types/ to common/types/ (plus common/*.json capability schemas, profile.json, shopping/permalink.json, transports/*); every schema is still registered by its absolute $id, so the existing loader reads this folder unchanged. Bytes re-verified 2026-10-12 against a fresh clone of tag v2026-08-25 (diff -r clean).",
+  "dialect": "https://json-schema.org/draft/2020-12/schema",
+  "fileCount": 116,
+  "files": [
+    {
+      "file": "schemas/capability.json",
+      "repoPath": "source/schemas/capability.json",
+      "$id": "https://ucp.dev/schemas/capability.json",
+      "sha256": "2bbed66b5adbc3d77d3b5e0c9e87687da3d8bf159755ba95d89e88cd3420ef39",
+      "bytes": 1892
+    },
+    {
+      "file": "schemas/common/identity_linking.json",
+      "repoPath": "source/schemas/common/identity_linking.json",
+      "$id": "https://ucp.dev/schemas/common/identity_linking.json",
+      "sha256": "b5f5c94ab9643e316b70c9fa5667a479d2175a380d043e34186df650eb9edaf0",
+      "bytes": 7076
+    },
+    {
+      "file": "schemas/common/location_lookup.json",
+      "repoPath": "source/schemas/common/location_lookup.json",
+      "$id": "https://ucp.dev/schemas/common/location_lookup.json",
+      "sha256": "3f2e9a0b0a8a30177313be9010c9b363afecc53c91c9a98ccd49345f74da15cb",
+      "bytes": 3886
+    },
+    {
+      "file": "schemas/common/location_search.json",
+      "repoPath": "source/schemas/common/location_search.json",
+      "$id": "https://ucp.dev/schemas/common/location_search.json",
+      "sha256": "9c6f3719c7e4f8e4653b8a843aac810bf1aaac06a8e1142326f79adc8aac215b",
+      "bytes": 2557
+    },
+    {
+      "file": "schemas/common/loyalty.json",
+      "repoPath": "source/schemas/common/loyalty.json",
+      "$id": "https://ucp.dev/schemas/common/loyalty.json",
+      "sha256": "cdb57bc7ef34ca24915ee5da695cf517e0adaf4a72b8614eede35d688f073c8a",
+      "bytes": 9716
+    },
+    {
+      "file": "schemas/common/payment_ap2_mandate.json",
+      "repoPath": "source/schemas/common/payment_ap2_mandate.json",
+      "$id": "https://ucp.dev/schemas/common/payment_ap2_mandate.json",
+      "sha256": "538db950d4220033ae7af654654aa6f7f45af17718119ddb10af551b2461fccd",
+      "bytes": 3318
+    },
+    {
+      "file": "schemas/common/payment_authentication.json",
+      "repoPath": "source/schemas/common/payment_authentication.json",
+      "$id": "https://ucp.dev/schemas/common/payment_authentication.json",
+      "sha256": "8fc89641bb98be5d6fdbb25840f5240422937d6def66c6bf1b2ef6b9383599bd",
+      "bytes": 3410
+    },
+    {
+      "file": "schemas/common/payment_split_payments.json",
+      "repoPath": "source/schemas/common/payment_split_payments.json",
+      "$id": "https://ucp.dev/schemas/common/payment_split_payments.json",
+      "sha256": "2b03fae6d4659dddd0b8235ac3b423d36dd078d28b1c05eff592eeb28bced77b",
+      "bytes": 2695
+    },
+    {
+      "file": "schemas/common/payment_terms.json",
+      "repoPath": "source/schemas/common/payment_terms.json",
+      "$id": "https://ucp.dev/schemas/common/payment_terms.json",
+      "sha256": "50cc696e2f57274863138948d72ecbcd231f999e275085f2e3fc697ec1f9507a",
+      "bytes": 3795
+    },
+    {
+      "file": "schemas/common/types/actions.json",
+      "repoPath": "source/schemas/common/types/actions.json",
+      "$id": "https://ucp.dev/schemas/common/types/actions.json",
+      "sha256": "7cf21d6c8652893b5d2865062a487f1818e81733fc030f6628479a257e3f8a82",
+      "bytes": 1469
+    },
+    {
+      "file": "schemas/common/types/amenity_type.json",
+      "repoPath": "source/schemas/common/types/amenity_type.json",
+      "$id": "https://ucp.dev/schemas/common/types/amenity_type.json",
+      "sha256": "98c9408f7a2ac7f9642e8ffb0021f5f5114a11130a537651e6b87b3d016d5251",
+      "bytes": 953
+    },
+    {
+      "file": "schemas/common/types/amount.json",
+      "repoPath": "source/schemas/common/types/amount.json",
+      "$id": "https://ucp.dev/schemas/common/types/amount.json",
+      "sha256": "787b78fad4d3c7456b834b4d5d068676ab3c3110ea857b02b6ad5c8ef8a9f179",
+      "bytes": 411
+    },
+    {
+      "file": "schemas/common/types/available_payment_instrument.json",
+      "repoPath": "source/schemas/common/types/available_payment_instrument.json",
+      "$id": "https://ucp.dev/schemas/common/types/available_payment_instrument.json",
+      "sha256": "d32ca30a463a647a53c806d8ee236be739741f015db9ba0ab13f4b67003f6507",
+      "bytes": 901
+    },
+    {
+      "file": "schemas/common/types/binding.json",
+      "repoPath": "source/schemas/common/types/binding.json",
+      "$id": "https://ucp.dev/schemas/common/types/binding.json",
+      "sha256": "3fdbd27215b630ca62b9681cb51a790a5bfaeea101c4b77440198adbf410cd43",
+      "bytes": 766
+    },
+    {
+      "file": "schemas/common/types/business_split_payments_config.json",
+      "repoPath": "source/schemas/common/types/business_split_payments_config.json",
+      "$id": "https://ucp.dev/schemas/common/types/business_split_payments_config.json",
+      "sha256": "6c5a765a06f39bb0d23637084deba0198db13a02804ef7da2cf8193325a2bf7f",
+      "bytes": 1025
+    },
+    {
+      "file": "schemas/common/types/card_credential.json",
+      "repoPath": "source/schemas/common/types/card_credential.json",
+      "$id": "https://ucp.dev/schemas/common/types/card_credential.json",
+      "sha256": "82813fd87b3f5f35dc9dcf3db613ab56c4c2dcb95b9c26ddadaf5db6926baaff",
+      "bytes": 2633
+    },
+    {
+      "file": "schemas/common/types/card_payment_instrument.json",
+      "repoPath": "source/schemas/common/types/card_payment_instrument.json",
+      "$id": "https://ucp.dev/schemas/common/types/card_payment_instrument.json",
+      "sha256": "2105d8e7b1affeae909dc5c4a827d19b772e6c31be0c667c812f26d88865317e",
+      "bytes": 2852
+    },
+    {
+      "file": "schemas/common/types/constraint_expression.json",
+      "repoPath": "source/schemas/common/types/constraint_expression.json",
+      "$id": "https://ucp.dev/schemas/common/types/constraint_expression.json",
+      "sha256": "8c0fcbfabc3f8038c89a86b7f6b9fa32c2754eba727328c6d90062584855ade2",
+      "bytes": 1824
+    },
+    {
+      "file": "schemas/common/types/context.json",
+      "repoPath": "source/schemas/common/types/context.json",
+      "$id": "https://ucp.dev/schemas/common/types/context.json",
+      "sha256": "ebb18d8833e1a1e9c24bd578999d5c8cd730c277f9f0b29495cc3ee34535d0b3",
+      "bytes": 4496
+    },
+    {
+      "file": "schemas/common/types/daily_hour.json",
+      "repoPath": "source/schemas/common/types/daily_hour.json",
+      "$id": "https://ucp.dev/schemas/common/types/daily_hour.json",
+      "sha256": "a093fa938ac0662c84c8975573f2a83fbabee8a5a612d99a72fa43cf2a0ee3df",
+      "bytes": 963
+    },
+    {
+      "file": "schemas/common/types/description.json",
+      "repoPath": "source/schemas/common/types/description.json",
+      "$id": "https://ucp.dev/schemas/common/types/description.json",
+      "sha256": "9c509e8ecc47ad408ee36b940cf836cd16525f773b3eb2b4a37d0ddcbaeb6380",
+      "bytes": 751
+    },
+    {
+      "file": "schemas/common/types/error_code.json",
+      "repoPath": "source/schemas/common/types/error_code.json",
+      "$id": "https://ucp.dev/schemas/common/types/error_code.json",
+      "sha256": "9368a4ad6d9a2a448c05b97baf7aa4a73a04efcf40d624a5d373ecc3f67a530c",
+      "bytes": 581
+    },
+    {
+      "file": "schemas/common/types/error_response.json",
+      "repoPath": "source/schemas/common/types/error_response.json",
+      "$id": "https://ucp.dev/schemas/common/types/error_response.json",
+      "sha256": "76a5b9a643132c33dc4bca947a7b0c26a8523ab6c8fd1a43141d5aeac0be2b94",
+      "bytes": 942
+    },
+    {
+      "file": "schemas/common/types/exception_hour.json",
+      "repoPath": "source/schemas/common/types/exception_hour.json",
+      "$id": "https://ucp.dev/schemas/common/types/exception_hour.json",
+      "sha256": "6c127e81823917833f4d9b853c03bb90be7bb52390cd61a574e9449d7930c933",
+      "bytes": 1377
+    },
+    {
+      "file": "schemas/common/types/geo.json",
+      "repoPath": "source/schemas/common/types/geo.json",
+      "$id": "https://ucp.dev/schemas/common/types/geo.json",
+      "sha256": "75bf6c526e71da3d08ac8d4b53becf5be8312fa0f6b399922e6662690276d893",
+      "bytes": 599
+    },
+    {
+      "file": "schemas/common/types/info_code.json",
+      "repoPath": "source/schemas/common/types/info_code.json",
+      "$id": "https://ucp.dev/schemas/common/types/info_code.json",
+      "sha256": "6ed9aec01e8fc597dc676e38dbd240684d120c831a2398648c6bd5d6e73fe38c",
+      "bytes": 480
+    },
+    {
+      "file": "schemas/common/types/instrument_group.json",
+      "repoPath": "source/schemas/common/types/instrument_group.json",
+      "$id": "https://ucp.dev/schemas/common/types/instrument_group.json",
+      "sha256": "2f8f7913399c5e40a850c68d6cb256cc0148732466f086e83d4bf2ba423765d3",
+      "bytes": 1007
+    },
+    {
+      "file": "schemas/common/types/link.json",
+      "repoPath": "source/schemas/common/types/link.json",
+      "$id": "https://ucp.dev/schemas/common/types/link.json",
+      "sha256": "a2bf68aa18f036c1b03b31ee77ddd2448f5ac2a4251b62a2e6db42daba62eaa8",
+      "bytes": 832
+    },
+    {
+      "file": "schemas/common/types/locality.json",
+      "repoPath": "source/schemas/common/types/locality.json",
+      "$id": "https://ucp.dev/schemas/common/types/locality.json",
+      "sha256": "f2062b6c3ca6991682000f4f4c5f40457c36056a19d5aafcd2de1d9a5daa74eb",
+      "bytes": 862
+    },
+    {
+      "file": "schemas/common/types/location.json",
+      "repoPath": "source/schemas/common/types/location.json",
+      "$id": "https://ucp.dev/schemas/common/types/location.json",
+      "sha256": "40787cbaea7020a14a4bfa4493c1850d86f01eb7d27c98d265ca89da442e0a17",
+      "bytes": 3530
+    },
+    {
+      "file": "schemas/common/types/location_distance.json",
+      "repoPath": "source/schemas/common/types/location_distance.json",
+      "$id": "https://ucp.dev/schemas/common/types/location_distance.json",
+      "sha256": "8a80f4a39e4486f21ba9cfb9075243ab613c2968b47c656452331a379983cc67",
+      "bytes": 1334
+    },
+    {
+      "file": "schemas/common/types/location_filter.json",
+      "repoPath": "source/schemas/common/types/location_filter.json",
+      "$id": "https://ucp.dev/schemas/common/types/location_filter.json",
+      "sha256": "1251b25e6493dbe4e2d854e3f6bdbf0e79cae629c1495e55c1d0cef1c72ec336",
+      "bytes": 1848
+    },
+    {
+      "file": "schemas/common/types/location_serves.json",
+      "repoPath": "source/schemas/common/types/location_serves.json",
+      "$id": "https://ucp.dev/schemas/common/types/location_serves.json",
+      "sha256": "0166f92abaf979f6cda8dd3c1f76280a35672de295ca2534cf3150cd507d8d28",
+      "bytes": 2118
+    },
+    {
+      "file": "schemas/common/types/location_summary.json",
+      "repoPath": "source/schemas/common/types/location_summary.json",
+      "$id": "https://ucp.dev/schemas/common/types/location_summary.json",
+      "sha256": "03fe88751f500d242fe50ecb80b1486b6bf466f39eead60ea22d04552aeb6425",
+      "bytes": 772
+    },
+    {
+      "file": "schemas/common/types/measure.json",
+      "repoPath": "source/schemas/common/types/measure.json",
+      "$id": "https://ucp.dev/schemas/common/types/measure.json",
+      "sha256": "dfcbe1ada0d058ea95459e59a08056a1f613550023c15d5182beaba685f82a47",
+      "bytes": 655
+    },
+    {
+      "file": "schemas/common/types/media.json",
+      "repoPath": "source/schemas/common/types/media.json",
+      "$id": "https://ucp.dev/schemas/common/types/media.json",
+      "sha256": "d277e2c4f26a6d8f86d57066397b14cb9d78c9ff098b308ab2140f90c027c3fc",
+      "bytes": 895
+    },
+    {
+      "file": "schemas/common/types/message.json",
+      "repoPath": "source/schemas/common/types/message.json",
+      "$id": "https://ucp.dev/schemas/common/types/message.json",
+      "sha256": "a66251758e5646743b0a3986434b277da6f52e181d21671bd3ad7fd75ab34339",
+      "bytes": 398
+    },
+    {
+      "file": "schemas/common/types/message_error.json",
+      "repoPath": "source/schemas/common/types/message_error.json",
+      "$id": "https://ucp.dev/schemas/common/types/message_error.json",
+      "sha256": "de0a584b67405c3b608ec4426c0badfda7be97e0419a60b9100abf67d04c74eb",
+      "bytes": 1731
+    },
+    {
+      "file": "schemas/common/types/message_info.json",
+      "repoPath": "source/schemas/common/types/message_info.json",
+      "$id": "https://ucp.dev/schemas/common/types/message_info.json",
+      "sha256": "56894c75128861b2fc696757fb0193ee9cd4d9bfcdcdb18902c4cdb41e04796b",
+      "bytes": 859
+    },
+    {
+      "file": "schemas/common/types/message_warning.json",
+      "repoPath": "source/schemas/common/types/message_warning.json",
+      "$id": "https://ucp.dev/schemas/common/types/message_warning.json",
+      "sha256": "0a479161db91d35bc6c20b9db389188c3d7b298a643cb4f8e3079dc67c5aefbf",
+      "bytes": 1613
+    },
+    {
+      "file": "schemas/common/types/network_token_credential.json",
+      "repoPath": "source/schemas/common/types/network_token_credential.json",
+      "$id": "https://ucp.dev/schemas/common/types/network_token_credential.json",
+      "sha256": "9e31dfaa27aa3a05080b40960effd975d104b905b836bcb91ca89d1b392ee499",
+      "bytes": 2193
+    },
+    {
+      "file": "schemas/common/types/pagination.json",
+      "repoPath": "source/schemas/common/types/pagination.json",
+      "$id": "https://ucp.dev/schemas/common/types/pagination.json",
+      "sha256": "8e86e9d65cce61b049ba5d32e674706e64eabc9e3658dd8ef101efadaba8a9a8",
+      "bytes": 1831
+    },
+    {
+      "file": "schemas/common/types/pan_credential.json",
+      "repoPath": "source/schemas/common/types/pan_credential.json",
+      "$id": "https://ucp.dev/schemas/common/types/pan_credential.json",
+      "sha256": "091ae8ee0221162466fea5ef90d009c7fb6538290755b35c9266f23e6cbf5ae1",
+      "bytes": 2007
+    },
+    {
+      "file": "schemas/common/types/payment.json",
+      "repoPath": "source/schemas/common/types/payment.json",
+      "$id": "https://ucp.dev/schemas/common/types/payment.json",
+      "sha256": "b6543bbdd4ecce91e1a5192fce4af1910570811901b755eebdcbf227dbdd0579",
+      "bytes": 649
+    },
+    {
+      "file": "schemas/common/types/payment_credential.json",
+      "repoPath": "source/schemas/common/types/payment_credential.json",
+      "$id": "https://ucp.dev/schemas/common/types/payment_credential.json",
+      "sha256": "47af578c9af0d585b2225c03037c116c880a1539826e77e6c9cdf741494392d3",
+      "bytes": 540
+    },
+    {
+      "file": "schemas/common/types/payment_identity.json",
+      "repoPath": "source/schemas/common/types/payment_identity.json",
+      "$id": "https://ucp.dev/schemas/common/types/payment_identity.json",
+      "sha256": "ddc7ee23ddfa054a218fed706abf2a516a40a6394d4ed77f5ccf2531e402da0b",
+      "bytes": 554
+    },
+    {
+      "file": "schemas/common/types/payment_instrument.json",
+      "repoPath": "source/schemas/common/types/payment_instrument.json",
+      "$id": "https://ucp.dev/schemas/common/types/payment_instrument.json",
+      "sha256": "d005c3ccb38afa7fab7e0d72e125fcf7f78b7b6b196d4096d6c558f6f3174222",
+      "bytes": 2193
+    },
+    {
+      "file": "schemas/common/types/payment_schedule.json",
+      "repoPath": "source/schemas/common/types/payment_schedule.json",
+      "$id": "https://ucp.dev/schemas/common/types/payment_schedule.json",
+      "sha256": "b144fc47b3f0a07391482427544e120d8efb0dd3f121f60b5820aa6a46f34bee",
+      "bytes": 2675
+    },
+    {
+      "file": "schemas/common/types/payment_term.json",
+      "repoPath": "source/schemas/common/types/payment_term.json",
+      "$id": "https://ucp.dev/schemas/common/types/payment_term.json",
+      "sha256": "7840ac5e206bbd5077b0c3e7e74219dba8a5a09512b504a4f20739d60a2335a9",
+      "bytes": 1218
+    },
+    {
+      "file": "schemas/common/types/policy.json",
+      "repoPath": "source/schemas/common/types/policy.json",
+      "$id": "https://ucp.dev/schemas/common/types/policy.json",
+      "sha256": "bd2ace0b58b81b25f3d98f527237e2de72412db65fb218a5f41c9fae748e8c71",
+      "bytes": 2581
+    },
+    {
+      "file": "schemas/common/types/postal_address.json",
+      "repoPath": "source/schemas/common/types/postal_address.json",
+      "$id": "https://ucp.dev/schemas/common/types/postal_address.json",
+      "sha256": "6ee3504a2a53a16df406e80c62d80b7353dff088dd3de5b770292c89bc5137ca",
+      "bytes": 1786
+    },
+    {
+      "file": "schemas/common/types/price.json",
+      "repoPath": "source/schemas/common/types/price.json",
+      "$id": "https://ucp.dev/schemas/common/types/price.json",
+      "sha256": "a625ac12ece594ceb36009bb5bbdef4a57f7620c21a8df3f50fc1930f84906a1",
+      "bytes": 570
+    },
+    {
+      "file": "schemas/common/types/price_filter.json",
+      "repoPath": "source/schemas/common/types/price_filter.json",
+      "$id": "https://ucp.dev/schemas/common/types/price_filter.json",
+      "sha256": "f3add5694735f5845759767de30ea0f5a3876d5975f8e6f7f382f29c2eec5e81",
+      "bytes": 891
+    },
+    {
+      "file": "schemas/common/types/price_range.json",
+      "repoPath": "source/schemas/common/types/price_range.json",
+      "$id": "https://ucp.dev/schemas/common/types/price_range.json",
+      "sha256": "1b225321ebd52b9c206c03a80d256ce9dccffee727e542eb0c3da00b0d5a0db1",
+      "bytes": 601
+    },
+    {
+      "file": "schemas/common/types/quantity_unit.json",
+      "repoPath": "source/schemas/common/types/quantity_unit.json",
+      "$id": "https://ucp.dev/schemas/common/types/quantity_unit.json",
+      "sha256": "a314c84ebcf8b12b10cf3f15c067fe164a3eeb13a57b5769b5c50e69f20494da",
+      "bytes": 1263
+    },
+    {
+      "file": "schemas/common/types/request_constraints.json",
+      "repoPath": "source/schemas/common/types/request_constraints.json",
+      "$id": "https://ucp.dev/schemas/common/types/request_constraints.json",
+      "sha256": "987eaa192930a0ea8d1c7b6a7cc947153e1d9da32b46d61aa49eaf782c166edf",
+      "bytes": 1557
+    },
+    {
+      "file": "schemas/common/types/reverse_domain_name.json",
+      "repoPath": "source/schemas/common/types/reverse_domain_name.json",
+      "$id": "https://ucp.dev/schemas/common/types/reverse_domain_name.json",
+      "sha256": "a5d616402d47c602196e6e455053ee3683bc9a6e90192330297bb13abd3326eb",
+      "bytes": 1280
+    },
+    {
+      "file": "schemas/common/types/signals.json",
+      "repoPath": "source/schemas/common/types/signals.json",
+      "$id": "https://ucp.dev/schemas/common/types/signals.json",
+      "sha256": "47c8bbee51fcfbb9f029656881126dda036830206eb8d41f37be0c257e7a87d2",
+      "bytes": 1043
+    },
+    {
+      "file": "schemas/common/types/signed_amount.json",
+      "repoPath": "source/schemas/common/types/signed_amount.json",
+      "$id": "https://ucp.dev/schemas/common/types/signed_amount.json",
+      "sha256": "b892a84dbefd07204d251c2546c638d5a376a8ca673f3e422b913ba22b3d64c9",
+      "bytes": 550
+    },
+    {
+      "file": "schemas/common/types/time_interval.json",
+      "repoPath": "source/schemas/common/types/time_interval.json",
+      "$id": "https://ucp.dev/schemas/common/types/time_interval.json",
+      "sha256": "4d196d96cfbca6dc29f9268aeb5f55399ad151b8f4a578239e466505312fd557",
+      "bytes": 885
+    },
+    {
+      "file": "schemas/common/types/token_credential.json",
+      "repoPath": "source/schemas/common/types/token_credential.json",
+      "$id": "https://ucp.dev/schemas/common/types/token_credential.json",
+      "sha256": "d46f57502f02075dc3beef25834babff9b80b7ada4cff6fbf5f5ae070baaa92c",
+      "bytes": 790
+    },
+    {
+      "file": "schemas/common/types/total.json",
+      "repoPath": "source/schemas/common/types/total.json",
+      "$id": "https://ucp.dev/schemas/common/types/total.json",
+      "sha256": "2d8618d61f31ca03a9a59362bae9c56744906d9db447b73a6222909b0e1850e4",
+      "bytes": 1261
+    },
+    {
+      "file": "schemas/common/types/totals.json",
+      "repoPath": "source/schemas/common/types/totals.json",
+      "$id": "https://ucp.dev/schemas/common/types/totals.json",
+      "sha256": "488a51268c0cf02de1b02e53219b542a695c7c1e239ca66db77c3916dfa0b449",
+      "bytes": 2053
+    },
+    {
+      "file": "schemas/common/types/unit.json",
+      "repoPath": "source/schemas/common/types/unit.json",
+      "$id": "https://ucp.dev/schemas/common/types/unit.json",
+      "sha256": "dc516d36c80edfb44347f4d5d6f39c40b1a14ebbba40ee5dc73ec3394397db82",
+      "bytes": 1905
+    },
+    {
+      "file": "schemas/common/types/warning_code.json",
+      "repoPath": "source/schemas/common/types/warning_code.json",
+      "$id": "https://ucp.dev/schemas/common/types/warning_code.json",
+      "sha256": "4246be713f15be3e8adfb0ffd9ebb984a216f1db2c1c9c059466e5b49ecb97d9",
+      "bytes": 507
+    },
+    {
+      "file": "schemas/payment_handler.json",
+      "repoPath": "source/schemas/payment_handler.json",
+      "$id": "https://ucp.dev/schemas/payment_handler.json",
+      "sha256": "5ea09bb44a6dd5a7696150e220eae2b3b4a8eacda176793fb816a9f8240a50a6",
+      "bytes": 1686
+    },
+    {
+      "file": "schemas/profile.json",
+      "repoPath": "source/schemas/profile.json",
+      "$id": "https://ucp.dev/schemas/profile.json",
+      "sha256": "720a4e676bd4aaa5cbdcef2f89a4d0b776c4f0e141f1911da7514227ecb5c239",
+      "bytes": 6438
+    },
+    {
+      "file": "schemas/service.json",
+      "repoPath": "source/schemas/service.json",
+      "$id": "https://ucp.dev/schemas/service.json",
+      "sha256": "4f8453ee67d82d53f05b06fb7ea03dec0e0600faea1098b3184b71cdf0fc2423",
+      "bytes": 3544
+    },
+    {
+      "file": "schemas/shopping/buyer_consent.json",
+      "repoPath": "source/schemas/shopping/buyer_consent.json",
+      "$id": "https://ucp.dev/schemas/shopping/buyer_consent.json",
+      "sha256": "eb8bd57886305d1a48d53c8757f613550050cbc0f9f1cad632905b8821dc41b0",
+      "bytes": 6418
+    },
+    {
+      "file": "schemas/shopping/cart.json",
+      "repoPath": "source/schemas/shopping/cart.json",
+      "$id": "https://ucp.dev/schemas/shopping/cart.json",
+      "sha256": "327170d810076424a925b400cb6c14f2fbc52088d76185badff5dc046e658aec",
+      "bytes": 4084
+    },
+    {
+      "file": "schemas/shopping/catalog_lookup.json",
+      "repoPath": "source/schemas/shopping/catalog_lookup.json",
+      "$id": "https://ucp.dev/schemas/shopping/catalog_lookup.json",
+      "sha256": "79c685132dcbf09b66e60535e372bb36acc75fede9a32c49aa0e1cc263a7f8df",
+      "bytes": 7470
+    },
+    {
+      "file": "schemas/shopping/catalog_search.json",
+      "repoPath": "source/schemas/shopping/catalog_search.json",
+      "$id": "https://ucp.dev/schemas/shopping/catalog_search.json",
+      "sha256": "3cf62e8d2330480400ea99d139bd4986f65743bc618247ab8e9d14da00a30e9d",
+      "bytes": 2278
+    },
+    {
+      "file": "schemas/shopping/checkout.json",
+      "repoPath": "source/schemas/shopping/checkout.json",
+      "$id": "https://ucp.dev/schemas/shopping/checkout.json",
+      "sha256": "1a856fabbe86e031baab0c35745cb0b44481da29a2075ee1e73f720e6337204d",
+      "bytes": 4365
+    },
+    {
+      "file": "schemas/shopping/discount.json",
+      "repoPath": "source/schemas/shopping/discount.json",
+      "$id": "https://ucp.dev/schemas/shopping/discount.json",
+      "sha256": "e0bb3853781e04f4874b3dc2e8ca4c49215c54e487769c1450898150909b52fc",
+      "bytes": 4759
+    },
+    {
+      "file": "schemas/shopping/fulfillment.json",
+      "repoPath": "source/schemas/shopping/fulfillment.json",
+      "$id": "https://ucp.dev/schemas/shopping/fulfillment.json",
+      "sha256": "d0306c8d47d4bee95889d2fc043de0d6086e34303a52ae00b9d42546a6d99a6f",
+      "bytes": 12412
+    },
+    {
+      "file": "schemas/shopping/order.json",
+      "repoPath": "source/schemas/shopping/order.json",
+      "$id": "https://ucp.dev/schemas/shopping/order.json",
+      "sha256": "1bd0951273ba69ab40e91f12c3e2d74652e190d339282292efab3593cca123ed",
+      "bytes": 3846
+    },
+    {
+      "file": "schemas/shopping/permalink.json",
+      "repoPath": "source/schemas/shopping/permalink.json",
+      "$id": "https://ucp.dev/schemas/shopping/permalink.json",
+      "sha256": "ff7cd079d018b0eb409e8a0138f4c5b343518e9d7d1d612d26e7589405d7def7",
+      "bytes": 2360
+    },
+    {
+      "file": "schemas/shopping/types/adjustment.json",
+      "repoPath": "source/schemas/shopping/types/adjustment.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/adjustment.json",
+      "sha256": "06bb707c736fd20643a35e1df4200bd5069d4ceeca731302c288f8bcd64a338a",
+      "bytes": 2900
+    },
+    {
+      "file": "schemas/shopping/types/attribution.json",
+      "repoPath": "source/schemas/shopping/types/attribution.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/attribution.json",
+      "sha256": "c65756a97aef7b9c61b1ed4364c347f278a765242777bbf42515f83ac14db0ea",
+      "bytes": 622
+    },
+    {
+      "file": "schemas/shopping/types/availability.json",
+      "repoPath": "source/schemas/shopping/types/availability.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/availability.json",
+      "sha256": "268f1e083ea2f933f61472985ced4cfa91265c9548f69fafc3a76d914906c4a6",
+      "bytes": 642
+    },
+    {
+      "file": "schemas/shopping/types/business_fulfillment_config.json",
+      "repoPath": "source/schemas/shopping/types/business_fulfillment_config.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/business_fulfillment_config.json",
+      "sha256": "815d92809de00c90551a9d56bf755e6532aa04b6ca1698522272cbe015615fa0",
+      "bytes": 1368
+    },
+    {
+      "file": "schemas/shopping/types/buyer.json",
+      "repoPath": "source/schemas/shopping/types/buyer.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/buyer.json",
+      "sha256": "24075ff053a9bc87f1b8b27fd2125df2035a7a22a35a784a58fe9b95a66d8cdb",
+      "bytes": 597
+    },
+    {
+      "file": "schemas/shopping/types/category.json",
+      "repoPath": "source/schemas/shopping/types/category.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/category.json",
+      "sha256": "13e7629270c910c77bfe328f158adc0899ad0636289ea9429805d7422112cdf8",
+      "bytes": 579
+    },
+    {
+      "file": "schemas/shopping/types/detail_option_value.json",
+      "repoPath": "source/schemas/shopping/types/detail_option_value.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/detail_option_value.json",
+      "sha256": "cc2deac3ec8c8c18249241e1a37cb0791221759fdee582c68069a0424979e403",
+      "bytes": 749
+    },
+    {
+      "file": "schemas/shopping/types/expectation.json",
+      "repoPath": "source/schemas/shopping/types/expectation.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/expectation.json",
+      "sha256": "2da205e383d582c345513d082ef9cd82799f95bce5416674dc7231a068349709",
+      "bytes": 1935
+    },
+    {
+      "file": "schemas/shopping/types/fulfillment.json",
+      "repoPath": "source/schemas/shopping/types/fulfillment.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/fulfillment.json",
+      "sha256": "bc27ac093d47902f2b884e59f1fd01ccf64e8bc4b0c4e48b4afebe7999325d49",
+      "bytes": 635
+    },
+    {
+      "file": "schemas/shopping/types/fulfillment_available_method.json",
+      "repoPath": "source/schemas/shopping/types/fulfillment_available_method.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/fulfillment_available_method.json",
+      "sha256": "1fd7eb09ea6a04a67fcd9cff091bf9c6cf5b3869f76a45c9c057314fd20003ce",
+      "bytes": 1204
+    },
+    {
+      "file": "schemas/shopping/types/fulfillment_destination.json",
+      "repoPath": "source/schemas/shopping/types/fulfillment_destination.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/fulfillment_destination.json",
+      "sha256": "f39d0b5269b52dda5ee04b3bda4b23f1ccb2259d6208df9c8b2ba543551e5df9",
+      "bytes": 1265
+    },
+    {
+      "file": "schemas/shopping/types/fulfillment_destination_filter.json",
+      "repoPath": "source/schemas/shopping/types/fulfillment_destination_filter.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/fulfillment_destination_filter.json",
+      "sha256": "3c217586884f9ff1aab26d1f0ccf33a662e4908ab257c7000d92dc02fb4185ce",
+      "bytes": 904
+    },
+    {
+      "file": "schemas/shopping/types/fulfillment_event.json",
+      "repoPath": "source/schemas/shopping/types/fulfillment_event.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/fulfillment_event.json",
+      "sha256": "ea135343c71569bf18468a4dcede5f4f50b0055e5bd062bb36326b34fdc0faeb",
+      "bytes": 2361
+    },
+    {
+      "file": "schemas/shopping/types/fulfillment_group.json",
+      "repoPath": "source/schemas/shopping/types/fulfillment_group.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/fulfillment_group.json",
+      "sha256": "23f74d66b15f7f43312c7c3bb09c5fbbaa7b6cd62d173bbbb1a27cc6c001a4fc",
+      "bytes": 1111
+    },
+    {
+      "file": "schemas/shopping/types/fulfillment_method.json",
+      "repoPath": "source/schemas/shopping/types/fulfillment_method.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/fulfillment_method.json",
+      "sha256": "5cf7b01b56ab3ed584c54d9bcf995b7ae01e85de6b11ba9d4526a57a8f536927",
+      "bytes": 3105
+    },
+    {
+      "file": "schemas/shopping/types/fulfillment_option.json",
+      "repoPath": "source/schemas/shopping/types/fulfillment_option.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/fulfillment_option.json",
+      "sha256": "e075730334e41549af1c7cd3846943ad1bd3f94cb4c40bba5bc5ad5aaff014df",
+      "bytes": 1338
+    },
+    {
+      "file": "schemas/shopping/types/fulfillment_option_base.json",
+      "repoPath": "source/schemas/shopping/types/fulfillment_option_base.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/fulfillment_option_base.json",
+      "sha256": "6f9d8ae9d79cd3d5dc0ae20a1d75761f53054c3fab265527bedaececaded7cca",
+      "bytes": 1125
+    },
+    {
+      "file": "schemas/shopping/types/input_correlation.json",
+      "repoPath": "source/schemas/shopping/types/input_correlation.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/input_correlation.json",
+      "sha256": "27a7da5dd86ce92b778591379bc8c9fc4376f123ea0b139cc55883221fb31b22",
+      "bytes": 897
+    },
+    {
+      "file": "schemas/shopping/types/item.json",
+      "repoPath": "source/schemas/shopping/types/item.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/item.json",
+      "sha256": "0c5ef0d419484ade4a07d4e4193754ee7ab46ffebe4cb6ccfb70ca4afc8c7dab",
+      "bytes": 2565
+    },
+    {
+      "file": "schemas/shopping/types/line_item.json",
+      "repoPath": "source/schemas/shopping/types/line_item.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/line_item.json",
+      "sha256": "0c968bf0360f1c6b753e4ae45f4ae18bb6fd29aa24e50cfbb117151f18d0adbf",
+      "bytes": 1421
+    },
+    {
+      "file": "schemas/shopping/types/location_destination.json",
+      "repoPath": "source/schemas/shopping/types/location_destination.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/location_destination.json",
+      "sha256": "6ca78514d2258a7b4a62ba6403526177277467ccbe5625124f7d8e160eefd9cc",
+      "bytes": 788
+    },
+    {
+      "file": "schemas/shopping/types/option_value.json",
+      "repoPath": "source/schemas/shopping/types/option_value.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/option_value.json",
+      "sha256": "8c128790c5604c1d38b10290e5fe29571018ce891476b9644c680dfff96634e0",
+      "bytes": 641
+    },
+    {
+      "file": "schemas/shopping/types/order_confirmation.json",
+      "repoPath": "source/schemas/shopping/types/order_confirmation.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/order_confirmation.json",
+      "sha256": "6f030ce24e438760ae8db0decbfe7ddd9ce6c9b0254c6b81956151a5042f4027",
+      "bytes": 740
+    },
+    {
+      "file": "schemas/shopping/types/order_line_item.json",
+      "repoPath": "source/schemas/shopping/types/order_line_item.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/order_line_item.json",
+      "sha256": "ad9dd2f4fea9f04077c990aa3548b8aed77179ee990538be9adc707ffb04f0c3",
+      "bytes": 2313
+    },
+    {
+      "file": "schemas/shopping/types/platform_fulfillment_config.json",
+      "repoPath": "source/schemas/shopping/types/platform_fulfillment_config.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/platform_fulfillment_config.json",
+      "sha256": "d5276726200e2fcebad60394cbd97314f59a335cd044fde3b1c981b52103edc3",
+      "bytes": 435
+    },
+    {
+      "file": "schemas/shopping/types/product.json",
+      "repoPath": "source/schemas/shopping/types/product.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/product.json",
+      "sha256": "a3a4174515e050ed1ddf273c2fb4b1c72e36336c1bbcff05976f9245408c488c",
+      "bytes": 2531
+    },
+    {
+      "file": "schemas/shopping/types/product_option.json",
+      "repoPath": "source/schemas/shopping/types/product_option.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/product_option.json",
+      "sha256": "30c7ebe59f9d49e8a259e2aecc4f6b814fdfbd755a8abdcc5524f4940aa85180",
+      "bytes": 614
+    },
+    {
+      "file": "schemas/shopping/types/rating.json",
+      "repoPath": "source/schemas/shopping/types/rating.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/rating.json",
+      "sha256": "3d9ea28f3b90edefe7b3aa042ccf559643e88e0efe1843b78fa30dea174214af",
+      "bytes": 854
+    },
+    {
+      "file": "schemas/shopping/types/search_filters.json",
+      "repoPath": "source/schemas/shopping/types/search_filters.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/search_filters.json",
+      "sha256": "18d73e8c3ca57306ded19d425aae45cd38eff150e2abe5cd2ccaada32a5abba3",
+      "bytes": 839
+    },
+    {
+      "file": "schemas/shopping/types/selected_option.json",
+      "repoPath": "source/schemas/shopping/types/selected_option.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/selected_option.json",
+      "sha256": "6b677befedce83b4203800166536d842744267500b3425379267aad8111d298b",
+      "bytes": 757
+    },
+    {
+      "file": "schemas/shopping/types/shipping_destination.json",
+      "repoPath": "source/schemas/shopping/types/shipping_destination.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/shipping_destination.json",
+      "sha256": "c7907026ef03a1dca9ebbbb3d6161cb5048a6930c9e09988d1d980ed245d8a9a",
+      "bytes": 800
+    },
+    {
+      "file": "schemas/shopping/types/unit_price.json",
+      "repoPath": "source/schemas/shopping/types/unit_price.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/unit_price.json",
+      "sha256": "85a40131603889a5aa3807c67a252e556845a274283cd684e09e89dd5604a3b0",
+      "bytes": 2166
+    },
+    {
+      "file": "schemas/shopping/types/variant.json",
+      "repoPath": "source/schemas/shopping/types/variant.json",
+      "$id": "https://ucp.dev/schemas/shopping/types/variant.json",
+      "sha256": "7f742fcacae92a5ccbfb6c04e1ca22815d1864f7c32599f76d12bcd2ed26544c",
+      "bytes": 4445
+    },
+    {
+      "file": "schemas/transports/a2a_message.json",
+      "repoPath": "source/schemas/transports/a2a_message.json",
+      "$id": "https://ucp.dev/schemas/transports/a2a_message.json",
+      "sha256": "be476c5b247a5c37daf8da83184ffbaf83e255631a99f3d2870edb278f43e438",
+      "bytes": 3872
+    },
+    {
+      "file": "schemas/transports/embedded_config.json",
+      "repoPath": "source/schemas/transports/embedded_config.json",
+      "$id": "https://ucp.dev/schemas/transports/embedded_config.json",
+      "sha256": "00381600d1d5b6ce832499c00712f6192b12674b3c2c833420c0e9d3f8f196a2",
+      "bytes": 939
+    },
+    {
+      "file": "schemas/transports/embedded_message.json",
+      "repoPath": "source/schemas/transports/embedded_message.json",
+      "$id": "https://ucp.dev/schemas/transports/embedded_message.json",
+      "sha256": "dc23be38b0c7bb791bd3a59cafc9b69e207ae53942e0144bf4a0773990e92a6c",
+      "bytes": 2298
+    },
+    {
+      "file": "schemas/transports/jsonrpc.json",
+      "repoPath": "source/schemas/transports/jsonrpc.json",
+      "$id": "https://ucp.dev/schemas/transports/jsonrpc.json",
+      "sha256": "70ede824a7550d31ee417481b4e0a1c221d9bfaa4464f6b909d3a3919d4d68da",
+      "bytes": 3605
+    },
+    {
+      "file": "schemas/transports/mcp_tool_call.json",
+      "repoPath": "source/schemas/transports/mcp_tool_call.json",
+      "$id": "https://ucp.dev/schemas/transports/mcp_tool_call.json",
+      "sha256": "7a4501a723b231df8ad1cb3b26a739d0a3d48985a22caeca4f7dedb6da2f50d1",
+      "bytes": 3785
+    },
+    {
+      "file": "schemas/ucp.json",
+      "repoPath": "source/schemas/ucp.json",
+      "$id": "https://ucp.dev/schemas/ucp.json",
+      "sha256": "05329a3ae4546f97efcf381c3b0cb279d21063e351bcf4edd00950dc14d67c9c",
+      "bytes": 11495
+    }
+  ]
+}

@@ -17,11 +17,11 @@ afterEach(() => {
 describe("resolvedGeminiModel", () => {
   it("defaults to the GA model and honors a GEMINI_MODEL override", () => {
     delete process.env.GEMINI_MODEL;
-    expect(resolvedGeminiModel()).toBe("gemini-2.5-flash");
+    expect(resolvedGeminiModel()).toBe("gemini-3.5-flash-lite");
     process.env.GEMINI_MODEL = "gemini-2.5-flash-lite";
     expect(resolvedGeminiModel()).toBe("gemini-2.5-flash-lite");
     process.env.GEMINI_MODEL = "  "; // whitespace falls back to the default
-    expect(resolvedGeminiModel()).toBe("gemini-2.5-flash");
+    expect(resolvedGeminiModel()).toBe("gemini-3.5-flash-lite");
   });
 });
 

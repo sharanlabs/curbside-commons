@@ -56,18 +56,47 @@ describe("UCP conformance corpus freeze-integrity (P2-1: every file byte-locked)
   });
 });
 
-describe("pinned UCP schemas freeze-integrity (tamper-evident, no network)", () => {
-  const base = join(process.cwd(), "fixtures", "ucp-schemas", UCP_PINNED_VERSION);
+/**
+ * Wave 1 / S1-pins — BOTH vendored UCP schema folders are held to the same bar.
+ * `2026-04-08` is the ACTIVE pin (UCP_PINNED_VERSION); `2026-08-25` is vendored
+ * ahead of any pin move so the move is a measured decision, never a silent one.
+ * `fileCount` is the number of schema files each folder's PROVENANCE.json must list.
+ */
+const VENDORED_UCP_VERSIONS = [
+  { version: "2026-04-08", fileCount: 78 },
+  { version: "2026-08-25", fileCount: 116 },
+] as const;
+const schemaDirFor = (version: string): string => join("fixtures", "ucp-schemas", version, "schemas");
+
+describe("the active UCP pin is one of the vendored folders", () => {
+  it("UCP_PINNED_VERSION stays 2026-04-08 and both vendored folders are exercised below", () => {
+    expect(UCP_PINNED_VERSION).toBe("2026-04-08");
+    expect(VENDORED_UCP_VERSIONS.map((v) => v.version)).toContain(UCP_PINNED_VERSION);
+    expect(VENDORED_UCP_VERSIONS.map((v) => v.version)).toEqual(["2026-04-08", "2026-08-25"]);
+  });
+});
+
+describe.each(VENDORED_UCP_VERSIONS)("pinned UCP schemas freeze-integrity — $version (tamper-evident, no network)", ({ version, fileCount }) => {
+  const base = join(process.cwd(), "fixtures", "ucp-schemas", version);
   const provenance = JSON.parse(readFileSync(join(base, "PROVENANCE.json"), "utf8")) as {
-    license: { spdx: string };
+    specVersion: string;
+    sourceTag: string;
+    license: { spdx: string; sha256: string };
     files: { file: string; sha256: string; $id: string | null }[];
     fileCount: number;
   };
 
-  it("license is Apache-2.0 and 78 schemas are pinned", () => {
+  it("provenance names this folder's version and tag; license is Apache-2.0 and byte-locked", () => {
+    expect(provenance.specVersion).toBe(version);
+    expect(provenance.sourceTag).toBe(`v${version}`);
     expect(provenance.license.spdx).toBe("Apache-2.0");
+    const licenseSha = createHash("sha256").update(readFileSync(join(base, "LICENSE"))).digest("hex");
+    expect(licenseSha, "LICENSE was edited after pinning").toBe(provenance.license.sha256);
+  });
+
+  it("PROVENANCE.json lists exactly the expected number of schemas", () => {
     expect(provenance.files.length).toBe(provenance.fileCount);
-    expect(provenance.files.length).toBeGreaterThanOrEqual(70);
+    expect(provenance.files.length).toBe(fileCount);
   });
 
   it("every pinned schema's sha256 matches PROVENANCE.json (no silent edit)", () => {
@@ -79,10 +108,12 @@ describe("pinned UCP schemas freeze-integrity (tamper-evident, no network)", () 
   });
 });
 
-describe("C5 conformance correctness — ajv verdicts vs manifest ground truth", () => {
+describe.each(VENDORED_UCP_VERSIONS)("C5 conformance correctness — ajv verdicts vs manifest ground truth — schemas $version", ({ version }) => {
+  const schemaDir = schemaDirFor(version);
+
   it("every VALID fixture is conformance-clean (ok:true, zero findings)", () => {
     for (const e of manifestOnDisk.entries.filter((x) => x.valid)) {
-      const rep = runUcpConformance(JSON.parse(readFixture(e.file)), { op: e.op });
+      const rep = runUcpConformance(JSON.parse(readFixture(e.file)), { op: e.op, schemaDir });
       expect(rep.ok, `${e.file} unexpectedly flagged: ${rep.findings.map((f) => f.ruleId)}`).toBe(true);
       expect(rep.findings).toHaveLength(0);
     }
@@ -94,7 +125,7 @@ describe("C5 conformance correctness — ajv verdicts vs manifest ground truth",
     // — a fixture accidentally violating a second class would still pass. The
     // distinct observed rule set must EQUAL the declared class. (M1 Codex P2.)
     for (const e of manifestOnDisk.entries.filter((x) => !x.valid)) {
-      const rep = runUcpConformance(JSON.parse(readFixture(e.file)), { op: e.op });
+      const rep = runUcpConformance(JSON.parse(readFixture(e.file)), { op: e.op, schemaDir });
       expect(rep.ok, `${e.file} should have failed conformance`).toBe(false);
       const distinct = [...new Set(rep.findings.map((f) => f.ruleId))];
       expect(distinct, `${e.file} declared ${e.violationClass}, observed ${distinct.join("+")}`).toEqual([
@@ -102,7 +133,9 @@ describe("C5 conformance correctness — ajv verdicts vs manifest ground truth",
       ]);
     }
   });
+});
 
+describe("C5 conformance correctness — violation-class coverage (corpus-level)", () => {
   it("every enumerated violation class is exercised by ≥1 invalid fixture", () => {
     const covered = new Set(
       manifestOnDisk.entries.filter((x) => !x.valid).map((x) => x.violationClass),
@@ -114,10 +147,10 @@ describe("C5 conformance correctness — ajv verdicts vs manifest ground truth",
   });
 });
 
-describe("conformance findings are C2-complete and in the DISTINCT LST-CONF-* family", () => {
+describe.each(VENDORED_UCP_VERSIONS)("conformance findings are C2-complete and in the DISTINCT LST-CONF-* family — schemas $version", ({ version }) => {
   it("every conformance finding carries all four receipts + category `conformance`", () => {
     for (const e of manifestOnDisk.entries.filter((x) => !x.valid)) {
-      const rep = runUcpConformance(JSON.parse(readFixture(e.file)), { op: e.op });
+      const rep = runUcpConformance(JSON.parse(readFixture(e.file)), { op: e.op, schemaDir: schemaDirFor(version) });
       for (const f of rep.findings) {
         // C2 four fields.
         expect(f.claim.id.length).toBeGreaterThan(0);

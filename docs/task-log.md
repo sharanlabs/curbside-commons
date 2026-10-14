@@ -131,3 +131,14 @@ Commit a1b05da (S3 + plan + archive) pushed · deploy window 56325eb → dpl_4KU
 (one deployment, MCP-verified) · four-point verify 4/4 on production (routes + 404 control · template button ×2 ·
 /docs#test-it 16/11/5/25 · provenance 56325eb · headers + HSTS, no CSP) · CI 37956794410 adjudicating · Wave 1 packets
 W1b, W1c added to the plan. D-4 not applied (owner's word pending).
+
+## 2026-10-12 — Wave 1 / S1-pins (builder lane, Sonnet 5.5; working tree only, uncommitted)
+Gemini pins re-verified and re-pinned (ai.google.dev/gemini-api/docs/pricing + /docs/models + /docs/thinking, read
+2026-10-12): default `gemini-3.5-flash-lite` ($0.30/$2.50 per 1M), override `gemini-3.8-flash` ($0.75/$3.75 through
+2026-12-31, doubling 2027-01-01 — re-pin trigger recorded in `pricing.ts`), 2.5 rows kept (docs: restricted to prior users);
+`PRICING_VERSION` 2026-06-18 → 2026-10-12. `gemini.ts`: model default + stale 2.5 comments only; the two thinking constants
+kept and marked UNVERIFIED for 3.5-flash-lite. UCP `v2026-08-25` vendoring completed (116 schemas byte-identical to the tag,
+PROVENANCE.json + README.md written); loader unchanged; active pin stays `2026-04-08`. `ucp-conformance.test.ts`
+parameterised over both folders (green on both; red with the new folder absent). Oracle diff on 2026-08-25: 33/35 agree, 2
+documented format-class divergences, 0 disagree (same as the 2026-04-08 run). New: `evals/agents/gemini-pins.test.ts` (+9).
+Skills: none beyond the startup contract and the playbook source-intake rule.
