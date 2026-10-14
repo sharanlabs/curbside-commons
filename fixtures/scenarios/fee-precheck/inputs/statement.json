@@ -1,0 +1,237 @@
+{
+  "meta": {
+    "simulated": true,
+    "generator": {
+      "name": "scenario:fee-precheck",
+      "seed": 20261007,
+      "version": "1.0.0"
+    },
+    "merchant": "Curbside Commons Test Kitchen (simulated)",
+    "month": "2026-06",
+    "currency": "USD",
+    "asOf": "2026-08-15",
+    "purchasePriceBaseConvention": "order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)"
+  },
+  "lines": [
+    {
+      "orderId": "ORD-1",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 300,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-1",
+      "month": "2026-06",
+      "declaredCategory": "basic_service_fee",
+      "label": "Basic service fee",
+      "amountCents": 100,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-1",
+      "month": "2026-06",
+      "declaredCategory": "transaction_fee",
+      "label": "Card processing",
+      "amountCents": 60,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-1",
+      "month": "2026-06",
+      "declaredCategory": "enhanced_service_fee",
+      "label": "Premium placement",
+      "amountCents": 400,
+      "orderPurchasePriceCents": 2000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-2",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 300,
+      "orderPurchasePriceCents": 3000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-2",
+      "month": "2026-06",
+      "declaredCategory": "basic_service_fee",
+      "label": "Basic service fee",
+      "amountCents": 90,
+      "orderPurchasePriceCents": 3000,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-3",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 645,
+      "orderPurchasePriceCents": 4300,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-3",
+      "month": "2026-06",
+      "declaredCategory": "basic_service_fee",
+      "label": "Basic service fee",
+      "amountCents": 215,
+      "orderPurchasePriceCents": 4300,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-3",
+      "month": "2026-06",
+      "declaredCategory": "transaction_fee",
+      "label": "Card processing",
+      "amountCents": 129,
+      "orderPurchasePriceCents": 4300,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-4",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 405,
+      "orderPurchasePriceCents": 2700,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-4",
+      "month": "2026-06",
+      "declaredCategory": "basic_service_fee",
+      "label": "Basic service fee",
+      "amountCents": 135,
+      "orderPurchasePriceCents": 2700,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-4",
+      "month": "2026-06",
+      "declaredCategory": "transaction_fee",
+      "label": "Card processing",
+      "amountCents": 81,
+      "orderPurchasePriceCents": 2700,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-5",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 240,
+      "orderPurchasePriceCents": 1600,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-5",
+      "month": "2026-06",
+      "declaredCategory": "basic_service_fee",
+      "label": "Basic service fee",
+      "amountCents": 80,
+      "orderPurchasePriceCents": 1600,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-5",
+      "month": "2026-06",
+      "declaredCategory": "transaction_fee",
+      "label": "Card processing",
+      "amountCents": 48,
+      "orderPurchasePriceCents": 1600,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-5",
+      "month": "2026-06",
+      "declaredCategory": "service_and_delivery",
+      "label": "Combined service + delivery bundle",
+      "amountCents": 150,
+      "orderPurchasePriceCents": 1600,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-6",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 480,
+      "orderPurchasePriceCents": 3200,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-6",
+      "month": "2026-06",
+      "declaredCategory": "basic_service_fee",
+      "label": "Basic service fee",
+      "amountCents": 160,
+      "orderPurchasePriceCents": 3200,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-6",
+      "month": "2026-06",
+      "declaredCategory": "transaction_fee",
+      "label": "Card processing (pass-through)",
+      "amountCents": 128,
+      "orderPurchasePriceCents": 3200,
+      "isRefund": false,
+      "passthroughDocumented": true
+    },
+    {
+      "orderId": "ORD-7",
+      "month": "2026-06",
+      "declaredCategory": "delivery_fee",
+      "label": "Delivery fee",
+      "amountCents": 330,
+      "orderPurchasePriceCents": 2200,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-7",
+      "month": "2026-06",
+      "declaredCategory": "basic_service_fee",
+      "label": "Basic service fee",
+      "amountCents": 110,
+      "orderPurchasePriceCents": 2200,
+      "isRefund": false,
+      "passthroughDocumented": false
+    },
+    {
+      "orderId": "ORD-7",
+      "month": "2026-06",
+      "declaredCategory": "transaction_fee",
+      "label": "Card processing",
+      "amountCents": 110,
+      "orderPurchasePriceCents": 2200,
+      "isRefund": false,
+      "passthroughDocumented": false
+    }
+  ]
+}

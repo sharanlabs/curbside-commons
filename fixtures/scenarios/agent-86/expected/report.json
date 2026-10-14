@@ -1,0 +1,86 @@
+{
+  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "matchingMode": "synthetic-controlled",
+  "simulated": true,
+  "findings": [
+    {
+      "claim": {
+        "id": "item-005-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "in_stock"
+      },
+      "referenceRowId": "item-005-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-005-v2#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "in_stock"
+      },
+      "referenceRowId": "item-005-v2",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-005-v3#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "in_stock"
+      },
+      "referenceRowId": "item-005-v3",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-006-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "in_stock"
+      },
+      "referenceRowId": "item-006-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-011-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "in_stock"
+      },
+      "referenceRowId": "item-011-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-011-v2#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "in_stock"
+      },
+      "referenceRowId": "item-011-v2",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\")."
+    }
+  ],
+  "ok": false
+}

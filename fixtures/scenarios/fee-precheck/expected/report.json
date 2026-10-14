@@ -1,0 +1,70 @@
+{
+  "specVersion": "uc1-rule-table-draft/2026-07-03+NYC§20-563.3+LL79-2025+base-U1-unresolved",
+  "simulated": true,
+  "classification": "as-declared by the platform; deterministic audit; LLM line-item classifier DEFERRED (F1b)",
+  "assumedPurchasePriceBase": "order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)",
+  "findings": [
+    {
+      "claim": {
+        "id": "ORD-5#service_and_delivery#L15",
+        "source": "fee-statement",
+        "field": "declaredCategory",
+        "value": "service_and_delivery"
+      },
+      "referenceRowId": "§ 20-563.3(d) (category lock)",
+      "ruleId": "NYC-563.3-d-1",
+      "severity": "error",
+      "category": "bundling",
+      "plainLine": "The bill charges $1.50 as \"service_and_delivery\" — that isn't one of the four fee types the law allows, so it's not permitted no matter what it's called.",
+      "verdict": "violation",
+      "feeClass": "bundling",
+      "provisional": [],
+      "professionalLine": "Line \"Combined service + delivery bundle\" is charged under the non-permitted category \"service_and_delivery\" ($1.50 on order ORD-5) — §20-563.3(d) permits only the four categories; any other fee is unlawful."
+    },
+    {
+      "claim": {
+        "id": "ORD-7#transaction_fee#L21",
+        "source": "fee-statement",
+        "field": "amountCents",
+        "value": 110
+      },
+      "referenceRowId": "§ 20-563.3(c)",
+      "ruleId": "NYC-563.3-c-1",
+      "severity": "error",
+      "category": "processing-fee-base-inflation",
+      "plainLine": "The card-processing fee here is 5.0% — over the flat 3% limit, with no proof it's just passing through the real card cost. (This depends on what \"purchase price\" includes — still an open question, U1.)",
+      "verdict": "violation",
+      "feeClass": "processing-fee-base-inflation",
+      "provisional": [
+        "U1-base"
+      ],
+      "professionalLine": "Transaction fee $1.10 on order ORD-7 is 5.0% of the purchase price — over the hard 3% cap, not documented as a pass-through (§20-563.3(c)); over-cap under the ASSUMED base \"order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)\" — PROVISIONAL (U1). No refund safe harbor applies to the transaction fee."
+    },
+    {
+      "claim": {
+        "id": "ORD-6#transaction_fee#L18",
+        "source": "fee-statement",
+        "field": "passthroughDocumented",
+        "value": true
+      },
+      "referenceRowId": "§ 20-563.3(c)(i)-(ii)",
+      "ruleId": "NYC-563.3-c-2",
+      "severity": "warn",
+      "category": "processing-fee-base-inflation",
+      "plainLine": "The card-processing fee here is 4.0% — over the 3% limit, but the platform says it's just passing through the real card cost. This bill alone can't prove that, so we flag it instead of clearing it or calling it a violation. (Also depends on the open \"purchase price\" question, U1.)",
+      "verdict": "asserted-passthrough-unverified",
+      "feeClass": "processing-fee-base-inflation",
+      "provisional": [
+        "U1-base"
+      ],
+      "professionalLine": "Transaction fee $1.28 on order ORD-6 is 4.0% of the purchase price — above the 3% cap, relying on the §20-563.3(c)(i)–(ii) pass-through exception AS ASSERTED by the platform's passthroughDocumented flag. The statement cannot verify the fee equals the actual processor charge; over-cap under the ASSUMED base \"order item subtotal before discounts, excluding tax and tip (ASSUMED — U1 unresolved)\" — PROVISIONAL (U1). Not counted as a violation; flagged for evidence-backed verification outside the statement."
+    }
+  ],
+  "verdictTally": {
+    "violation": 2,
+    "conditional-pending-refund-window": 0,
+    "cured-by-refund": 0,
+    "asserted-passthrough-unverified": 1
+  },
+  "ok": false
+}

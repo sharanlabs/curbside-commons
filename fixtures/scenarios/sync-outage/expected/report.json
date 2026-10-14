@@ -1,0 +1,138 @@
+{
+  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "matchingMode": "synthetic-controlled",
+  "simulated": true,
+  "findings": [
+    {
+      "claim": {
+        "id": "item-001-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "in_stock"
+      },
+      "referenceRowId": "item-001-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-011-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "in_stock"
+      },
+      "referenceRowId": "item-011-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"in_stock\" but the catalog state is 86'd/sold out (expected \"out_of_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-001-v3#price.amount",
+        "source": "acp-feed",
+        "field": "price.amount",
+        "value": "27.50"
+      },
+      "referenceRowId": "item-001-v3",
+      "ruleId": "LST-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The served price 27.50 does not match the catalog price 28.50."
+    },
+    {
+      "claim": {
+        "id": "item-011-v2#price.amount",
+        "source": "acp-feed",
+        "field": "price.amount",
+        "value": "24.00"
+      },
+      "referenceRowId": "item-011-v2",
+      "ruleId": "LST-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The served price 24.00 does not match the catalog price 25.50."
+    },
+    {
+      "claim": {
+        "id": "item-001-v1#expiration_date",
+        "source": "acp-feed",
+        "field": "expiration_date",
+        "value": "2026-07-02T12:00:00Z"
+      },
+      "referenceRowId": "item-001-v1",
+      "ruleId": "LST-STALE-EXPIRED",
+      "severity": "warn",
+      "category": "staleness",
+      "plainLine": "This row expired 2026-07-02T12:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z)."
+    },
+    {
+      "claim": {
+        "id": "item-001-v2#expiration_date",
+        "source": "acp-feed",
+        "field": "expiration_date",
+        "value": "2026-07-02T12:00:00Z"
+      },
+      "referenceRowId": "item-001-v2",
+      "ruleId": "LST-STALE-EXPIRED",
+      "severity": "warn",
+      "category": "staleness",
+      "plainLine": "This row expired 2026-07-02T12:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z)."
+    },
+    {
+      "claim": {
+        "id": "item-001-v3#expiration_date",
+        "source": "acp-feed",
+        "field": "expiration_date",
+        "value": "2026-07-02T12:00:00Z"
+      },
+      "referenceRowId": "item-001-v3",
+      "ruleId": "LST-STALE-EXPIRED",
+      "severity": "warn",
+      "category": "staleness",
+      "plainLine": "This row expired 2026-07-02T12:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z)."
+    },
+    {
+      "claim": {
+        "id": "item-006-v1#expiration_date",
+        "source": "acp-feed",
+        "field": "expiration_date",
+        "value": "2026-07-02T12:00:00Z"
+      },
+      "referenceRowId": "item-006-v1",
+      "ruleId": "LST-STALE-EXPIRED",
+      "severity": "warn",
+      "category": "staleness",
+      "plainLine": "This row expired 2026-07-02T12:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z)."
+    },
+    {
+      "claim": {
+        "id": "item-011-v1#expiration_date",
+        "source": "acp-feed",
+        "field": "expiration_date",
+        "value": "2026-07-02T12:00:00Z"
+      },
+      "referenceRowId": "item-011-v1",
+      "ruleId": "LST-STALE-EXPIRED",
+      "severity": "warn",
+      "category": "staleness",
+      "plainLine": "This row expired 2026-07-02T12:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z)."
+    },
+    {
+      "claim": {
+        "id": "item-011-v2#expiration_date",
+        "source": "acp-feed",
+        "field": "expiration_date",
+        "value": "2026-07-02T12:00:00Z"
+      },
+      "referenceRowId": "item-011-v2",
+      "ruleId": "LST-STALE-EXPIRED",
+      "severity": "warn",
+      "category": "staleness",
+      "plainLine": "This row expired 2026-07-02T12:00:00Z but is still served (catalog as-of 2026-07-03T00:00:00Z)."
+    }
+  ],
+  "ok": false
+}

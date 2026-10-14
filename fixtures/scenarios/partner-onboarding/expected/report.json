@@ -1,0 +1,86 @@
+{
+  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "matchingMode": "synthetic-controlled",
+  "simulated": true,
+  "findings": [
+    {
+      "claim": {
+        "id": "item-007-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "out_of_stock"
+      },
+      "referenceRowId": "item-007-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"out_of_stock\" but the catalog state is in stock (expected \"in_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-009-v1#availability",
+        "source": "acp-feed",
+        "field": "availability",
+        "value": "out_of_stock"
+      },
+      "referenceRowId": "item-009-v1",
+      "ruleId": "LST-AVAIL-STATE",
+      "severity": "error",
+      "category": "availability",
+      "plainLine": "The copy says \"out_of_stock\" but the catalog state is in stock (expected \"in_stock\")."
+    },
+    {
+      "claim": {
+        "id": "item-010-v1#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "Truffle Fries (Small) – Partner Label"
+      },
+      "referenceRowId": "item-010-v1",
+      "ruleId": "LST-IDENT-NAME",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The served name \"Truffle Fries (Small) – Partner Label\" does not match the catalog name \"Truffle Fries (Small)\"."
+    },
+    {
+      "claim": {
+        "id": "item-011-v2#title",
+        "source": "acp-feed",
+        "field": "title",
+        "value": "Bánh Mì Sandwich (Large) – Partner Label"
+      },
+      "referenceRowId": "item-011-v2",
+      "ruleId": "LST-IDENT-NAME",
+      "severity": "error",
+      "category": "identity",
+      "plainLine": "The served name \"Bánh Mì Sandwich (Large) – Partner Label\" does not match the catalog name \"Bánh Mì Sandwich (Large)\"."
+    },
+    {
+      "claim": {
+        "id": "item-003-v1#price.amount",
+        "source": "acp-feed",
+        "field": "price.amount",
+        "value": "10.00"
+      },
+      "referenceRowId": "item-003-v1",
+      "ruleId": "LST-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The served price 10.00 does not match the catalog price 7.00."
+    },
+    {
+      "claim": {
+        "id": "item-004-v2#price.amount",
+        "source": "acp-feed",
+        "field": "price.amount",
+        "value": "27.50"
+      },
+      "referenceRowId": "item-004-v2",
+      "ruleId": "LST-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The served price 27.50 does not match the catalog price 26.50."
+    }
+  ],
+  "ok": false
+}

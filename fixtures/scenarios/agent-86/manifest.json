@@ -1,0 +1,54 @@
+{
+  "id": "agent-86",
+  "number": 1,
+  "simulated": true,
+  "shapedLike": null,
+  "seed": 20261001,
+  "generator": "generate-scenarios.mts@1.0.0",
+  "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "pack": "listings",
+  "derivedFrom": {
+    "fixtures": [
+      "fixtures/synthetic-restaurant/sor.catalog.json",
+      "fixtures/synthetic-restaurant/acp-feed.faithful.json"
+    ],
+    "corpusSeed": 20260703,
+    "corpusAsOf": "2026-07-03T00:00:00Z"
+  },
+  "transform": {
+    "itemsMarkedSoldOutInRecord": 3,
+    "feed": "faithful copy, unchanged",
+    "pickedItems": [
+      "item-011",
+      "item-005",
+      "item-006"
+    ]
+  },
+  "inputs": [
+    "inputs/events.jsonl",
+    "inputs/feed.json",
+    "inputs/record.json"
+  ],
+  "expected": [
+    "expected/report.json",
+    "expected/README.md"
+  ],
+  "absentUntilS2": [
+    "root-cause",
+    "impact",
+    "route",
+    "turns"
+  ],
+  "figures": {
+    "verdict": "FAIL",
+    "findings": 6,
+    "errors": 6,
+    "warnings": 0,
+    "rows_read": 24,
+    "rules": "LST-AVAIL-STATE ×6",
+    "items86": 3,
+    "order_row": "item-005-v1",
+    "order_title": "Margherita Pizza (Small)",
+    "order_price": "$19.00"
+  }
+}
