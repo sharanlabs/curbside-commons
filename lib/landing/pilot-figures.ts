@@ -58,7 +58,7 @@ export const STATE = {
   preflightTool: "PROPOSED; not built",
   picker: "ARRIVES S4",
   csvIngestDrop: "BUILT; it reads named columns only",
-  jsonIngestDrop: "ARRIVES S1.5 (in progress)",
+  jsonIngestDrop: "BUILT 2026-10-31 (S1.5): declared keys only, on both paths",
   adapters: "ARRIVES S3",
 } as const;
 

@@ -77,9 +77,9 @@ Itemised +124 = scenarios 91 · gemini-pins 9 · listings-coverage-c6 +5 · ucp-
 | (b) 4 governance-model C10 overclaim | exec-layer | **verified `204ade5`** | C10 described as an explicit list + patterns + rendered scan; new probes "ARRIVE with S1.5" |
 | (a) 12 model-risk-register:38 marked-not-faked | exec-layer | **verified `204ade5`** | Audit/Evidence BUILT; Impact + ledger "MERGED 2026-10-31"; Route/Explain-drift "ARRIVE S2 (in progress)" |
 | (b) 5–14, 18, 19, 25 · (a) 14 stale labels · F14 one-pager · F3a register line | exec-layer | **verified `204ade5` / `a047b0e`** (grep: 0 register hits in the six docs; no endorsement/saved-$ phrasing) | lane commit `4a8c763`; orchestrator grep at the prefix merge |
-| (b) 15 plainLine register (`detectors.ts`) | S1.5 | pending the S1.5 merge | — |
-| (b) 20–22 scenarios README · (a) 7–9 pin/scenarios 2 and 6 | S1.5 | pending | — |
+| (b) 15 plainLine register (`detectors.ts`) | S1.5 → **S1.5b** | deferred by a correct stop: the change moves the bundled report hash pinned in 40 crew exam records | S1.5b does it in one regeneration after S2-crew |
+| (b) 20–22 scenarios README · (a) 8–9 scenarios 2 and 6 | S1.5 | **verified at the S1.5 merge** | README rows carry built / arrives, no lane jargon; folders exist with goldens; (a) 7 pin flip → S1.5b |
 | (c) gemini-pins RED proof header | S2-ledger | **verified `7e4f699`** | header carries the 2.5 → 2.6 red |
-| (c) c6 header restore sha | S1.5 | committed in-lane `17bddd5` | pending merge |
-| (d) endorsement sentence accepted by C10 | S1.5 probes | pending — must be red after the S1.5 merge | re-applied at merge |
+| (c) c6 header restore sha | S1.5 | **verified** | header carries the restore sha |
+| (d) endorsement sentence accepted by C10 | S1.5 probes | **verified at the S1.5 merge** | planted again in the worktree → 1 red in the new probe family; restored |
 | (a) 15 task-log inaccuracies | orchestrator | **done** | correction entry appended |
