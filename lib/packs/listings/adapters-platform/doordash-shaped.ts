@@ -34,8 +34,9 @@
  * both menus' windows; if the two listings state anything else differently, the
  * document is refused — the copy would be saying two things about one id.
  *
- * PRICE UNIT — cents inferred, not stated by DoorDash. The documentation pairs
- * integer prices with dollar amounts in prose and never names the unit. The unit
+ * PRICE UNIT — cents inferred, not stated by DoorDash. Its public partner
+ * documentation (read 2026-10-31) pairs integer prices with dollar amounts in
+ * prose and never names the unit. The unit
  * is therefore an explicit parameter, `priceUnit`, defaulting to "cents"; "dollars"
  * reads the same integers as whole dollars.
  *
@@ -79,7 +80,7 @@ import {
 export type DoorDashPriceUnit = "cents" | "dollars";
 
 export interface DoorDashShapedOptions {
-  /** Default "cents" — inferred, not stated by DoorDash. */
+  /** Default "cents" — inferred from the public partner documentation, which does not state the unit. */
   readonly priceUnit?: DoorDashPriceUnit;
   /** Default "price" (Delivery); "base_price" = Pickup / Storefront / Voice. */
   readonly priceField?: "price" | "base_price";
