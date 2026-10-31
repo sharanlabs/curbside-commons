@@ -12,7 +12,7 @@ import AxeBuilder from "@axe-core/playwright";
 
 // The product's whole surface: the four chapters plus the /docs reference. This
 // list is the site — if a route is added, it joins the zero-violation bar here.
-const SURFACES = ["/", "/report", "/fees", "/playground", "/proof", "/docs"] as const;
+const SURFACES = ["/", "/report", "/fees", "/playground", "/proof", "/docs", "/pilot"] as const; // /pilot added 2026-10-31 (exec-layer merge): outside the nav, still a served surface
 
 for (const path of SURFACES) {
   test(`axe: ${path} has zero WCAG A/AA violations`, async ({ page }) => {

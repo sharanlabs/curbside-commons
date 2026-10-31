@@ -20,7 +20,7 @@ import { test, expect } from "@playwright/test";
  */
 
 // Every served surface: the four chapters plus the /docs reference.
-const ROUTES = ["/", "/report", "/fees", "/playground", "/proof", "/docs"];
+const ROUTES = ["/", "/report", "/fees", "/playground", "/proof", "/docs", "/pilot"]; // /pilot added 2026-10-31 (exec-layer merge)
 const WIDTHS = [1280, 1440, 1728] as const;
 
 /** Minimum readable measure for sentence-length text (the /fees defect was 48px). */

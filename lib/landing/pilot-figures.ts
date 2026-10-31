@@ -50,7 +50,7 @@ export const STATE = {
   impactArithmetic: "MERGED 2026-10-31 as a library; shown in a run when S2 lands",
   ledger: "library MERGED 2026-10-31, and a run that writes to it ARRIVES S2 (in progress)",
   signing: "BUILT as an offline simulator",
-  rootCauseSeat: "ARRIVES S2 (in progress); shows DEFER until it passes an exam",
+  rootCauseSeat: "ARRIVES S2 (in progress); shows DEFER — no live exam inside this pilot (decision 2026-10-14); a deterministic explanation stands in",
   intakeReviewer: "BUILT; examined on one model only",
   slackEmail: "BUILT, not sent",
   partnerTicket: "ARRIVES S4",
