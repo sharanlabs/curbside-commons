@@ -137,6 +137,7 @@ const scannedFiles = [
   ...publicProse,
   ...siteShell,
   ...pilotDocs,
+  join(root, "SECURITY.md"),
   join(root, "bin", "check.mjs"),
   join(root, "fixtures", "README.md"),
   join(root, "fixtures", "synthetic-restaurant", "README.md"),

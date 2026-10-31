@@ -53,3 +53,34 @@ the typed tool registry. Its posture, stated plainly:
    **Revisit trigger:** the moment any network transport is added or the server is
    hosted for multiple clients, this exception is void and rate limiting must be
    implemented before that change ships.
+
+## Dependencies
+
+What the continuous-integration workflow (`.github/workflows/ci.yml`) now produces on every run, as one downloadable artifact named `supply-chain-audit-and-sbom` (kept 14 days, runtime dependencies only):
+
+- **`audit.json`** — the output of `npm audit --omit=dev --json`: known advisories against the packages the shipped code depends on. For now this step is **non-blocking**: it reports and never fails the build. Making it blocking is a recorded follow-up once the first run's advisories have been read.
+- **`sbom.cdx.json`** — a CycloneDX software bill of materials from `npm sbom --sbom-format cyclonedx --omit=dev`: every runtime package and version, as a machine-readable list.
+
+Read them from the run's page under **Actions**, in the **Artifacts** section at the bottom. Nothing here is a claim that the dependency tree is free of advisories; the audit file is what says so, run by run.
+
+Runtime dependency licenses, read from the installed packages (2026-10-31):
+
+| Dependency | Version | License |
+| --- | --- | --- |
+| @ai-sdk/google | 2.0.83 | Apache-2.0 |
+| @ai-sdk/groq | 2.0.45 | Apache-2.0 |
+| @modelcontextprotocol/sdk | 1.29.0 | MIT |
+| @number-flow/react | 0.6.1 | MIT |
+| ai | 5.0.217 | Apache-2.0 |
+| ajv | 8.20.0 | MIT |
+| ajv-formats | 3.0.1 | MIT |
+| class-variance-authority | 0.7.1 | Apache-2.0 |
+| clsx | 2.1.1 | MIT |
+| lucide-react | 0.555.0 | ISC |
+| next | 16.2.10 | MIT |
+| react | 19.2.7 | MIT |
+| react-dom | 19.2.7 | MIT |
+| tailwind-merge | 3.6.0 | MIT |
+| zod | 4.4.3 | MIT |
+
+These are the direct runtime dependencies; the SBOM lists the transitive ones.

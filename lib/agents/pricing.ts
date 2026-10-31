@@ -35,10 +35,37 @@
  * price. The page states it doubles on 2027-01-01 ($1.50 in / $7.50 out). This table is
  * date-free by design (a run's cost must be reproducible from the record), so the row MUST be
  * re-pinned, with a new PRICING_VERSION, before any live run on or after 2027-01-01.
+ *
+ * BUMPED 2026-10-31 (Wave 2 / S2-ledger): ONLY change is NEW rows — the $0 free-tier ids the
+ * crew uses (Groq free tier, local Ollama), each carrying `tier: "free"` and its documented limits
+ * as data. No existing price moved. Groq limits are as read from console.groq.com on 2026-10-12
+ * (plan § 8): RPM 30 · RPD 1,000 · TPM 8,000 · TPD 200,000 — RE-VERIFY AT USE (RULES §6); the
+ * daily-reset boundary is UNVERIFIED and the budget ledger treats the UTC date as the day.
+ * A $0 price is a PRICE, not an exemption: the budget ledger still counts every request and token
+ * against these limits (the 200K TPD cap binds long before the $5 cap ever could).
  */
-export const PRICING_VERSION = "2026-10-12";
+export const PRICING_VERSION = "2026-10-31";
 
-type ModelPrice = { inputPerMillionUsd: number; outputPerMillionUsd: number };
+/** Documented provider free-tier limits, kept as data next to the $0 row they govern. */
+export type FreeTierLimits = {
+  readonly rpm: number;
+  readonly rpd: number;
+  readonly tpm: number;
+  readonly tpd: number;
+};
+
+type ModelPrice = {
+  inputPerMillionUsd: number;
+  outputPerMillionUsd: number;
+  /** Present only on $0 rows. */
+  tier?: "free";
+  provider?: string;
+  /** null = no provider-side quota (local model). */
+  limits?: FreeTierLimits | null;
+};
+
+/** Groq free tier, console.groq.com read 2026-10-12 (plan § 8). Re-verify at use, RULES §6. */
+const GROQ_FREE_LIMITS: FreeTierLimits = { rpm: 30, rpd: 1_000, tpm: 8_000, tpd: 200_000 };
 
 /** Per-model USD price per 1,000,000 tokens, keyed on the BARE Gemini id. */
 export const GEMINI_PRICING: Record<string, ModelPrice> = {
@@ -51,7 +78,19 @@ export const GEMINI_PRICING: Record<string, ModelPrice> = {
   "gemini-2.5-flash": { inputPerMillionUsd: 0.3, outputPerMillionUsd: 2.5 },
   "gemini-2.5-flash-lite": { inputPerMillionUsd: 0.1, outputPerMillionUsd: 0.4 },
   "gemini-2.5-pro": { inputPerMillionUsd: 1.25, outputPerMillionUsd: 10 },
+  // $0 free-tier rows (2026-10-31). Groq free tier (no card): the crew's hosted open-weight seats.
+  "openai/gpt-oss-120b": { inputPerMillionUsd: 0, outputPerMillionUsd: 0, tier: "free", provider: "groq", limits: GROQ_FREE_LIMITS },
+  "openai/gpt-oss-20b": { inputPerMillionUsd: 0, outputPerMillionUsd: 0, tier: "free", provider: "groq", limits: GROQ_FREE_LIMITS },
+  "qwen/qwen3.8-27b": { inputPerMillionUsd: 0, outputPerMillionUsd: 0, tier: "free", provider: "groq", limits: GROQ_FREE_LIMITS },
+  // Local Ollama (tier D): no money and no provider quota; still counted by the ledger.
+  "gpt-oss:20b": { inputPerMillionUsd: 0, outputPerMillionUsd: 0, tier: "free", provider: "ollama", limits: null },
+  "qwen3:8b": { inputPerMillionUsd: 0, outputPerMillionUsd: 0, tier: "free", provider: "ollama", limits: null },
 };
+
+/** The documented free-tier limits for a model id (null for a local or paid model, or an unknown id). */
+export function freeTierLimits(model: string): FreeTierLimits | null {
+  return GEMINI_PRICING[bareModelId(model)]?.limits ?? null;
+}
 
 /** Strip a "models/" prefix so a prefixed id still keys the table. */
 function bareModelId(model: string): string {
