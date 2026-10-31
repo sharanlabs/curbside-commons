@@ -1,6 +1,6 @@
 # Governance model — who decides, who recommends, who signs
 
-**Type:** explanation + reference (Diátaxis) · **Audience:** a platform's risk, operations and compliance readers · **Status:** written 2026-10-12, Wave 1 / S4-docs · **Source of the contracts below:** `docs/plan-menu-integrity-crew-2026-10-09.md` §§ 5, 6, 17 as amended by `docs/plan-wave2-gap-sheet-2026-10-12.md` (pages 1–3) and the 2026-10-12 entries in `docs/decision-log.md`. `RULES.md` wins over this file.
+**Type:** explanation + reference (Diátaxis) · **Audience:** a platform's risk, operations and compliance readers · **Status:** written 2026-10-12, Wave 1 / S4-docs · **Source of the contracts below:** `docs/plan-menu-integrity-crew-2026-10-09.md` §§ 5, 6, 17 as amended by `docs/plan-wave2-gap-sheet-2026-10-12.md` (pages 1–3) and the 2026-10-12 entries in `docs/decision-log.md`. `RULES.md` wins over this file. · **Corrected:** 2026-10-31, Wave 2 / exec-layer, from the Wave 1 acceptance review (`docs/reviews/wave1-acceptance-2026-10-31.md`, items 4–7).
 
 ## The answer first
 
@@ -10,7 +10,7 @@ Curbside Commons is a **human-gated, sequential workflow** that checks a deliver
 2. **Agents recommend.** AI "seats" triage and explain in a separate envelope. They cannot flip a verdict, and every one carries a label earned per model, or the word DEFER.
 3. **Humans approve.** Anything that would act needs a signed human decision. In the pilot the product **proposes at most; it never acts** (Tier 1, below).
 
-*In plain words:* a calculator does the judging, a rule table decides who should look at a finding, an AI assistant is only allowed to say "approve this routing" or "hand it to a person", and a named person signs before anything happens. The AI cannot overrule the calculator, and the pilot stops before anything is changed.
+*In plain words:* a calculator does the judging, a rule table (arriving in S2) decides who should look at a finding, an AI assistant is only allowed to say "approve this routing" or "hand it to a person", and a named person signs a proposal; nothing acts. The AI cannot overrule the calculator, and the pilot stops before anything is changed.
 
 **Decoder (first use).** *Verdict* — the engine's pass or fail on one comparison, with evidence. *Receipt* — the evidence attached to a finding: the claim, the reference row, the rule id, the severity. *Seat* — one role in the crew (some are deterministic code, some are model-driven). *Drift* — the platform's copy of a menu no longer matching the merchant's record. *DEFER* — the honest label for "this has not passed its exam on this model". Terms of art are also in [`GLOSSARY.md`](GLOSSARY.md).
 
@@ -26,8 +26,9 @@ Curbside Commons is a **human-gated, sequential workflow** that checks a deliver
 
 | Mark | Meaning |
 | --- | --- |
-| **BUILT** | Exists on `main` at `fac8204`, with a test in the repo. |
-| **ARRIVES S\<n\>** | Planned for slice *n* (plan § 12 and the gap sheet). Not on the site or CLI today. |
+| **BUILT** | Exists on `main` as of `cd0d347` (2026-10-31, Wave 1 merged), with a test in the repo. |
+| **MERGED 2026-10-31** | Landed on `main` the night of 2026-10-31 (Wave 2) as a library with its own tests; not yet wired into a crew run, the site or the CLI. |
+| **ARRIVES S\<n\>** | Planned for slice *n* (plan § 12 and the gap sheet). Not on the site or CLI today. "(in progress)" marks a slice being built the night of 2026-10-31. |
 | **OWED** | Named in plan § 6 as to-add, with no slice assigned. |
 
 Nothing marked ARRIVES or OWED is a capability today. Read those rows as the roadmap and nothing more.
@@ -42,7 +43,7 @@ Nothing marked ARRIVES or OWED is a capability today. Read those rows as the roa
 | **Humans** | Approve, or refuse, anything that would act | Ed25519-signed; bound to the role, to the content and to the run digest; replay- and expiry-checked (seven ordered checks) | BUILT as an offline simulator (`lib/approvals/`); a console surface for it is not on the site today |
 | **The platform** | Governs changes to the rules | Change control: the drift-lock fails the build when code and rulebook disagree; a dated freshness check and a named approver are to be added | Drift-lock BUILT for the fee rule table (`evals/packs/fees-drift-lock.test.ts`) · freshness check and named approver OWED |
 
-**Why routing is a rule table and not a model decision.** The reviewer seat earned its label on one narrow surface: approve or escalate (`docs/crew-live-l1-status.md`). Routing is a different decision, and wearing the old label on it would overstate what was measured. A rule table is also what an operations lead can read and audit. The reviewer sees the computed route and may only approve or escalate it. Any escalation, any injection anomaly and any Tier-2 or Tier-3 request goes to `human-escalation` regardless of the table.
+**Why routing is a rule table and not a model decision.** The reviewer seat earned its label on one narrow surface: approve or escalate (`docs/crew-live-l1-status.md`). Routing is a different decision, and wearing the old label on it would overstate what was measured. A rule table is also what an operations lead can read and audit. Once the route table lands (S2, in progress), the reviewer sees the computed route and may only approve or escalate it. Any escalation, any injection anomaly and any Tier-2 or Tier-3 request goes to `human-escalation` regardless of the table.
 
 ## 2 · The crew — roster and labels
 
@@ -53,14 +54,14 @@ The roster follows plan § 5, **amended 2026-10-12** in two places by the gap sh
 | Intake | LLM (exists; floors cleared 2026-07-07) | the trigger + scenario brief | which tool to run, scoped | agent (live-run floors cleared) · DEFER on an un-examined model |
 | Audit | deterministic (exists) | feed · record · map | the verifier report | deterministic workflow |
 | Evidence | deterministic (exists) | the report | receipts bundle, report hash | deterministic workflow |
-| **Explain-drift** *(amended)* | deterministic (NEW, S2) | findings + a scenario event log (who changed what, when) | a timestamp-and-actor explanation of why a finding exists | deterministic workflow; **this is what the pilot shows under "why"** |
-| **Root-cause** *(amended)* | LLM (NEW, S2) | findings + the event log, pre-summarised deterministically (findings and events only, no raw text) | one of {sync-latency, merchant-edit, integrator-bug, platform-override, encoding, unknown} + a cited reason | advisory; **renders DEFER on its face until it has sat a pre-registered exam** (floors in the register) · never gates |
-| **Impact** | deterministic (NEW, S2) | findings + scenario order velocity | orders at risk · refund $ · error-charge exposure · agent-cancel exposure, with the arithmetic | labeled simulated; every number derived |
-| **Route** *(amended)* | deterministic (NEW, S2) | trigger kind · finding categories · max severity · pack | merchant-ops, partner or compliance, plus the artifact set | deterministic workflow |
+| **Explain-drift** *(amended)* | deterministic (ARRIVES S2, in progress) | findings + a scenario event log (who changed what, when) | a timestamp-and-actor explanation of why a finding exists | deterministic workflow; **this is what the pilot is designed to show under "why" once it lands** |
+| **Root-cause** *(amended)* | LLM (ARRIVES S2, in progress) | findings + the event log, pre-summarised deterministically (findings and events only, no raw text) | one of {sync-latency, merchant-edit, integrator-bug, platform-override, encoding, unknown} + a cited reason | advisory; **renders DEFER on its face until it has sat a pre-registered exam** (floors in the register) · never gates |
+| **Impact** | deterministic (arithmetic MERGED 2026-10-31 as `lib/impact`; wired into a crew run ARRIVES S2, in progress) | findings + scenario order velocity | orders at risk · refund $ · error-charge exposure · agent-cancel exposure, with the arithmetic | labeled simulated; every number derived |
+| **Route** *(amended)* | deterministic (ARRIVES S2, in progress) | trigger kind · finding categories · max severity · pack | merchant-ops, partner or compliance, plus the artifact set | deterministic workflow |
 | Reviewer *(amended)* | LLM (exists; floors cleared) | all of the above, including the computed route | approve or escalate that route | agent (live-run floors cleared), on approve and escalate only |
 | Approval | human, signed (exists as simulator) | a proposal bound to the run digest | a signed decision or a refusal | the only path to "executed = recorded" |
 
-**Honest label for the whole.** In the vocabulary of the major model vendors' published agent-design guidance (plan § 16), the crew is a **sequential workflow with bounded LLM seats**, not an autonomous agent. The engine and the rule tables do the judging and the routing. That is the label it carries.
+**Honest label for the whole.** In the vocabulary of the major model vendors' published agent-design guidance (Anthropic, *Building effective agents* and *Common workflow patterns*; OpenAI, *A practical guide to building agents*; as read for plan § 16 on 2026-10-09, not re-read by this lane), the crew is a **sequential workflow with bounded LLM seats**, not an autonomous agent. The engine does the judging; the route table, when it lands in S2, does the routing. That is the label it carries.
 
 **Where the per-model exam state lives:** [`model-risk-register.md`](model-risk-register.md). A seat's label is per (seat, model); the register is the table that says which pairs have sat their exam.
 
@@ -71,7 +72,7 @@ The catalog a risk team asks for. **The pilot stops at Tier 1.**
 | Tier | Name | What it covers | Status in this prototype |
 | --- | --- | --- | --- |
 | **0** | notify | Slack / email / partner-ticket artifacts. A transport, if ever wired, is per-channel, allow-listed, owner-armed. | Slack and email builders BUILT, **not sent**; the partner-ticket builder ARRIVES S4 |
-| **1** | propose | 86 an item · force re-sync · hold an item on the agent surface · open a partner ticket. Proposed with receipts and impact; requires a signed human decision; "executed" = a ledger record. | Signed-approval simulator BUILT; the ledger that records "executed" ARRIVES S2 |
+| **1** | propose | 86 an item · force re-sync · hold an item on the agent surface · open a partner ticket. Proposed with receipts and impact; requires a signed human decision; "executed" = a ledger record. | Signed-approval simulator BUILT; the run-ledger library MERGED on `main` 2026-10-31 (`lib/ledger`); a crew run that writes to it ARRIVES S2 (in progress) |
 | **2** | act on a completed, human-approved audit | e.g. calling a platform API to 86 an item. Permitted in principle by `docs/decisions/crew-acts-2026-07-26.md`; **out of scope here**; never from inside an audit. | Not built, not planned for the pilot |
 | **3** | never | Amend a merchant record · issue a credit · file a dispute or complaint on anyone's behalf. | Prohibited |
 
@@ -83,7 +84,7 @@ flowchart LR
   E --> V[Reviewer: approve or escalate<br/>BUILT]
   V --> N[Tier 0 · notify<br/>artifact built, not sent]
   V --> P[Tier 1 · propose<br/>needs a signed human decision]
-  P --> L[(Ledger record<br/>ARRIVES S2)]
+  P --> L[(Ledger record<br/>library MERGED 2026-10-31 · run wiring ARRIVES S2)]
   P -. out of scope .-> T2[Tier 2 · act]
   T3[Tier 3 · never]
 ```
@@ -95,12 +96,12 @@ Each row: what exists today, what the plan adds.
 | Control | Exists today (BUILT) | To add | Status of the addition |
 | --- | --- | --- | --- |
 | **Evidence** | Claim · reference row · rule id · severity on every finding, enforced by construction | The id-mapping sheet cited as a reference row when it resolves an identity | ARRIVES S3 |
-| **Model risk** | Per-seat model pin · a pre-call budget guard (a fail-closed estimate; see below) · injection tripwire before any model turn (`lib/crew/injection-scan.ts`) · report-hash pin when a model touched the run · eval-locks | [`model-risk-register.md`](model-risk-register.md) and a re-exam rule on any model change · a post-call overflow stop · a provider canary | Register and re-exam rule written; exams fill it in S5 · post-call stop ARRIVES S2 (budget truth) · canary ARRIVES S5 |
+| **Model risk** | Per-seat model pin · a pre-call budget guard (a fail-closed estimate; see below) · injection tripwire before any model turn (`lib/crew/injection-scan.ts`) · report-hash pin when a model touched the run · eval-locks | [`model-risk-register.md`](model-risk-register.md) and a re-exam rule on any model change · a post-call overflow stop · a provider canary | Register and re-exam rule written; exams fill it in S5 · post-call stop MERGED 2026-10-31 (`settleCall`, budget truth), not yet wired to a live driver · canary ARRIVES S5 |
 | **Data** | Nothing leaves the tab or machine in site mode, proven by import-graph tests | A data-classification sheet · an ingest rule that drops any customer field from a platform export, with a planted-field test · a retention rule · a one-page data-handling statement | Classification, retention and handling statement written in `pilot-kit/data-request-spec.md` and `pilot-kit/security-one-pager.md`; the ingest rule (allow-list, drop by default) and its test ARRIVE S3 |
-| **Audit trail** | Report hash and the receipts bundle | The run ledger: inputs hashed · rule versions · model versions · recommendations · signer · timestamp, exportable as JSON-lines, hash-chained | ARRIVES S2 |
+| **Audit trail** | Report hash and the receipts bundle | The run ledger: inputs hashed · rule versions · model versions · recommendations · signer · timestamp, exportable as JSON-lines, hash-chained | Library MERGED 2026-10-31 (`lib/ledger`); a crew run that writes to it ARRIVES S2 (in progress) |
 | **Operational** | Manual trigger only; no scheduler; no standing process | An incident and rollback note · an escalation path · a RACI across merchant-ops, integrations and compliance | Written in §§ 5–7 below |
 
-**An honest limit on the budget guard.** The live path's cap is a **pre-call estimate**. It reserves a conservative cost before each call and refuses the call if the reservation would breach the cap. The paired **post-call overflow stop**, which halts a run when a call bills above its reservation, exists only in the archived legacy orchestrator; **no active driver is wired to the guard today**, and the post-call stop must be re-implemented before any live arming (header of `lib/agents/budget.ts`). Under the 2026-10-12 free-only gate the product runs on free tiers and free local models, so the guard is a fail-safe and not a spend allowance. Free tiers have their own rate ceilings; those are recorded in the register.
+**An honest limit on the budget guard.** The live path's cap is a **pre-call estimate**. It reserves a conservative cost before each call and refuses the call if the reservation would breach the cap. The paired **post-call overflow stop**, which halts a run when a call bills above its reservation, was re-implemented as `settleCall` in `lib/agents/budget.ts` and MERGED on `main` 2026-10-31; **no active driver is wired to the guard or to that stop today**, and both must be wired before any live arming (`lib/agents/budget.ts`). Under the 2026-10-12 free-only gate the product runs on free tiers and free local models, so the guard is a fail-safe and not a spend allowance. Free tiers have their own rate ceilings; those are recorded in the register.
 
 ## 5 · Who is responsible for what (RACI — a template)
 
@@ -143,7 +144,7 @@ The pilot kit in [`pilot-kit/`](pilot-kit/README.md) carries the working documen
 
 | RMF function (plain gloss) | Where this project carries it | Status |
 | --- | --- | --- |
-| **GOVERN** (who is accountable, under what policy) | Decision rights (§ 1) · action tiers (§ 3) · RACI (§ 5) · rule change control (§ 6) · honesty rules in `RULES.md` §4 · the C10 gate that scans every public sentence | Written and tested where marked BUILT; RACI is a template |
+| **GOVERN** (who is accountable, under what policy) | Decision rights (§ 1) · action tiers (§ 3) · RACI (§ 5) · rule change control (§ 6) · honesty rules in `RULES.md` §4 · the C10 gate: eight affirmative-overclaim patterns run over an **explicit list of files** and over the visible text of every built page. It is a pattern scan, not a semantic review: it does not read page metadata or accessibility attributes, and its eight patterns do not cover claims of endorsement, of approval or of money recovered (probes for those ARRIVE S1.5, in progress). A human claim-to-evidence read is the other half (Codex cross-check 2026-10-12, § 5) | Written and tested where marked BUILT; RACI is a template |
 | **MAP** (what the system is for, and what can go wrong) | Use case and personas (plan § 17) · scenario library of eight drift stories (plan § 9) · data-classification sheet · the "what we are not claiming" boxes | Written; scenarios ARRIVE S1–S4 |
 | **MEASURE** (evidence the system works, per model) | Pre-registered floors, eval-locks and burned splits · the model-risk register (label per seat and model) · derived-figures rule (no typed number) · deterministic baselines the model seats must beat | BUILT for intake, reviewer and the fee classifier; root-cause exam ARRIVES S5 |
 | **MANAGE** (acting on risk, and recovering) | Tiers 0–3 · signed approval · DEFER on an un-examined model · escalation to a human · counter-decision, never edit · injection tripwire · the ledger | Mixed; each row marks BUILT, ARRIVES or OWED |
@@ -156,4 +157,4 @@ The pilot kit in [`pilot-kit/`](pilot-kit/README.md) carries the working documen
 - Crew-acts decision: `docs/decisions/crew-acts-2026-07-26.md`.
 - Seat exam records: `docs/crew-live-l1-status.md` (intake and reviewer).
 - NIST: link above, fetched 2026-10-12.
-- Honesty rules: `RULES.md` §§ 4, 6, 8. The C10 gate (`evals/packs/honesty-c10.test.ts`) scans this file for affirmative overclaims.
+- Honesty rules: `RULES.md` §§ 4, 6, 8. The C10 gate (`evals/packs/honesty-c10.test.ts`) scans this file, by its entry in an explicit file list, for eight affirmative-overclaim patterns. It does not prove the absence of every overclaim; see the GOVERN row in § 9.

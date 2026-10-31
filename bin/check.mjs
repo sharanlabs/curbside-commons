@@ -45,6 +45,20 @@ Usage:
       spec-faithful simulated agent follows a spec-valid but false surface; the
       verifier catches the surface/SOR mismatch. Deterministic, $0, zero-config.
       Prints plain text, or the machine transcript with --json. Always exit 0.
+  scenario <id> [--json] [--root <dir>]
+  scenario --list [--root <dir>]
+      SCENARIO leg: run one labeled scenario folder (fixtures/scenarios/<id>/)
+      through the engine and compare the result byte-for-byte to its committed
+      expectation; prints the figures the brief states. Exit 0 = matches,
+      1 = differs, 2 = unknown id / unreadable input. --list prints every folder
+      present. Deterministic, $0, no model call. --root is for tests (default:
+      this repo).
+  ledger verify <file> [--checkpoint <seq>:<hash>]
+  ledger checkpoint <file>
+  ledger diff <a> <b>
+      LEDGER leg: verify a run ledger's hash chain (exit 0 ok, 1 broken, 2 bad
+      input); print the seq:hash to record out of band; or compare two ledgers run
+      by run. Read-only: nothing here writes a ledger.
   help
       Show this message.
 
@@ -131,6 +145,86 @@ async function main(argv) {
     try {
       const { runFeeCheck } = await import("../lib/packs/fees/cli.ts");
       const result = runFeeCheck(positionals[0], { json });
+      process.stdout.write(result.output);
+      return result.exitCode;
+    } catch (err) {
+      process.stderr.write(`check: ${err instanceof Error ? err.message : String(err)}\n`);
+      return 2;
+    }
+  }
+
+  // SCENARIO leg: one labeled scenario through the engine vs its committed golden.
+  if (cmd === "scenario") {
+    let json = false;
+    let list = false;
+    let root = new URL("..", import.meta.url).pathname;
+    const positionals = [];
+    for (let i = 1; i < args.length; i++) {
+      const arg = args[i];
+      if (arg === "--json") json = true;
+      else if (arg === "--list") list = true;
+      else if (arg === "--root") {
+        if (!args[i + 1]) {
+          process.stderr.write(`check: "--root" needs a directory\n\n${USAGE}`);
+          return 2;
+        }
+        root = args[++i];
+      } else if (arg.startsWith("--")) {
+        process.stderr.write(`check: "scenario" accepts only --list, --json and --root (got "${arg}")\n\n${USAGE}`);
+        return 2;
+      } else positionals.push(arg);
+    }
+    if (list ? positionals.length !== 0 : positionals.length !== 1) {
+      process.stderr.write(`check: "scenario" needs exactly ONE <id>, or --list\n\n${USAGE}`);
+      return 2;
+    }
+    try {
+      const mod = await import("../lib/cli/scenario.ts");
+      if (list) {
+        const rows = mod.listScenarios(root);
+        process.stdout.write(json ? `${JSON.stringify(rows, null, 2)}\n` : mod.renderScenarioList(rows));
+        return 0;
+      }
+      const run = mod.runScenario(root, positionals[0]);
+      process.stdout.write(json ? `${JSON.stringify(run, null, 2)}\n` : mod.renderScenarioRun(run));
+      return run.goldenMatch ? 0 : 1;
+    } catch (err) {
+      process.stderr.write(`check: ${err instanceof Error ? err.message : String(err)}\n`);
+      return 2;
+    }
+  }
+
+  // LEDGER leg: read-only verbs over a run ledger file.
+  if (cmd === "ledger") {
+    const sub = args[1];
+    const rest = args.slice(2);
+    let cpArg;
+    const positionals = [];
+    for (let i = 0; i < rest.length; i++) {
+      if (rest[i] === "--checkpoint" && sub === "verify") {
+        if (!rest[i + 1]) {
+          process.stderr.write(`check: "--checkpoint" needs <seq>:<hash>\n\n${USAGE}`);
+          return 2;
+        }
+        cpArg = rest[++i];
+      } else if (rest[i].startsWith("--")) {
+        process.stderr.write(`check: unknown flag "${rest[i]}" for "ledger ${sub ?? ""}"\n\n${USAGE}`);
+        return 2;
+      } else positionals.push(rest[i]);
+    }
+    const need = sub === "diff" ? 2 : 1;
+    if (!["verify", "checkpoint", "diff"].includes(sub) || positionals.length !== need) {
+      process.stderr.write(`check: usage: ledger verify <file> | ledger checkpoint <file> | ledger diff <a> <b>\n\n${USAGE}`);
+      return 2;
+    }
+    try {
+      const mod = await import("../lib/cli/ledger.ts");
+      const result =
+        sub === "verify"
+          ? mod.ledgerVerify(positionals[0], cpArg === undefined ? undefined : mod.parseCheckpointArg(cpArg))
+          : sub === "checkpoint"
+            ? mod.ledgerCheckpoint(positionals[0])
+            : mod.ledgerDiff(positionals[0], positionals[1]);
       process.stdout.write(result.output);
       return result.exitCode;
     } catch (err) {

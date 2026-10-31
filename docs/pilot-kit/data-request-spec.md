@@ -26,7 +26,7 @@ If a platform later deploys the tool on its own data — a **separate decision**
 
 | # | Input | What it is | Format | Status of the reader |
 | --- | --- | --- | --- | --- |
-| 1 | **The platform's copy of the menu** for the pilot cohort | What the marketplace shows: items, variations, prices, availability, modifier groups and options with their prices | The spreadsheet shape the site's template already uses (`menu-as-published.csv`, matched on `item_id`) today; platform-shaped JSON adapters arrive in S3 | Spreadsheet path BUILT; platform-shaped adapters ARRIVE S3; modifier checks ARRIVE S1 |
+| 1 | **The platform's copy of the menu** for the pilot cohort | What the marketplace shows: items, variations, prices, availability, modifier groups and options with their prices | The spreadsheet shape the site's template already uses (`menu-as-published.csv`, matched on `item_id`) today; platform-shaped JSON adapters arrive in S3 | Spreadsheet path BUILT; modifier checks (option price, missing option) BUILT in the listings engine (S1); platform-shaped adapters ARRIVE S3 |
 | 2 | **The merchant's record** | What the merchant holds: the same items and prices, stock, an as-of date | The site's second template (`menu-record.csv`) today, or a point-of-sale read | Spreadsheet path BUILT |
 | 3 | **An id-mapping sheet** | A human-owned, versioned table that says which marketplace id is which record id, so no id is guessed | CSV | ARRIVES S3 |
 | 4 | **The platform's own order-error export** | The platform's own instrument for order errors (the public documentation of one platform's Order Errors CSV lists issue type, item in error, refund, merchant charge and platform-absorbed amount; plan § 3, read 2026-10-09) | CSV, with customer fields **removed by the platform before the tool sees it** | Reader ARRIVES S3 |
@@ -43,16 +43,16 @@ If a platform later deploys the tool on its own data — a **separate decision**
 | **C2** | Order-level business records with **no person identifiers**: order id, timestamp, channel (app or agent), line items, status, refund amount, reason code | **Only as needed** to size impact | Stays inside the platform's environment; strip any person identifier first |
 | **C3** | Personal data about a customer, courier or merchant staff member: names, addresses, phone numbers, email addresses, payment details, device or account identifiers, free-text notes that can identify a person | **Never** | Removed by the platform **before** the export; and dropped by the tool's ingest allow-list as a second line |
 
-**The second line of defence (ARRIVES S3).** The ingest allow-list works by **dropping by default**: only named columns are read, and anything else is discarded and counted. A planted-customer-field test proves a deliberately planted personal field does not survive ingest (gap sheet page 5). **Today this rule is not built.** Until S3, do not feed any export that contains C3.
+**The second line of defence (ARRIVES S3).** The ingest allow-list works by **dropping by default**: only named columns are read, and anything else is discarded and counted. A planted-customer-field test **would** prove that a deliberately planted personal field does not survive ingest (planned, gap sheet page 5). **Today neither the rule nor its test is built.** Until S3, do not feed any export that contains C3.
 
 **Free text is the risk.** A notes or comments column can hold a person's name or address even when no column is named for it. The allow-list drops unnamed columns; the platform should also drop free-text columns it does not need.
 
 ## 4 · What the tool does with the data
 
 - **Reads** it in the tab or on the operator's machine. In a future platform-side deployment nothing is sent to us or to any model host.
-- **Writes** a run ledger on the operator's machine (ARRIVES S2): hashed inputs, rule versions, model versions, recommendations, signer, timestamp. The ledger is local, append-only and exportable as JSON-lines.
+- **Writes** a run ledger on the operator's machine (the run-ledger library MERGED on `main` 2026-10-31 (`lib/ledger`); a crew run that writes to it ARRIVES S2 (in progress)): hashed inputs, rule versions, model versions, recommendations, signer, timestamp. The ledger is local, append-only and exportable as JSON-lines.
 - **Builds** Slack, email and partner-ticket artifacts. **It does not send them.**
-- **Carries** a deployment provenance label on every artifact in a future platform-side run (ARRIVES S3). Our pilot artifacts remain synthetic.
+- **Would carry** a deployment provenance label on every artifact in a future platform-side run. That label belongs to the separate deployment decision and is not planned in any current slice (the input-provenance flag was dropped from S3 on 2026-10-14, `docs/decision-log.md`). Our pilot artifacts remain synthetic.
 
 ## 5 · Retention and deletion
 

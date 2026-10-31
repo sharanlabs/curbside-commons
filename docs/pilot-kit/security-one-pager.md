@@ -34,8 +34,8 @@ The tool runs in **one of three modes**. In two of them no data leaves the machi
 | **Nothing is sent** | The Slack and email builders produce payloads; no send transport is wired into the site, CLI or MCP tools | BUILT |
 | **Anything that would act needs a signed human decision** | Offline Ed25519 approval simulator with seven ordered checks (`lib/approvals/`) | BUILT as a simulator |
 | **Prompt-injection tripwire before any model turn** | `lib/crew/injection-scan.ts`; hardening for Unicode normalization and multilingual and Base64 payloads | Tripwire BUILT; hardening ARRIVES S3 |
-| **Customer fields are dropped at ingest** | Allow-list, drop by default, with a planted-field test | ARRIVES S3 |
-| **A run record exists** | Hash-chained, append-only ledger, exportable as JSON-lines | ARRIVES S2 |
+| **Customer fields are dropped at ingest** | Allow-list, drop by default, with a planted-field test. The spreadsheet (CSV) path already reads only named columns and drops the rest (`lib/playground/csv-adapters.ts`). The JSON feed path does not yet project nested keys: a planted `customer_email` inside a `modifiers[]` object passes into the report today (security review F4, 2026-10-31) | CSV: BUILT; JSON: ARRIVES with S1.5 (in progress) |
+| **A run record exists** | Hash-chained, append-only ledger, exportable as JSON-lines | Library MERGED on `main` 2026-10-31 (`lib/ledger`); a crew run that writes to it ARRIVES S2 (in progress) |
 | **No secrets in the repo** | `RULES.md` §11; `.env.example` is the template; contact data is fake | Rule; checked by review |
 | **License** | Apache-2.0 (`LICENSE`; `package.json`) | BUILT |
 | **Dependencies are listed** | `package.json` `dependencies`. No analytics or telemetry SDK appears there at commit `fac8204`. | BUILT |
@@ -44,7 +44,7 @@ The tool runs in **one of three modes**. In two of them no data leaves the machi
 ## 3 · Known gaps, stated
 
 - **No Content-Security-Policy header today.** Production verification on 2026-10-09 found four security headers plus HSTS on a subpath and **no CSP** (plan § 12, S0).
-- **The live budget guard is a pre-call estimate.** No active driver is wired to it, and the post-call overflow stop must be re-implemented before any live arming. See `docs/model-risk-register.md` § 5.
+- **The live budget guard is a pre-call estimate.** No active driver is wired to it. The post-call overflow stop merged as a library function on 2026-10-31 and must be wired before any live arming. See `docs/model-risk-register.md` § 5.
 - **Hosted model ids are unpinned.** Provider behavior can drift between runs; replay is what keeps a walkthrough stable. A canary arrives in S5.
 - **Hosting-provider logs are outside this repo.** The static site is hosted on a free hosting tier. What request logging the provider keeps for the project is **UNVERIFIED**; the site itself ships no analytics SDK.
 - **The local-model path (Tier D) has not been smoke-tested.** That run on the owner's machine arrives in S5.
