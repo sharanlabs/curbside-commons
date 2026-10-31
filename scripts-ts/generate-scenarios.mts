@@ -2,10 +2,15 @@
  * Scenario-library generator — Wave 1 / lane 3 (docs/plan-menu-integrity-crew-2026-10-09.md
  * §9 + Appendix W1c; events.jsonl per docs/plan-wave2-gap-sheet-2026-10-12.md p.2).
  *
- * Builds fixtures/scenarios/<id>/ for the five scenarios that need NO new detector:
- *   agent-86 · sync-outage · platform-override · partner-onboarding · fee-precheck
- * Each folder: brief.md · inputs/ (feed+record+events | statement+events) ·
- * expected/ (the engine report only) · manifest.json.
+ * Builds fixtures/scenarios/<id>/ for the seven scenarios built so far:
+ *   agent-86 · modifier-drift · sync-outage · platform-override ·
+ *   partner-onboarding · spec-valid-lie · fee-precheck
+ * (modifier-drift and spec-valid-lie added by Wave 2 lane S1.5, 2026-10-31, on
+ * the S1 menu model and the UCP wire builder; generator 1.0.0 → 1.1.0, the five
+ * earlier scenarios' PRNG consumption untouched.)
+ * Each folder: brief.md · inputs/ (feed+record+events | statement+events; plus
+ * the UCP wire document for spec-valid-lie) · expected/ (the engine report
+ * only) · manifest.json.
  *
  * Every input is a deterministic, seeded transformation of the committed
  * fixtures/synthetic-restaurant corpus (READ-ONLY here — never written). Inputs
@@ -15,16 +20,16 @@
  * evals/packs/scenarios.test.ts regenerates in memory, byte-compares, and
  * re-derives the figures independently.
  *
- * Out of scope here, by design: root-cause · impact · route · turns (S2). The
- * scenarios `modifier-drift` and `spec-valid-lie` are built by the S1 lane.
+ * Out of scope here, by design: root-cause · impact · route · turns (S2) and
+ * `injected-artifact` (S3).
  *
  * Run: node scripts-ts/generate-scenarios.mts        (Node ≥ 24; writes fixtures/scenarios/)
  * Import: `buildScenarioFiles()` is pure (reads the base corpus, writes nothing).
  *
- * Plain: one recipe that rebuilds five labeled, synthetic test cases — each a
+ * Plain: one recipe that rebuilds seven labeled, synthetic test cases — each a
  * small story, the data behind it, and what the existing checker says about it.
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
@@ -32,12 +37,19 @@ import {
   CORPUS_SEED,
   LISTINGS_SPEC_VERSION,
   acpFeedToClaims,
+  applyModifierPriceDrift,
+  buildUcpSearchResponse,
   centsToDecimal,
   mulberry32,
+  projectModifier,
+  recordModifierOptions,
   runListingsVerification,
+  ucpSearchResponseToClaims,
   type AcpFeed,
   type SyntheticCatalog,
+  type UcpSearchResponse,
 } from "../lib/packs/listings/index.ts";
+import { runUcpConformance } from "../lib/packs/listings/conformance.ts";
 import {
   FEES_SPEC_VERSION,
   auditStatement,
@@ -48,24 +60,36 @@ import {
 import { serializeReport } from "../lib/verifier-core/verify.ts";
 import type { VerifierReport } from "../lib/verifier-core/report.ts";
 
-export const GENERATOR_VERSION = "1.0.0";
-export const SCENARIO_IDS = ["agent-86", "sync-outage", "platform-override", "partner-onboarding", "fee-precheck"] as const;
+export const GENERATOR_VERSION = "1.1.0";
+export const SCENARIO_IDS = [
+  "agent-86",
+  "modifier-drift",
+  "sync-outage",
+  "platform-override",
+  "partner-onboarding",
+  "spec-valid-lie",
+  "fee-precheck",
+] as const;
 export type ScenarioId = (typeof SCENARIO_IDS)[number];
 
 /** Plan §9 numbering (agent-86 = 1 … fee-precheck = 7). */
 const NUMBER: Record<ScenarioId, number> = {
   "agent-86": 1,
+  "modifier-drift": 2,
   "sync-outage": 3,
   "platform-override": 4,
   "partner-onboarding": 5,
+  "spec-valid-lie": 6,
   "fee-precheck": 7,
 };
 /** One pinned seed per scenario (distinct from the corpus seed 20260703). */
 const SEED: Record<ScenarioId, number> = {
   "agent-86": 20261001,
+  "modifier-drift": 20261002,
   "sync-outage": 20261003,
   "platform-override": 20261004,
   "partner-onboarding": 20261005,
+  "spec-valid-lie": 20261006,
   "fee-precheck": 20261007,
 };
 
@@ -77,6 +101,12 @@ const OVERRIDE_HOURS = 48; // platform-override: how long before as-of the manua
 const N_ITEMS_EDITED = 6; // platform-override: items edited by hand
 const N_ROWS_DRIFTED = 6; // partner-onboarding: rows of the partner feed that drift
 const N_EXTRA_ORDERS = 5; // fee-precheck: orders added to the faithful two
+const N_ITEMS_MOD = 2; // modifier-drift: items whose add-on the merchant repriced
+const RECORD_OPTION_CENTS = 150; // modifier-drift: the record's new add-on price (+$1.50)
+const COPY_OPTION_CENTS = 200; // modifier-drift: the add-on price the stale copy still serves (+$2.00)
+const MOD_SYNC_HOURS = 24; // modifier-drift: the copy's last sync, before the reprice
+const N_LIE_ROWS = 2; // spec-valid-lie: answered rows whose price the record does not have
+const LIE_STEP_CENTS = 100; // spec-valid-lie: each lie lifts a price by 1–3 of these
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const baseDir = join(root, "fixtures", "synthetic-restaurant");
@@ -410,6 +440,164 @@ function buildPartnerOnboarding(): Built {
   };
 }
 
+// ── 2 · modifier-drift ───────────────────────────────────────────────────────
+
+function buildModifierDrift(): Built {
+  const id = "modifier-drift";
+  const rand = mulberry32(SEED[id]);
+  const record = clone(SOR);
+  record.generator = recordProvenance(id);
+  const asOf = record.asOf;
+
+  // Items orderable in every size that carry at least one priced add-on.
+  const eligible = record.items.filter(
+    (it) => it.variations.every((v) => v.stock === "in_stock") && it.modifierLists.some((l) => l.options.some((o) => o.priceDeltaCents > 0)),
+  );
+  const picked = shuffled(rand, eligible).slice(0, N_ITEMS_MOD);
+  if (picked.length < N_ITEMS_MOD) throw new Error("modifier-drift: not enough items with a priced add-on");
+  const optionIds = picked.map((it) => {
+    const priced = it.modifierLists.flatMap((l) => l.options.filter((o) => o.priceDeltaCents > 0));
+    const option = priced[Math.floor(rand() * priced.length)];
+    option.priceDeltaCents = RECORD_OPTION_CENTS; // the merchant's reprice, in the record
+    return option.id;
+  });
+
+  // The copy: the bundled faithful feed with every row's add-ons projected from the
+  // record (the S1 menu model), then the stale add-on price on the repriced options.
+  const byItemId = new Map(record.items.map((i) => [i.id, i]));
+  let feed: AcpFeed = {
+    ...clone(FAITHFUL),
+    items: FAITHFUL.items.map((row) => ({
+      ...row,
+      modifiers: recordModifierOptions(byItemId.get(row.group_id)!).map(({ list, option }) => projectModifier(list, option)),
+    })),
+  };
+  for (const optionId of optionIds) feed = applyModifierPriceDrift(feed, optionId, COPY_OPTION_CENTS - RECORD_OPTION_CENTS).feed;
+
+  const events: Ev[] = [{ at: shiftMin(asOf, -hours(MOD_SYNC_HOURS)), actor: "integrator", action: "sync", target: "catalog" }];
+  optionIds.forEach((optionId, k) => {
+    events.push({ at: shiftMin(asOf, -(120 + k * 11 + Math.floor(rand() * 7))), actor: "merchant", action: "price_edit", target: optionId });
+  });
+
+  const report = runListings(feed, record);
+  const mod = report.findings.filter((f) => f.ruleId === "LST-MOD-PRICE-VALUE");
+  const options = record.items.flatMap((it) => recordModifierOptions(it)).filter(({ option }) => optionIds.includes(option.id));
+  return {
+    id,
+    pack: "listings",
+    engine: LISTINGS_SPEC_VERSION,
+    inputs: { "feed.json": asJson(feed), "record.json": asJson(record), "events.jsonl": eventsText(events) },
+    report: serializeReport(report),
+    figures: {
+      ...commonFigures(feed, report),
+      options_drifted: new Set(mod.map((f) => f.referenceRowId)).size,
+      option_names: options.map(({ list, option }) => `${option.name} (${list.name})`).join(", "),
+      items_drifted: new Set(mod.map((f) => itemOfRow(record, rowOf(f.claim.id)).id)).size,
+      rows_drifted: mod.length,
+      record_price: `$${centsToDecimal(RECORD_OPTION_CENTS)}`,
+      copy_price: `$${centsToDecimal(COPY_OPTION_CENTS)}`,
+    },
+    transform: {
+      itemsRepriced: N_ITEMS_MOD,
+      recordOptionCents: RECORD_OPTION_CENTS,
+      copyOptionCents: COPY_OPTION_CENTS,
+      lastSyncHoursBeforeAsOf: MOD_SYNC_HOURS,
+      record: "one priced add-on option per picked item set to the record price",
+      feed: "faithful feed + every row's record add-ons (menu model); the repriced options keep the old price on the copy",
+      pickedItems: picked.map((i) => i.id),
+      repricedOptions: optionIds,
+    },
+  };
+}
+
+// ── 6 · spec-valid-lie ───────────────────────────────────────────────────────
+
+/** Every vendored UCP schema version (folder names under fixtures/ucp-schemas). */
+function vendoredUcpVersions(): string[] {
+  return readdirSync(join(root, "fixtures", "ucp-schemas"), { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort();
+}
+
+function buildSpecValidLie(): Built {
+  const id = "spec-valid-lie";
+  const rand = mulberry32(SEED[id]);
+  const record = clone(SOR);
+  record.generator = recordProvenance(id);
+  const asOf = record.asOf;
+
+  const eligible = FAITHFUL.items.filter((r) => r.availability === "in_stock").map((r) => r.item_id);
+  const picked = shuffled(rand, eligible).slice(0, N_LIE_ROWS);
+  const lift = new Map(picked.map((rowId) => [rowId, LIE_STEP_CENTS * (1 + Math.floor(rand() * 3))]));
+
+  // The responder's state: the record with the lifted prices. The wire document is
+  // built from it by the existing UCP builder, so it is schema-shaped by construction.
+  const served = clone(record);
+  for (const it of served.items) for (const v of it.variations) if (lift.has(v.id)) v.priceCents += lift.get(v.id)!;
+  const wire = { simulated: true, ...buildUcpSearchResponse(served) } as UcpSearchResponse & { simulated: true };
+  // The feed the answer was built from carries the same prices (one comparator, two surfaces).
+  const feed = clone(FAITHFUL);
+  for (const row of feed.items) {
+    if (!lift.has(row.item_id)) continue;
+    const v = served.items.flatMap((i) => i.variations).find((x) => x.id === row.item_id)!;
+    row.price = centsToDecimal(v.priceCents);
+  }
+
+  const versions = vendoredUcpVersions();
+  const conformance = versions.map((v) => runUcpConformance(wire, { op: "search", schemaDir: join(root, "fixtures", "ucp-schemas", v, "schemas") }));
+  if (!conformance.every((r) => r.ok)) throw new Error("spec-valid-lie: the wire document must pass conformance on every vendored schema version");
+  const active = runUcpConformance(wire, { op: "search", schemaDir: join(root, "fixtures", "ucp-schemas", wire.ucp.version, "schemas") });
+
+  const events: Ev[] = [{ at: shiftMin(asOf, -90), actor: "integrator", action: "sync", target: "catalog" }];
+  for (const rowId of picked) events.push({ at: shiftMin(asOf, -(20 + Math.floor(rand() * 40))), actor: "unknown", action: "price_edit", target: rowId });
+
+  const report = runListingsVerification(ucpSearchResponseToClaims(wire), record);
+  const acp = runListings(feed, record);
+  const lies = report.findings.filter((f) => f.ruleId === "LST-PRICE-VALUE");
+  const firstRow = rowOf(lies[0].claim.id);
+  const firstFeedRow = FAITHFUL.items.find((r) => r.item_id === firstRow)!;
+  const recordCents = record.items.flatMap((i) => i.variations).find((v) => v.id === firstRow)!.priceCents;
+  return {
+    id,
+    pack: "listings",
+    engine: LISTINGS_SPEC_VERSION,
+    inputs: {
+      "feed.json": asJson(feed),
+      "record.json": asJson(record),
+      "ucp-response.json": asJson(wire),
+      "events.jsonl": eventsText(events),
+    },
+    report: serializeReport(report),
+    figures: {
+      verdict: report.ok ? "PASS" : "FAIL",
+      findings: report.findings.length,
+      errors: report.findings.filter((f) => f.severity === "error").length,
+      warnings: report.findings.filter((f) => f.severity === "warn").length,
+      rows_read: wire.products.reduce((n, p) => n + p.variants.length, 0),
+      rules: tally(report.findings.map((f) => f.ruleId)),
+      conformance: active.ok ? "pass" : "fail",
+      conformance_findings: active.findings.length,
+      ucp_version: wire.ucp.version,
+      schema_versions: versions.join(", "),
+      lie_rows: lies.length,
+      lie_title: firstFeedRow.title,
+      copy_price: `$${centsToDecimal(recordCents + lift.get(firstRow)!)}`,
+      record_price: `$${centsToDecimal(recordCents)}`,
+      acp_findings: acp.findings.length,
+      acp_rules: tally(acp.findings.map((f) => f.ruleId)),
+    },
+    transform: {
+      liedRowsChosen: N_LIE_ROWS,
+      liftStepCents: LIE_STEP_CENTS,
+      record: "unchanged copy of the base record",
+      ucpResponse: "buildUcpSearchResponse over the record with the chosen rows' prices lifted (schema-shaped by construction)",
+      feed: "faithful feed with the same rows at the same lifted prices",
+      liftedRows: picked,
+    },
+  };
+}
+
 // ── 7 · fee-precheck ─────────────────────────────────────────────────────────
 
 function buildFeePrecheck(): Built {
@@ -499,6 +687,58 @@ const SEATS_LISTINGS = `- Audit (deterministic) runs the listings engine on the 
 const NOT_YET = "Root cause, impact and routing arrive in S2; this folder holds the engine report and the event evidence only.";
 
 export const BRIEF_TEMPLATES: Record<ScenarioId, string> = {
+  "modifier-drift": `# modifier-drift — an add-on is repriced in the record, not on the copy
+
+## The story
+
+On this synthetic menu the merchant reprices {{options_drifted}} add-on options in the record to +{{record_price}}. The marketplace copy last synced before the change, so it still charges +{{copy_price}} for them, on every size of the {{items_drifted}} items that carry them. An order with one of those add-ons is charged more than the merchant asked. The record is right and the copy is stale. The audit names each row and option, with the record's own option price as the receipt.
+
+## What the reviewer will see
+
+- Verdict {{verdict}}: {{findings}} findings ({{errors}} errors, {{warnings}} warnings) over {{rows_read}} feed rows.
+- Rules that fire: {{rules}} — the copy's add-on price is not the record's.
+- Options affected: {{option_names}}; rows affected: {{rows_drifted}}.
+- No base price, availability or name is flagged.
+
+## Which seats act
+
+${SEATS_LISTINGS}
+
+## What a human signs
+
+A Merchant-Ops analyst would sign a proposal to re-sync the modifier lists of the affected items. The signature is a ledger record, never a platform action; nothing here is sent.
+
+## Not yet
+
+Root cause, impact (the orders those add-ons touched) and routing arrive in S2; this folder holds the engine report and the event evidence only.
+`,
+
+  "spec-valid-lie": `# spec-valid-lie — a catalog answer that passes conformance and still states a wrong price
+
+## The story
+
+A synthetic merchant's catalog answer, written in the public UCP schema shape, is checked twice. Against the pinned UCP schemas it is well formed: conformance {{conformance}}, {{conformance_findings}} schema findings, and it passes every vendored schema version ({{schema_versions}}). Against the merchant record it is wrong: {{lie_rows}} rows state a price the record does not have, and {{lie_title}} is answered at {{copy_price}} while the record says {{record_price}}. A document can be valid and still untrue; the two checks answer different questions.
+
+## What the reviewer will see
+
+- Conformance {{conformance}}: {{conformance_findings}} findings against the pinned schemas, UCP version {{ucp_version}}.
+- Truth verdict {{verdict}}: {{findings}} findings ({{errors}} errors, {{warnings}} warnings) over {{rows_read}} answered rows.
+- Rules that fire: {{rules}}.
+- The feed the answer was built from: {{acp_findings}} findings ({{acp_rules}}) on the same rows — one comparator, two surfaces.
+
+## Which seats act
+
+${SEATS_LISTINGS}
+
+## What a human signs
+
+An Integrations manager would sign a proposal to correct the responder's prices before an agent relies on them. The signature is a ledger record, never a platform action; nothing here is sent.
+
+## Not yet
+
+Root cause, impact and routing arrive in S2; this folder holds the engine report, the conformance verdict and the event evidence only.
+`,
+
   "agent-86": `# agent-86 — an agent order lands on an item the kitchen has 86'd
 
 ## The story
@@ -637,13 +877,23 @@ The engine report only (\`report.json\`), produced by the existing engine on \`i
 Root-cause, impact, route and recorded turns arrive in S2. They are deliberately absent here — not empty, not stubbed.
 `;
 
+/** spec-valid-lie runs the truth leg on the UCP answer, so its note says which input. */
+const EXPECTED_NOTE_SPEC_VALID_LIE = `# expected/
+
+The engine report only (\`report.json\`): the existing engine's truth leg run on \`inputs/ucp-response.json\` against \`inputs/record.json\`. The same document's conformance verdict (it passes the pinned UCP schemas) is recorded in \`manifest.json\` figures, not as a second report.
+
+Root-cause, impact, route and recorded turns arrive in S2. They are deliberately absent here — not empty, not stubbed.
+`;
+
 // ── assembly ─────────────────────────────────────────────────────────────────
 
 const BUILDERS: Record<ScenarioId, () => Built> = {
   "agent-86": buildAgent86,
+  "modifier-drift": buildModifierDrift,
   "sync-outage": buildSyncOutage,
   "platform-override": buildPlatformOverride,
   "partner-onboarding": buildPartnerOnboarding,
+  "spec-valid-lie": buildSpecValidLie,
   "fee-precheck": buildFeePrecheck,
 };
 
@@ -655,7 +905,7 @@ function render(template: string, figures: Figures): string {
   });
 }
 
-/** Every file of the five scenarios as repo-relative path → exact bytes. Pure. */
+/** Every file of the seven scenarios as repo-relative path → exact bytes. Pure. */
 export function buildScenarioFiles(): Map<string, string> {
   const files = new Map<string, string>();
   for (const id of SCENARIO_IDS) {
@@ -663,7 +913,7 @@ export function buildScenarioFiles(): Map<string, string> {
     const dir = `fixtures/scenarios/${id}`;
     for (const [name, bytes] of Object.entries(b.inputs)) files.set(`${dir}/inputs/${name}`, bytes);
     files.set(`${dir}/expected/report.json`, b.report);
-    files.set(`${dir}/expected/README.md`, EXPECTED_NOTE);
+    files.set(`${dir}/expected/README.md`, id === "spec-valid-lie" ? EXPECTED_NOTE_SPEC_VALID_LIE : EXPECTED_NOTE);
     files.set(`${dir}/brief.md`, render(BRIEF_TEMPLATES[id], b.figures));
     files.set(
       `${dir}/manifest.json`,

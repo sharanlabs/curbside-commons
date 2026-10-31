@@ -1,0 +1,63 @@
+{
+  "id": "modifier-drift",
+  "number": 2,
+  "simulated": true,
+  "shapedLike": null,
+  "seed": 20261002,
+  "generator": "generate-scenarios.mts@1.1.0",
+  "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "pack": "listings",
+  "derivedFrom": {
+    "fixtures": [
+      "fixtures/synthetic-restaurant/sor.catalog.json",
+      "fixtures/synthetic-restaurant/acp-feed.faithful.json"
+    ],
+    "corpusSeed": 20260703,
+    "corpusAsOf": "2026-07-03T00:00:00Z"
+  },
+  "transform": {
+    "itemsRepriced": 2,
+    "recordOptionCents": 150,
+    "copyOptionCents": 200,
+    "lastSyncHoursBeforeAsOf": 24,
+    "record": "one priced add-on option per picked item set to the record price",
+    "feed": "faithful feed + every row's record add-ons (menu model); the repriced options keep the old price on the copy",
+    "pickedItems": [
+      "item-009",
+      "item-011"
+    ],
+    "repricedOptions": [
+      "item-009-m1-o3",
+      "item-011-m1-o2"
+    ]
+  },
+  "inputs": [
+    "inputs/events.jsonl",
+    "inputs/feed.json",
+    "inputs/record.json"
+  ],
+  "expected": [
+    "expected/report.json",
+    "expected/README.md"
+  ],
+  "absentUntilS2": [
+    "root-cause",
+    "impact",
+    "route",
+    "turns"
+  ],
+  "figures": {
+    "verdict": "FAIL",
+    "findings": 5,
+    "errors": 5,
+    "warnings": 0,
+    "rows_read": 24,
+    "rules": "LST-MOD-PRICE-VALUE ×5",
+    "options_drifted": 2,
+    "option_names": "Almond (Milk), Avocado (Add-ons)",
+    "items_drifted": 2,
+    "rows_drifted": 5,
+    "record_price": "$1.50",
+    "copy_price": "$2.00"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "matchingMode": "synthetic-controlled",
+  "simulated": true,
+  "findings": [
+    {
+      "claim": {
+        "id": "item-009-v1#modifier.item-009-m1-o3",
+        "source": "acp-feed",
+        "field": "modifier.option",
+        "value": {
+          "id": "item-009-m1-o3",
+          "list_id": "item-009-m1",
+          "list_name": "Milk",
+          "name": "Almond",
+          "price_delta": "2.00",
+          "availability": "in_stock"
+        }
+      },
+      "referenceRowId": "item-009-m1-o3",
+      "ruleId": "LST-MOD-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The \"Almond\" option (Milk) is served at +2.00 but the catalog modifier price is +1.50."
+    },
+    {
+      "claim": {
+        "id": "item-009-v2#modifier.item-009-m1-o3",
+        "source": "acp-feed",
+        "field": "modifier.option",
+        "value": {
+          "id": "item-009-m1-o3",
+          "list_id": "item-009-m1",
+          "list_name": "Milk",
+          "name": "Almond",
+          "price_delta": "2.00",
+          "availability": "in_stock"
+        }
+      },
+      "referenceRowId": "item-009-m1-o3",
+      "ruleId": "LST-MOD-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The \"Almond\" option (Milk) is served at +2.00 but the catalog modifier price is +1.50."
+    },
+    {
+      "claim": {
+        "id": "item-009-v3#modifier.item-009-m1-o3",
+        "source": "acp-feed",
+        "field": "modifier.option",
+        "value": {
+          "id": "item-009-m1-o3",
+          "list_id": "item-009-m1",
+          "list_name": "Milk",
+          "name": "Almond",
+          "price_delta": "2.00",
+          "availability": "in_stock"
+        }
+      },
+      "referenceRowId": "item-009-m1-o3",
+      "ruleId": "LST-MOD-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The \"Almond\" option (Milk) is served at +2.00 but the catalog modifier price is +1.50."
+    },
+    {
+      "claim": {
+        "id": "item-011-v1#modifier.item-011-m1-o2",
+        "source": "acp-feed",
+        "field": "modifier.option",
+        "value": {
+          "id": "item-011-m1-o2",
+          "list_id": "item-011-m1",
+          "list_name": "Add-ons",
+          "name": "Avocado",
+          "price_delta": "2.00",
+          "availability": "in_stock"
+        }
+      },
+      "referenceRowId": "item-011-m1-o2",
+      "ruleId": "LST-MOD-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The \"Avocado\" option (Add-ons) is served at +2.00 but the catalog modifier price is +1.50."
+    },
+    {
+      "claim": {
+        "id": "item-011-v2#modifier.item-011-m1-o2",
+        "source": "acp-feed",
+        "field": "modifier.option",
+        "value": {
+          "id": "item-011-m1-o2",
+          "list_id": "item-011-m1",
+          "list_name": "Add-ons",
+          "name": "Avocado",
+          "price_delta": "2.00",
+          "availability": "in_stock"
+        }
+      },
+      "referenceRowId": "item-011-m1-o2",
+      "ruleId": "LST-MOD-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The \"Avocado\" option (Add-ons) is served at +2.00 but the catalog modifier price is +1.50."
+    }
+  ],
+  "ok": false
+}

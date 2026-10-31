@@ -1,0 +1,63 @@
+{
+  "id": "spec-valid-lie",
+  "number": 6,
+  "simulated": true,
+  "shapedLike": null,
+  "seed": 20261006,
+  "generator": "generate-scenarios.mts@1.1.0",
+  "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "pack": "listings",
+  "derivedFrom": {
+    "fixtures": [
+      "fixtures/synthetic-restaurant/sor.catalog.json",
+      "fixtures/synthetic-restaurant/acp-feed.faithful.json"
+    ],
+    "corpusSeed": 20260703,
+    "corpusAsOf": "2026-07-03T00:00:00Z"
+  },
+  "transform": {
+    "liedRowsChosen": 2,
+    "liftStepCents": 100,
+    "record": "unchanged copy of the base record",
+    "ucpResponse": "buildUcpSearchResponse over the record with the chosen rows' prices lifted (schema-shaped by construction)",
+    "feed": "faithful feed with the same rows at the same lifted prices",
+    "liftedRows": [
+      "item-011-v1",
+      "item-010-v1"
+    ]
+  },
+  "inputs": [
+    "inputs/events.jsonl",
+    "inputs/feed.json",
+    "inputs/record.json",
+    "inputs/ucp-response.json"
+  ],
+  "expected": [
+    "expected/report.json",
+    "expected/README.md"
+  ],
+  "absentUntilS2": [
+    "root-cause",
+    "impact",
+    "route",
+    "turns"
+  ],
+  "figures": {
+    "verdict": "FAIL",
+    "findings": 2,
+    "errors": 2,
+    "warnings": 0,
+    "rows_read": 24,
+    "rules": "LST-PRICE-VALUE ×2",
+    "conformance": "pass",
+    "conformance_findings": 0,
+    "ucp_version": "2026-04-08",
+    "schema_versions": "2026-04-08, 2026-08-25",
+    "lie_rows": 2,
+    "lie_title": "Truffle Fries (Small)",
+    "copy_price": "$8.00",
+    "record_price": "$6.00",
+    "acp_findings": 2,
+    "acp_rules": "LST-PRICE-VALUE ×2"
+  }
+}

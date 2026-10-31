@@ -4,30 +4,37 @@ import { describe, expect, it } from "vitest";
 import {
   LISTINGS_SPEC_VERSION,
   acpFeedToClaims,
+  recordModifierOptions,
   runListingsVerification,
+  ucpSearchResponseToClaims,
   type AcpFeed,
   type SyntheticCatalog,
+  type UcpSearchResponse,
 } from "@/lib/packs/listings";
+import { runUcpConformance } from "@/lib/packs/listings/conformance";
 import { FEES_SPEC_VERSION, auditStatement, parseStatement, serializeFeeReport } from "@/lib/packs/fees";
 import { serializeReport } from "@/lib/verifier-core";
 
 /**
- * SCENARIO LIBRARY, WAVE 1 / LANE 3 — five scenarios, no new detector.
- * (docs/plan-menu-integrity-crew-2026-10-09.md §9 + Appendix W1c; lane packet
- * "scenarios-w1", 2026-10-12; events.jsonl per docs/plan-wave2-gap-sheet-2026-10-12.md p.2.)
+ * SCENARIO LIBRARY — seven scenarios (docs/plan-menu-integrity-crew-2026-10-09.md
+ * §9 + Appendix W1c; Wave 1 lane "scenarios-w1", 2026-10-12, built five; Wave 2
+ * lane S1.5, 2026-10-31, added modifier-drift (2) and spec-valid-lie (6) in the
+ * same generator; events.jsonl per docs/plan-wave2-gap-sheet-2026-10-12.md p.2.)
  *
  * fixtures/scenarios/<id>/ = brief.md · inputs/ · expected/ · manifest.json for
- *   agent-86 · sync-outage · platform-override · partner-onboarding · fee-precheck
+ *   agent-86 · modifier-drift · sync-outage · platform-override ·
+ *   partner-onboarding · spec-valid-lie · fee-precheck
  * generated from seed by ONE script (scripts-ts/generate-scenarios.mts) out of
- * fixtures/synthetic-restaurant (read-only). The other two ids of the plan's
- * eight that exist this wave are built by the S1 lane; this file owns only these five.
+ * fixtures/synthetic-restaurant (read-only). The eighth id, injected-artifact,
+ * arrives in S3.
  *
  *  FREEZE    regenerate in memory and byte-compare every committed file; the
  *            committed file set IS the generated file set (nothing extra, nothing
  *            hand-added). One byte edited → red → `node scripts-ts/generate-scenarios.mts`
  *            → green.
- *  ENGINE    the EXISTING engine (listings pack for 1/3/4/5; the fee audit for 7)
- *            is run here, on the committed inputs, and (a) must reproduce
+ *  ENGINE    the EXISTING engine (listings pack for 1–6 — for 6 its truth leg on
+ *            the UCP answer plus the conformance check on the same document;
+ *            the fee audit for 7) is run here, on the committed inputs, and (a) must reproduce
  *            expected/report.json byte for byte, (b) must reproduce every figure
  *            the manifest records — derived by code written in THIS file,
  *            independently of the generator's own derivation.
@@ -56,15 +63,38 @@ import { serializeReport } from "@/lib/verifier-core";
  *         sha256 (first 16 hex) of agent-86/brief.md: regenerated = a74adc233f8e237a ·
  *         edited ("never hears about it" -> "never hears 7 about it") = 642509dbf0da50c5 ·
  *         after re-running the generator = a74adc233f8e237a
+ *  S1.5 (2026-10-31) — the two new ids, red first and the freeze tooth re-proved:
+ *  RED 4  (01:52) generator + test in place, the two new folders moved away:
+ *         31 failed / 91 passed — folder contract ×2, ABSENT ×2, FREEZE, ENGINE
+ *         ×11, EVENTS ×6, BRIEF ×10 for the two new ids; the five Wave 1 ids
+ *         stayed green. `node scripts-ts/generate-scenarios.mts` → 122/122.
+ *  RED 5  freeze tooth on a NEW folder: in
+ *         fixtures/scenarios/spec-valid-lie/inputs/ucp-response.json the first
+ *         `"amount": 800,` (a product's price_range.min) edited to 801 ->
+ *         FREEZE red (1 failed / 121 passed; ENGINE stays green because the
+ *         truth adapter reads variant prices, not price_range — the freeze
+ *         tooth is what catches it). sha256 (first 16 hex): regenerated =
+ *         0b37ca4512ccf7d6 · edited = 18f192da656bd15b · after re-running the
+ *         generator = 0b37ca4512ccf7d6 (restored byte-for-byte), 122/122.
+ *  The five Wave 1 folders regenerate byte-identical except the generator
+ *  version stamp (1.0.0 → 1.1.0: each manifest's `generator` line and the
+ *  record's / statement's `generator.version`); their PRNG streams are untouched.
  */
 
 const ROOT = process.cwd();
 const SCEN = join(ROOT, "fixtures", "scenarios");
 const read = (p: string): string => readFileSync(p, "utf8");
 
-const IDS = ["agent-86", "sync-outage", "platform-override", "partner-onboarding", "fee-precheck"] as const;
+const IDS = [
+  "agent-86",
+  "modifier-drift",
+  "sync-outage",
+  "platform-override",
+  "partner-onboarding",
+  "spec-valid-lie",
+  "fee-precheck",
+] as const;
 type Id = (typeof IDS)[number];
-const S1_IDS = ["modifier-drift", "spec-valid-lie"] as const;
 const PLAN_EIGHT = [
   "agent-86",
   "modifier-drift",
@@ -171,7 +201,7 @@ describe("probes bite in isolation (so a green scan means something)", () => {
 // THE FIVE FOLDERS
 // ---------------------------------------------------------------------------
 
-describe("the five scenario folders exist with the folder contract", () => {
+describe("the seven scenario folders exist with the folder contract", () => {
   it.each(IDS)("%s has brief.md · manifest.json · inputs/ (with events.jsonl) · expected/", (id) => {
     const files = listFiles(dirOf(id));
     expect(files, `fixtures/scenarios/${id} is missing`).not.toHaveLength(0);
@@ -182,17 +212,22 @@ describe("the five scenario folders exist with the folder contract", () => {
     expect(inputs).toEqual(
       isFees(id)
         ? ["inputs/events.jsonl", "inputs/statement.json"]
-        : ["inputs/events.jsonl", "inputs/feed.json", "inputs/record.json"],
+        : id === "spec-valid-lie"
+          ? ["inputs/events.jsonl", "inputs/feed.json", "inputs/record.json", "inputs/ucp-response.json"]
+          : ["inputs/events.jsonl", "inputs/feed.json", "inputs/record.json"],
     );
   });
 
-  it("the folder README names all eight plan ids exactly as spelled; the two S1 ids are 'built by the S1 lane'", () => {
+  it("the folder README names all eight plan ids exactly as spelled; each built id's row says built, injected-artifact arrives S3", () => {
     const readme = read(join(SCEN, "README.md"));
     for (const id of PLAN_EIGHT) expect(readme, `README lacks id ${id}`).toContain(`\`${id}\``);
-    for (const id of S1_IDS) {
-      const line = readme.split("\n").find((l) => l.includes(`\`${id}\``)) ?? "";
-      expect(line, `README row for ${id}`).toMatch(/built by the S1 lane/);
-    }
+    const row = (id: string) => readme.split("\n").find((l) => l.startsWith("| ") && l.includes(`\`${id}\``)) ?? "";
+    for (const id of IDS) expect(row(id), `README row for ${id}`).toMatch(/\| built \|/);
+    expect(row("injected-artifact")).toMatch(/\| arrives S3 \|/);
+  });
+
+  it("the folder README carries no build-lane jargon (a reader's table, not a work log)", () => {
+    expect(read(join(SCEN, "README.md"))).not.toMatch(/this lane|S1 lane|Wave \d|lane \(/i);
   });
 });
 
@@ -218,7 +253,7 @@ describe("FREEZE — the committed folders are exactly the generator's output at
     expect([...g.buildScenarioFiles()]).toEqual([...g.buildScenarioFiles()]);
   });
 
-  it("every generated file is committed, byte-identical; no other file exists in the five folders", async () => {
+  it("every generated file is committed, byte-identical; no other file exists in the seven folders", async () => {
     const g = await gen();
     const generated = g.buildScenarioFiles();
     for (const [rel, bytes] of generated) {
@@ -261,6 +296,25 @@ function runListings(id: Id): ListingsRun {
   return { feed, record, report: runListingsVerification(acpFeedToClaims(feed), record) };
 }
 
+/** spec-valid-lie: the UCP answer, its truth-leg report, and its conformance per vendored schema version. */
+function runSpecValidLie() {
+  const wire = JSON.parse(read(join(dirOf("spec-valid-lie"), "inputs", "ucp-response.json"))) as UcpSearchResponse;
+  const record = JSON.parse(read(join(dirOf("spec-valid-lie"), "inputs", "record.json"))) as SyntheticCatalog;
+  const versions = readdirSync(join(ROOT, "fixtures", "ucp-schemas"), { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort();
+  const conformanceOn = (v: string) =>
+    runUcpConformance(wire, { op: "search", schemaDir: join(ROOT, "fixtures", "ucp-schemas", v, "schemas") });
+  return {
+    wire,
+    record,
+    versions,
+    conformanceOn,
+    report: runListingsVerification(ucpSearchResponseToClaims(wire), record),
+  };
+}
+
 /** Rule tally "RULE ×n, RULE ×m" sorted by rule id — written here, not imported from the generator. */
 function tallyOf(ruleIds: readonly string[]): string {
   const counts = new Map<string, number>();
@@ -275,7 +329,7 @@ const rowOf = (claimId: string): string => claimId.split("#")[0];
 const hoursBetween = (laterIso: string, earlierIso: string): number =>
   (Date.parse(laterIso) - Date.parse(earlierIso)) / 3_600_000;
 
-/** Figures common to the four listings scenarios. */
+/** Figures common to the listings scenarios (ACP surface). */
 function listingsCommon({ feed, report }: ListingsRun): Figures {
   return {
     verdict: report.ok ? "PASS" : "FAIL",
@@ -312,10 +366,59 @@ function liveFigures(id: Id): Figures {
     };
   }
 
+  if (id === "spec-valid-lie") {
+    const { wire, record, versions, conformanceOn, report } = runSpecValidLie();
+    const acp = runListings(id);
+    const active = conformanceOn(wire.ucp.version);
+    const lies = report.findings.filter((f) => f.ruleId === "LST-PRICE-VALUE");
+    const first = rowOf(lies[0].claim.id);
+    const answered = wire.products.flatMap((p) => p.variants).find((v) => v.id === first)!;
+    const recordCents = record.items.flatMap((i) => i.variations).find((v) => v.id === first)!.priceCents;
+    return {
+      verdict: report.ok ? "PASS" : "FAIL",
+      findings: report.findings.length,
+      errors: report.findings.filter((f) => f.severity === "error").length,
+      warnings: report.findings.filter((f) => f.severity === "warn").length,
+      rows_read: wire.products.reduce((n, p) => n + p.variants.length, 0),
+      rules: tallyOf(report.findings.map((f) => f.ruleId)),
+      conformance: active.ok ? "pass" : "fail",
+      conformance_findings: active.findings.length,
+      ucp_version: wire.ucp.version,
+      schema_versions: versions.join(", "),
+      lie_rows: lies.length,
+      lie_title: acp.feed.items.find((r) => r.item_id === first)!.title,
+      copy_price: `$${(answered.price.amount / 100).toFixed(2)}`,
+      record_price: `$${(recordCents / 100).toFixed(2)}`,
+      acp_findings: acp.report.findings.length,
+      acp_rules: tallyOf(acp.report.findings.map((f) => f.ruleId)),
+    };
+  }
+
   const run = runListings(id);
   const { feed, record, report } = run;
   const common = listingsCommon(run);
   const byRule = (rule: string) => report.findings.filter((f) => f.ruleId === rule);
+
+  if (id === "modifier-drift") {
+    const mod = byRule("LST-MOD-PRICE-VALUE");
+    const optionIds = new Set(mod.map((f) => f.referenceRowId));
+    const options = record.items.flatMap((it) => recordModifierOptions(it)).filter(({ option }) => optionIds.has(option.id));
+    const recordPrices = new Set(options.map(({ option }) => option.priceDeltaCents));
+    const copyPrices = new Set(
+      feed.items.flatMap((r) => (r.modifiers ?? []).filter((m) => optionIds.has(m.id)).map((m) => m.price_delta)),
+    );
+    expect(recordPrices.size, "one record price across the repriced options").toBe(1);
+    expect(copyPrices.size, "one copy price across the repriced options").toBe(1);
+    return {
+      ...common,
+      options_drifted: optionIds.size,
+      option_names: options.map(({ list, option }) => `${option.name} (${list.name})`).join(", "),
+      items_drifted: new Set(mod.map((f) => itemOfRow(record, rowOf(f.claim.id)).id)).size,
+      rows_drifted: mod.length,
+      record_price: `$${([...recordPrices][0] / 100).toFixed(2)}`,
+      copy_price: `$${[...copyPrices][0]}`,
+    };
+  }
 
   if (id === "agent-86") {
     const first = rowOf(report.findings[0].claim.id);
@@ -382,6 +485,8 @@ describe("ENGINE — the existing engine, run on the committed inputs, reproduce
     if (isFees(id)) {
       const report = auditStatement(parseStatement(read(join(dirOf(id), "inputs", "statement.json"))));
       expect(serializeFeeReport(report)).toBe(expected);
+    } else if (id === "spec-valid-lie") {
+      expect(serializeReport(runSpecValidLie().report)).toBe(expected);
     } else {
       expect(serializeReport(runListings(id).report)).toBe(expected);
     }
@@ -455,6 +560,55 @@ describe("ENGINE — the existing engine, run on the committed inputs, reproduce
     for (const r of new Set(report.findings.map((f) => f.ruleId))) {
       expect(["LST-PRICE-VALUE", "LST-AVAIL-STATE", "LST-IDENT-NAME"]).toContain(r);
     }
+  });
+
+  it("modifier-drift: only LST-MOD-PRICE-VALUE fires — the record's add-on price vs the copy's, on every row of the repriced items", () => {
+    const { feed, record, report } = runListings("modifier-drift");
+    expect(new Set(report.findings.map((f) => f.ruleId))).toEqual(new Set(["LST-MOD-PRICE-VALUE"]));
+    const optionIds = new Set(report.findings.map((f) => f.referenceRowId));
+    for (const f of report.findings) {
+      const row = feed.items.find((r) => r.item_id === rowOf(f.claim.id))!;
+      const served = row.modifiers!.find((m) => optionIds.has(m.id))!;
+      const rec = recordModifierOptions(itemOfRow(record, row.item_id)).find(({ option }) => option.id === served.id)!;
+      expect(served.price_delta).not.toBe((rec.option.priceDeltaCents / 100).toFixed(2));
+    }
+    // every served row of a repriced item is flagged — one sync carried the stale price to every size
+    const items = new Set(report.findings.map((f) => itemOfRow(record, rowOf(f.claim.id)).id));
+    const rowsOfItems = feed.items.filter((r) => items.has(r.group_id));
+    expect(report.findings).toHaveLength(rowsOfItems.length);
+    // the faithful menu copy of the same record would be clean (the drift is the whole story)
+    const healed: AcpFeed = {
+      ...feed,
+      items: feed.items.map((r) => ({
+        ...r,
+        modifiers: r.modifiers!.map((m) => {
+          const rec = recordModifierOptions(itemOfRow(record, r.item_id)).find(({ option }) => option.id === m.id)!;
+          return { ...m, price_delta: (rec.option.priceDeltaCents / 100).toFixed(2) };
+        }),
+      })),
+    };
+    expect(runListingsVerification(acpFeedToClaims(healed), record).findings).toEqual([]);
+  });
+
+  it("spec-valid-lie: the UCP answer PASSES conformance on every vendored schema version while the truth leg reports its prices", () => {
+    const { wire, record, versions, conformanceOn, report } = runSpecValidLie();
+    expect(versions.length).toBeGreaterThanOrEqual(2);
+    for (const v of versions) {
+      const c = conformanceOn(v);
+      expect(c.ok, `conformance on ${v}: ${c.findings.map((f) => f.ruleId)}`).toBe(true);
+      expect(c.findings).toHaveLength(0);
+    }
+    expect(report.ok).toBe(false);
+    expect(new Set(report.findings.map((f) => f.ruleId))).toEqual(new Set(["LST-PRICE-VALUE"]));
+    for (const f of report.findings) {
+      const answered = wire.products.flatMap((p) => p.variants).find((v) => v.id === rowOf(f.claim.id))!;
+      const truth = record.items.flatMap((i) => i.variations).find((v) => v.id === rowOf(f.claim.id))!;
+      expect(answered.price.amount).toBeGreaterThan(truth.priceCents);
+    }
+    expect(wire).toMatchObject({ simulated: true });
+    // one comparator, two surfaces: the feed the answer was built from is flagged on the same rows
+    const acp = runListings("spec-valid-lie").report;
+    expect(acp.findings.map((f) => rowOf(f.claim.id)).sort()).toEqual(report.findings.map((f) => rowOf(f.claim.id)).sort());
   });
 
   it("fee-precheck: the existing fee audit runs offline from a test; the three expected rules fire; base-derived findings are provisional", () => {
@@ -569,6 +723,29 @@ describe("EVENTS — inputs/events.jsonl is evidence: it parses, fits the run, a
     expect(evs.map((e) => e.target).sort()).toEqual(report.findings.map((f) => rowOf(f.claim.id)).sort());
     const priceRows = report.findings.filter((f) => f.ruleId === "LST-PRICE-VALUE").map((f) => rowOf(f.claim.id)).sort();
     expect(evs.filter((e) => e.action === "price_edit").map((e) => e.target).sort()).toEqual(priceRows);
+  });
+
+  it("modifier-drift: a merchant price_edit per repriced option, after the copy's last sync", () => {
+    const { report, record } = runListings("modifier-drift");
+    const evs = eventsOf("modifier-drift");
+    const edits = evs.filter((e) => e.action === "price_edit");
+    expect(edits.map((e) => e.target).sort()).toEqual([...new Set(report.findings.map((f) => f.referenceRowId))].sort());
+    const lastSync = evs.filter((e) => e.action === "sync").map((e) => e.at).sort().pop()!;
+    for (const e of edits) {
+      expect(e.actor).toBe("merchant");
+      expect(Date.parse(e.at)).toBeGreaterThan(Date.parse(lastSync));
+      expect(Date.parse(e.at)).toBeLessThan(Date.parse(record.asOf));
+    }
+  });
+
+  it("spec-valid-lie: a price_edit per lied row, by an unknown actor, before the record's as-of time", () => {
+    const { report, record } = runSpecValidLie();
+    const edits = eventsOf("spec-valid-lie").filter((e) => e.action === "price_edit");
+    expect(edits.map((e) => e.target).sort()).toEqual(report.findings.map((f) => rowOf(f.claim.id)).sort());
+    for (const e of edits) {
+      expect(e.actor).toBe("unknown");
+      expect(Date.parse(e.at)).toBeLessThan(Date.parse(record.asOf));
+    }
   });
 
   it("fee-precheck: every event targets a real statement line (order#category)", () => {
