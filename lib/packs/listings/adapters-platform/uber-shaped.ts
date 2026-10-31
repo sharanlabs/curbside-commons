@@ -40,6 +40,11 @@
  * when the document has exactly ONE menu, and hours are attached only then; with
  * several menus the copy makes no hours claim.
  *
+ * Category objects: the research record names the `categories` list (required)
+ * and `menu.category_ids`, but no field ON a category. The adapter reads nothing
+ * from a category; the builder writes `{ id, title }` by the title convention —
+ * an inference, UNVERIFIED as field names.
+ *
  * Description: named on the item; its form is not stated in the research record
  * (titles are stated as `{translations:{en_us}}`). Both a plain string and that
  * translations form are read (UNVERIFIED which one the documentation uses).
