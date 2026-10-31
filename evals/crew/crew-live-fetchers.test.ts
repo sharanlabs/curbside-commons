@@ -20,9 +20,21 @@
  * lane; the regressions they catch are exactly the edits an audit fears — a
  * retry loop (breaks the one-fetch assertion), a schema-invalid → default
  * decision (breaks the degraded-record assertions), or a dropped env gate.
+ *
+ * S2-crew CP1(ii) — SDK RETRY AMPLIFICATION (Codex 2026-10-12 § 4). The DI
+ * `generate` seam above sits ABOVE the SDK, so it could never see the SDK's own
+ * default `maxRetries: 2` turning one fetch into three. The last describe block
+ * therefore builds the REAL live generate (`createCrewLiveGenerate`: real
+ * `ai` + `@ai-sdk/groq`) over an offline TRANSPORT stub — no network, no key,
+ * `ENABLE_LIVE_AI` untouched (an injected generate bypasses the gate) — and
+ * counts requests at the transport.
+ * MUTATION PROOF (recorded 2026-10-31): `maxRetries: 0` deleted from
+ * `createCrewLiveGenerate` → both 503 cases (Intake, Reviewer) see 3 requests
+ * (2 RED, "expected 3 to be 1"); restored → 1 request each, 12/12 green.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  createCrewLiveGenerate,
   fetchIntakeTurnLive,
   fetchReviewerTurnLive,
   IntakeLiveOutputSchema,
@@ -160,5 +172,65 @@ describe("crew live fetchers — Reviewer DI happy path + failure semantics", ()
   it("a live call WITHOUT the owner-gated env flags (and without DI) throws loudly", async () => {
     vi.stubEnv("ENABLE_LIVE_AI", "false");
     await expect(fetchReviewerTurnLive(REVIEWER_INPUT)).rejects.toThrow(/CREW_LIVE_DISABLED/);
+  });
+});
+
+describe("crew live fetchers — the REAL SDK path over an offline transport stub: one request per turn (maxRetries 0)", () => {
+  /** An offline transport: records every request, answers with a fixed status/body. Never touches the network. */
+  function stubTransport(status: number, body: unknown): { transport: (i: RequestInfo | URL, init?: RequestInit) => Promise<Response>; urls: string[] } {
+    const urls: string[] = [];
+    return {
+      urls,
+      transport: async (input) => {
+        urls.push(typeof input === "string" ? input : input instanceof URL ? input.href : input.url);
+        return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+      },
+    };
+  }
+
+  const okCompletion = (content: string) => ({
+    id: "chatcmpl-offline-stub",
+    object: "chat.completion",
+    created: 0,
+    model: "openai/gpt-oss-120b",
+    choices: [{ index: 0, message: { role: "assistant", content }, finish_reason: "stop" }],
+    usage: { prompt_tokens: 300, completion_tokens: 12, total_tokens: 312 },
+  });
+
+  it("a retryable provider failure (503) is ONE transport request, reported as attempts: 1 on the degraded record", async () => {
+    const stub = stubTransport(503, { error: { message: "offline stub: service unavailable", type: "server_error" } });
+    const generate = createCrewLiveGenerate({ transport: stub.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate });
+    expect(out.ok).toBe(false);
+    if (out.ok) throw new Error("unreachable");
+    expect(stub.urls.length).toBe(1);
+    expect(out.attempts).toBe(1);
+  });
+
+  it("the same for the Reviewer turn: one request, attempts: 1", async () => {
+    const stub = stubTransport(503, { error: { message: "offline stub: service unavailable", type: "server_error" } });
+    const generate = createCrewLiveGenerate({ transport: stub.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchReviewerTurnLive(REVIEWER_INPUT, { generate });
+    expect(out.ok).toBe(false);
+    expect(stub.urls.length).toBe(1);
+  });
+
+  it("a valid structured answer is ONE request, parsed into the closed vocabulary, with usage.attempts === 1", async () => {
+    const stub = stubTransport(200, okCompletion(JSON.stringify({ decision: "route", tool: "audit_statement" })));
+    const generate = createCrewLiveGenerate({ transport: stub.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate });
+    expect(stub.urls.length).toBe(1);
+    expect(stub.urls[0]).toMatch(/\/chat\/completions$/);
+    expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error("unreachable");
+    expect(out.decision).toEqual({ kind: "route", tool: "audit_statement", params: mapParamsForTool("audit_statement", ARTIFACT_PATH) });
+    expect(out.usage.attempts).toBe(1);
+  });
+
+  it("an injected generate that reports no attempt count is the fetcher's single call (attempts: 1), never omitted", async () => {
+    const out = await fetchReviewerTurnLive(REVIEWER_INPUT, { generate: async () => ({ object: { decision: "approve" } }) });
+    expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error("unreachable");
+    expect(out.usage.attempts).toBe(1);
   });
 });
