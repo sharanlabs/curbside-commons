@@ -44,6 +44,8 @@ import {
   buildIntakeLivePrompt,
   createCrewLiveBudgetLedger,
   createCrewLiveGenerate,
+  CREW_LIVE_TOOL_NAMES,
+  CREW_LIVE_TOOL_NAMES_S2,
   crewLiveEstimate,
   fetchIntakeTurnLive,
   fetchReviewerTurnLive,
@@ -51,6 +53,7 @@ import {
   mapParamsForTool,
   resolvedCrewLiveModel,
   ReviewerLiveOutputSchema,
+  SOR_CATALOG_PATH,
 } from "../../lib/agents/crew-live.ts";
 import type { IntakeTurnInput, ReviewerTurnInput } from "../../lib/crew/model.ts";
 
@@ -320,5 +323,44 @@ describe("crew live fetchers — BUDGET TRUTH on the live path (reserve → one 
     vi.stubEnv("GROQ_API_KEY", "offline-test-placeholder-not-a-key");
     await expect(fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH)).rejects.toThrow(/CREW_LIVE_BUDGET_REQUIRED/);
     await expect(fetchReviewerTurnLive(REVIEWER_INPUT)).rejects.toThrow(/CREW_LIVE_BUDGET_REQUIRED/);
+  });
+});
+
+describe("crew live mapper — de-hardwired catalog + case-chosen surface (S2-crew CP4; security review F9)", () => {
+  it("defaults are byte-stable: the committed SOR catalog and the L-1 'ucp-in-path' surface rule", () => {
+    expect(mapParamsForTool("check_feed", "fixtures/synthetic-restaurant/ucp-catalog-response.drifted.json")).toEqual({
+      feedPath: "fixtures/synthetic-restaurant/ucp-catalog-response.drifted.json",
+      catalogPath: SOR_CATALOG_PATH,
+      surface: "ucp",
+    });
+  });
+
+  it("a scenario run passes its own record and the case's surface; the path's spelling no longer decides", () => {
+    expect(
+      mapParamsForTool("check_feed", "fixtures/scenarios/ucp-looking-name/inputs/feed.json", {
+        catalogPath: "fixtures/scenarios/agent-86/inputs/record.json",
+        surface: "acp",
+      }),
+    ).toEqual({ feedPath: "fixtures/scenarios/ucp-looking-name/inputs/feed.json", catalogPath: "fixtures/scenarios/agent-86/inputs/record.json", surface: "acp" });
+  });
+
+  it("fetchIntakeTurnLive threads catalogPath + surface into the mapped params", async () => {
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, "fixtures/scenarios/agent-86/inputs/feed.json", {
+      generate: async () => ({ object: { decision: "route", tool: "check_feed" } }),
+      catalogPath: "fixtures/scenarios/agent-86/inputs/record.json",
+      surface: "acp",
+    });
+    expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error("unreachable");
+    expect(out.decision).toEqual({
+      kind: "route",
+      tool: "check_feed",
+      params: { feedPath: "fixtures/scenarios/agent-86/inputs/feed.json", catalogPath: "fixtures/scenarios/agent-86/inputs/record.json", surface: "acp" },
+    });
+  });
+
+  it("the S2 tool list extends the examined Intake enum without touching it", () => {
+    expect([...CREW_LIVE_TOOL_NAMES_S2]).toStrictEqual([...CREW_LIVE_TOOL_NAMES, "explain_drift", "size_impact"]);
+    expect(CREW_LIVE_TOOL_NAMES).not.toContain("explain_drift");
   });
 });
