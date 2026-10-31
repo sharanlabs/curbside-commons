@@ -35,10 +35,11 @@
  * OBFUSCATION FOLDING (security review 2026-10-31 F3b): the signatures used to
  * miss a payload split by zero-width characters or soft hyphens, written in
  * fullwidth letters, or spelled with Cyrillic/Greek look-alikes. The scan now
- * runs on BOTH the raw text and a folded view ({@link foldForScan}: NFKC, then
- * every format character `\p{Cf}` removed, then a fixed confusables table
- * mapped to Latin) and reports the union, so every prior hit still fires and
- * the folded view can only ADD hits. The zero-false-positive corpus is
+ * runs on the raw text and TWO folded views — {@link foldForScan} (NFKC, every
+ * invisible removed, a fixed confusables table mapped to Latin) and
+ * {@link spacedForScan} (the same, but every invisible becomes one space, for
+ * zero-width characters used as word separators) — and reports the union, so
+ * every prior hit still fires and the folded views can only ADD hits. The zero-false-positive corpus is
  * re-proven on the folded view by the same suites.
  * KNOWN RESIDUAL (recorded, not solved): a NON-ENGLISH PARAPHRASE ("ignorez les
  * instructions précédentes") and any paraphrase outside the signature
@@ -237,13 +238,16 @@ const SIGNATURES: readonly InjectionSignature[] = [
  * (which is NOT a certificate of safety — see the module header).
  */
 export function detectInjectionSignatures(rawContent: string): string[] {
-  const folded = foldForScan(rawContent);
+  const views = [rawContent, foldForScan(rawContent), spacedForScan(rawContent)].filter((v, i, all) => all.indexOf(v) === i);
   const hits: string[] = [];
   for (const sig of SIGNATURES) {
-    if (sig.pattern.test(rawContent) || (folded !== rawContent && sig.pattern.test(folded))) hits.push(sig.name);
+    if (views.some((v) => sig.pattern.test(v))) hits.push(sig.name);
   }
   return hits;
 }
+
+/** Invisible characters a payload can hide behind: every format character, plus the Hangul fillers (category Lo, so not in \p{Cf}). */
+const INVISIBLE_RE = /[\p{Cf}\u115F\u1160\u3164\uFFA0]/gu;
 
 /**
  * Cyrillic and Greek letters that render like Latin ones — a FIXED table (no
@@ -273,7 +277,23 @@ const CONFUSABLE_RE = new RegExp(`[${Object.keys(CONFUSABLES).join("")}]`, "g");
 export function foldForScan(text: string): string {
   return text
     .normalize("NFKC")
-    .replace(/\p{Cf}/gu, "")
+    .replace(INVISIBLE_RE, "")
+    .replace(CONFUSABLE_RE, (ch) => CONFUSABLES[ch] ?? ch);
+}
+
+/**
+ * The SECOND folded view (orchestrator amendment 4, 2026-10-31): stripping
+ * invisibles JOINS words, so a payload that uses zero-width characters AS WORD
+ * SEPARATORS ("ignore<ZWSP>all<ZWSP>previous") folds to "ignoreallprevious"
+ * and slips past the phrase patterns. Here every invisible becomes ONE space
+ * and runs of horizontal whitespace collapse to one (newlines are kept, since
+ * several signatures stop at a line break). A hit in either view is a hit.
+ */
+export function spacedForScan(text: string): string {
+  return text
+    .normalize("NFKC")
+    .replace(INVISIBLE_RE, " ")
+    .replace(/[^\S\n]+/g, " ")
     .replace(CONFUSABLE_RE, (ch) => CONFUSABLES[ch] ?? ch);
 }
 

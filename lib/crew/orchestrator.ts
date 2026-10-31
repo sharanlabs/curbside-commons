@@ -29,7 +29,7 @@ import { assertDecisionGrade, callTool, resolveInAllowedRoot, type ToolResult } 
 import { argsDigest, sha256Hex } from "./canonical.ts";
 import { detectInjectionSignatures } from "./injection-scan.ts";
 import { buildCaseManifest, manifestDigestOf, REPLAY_MODEL_ID } from "./manifest.ts";
-import { quarantineExcerpt, reviewerLabelStateFor, type CrewModel, type IntakeDecision } from "./model.ts";
+import { newQuarantineNonce, quarantineExcerpt, reviewerLabelStateFor, type CrewModel, type IntakeDecision } from "./model.ts";
 import { route, ROUTE_TABLE_LABEL, type RouteInput, type RouteResult } from "./route.ts";
 import {
   deriveRecommendationClass,
@@ -97,10 +97,15 @@ export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord 
     anomalies.push(`injection_signature:${sig}`);
   }
 
+  // One crypto-random quarantine nonce per run (security amendment 4): both
+  // model turns see the excerpt inside markers the artifact cannot forge. The
+  // nonce enters no trajectory, record or golden.
+  const quarantineNonce = newQuarantineNonce();
   const decision: IntakeDecision = model.intakeTurn({
     caseId: crewCase.caseId,
     ask: crewCase.ask,
-    quarantinedArtifactExcerpt: quarantineExcerpt(rawArtifact),
+    quarantinedArtifactExcerpt: quarantineExcerpt(rawArtifact, quarantineNonce),
+    quarantineNonce,
     allowedTools: crewCase.allowedTools,
     manifestDigest,
   });
@@ -241,7 +246,8 @@ export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord 
     terminalClassSoFar: terminalClass,
     findingCount: consumedReport?.findings.length ?? 0,
     anomalies,
-    quarantinedArtifactExcerpt: quarantineExcerpt(rawArtifact),
+    quarantinedArtifactExcerpt: quarantineExcerpt(rawArtifact, quarantineNonce),
+    quarantineNonce,
     manifestDigest,
     ...(s2 !== undefined ? { computedRoute: s2.proposedRoute } : {}),
   };
