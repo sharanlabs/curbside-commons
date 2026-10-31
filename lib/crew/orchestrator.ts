@@ -25,9 +25,10 @@
  * point, the run is handed to the human, even when the brain says "all good."
  */
 import { readFileSync } from "node:fs";
-import { createHash } from "node:crypto";
 import { assertDecisionGrade, callTool, type ToolResult } from "../tools/registry.ts";
+import { argsDigest, sha256Hex } from "./canonical.ts";
 import { detectInjectionSignatures } from "./injection-scan.ts";
+import { buildCaseManifest, manifestDigestOf, REPLAY_MODEL_ID } from "./manifest.ts";
 import { quarantineExcerpt, type CrewModel, type IntakeDecision } from "./model.ts";
 import {
   deriveRecommendationClass,
@@ -40,23 +41,14 @@ import {
   type TrajectoryStep,
 } from "./types.ts";
 
-/** sha256 of the canonical JSON (recursively key-sorted) of a params object — the §6 argument digest. */
-export function argsDigest(params: Readonly<Record<string, unknown>>): string {
-  const canonicalize = (v: unknown): unknown => {
-    if (Array.isArray(v)) return v.map(canonicalize);
-    if (v !== null && typeof v === "object") {
-      const entries = Object.entries(v as Record<string, unknown>).sort(([a], [b]) => (a < b ? -1 : 1));
-      return Object.fromEntries(entries.map(([k, val]) => [k, canonicalize(val)]));
-    }
-    return v;
-  };
-  return createHash("sha256").update(JSON.stringify(canonicalize(params))).digest("hex");
-}
+/** sha256 of the canonical JSON (recursively key-sorted) of a params object — the §6 argument digest (implementation in canonical.ts, byte-identical). */
+export { argsDigest };
 
 /** sha256 of a canonical payload string — the §6 engine-report hash. */
 export function reportHash(canonical: string): string {
-  return createHash("sha256").update(canonical).digest("hex");
+  return sha256Hex(canonical);
 }
+
 
 /** Run one committed case through the crew. Deterministic given (case, model). */
 export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord {
@@ -67,7 +59,25 @@ export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord 
   let engineReportHash: string | null = null;
 
   // ---- INTAKE (model-directed routing; decision contained below, never trusted) ----
-  const rawArtifact = readFileSync(crewCase.inputArtifact.path, "utf8");
+  const artifactBytes = readFileSync(crewCase.inputArtifact.path);
+  const rawArtifact = artifactBytes.toString("utf8");
+
+  // ---- REPLAY BINDING (S2-crew CP1; Codex § 4): recompute the manifest from
+  // the case actually being run and the bytes actually read. A stale stamp on
+  // the case is refused here; a recorded turn bound to another manifest is
+  // refused by the model seam (RecordedModel) when it sees this digest. ----
+  // The stamp on a case is its digest as a REPLAY case; the digest handed to
+  // the model seam carries the model's own id (an ad-hoc scripted test double
+  // with no id is a replay source too).
+  const stampDigest = manifestDigestOf(buildCaseManifest(crewCase, artifactBytes, REPLAY_MODEL_ID));
+  const modelId = model.modelId ?? REPLAY_MODEL_ID;
+  const manifestDigest =
+    modelId === REPLAY_MODEL_ID ? stampDigest : manifestDigestOf(buildCaseManifest(crewCase, artifactBytes, modelId));
+  if (crewCase.manifestDigest !== undefined && crewCase.manifestDigest !== stampDigest) {
+    throw new Error(
+      `crew: case manifestDigest is stale (caseId=${crewCase.caseId}) — the case or its artifact changed since it was stamped; re-run scripts-ts/stamp-case-digests.mts and re-record its turns`,
+    );
+  }
 
   // ---- STRUCTURAL INJECTION TRIPWIRE (M2): scan the FULL artifact BEFORE any
   // model turn, so a payload placed past the 400-char model excerpt window
@@ -84,6 +94,7 @@ export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord 
     ask: crewCase.ask,
     quarantinedArtifactExcerpt: quarantineExcerpt(rawArtifact),
     allowedTools: crewCase.allowedTools,
+    manifestDigest,
   });
   steps.push({
     member: "intake",
@@ -213,6 +224,7 @@ export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord 
     findingCount: consumedReport?.findings.length ?? 0,
     anomalies,
     quarantinedArtifactExcerpt: quarantineExcerpt(rawArtifact),
+    manifestDigest,
   });
   steps.push({
     member: "reviewer",

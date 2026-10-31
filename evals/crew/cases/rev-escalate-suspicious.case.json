@@ -1,5 +1,6 @@
 {
   "caseId": "rev-escalate-suspicious",
+  "manifestDigest": "ddc4091de8d103264ae43770d17b05a5f5c0b122abcbfc5cd5386335e3dc4886",
   "member": "reviewer",
   "inputArtifact": {
     "path": "evals/crew/fixtures/statement.injection.json"

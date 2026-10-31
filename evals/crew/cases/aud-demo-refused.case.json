@@ -1,5 +1,6 @@
 {
   "caseId": "aud-demo-refused",
+  "manifestDigest": "cc1f00f90469c8ae07a288a224a4d7d2673c3e87b3711a239ab50cdb5c564a59",
   "member": "audit",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/fees/statement.faithful.json"

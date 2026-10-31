@@ -1,5 +1,6 @@
 {
   "caseId": "int-reject-malformed",
+  "manifestDigest": "1b53d52602fe442ebcaa4ef77869f20f3750e4ed4f90f29083551802ae2b13c3",
   "member": "intake",
   "inputArtifact": {
     "path": "evals/crew/fixtures/garbage.txt"

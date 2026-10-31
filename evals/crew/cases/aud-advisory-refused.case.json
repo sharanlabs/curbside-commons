@@ -1,5 +1,6 @@
 {
   "caseId": "aud-advisory-refused",
+  "manifestDigest": "5f2093e97cebb2b567857cc9f1d31660366bcbf19f4a14b3529c8a3f70fe5136",
   "member": "audit",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/fees/statement.drifted.json"

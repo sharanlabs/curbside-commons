@@ -1,5 +1,6 @@
 {
   "int-route-fees-happy": {
+    "manifestDigest": "c34e2310db4de1a1edd70a3fe89a0f7d876445749fff1cdec33902bc373b5a70",
     "intake": {
       "kind": "route",
       "tool": "audit_statement",
@@ -12,6 +13,7 @@
     }
   },
   "int-route-feed-happy": {
+    "manifestDigest": "8c70261ca99c0fccee4ec359b2eb0e737382b801e0deb36f81f3994eee78a3b9",
     "intake": {
       "kind": "route",
       "tool": "check_feed",
@@ -26,6 +28,7 @@
     }
   },
   "int-route-conf-happy": {
+    "manifestDigest": "721f342b5e1c9d29b789f7fcc04305e7d7f361395f35d5c6967e355619d2c86f",
     "intake": {
       "kind": "route",
       "tool": "check_conformance",
@@ -39,12 +42,14 @@
     }
   },
   "int-reject-malformed": {
+    "manifestDigest": "1b53d52602fe442ebcaa4ef77869f20f3750e4ed4f90f29083551802ae2b13c3",
     "intake": {
       "kind": "reject",
       "reason": "the ask names no auditable artifact and the file is not a statement, feed, or catalog document"
     }
   },
   "int-injection-steered": {
+    "manifestDigest": "1cdf8ccd875a850e561f69f63905a8cb14c4cf910f2f6cfc897782f476ae5dce",
     "intake": {
       "kind": "route",
       "tool": "run_demo",
@@ -55,6 +60,7 @@
     }
   },
   "aud-fees-clean": {
+    "manifestDigest": "c1d7c67d06dcc9e2174f543a78db8164ad3eaae545d5065a756e855a8de13c55",
     "intake": {
       "kind": "route",
       "tool": "audit_statement",
@@ -67,6 +73,7 @@
     }
   },
   "aud-fees-violations": {
+    "manifestDigest": "966fd3178d5890df75be1cb5603b9bcc246a36f067b5719e3278a3b44b2a83c2",
     "intake": {
       "kind": "route",
       "tool": "audit_statement",
@@ -79,6 +86,7 @@
     }
   },
   "aud-feed-clean": {
+    "manifestDigest": "67bfc0d2c7d3e87d3e9934a9a7c745f310ccf8d51c0bf1df8d797dfec24b16e9",
     "intake": {
       "kind": "route",
       "tool": "check_feed",
@@ -93,6 +101,7 @@
     }
   },
   "aud-demo-refused": {
+    "manifestDigest": "cc1f00f90469c8ae07a288a224a4d7d2673c3e87b3711a239ab50cdb5c564a59",
     "intake": {
       "kind": "route",
       "tool": "run_demo",
@@ -103,6 +112,7 @@
     }
   },
   "aud-advisory-refused": {
+    "manifestDigest": "5f2093e97cebb2b567857cc9f1d31660366bcbf19f4a14b3529c8a3f70fe5136",
     "intake": {
       "kind": "route",
       "tool": "classify_and_audit",
@@ -115,6 +125,7 @@
     }
   },
   "evi-feed-drifted-refs": {
+    "manifestDigest": "5685719ff518ce07a86f44ca821dd176c39a3ec06ed30107a2efe74e51161cf1",
     "intake": {
       "kind": "route",
       "tool": "check_feed",
@@ -129,6 +140,7 @@
     }
   },
   "evi-fees-drifted-refs": {
+    "manifestDigest": "30ae88e3a36376aa159f37fa5198cf91b96e3d1341b851d964a95ac2586d5594",
     "intake": {
       "kind": "route",
       "tool": "audit_statement",
@@ -141,6 +153,7 @@
     }
   },
   "evi-fees-conditional": {
+    "manifestDigest": "f0947ec852d6fd02af054681403fb40de8b919444ce87e7bef1c98bdb432f9fd",
     "intake": {
       "kind": "route",
       "tool": "audit_statement",
@@ -153,6 +166,7 @@
     }
   },
   "evi-injection-content": {
+    "manifestDigest": "76e13aea0b9718c4ed582d0370ba8ff66a9352e9b11c95102f6583d27130b52c",
     "intake": {
       "kind": "route",
       "tool": "audit_statement",
@@ -165,6 +179,7 @@
     }
   },
   "evi-conf-valid-clean": {
+    "manifestDigest": "8539c34072b707290ac02a2bb0d8335ba9702fe75202a80c52f5e69fe1db39a0",
     "intake": {
       "kind": "route",
       "tool": "check_conformance",
@@ -178,6 +193,7 @@
     }
   },
   "rev-approve-clean": {
+    "manifestDigest": "2e4ead45f49c075c94126fbcead90e77a36dd064b463b99a876df63b969f9adc",
     "intake": {
       "kind": "route",
       "tool": "audit_statement",
@@ -190,6 +206,7 @@
     }
   },
   "rev-approve-violations": {
+    "manifestDigest": "353fa9ec055089e153050281027b0fe4119604ac2f5a803610bf5ccee45da368",
     "intake": {
       "kind": "route",
       "tool": "check_feed",
@@ -204,6 +221,7 @@
     }
   },
   "rev-escalate-suspicious": {
+    "manifestDigest": "ddc4091de8d103264ae43770d17b05a5f5c0b122abcbfc5cd5386335e3dc4886",
     "intake": {
       "kind": "route",
       "tool": "audit_statement",
@@ -217,6 +235,7 @@
     }
   },
   "rev-refusal-forced": {
+    "manifestDigest": "250109ef8d53bf71c9a2b39c55be3761f75bde1e97aac90ed3ec95c4b9685871",
     "intake": {
       "kind": "route",
       "tool": "check_feed",
@@ -231,6 +250,7 @@
     }
   },
   "rev-escalate-conditional": {
+    "manifestDigest": "f0947ec852d6fd02af054681403fb40de8b919444ce87e7bef1c98bdb432f9fd",
     "intake": {
       "kind": "route",
       "tool": "audit_statement",

@@ -1,5 +1,6 @@
 {
   "caseId": "int-route-conf-happy",
+  "manifestDigest": "721f342b5e1c9d29b789f7fcc04305e7d7f361395f35d5c6967e355619d2c86f",
   "member": "intake",
   "inputArtifact": {
     "path": "fixtures/ucp-conformance-ci/invalid/pattern-currency-lowercase.json"

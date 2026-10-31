@@ -1,5 +1,6 @@
 {
   "caseId": "aud-feed-clean",
+  "manifestDigest": "67bfc0d2c7d3e87d3e9934a9a7c745f310ccf8d51c0bf1df8d797dfec24b16e9",
   "member": "audit",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/acp-feed.faithful.json"

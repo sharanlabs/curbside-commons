@@ -1,5 +1,6 @@
 {
   "caseId": "int-injection-steered",
+  "manifestDigest": "1cdf8ccd875a850e561f69f63905a8cb14c4cf910f2f6cfc897782f476ae5dce",
   "member": "intake",
   "inputArtifact": {
     "path": "evals/crew/fixtures/statement.injection.json"

@@ -22,6 +22,8 @@
  * with the owner's word. Whatever a bill or menu file SAYS is treated as
  * evidence to look at, never as orders to follow.
  */
+import { REPLAY_MODEL_ID } from "./manifest.ts";
+import type { RouteResult } from "./route.ts";
 import type { CrewMemberName, TerminalClass } from "./types.ts";
 
 /** Intake's closed decision vocabulary: route to ONE tool, or reject the ask. */
@@ -40,6 +42,14 @@ export interface IntakeTurnInput {
   readonly ask: string;
   readonly quarantinedArtifactExcerpt: string;
   readonly allowedTools: readonly string[];
+  /**
+   * S2-crew replay binding: the manifest digest the orchestrator RECOMPUTED for
+   * the case it is running (`lib/crew/manifest.ts`). `runCase` always supplies
+   * it. Optional only because the pre-registered composition lock probes turn
+   * existence without one; a probe without a digest is not a replay. Never
+   * rendered into a live prompt (the L-1 prompt bytes are pinned).
+   */
+  readonly manifestDigest?: string;
 }
 
 /** Input to a Reviewer turn — a structured summary, never raw artifact text in instruction position. */
@@ -49,12 +59,42 @@ export interface ReviewerTurnInput {
   readonly findingCount: number;
   readonly anomalies: readonly string[];
   readonly quarantinedArtifactExcerpt: string;
+  /** S2-crew replay binding — see {@link IntakeTurnInput.manifestDigest}. */
+  readonly manifestDigest?: string;
+  /**
+   * S2-crew: the deterministic route (`lib/crew/route.ts`) the run takes if the
+   * Reviewer approves. The Reviewer's vocabulary stays approve | escalate.
+   * Present ⇒ this is the EXPANDED configuration, on which the L-1 label was
+   * never earned: the seat renders "requalification pending"
+   * ({@link reviewerLabelStateFor}). NOT rendered into the live Reviewer prompt —
+   * those bytes are pinned by the L-1 lane-drift lock; showing the route to a
+   * live model is a prompt change that needs a fresh owner-armed exam.
+   */
+  readonly computedRoute?: RouteResult;
 }
 
 /** The model seam both model-directed members consume. */
 export interface CrewModel {
+  /** The model id a manifest is computed with (`"replay"` for committed turns). Optional: ad-hoc test models carry none. */
+  readonly modelId?: string;
   intakeTurn(input: IntakeTurnInput): IntakeDecision;
   reviewerTurn(input: ReviewerTurnInput): ReviewerDecision;
+}
+
+/** The earned L-1 label, verbatim (`docs/crew-live-l1-status.md`). */
+export const REVIEWER_EARNED_LABEL = "agent (live-run floors cleared)";
+/** The label on the expanded configuration until it sits fresh cases (Codex § 2 C; decision-log 2026-10-14). */
+export const REQUALIFICATION_PENDING_LABEL = "requalification pending";
+
+/**
+ * The Reviewer seat's label for one turn. The L-1 label was earned on inputs
+ * WITHOUT a computed route; a turn that sees one is a configuration that has
+ * not been examined, so the label does not transfer.
+ */
+export function reviewerLabelStateFor(
+  input: Pick<ReviewerTurnInput, "computedRoute">,
+): typeof REVIEWER_EARNED_LABEL | typeof REQUALIFICATION_PENDING_LABEL {
+  return input.computedRoute === undefined ? REVIEWER_EARNED_LABEL : REQUALIFICATION_PENDING_LABEL;
 }
 
 /** Wrap untrusted artifact content in the explicit quarantine marker (data, never instructions). */
@@ -71,39 +111,66 @@ export function quarantineExcerpt(rawContent: string): string {
 /** The committed recorded-turns fixture shape (evals/crew/cases/recorded-turns.json). */
 export interface RecordedTurnsFixture {
   readonly [caseId: string]: {
+    /** The manifest digest the turns were recorded under (S2-crew; stamped by scripts-ts/stamp-case-digests.mts). */
+    readonly manifestDigest: string;
     readonly intake?: IntakeDecision;
     readonly reviewer?: ReviewerDecision;
   };
 }
 
+const DIGEST_RE = /^[0-9a-f]{64}$/;
+
 /**
- * The offline model: replays committed turns keyed by (caseId, member).
+ * The offline model: replays committed turns keyed by (caseId, member) AND
+ * bound to the manifest they were recorded under.
  * A missing key THROWS — there is no default decision, so an unplanned model
- * turn can never silently pass (§6: loud on miss, never a fallback).
+ * turn can never silently pass (§6: loud on miss, never a fallback). An entry
+ * without a stamped digest is refused at construction, and a turn whose
+ * digest differs from the one the orchestrator recomputed for the running
+ * case THROWS (Codex 2026-10-12 § 4: a changed case must never replay an
+ * obsolete answer).
  */
 export class RecordedModel implements CrewModel {
+  readonly modelId = REPLAY_MODEL_ID;
   private readonly turns: RecordedTurnsFixture;
 
   constructor(turns: RecordedTurnsFixture) {
+    for (const [caseId, entry] of Object.entries(turns)) {
+      if (typeof entry?.manifestDigest !== "string" || !DIGEST_RE.test(entry.manifestDigest)) {
+        throw new Error(
+          `RecordedModel: recorded turns for caseId="${caseId}" carry no manifest digest — an unbound turn can never replay (run scripts-ts/stamp-case-digests.mts)`,
+        );
+      }
+    }
     this.turns = turns;
   }
 
-  private lookup<K extends "intake" | "reviewer">(caseId: string, member: K): NonNullable<RecordedTurnsFixture[string][K]> {
-    const decision = this.turns[caseId]?.[member];
-    if (decision === undefined) {
+  private lookup<K extends "intake" | "reviewer">(
+    caseId: string,
+    member: K,
+    manifestDigest: string | undefined,
+  ): NonNullable<RecordedTurnsFixture[string][K]> {
+    const entry = this.turns[caseId];
+    const decision = entry?.[member];
+    if (entry === undefined || decision === undefined) {
       throw new Error(
         `RecordedModel: no committed turn for (caseId="${caseId}", member="${member}") — recorded replay never defaults`,
+      );
+    }
+    if (manifestDigest !== undefined && manifestDigest !== entry.manifestDigest) {
+      throw new Error(
+        `RecordedModel: recorded replay does not match this case's manifest (caseId=${caseId}, member=${member}; recorded under ${entry.manifestDigest.slice(0, 12)}…, running ${manifestDigest.slice(0, 12)}…) — the case changed since its turns were recorded; never replay an obsolete answer`,
       );
     }
     return decision;
   }
 
   intakeTurn(input: IntakeTurnInput): IntakeDecision {
-    return this.lookup(input.caseId, "intake");
+    return this.lookup(input.caseId, "intake", input.manifestDigest);
   }
 
   reviewerTurn(input: ReviewerTurnInput): ReviewerDecision {
-    return this.lookup(input.caseId, "reviewer");
+    return this.lookup(input.caseId, "reviewer", input.manifestDigest);
   }
 }
 

@@ -1,5 +1,6 @@
 {
   "caseId": "rev-refusal-forced",
+  "manifestDigest": "250109ef8d53bf71c9a2b39c55be3761f75bde1e97aac90ed3ec95c4b9685871",
   "member": "reviewer",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/acp-feed.drifted.json"

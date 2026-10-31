@@ -105,6 +105,8 @@ describe("floor teeth — a fabricated EXTRA reference cannot ride through (Code
     const c = cases2.get("aud-fees-clean")!;
     const steered = new RecordedModel({
       "aud-fees-clean": {
+        // S2-crew: recorded turns carry the manifest digest they were recorded under.
+        manifestDigest: c.manifestDigest!,
         intake: {
           kind: "route",
           tool: "audit_statement",

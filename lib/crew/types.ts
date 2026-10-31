@@ -182,4 +182,43 @@ export interface CrewCase {
   readonly expectedFindingRefs: readonly string[];
   /** §6 gate expectation: approve-recommendation ⇔ terminal "recommendation"; escalate-to-human ⇔ terminal "escalate-to-human". */
   readonly expectedGateState: "approve-recommendation" | "escalate-to-human";
+  /**
+   * S2-crew replay binding: sha256 of this case's manifest (`lib/crew/manifest.ts`),
+   * written by `scripts-ts/stamp-case-digests.mts`. Optional ONLY because the
+   * frozen L-1 held-out split (`evals/crew/cases-live/**`) predates it; every
+   * replay case carries it, and `runCase` throws when it is present but stale.
+   */
+  readonly manifestDigest?: string;
+  /**
+   * S2-crew extension (root-cause baseline · impact · route). Absent on every
+   * A2/L-1 case, which therefore run exactly as before. Present ⇒ the
+   * orchestrator calls `explain_drift` (and `size_impact` when an orders file is
+   * named) through `callTool`, each contracted in `expectedToolCalls`, then
+   * computes the deterministic route the Reviewer sees.
+   */
+  readonly s2?: CrewCaseS2;
+}
+
+/** The S2 block of a case — every fact the deterministic S2 seats need, supplied by the case, never inferred. */
+export interface CrewCaseS2 {
+  /** The scenario's event log (`{at, actor, action, target}` per line) — evidence for explain_drift. */
+  readonly eventsPath: string;
+  /** The instant the explanation is computed as of (the record's own as-of). */
+  readonly asOf: string;
+  /**
+   * Route facts the route table needs that the engine report cannot supply.
+   * OWNERSHIP comes from scenario evidence and is stated here by the case
+   * author — the crew never infers it (Codex 2026-10-12 § 3 page 1).
+   */
+  readonly route: {
+    readonly pack: "listings" | "fees" | "conformance";
+    readonly triggerKind: "sweep" | "order-errors" | "complaint" | "partner-onboarding" | "agent-preflight";
+    readonly ownership: "merchant" | "integrator" | "platform" | "unknown";
+  };
+  /** Present only when the case supplies an orders file; absent ⇒ the impact step is skipped with a typed step. */
+  readonly impact?: {
+    readonly ordersPath: string;
+    readonly windowDays: number;
+    readonly errorChargeShare: number;
+  };
 }

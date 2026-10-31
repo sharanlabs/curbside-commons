@@ -1,5 +1,6 @@
 {
   "caseId": "rev-approve-clean",
+  "manifestDigest": "2e4ead45f49c075c94126fbcead90e77a36dd064b463b99a876df63b969f9adc",
   "member": "reviewer",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/fees/statement.faithful.json"

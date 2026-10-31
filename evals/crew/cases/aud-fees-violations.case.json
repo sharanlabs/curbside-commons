@@ -1,5 +1,6 @@
 {
   "caseId": "aud-fees-violations",
+  "manifestDigest": "966fd3178d5890df75be1cb5603b9bcc246a36f067b5719e3278a3b44b2a83c2",
   "member": "audit",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/fees/statement.drifted.json"

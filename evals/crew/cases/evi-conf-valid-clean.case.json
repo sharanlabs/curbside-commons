@@ -1,5 +1,6 @@
 {
   "caseId": "evi-conf-valid-clean",
+  "manifestDigest": "8539c34072b707290ac02a2bb0d8335ba9702fe75202a80c52f5e69fe1db39a0",
   "member": "evidence",
   "inputArtifact": {
     "path": "fixtures/ucp-conformance-ci/valid/search-single-product.json"
