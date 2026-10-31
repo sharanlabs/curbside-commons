@@ -45,7 +45,7 @@ af6a1dc wip(exec-layer): plan §§ 7/17 — 'enforced by sampling' marked UNVERI
 | `docs/plan-menu-integrity-crew-2026-10-09.md` | §§ 7/17 only: "enforced by sampling" UNVERIFIED; § 17 threshold per re-read (WIP `4a66958` rewrote the § 7/§ 17 claims earlier) |
 | `lib/landing/pilot-figures.ts` (new) | The one module `/pilot` reads: cost model (declared integer constants, exact arithmetic, throws on a fraction), bundled pair from `GUIDE`, scenario library read from `fixtures/scenarios/*/manifest.json` (refuses non-simulated), tiers/controls/before-after as text, M1, a `STATE` block of in-flight labels |
 | `app/pilot/page.tsx` (new) | Static route outside the nav, on the `/docs` layer (`docs-main pilot-main`); sections: what this is/is not · delivery point · before/after · cost model · M1 · governance · scenario library · data and security · "What is real" link; every figure a `data-pilot` field |
-| `app/globals.css` | `.pilot-*` block only (189 lines, tokens only, no literal colours, no new token or font), inserted before the fees print block |
+| `app/globals.css` | `.pilot-*` block only (tokens only, no literal colours, no new token or font; the technical line in the sans, mono kept for figures, states and inline code), inserted before the fees print block |
 | `evals/packs/pilot-figures.test.ts` (new) | 25 tests (ARITHMETIC · FORMATTERS · SOURCES · LABELS · BUNDLED · LIBRARY · GOVERNANCE · EGRESS) |
 | `evals/packs/pilot-page.test.ts` (new) | 18 tests on the built `out/pilot.html` (FIGURES · NO TYPED DIGIT · REGISTER · §4 · NAV) |
 | `evals/e2e/pilot.spec.ts` (new, not run) | 5 Playwright tests: paints light/dark + nav unchanged (×2), axe 0 (×2), rendered arithmetic closes |
@@ -87,6 +87,8 @@ Mutations (each applied by hand, run, restored with `git checkout`, re-run green
 
 No environmental red in the vitest runs (build-offline ran before each full run).
 
+**Gates re-run at `b861e8e`** (after the plan §§ 7/17 edit, the staleness guard and the sans change), 01:58 EDT: `build-offline` 0 · `tsc` 0 · `eslint . --max-warnings=0` 0 · `vitest run` 0 — **1870 passed · 8 skipped** (137 files; unchanged, the guard is a new assertion inside an existing test) · the four named suites 0 — 221. The guard was seen red first on the stale `out/` ("out/pilot.html is older than app/pilot/page.tsx — rebuild with scripts/build-offline.mjs"), then green after the rebuild.
+
 ## DEVIATIONS
 
 1. **Freshness facts from `main` applied** (`fe30fb8`, `docs/research/freshness-2026-10-31.md`): the 2026-10-09 record had Uber's Menu Maker direction reversed, the 20–50 % figure on the wrong domain, the 03-03 date unreproduced, the 99 % floor as 99.9 % baseline. Fixed in `pilot-proposal.md` § 2 and § 3, `executive-brief.md`, the Groq row of the register. The cited freshness doc exists on `main`, not on this branch; the reference resolves at merge.
@@ -115,6 +117,9 @@ No environmental red in the vitest runs (build-offline ran before each full run)
 5. Whether `/pilot` should hyperlink the repository documents (DEVIATION 13) is an owner call.
 6. The digit allow-list accepts any `§ N` reference; a figure typed after "§" would pass. Accepted as a known edge.
 7. Codex changed-files review of this lane is owed (deferred by owner word 2026-10-31).
+8. **`readManifest` throws on a manifest without `figures.verdict` / `figures.findings`**, which fails the whole site build, not one row. `injected-artifact` (S3) is a crew-eval scenario and may not carry an engine verdict; the S3 packet should carry the manifest-shape contract, or the orchestrator softens that branch to render "—".
+9. **Root-cause wording vs the 2026-10-14 decision** (the live root-cause exam is cut from this pilot): the proposal's "Why" row, governance roster row and register row say "renders DEFER until it passes an exam" / "exam is S5". Not false, but "no exam inside this pilot; it shows DEFER" is the sharper line.
+10. `pilot-page.test.ts` now refuses an `out/pilot.html` older than its inputs (page, module, test-guide, globals.css, every scenario manifest). Every full run therefore needs `build-offline` first — already the standing rule.
 
 ## NOT DONE
 
