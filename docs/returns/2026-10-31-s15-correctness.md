@@ -87,7 +87,7 @@ Earlier lane commits: `17bddd5` (c6 restore sha + PROVENANCE note) · `4544a5c` 
 - `node scripts/build-offline.mjs` → 0 (run before every full vitest; the honesty-c10 rendered leg re-runs `npm run build` and fails on Google Fonts in this sandbox whenever out/ is older than lib/app/components — seen and cleared three times; environmental, not patched)
 - `npx tsc --noEmit` → 0
 - `npx eslint . --max-warnings=0` → 0
-- `npx vitest run` → 0 · 2096 passed · 8 skipped (137 files + 7 skipped)
+- `npx vitest run` → 0 · 2096 passed · 8 skipped (137 files + 7 skipped); re-run after the final comment-only run.ts edit → same
 - `npx vitest run evals/packs/honesty-c10.test.ts` → 0 · 275 passed
 - `node scripts-ts/generate-scenarios.mts` → 0 (writes 49 files; FREEZE byte-equal)
 - `node scripts-ts/ucp-oracle-diff.mts` → 0 · **33/35 agree, 2 documented format-class divergences, 0 disagree** at the active pin `2026-04-08`, and the same 33/35 · 2 · 0 in a trial at `2026-08-25` (pin flipped and corpus regenerated, uncommitted, reverted). cargo and `ucp-schema` are installed on this seat; no network was used.
@@ -118,7 +118,9 @@ Earlier lane commits: `17bddd5` (c6 restore sha + PROVENANCE note) · `4544a5c` 
 3. **Browser parse-layer duplicate check** (components): replacing the inline loop at `verify-in-browser.ts` ~:457-469 with `findDuplicateVariationId` + `duplicateVariationIdMessage` is a 10-line edit beyond an import path. Its comment at ~:350-360 ("both sort correctly as text because the fractional part comes after every field") is Codex's 100 ms case, now moot in the engine; the comment is stale.
 4. **Detector gap:** no rule compares a served modifier option's availability with the record's `soldOut`. An 86'd add-on still offered on the copy is silent. A new rule id (for example an `LST-MOD-AVAIL-STATE`) is needed before scenario 2 can tell that part of its story.
 5. **C10 coverage limits, stated rather than claimed:** the families are phrase lists, not semantics. Scenario briefs and `fixtures/scenarios/README.md` sit outside `scannedFiles`; they are held by `scenarios.test.ts`'s own named-party and register probes, which do not include the saved-money family. A human claim-to-evidence review stays a named step (decision-log 2026-10-14).
-6. **`variant_dict` projection keeps only `variation`.** Other variant attributes a copy sends are dropped from the evidence by design (F4 allow-list). If a later adapter needs size/colour keys, they must be declared there.
+6. **A rule list now out of date** (outside this lane's named tests): `evals/packs/acp-field-rules.test.ts` has an `emittable` list that claims to name "every rule the listings detectors + completeness sweep can emit". It omits `LST-DATE-INVALID`, and it already omitted the three `LST-MOD-*` ids. The test only checks that its cases cover the list, so it stays green while the claim is false.
+7. **For the admitting mutation:** there is no comparison inside `instants.ts`, which only parses. The instant comparison is `copy < asOf` in `beforeAsOf` in `detectors.ts`. A flip meant to test the fix must target that line, or the re-apply mutates the wrong file and reports "doesn't bite".
+8. **`variant_dict` projection keeps only `variation`.** Other variant attributes a copy sends are dropped from the evidence by design (F4 allow-list). If a later adapter needs size/colour keys, they must be declared there.
 
 ## NOT DONE
 

@@ -39,10 +39,13 @@ import { UCP_PINNED_VERSION } from "./ucp.ts";
 // embedded in four frozen live-exam goldens (evals/crew/gold/**/l1-live-turns.json)
 // whose lock pins the engine-report hash the seats were examined on. Bumping it
 // here would force a re-pin of a pre-registered record as a merge side-effect;
-// S1.5 bumps it deliberately, regenerates the derived goldens by script, and
-// renders the Intake/Reviewer labels "requalification pending" (decision-log
-// 2026-10-14). Pre-existing feeds carry no menu fields and produce byte-identical
-// reports either way (evals/packs/listings-coverage-c6.test.ts).
+// S1.5 was to bump it deliberately, regenerate the derived goldens by script, and
+// render the Intake/Reviewer labels "requalification pending" (decision-log
+// 2026-10-14). NOT DONE in S1.5 (2026-10-31): the crew's pre-registered
+// `expectedEngineReportHash` pins sit outside that lane — see
+// docs/returns/2026-10-31-s15-correctness.md OPEN 1 for the file map. Pre-existing
+// feeds carry no menu fields and produce byte-identical reports either way
+// (evals/packs/listings-coverage-c6.test.ts).
 export const LISTINGS_SPEC_VERSION = `taxonomy-v1+acp-extract-2026-07-02+ucp-pin-${UCP_PINNED_VERSION}`;
 
 /**
