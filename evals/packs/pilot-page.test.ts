@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -115,9 +115,36 @@ function expected(): Map<string, string> {
   return e;
 }
 
+/**
+ * FRESHNESS — a suite that reads whatever out/ holds is fail-open: edited
+ * source would be judged against yesterday's HTML (the C10 header's phase-F
+ * finding #9). This suite does NOT rebuild (the networked `npm run build`
+ * fails in a sandbox without a font host); it refuses a page older than any
+ * input that shapes it.
+ */
+function newestInput(): { file: string; ms: number } {
+  const inputs = [
+    "app/pilot/page.tsx",
+    "lib/landing/pilot-figures.ts",
+    "lib/landing/test-guide.ts",
+    "app/globals.css",
+    ...readdirSync(join(ROOT, "fixtures", "scenarios"), { withFileTypes: true })
+      .filter((d) => d.isDirectory() && existsSync(join(ROOT, "fixtures", "scenarios", d.name, "manifest.json")))
+      .map((d) => `fixtures/scenarios/${d.name}/manifest.json`),
+  ];
+  return inputs
+    .map((file) => ({ file, ms: statSync(join(ROOT, file)).mtimeMs }))
+    .reduce((a, b) => (b.ms > a.ms ? b : a));
+}
+
 describe("/pilot is built and is the page this suite thinks it is", () => {
   it("out/ carries the /pilot page with its main element (run scripts/build-offline.mjs first)", () => {
     expect(PAGE, "no out/pilot.html — build the site before this suite").toBeDefined();
+    const newest = newestInput();
+    expect(
+      statSync(PAGE!).mtimeMs >= newest.ms,
+      `out/pilot.html is older than ${newest.file} — rebuild with scripts/build-offline.mjs`,
+    ).toBe(true);
     expect(main.length, "the built page has no <main class=\"docs-main pilot-main\">").toBeGreaterThan(1000);
     expect(visible(main)).toContain("A pilot proposal, with the arithmetic attached.");
   });

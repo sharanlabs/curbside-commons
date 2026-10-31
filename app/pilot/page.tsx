@@ -217,7 +217,7 @@ export default function PilotPage() {
                     <tr>
                       <th scope="row">{COST.catchRate.label}</th>
                       <td className="pilot-fig">{COST.catchRate.display}</td>
-                      <td className="pilot-how">the pilot would measure it; the model assumes none</td>
+                      <td>the pilot would measure it; the model assumes none</td>
                     </tr>
                   </tbody>
                 </table>

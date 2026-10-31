@@ -5245,13 +5245,15 @@ h1.p2-h1 {
   color: var(--ink);
   font-weight: 590;
 }
+/* the technical line beside each plain paragraph: prose, so it is set in the
+   sans (DESIGN.md: mono is for data, never for prose); only its inline code
+   (paths, file names) takes the mono voice */
 .pilot-tech {
   margin-top: 16px;
-  font-family: var(--ff-mono);
-  font-size: 12.5px;
+  font-size: 14px;
   line-height: 1.6;
   color: var(--muted);
-  max-width: 88ch;
+  max-width: 76ch;
   text-wrap: pretty;
 }
 .pilot-tech code,
