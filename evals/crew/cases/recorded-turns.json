@@ -28,7 +28,7 @@
     }
   },
   "int-route-conf-happy": {
-    "manifestDigest": "721f342b5e1c9d29b789f7fcc04305e7d7f361395f35d5c6967e355619d2c86f",
+    "manifestDigest": "7084751f7acb31d5609f9a0615cffc68b6fc9fc52dfb187e78ff36e3ea16a12d",
     "intake": {
       "kind": "route",
       "tool": "check_conformance",
@@ -179,7 +179,7 @@
     }
   },
   "evi-conf-valid-clean": {
-    "manifestDigest": "8539c34072b707290ac02a2bb0d8335ba9702fe75202a80c52f5e69fe1db39a0",
+    "manifestDigest": "8fe05239995ff89c9001b6001580ca4eeab112f4236fd3d86992f5b3e02c6ed4",
     "intake": {
       "kind": "route",
       "tool": "check_conformance",

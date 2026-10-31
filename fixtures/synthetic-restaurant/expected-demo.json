@@ -2,7 +2,7 @@
   "claim": "a spec-faithful simulated agent follows a spec-valid but false surface; the verifier catches the surface/SOR mismatch",
   "actorLabel": "spec-faithful demonstration actor — simulated",
   "simulated": true,
-  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-08-25",
   "selection": {
     "intent": "Order the \"Smoked Brisket Plate\" if the published feed lists it as available.",
     "targetTitle": "Smoked Brisket Plate",

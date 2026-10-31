@@ -91,7 +91,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "77f1e021c6ed01f778d8d400ac6845c086f78816d71e23b1ea4e0ac4be41ce5d",
+        "engineReportHash": "f62fc033e29afc977ecb0d5bad2b5189add8ed33bda60fa0398286f281f7be39",
         "consumedFindingIds": [
           "/products/0/variants/0/price/amount (minimum)"
         ]
@@ -208,7 +208,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "0f6dbc79c8be762c2f234cdd9c7c0ee41d45b20cee8fe1ca2c3607038b0b908c",
+        "engineReportHash": "1aa0ef5d77a009f5fed7cf6b810c8a5fe78ca3639659690f6f434ca9aabd71a7",
         "consumedFindingIds": [
           "item-002-v2#existence",
           "item-004-v1#availability",
@@ -311,7 +311,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "0f034e4bd79ec095f58b707523fd5e59445986a34e72e5698a70c4f2a3bf9a1b",
+        "engineReportHash": "6e241ae574b0bf1c803ef69b6eaa52274990191cd84c6cdedb66c3ef7da02385",
         "consumedFindingIds": []
       }
     },
@@ -358,7 +358,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "4fc243233232e7076dc8edb429f4d2ec97a2478aaee9b0c879766fa7c83b9cad",
+        "engineReportHash": "c55436a3458f6764f6ead818b5681210025b8c5f82643dc9224ca2d66d3ab064",
         "consumedFindingIds": [
           "/products/0/variants/0/price/amount (type)"
         ]
@@ -431,7 +431,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "0f6dbc79c8be762c2f234cdd9c7c0ee41d45b20cee8fe1ca2c3607038b0b908c",
+        "engineReportHash": "1aa0ef5d77a009f5fed7cf6b810c8a5fe78ca3639659690f6f434ca9aabd71a7",
         "consumedFindingIds": [
           "item-002-v2#existence",
           "item-004-v1#availability",
@@ -569,7 +569,7 @@
           "injection_signature:ai-addressed-directive",
           "injection_signature:approval-steering-directive"
         ],
-        "engineReportHash": "d15f079b8e146fd5d05a4a2c31b4b6b4e5dbb95bdcd637c72d6f3c8ab27603e5",
+        "engineReportHash": "63840b2dc98210aa10b65f5823536e507dee960c0092c97fa1206c1fd6914597",
         "consumedFindingIds": [
           "item-002-v2#existence",
           "item-004-v1#availability",
@@ -702,7 +702,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "0f034e4bd79ec095f58b707523fd5e59445986a34e72e5698a70c4f2a3bf9a1b",
+        "engineReportHash": "6e241ae574b0bf1c803ef69b6eaa52274990191cd84c6cdedb66c3ef7da02385",
         "consumedFindingIds": []
       }
     },
@@ -745,7 +745,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "756a27ee7aa06424ce91dda95011d307fb58f1c2a145a345d3922d1a4b0711ee",
+        "engineReportHash": "b5ef1e775b0b9f5fc7999e078bde82c6fe1623d0a213732665b72705e1fd5376",
         "consumedFindingIds": []
       }
     },
@@ -853,7 +853,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "64b8b9e557516b08267e9f993d27740de040684b3ff583780b83405eae6bec73",
+        "engineReportHash": "3169bc7857bc1e1377e6d181b0cff9f03798e6a82e2133a0d67f83f93b7f24c1",
         "consumedFindingIds": [
           "/ucp/status (enum)"
         ]

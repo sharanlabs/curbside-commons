@@ -5,7 +5,7 @@
   "ucpVersionSkew": {
     "class": "spec-version-skew",
     "surfaces": "ucp-only",
-    "pinned": "2026-04-08",
+    "pinned": "2026-08-25",
     "served": [
       "2026-03-01-draft"
     ]

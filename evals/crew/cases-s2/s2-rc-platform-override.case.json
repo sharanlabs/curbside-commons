@@ -137,7 +137,7 @@
       }
     }
   ],
-  "expectedEngineReportHash": "fb2dfabf5fc14aa83a3e28b6d76e0463853042e98142d82ff69bb85d4e2d6180",
+  "expectedEngineReportHash": "8bd4269264f60d84ebdce91bc72733a259fd085a5aa85675efa5cd3576df8d47",
   "expectedRecommendationClass": "flag-violations",
   "expectedFindingRefs": [
     "item-006-v1#availability",

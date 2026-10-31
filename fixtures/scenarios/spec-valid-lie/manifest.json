@@ -5,7 +5,7 @@
   "shapedLike": null,
   "seed": 20261006,
   "generator": "generate-scenarios.mts@1.1.0",
-  "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-08-25",
   "pack": "listings",
   "derivedFrom": {
     "fixtures": [
@@ -52,7 +52,7 @@
     "rules": "LST-PRICE-VALUE ×2",
     "conformance": "pass",
     "conformance_findings": 0,
-    "ucp_version": "2026-04-08",
+    "ucp_version": "2026-08-25",
     "schema_versions": "2026-04-08, 2026-08-25",
     "lie_rows": 2,
     "lie_title": "Truffle Fries (Small)",

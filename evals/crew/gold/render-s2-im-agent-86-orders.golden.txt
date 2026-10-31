@@ -1,6 +1,6 @@
 CREW RUN — case s2-im-agent-86-orders (SIMULATED data; orchestration harness — offline replay)
 terminal: recommendation · class: flag-violations
-engine report consumed: sha256 3e90810909ff168930a114acc24f7de10b7c17529bcc7865143ecd9f647d03c6
+engine report consumed: sha256 c642bcb72b313fd0af2d84076089d75d303b3c3512e5cce1dc7eb4ad49986a22
 
  1. INTAKE · MODEL TURN — intake routed the ask to tool "check_feed"
  2. AUDIT · TOOL CALL [check_feed] — executed "check_feed" via the registry (exit 1)
