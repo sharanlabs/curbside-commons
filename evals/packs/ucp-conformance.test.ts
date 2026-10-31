@@ -58,8 +58,9 @@ describe("UCP conformance corpus freeze-integrity (P2-1: every file byte-locked)
 
 /**
  * Wave 1 / S1-pins — BOTH vendored UCP schema folders are held to the same bar.
- * `2026-04-08` is the ACTIVE pin (UCP_PINNED_VERSION); `2026-08-25` is vendored
- * ahead of any pin move so the move is a measured decision, never a silent one.
+ * `2026-08-25` is the ACTIVE pin (UCP_PINNED_VERSION, moved from `2026-04-08` by
+ * S1.5b on 2026-10-31 after the oracle diff agreed 33/35 at both pins); `2026-04-08`
+ * stays vendored and exercised so the previous pin remains a measured comparison.
  * `fileCount` is the number of schema files each folder's PROVENANCE.json must list.
  */
 const VENDORED_UCP_VERSIONS = [
@@ -69,8 +70,8 @@ const VENDORED_UCP_VERSIONS = [
 const schemaDirFor = (version: string): string => join("fixtures", "ucp-schemas", version, "schemas");
 
 describe("the active UCP pin is one of the vendored folders", () => {
-  it("UCP_PINNED_VERSION stays 2026-04-08 and both vendored folders are exercised below", () => {
-    expect(UCP_PINNED_VERSION).toBe("2026-04-08");
+  it("UCP_PINNED_VERSION is 2026-08-25 and both vendored folders are exercised below", () => {
+    expect(UCP_PINNED_VERSION).toBe("2026-08-25");
     expect(VENDORED_UCP_VERSIONS.map((v) => v.version)).toContain(UCP_PINNED_VERSION);
     expect(VENDORED_UCP_VERSIONS.map((v) => v.version)).toEqual(["2026-04-08", "2026-08-25"]);
   });
