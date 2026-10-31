@@ -5342,6 +5342,10 @@ h1.p2-h1 {
 .pilot-table .pilot-how {
   font-size: 12px;
   color: var(--muted);
+  /* Layout-sanity contract (evals/e2e/layout-sanity.spec.ts): sentence-length text never renders
+     below 120px. Inside the half-width .pilot-cols grid the auto table layout squeezed this column to
+     its longest word (94px) at every desktop width — CI runs #84–#89, 2026-10-31. */
+  min-width: 160px;
 }
 .pilot-cols {
   display: grid;
