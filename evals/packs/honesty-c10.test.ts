@@ -830,3 +830,193 @@ describe("mockup claim scan (every committed mockup HTML, recursive)", () => {
     expect(BANNED_CLAIMS.some((p) => p.test(stripped))).toBe(false);
   });
 });
+
+// ---------------------------------------------------------------------------
+// S3 (2026-10-31) — "SHAPED LIKE" CARRIER PROBES, paragraph-scoped. ADDED; no
+// existing pattern or list above is changed.
+//
+// Plan § 14: "the honesty line gets harder — 'shaped like DoorDash's menu API'
+// must never read as DoorDash data or partnership"; the S3 platform-shaped
+// adapters put platform names into code, fixtures and reports. Two probes:
+//
+//  CARRIER   a paragraph that names DoorDash / Uber Eats / Grubhub / Square /
+//            Toast must, in the SAME paragraph, carry a nominative carrier:
+//            "shaped like", "public partner documentation", "public
+//            integration docs", "not from", "not affiliated", "nominative" —
+//            and (measured on the corpus, DEVIATION recorded in the S3 return
+//            packet) the compound "<platform>-shaped" and a "no … affiliation"
+//            statement, which say the same thing.
+//  NEXT-TO   "<platform> API", "<platform>-compatible" / "compatible with
+//            <platform>", "certified" within a sentence of a platform name, and
+//            "integrates with <platform>" never appear — on any surface, with
+//            no carrier exemption.
+//
+// A paragraph is a blank-line-separated block of a source file, where comment
+// decoration ("*", "//", "/**") counts as blank; on a built page, a block-level
+// element (p, li, h1–h6, div, td, …); every attribute value is its own
+// paragraph. Platform names match case-sensitively (as written in prose).
+//
+// Corpus measured at 02:55 (all scanned files, the S3 surfaces, every built
+// page): 0 NEXT-TO hits; 17 CARRIER hits before the two compound carriers were
+// recognised, 9 after — 2 in this lane's own adapter (reworded) and 7 in the
+// field comments of lib/packs/listings/types.ts ("≈ Square CatalogItem subset"),
+// a file outside this lane: pinned below by exact count (a new hit, or a fix,
+// turns the pin red) and listed under OPEN for the lane that owns the file.
+//
+// RED proofs (2026-10-31): each planted phrase below is RED in isolation and
+// each honest one GREEN; "Shaped like DoorDash's public partner documentation."
+// appended as its own paragraph to docs/pilot-kit/README.md stays green while
+// "The menu feed comes from DoorDash." appended there turns the corpus test RED
+// (the honest paragraph alone: 1 passed; with the planted one: 1 failed, naming
+// "docs/pilot-kit/README.md: carrier: The menu feed comes from DoorDash.");
+// restored byte-for-byte (sha256/16 d3f9f79d1cf7bf97 → ea94be00763b1da3 with both
+// appended → d3f9f79d1cf7bf97).
+// ---------------------------------------------------------------------------
+
+const S3_PLATFORM = String.raw`(?:DoorDash|Uber\s?Eats|Grubhub|Square|Toast)`;
+const S3_NAMED = new RegExp(String.raw`\b${S3_PLATFORM}\b`);
+const S3_CARRIER = new RegExp(
+  String.raw`shaped like|public partner documentation|public integration docs|not from|not affiliated|nominative|\b${S3_PLATFORM}(?:[- ][A-Za-z]+){0,2}-shaped\b|\bno\s+(?:[A-Za-z]+\s+){0,2}affiliation\b`,
+  "i",
+);
+const S3_NEXT_TO: readonly RegExp[] = [
+  new RegExp(String.raw`\b${S3_PLATFORM}\s+API\b`),
+  new RegExp(String.raw`\b${S3_PLATFORM}[- ]compatible\b|\bcompatible\s+with\s+${S3_PLATFORM}\b`, "i"),
+  new RegExp(String.raw`\bcertified\b[^.!?]{0,40}\b${S3_PLATFORM}\b|\b${S3_PLATFORM}\b[^.!?]{0,40}\bcertified\b`),
+  new RegExp(String.raw`\bintegrates?\s+with\s+${S3_PLATFORM}\b`, "i"),
+];
+
+/** Blank-line paragraphs of a source/prose file (comment decoration counts as blank). */
+function s3Paragraphs(text: string): string[] {
+  const out: string[] = [];
+  let cur: string[] = [];
+  for (const raw of text.split("\n")) {
+    const line = raw.replace(/^\s*(?:\/\/+|\/\*\*?|\*\/|\*(?!\*))?\s?/, "").trim();
+    if (line === "" || line === "*/") {
+      if (cur.length > 0) out.push(cur.join(" "));
+      cur = [];
+    } else cur.push(line);
+  }
+  if (cur.length > 0) out.push(cur.join(" "));
+  return out;
+}
+
+/** Block-level paragraphs of a built page's visible text, plus each attribute value on its own. */
+function s3PageParagraphs(html: string): string[] {
+  const blocks = html
+    .replace(/<script\b[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style\b[\s\S]*?<\/style>/gi, " ")
+    .replace(/<\/(?:p|li|h[1-6]|div|section|td|th|dd|dt|blockquote|figcaption|caption|footer|header|article|tr|summary|ul|ol|table|nav|main|aside)>|<br\s*\/?>/gi, "\n\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&rsquo;|&#39;|&#x27;|&apos;/g, "'")
+    .replace(/&ldquo;|&rdquo;|&quot;/g, '"')
+    .replace(/&nbsp;/g, " ")
+    .split(/\n\s*\n/)
+    .map((x) => x.replace(/\s+/g, " ").trim())
+    .filter((x) => x !== "");
+  return [...blocks, ...attributeTexts(html)];
+}
+
+/** Every carrier / next-to violation in a list of paragraphs. */
+function s3Violations(paragraphs: readonly string[]): string[] {
+  const out: string[] = [];
+  for (const p of paragraphs) {
+    if (S3_NAMED.test(p) && !S3_CARRIER.test(p)) out.push(`carrier: "${p.slice(0, 160)}"`);
+    for (const re of S3_NEXT_TO) {
+      const m = re.exec(p);
+      if (m) out.push(`next-to: "${m[0]}" in "${p.slice(0, 160)}"`);
+    }
+  }
+  return out;
+}
+
+/** The S3 surfaces — every new file a reader or a report sees, named explicitly (never globbed). */
+const S3_SURFACES = [
+  join(root, "lib", "packs", "listings", "adapters-platform", "shared.ts"),
+  join(root, "lib", "packs", "listings", "adapters-platform", "doordash-shaped.ts"),
+  join(root, "lib", "packs", "listings", "adapters-platform", "uber-shaped.ts"),
+  join(root, "lib", "packs", "listings", "adapters-platform", "order-errors-csv.ts"),
+  join(root, "lib", "packs", "listings", "mapping-sheet.ts"),
+  join(root, "lib", "packs", "listings", "scorecard.ts"),
+  join(root, "fixtures", "scenarios", "README.md"),
+  join(root, "fixtures", "scenarios", "partner-onboarding", "brief.md"),
+  join(root, "fixtures", "scenarios", "partner-onboarding", "expected", "README.md"),
+  join(root, "fixtures", "scenarios", "partner-onboarding", "expected", "scorecard.json"),
+  join(root, "fixtures", "scenarios", "injected-artifact", "brief.md"),
+  join(root, "fixtures", "scenarios", "injected-artifact", "expected", "README.md"),
+  join(root, "fixtures", "scenarios", "injected-artifact", "expected", "platform-report.json"),
+];
+
+/** Out-of-lane files with a measured, pinned count of carrier hits awaiting rewording (OPEN in the S3 packet). */
+const S3_PENDING_REWORD: Readonly<Record<string, number>> = {
+  [join(root, "lib", "packs", "listings", "types.ts")]: 7,
+};
+
+const S3_PLANTED_RED: readonly string[] = [
+  "The menu feed comes from DoorDash.",
+  "Built on the DoorDash API.",
+  "A DoorDash-compatible feed checker.",
+  "Fully compatible with Uber Eats menus.",
+  "Certified for Grubhub menus.",
+  "A Square certified integration partner, shaped like the public docs.",
+  "The checker integrates with Toast.",
+];
+const S3_HONEST_GREEN: readonly string[] = [
+  "Shaped like DoorDash's public partner documentation (read 2026-10-31), not from the platform; never called; not affiliated.",
+  "A DoorDash-shaped menu document, read field by field.",
+  "The record is a Square-Catalog-shaped subset that claims no Square affiliation.",
+  "Uber Eats names are nominative references to public integration docs.",
+];
+
+describe("C10 S3 — 'shaped like' carrier probes (paragraph-scoped) and the never-next-to strings", () => {
+  it.each(S3_PLANTED_RED)("bites in isolation: %s", (planted) => {
+    expect(s3Violations(s3Paragraphs(planted)).length, planted).toBeGreaterThan(0);
+  });
+
+  it.each(S3_HONEST_GREEN)("an honest paragraph stays green: %s", (honest) => {
+    expect(s3Violations(s3Paragraphs(honest))).toEqual([]);
+  });
+
+  it("a carrier in ANOTHER paragraph does not exempt the name (paragraph scope, not file scope)", () => {
+    expect(s3Violations(s3Paragraphs("Shaped like the public partner documentation.\n\nThe menu feed comes from DoorDash."))).toHaveLength(1);
+    expect(s3Violations(s3Paragraphs("/**\n * Shaped like the public docs.\n *\n * Rows from DoorDash.\n */"))).toHaveLength(1);
+    expect(s3Violations(s3PageParagraphs("<p>Shaped like the public partner documentation.</p><p>Rows from Uber Eats.</p>"))).toHaveLength(1);
+    expect(s3Violations(s3PageParagraphs('<img alt="Rows from Grubhub" src="x.png"><p>not affiliated</p>'))).toHaveLength(1);
+  });
+
+  it.each(S3_SURFACES)("S3 surface %s: the existing banned and new-family claims are absent", (file) => {
+    const text = readFileSync(file, "utf8");
+    for (const pattern of BANNED_CLAIMS) expect(pattern.test(text), `${pattern} in ${file}`).toBe(false);
+    expect(newClaimViolations(text)).toEqual([]);
+  });
+
+  it("every scanned file and every S3 surface: no carrier or next-to violation (the out-of-lane pin holds exactly)", () => {
+    const violations: string[] = [];
+    for (const file of [...new Set([...scannedFiles, ...S3_SURFACES])]) {
+      const found = s3Violations(s3Paragraphs(readFileSync(file, "utf8")));
+      const pinned = S3_PENDING_REWORD[file];
+      if (pinned !== undefined) {
+        expect(found.length, `${relative(root, file)}: pinned carrier count (reword it, then lower the pin)`).toBe(pinned);
+        expect(found.every((v) => v.startsWith("carrier:")), relative(root, file)).toBe(true);
+        continue;
+      }
+      for (const v of found) violations.push(`${relative(root, file)}: ${v}`);
+    }
+    expect(violations, violations.join("\n")).toEqual([]);
+    for (const file of Object.keys(S3_PENDING_REWORD)) expect(scannedFiles, file).toContain(file);
+  });
+
+  it(
+    "every built page: no carrier or next-to violation in any block or attribute value",
+    { timeout: 600_000 },
+    () => {
+      ensureBuilt();
+      const violations: string[] = [];
+      for (const file of htmlFiles(outDir)) {
+        for (const v of s3Violations(s3PageParagraphs(readFileSync(file, "utf8")))) violations.push(`${relative(root, file)}: ${v}`);
+      }
+      expect(violations, violations.join("\n")).toEqual([]);
+    },
+  );
+});

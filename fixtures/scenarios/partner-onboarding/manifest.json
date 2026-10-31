@@ -4,7 +4,7 @@
   "simulated": true,
   "shapedLike": null,
   "seed": 20261005,
-  "generator": "generate-scenarios.mts@1.1.0",
+  "generator": "generate-scenarios.mts@1.2.0",
   "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-08-25",
   "pack": "listings",
   "derivedFrom": {
@@ -23,16 +23,45 @@
       "name"
     ],
     "record": "unchanged copy of the base record",
-    "feed": "faithful feed with the chosen rows drifted one way each (price · availability · name)"
+    "feed": "faithful feed with the chosen rows drifted one way each (price · availability · name)",
+    "partnerOps": "synthetic partner-operations record drawn after the drift draws (injections, visible menu issues and their fix hours, orders)",
+    "partnerOpsRanges": {
+      "injections": [
+        1800,
+        2199
+      ],
+      "injectionFailures": [
+        1,
+        6
+      ],
+      "issues": [
+        3,
+        7
+      ],
+      "fixHours": [
+        2,
+        72
+      ],
+      "orders": [
+        600,
+        1499
+      ],
+      "failedOrders": [
+        0,
+        11
+      ]
+    }
   },
   "inputs": [
     "inputs/events.jsonl",
     "inputs/feed.json",
+    "inputs/partner-ops.json",
     "inputs/record.json"
   ],
   "expected": [
     "expected/report.json",
-    "expected/README.md"
+    "expected/README.md",
+    "expected/scorecard.json"
   ],
   "absentUntilS2": [
     "root-cause",
@@ -49,6 +78,12 @@
     "rules": "LST-AVAIL-STATE ×2, LST-IDENT-NAME ×2, LST-PRICE-VALUE ×2",
     "clean_rows": 18,
     "drifted_rows": 6,
-    "clean_pct": "75.0%"
+    "clean_pct": "75.0%",
+    "scorecard_rows": 9,
+    "scorecard_met": 3,
+    "scorecard_not_met": 3,
+    "scorecard_not_measured": 3,
+    "criteria_read": "2026-10-31",
+    "injection_rate": "2193 of 2194 (99.95 %)"
   }
 }

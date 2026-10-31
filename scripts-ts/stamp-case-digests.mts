@@ -28,7 +28,9 @@ import { caseManifestDigest } from "../lib/crew/manifest.ts";
 import type { CrewCase } from "../lib/crew/types.ts";
 
 /** The replay case directories that carry recorded turns (the frozen L-1 split is NOT stamped: its turns are a live run's provenance). */
-export const STAMPED_CASE_DIRS = ["evals/crew/cases", "evals/crew/cases-s2"] as const;
+export const STAMPED_CASE_DIRS = ["evals/crew/cases", "evals/crew/cases-s2",
+  "evals/crew/cases-s3", // S3 lane (2026-10-31): scenario 8's crew case binds its artifact bytes too
+] as const;
 
 type Mode = "plain" | "ascii";
 

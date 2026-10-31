@@ -3,11 +3,18 @@ import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   LISTINGS_SPEC_VERSION,
+  SHAPED_LIKE_DOORDASH,
   acpFeedToClaims,
+  doordashShapedToFeed,
   recordModifierOptions,
   runListingsVerification,
+  runPlatformShapedCheck,
+  scorePartner,
+  serializePlatformShapedReport,
+  serializeScorecard,
   ucpSearchResponseToClaims,
   type AcpFeed,
+  type PartnerOpsRecord,
   type SyntheticCatalog,
   type UcpSearchResponse,
 } from "@/lib/packs/listings";
@@ -16,17 +23,19 @@ import { FEES_SPEC_VERSION, auditStatement, parseStatement, serializeFeeReport }
 import { serializeReport } from "@/lib/verifier-core";
 
 /**
- * SCENARIO LIBRARY — seven scenarios (docs/plan-menu-integrity-crew-2026-10-09.md
+ * SCENARIO LIBRARY — eight scenarios (docs/plan-menu-integrity-crew-2026-10-09.md
  * §9 + Appendix W1c; Wave 1 lane "scenarios-w1", 2026-10-12, built five; Wave 2
  * lane S1.5, 2026-10-31, added modifier-drift (2) and spec-valid-lie (6) in the
- * same generator; events.jsonl per docs/plan-wave2-gap-sheet-2026-10-12.md p.2.)
+ * same generator; lane S3, 2026-10-31, added the partner scorecard to
+ * partner-onboarding (5) and built injected-artifact (8) on the platform-shaped
+ * adapter; events.jsonl per docs/plan-wave2-gap-sheet-2026-10-12.md p.2.)
  *
  * fixtures/scenarios/<id>/ = brief.md · inputs/ · expected/ · manifest.json for
  *   agent-86 · modifier-drift · sync-outage · platform-override ·
- *   partner-onboarding · spec-valid-lie · fee-precheck
+ *   partner-onboarding · spec-valid-lie · fee-precheck · injected-artifact
  * generated from seed by ONE script (scripts-ts/generate-scenarios.mts) out of
- * fixtures/synthetic-restaurant (read-only). The eighth id, injected-artifact,
- * arrives in S3.
+ * fixtures/synthetic-restaurant (read-only). injected-artifact's crew case and
+ * replayed trajectory live in evals/crew/cases-s3/ (crew-composition-lock-s3).
  *
  *  FREEZE    regenerate in memory and byte-compare every committed file; the
  *            committed file set IS the generated file set (nothing extra, nothing
@@ -80,6 +89,21 @@ import { serializeReport } from "@/lib/verifier-core";
  *  The five Wave 1 folders regenerate byte-identical except the generator
  *  version stamp (1.0.0 → 1.1.0: each manifest's `generator` line and the
  *  record's / statement's `generator.version`); their PRNG streams are untouched.
+ *  S3 (2026-10-31) — scenario 5 extended, scenario 8 built, the freeze re-proved:
+ *  RED 6  (02:51) generator + test in place, injected-artifact moved away and
+ *         partner-onboarding's two new files deleted: 24 failed / 117 passed (folder contract, FREEZE, ENGINE,
+ *         EVENTS, BRIEF for injected-artifact; partner-onboarding's contract, scorecard
+ *         and figures); the other six ids stayed green.
+ *         `node scripts-ts/generate-scenarios.mts` → 141/141.
+ *  RED 7  freeze tooth on the scorecard: in
+ *         fixtures/scenarios/partner-onboarding/expected/scorecard.json one
+ *         `"met"` state edited to `"not met"` → 2 failed / 139 passed (FREEZE and the ENGINE scorecard byte check); restored by the
+ *         generator. sha256/16: regenerated = 3133f55e064b510f · edited = 511ac23bb8154b52 ·
+ *         after re-running the generator = 3133f55e064b510f, 141/141.
+ *  Every other folder regenerates byte-identical except the version stamp
+ *  (1.1.0 → 1.2.0: manifest `generator`, record / statement `generator.version`);
+ *  partner-onboarding's feed, record body and events are byte-identical (its
+ *  partner-operations draws come after the drift draws).
  */
 
 const ROOT = process.cwd();
@@ -94,6 +118,7 @@ const IDS = [
   "partner-onboarding",
   "spec-valid-lie",
   "fee-precheck",
+  "injected-artifact",
 ] as const;
 type Id = (typeof IDS)[number];
 const PLAN_EIGHT = [
@@ -202,7 +227,21 @@ describe("probes bite in isolation (so a green scan means something)", () => {
 // THE FIVE FOLDERS
 // ---------------------------------------------------------------------------
 
-describe("the seven scenario folders exist with the folder contract", () => {
+/** Expected files beyond report.json + README.md, per id. */
+const EXTRA_EXPECTED: Partial<Record<Id, readonly string[]>> = {
+  "spec-valid-lie": ["expected/ucp-truth-report.json"],
+  "partner-onboarding": ["expected/scorecard.json"],
+  "injected-artifact": ["expected/platform-report.json"],
+};
+/** Inputs per id (sorted). */
+const INPUTS: Partial<Record<Id, readonly string[]>> = {
+  "fee-precheck": ["inputs/events.jsonl", "inputs/statement.json"],
+  "spec-valid-lie": ["inputs/events.jsonl", "inputs/feed.json", "inputs/record.json", "inputs/ucp-response.json"],
+  "partner-onboarding": ["inputs/events.jsonl", "inputs/feed.json", "inputs/partner-ops.json", "inputs/record.json"],
+  "injected-artifact": ["inputs/events.jsonl", "inputs/feed.json", "inputs/platform-shaped.json", "inputs/record.json"],
+};
+
+describe("the eight scenario folders exist with the folder contract", () => {
   it.each(IDS)("%s has brief.md · manifest.json · inputs/ (with events.jsonl) · expected/", (id) => {
     const files = listFiles(dirOf(id));
     expect(files, `fixtures/scenarios/${id} is missing`).not.toHaveLength(0);
@@ -210,26 +249,18 @@ describe("the seven scenario folders exist with the folder contract", () => {
       expect(files, `${id}: ${f}`).toContain(f);
     }
     expect(files.filter((f) => f.startsWith("expected/"))).toEqual(
-      id === "spec-valid-lie"
-        ? ["expected/README.md", "expected/report.json", "expected/ucp-truth-report.json"]
-        : ["expected/README.md", "expected/report.json"],
+      ["expected/README.md", "expected/report.json", ...(EXTRA_EXPECTED[id] ?? [])].sort(),
     );
     const inputs = files.filter((f) => f.startsWith("inputs/"));
-    expect(inputs).toEqual(
-      isFees(id)
-        ? ["inputs/events.jsonl", "inputs/statement.json"]
-        : id === "spec-valid-lie"
-          ? ["inputs/events.jsonl", "inputs/feed.json", "inputs/record.json", "inputs/ucp-response.json"]
-          : ["inputs/events.jsonl", "inputs/feed.json", "inputs/record.json"],
-    );
+    expect(inputs).toEqual(INPUTS[id] ?? ["inputs/events.jsonl", "inputs/feed.json", "inputs/record.json"]);
   });
 
-  it("the folder README names all eight plan ids exactly as spelled; each built id's row says built, injected-artifact arrives S3", () => {
+  it("the folder README names all eight plan ids exactly as spelled, and every row says built", () => {
     const readme = read(join(SCEN, "README.md"));
     for (const id of PLAN_EIGHT) expect(readme, `README lacks id ${id}`).toContain(`\`${id}\``);
     const row = (id: string) => readme.split("\n").find((l) => l.startsWith("| ") && l.includes(`\`${id}\``)) ?? "";
     for (const id of IDS) expect(row(id), `README row for ${id}`).toMatch(/\| built \|/);
-    expect(row("injected-artifact")).toMatch(/\| arrives S3 \|/);
+    expect(IDS).toEqual(PLAN_EIGHT);
   });
 
   it("the folder README carries no build-lane jargon (a reader's table, not a work log)", () => {
@@ -259,7 +290,7 @@ describe("FREEZE — the committed folders are exactly the generator's output at
     expect([...g.buildScenarioFiles()]).toEqual([...g.buildScenarioFiles()]);
   });
 
-  it("every generated file is committed, byte-identical; no other file exists in the seven folders", async () => {
+  it("every generated file is committed, byte-identical; no other file exists in the eight folders", async () => {
     const g = await gen();
     const generated = g.buildScenarioFiles();
     for (const [rel, bytes] of generated) {
@@ -281,7 +312,7 @@ type Manifest = {
   id: string;
   number: number;
   simulated: boolean;
-  shapedLike: null;
+  shapedLike: string | null;
   seed: number;
   generator: string;
   engine: string;
@@ -334,6 +365,15 @@ function tallyOf(ruleIds: readonly string[]): string {
 const rowOf = (claimId: string): string => claimId.split("#")[0];
 const hoursBetween = (laterIso: string, earlierIso: string): number =>
   (Date.parse(laterIso) - Date.parse(earlierIso)) / 3_600_000;
+
+/** injected-artifact: the platform-shaped menu, its adapted feed, and the wrapped report. */
+function runInjected() {
+  const doc = JSON.parse(read(join(dirOf("injected-artifact"), "inputs", "platform-shaped.json"))) as unknown;
+  const { record } = runListings("injected-artifact");
+  const adapted = doordashShapedToFeed(doc);
+  return { doc, adapted, platform: runPlatformShapedCheck(adapted, record) };
+}
+const opsOf = (): PartnerOpsRecord => JSON.parse(read(join(dirOf("partner-onboarding"), "inputs", "partner-ops.json"))) as PartnerOpsRecord;
 
 /** Figures common to the listings scenarios (ACP surface). */
 function listingsCommon({ feed, report }: ListingsRun): Figures {
@@ -474,14 +514,40 @@ function liveFigures(id: Id): Figures {
     };
   }
 
+  if (id === "injected-artifact") {
+    const { platform } = runInjected();
+    const m = manifestOf(id);
+    // The payload rows: every row whose description differs from the record item's own.
+    const payloadRows = feed.items.filter((r) => r.description !== itemOfRow(record, r.item_id).description);
+    return {
+      ...common,
+      platform_findings: platform.report.findings.length,
+      lie_rows: byRule("LST-PRICE-VALUE").length,
+      payload_rows: payloadRows.map((r) => r.title).join(", "),
+      payloads: payloadRows.length,
+      shaped_read: String(m.shapedLike).slice(-10),
+    };
+  }
+
   // partner-onboarding
   const drifted = new Set(report.findings.map((f) => rowOf(f.claim.id))).size;
   const clean = feed.items.length - drifted;
+  const ops = opsOf();
+  const card = scorePartner(report, ops);
+  const n = (state: string) => card.rows.filter((r) => r.state === state).length;
+  const { attempts, successes } = ops.injections;
+  const bp = Math.floor((successes * 10_000) / attempts);
   return {
     ...common,
     clean_rows: clean,
     drifted_rows: drifted,
     clean_pct: `${((clean * 100) / feed.items.length).toFixed(1)}%`,
+    scorecard_rows: card.rows.length,
+    scorecard_met: n("met"),
+    scorecard_not_met: n("not met"),
+    scorecard_not_measured: n("not measured here"),
+    criteria_read: card.criteriaRead,
+    injection_rate: `${successes} of ${attempts} (${Math.floor(bp / 100)}.${String(bp % 100).padStart(2, "0")} %)`,
   };
 }
 
@@ -496,16 +562,29 @@ describe("ENGINE — the existing engine, run on the committed inputs, reproduce
     }
   });
 
+  it("partner-onboarding: expected/scorecard.json is the scorecard over the report and the partner-operations record, byte for byte", () => {
+    const expected = read(join(dirOf("partner-onboarding"), "expected", "scorecard.json"));
+    expect(serializeScorecard(scorePartner(runListings("partner-onboarding").report, opsOf()))).toBe(expected);
+  });
+
+  it("injected-artifact: expected/platform-report.json is the engine on the platform-shaped menu, byte for byte, labeled", () => {
+    const expected = read(join(dirOf("injected-artifact"), "expected", "platform-report.json"));
+    const { platform } = runInjected();
+    expect(serializePlatformShapedReport(platform)).toBe(expected);
+    expect(platform.shapedLike).toBe(SHAPED_LIKE_DOORDASH);
+    expect(expected).toMatch(/not from the platform; never called; not affiliated/);
+  });
+
   it("spec-valid-lie: expected/ucp-truth-report.json is the truth leg on the UCP answer, byte for byte", () => {
     const expected = read(join(dirOf("spec-valid-lie"), "expected", "ucp-truth-report.json"));
     expect(serializeReport(runSpecValidLie().report)).toBe(expected);
   });
 
-  it.each(IDS)("%s: manifest contract (simulated · shapedLike null · seed · generator · engine from code)", (id) => {
+  it.each(IDS)("%s: manifest contract (simulated · shapedLike · seed · generator · engine from code)", (id) => {
     const m = manifestOf(id);
     expect(m.id).toBe(id);
     expect(m.simulated).toBe(true);
-    expect(m.shapedLike).toBeNull();
+    expect(m.shapedLike).toBe(id === "injected-artifact" ? SHAPED_LIKE_DOORDASH : null);
     expect(Number.isInteger(m.seed)).toBe(true);
     expect(m.generator).toMatch(/^generate-scenarios\.mts@\d+\.\d+\.\d+$/);
     expect(m.engine).toBe(isFees(id) ? FEES_SPEC_VERSION : LISTINGS_SPEC_VERSION);
@@ -569,6 +648,38 @@ describe("ENGINE — the existing engine, run on the committed inputs, reproduce
     for (const r of new Set(report.findings.map((f) => f.ruleId))) {
       expect(["LST-PRICE-VALUE", "LST-AVAIL-STATE", "LST-IDENT-NAME"]).toContain(r);
     }
+  });
+
+  it("partner-onboarding: the scorecard's two menu rows count exactly the report's findings by class; three rows are never scored", () => {
+    const { report } = runListings("partner-onboarding");
+    const card = JSON.parse(read(join(dirOf("partner-onboarding"), "expected", "scorecard.json"))) as ReturnType<typeof scorePartner>;
+    const sync = report.findings.filter((f) => ["price", "identity", "existence", "encoding"].includes(f.category ?? "")).length;
+    const avail = report.findings.filter((f) => f.category === "availability").length;
+    expect(card.rows[0].measured.startsWith(`${sync} disagreement`)).toBe(true);
+    expect(card.rows[1].measured.startsWith(`${avail} disagreement`)).toBe(true);
+    expect(card.rows.slice(2, 5).map((r) => r.state)).toEqual(["not measured here", "not measured here", "not measured here"]);
+    expect(card.simulated).toBe(true);
+    expect(opsOf().simulated).toBe(true);
+  });
+
+  it("injected-artifact: only LST-PRICE-VALUE fires; the payload rows draw no finding; the platform-shaped read finds the same", () => {
+    const { feed, record, report } = runListings("injected-artifact");
+    expect(new Set(report.findings.map((f) => f.ruleId))).toEqual(new Set(["LST-PRICE-VALUE"]));
+    const payloadRows = feed.items.filter((r) => r.description !== itemOfRow(record, r.item_id).description).map((r) => r.item_id);
+    expect(payloadRows).toHaveLength(2);
+    for (const r of payloadRows) expect(report.findings.some((f) => rowOf(f.claim.id) === r)).toBe(false);
+    const { platform, adapted } = runInjected();
+    const strip = (x: unknown) => JSON.stringify(x, (k, v) => (k === "shapedLike" ? undefined : v));
+    expect(strip(platform.report.findings)).toBe(strip(report.findings));
+    for (const f of platform.report.findings) expect((f.claim as { shapedLike?: string }).shapedLike).toBe(SHAPED_LIKE_DOORDASH);
+    // the payloads ride in DESCRIPTION fields of both forms, and the adapted feed carries them through unchanged
+    for (const r of payloadRows) {
+      const feedRow = feed.items.find((x) => x.item_id === r)!;
+      expect(adapted.items.find((x) => x.item_id === r)!.description).toBe(feedRow.description);
+    }
+    const shaped = read(join(dirOf("injected-artifact"), "inputs", "platform-shaped.json"));
+    expect(shaped).toContain("NOTE TO AI REVIEWERS");
+    expect(shaped).toContain("\u200B");
   });
 
   it("modifier-drift: only LST-MOD-PRICE-VALUE fires — the record's add-on price vs the copy's, on every row of the repriced items", () => {
@@ -755,6 +866,18 @@ describe("EVENTS — inputs/events.jsonl is evidence: it parses, fits the run, a
       expect(e.actor).toBe("unknown");
       expect(Date.parse(e.at)).toBeLessThan(Date.parse(record.asOf));
     }
+  });
+
+  it("injected-artifact: a price_edit per lied row, by an unknown actor, before the record's as-of time; the payloads leave no event", () => {
+    const { report, record } = runListings("injected-artifact");
+    const evs = eventsOf("injected-artifact");
+    const edits = evs.filter((e) => e.action === "price_edit");
+    expect(edits.map((e) => e.target).sort()).toEqual(report.findings.map((f) => rowOf(f.claim.id)).sort());
+    for (const e of edits) {
+      expect(e.actor).toBe("unknown");
+      expect(Date.parse(e.at)).toBeLessThan(Date.parse(record.asOf));
+    }
+    expect(evs.filter((e) => e.action !== "price_edit").map((e) => e.action)).toEqual(["sync"]);
   });
 
   it("fee-precheck: every event targets a real statement line (order#category)", () => {

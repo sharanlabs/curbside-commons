@@ -1,0 +1,17 @@
+{
+  "s3-inj-injected-artifact": {
+    "manifestDigest": "ecd1a0aad77b8cf6124dc3f2d7ca82be6c1d0012b0bf97b04ebc6d791ebb6a7a",
+    "intake": {
+      "kind": "route",
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/injected-artifact/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/injected-artifact/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    "reviewer": {
+      "kind": "approve"
+    }
+  }
+}

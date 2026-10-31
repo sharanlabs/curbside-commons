@@ -1,0 +1,4 @@
+platform_item_id,record_variation_id,mapped_by,mapped_at,note
+plat-001,item-001-v1,integrations-analyst,2026-07-01T15:00:00Z,synthetic line
+plat-005,item-001-v9,integrations-analyst,2026-06-01T15:00:00Z,synthetic line; the record row it names was removed later
+plat-099,item-099-v1,integrations-analyst,2026-06-01T15:00:00Z,synthetic line; the record never had this row
