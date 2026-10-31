@@ -5349,7 +5349,12 @@ h1.p2-h1 {
 }
 .pilot-cols {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* One column by decision (2026-10-31, CI runs #84–#93): .docs-wrap caps the measure at 1040px, so two
+     three-column tables with sentence-length cells shared 968px at EVERY desktop width — the
+     arithmetic column fell to its longest word (94px), a floor on it pushed the label column under
+     the layout-sanity 120px measure instead, and the wrapper began to scroll sideways (axe:
+     scrollable region). Stacked, each table has the full measure and nothing scrolls. */
+  grid-template-columns: 1fr;
   gap: clamp(24px, 4vw, 40px);
   align-items: start;
 }
