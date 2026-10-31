@@ -1,0 +1,102 @@
+{
+  "caseId": "s2-rc-modifier-drift",
+  "manifestDigest": "90ff13e11af435377951ed4fe150f20024670978645223b617b616a52dccf488",
+  "member": "root-cause",
+  "inputArtifact": {
+    "path": "fixtures/scenarios/modifier-drift/inputs/feed.json"
+  },
+  "ask": "Nightly sweep: check this marketplace copy against the merchant's record.",
+  "allowedTools": [
+    "check_feed",
+    "explain_drift",
+    "size_impact"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/modifier-drift/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/modifier-drift/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    {
+      "tool": "explain_drift",
+      "params": {
+        "findings": [
+          {
+            "id": "item-009-v1#modifier.item-009-m1-o3",
+            "ruleId": "LST-MOD-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-009-m1-o3"
+          },
+          {
+            "id": "item-009-v2#modifier.item-009-m1-o3",
+            "ruleId": "LST-MOD-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-009-m1-o3"
+          },
+          {
+            "id": "item-009-v3#modifier.item-009-m1-o3",
+            "ruleId": "LST-MOD-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-009-m1-o3"
+          },
+          {
+            "id": "item-011-v1#modifier.item-011-m1-o2",
+            "ruleId": "LST-MOD-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-011-m1-o2"
+          },
+          {
+            "id": "item-011-v2#modifier.item-011-m1-o2",
+            "ruleId": "LST-MOD-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-011-m1-o2"
+          }
+        ],
+        "events": [
+          {
+            "at": "2026-07-02T00:00:00Z",
+            "actor": "integrator",
+            "action": "sync",
+            "target": "catalog"
+          },
+          {
+            "at": "2026-07-02T21:46:00Z",
+            "actor": "merchant",
+            "action": "price_edit",
+            "target": "item-011-m1-o2"
+          },
+          {
+            "at": "2026-07-02T21:54:00Z",
+            "actor": "merchant",
+            "action": "price_edit",
+            "target": "item-009-m1-o3"
+          }
+        ],
+        "asOf": "2026-07-03T00:00:00Z"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "a7b940d7c44f1e2585c0a6299074bad2066207576943df6a6c4a02a0d3f7f860",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "item-009-v1#modifier.item-009-m1-o3",
+    "item-009-v2#modifier.item-009-m1-o3"
+  ],
+  "expectedGateState": "approve-recommendation",
+  "s2": {
+    "eventsPath": "fixtures/scenarios/modifier-drift/inputs/events.jsonl",
+    "asOf": "2026-07-03T00:00:00Z",
+    "route": {
+      "pack": "listings",
+      "triggerKind": "sweep",
+      "ownership": "merchant"
+    }
+  }
+}

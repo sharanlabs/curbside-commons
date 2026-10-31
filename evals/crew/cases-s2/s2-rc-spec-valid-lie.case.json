@@ -1,0 +1,81 @@
+{
+  "caseId": "s2-rc-spec-valid-lie",
+  "manifestDigest": "f5bac0c983f50b22dbc7fdd0d801b9a9a605b9161b88ed16ea85dd3b76686930",
+  "member": "root-cause",
+  "inputArtifact": {
+    "path": "fixtures/scenarios/spec-valid-lie/inputs/feed.json"
+  },
+  "ask": "Before an agent relies on this catalog's prices, check the feed it was built from against the merchant's record.",
+  "allowedTools": [
+    "check_feed",
+    "explain_drift",
+    "size_impact"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/spec-valid-lie/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/spec-valid-lie/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    {
+      "tool": "explain_drift",
+      "params": {
+        "findings": [
+          {
+            "id": "item-010-v1#price.amount",
+            "ruleId": "LST-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-010-v1"
+          },
+          {
+            "id": "item-011-v1#price.amount",
+            "ruleId": "LST-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-011-v1"
+          }
+        ],
+        "events": [
+          {
+            "at": "2026-07-02T22:30:00Z",
+            "actor": "integrator",
+            "action": "sync",
+            "target": "catalog"
+          },
+          {
+            "at": "2026-07-02T23:05:00Z",
+            "actor": "unknown",
+            "action": "price_edit",
+            "target": "item-010-v1"
+          },
+          {
+            "at": "2026-07-02T23:17:00Z",
+            "actor": "unknown",
+            "action": "price_edit",
+            "target": "item-011-v1"
+          }
+        ],
+        "asOf": "2026-07-03T00:00:00Z"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "4b5375b15103b9f0536096393c8e6c4f9d30ffaedb0e7824e0aaf28994be6bac",
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human",
+  "s2": {
+    "eventsPath": "fixtures/scenarios/spec-valid-lie/inputs/events.jsonl",
+    "asOf": "2026-07-03T00:00:00Z",
+    "route": {
+      "pack": "listings",
+      "triggerKind": "agent-preflight",
+      "ownership": "unknown"
+    }
+  }
+}

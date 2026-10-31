@@ -46,6 +46,9 @@ const EXPECTED: Record<string, { explain: string | null; route: string; terminal
   "s2-rc-sync-outage": { explain: "sync-latency", route: "partner", terminal: "recommendation" },
   "s2-rc-platform-override": { explain: "platform-override", route: "merchant-ops", terminal: "recommendation" },
   "s2-rc-partner-onboarding": { explain: "unknown", route: "human-escalation", terminal: "escalate-to-human" }, // ownership unknown dominates the onboarding trigger (route row 2; Codex 2026-10-14 adopted at merge 2026-10-31)
+  // W3-a CP2 (2026-10-31): scenarios 2 and 6. Routes are the table's answer for the case's stated ownership, never chosen here.
+  "s2-rc-modifier-drift": { explain: "merchant-edit", route: "merchant-ops", terminal: "recommendation" }, // merchant price_edit on both repriced options after the last sync
+  "s2-rc-spec-valid-lie": { explain: "unknown", route: "human-escalation", terminal: "escalate-to-human" }, // the two lied rows were edited by actor "unknown": no owner is established (route row 2)
   "s2-rc-uncontracted-explain": { explain: null, route: "human-escalation", terminal: "escalate-to-human" },
   "s2-im-fee-precheck": { explain: "unknown", route: "compliance", terminal: "recommendation" },
   "s2-im-sync-outage-unowned": { explain: "sync-latency", route: "human-escalation", terminal: "escalate-to-human" },

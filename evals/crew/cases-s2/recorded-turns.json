@@ -132,5 +132,35 @@
     "reviewer": {
       "kind": "approve"
     }
+  },
+  "s2-rc-modifier-drift": {
+    "manifestDigest": "90ff13e11af435377951ed4fe150f20024670978645223b617b616a52dccf488",
+    "intake": {
+      "kind": "route",
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/modifier-drift/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/modifier-drift/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    "reviewer": {
+      "kind": "approve"
+    }
+  },
+  "s2-rc-spec-valid-lie": {
+    "manifestDigest": "f5bac0c983f50b22dbc7fdd0d801b9a9a605b9161b88ed16ea85dd3b76686930",
+    "intake": {
+      "kind": "route",
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/spec-valid-lie/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/spec-valid-lie/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    "reviewer": {
+      "kind": "approve"
+    }
   }
 }
