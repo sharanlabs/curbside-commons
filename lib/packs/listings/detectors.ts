@@ -24,6 +24,7 @@ import {
   type ModifierOptionClaimValue,
   type ModifierSetClaimValue,
 } from "./modifiers.ts";
+import { INSTANT_FORMS, parseInstant } from "./instants.ts";
 import { expectedTitle, type SorTruth } from "./reference.ts";
 
 /** Deterministic mojibake transform (UTF-8 bytes read as Latin-1) — the
@@ -44,6 +45,47 @@ function isSorTruth(v: unknown): v is SorTruth {
  * grace closes itself. A different window count on a day is never inside it.
  */
 export const HOURS_WINDOW_GRACE_MINUTES = 15;
+
+/**
+ * LST-DATE-INVALID (S1.5) — a date the staleness rules must compare is not an
+ * instant {@link parseInstant} can read. Reported as an error, never passed and
+ * never a crash: a stale row carrying an unreadable expiry is exactly the row a
+ * silent pass would hide. `side` says whose value it is — the copy's field, or
+ * the catalog's own `asOf` (then the copy's value is quoted too).
+ */
+function dateInvalid(
+  claim: Parameters<Detector>[0],
+  match: NonNullable<Parameters<Detector>[1]>,
+  side: "copy" | "catalog",
+  raw: unknown,
+): FindingInput {
+  const field = claim.field;
+  const plainLine =
+    side === "copy"
+      ? `The copy's ${field} is "${String(raw)}", which is not a readable date (${INSTANT_FORMS}) — its staleness cannot be checked, so it is reported, not passed.`
+      : `The catalog's asOf is "${String(raw)}", which is not a readable date (${INSTANT_FORMS}) — the copy's ${field} "${String(claim.value)}" cannot be checked against it, so it is reported, not passed.`;
+  return {
+    claim,
+    referenceRowId: side === "copy" ? match.referenceRowId : "catalog-meta",
+    ruleId: "LST-DATE-INVALID",
+    severity: "error",
+    category: "staleness",
+    plainLine,
+  };
+}
+
+/**
+ * Compare a copy date against the catalog's as-of AS INSTANTS. Returns
+ * "invalid-copy" / "invalid-catalog" when a side is unreadable, else whether
+ * the copy's instant is strictly before as-of. Raw strings stay in plainLines.
+ */
+function beforeAsOf(copyRaw: unknown, asOfRaw: string): "invalid-copy" | "invalid-catalog" | boolean {
+  const copy = parseInstant(copyRaw);
+  if (copy === null) return "invalid-copy";
+  const asOf = parseInstant(asOfRaw);
+  if (asOf === null) return "invalid-catalog";
+  return copy < asOf;
+}
 
 /** Served windows of one day, ordered by opening time. */
 function windowsOn(day: string, ws: readonly AcpFeedHoursWindow[]): readonly AcpFeedHoursWindow[] {
@@ -231,7 +273,12 @@ export const listingsDetectors: readonly Detector[] = [
     if (claim.field !== "expiration_date" || !match || !isSorTruth(match.value)) return [];
     const asOf = match.value.catalog.asOf;
     const actual = String(claim.value);
-    if (actual >= asOf) return []; // ISO-8601 strings compare lexicographically.
+    // Instants, not strings (S1.5): "…00.100Z" sorts before "…00Z" as text, and
+    // a +02:00 offset sorts by its literal digits.
+    const before = beforeAsOf(claim.value, asOf);
+    if (before === "invalid-copy") return [dateInvalid(claim, match, "copy", claim.value)];
+    if (before === "invalid-catalog") return [dateInvalid(claim, match, "catalog", asOf)];
+    if (!before) return [];
     return [
       {
         claim,
@@ -261,7 +308,10 @@ export const listingsDetectors: readonly Detector[] = [
       ];
     }
     const actual = String(claim.value);
-    if (actual >= asOf) return [];
+    const before = beforeAsOf(claim.value, asOf);
+    if (before === "invalid-copy") return [dateInvalid(claim, match, "copy", claim.value)];
+    if (before === "invalid-catalog") return [dateInvalid(claim, match, "catalog", asOf)];
+    if (!before) return [];
     return [
       {
         ...base,
