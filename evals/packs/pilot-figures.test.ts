@@ -48,15 +48,16 @@ import {
  * restored with `git checkout -- lib/landing/pilot-figures.ts`; restored file
  * re-run green — recorded in docs/returns/2026-10-31-exec-layer.md):
  *  M-a  `const refundExposureCents = driftErrorsPerMonth * a.avgRefundCents.value;`
- *       → `… * a.avgRefundCents.value + 100;` → RED: ARITHMETIC (refund
- *       exposure), SOURCES (plan § 7 and pilot-proposal $108,000).
- *  M-b  `ordersPerStorePerDay` value `30` → `31` → RED: SOURCES (plan § 7
+ *       → `… * a.avgRefundCents.value + 100;` → 3 RED: ARITHMETIC (refund
+ *       exposure), SOURCES (plan § 7 sentence; pilot-proposal table).
+ *  M-b  `ordersPerStorePerDay` value `30` → `31` → 2 RED: SOURCES (plan § 7
  *       sentence and the pilot-proposal table); ARITHMETIC stays green, which is
  *       why the source locks exist.
- *  M-c  the `m.simulated !== true` refusal removed from readManifest → RED:
+ *  M-c  the `m.simulated !== true` refusal disabled (`if (false)`) → 1 RED:
  *       LIBRARY "a manifest that is not simulated is refused".
  *  M-d  formatBp's trailing-zero strip removed (`.replace(/0+$/, "")` dropped)
- *       → RED: formatters ("1.5%" became "1.50%").
+ *       → 1 RED: FORMATTERS ("1.5%" became "1.50%").
+ *  All four measured 2026-10-31 01:46 EDT; restored → 25 of 25 green.
  */
 
 const ROOT = process.cwd();
@@ -173,7 +174,8 @@ describe("SOURCES — the inputs are the plan's, and the markdown that must type
   });
 
   it("M1's wording is success-metrics.md's", () => {
-    const sm = readRepo("docs/pilot-kit/success-metrics.md");
+    // The page sets apostrophes typographically (’); the markdown types them straight.
+    const sm = readRepo("docs/pilot-kit/success-metrics.md").replace(/'/g, "’");
     expect(sm).toContain(`**${M1.id}** | **${M1.name}**`);
     expect(sm).toContain(M1.floor);
     expect(sm).toContain(M1.instrument);

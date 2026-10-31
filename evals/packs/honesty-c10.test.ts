@@ -112,6 +112,11 @@ const siteShell = [
   join(root, "components", "proof", "CalibrationPlate.tsx"),
   join(root, "components", "proof", "CountFig.tsx"),
   join(root, "app", "docs", "page.tsx"),
+  // /pilot, the executive page (Wave 2 exec-layer, 2026-10-31): the most
+  // claim-dense page on the site (cost model, governance, platform references),
+  // and the module whose strings it renders. Named here, never globbed.
+  join(root, "app", "pilot", "page.tsx"),
+  join(root, "lib", "landing", "pilot-figures.ts"),
 ];
 
 // Wave 1 / S4-docs (2026-10-12; plan docs/plan-menu-integrity-crew-2026-10-09.md

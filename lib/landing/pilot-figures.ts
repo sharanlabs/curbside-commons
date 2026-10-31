@@ -48,7 +48,7 @@ export const STATE = {
   modifierChecks: "BUILT (S1)",
   explainAndRoute: "ARRIVES S2 (in progress)",
   impactArithmetic: "MERGED 2026-10-31 as a library; shown in a run when S2 lands",
-  ledger: "Library MERGED 2026-10-31; a run that writes to it ARRIVES S2 (in progress)",
+  ledger: "library MERGED 2026-10-31, and a run that writes to it ARRIVES S2 (in progress)",
   signing: "BUILT as an offline simulator",
   rootCauseSeat: "ARRIVES S2 (in progress); shows DEFER until it passes an exam",
   intakeReviewer: "BUILT; examined on one model only",
@@ -57,7 +57,7 @@ export const STATE = {
   orderErrorTrigger: "ARRIVES S3",
   preflightTool: "PROPOSED; not built",
   picker: "ARRIVES S4",
-  csvIngestDrop: "BUILT (the spreadsheet path reads named columns only)",
+  csvIngestDrop: "BUILT; it reads named columns only",
   jsonIngestDrop: "ARRIVES S1.5 (in progress)",
   adapters: "ARRIVES S3",
 } as const;
@@ -241,10 +241,10 @@ export const BUNDLED = {
 /** The plan's eight stories (plan § 9), in the plan's order. Text, not figures. */
 export const PLAN_SCENARIOS: ReadonlyArray<{ readonly id: string; readonly story: string; readonly arrives: string | null }> = [
   { id: "agent-86", story: "An agent order lands on an item the record shows sold out while the copy still offers it", arrives: null },
-  { id: "modifier-drift", story: "A modifier option's price differs between the record and the copy", arrives: "S1.5 (in progress)" },
+  { id: "modifier-drift", story: "A modifier option’s price differs between the record and the copy", arrives: "S1.5 (in progress)" },
   { id: "sync-outage", story: "A whole category goes stale after a sync-vendor outage", arrives: null },
   { id: "platform-override", story: "A manual platform-side edit wins over the feed", arrives: null },
-  { id: "partner-onboarding", story: "A new integration partner's feed, a chosen mix of clean and drifted rows", arrives: null },
+  { id: "partner-onboarding", story: "A new integration partner’s feed, a chosen mix of clean and drifted rows", arrives: null },
   { id: "spec-valid-lie", story: "A response that passes conformance and still states a wrong price", arrives: "S1.5 (in progress)" },
   { id: "fee-precheck", story: "A draft fee statement pre-checked against NYC §20-563.3 for a legal team", arrives: null },
   { id: "injected-artifact", story: "A prompt-injected artifact tries to steer the crew", arrives: "S3" },
@@ -350,7 +350,7 @@ export const TIERS: ReadonlyArray<{ readonly tier: number; readonly name: string
     name: "Propose",
     covers:
       "Hold an item on the agent surface, force a re-sync, mark an item sold out, open a partner ticket. Proposed with receipts; needs a signed human decision; \"executed\" means a ledger record.",
-    state: `Signing ${STATE.signing}; ledger: ${STATE.ledger}`,
+    state: `Signing ${STATE.signing}; the ledger ${STATE.ledger}`,
   },
   {
     tier: 2,
@@ -361,7 +361,7 @@ export const TIERS: ReadonlyArray<{ readonly tier: number; readonly name: string
   {
     tier: 3,
     name: "Never",
-    covers: "Amend a merchant record, issue a credit, or file a dispute or complaint on anyone's behalf.",
+    covers: "Amend a merchant record, issue a credit, or file a dispute or complaint on anyone’s behalf.",
     state: "Prohibited",
   },
 ];
@@ -380,12 +380,12 @@ export const CONTROLS: ReadonlyArray<{ readonly control: string; readonly today:
   {
     control: "Data",
     today: "Nothing leaves the tab or the machine in site mode, held by import-graph tests; the spreadsheet path reads named columns only.",
-    next: `Customer fields dropped on the JSON path too (${STATE.jsonIngestDrop}).`,
+    next: `Customer fields dropped on the JSON path too: ${STATE.jsonIngestDrop}.`,
   },
   {
     control: "Audit trail",
     today: "A report hash and the receipts bundle on every run.",
-    next: `A hash-chained run ledger, exportable as JSON-lines (${STATE.ledger}).`,
+    next: `A hash-chained run ledger, exportable as JSON-lines: ${STATE.ledger}.`,
   },
   {
     control: "Operational",
@@ -444,7 +444,7 @@ export const BEFORE_AFTER: ReadonlyArray<{ readonly step: string; readonly befor
 export const M1 = {
   id: "M1",
   name: "Menu-data-caused order-error adjustments per 1,000 orders",
-  instrument: "The platform's own order-error report",
+  instrument: "The platform’s own order-error report",
   floor: "TBD at pilot start — set before the first run",
-  when: "measured later, with the platform's own instruments, after a separate deployment decision",
+  when: "measured later, with the platform’s own instruments, after a separate deployment decision",
 } as const;
