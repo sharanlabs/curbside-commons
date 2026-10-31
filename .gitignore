@@ -24,7 +24,7 @@ RULES_CONFIG_DUMP.txt
 *.key
 
 # Dependencies + build output
-node_modules/
+node_modules
 .next/
 next-env.d.ts
 coverage/
@@ -54,4 +54,4 @@ scratchpad/
 .env*
 
 # Dependencies — never tracked (a lane symlink was committed by accident 2026-10-14, removed the same day).
-node_modules/
+node_modules
