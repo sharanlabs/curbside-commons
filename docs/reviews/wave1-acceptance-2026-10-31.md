@@ -68,3 +68,18 @@ Itemised +124 = scenarios 91 · gemini-pins 9 · listings-coverage-c6 +5 · ucp-
 ## Verdict (orchestrator, 01:2x)
 
 **Wave 1 ACCEPTED WITH CORRECTIONS.** Code lanes sound: tests bite, counts exact, contracts met except the items deliberately deferred to S1.5. Docs lanes need the wording fixes above (exec-layer) and one marked-not-faked correction (model-risk-register:38). Push of `main` waits for the S1.5 and exec-layer merges. Codex changed-files reviews remain owed (owner's limits).
+
+## Reconciliation (written at each merge; verified = the fixed sentence read on `main`, or the probe re-applied)
+
+| item | lane | status on main | evidence |
+| --- | --- | --- | --- |
+| (b) 1–3 pilot-proposal must-fix | exec-layer | **verified `204ade5`** | `:7` now "designed to … would likely become"; `:9` "a human signs a proposal; nothing acts"; `:45` pre-flight as proposal (diff read at the prefix merge) |
+| (b) 4 governance-model C10 overclaim | exec-layer | **verified `204ade5`** | C10 described as an explicit list + patterns + rendered scan; new probes "ARRIVE with S1.5" |
+| (a) 12 model-risk-register:38 marked-not-faked | exec-layer | **verified `204ade5`** | Audit/Evidence BUILT; Impact + ledger "MERGED 2026-10-31"; Route/Explain-drift "ARRIVE S2 (in progress)" |
+| (b) 5–14, 18, 19, 25 · (a) 14 stale labels | exec-layer | **verified `204ade5`** (grep: 0 register hits in the six docs; no endorsement/saved-$ phrasing) | lane commit `4a8c763`; orchestrator grep at the prefix merge |
+| (b) 15 plainLine register (`detectors.ts`) | S1.5 | pending the S1.5 merge | — |
+| (b) 20–22 scenarios README · (a) 7–9 pin/scenarios 2 and 6 | S1.5 | pending | — |
+| (c) gemini-pins RED proof header | S2-ledger | **verified `7e4f699`** | header carries the 2.5 → 2.6 red |
+| (c) c6 header restore sha | S1.5 | committed in-lane `17bddd5` | pending merge |
+| (d) endorsement sentence accepted by C10 | S1.5 probes | pending — must be red after the S1.5 merge | re-applied at merge |
+| (a) 15 task-log inaccuracies | orchestrator | **done** | correction entry appended |
