@@ -4,7 +4,7 @@
  * Writes fixtures/synthetic-restaurant/orders.jsonl: ~400 INVENTED orders over a
  * 30-day window ending at the corpus as-of, one JSON object per line in the
  * lib/impact OrderRecord shape. It exists so the Impact arithmetic has something
- * to size; it claims no real volume, no real refunds, no real merchant.
+ * to size; it states no order volume, refunds or merchant beyond this invented corpus.
  *
  * Determinism: its OWN mulberry32 stream at seed 20261031 (a fresh instance — the
  * wedge generator's seed 20260703 stream is never read or advanced). Reads
