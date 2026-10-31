@@ -117,5 +117,20 @@
       "kind": "escalate",
       "reason": "an agent order is pending on items the record shows sold out; a person confirms the hold"
     }
+  },
+  "s2-im-agent-86-orders": {
+    "manifestDigest": "c7445c9317fad6bc4a8c2bc4b9ebc33a6f22aa1535af570dd690ad5574f7ced4",
+    "intake": {
+      "kind": "route",
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/agent-86/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/agent-86/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    "reviewer": {
+      "kind": "approve"
+    }
   }
 }

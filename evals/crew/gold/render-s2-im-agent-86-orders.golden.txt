@@ -1,0 +1,22 @@
+CREW RUN — case s2-im-agent-86-orders (SIMULATED data; orchestration harness — offline replay)
+terminal: recommendation · class: flag-violations
+engine report consumed: sha256 3e90810909ff168930a114acc24f7de10b7c17529bcc7865143ecd9f647d03c6
+
+ 1. INTAKE · MODEL TURN — intake routed the ask to tool "check_feed"
+ 2. AUDIT · TOOL CALL [check_feed] — executed "check_feed" via the registry (exit 1)
+ 3. EVIDENCE · RECOMMENDATION — evidence assembled 1 recommendation (flag-violations) referencing 6 engine finding(s)
+      refs: item-005-v1#availability · item-005-v2#availability · item-005-v3#availability · item-006-v1#availability · item-011-v1#availability · item-011-v2#availability
+ 4. ROOT-CAUSE · TOOL CALL [explain_drift] — explain_drift (deterministic baseline): merchant-edit, citing 6 event(s)
+ 5. ROOT-CAUSE · DEFER — LLM root-cause seat: DEFER — not examined on any model; this run shows the deterministic baseline, never a model's guess
+ 6. IMPACT · TOOL CALL [size_impact] — size_impact (simulated): 4 distinct order(s) at risk
+ 7. EVIDENCE · ROUTE — route table (deterministic workflow) proposes merchant-ops → slack, email — Row 4: everything else goes to merchant operations with a Slack digest and a merchant email.
+ 8. REVIEWER · MODEL TURN — reviewer approved the recommendations
+
+route (deterministic workflow): merchant-ops → slack · email — Row 4: everything else goes to merchant operations with a Slack digest and a merchant email.
+root cause (deterministic baseline): merchant-edit — cited events: #1 · #2 · #3 · #4 · #5 · #6 — All 6 finding(s) read as merchant-edit: the latest event on each row is the merchant's own edit, made while the copy was inside its refresh window.
+root-cause seat (LLM): DEFER — not examined on any model; never called in this run
+impact [simulated]: 4 distinct order(s) at risk · observed menu refunds $30.00 · prospective exposure $19.00 · agent-cancel exposure $50.00 · error-charge exposure $7.50 (assumptions: windowDays = 30; errorChargeShare = 0.25; touchConvention = variation-or-option-id)
+reviewer seat: requalification pending (approve | escalate only; flag-attention → escalate is model-enforced; code forces escalation on anomalies only; code enforcement deferred to S5 with a re-exam)
+
+anomalies: none
+outcome: 1 recommendation(s) for the human — the engine's verdicts are untouched; these are references, not decisions.

@@ -313,7 +313,7 @@ const SIZE_IMPACT_INPUT_SCHEMA: Readonly<Record<string, unknown>> = Object.freez
         properties: {
           id: { type: "string", minLength: 1, maxLength: 500 },
           ruleId: { type: "string", minLength: 1, maxLength: 100 },
-          category: { type: "string", minLength: 1, maxLength: 100 },
+          category: { type: "string", maxLength: 100 },
           referenceRowId: { type: ["string", "null"], maxLength: 500 },
         },
       },

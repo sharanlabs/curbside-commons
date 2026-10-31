@@ -478,12 +478,13 @@ function runS2Seats(
   } else if (report === null) {
     impact = Object.freeze({ kind: "skipped" as const, reason: "no engine report was consumed" });
     steps.push({ member: "impact", kind: "skipped", toolName: "size_impact", note: "no engine report was consumed — size_impact not called" });
-  } else if (report.findings.some((f) => f.category === null)) {
-    impact = Object.freeze({ kind: "skipped" as const, reason: "a consumed finding carries no category" });
-    steps.push({ member: "impact", kind: "skipped", toolName: "size_impact", note: "a consumed finding carries no category — size_impact input cannot be built without inventing one" });
   } else {
+    // The mapping the S2-impact packet fixes: id = the claim id, category = the
+    // finding's category or "" (the arithmetic never reads it), referenceRowId
+    // as reported or null (a modifier finding touches a line by its
+    // `#modifier.<optionId>` claim-id suffix inside lib/impact).
     const params = {
-      findings: report.findings.map((f) => ({ id: f.id, ruleId: f.ruleId, category: f.category as string, referenceRowId: f.referenceRowId })),
+      findings: report.findings.map((f) => ({ id: f.id, ruleId: f.ruleId, category: f.category ?? "", referenceRowId: f.referenceRowId })),
       orders: readEventLog(s2.impact.ordersPath),
       windowDays: s2.impact.windowDays,
       errorChargeShare: s2.impact.errorChargeShare,

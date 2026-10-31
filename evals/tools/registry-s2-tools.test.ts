@@ -127,21 +127,29 @@ describe("explain_drift + size_impact — registered, described, refused when ma
     expect(() => callTool("size_impact", { ...ok, rootCause: "x" })).toThrow(ToolInputError);
   });
 
-  it("size_impact on valid input is exactly lib/impact's own answer — or its own loud failure (the S2-crew stub throws; the merged module answers)", () => {
-    const input: ImpactInput = { findings: [], orders: [], windowDays: 30, errorChargeShare: 0.5 };
-    let direct: { ok: true; value: unknown } | { ok: false; message: string };
-    try {
-      direct = { ok: true, value: sizeImpact(input) };
-    } catch (err) {
-      direct = { ok: false, message: err instanceof Error ? err.message : String(err) };
-    }
-    if (direct.ok) {
-      const r = callTool("size_impact", input);
-      expect(outputValidatorFor("size_impact")!(r)).toBe(true);
-      expect(JSON.parse(r.canonical)).toStrictEqual(direct.value);
-    } else {
-      expect(() => callTool("size_impact", input)).toThrow(direct.message);
-    }
+  it("size_impact over a small orders array equals a direct lib/impact sizeImpact call (figures non-trivial, labeled simulated)", () => {
+    const line = (variation_id: string, cents: number, qty = 1, modifier_option_ids: string[] = []) => ({ variation_id, modifier_option_ids, qty, unit_price_cents_charged: cents });
+    const input: ImpactInput = {
+      findings: [
+        { id: "item-005-v1#availability", ruleId: "LST-AVAIL-STATE", category: "availability", referenceRowId: "item-005-v1" },
+        { id: "item-001-v3#price.amount", ruleId: "LST-PRICE-VALUE", category: "", referenceRowId: "item-001-v3" },
+      ],
+      orders: [
+        { order_id: "t-1", placed_at: "2026-07-01T12:00:00Z", channel: "agent", lines: [line("item-005-v1", 1900)], status: "cancelled", refund_cents: 0, refund_allocation: [], reason: "none" },
+        { order_id: "t-2", placed_at: "2026-07-02T12:00:00Z", channel: "app", lines: [line("item-001-v3", 2850, 2), line("item-002-v1", 900)], status: "refunded", refund_cents: 2850, refund_allocation: [{ variation_id: "item-001-v3", cents: 2850 }], reason: "menu" },
+        { order_id: "t-3", placed_at: "2026-07-02T13:00:00Z", channel: "app", lines: [line("item-001-v3", 2850)], status: "fulfilled", refund_cents: 0, refund_allocation: [], reason: "none" },
+        { order_id: "t-4", placed_at: "2026-07-02T14:00:00Z", channel: "app", lines: [line("item-002-v1", 900)], status: "fulfilled", refund_cents: 0, refund_allocation: [], reason: "none" },
+      ],
+      windowDays: 30,
+      errorChargeShare: 0.5,
+    };
+    const direct = sizeImpact(input);
+    const r = callTool("size_impact", input);
+    expect(outputValidatorFor("size_impact")!(r)).toBe(true);
+    expect(JSON.parse(r.canonical)).toStrictEqual(JSON.parse(JSON.stringify(direct)));
+    expect(direct.label).toBe("simulated");
+    expect(direct.ordersAtRiskDistinct).toBe(3); // t-1, t-2, t-3 touch a flagged row; t-4 does not
+    expect(direct.observedMenuRefundCents).toBe(2850);
   });
 });
 
