@@ -157,3 +157,12 @@ export {
   OrderErrorsCsvError,
   parseOrderErrorsCsv,
 } from "./adapters-platform/order-errors-csv.ts";
+export type { MappedRun, MappingResolution, MappingSheet, MappingSheetRow } from "./mapping-sheet.ts";
+export {
+  MAPPING_SHEET_COLUMNS,
+  MappingSheetError,
+  mappingRowId,
+  mappingSheetReference,
+  parseMappingSheet,
+  runListingsVerificationWithMapping,
+} from "./mapping-sheet.ts";

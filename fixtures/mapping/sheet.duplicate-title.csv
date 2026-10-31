@@ -1,0 +1,2 @@
+platform_item_id,record_variation_id,mapped_by,mapped_at,note
+plat-dup,item-003-v1,integrations-analyst,2026-07-01T15:00:00Z,synthetic line; two record rows share this row's name
