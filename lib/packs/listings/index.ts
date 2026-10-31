@@ -120,3 +120,40 @@ export {
 } from "./reference.ts";
 export { HOURS_WINDOW_GRACE_MINUTES, hoursWindowDetector, listingsDetectors, mojibake } from "./detectors.ts";
 export { LISTINGS_SPEC_VERSION, runListingsVerification } from "./run.ts";
+
+// S3 (2026-10-31): platform-shaped inputs — shaped like the public partner
+// documentation of two delivery platforms (read 2026-10-31), not from either;
+// never called; not affiliated. Browser-safe (no node:fs).
+export type {
+  PlatformClaim,
+  PlatformRefusalKind,
+  PlatformShapedFeed,
+  PlatformShapedReport,
+  ShapedLike,
+} from "./adapters-platform/shared.ts";
+export {
+  CARRIER_SENTENCE,
+  PlatformShapeError,
+  SHAPED_LIKE_DOORDASH,
+  SHAPED_LIKE_UBER,
+  UNSTATED_FIELDS,
+  platformFeedToClaims,
+  runPlatformShapedCheck,
+  serializePlatformShapedReport,
+} from "./adapters-platform/shared.ts";
+export type {
+  DoorDashPriceUnit,
+  DoorDashShapedDocument,
+  DoorDashShapedOptions,
+} from "./adapters-platform/doordash-shaped.ts";
+export { acpFeedToDoorDashShaped, doordashShapedToFeed } from "./adapters-platform/doordash-shaped.ts";
+export type { UberShapedDocument, UberShapedOptions } from "./adapters-platform/uber-shaped.ts";
+export { acpFeedToUberShaped, uberShapedToFeed } from "./adapters-platform/uber-shaped.ts";
+export type { OrderErrorRow, OrderErrorsTrigger, OrderIssueType } from "./adapters-platform/order-errors-csv.ts";
+export {
+  ORDER_ERRORS_CARRIER,
+  ORDER_ERRORS_COLUMNS,
+  ORDER_ERRORS_SHAPED_LIKE,
+  OrderErrorsCsvError,
+  parseOrderErrorsCsv,
+} from "./adapters-platform/order-errors-csv.ts";
