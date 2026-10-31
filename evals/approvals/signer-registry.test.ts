@@ -15,7 +15,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { loadSigners, rotateSigner, toAuthorizedSigners, type SignerRecord } from "@/lib/approvals/signers.ts";
+import { loadSigners, rotateSigner, toAuthorizedSigners } from "@/lib/approvals/signers.ts";
 import { createApprovalRequest, signDecision, verifyAndExecute } from "@/lib/approvals/simulator.ts";
 import {
   ApprovalError,
@@ -121,7 +121,8 @@ describe("the eight-door ORDER (earlier door always wins)", () => {
     const f = flow(roster(null));
     const forged = signDecision(f.request, "approve", keyB.privateKey, "key-a", clk(T0 + 1000));
     expect(() => verifyAndExecute(f.request, forged, f.opts)).toThrow(SignatureInvalidError);
-    const foreign = createApprovalRequest({ ...record, n: 2 }, { clock: clk(T0), ttlMs: TTL, nonce: "n1" });
+    const other = { ...record, n: 2 };
+    const foreign = createApprovalRequest(other, { clock: clk(T0), ttlMs: TTL, nonce: "n1" });
     const alt = { ...foreign, requestId: f.request.requestId };
     const d = signDecision(alt, "approve", keyA.privateKey, "key-a", clk(T0 + 1000));
     expect(() => verifyAndExecute(f.request, d, f.opts)).toThrow(SubjectMismatchError);
@@ -129,7 +130,7 @@ describe("the eight-door ORDER (earlier door always wins)", () => {
 });
 
 describe("signer registry (signers.json + loadSigners)", () => {
-  const good = (over: Partial<Record<keyof SignerRecord, unknown>> = {}) => ({
+  const good = (over: Record<string, unknown> = {}) => ({
     signerId: "s1", role: "approver", publicKeyPem: pem(keyA), enrolledAt: "2026-10-31T00:00:00Z", revokedAt: null, ...over,
   });
 
