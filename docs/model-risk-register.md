@@ -1,6 +1,6 @@
 # Model-risk register — which seat has sat its exam, on which model
 
-**Type:** reference · **Audience:** a platform's model-risk and engineering readers · **Written:** 2026-10-12, Wave 1 / S4-docs · **Contract:** `docs/plan-menu-integrity-crew-2026-10-09.md` §§ 5, 8 as amended by `docs/plan-wave2-gap-sheet-2026-10-12.md` (page 2) and the 2026-10-12 free-only gate in `docs/decision-log.md`. `RULES.md` wins.
+**Type:** reference · **Audience:** a platform's model-risk and engineering readers · **Written:** 2026-10-12, Wave 1 / S4-docs · **Contract:** `docs/plan-menu-integrity-crew-2026-10-09.md` §§ 5, 8 as amended by `docs/plan-wave2-gap-sheet-2026-10-12.md` (page 2) and the 2026-10-12 free-only gate in `docs/decision-log.md`. `RULES.md` wins. · **Corrected:** 2026-10-31, Wave 2 / exec-layer, from the Wave 1 acceptance review (`docs/reviews/wave1-acceptance-2026-10-31.md`, check (a) and item 11).
 
 ## The answer first
 
@@ -32,10 +32,10 @@ Owner of every row: the **project owner** (build side). The platform-side owner 
 | Seat | Model | Version / pin | Floors | Last exam date | Owner | State |
 | --- | --- | --- | --- | --- | --- | --- |
 | **Intake** | Groq-hosted `openai/gpt-oss-120b` | Unpinned hosted id (`DEFAULT_CREW_LIVE_MODEL` in `lib/agents/crew-live.ts`; `CREW_LIVE_MODEL` overrides) | 100 % safety and ≥ 90 % class-match, which is 5 of 5 at N = 5 (`docs/plan-a2-trajectory-floors.md` §§ 3, 4, 6, as run in `docs/crew-live-l1-status.md`) | 2026-07-07 US Eastern (the run began 2026-07-08T02:13Z) | Project owner | **CLEARED** on this model only |
-| **Reviewer** | Groq-hosted `openai/gpt-oss-120b` | Same as Intake | Same floors; the exam surface is **approve or escalate** and nothing else | 2026-07-07 US Eastern (same run) | Project owner | **CLEARED** on this model only, on approve and escalate only |
+| **Reviewer** | Groq-hosted `openai/gpt-oss-120b` | Same as Intake | Same floors; the exam surface is **approve or escalate** and nothing else. The "flag-attention → escalate" rule is model-enforced (it lives in the Reviewer prompt); code forces escalation on anomalies only; code enforcement is deferred to S5 with a re-exam (security review F3a, 2026-10-31) | 2026-07-07 US Eastern (same run) | Project owner | **CLEARED** on this model only, on approve and escalate only |
 | **Root-cause** | None chosen | None | Plan § 5: per-class recall ≥ 0.80 · zero unsafe class flips across K = 3 · beats the deterministic explain-drift baseline. Gap sheet page 2: **at least 10 cases per class (six classes, so at least 60 cases)**, scored on the class only, a Wilson lower bound reported, labeled "smoke-scale, n = 10/class". Floors are committed before any live turn. | None recorded | Project owner | **NOT EXAMINED** (seat arrives in S2; exam is S5 and owner-armed) |
 
-**Seats with no model, which therefore carry no row:** Audit, Evidence, Impact, Route and Explain-drift are deterministic code. Their correctness is held by tests, not by an exam, and the gap sheet labels the last two "deterministic workflow". The Reviewer sees the route table's output and may only approve or escalate it, so the earned label has not been widened.
+**Seats with no model, which therefore carry no row:** Audit and Evidence are deterministic code, BUILT, and their correctness is held by tests, not by an exam. Impact's arithmetic (`lib/impact`) and the run ledger (`lib/ledger`) were MERGED on `main` 2026-10-31, each with its own tests; neither is wired into a crew run yet. Route and Explain-drift are planned as deterministic code and ARRIVE S2 (in progress) until the S2-crew lane merges; they do not exist on `main` today. When they land, their correctness is to be held by tests in the same way, and the gap sheet labels Route and Explain-drift "deterministic workflow". Once the route table lands, the Reviewer sees its output and may only approve or escalate it, so the earned label is not widened.
 
 **On the Intake and Reviewer exam.** Twenty cases, one pass, no retries, a held-out split that is now **exposed and may never be re-scored**. Every raw model turn is frozen in the repo, and `evals/crew/l1-live-lock.test.ts` re-derives the results on every suite run. The derived records were recomputed on 2026-07-24 when a deterministic injection scan was added; the floors still clear and the label is unaffected (`docs/crew-live-l1-status.md`). One of the reviewer's five cases measures containment rather than judgment, as that document records.
 
@@ -54,8 +54,8 @@ The model tiers are as plan § 8 fixes them (verified by the plan on 2026-10-09;
 | Tier | What | Cost | When |
 | --- | --- | --- | --- |
 | **A · Replay** (default) | Recorded model turns committed per scenario; the crew evals already run this way | $0, offline, deterministic | Every showcase; CI; the public site |
-| **B · Hosted open-weight** | Groq free tier (no card): `openai/gpt-oss-120b` (the seats' floors were earned here), `gpt-oss-20b`, `qwen/qwen3.8-27b`; 30 RPM · 1K RPD · 8K TPM · 200K TPD | $0 | Live run of a seat; new exams |
-| **C · Google AI Studio free tier** (cross-family judge or alternate drafter) | Free input and output; content may be used by Google, so synthetic data only. Model ids: see `lib/agents/pricing.ts` (another lane is re-pinning them this wave, so none is written here). The owner's Google Cloud credit via Vertex is a fallback only if free-tier limits bite, as a credit and never a charge. | $0 | Cross-family checks; a second drafter for consistency runs |
+| **B · Hosted open-weight** | Groq free tier (no card): `openai/gpt-oss-120b` (the seats' floors were earned here), `gpt-oss-20b`, `qwen/qwen3.8-27b`; 30 RPM · 1K RPD · 8K TPM · 200K TPD (Groq's rate-limit page read 2026-10-12, `docs/research/guidelines-adherence-2026-10-12.md`; re-read 2026-10-31, when the table was captioned for a different plan, so **whether these are the free tier's limits is UNVERIFIED** from outside a login and the owner confirms them in the console before any arming, `docs/research/freshness-2026-10-31.md` row 2a; `qwen/qwen3.8-27b` is a Preview model; re-verify at use, `RULES.md` §6) | $0 | Live run of a seat; new exams |
+| **C · Google AI Studio free tier** (cross-family judge or alternate drafter) | Free input and output; content may be used by Google, so synthetic data only (Google's free-tier terms as recorded in plan § 8, read 2026-10-09; re-verify at use, `RULES.md` §6). Model ids: see `lib/agents/pricing.ts` (another lane is re-pinning them this wave, so none is written here). The owner's Google Cloud credit via Vertex is a fallback only if free-tier limits bite, as a credit and never a charge. | $0 | Cross-family checks; a second drafter for consistency runs |
 | **D · Local open-weight** | Ollama with JSON-schema `format`, temperature 0: `gpt-oss:20b` (same family as Tier B, so floors transfer only with a re-exam) or `qwen3:8b`. The owner picks by machine memory (plan decision D-6, open). | $0, air-gapped | The "runs inside your environment" story; offline live runs |
 
 | Candidate model | Intake | Reviewer | Root-cause | Fee-line classifier |
@@ -111,9 +111,9 @@ Rate ceilings on the free tiers (Tier B figures above) also bound how large an e
 
 ## Sources and dates
 
-- Plan § 8 (2026-10-09) for the tiers and free-tier ceilings, not re-verified by this lane.
+- Plan § 8 (2026-10-09) for the tiers and the Google free-tier terms; Groq's free-tier ceilings as read 2026-10-12 (`docs/research/guidelines-adherence-2026-10-12.md`). Neither re-verified by this lane; both are re-verified at use (`RULES.md` §6).
 - `docs/crew-live-l1-status.md` (intake and reviewer exam, 2026-07-07/08, derivation note 2026-07-24).
 - `docs/fee-classifier-recalibration-status.md` and `docs/fee-classifier-calibration-status.md` (2026-07-09 and 2026-07-05).
-- `lib/agents/budget.ts`, `lib/agents/crew-live.ts`, `lib/agents/fee-classifier.ts`, `lib/crew/injection-scan.ts` at commit `fac8204`.
+- `lib/agents/budget.ts`, `lib/agents/crew-live.ts`, `lib/agents/fee-classifier.ts`, `lib/crew/injection-scan.ts` at commit `fac8204`; the budget-guard and seat statements re-checked at `cd0d347` (2026-10-31).
 - Free-only gate and provider canary: `docs/decision-log.md` 2026-10-12.
 - Models that belonged to the pre-pivot activation module (an earlier judge, strategist, router and drafter) live under `legacy/activation/`. They are not in the crew's runtime path and carry no row here; their status documents remain in `docs/` for provenance.
