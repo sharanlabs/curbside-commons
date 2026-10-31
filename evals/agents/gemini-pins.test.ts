@@ -17,8 +17,8 @@ afterEach(() => {
 });
 
 describe("S1-pins — the pinned price list", () => {
-  it("PRICING_VERSION is the 2026-10-12 re-verification date", () => {
-    expect(PRICING_VERSION).toBe("2026-10-12");
+  it("PRICING_VERSION is the 2026-10-31 pin (new $0 free-tier rows only; paid prices unchanged, last re-verified 2026-10-12)", () => {
+    expect(PRICING_VERSION).toBe("2026-10-31");
   });
 
   it("gemini-3.5-flash-lite (the default) is priced $0.30 in / $2.50 out per 1M", () => {
