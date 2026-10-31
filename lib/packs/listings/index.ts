@@ -104,6 +104,15 @@ export type {
 } from "./ucp-wire.ts";
 export { buildUcpSearchResponse, ucpSearchResponseToClaims } from "./ucp-wire.ts";
 export { acpFeedToClaims, ucpResponseToClaims } from "./adapters.ts";
-export { expectedTitle, indexCatalog, sorReference } from "./reference.ts";
+export type { DuplicateVariationId, VariationLocation } from "./reference.ts";
+export {
+  DuplicateVariationIdError,
+  assertUniqueVariationIds,
+  duplicateVariationIdMessage,
+  expectedTitle,
+  findDuplicateVariationId,
+  indexCatalog,
+  sorReference,
+} from "./reference.ts";
 export { HOURS_WINDOW_GRACE_MINUTES, hoursWindowDetector, listingsDetectors, mojibake } from "./detectors.ts";
 export { LISTINGS_SPEC_VERSION, runListingsVerification } from "./run.ts";

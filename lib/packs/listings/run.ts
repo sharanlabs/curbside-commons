@@ -21,7 +21,13 @@ import type {
 import { makeFinding } from "../../verifier-core/guard.ts";
 import { buildReport, verifyClaims } from "../../verifier-core/verify.ts";
 import { listingsDetectors } from "./detectors.ts";
-import { expectedTitle, indexCatalog, sorReference, type SorTruth } from "./reference.ts";
+import {
+  assertUniqueVariationIds,
+  expectedTitle,
+  indexCatalog,
+  sorReference,
+  type SorTruth,
+} from "./reference.ts";
 import type { SyntheticCatalog } from "./types.ts";
 import { UCP_PINNED_VERSION } from "./ucp.ts";
 
@@ -234,6 +240,12 @@ export function runListingsVerification(
   sor: SyntheticCatalog,
   provenance: ListingsRunProvenance = {},
 ): VerifierReport {
+  // REFUSE an ambiguous reference before any claim is judged (S1.5; Codex
+  // cross-check 2026-10-12 § 4). Every caller — the CLI, the MCP `check_feed`
+  // tool, the demo, the scenario generator and the browser seam
+  // (`verifyAcpFeed`) — reaches the engine through here, so all of them share
+  // this one predicate. Throws DuplicateVariationIdError; never a PASS.
+  assertUniqueVariationIds(sor);
   const reference = sorReference(sor);
   const detected = verifyClaims(claims, reference, listingsDetectors);
   const completeness = completenessSweep(claims, sor);
