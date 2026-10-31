@@ -2,7 +2,7 @@
 
 **Plain English:** one row per lane of work tonight, who is building it, where its branch lives, and what state it is in. The lead updates this after every return. Anyone resuming this run starts here.
 
-Baseline: `main` @ `cd0d347` · tsc 0 · eslint 0 · vitest 1821 + 8 · origin/main @ `fac8204` (10 commits unpushed; remote reachable from this seat) · production serves `56325eb` (S3) · deploy gate closed.
+Baseline at open: `main` @ `cd0d347` · tsc 0 · eslint 0 · vitest 1821 + 8 · origin/main @ `fac8204` (10 commits unpushed). **At 02:5x: `main` == origin/main @ `cc5f248` · vitest 2293 + 8 · pushed pre-Codex.** · production serves `56325eb` (S3) · deploy gate closed.
 Lane contract: `docs/wave2-lane-contract-2026-10-31.md`. Return packets: `docs/returns/2026-10-31-<lane>.md` on each lane's branch.
 Model rule (decision-log 2026-10-12 amendment): cheapest model with proven-equal output; judgment work on Opus; pattern-following on Sonnet; read-only verification on Haiku; equivalence judged by diff-first review + gates + the three independent checks at merge.
 
