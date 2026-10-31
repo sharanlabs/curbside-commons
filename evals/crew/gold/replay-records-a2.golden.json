@@ -128,7 +128,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "756a27ee7aa06424ce91dda95011d307fb58f1c2a145a345d3922d1a4b0711ee",
+        "engineReportHash": "b5ef1e775b0b9f5fc7999e078bde82c6fe1623d0a213732665b72705e1fd5376",
         "consumedFindingIds": []
       }
     },
@@ -275,7 +275,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "0f034e4bd79ec095f58b707523fd5e59445986a34e72e5698a70c4f2a3bf9a1b",
+        "engineReportHash": "6e241ae574b0bf1c803ef69b6eaa52274990191cd84c6cdedb66c3ef7da02385",
         "consumedFindingIds": []
       }
     },
@@ -352,7 +352,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "3aabaaacda3887f2ab80530c44d5104fe6499c7e26a0373c6bb1030fb0c98f2f",
+        "engineReportHash": "a52e6469754065df70b1eb46f4b6bd3fa57c9fd2942e934ca7c079e40508e44e",
         "consumedFindingIds": [
           "item-002-v2#existence",
           "item-004-v1#availability",
@@ -650,7 +650,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "2fe187bab9c5a44b12461835bd03bec24c74b822a7d9bc5fc07e009bf05b84f7",
+        "engineReportHash": "b8b42ae8678c5d134822dde53604312c6867f01ad55086783e5030d0f59d5c68",
         "consumedFindingIds": [
           "/products/0/variants/0/price/currency (pattern)"
         ]
@@ -729,7 +729,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "3aabaaacda3887f2ab80530c44d5104fe6499c7e26a0373c6bb1030fb0c98f2f",
+        "engineReportHash": "a52e6469754065df70b1eb46f4b6bd3fa57c9fd2942e934ca7c079e40508e44e",
         "consumedFindingIds": [
           "item-002-v2#existence",
           "item-004-v1#availability",
@@ -909,7 +909,7 @@
           }
         ],
         "anomalies": [],
-        "engineReportHash": "3aabaaacda3887f2ab80530c44d5104fe6499c7e26a0373c6bb1030fb0c98f2f",
+        "engineReportHash": "a52e6469754065df70b1eb46f4b6bd3fa57c9fd2942e934ca7c079e40508e44e",
         "consumedFindingIds": [
           "item-002-v2#existence",
           "item-004-v1#availability",

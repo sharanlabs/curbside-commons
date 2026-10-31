@@ -1,6 +1,6 @@
 CREW RUN — case s2-rc-sync-outage (SIMULATED data; orchestration harness — offline replay)
 terminal: recommendation · class: flag-violations
-engine report consumed: sha256 b8a08ba6a2234d9f860bc1626a66aa4837f171ff5b6115acabad61b0c4a8544e
+engine report consumed: sha256 77be527f86cb7226fe33fe6b9a404b4dbde7e5c9a16421b7b3f91370e3bc7a6e
 
  1. INTAKE · MODEL TURN — intake routed the ask to tool "check_feed"
  2. AUDIT · TOOL CALL [check_feed] — executed "check_feed" via the registry (exit 1)

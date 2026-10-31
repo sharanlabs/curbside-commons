@@ -40,7 +40,7 @@ export interface UcpCatalogResponseFixture {
 }
 
 /** The spec version the verifier pins reports against (C10 header pin). */
-export const UCP_PINNED_VERSION = "2026-04-08";
+export const UCP_PINNED_VERSION = "2026-08-25";
 
 /**
  * Build a catalog-response fixture from a feed state (faithful or drifted). The

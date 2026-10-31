@@ -23,7 +23,7 @@
       }
     }
   ],
-  "expectedEngineReportHash": "4fc243233232e7076dc8edb429f4d2ec97a2478aaee9b0c879766fa7c83b9cad",
+  "expectedEngineReportHash": "c55436a3458f6764f6ead818b5681210025b8c5f82643dc9224ca2d66d3ab064",
   "expectedRecommendationClass": "flag-violations",
   "expectedFindingRefs": [
     "/products/0/variants/0/price/amount (type)"

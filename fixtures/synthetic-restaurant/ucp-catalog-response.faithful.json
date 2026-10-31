@@ -3,7 +3,7 @@
   "note": "CONSTRUCTED SIMULATION of a UCP catalog-capability response shape (our interpretation; UCP food schemas pending as of 2026-07-02). Not recorded from any real marketplace.",
   "capability": "catalog",
   "supported_versions": [
-    "2026-04-08"
+    "2026-08-25"
   ],
   "session": {
     "id": "sess-sim-faithful-001"

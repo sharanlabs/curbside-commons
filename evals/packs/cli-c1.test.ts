@@ -149,7 +149,7 @@ describe("C1 conformance leg — UCP schema validation (real process, W2)", () =
     expect(r.status).toBe(0);
     const report = JSON.parse(r.stdout) as { ok: boolean; specVersion: string };
     expect(report.ok).toBe(true);
-    expect(report.specVersion).toContain("2026-04-08");
+    expect(report.specVersion).toContain("2026-08-25");
   }, 60000);
 
   it("exit 1 (non-zero) on a schema-violating document, findings in the LST-CONF-* family", () => {
@@ -201,7 +201,7 @@ describe("C1 machine-JSON leg — --json alias + C10 header surface (W3)", () =>
       matchingMode: string;
       simulated: boolean;
     };
-    expect(report.specVersion).toContain("ucp-pin-2026-04-08");
+    expect(report.specVersion).toContain("ucp-pin-2026-08-25");
     expect(["synthetic-controlled", "real-world"]).toContain(report.matchingMode);
     expect(report.simulated).toBe(true);
   }, 60000);
@@ -219,7 +219,7 @@ describe("C1 machine-JSON leg — --json alias + C10 header surface (W3)", () =>
       matchingMode: string;
       simulated: boolean;
     };
-    expect(report.specVersion).toContain("2026-04-08");
+    expect(report.specVersion).toContain("2026-08-25");
     expect(["synthetic-controlled", "real-world"]).toContain(report.matchingMode);
     expect(report.simulated).toBe(true);
   }, 60000);

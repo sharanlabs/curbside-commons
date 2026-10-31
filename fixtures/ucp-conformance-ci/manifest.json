@@ -3,8 +3,8 @@
   "note": "Constructed-simulation UCP catalog-response corpus for the W2 conformance leg. Each invalid fixture violates exactly ONE named schema rule. Verdicts asserted in evals/packs/ucp-conformance.test.ts; optional cargo differential oracle in scripts-ts/ucp-oracle-diff.mts.",
   "seed": 20260703,
   "asOf": "2026-07-03T00:00:00Z",
-  "specVersion": "2026-04-08",
-  "schemaSource": "fixtures/ucp-schemas/2026-04-08 (Universal-Commerce-Protocol/ucp @ v2026-04-08, Apache-2.0)",
+  "specVersion": "2026-08-25",
+  "schemaSource": "fixtures/ucp-schemas/2026-08-25 (Universal-Commerce-Protocol/ucp @ v2026-08-25, Apache-2.0)",
   "counts": {
     "total": 35,
     "valid": 14,

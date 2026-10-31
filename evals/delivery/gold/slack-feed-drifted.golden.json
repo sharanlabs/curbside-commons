@@ -30,7 +30,7 @@
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*[error]* This item is hidden in the merchant's own catalog but is being served to customers.\n`item-002-v2#existence` · rule `LST-AVAIL-HIDDEN-SHOWN`"
+        "text": "*[error]* This item is hidden in the merchant's own catalog but is served on the copy.\n`item-002-v2#existence` · rule `LST-AVAIL-HIDDEN-SHOWN`"
       }
     },
     {
@@ -58,14 +58,14 @@
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*[warn]* The name is cut off in the feed: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\".\n`item-005-v2#title` · rule `LST-ENC-TRUNC`"
+        "text": "*[warn]* The name is cut off in the feed: \"Margherita…\" vs the record's \"Margherita Pizza (Medium)\".\n`item-005-v2#title` · rule `LST-ENC-TRUNC`"
       }
     },
     {
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*[warn]* The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the real \"Jalapeño Poppers (Large)\".\n`item-004-v3#title` · rule `LST-ENC-UTF8`"
+        "text": "*[warn]* The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the record's \"Jalapeño Poppers (Large)\".\n`item-004-v3#title` · rule `LST-ENC-UTF8`"
       }
     },
     {

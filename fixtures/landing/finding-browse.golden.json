@@ -3,7 +3,7 @@
     "index": 1,
     "severity": "error",
     "ruleId": "LST-AVAIL-HIDDEN-SHOWN",
-    "plain": "This item is hidden in the merchant's own catalog but is being served to customers.",
+    "plain": "This item is hidden in the merchant's own catalog but is served on the copy.",
     "onBench": false
   },
   {
@@ -31,14 +31,14 @@
     "index": 5,
     "severity": "warn",
     "ruleId": "LST-ENC-TRUNC",
-    "plain": "The name is cut off in the feed: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\".",
+    "plain": "The name is cut off in the feed: \"Margherita…\" vs the record's \"Margherita Pizza (Medium)\".",
     "onBench": false
   },
   {
     "index": 6,
     "severity": "warn",
     "ruleId": "LST-ENC-UTF8",
-    "plain": "The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the real \"Jalapeño Poppers (Large)\".",
+    "plain": "The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the record's \"Jalapeño Poppers (Large)\".",
     "onBench": false
   },
   {

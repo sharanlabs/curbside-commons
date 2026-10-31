@@ -4,7 +4,7 @@ Curbside Commons — verifier demo (SIMULATED)
 
 Demo claim: a spec-faithful simulated agent follows a spec-valid but false surface; the verifier catches the surface/SOR mismatch
 Actor:      spec-faithful demonstration actor — simulated
-Spec pin:   taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08
+Spec pin:   taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-08-25
 Simulated:  true
 
 ----------------------------------------------------------------------------

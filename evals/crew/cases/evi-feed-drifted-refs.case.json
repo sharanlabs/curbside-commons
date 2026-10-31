@@ -23,7 +23,7 @@
       }
     }
   ],
-  "expectedEngineReportHash": "3aabaaacda3887f2ab80530c44d5104fe6499c7e26a0373c6bb1030fb0c98f2f",
+  "expectedEngineReportHash": "a52e6469754065df70b1eb46f4b6bd3fa57c9fd2942e934ca7c079e40508e44e",
   "expectedRecommendationClass": "flag-violations",
   "expectedFindingRefs": [
     "item-002-v2#existence",

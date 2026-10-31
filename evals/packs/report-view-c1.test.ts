@@ -157,7 +157,7 @@ describe("C4 — every finding leads with a plain-words line (golden corpus)", (
 describe("C10 — the view carries the pinned header surface", () => {
   it("specVersion pin, matchingMode label, and simulated flag are present", () => {
     const view = toReportView(acp);
-    expect(view.specVersion).toContain("ucp-pin-2026-04-08");
+    expect(view.specVersion).toContain("ucp-pin-2026-08-25");
     expect(["synthetic-controlled", "real-world"]).toContain(view.matchingMode);
     expect(view.matchingModePlain.length).toBeGreaterThan(0);
     expect(view.simulated).toBe(true);

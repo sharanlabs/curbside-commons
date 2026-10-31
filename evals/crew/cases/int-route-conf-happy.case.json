@@ -1,6 +1,6 @@
 {
   "caseId": "int-route-conf-happy",
-  "manifestDigest": "721f342b5e1c9d29b789f7fcc04305e7d7f361395f35d5c6967e355619d2c86f",
+  "manifestDigest": "7084751f7acb31d5609f9a0615cffc68b6fc9fc52dfb187e78ff36e3ea16a12d",
   "member": "intake",
   "inputArtifact": {
     "path": "fixtures/ucp-conformance-ci/invalid/pattern-currency-lowercase.json"
@@ -22,7 +22,7 @@
       }
     }
   ],
-  "expectedEngineReportHash": "2fe187bab9c5a44b12461835bd03bec24c74b822a7d9bc5fc07e009bf05b84f7",
+  "expectedEngineReportHash": "b8b42ae8678c5d134822dde53604312c6867f01ad55086783e5030d0f59d5c68",
   "expectedRecommendationClass": "flag-violations",
   "expectedFindingRefs": [
     "/products/0/variants/0/price/currency (pattern)"

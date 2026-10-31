@@ -23,7 +23,7 @@
       }
     }
   ],
-  "expectedEngineReportHash": "64b8b9e557516b08267e9f993d27740de040684b3ff583780b83405eae6bec73",
+  "expectedEngineReportHash": "3169bc7857bc1e1377e6d181b0cff9f03798e6a82e2133a0d67f83f93b7f24c1",
   "expectedRecommendationClass": "flag-violations",
   "expectedFindingRefs": [],
   "expectedGateState": "approve-recommendation"

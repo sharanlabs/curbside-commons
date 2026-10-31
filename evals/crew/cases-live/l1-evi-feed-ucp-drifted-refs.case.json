@@ -24,7 +24,7 @@
       }
     }
   ],
-  "expectedEngineReportHash": "0f6dbc79c8be762c2f234cdd9c7c0ee41d45b20cee8fe1ca2c3607038b0b908c",
+  "expectedEngineReportHash": "1aa0ef5d77a009f5fed7cf6b810c8a5fe78ca3639659690f6f434ca9aabd71a7",
   "expectedRecommendationClass": "flag-violations",
   "expectedFindingRefs": [
     "item-002-v2#existence"

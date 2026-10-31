@@ -1,5 +1,5 @@
 {
-  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-08-25",
   "matchingMode": "synthetic-controlled",
   "simulated": true,
   "findings": [
@@ -14,7 +14,7 @@
       "ruleId": "LST-AVAIL-HIDDEN-SHOWN",
       "severity": "error",
       "category": "availability",
-      "plainLine": "This item is hidden in the merchant's own catalog but is being served to customers."
+      "plainLine": "This item is hidden in the merchant's own catalog but is served on the copy."
     },
     {
       "claim": {
@@ -70,7 +70,7 @@
       "ruleId": "LST-ENC-TRUNC",
       "severity": "warn",
       "category": "encoding",
-      "plainLine": "The name is cut off in the feed: \"Margherita…\" vs the real \"Margherita Pizza (Medium)\"."
+      "plainLine": "The name is cut off in the feed: \"Margherita…\" vs the record's \"Margherita Pizza (Medium)\"."
     },
     {
       "claim": {
@@ -83,7 +83,7 @@
       "ruleId": "LST-ENC-UTF8",
       "severity": "warn",
       "category": "encoding",
-      "plainLine": "The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the real \"Jalapeño Poppers (Large)\"."
+      "plainLine": "The name is garbled by a text-encoding error: served \"JalapeÃ±o Poppers (Large)\" vs the record's \"Jalapeño Poppers (Large)\"."
     },
     {
       "claim": {

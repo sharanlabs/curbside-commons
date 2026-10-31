@@ -6,7 +6,7 @@ A synthetic merchant's catalog answer, written in the public UCP schema shape, i
 
 ## What the reviewer will see
 
-- Conformance pass: 0 findings against the pinned schemas, UCP version 2026-04-08.
+- Conformance pass: 0 findings against the pinned schemas, UCP version 2026-08-25.
 - Truth verdict FAIL: 2 findings (2 errors, 0 warnings) over 24 answered rows.
 - Rules that fire: LST-PRICE-VALUE ×2.
 - The feed the answer was built from: 2 findings (LST-PRICE-VALUE ×2) on the same rows — one comparator, two surfaces.
