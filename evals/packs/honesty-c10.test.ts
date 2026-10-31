@@ -188,6 +188,145 @@ const BANNED_PROBES: ReadonlyArray<readonly [RegExp, string]> = [
   [BANNED_CLAIMS[7], "we have live platform access"],
 ];
 
+// ---------------------------------------------------------------------------
+// S1.5 (2026-10-31) — THREE NEW PROBE FAMILIES, sentence-scoped.
+//
+// Codex cross-check 2026-10-12 § 5: the eight patterns above ACCEPT "Trusted by
+// DoorDash", "DoorDash-approved menu verification" and "We saved merchants
+// $108,000 per month". The Wave 1 acceptance review (2026-10-31 01:14) planted
+// "Trusted by every major delivery platform and approved for production use."
+// in docs/governance-model.md and the gate stayed GREEN. These families close
+// that gap. They are ADDED; no existing pattern is changed or weakened.
+//
+//  ENDORSEMENT  "trusted by / approved by / endorsed by / partnered with / in
+//               partnership with <party>", "<platform>-approved", "official
+//               <platform> partner|integration|…". No carrier exempts these;
+//               only a negation in the same clause ("not endorsed by …") does.
+//  ACCESS       "<platform> data", "<platform>'s export", "integrated with /
+//               connected to <platform>" — exempt when the SAME SENTENCE
+//               carries a nominative carrier ("shaped like", "public
+//               integration docs", "not from", "not affiliated", "nominative")
+//               or a negation of the access.
+//  SAVED-MONEY  "saved … $", "we saved", "prevented … refunds", "reduced … by
+//               N %", "cut … costs" — exempt when the same sentence carries
+//               "illustrative", "hypothesis", "synthetic", "assumption",
+//               "would" or "could".
+// A "sentence" is a span ended by . ! or ? (whitespace collapsed first, so a
+// claim wrapped across lines or split across JSX elements is one sentence).
+//
+// RED proofs (2026-10-31, measured; commands in the return packet):
+//  - each family's planted phrases are asserted RED below, in isolation, and
+//    each carrier/negation exemption is asserted GREEN on its own sentence;
+//    the corpus needed NO rewording — one measured false positive (an honest
+//    "Not real DoorDash / … / Grubhub data" in a 2026-07-13 mockup) narrowed
+//    the negation window from 40 to 60 characters;
+//  - pilotDocs (Wave 1 acceptance review item (c), whose pilotDocs list had no
+//    RED proof): at 01:44 the review's sentence "Trusted by every major
+//    delivery platform and approved for production use." appended to
+//    docs/governance-model.md (sha256/16 ee8cf657f22ab766 → 7ca5719b41ee22f3)
+//    → this file 1 failed / 267 passed, on the governance-model row of the
+//    new-family scan (the eight old patterns still accept it); the saved copy
+//    restored → ee8cf657f22ab766, 268/268;
+//  - the attribute probe: alt="Trusted by DoorDash" planted after <body> in the
+//    built out/index.html (05d70866ce86938a → 3502792dce26421d) → the
+//    attribute test RED while both visible-text scans stayed GREEN (the gap it
+//    closes); the saved copy restored → 05d70866ce86938a, green.
+// ---------------------------------------------------------------------------
+
+/** Named platforms a sentence could falsely claim a relationship with. */
+const PLATFORM = String.raw`(?:DoorDash|Uber\s?Eats|Uber|Grubhub|Square|Toast|Instacart|Postmates)`;
+/** Unnamed parties an endorsement claim can lean on ("every major delivery platform"). */
+const PLATFORMS_GENERIC = String.raw`(?:(?:every|all|the|major|leading|top|big|large|national|several|many)\s+)*(?:(?:US|food|delivery|ordering|marketplace|commerce|restaurant)\s+)*(?:platforms?|marketplaces?)`;
+const PARTY = `(?:${PLATFORM}|${PLATFORMS_GENERIC})`;
+
+type ProbeFamily = "endorsement" | "access" | "saved-money";
+interface ClaimProbe {
+  readonly family: ProbeFamily;
+  readonly pattern: RegExp;
+}
+
+const NEW_CLAIM_PROBES: readonly ClaimProbe[] = [
+  { family: "endorsement", pattern: new RegExp(String.raw`\btrusted by ${PARTY}\b`, "i") },
+  { family: "endorsement", pattern: new RegExp(String.raw`\b${PLATFORM}[- ]approved\b`, "i") },
+  { family: "endorsement", pattern: new RegExp(String.raw`\bapproved by ${PARTY}\b`, "i") },
+  { family: "endorsement", pattern: new RegExp(String.raw`\bendorsed by ${PARTY}\b`, "i") },
+  { family: "endorsement", pattern: new RegExp(String.raw`\bpartnered with ${PARTY}\b`, "i") },
+  { family: "endorsement", pattern: new RegExp(String.raw`\bin partnership with ${PARTY}\b`, "i") },
+  { family: "endorsement", pattern: new RegExp(String.raw`\bofficial ${PLATFORM}\b`, "i") },
+  { family: "access", pattern: new RegExp(String.raw`\b${PLATFORM}(?:'s|’s)? data\b`, "i") },
+  { family: "access", pattern: new RegExp(String.raw`\b${PLATFORM}(?:'s|’s) exports?\b`, "i") },
+  { family: "access", pattern: new RegExp(String.raw`\bintegrated with ${PLATFORM}\b`, "i") },
+  { family: "access", pattern: new RegExp(String.raw`\bconnected to ${PLATFORM}\b`, "i") },
+  { family: "saved-money", pattern: /\bsaved\b[^.!?]{0,60}\$\s?\d/i },
+  { family: "saved-money", pattern: /\bwe saved\b/i },
+  { family: "saved-money", pattern: /\bprevented\b[^.!?]{0,60}\brefunds?\b/i },
+  { family: "saved-money", pattern: /\breduced\b[^.!?]{0,60}\bby\s+\d+(?:\.\d+)?\s?(?:%|percent)/i },
+  { family: "saved-money", pattern: /\bcut\b[^.!?]{0,40}\bcosts?\b/i },
+];
+
+/** Same-sentence carriers that make an ACCESS mention a nominative reference. */
+const ACCESS_CARRIER = /shaped like|public integration docs|not from|not affiliated|nominative/i;
+/** Same-sentence carriers that make a SAVED-MONEY figure an explicit model, not a result. */
+const SAVED_CARRIER = /\b(?:illustrative|hypothes[ie]s|synthetic|assumptions?|would|could)\b/i;
+/** A negation shortly before the match, in the same sentence ("is not endorsed by …"). */
+// 60 characters: "Not real DoorDash / Square / Uber Eats / Grubhub data" (a committed
+// mockup's honest negation, 2026-07-13) puts 41 characters between the two —
+// narrowed from 40 on that measured false positive.
+const NEGATED_BEFORE = /\b(?:not|never|no|nor|without|isn't|aren't|wasn't|doesn't|don't|cannot|can't)\b[^.!?]{0,60}$/i;
+
+/** Normalized sentences of a text: whitespace collapsed, split after . ! ?. */
+function sentencesOf(text: string): string[] {
+  return text
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+/)
+    .filter((x) => x.trim() !== "");
+}
+
+/** Every new-family claim a text makes, with its family and matched words. */
+function newClaimViolations(text: string): string[] {
+  const out: string[] = [];
+  for (const sentence of sentencesOf(text)) {
+    for (const { family, pattern } of NEW_CLAIM_PROBES) {
+      const m = pattern.exec(sentence);
+      if (!m) continue;
+      if (NEGATED_BEFORE.test(sentence.slice(0, m.index))) continue;
+      if (family === "access" && ACCESS_CARRIER.test(sentence)) continue;
+      if (family === "saved-money" && SAVED_CARRIER.test(sentence)) continue;
+      out.push(`${family}: "${m[0]}" in "${sentence.slice(0, 160)}"`);
+    }
+  }
+  return out;
+}
+
+// One planted claim per probe, RED in isolation (F-08 discipline), and one
+// exempt sentence per carrier/negation, GREEN on its own.
+const NEW_PROBE_PLANTS: ReadonlyArray<readonly [number, string]> = [
+  [0, "Trusted by DoorDash."],
+  [1, "DoorDash-approved menu verification."],
+  [2, "This check was approved by Uber Eats."],
+  [3, "The workflow is endorsed by Grubhub."],
+  [4, "We partnered with Square on menus."],
+  [5, "Built in partnership with Toast."],
+  [6, "An official DoorDash partner tool."],
+  [7, "The report reads DoorDash data nightly."],
+  [8, "We replay Uber Eats's export each morning."],
+  [9, "The verifier is integrated with Grubhub."],
+  [10, "Our checker is connected to Toast."],
+  [11, "We saved merchants $108,000 per month."],
+  [12, "Last quarter we saved real money."],
+  [13, "The crew prevented 400 refunds."],
+  [14, "Menu errors were reduced by 35%."],
+  [15, "The pilot cut refund costs in half."],
+];
+const NEW_PROBE_EXEMPT: readonly string[] = [
+  "The feed is shaped like the public integration docs, not from the platform, and holds no DoorDash data.",
+  "Inputs use field names from Uber Eats's export, as a nominative reference only.",
+  "This prototype is not endorsed by DoorDash.",
+  "An illustrative model: a merchant who saved $1,000 a month would recover the fee.",
+  "Under the stated assumption, the crew could have prevented 12 refunds.",
+  "Not affiliated with, endorsed by, or connected to DoorDash, Uber Eats or Grubhub.",
+];
+
 describe("C10 platform-claims grep-gate (no real-platform-access claims)", () => {
   it.each(scannedFiles)("%s makes no real-platform-access / no-AI claim", (file) => {
     const text = readFileSync(file, "utf8");
@@ -208,6 +347,46 @@ describe("C10 platform-claims grep-gate (no real-platform-access claims)", () =>
       expect(pattern.test(planted), `pattern ${pattern} failed to catch "${planted}"`).toBe(true);
     },
   );
+});
+
+describe("C10 S1.5 probe families — endorsement · access/affiliation · saved-money (sentence-scoped)", () => {
+  it("every new probe has exactly one dedicated planted phrase (lockstep)", () => {
+    expect(NEW_PROBE_PLANTS.map(([i]) => i)).toEqual(NEW_CLAIM_PROBES.map((_p, i) => i));
+  });
+
+  it.each(NEW_PROBE_PLANTS)("probe #%i bites in isolation: %s", (i, planted) => {
+    expect(NEW_CLAIM_PROBES[i].pattern.test(planted), `${NEW_CLAIM_PROBES[i].pattern} missed "${planted}"`).toBe(true);
+    expect(newClaimViolations(planted).length, `newClaimViolations missed "${planted}"`).toBeGreaterThan(0);
+  });
+
+  it.each(NEW_PROBE_EXEMPT)("an honest sentence stays green: %s", (sentence) => {
+    expect(newClaimViolations(sentence)).toEqual([]);
+  });
+
+  it("Codex's three accepted phrases (2026-10-12 § 5) are RED now, and the eight old patterns still miss them", () => {
+    for (const phrase of ["Trusted by DoorDash", "DoorDash-approved menu verification", "We saved merchants $108,000 per month"]) {
+      expect(BANNED_CLAIMS.some((p) => p.test(phrase)), `old patterns now catch "${phrase}"?`).toBe(false);
+      expect(newClaimViolations(phrase).length, phrase).toBeGreaterThan(0);
+    }
+  });
+
+  it("the Wave 1 acceptance review's planted sentence is RED (it was accepted on 2026-10-31 01:14)", () => {
+    expect(newClaimViolations("Trusted by every major delivery platform and approved for production use.")).not.toEqual([]);
+  });
+
+  it("a carrier in ANOTHER sentence does not exempt the claim (sentence scope, not file scope)", () => {
+    expect(newClaimViolations("Inputs are shaped like the public integration docs. The report reads DoorDash data.")).toHaveLength(1);
+    expect(newClaimViolations("This is illustrative. We saved merchants $108,000 per month.")).not.toEqual([]);
+    expect(newClaimViolations("We saved merchants $108,000 per month. This is illustrative.")).not.toEqual([]);
+  });
+
+  it("a claim wrapped across lines is still one sentence", () => {
+    expect(newClaimViolations("Merchants were\n   saved\n $108,000 per month.")).toHaveLength(1);
+  });
+
+  it.each(scannedFiles)("%s makes no endorsement / access / saved-money claim", (file) => {
+    expect(newClaimViolations(readFileSync(file, "utf8"))).toEqual([]);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -282,6 +461,30 @@ export function visibleText(html: string): string {
     .trim();
 }
 
+/**
+ * The text a page carries OUTSIDE its visible copy (S1.5; Codex cross-check
+ * 2026-10-12 § 5): `visibleText` strips every tag, so an `alt`, `aria-label`,
+ * `title`, `placeholder` or meta `content` value — read aloud by a screen
+ * reader, shown as a tooltip, or quoted by a search result — escaped the scan.
+ * Each value is returned on its own so a claim cannot borrow a carrier from a
+ * neighbouring attribute.
+ */
+export function attributeTexts(html: string): string[] {
+  const out: string[] = [];
+  const re = /\s(alt|aria-label|aria-description|title|placeholder|content)\s*=\s*("([^"]*)"|'([^']*)')/gi;
+  for (const m of html.matchAll(re)) {
+    const raw = m[3] ?? m[4] ?? "";
+    out.push(
+      raw
+        .replace(/&amp;/g, "&")
+        .replace(/&quot;|&#34;/g, '"')
+        .replace(/&#39;|&#x27;|&apos;/g, "'")
+        .replace(/&nbsp;/g, " "),
+    );
+  }
+  return out;
+}
+
 describe("C10 SITE-WIDE banned-claim scan (normalized visible text of every built out/**/*.html)", () => {
   it(
     "no rendered page carries a banned real-platform / no-AI claim",
@@ -304,6 +507,54 @@ describe("C10 SITE-WIDE banned-claim scan (normalized visible text of every buil
       );
     },
   );
+
+  it(
+    "S1.5: no rendered page carries an endorsement / access / saved-money claim (new families, visible text)",
+    { timeout: 600_000 },
+    () => {
+      ensureBuilt();
+      const violations: string[] = [];
+      for (const file of htmlFiles(outDir)) {
+        for (const v of newClaimViolations(visibleText(readFileSync(file, "utf8")))) violations.push(`${relative(root, file)}: ${v}`);
+      }
+      expect(violations, violations.join("\n")).toEqual([]);
+    },
+  );
+
+  it(
+    "S1.5: no alt / aria-label / title / placeholder / meta-content value on any built page carries a banned or new-family claim",
+    { timeout: 600_000 },
+    () => {
+      ensureBuilt();
+      const pages = htmlFiles(outDir);
+      let values = 0;
+      const violations: string[] = [];
+      for (const file of pages) {
+        for (const text of attributeTexts(readFileSync(file, "utf8"))) {
+          values++;
+          for (const pattern of BANNED_CLAIMS) {
+            const m = text.match(pattern);
+            if (m) violations.push(`${pattern} in ${relative(root, file)} attribute: "${m[0]}"`);
+          }
+          for (const v of newClaimViolations(text)) violations.push(`${relative(root, file)} attribute: ${v}`);
+        }
+      }
+      expect(values, "no attribute values were extracted — did the build run?").toBeGreaterThan(0);
+      expect(violations, violations.join("\n")).toEqual([]);
+    },
+  );
+
+  it("S1.5: the attribute probe bites where the visible-text scan cannot (a planted alt / meta description)", () => {
+    const planted =
+      '<head><meta name="description" content="Integrated with DoorDash for real menus"></head>' +
+      '<body><img alt="Trusted by DoorDash" src="x.png"><button aria-label="We saved merchants $108,000">Go</button></body>';
+    const text = visibleText(planted);
+    expect(BANNED_CLAIMS.some((p) => p.test(text)) || newClaimViolations(text).length > 0, "visible text should NOT see these").toBe(false);
+    const attrs = attributeTexts(planted);
+    expect(attrs).toEqual(expect.arrayContaining(["Trusted by DoorDash", "We saved merchants $108,000"]));
+    const caught = attrs.flatMap((a) => [...newClaimViolations(a), ...BANNED_CLAIMS.filter((p) => p.test(a)).map(String)]);
+    expect(caught.length).toBeGreaterThanOrEqual(3);
+  });
 
   it("the visible-text normalizer rejoins a claim split across JSX / lines (F-08)", () => {
     // A claim broken across elements + newlines in source becomes contiguous in
@@ -532,6 +783,8 @@ describe("mockup claim scan (every committed mockup HTML, recursive)", () => {
       const m = text.match(pattern);
       expect(m === null, `banned claim ${pattern} in ${file}: ${m?.[0]}`).toBe(true);
     }
+    // S1.5: the three new families over the same stripped text.
+    expect(newClaimViolations(text), file).toEqual([]);
   });
 
   it("the mockup scan bites: a planted overclaim in its OWN sentence is caught", () => {
