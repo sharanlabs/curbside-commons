@@ -49,6 +49,6 @@ Path guard resolves real paths, case-sensitive, judges a missing path by its nea
 | F8 / F9 | S2-crew | `inputArtifact.path` through `resolveInAllowedRoot`; surface chosen from the case |
 | F10 | open | `executed: true` on a reject — follow-up (approvals) |
 | F11 | main `756c9fb` | `.telemetry/` in `.gitignore` |
-| F12 | owner | retired RAG code still imports `@huggingface/transformers` — delete or keep is the owner's call |
+| F12 | main, session 51 (10:1x) | deleted `lib/rag/embed-transformers.ts` + the four `scripts-ts/rag-*.mts`; `@huggingface/transformers` devDependency removed, and with it `onnxruntime-node` and `sharp`/libvips leave the lockfile — CI run #92 had died in onnxruntime-node's install script (a GPU-binary download from nuget.org timed out). Owner-card default taken; one `git revert` restores it |
 | F13 | contract | lanes never ran npm (one indirect `npm run build` via a test fallback, disclosed by S3; `node_modules` unchanged) |
 | F14 | main `756c9fb` + exec-layer | NOTICE names both UCP tags; the one-pager describes both input paths |
