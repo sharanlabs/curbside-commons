@@ -18,7 +18,7 @@
 
 ## Owner card (ranked; carried from HANDOFF and updated here)
 
-1. **Codex seat:** smoke-test it from your shell (the sandbox cannot read the seat's auth): `~/claude-os/bin/codex-guarded exec -s read-only -o /tmp/codex-smoke-curbside.txt "Reply with the single word OK."` — paste the output or the raw error. Owed gates: Wave 1 ×4, Wave 2 ×9, then Wave 3 lanes as they land, then S6.
+1. **Codex seat: LIVE** (owner smoke test 09:3x: `gpt-6.1-sol @ high` via `codex-guarded`, route `default`, answered `OK`, 34,380 tokens for the hooks + one word). **Run the owed gates once, in your shell:** `nohup bash scripts/codex-wave-gates.sh > /tmp/codex-gates.log 2>&1 &` then `tail -f /tmp/codex-gates.log`. Thirteen sequential changed-files reviews (Wave 1 ×4, Wave 2 ×9) on route `review`; resumable; stops at the first run with no verdict and prints the raw error. Verdicts land in `docs/reviews/codex-2026-10-31-<lane>.md`; the orchestrator reconciles each (refute or fix), never rubber-stamps.
 2. **Deploy condition, one line:** replay on the site (the plan's reading, and the default this board runs on) — or also an owner-armed live run?
 3. **Retired RAG code** (`lib/rag/embed-transformers.ts` + four `scripts-ts/rag-*.mts`, imports `@huggingface/transformers`): default = delete and `npm uninstall @huggingface/transformers` (dead since 2026-07-26; git history is the evidence; it pulls an LGPL dev dependency). Say "keep" to override.
 4. **CI for the pushes** (`fac8204..cc5f248`, `cc5f248..7e14030`, `7e14030..e692e95`): `gh run list --limit 4` from your shell; a red in `pilot.spec.ts` or a scenario e2e is most likely a locator assumption.
@@ -35,6 +35,8 @@
 - 09:2x — packets written for lanes 1 and 2; this board opened; "Wave 2 ×10" → "×9" corrected in HANDOFF and the memory note.
 
 - 09:2x — lanes 1 (Opus) and 2 (Sonnet) dispatched into `.worktrees/w3a-crew-cases` and `.worktrees/w3d-large-fixture`, both at `e692e95` with the `node_modules` symlink in place; the briefing to the owner sent with the card above.
+
+- 09:3x — owner ran the Codex smoke test: seat LIVE (gpt-6.1-sol @ high, `OK`). The owed gates cannot run from the sandbox (seat auth unreadable), so `scripts/codex-wave-gates.sh` was written: one owner command, thirteen lanes sequential on route `review`, resumable, stop-on-no-verdict, SHADOW-DUE honored, a run record appended to `docs/reviews/codex-2026-10-31-gates-run.md`. Dry-run of all thirteen prompts passed (3.5–3.9 KB each).
 
 ## Pins moved by the orchestrator at merge — before → after
 
