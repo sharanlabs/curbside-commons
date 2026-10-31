@@ -1,7 +1,8 @@
 /**
  * A1 MCP tool descriptions — the honesty-labeled `description` string the MCP
- * server advertises for each of the A0 registry's tools — six engine tools +
- * the E2 advisory retrieval tool `lookup_reference` (plan
+ * server advertises for each of the A0 registry's tools — the engine tools,
+ * the E2 advisory retrieval tool `lookup_reference` and the two S2 crew tools
+ * `explain_drift` and `size_impact` (plan
  * `docs/plan-agentic-extension.md` §5 row A1; E2 pre-reg §6). Kept as its own small module
  * (not inlined in `server.ts`) so the exact committed wording is one
  * grep/import away for the conformance tests and never silently drifts from
@@ -17,7 +18,7 @@
  * states the required "ADVISORY — candidate leads, never a verdict; classifier
  * has NOT earned a calibrated label" marking verbatim.
  *
- * Plain: the little labeled sticker on each of the seven buttons, so a person
+ * Plain: the little labeled sticker on each of the buttons, so a person
  * (or an AI agent) reading the tool list — never running the tool — already
  * knows which answers are real audits, which are just leads, and which are
  * only a walkthrough.
@@ -65,10 +66,9 @@ export const TOOL_DESCRIPTIONS: Readonly<Record<string, string>> = Object.freeze
     "data): plays the scripted demonstration in which a spec-valid-but-false surface is caught " +
     "against the SOR catalog. Always exits successfully; this is a narration, not a pass/fail " +
     "check.",
-  // S2-crew (2026-10-31): committed descriptions for the two S2 tools. They are
-  // registered but NOT yet advertised on tools/list (lib/mcp/server.ts,
-  // MCP_ADVERTISED_TOOLS) — advertisement needs the MCP conformance test, a
-  // transcript re-record and schema files, all outside the S2-crew lane.
+  // S2-crew (2026-10-31): committed descriptions for the two S2 tools, advertised
+  // on tools/list since W3-a CP4 (2026-10-31; lib/mcp/server.ts,
+  // MCP_ADVERTISED_TOOLS).
   explain_drift:
     "DETERMINISTIC BASELINE — an explanation, never a verdict. SIMULATED data (never real " +
     "merchant data): classes the cause of a set of engine findings from the scenario's event " +

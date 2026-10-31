@@ -4,13 +4,15 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
 
 import { TOOL_DESCRIPTIONS } from "@/lib/mcp/descriptions.ts";
+import { callTool } from "@/lib/tools/registry.ts";
 import { canonicalJson } from "./canonical-json.mjs";
 import { connectMcpClient, MCP_TEST_TIMEOUT_MS } from "./harness.ts";
 
 /**
  * AC-4 — MCP conformance (plan §4 AC-4, §5 row A1): `tools/list` over a REAL
- * spawned server returns exactly the registry's tools (six engine tools + the
- * E2 lookup_reference), in registry order, each
+ * spawned server returns exactly the registry's tools (the engine tools, the
+ * E2 lookup_reference and, since W3-a CP4 2026-10-31, the two S2 crew tools
+ * explain_drift and size_impact), in registry order, each
  * with its committed input schema (canonicalized — see `canonical-json.mjs`
  * for why a raw byte comparison would spuriously fail on SDK key reordering)
  * and its committed honesty-labeled description.
@@ -27,10 +29,12 @@ const EXPECTED_TOOL_ORDER = [
   "get_rule",
   "lookup_reference", // E2 advisory retrieval (pre-reg §6, added 2026-07-12 post-scoring)
   "run_demo",
+  "explain_drift", // S2 deterministic root-cause baseline (advertised W3-a CP4, 2026-10-31)
+  "size_impact", // S2 impact arithmetic, simulated figures (advertised W3-a CP4, 2026-10-31)
 ] as const;
 
 // Byte-locked behaviour hints + envelope output schema (MCP spec 2025-06-18). Every
-// tool advertises the SAME values: all seven are read-only, non-destructive,
+// tool advertises the SAME values: every one is read-only, non-destructive,
 // idempotent, closed-world deterministic-engine tools, and each returns the fixed
 // `structuredContent` honesty envelope. These lock what the server actually advertises
 // so a hint/schema can never silently drift from tool behaviour.
@@ -70,7 +74,7 @@ describe("AC-4 MCP conformance — tools/list (real spawned server)", () => {
   }, MCP_TEST_TIMEOUT_MS);
 
   it(
-    "returns EXACTLY the registry's seven tools, in its own definition order",
+    "returns EXACTLY the registry's advertised tools, in its own definition order",
     async () => {
       const { tools } = await client.listTools();
       expect(tools.map((t) => t.name)).toEqual([...EXPECTED_TOOL_ORDER]);
@@ -172,4 +176,66 @@ describe("AC-4 MCP conformance — tools/list (real spawned server)", () => {
     },
     MCP_TEST_TIMEOUT_MS,
   );
+});
+
+/**
+ * W3-a CP4 (2026-10-31) — the two newly advertised S2 tools are CALLABLE over a
+ * REAL spawned stdio server, not only listed: each `tools/call` returns the
+ * registry's own direct `callTool` canonical byte for byte, `isError: false`,
+ * exit 0. Inputs are inline and synthetic (no file read): explain_drift on one
+ * finding with one merchant 86 event before the as-of (→ merchant-edit), and
+ * size_impact on no orders (→ zero figures, labeled simulated).
+ *
+ * MUTATION PROOF (recorded 2026-10-31): `size_impact` removed from
+ * MCP_ADVERTISED_TOOLS in lib/mcp/server.ts → 6 failed / 37 passed (the
+ * tools/list order test, the four size_impact listing tests, and the
+ * size_impact call below, refused as an unknown tool); restored → 43/43.
+ */
+describe("W3-a CP4 — explain_drift and size_impact are callable over MCP (real spawned server)", () => {
+  let client: Client;
+  let close: () => Promise<void>;
+
+  beforeAll(async () => {
+    const conn = await connectMcpClient();
+    client = conn.client;
+    close = conn.close;
+  }, MCP_TEST_TIMEOUT_MS);
+
+  afterAll(async () => {
+    await close();
+  }, MCP_TEST_TIMEOUT_MS);
+
+  const CALLS = [
+    {
+      name: "explain_drift",
+      args: {
+        findings: [{ id: "item-005-v1#availability", ruleId: "LST-AVAIL-STATE", category: "availability", referenceRowId: "item-005-v1" }],
+        events: [{ at: "2026-07-02T21:46:00Z", actor: "merchant", action: "86", target: "item-005-v1" }],
+        asOf: "2026-07-03T00:00:00Z",
+      },
+      expect: (canonical: string) => expect(JSON.parse(canonical)).toMatchObject({ class: "merchant-edit", citedEvents: [0], label: "deterministic baseline" }),
+    },
+    {
+      name: "size_impact",
+      args: { findings: [], orders: [], windowDays: 7, errorChargeShare: 0.5 },
+      expect: (canonical: string) => expect(JSON.parse(canonical)).toMatchObject({ ordersAtRiskDistinct: 0, label: "simulated" }),
+    },
+  ] as const;
+
+  for (const c of CALLS) {
+    it(
+      `${c.name}: tools/call succeeds and its text is the direct callTool canonical, byte for byte`,
+      async () => {
+        const direct = callTool(c.name, c.args);
+        const result = await client.callTool({ name: c.name, arguments: c.args });
+        const content = result.content as ReadonlyArray<{ type: string; text?: string }>;
+        expect(result.isError).toBe(false);
+        expect(content).toHaveLength(1);
+        expect(content[0]?.text).toBe(direct.canonical);
+        expect(result.structuredContent).toEqual({ tool: c.name, ok: true, exitCode: 0, demoOnly: false, advisory: false, earnsLabel: null });
+        c.expect(direct.canonical);
+      },
+      MCP_TEST_TIMEOUT_MS,
+    );
+  }
 });

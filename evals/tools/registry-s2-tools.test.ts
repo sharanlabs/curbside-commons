@@ -92,10 +92,12 @@ describe("explain_drift + size_impact — registered, described, refused when ma
     expect(TOOL_DESCRIPTIONS.explain_drift).toMatch(/DEFER/);
   });
 
-  it("the MCP surface still advertises exactly the original seven (S2 advertisement is an OPEN merge item)", () => {
-    expect(TOOL_ORDER).not.toContain("explain_drift");
-    expect(TOOL_ORDER).not.toContain("size_impact");
-    expect(TOOL_ORDER.length).toBe(7);
+  // W3-a CP4 (2026-10-31): the S2-crew OPEN item is closed — both tools are on
+  // tools/list (this pin used to say "still exactly the original seven").
+  it("the MCP surface advertises every registered tool in registry order, the two S2 tools included", () => {
+    expect(TOOL_ORDER).toStrictEqual([...TOOLS.keys()]);
+    expect(TOOL_ORDER).toContain("explain_drift");
+    expect(TOOL_ORDER).toContain("size_impact");
   });
 
   it("explain_drift refuses malformed input: missing asOf, bad actor, bad action, non-instant timestamps", () => {

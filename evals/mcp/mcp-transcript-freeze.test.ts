@@ -51,16 +51,32 @@ describe("MCP scripted-client transcript is byte-frozen", () => {
     expect(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(committed)).toBe(false);
   });
 
-  // 7 happy calls since 2026-07-12: the E2 lookup_reference tool joined the
-  // registry (pre-reg §6) and the scripted session exercises every tool once.
-  it("the committed transcript's session shape matches the packet: initialize -> tools/list -> 7 happy calls -> 2 invalid calls", () => {
+  // The happy-call count is DERIVED from the transcript (W3-a CP4, 2026-10-31),
+  // never hand-typed: each happy call names a tool the same session listed, no
+  // tool is called twice, and the listed tools the scripted session does NOT
+  // call are pinned by name. That set is exactly the two S2 tools advertised in
+  // W3-a CP4: the recorder (evals/mcp/record-transcript.mjs) sat outside that
+  // packet, and an explain_drift call would put its required ISO `asOf` into the
+  // transcript, which the no-timestamp scan above refuses — both are orchestrator
+  // decisions (W3-a return packet, OPEN). Both tools are proven callable over the
+  // real server in mcp-conformance.test.ts. When the recorder gains them, this
+  // pin goes red and the remainder becomes [].
+  // MUTATION PROOF (2026-10-31): the run_demo happy call deleted from the golden
+  // → this test red ("run_demo" joins the uncalled remainder) and the byte-freeze
+  // red, 2 failed / 2 passed; golden restored → 4/4.
+  it("the committed transcript's session shape matches the packet: initialize -> tools/list -> one happy call per listed tool (count derived) -> 2 invalid calls", () => {
     const transcript = JSON.parse(readFileSync(golden, "utf8")) as {
-      steps: ReadonlyArray<{ step: string }>;
+      steps: ReadonlyArray<{ step: string; tools?: ReadonlyArray<{ name: string }>; request?: { name: string } }>;
     };
     const stepNames = transcript.steps.map((s) => s.step);
     expect(stepNames[0]).toBe("initialize");
     expect(stepNames[1]).toBe("tools/list");
-    expect(stepNames.filter((s) => s === "tools/call")).toHaveLength(7);
+    const listed = (transcript.steps[1].tools ?? []).map((t) => t.name);
+    const called = transcript.steps.filter((s) => s.step === "tools/call").map((s) => s.request?.name ?? "");
+    expect(listed.length).toBeGreaterThan(0);
+    expect(new Set(called).size, "a tool is called twice in the scripted session").toBe(called.length);
+    for (const name of called) expect(listed, `happy call "${name}" is not on tools/list`).toContain(name);
+    expect(listed.filter((name) => !called.includes(name))).toStrictEqual(["explain_drift", "size_impact"]);
     expect(stepNames.filter((s) => s === "tools/call (invalid)")).toHaveLength(2);
   });
 
