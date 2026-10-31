@@ -30,3 +30,19 @@ Model rule (decision-log 2026-10-12 amendment): cheapest model with proven-equal
 - 00:49 session opened; startup contract read; gates re-measured on `0ac396f`: tsc 0 · eslint 0 · vitest 1821 + 8.
 - 00:5x advisor consulted; plan confirmed (resume, not pivot); four tweaks adopted (Wave 1 acceptance as a step · S1 completion folded into S1.5 · freshness lane · Codex deferral logged).
 - 01:0x record committed `cd0d347`; exec-layer WIP committed `61a6127`; four wave2 branches fast-forwarded; three S2 worktrees + review worktree created.
+
+## Advisory ledger (advisors advise; the orchestrator decides — org-model v2 § 21)
+
+| Date · body | Claim | Evidence | Falsifier | Disposition | Outcome |
+| --- | --- | --- | --- | --- | --- |
+| 2026-10-31 01:10 · efficiency-head (Sonnet, ~57k tokens) | Width, not seat choice, is the risk: ~12 agents open on one seat; fold the three Haiku checks into one Haiku + a counts script | its reading of the dispatch table; no served-routes or reset-time data available to it | the fold misses a defect the three would have caught | **Declined for this wave** (all three already running, Haiku is cheap); **adopted for future fan-outs**: count accounting becomes a script, Haiku classifies grep hits only | pending |
+| same | Hold batch 1b until batch 1a returns, or past ~01:45 (window rule E125) | window model assumes a ~50-minute heavy window; the seat's real reset time is unknown from this sandbox | 1b finishing inside the window without a cut | **Partially adopted**: 1b dispatches at the first checkpoint once 1a lanes show WIP commits on disk; not held on a clock that cannot be verified; WIP-commit discipline is the mitigation | pending |
+| same | S2-ledger is trust-bearing (approvals, budget rows); re-seat to Opus if its first return needs > 1 correction round; orchestrator runs a tamper test at merge | green tests can be non-biting | S2-ledger passes the tamper test first round | **Adopted** as a merge rule | pending |
+| same | Serialise cli-experience after the S1.5 merge (both edit `lib/packs/listings/cli.ts`) | file-ownership collision | no conflict at merge | **Adopted**: cli-experience dispatches after S1.5 merges | pending |
+| same | Add check · outcome · cause (capability/input) columns per lane; the packet's MODEL self-report is not evidence of equivalence | self-grading | — | **Adopted**: columns filled at each merge from the orchestrator's own checks, never from the packet's MODEL line | pending |
+| same | Owner-time budget by morning ≈ 10 min + one conversation: Codex reset/gates GO (2 min) · deploy yes/no with D-4 as one release-policy ask (3 min, only after Codex) · one validation conversation (25 min, book a slot) · D-6 one `sysctl` paste (2 min) · push = FYI not an ask | — | — | **Adopted** as the shape of the morning owner card | pending |
+| same | Savings claim: net 35–50 % cheaper than all-Fable (ESTIMATED; Opus ≈ 0.5, Sonnet ≈ 0.3, Haiku ≈ 0.1 of Fable, ratios unverified); advisory overhead ≈ 4 % of the wave, under the 15 % cap | estimates only | measured tokens at wrap | recorded as estimate | pending |
+
+Lesson line (efficiency-head): on a one-seat overnight run the scarce unit is the window, not dollars — open heavy lanes by critical path, make each WIP commit the product, turn count and sweep checks into scripts, not seats.
+
+- 01:10 efficiency-head returned; dispositions above. 01:11 state-doc top blocks committed `3b63bad`; budget test 5/5. Fallback wake-up armed (25 min). Waiting on lanes.
