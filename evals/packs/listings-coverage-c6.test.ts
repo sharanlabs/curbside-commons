@@ -44,6 +44,18 @@ import { parseInstant } from "@/lib/packs/listings/instants";
  *   LST-MOD-MISSING — `return []` after the field guard: menu-002 not caught.
  *   LST-HOURS-WINDOW — window comparison dropped (`if (false && !inSync)`):
  *     menu-003 not caught.
+ * RE-APPLY WITH RESTORE SHA (S1.5, 2026-10-31 01:39; Wave 1 acceptance review
+ * item (c)): `if (true || actual === expected) return [];` applied to the
+ * LST-MOD-PRICE-VALUE detector ONLY (detectors.ts sha256/16 aaf19a2a925d5f09 →
+ * 9624c040e7aac195) → this file 3 failed / 19 passed (all-class 10/11 caught ·
+ * per-ENTRY menu-001 · one-finding-per-entry), listings-differential-c3 and
+ * scenarios green (no c3 or scenario input carries a modifier). Restored from
+ * the saved copy → aaf19a2a925d5f09 byte-exact, 22/22 green. The acceptance
+ * review's wider red (c3 + scenarios) is not reproduced by the single-detector
+ * mutation: the line `if (actual === expected) return [];` occurs five times in
+ * detectors.ts, and replacing all five turns c6 6 · c3 7 · scenarios 28 red —
+ * a multi-site replacement is the likely cause (inference, not re-measured on
+ * the reviewer's tree).
  */
 
 const sor = generateCatalog(CORPUS_SEED, CORPUS_AS_OF);
