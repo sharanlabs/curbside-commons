@@ -9,7 +9,7 @@
 | # | Lane | Owns | Seat | Packet | State | Return |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | **W3-a CP1** — crew-case coverage test · cases for modifier-drift + spec-valid-lie · scenario 5 ownership → partner · MCP advertisement of explain_drift + size_impact | `evals/crew/cases-s2/**`, coverage test, `lib/mcp/server.ts` allowlist, `lib/tools/schemas/*`, `evals/mcp/**` | Opus | `docs/packets/2026-10-31-w3a-crew-cases.md` | DISPATCHED 09:2x | — |
-| 2 | **W3-d** — large synthetic restaurant (~300 items, modifier groups, 7-day drift) · alert-volume figures derived · hours-grace parameter | `scripts-ts/generate-large-fixture.mts`, `fixtures/synthetic-restaurant-large/**`, `evals/packs/large-fixture.test.ts`, grace plumbing in `detectors.ts` | Sonnet | `docs/packets/2026-10-31-w3d-large-fixture.md` | DISPATCHED 09:2x | — |
+| 2 | **W3-d** — large synthetic restaurant (~300 items, modifier groups, 7-day drift) · alert-volume figures derived · hours-grace parameter | `scripts-ts/generate-large-fixture.mts`, `fixtures/synthetic-restaurant-large/**`, `evals/packs/large-fixture.test.ts`, grace plumbing in `detectors.ts` | Sonnet | `docs/packets/2026-10-31-w3d-large-fixture.md` | RETURNED 09:4x · reviewed · CP6 (new-alert figure) requested before merge | `793a490` |
 | 3 | **W3-a CP2** — scenario picker in INPUTS · crew-on-site in replay (route · explain · impact · DEFER · artifacts · approval stub · ledger entry) | `components/landing/**`, `lib/playground/scenario-loader.ts`, picker test | Opus | not yet | **HELD** — waits on the owner's deploy-condition answer (replay on site vs also an owner-armed live run) and on lane 1 | — |
 | 4 | **W3-b** — redesign port (eight steps, left rail, depth-one disclosures; DESIGN.md rewrite; canonical pins moved with reasons; fold re-measured) | `app/page.tsx`, `app/globals.css`, `components/**` layout, `DESIGN.md`, `evals/design/**` | Opus | not yet | after lane 3 | — |
 | 5 | **W3-c** — one Playwright spec per built scenario on the guided path | `evals/e2e/scenario-*.spec.ts`, `walkthrough.spec.ts` | Sonnet | not yet | after lane 4 | — |
@@ -26,6 +26,7 @@
 6. Book the platform-intake conversation (`docs/research/interview-guide-platform-intake-2026-10-12.md`).
 7. Housekeeping the sandbox could not finish: `git worktree prune` (the fifteen Wave 1/2 working directories are gone; their `.git/worktrees/*` metadata is undeletable from the sandbox) then `git branch -d` the fourteen merged `wave1/*` and `wave2/*` branches.
 8. Before any live arming: Groq free-tier limits on console.groq.com/settings/limits.
+9. **Drift rates for the large fixture** (`scripts-ts/generate-large-fixture.mts` constants, 0.4–1.0 % of units per day): placeholders labelled as assumptions. If you want other values before any figure reaches the site, name them; otherwise they stand as declared assumptions.
 
 ## Log
 
@@ -37,6 +38,8 @@
 - 09:2x — lanes 1 (Opus) and 2 (Sonnet) dispatched into `.worktrees/w3a-crew-cases` and `.worktrees/w3d-large-fixture`, both at `e692e95` with the `node_modules` symlink in place; the briefing to the owner sent with the card above.
 
 - 09:3x — owner ran the Codex smoke test: seat LIVE (gpt-6.1-sol @ high, `OK`). The owed gates cannot run from the sandbox (seat auth unreadable), so `scripts/codex-wave-gates.sh` was written: one owner command, thirteen lanes sequential on route `review`, resumable, stop-on-no-verdict, SHADOW-DUE honored, a run record appended to `docs/reviews/codex-2026-10-31-gates-run.md`. Dry-run of all thirteen prompts passed (3.5–3.9 KB each).
+
+- 09:4x — **W3-d returned** (`793a490`, 254k tokens, 37 tool calls, ~11 min). Orchestrator review: diff scope clean (only the five allowed paths; `lib/**` untouched — the hours-grace parameter already existed as `hoursWindowDetector(graceMinutes = HOURS_WINDOW_GRACE_MINUTES)`, so CP3 is a correct empty commit); regeneration byte-identical in the seat (0 changed paths); register scan of README + manifest: zero hits for sample/demo/example/real/actual/live, nine synthetic/simulated/assumption lines; generator uses its own mulberry32 seed `20261101` with one stream per day and reads no existing corpus. **Orchestrator mutations (not the lane's):** seed flip `20261101 → 20261102` → 2 red (FREEZE bytes + declared-rates); manifest day-3 `findingsPer100Items` +1 → 2 red; both restored, 26 green. **Decisions on its OPEN items:** (1) hours once per item ACCEPTED — the existing corpus feeds carry hours on zero rows, so one hours claim per item is already a superset of the shape the engine has seen; cap stays 5 MB. (2) alert-rate semantics: BOTH readings carried — cumulative (as built) AND a per-day new-alert figure (findings absent the previous day, keyed by claim id + rule id); a repair model stays out (it needs assumptions nobody has given). Sent back to the lane as CP6 before merge so the /pilot lane re-pins once. (3) the declared rates (0.4–1.0 %/day) are labelled assumptions → owner card.
 
 ## Pins moved by the orchestrator at merge — before → after
 
