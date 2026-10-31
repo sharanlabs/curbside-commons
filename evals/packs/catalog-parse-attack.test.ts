@@ -10,14 +10,22 @@ import {
   verifyAcpFeed,
 } from "@/components/playground/verify-in-browser";
 import {
+  CORPUS_AS_OF,
+  CORPUS_SEED,
   DuplicateVariationIdError,
+  ListingsInputError,
+  ReservedIdError,
   acpFeedToClaims,
+  buildFaithfulMenuFeed,
   findDuplicateVariationId,
+  generateMenuModelCatalog,
   runListingsVerification,
   type AcpFeed,
+  type AcpFeedItem,
   type SorItem,
   type SyntheticCatalog,
 } from "@/lib/packs/listings";
+import { DuplicateFeedRowError, FeedShapeError } from "@/lib/packs/listings/adapters";
 import { runCheck } from "@/lib/packs/listings/cli";
 
 /**
@@ -274,5 +282,163 @@ describe("S1.5 — the duplicate-id refusal is one predicate on every path (Code
       readFileSync(join(process.cwd(), "fixtures", "synthetic-restaurant", "acp-feed.faithful.json"), "utf8"),
     ) as AcpFeed;
     expect(runListingsVerification(acpFeedToClaims(faithful), bundled).ok).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// S1.5 — engine-side input refusals from the security review of 2026-10-31
+// (docs/reviews/security-privacy-legal-2026-10-31.md F1 · F4 · F6 · F7), each
+// driven through `runCheck`, the call the CLI and the MCP `check_feed` tool make.
+//
+// RED proof (2026-10-31 01:47, measured on this file of 29 tests; every
+// mutation restored from a saved copy → adapters.ts 864c03a2c1799e32 ·
+// modifiers.ts c0842c1396f989ff · run.ts e9fabfbfddd71741 (sha256/16), 29/29):
+//  F1  guardRows' reserved-id `throw` line deleted (adapters.ts) → 5 failed:
+//      the four ACP/UCP `catalog#1` / `catalog` probes verify instead of
+//      refusing, and the same-predicate test. The
+//      `assertNoReservedVariationIds(sor);` call deleted (run.ts) → 1 failed
+//      (the catalog-side probe).
+//  F4  each projection reverted ALONE to the raw value — the option object
+//      (modifiers.ts), `row.hours` (modifiers.ts), the raw `variant_dict`
+//      (adapters.ts) → 1 failed each: "customer_email" reaches the report.
+//  F6  guardRows' duplicate-id `throw` line deleted → 3 failed.
+//  F7  guardRows' menu-field loop short-circuited → 3 failed (the projection
+//      dies on the raw value instead of a FeedShapeError naming the field).
+// ---------------------------------------------------------------------------
+
+const ROOT = process.cwd();
+const restaurant = join(ROOT, "fixtures", "synthetic-restaurant");
+const readFixture = <T,>(name: string): T => JSON.parse(readFileSync(join(restaurant, name), "utf8")) as T;
+
+/** Write `feed` and `catalog` to a temp dir, run `runCheck`, clean up; returns the result or the thrown error. */
+function check(feed: unknown, catalog: unknown, surface: "acp" | "ucp" = "acp"): { output?: string; ok?: boolean; error?: unknown } {
+  const dir = mkdtempSync(join(tmpdir(), "s15-sec-"));
+  try {
+    const feedPath = join(dir, "feed.json");
+    const catPath = join(dir, "catalog.json");
+    writeFileSync(feedPath, JSON.stringify(feed));
+    writeFileSync(catPath, JSON.stringify(catalog));
+    const r = runCheck(feedPath, catPath, surface);
+    return { output: r.output, ok: r.report.ok };
+  } catch (error) {
+    return { error };
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+describe("S1.5 — F1: a feed row named `catalog` / `catalog#N` is refused, never a PASS", () => {
+  const record = readFixture<SyntheticCatalog>("sor.catalog.json");
+  const acp = readFixture<AcpFeed>("acp-feed.faithful.json");
+  const ucp = readFixture<{ items: Array<Record<string, unknown>> }>("ucp-catalog-response.faithful.json");
+  const fakeAcp = (id: string): AcpFeed => ({ ...acp, items: [...acp.items, { ...acp.items[0], item_id: id, title: "Phantom Platter", price: "20.00" }] });
+  const fakeUcp = (id: string) => ({ ...ucp, items: [...ucp.items, { ...ucp.items[0], id, title: "Phantom Platter", price: { amount: "20.00", currency: "USD" } }] });
+
+  it("control: the clean pair passes, and a fake `ghost-1` row is caught as a ghost", () => {
+    expect(check(acp, record).ok).toBe(true);
+    const ghost = check(fakeAcp("ghost-1"), record);
+    expect(ghost.ok).toBe(false);
+    expect(ghost.output).toContain("LST-EXIST-GHOST");
+  });
+
+  it.each(["catalog#1", "catalog"])("ACP: a fake row %s priced 20.00 is refused by name (security review probe)", (id) => {
+    const r = check(fakeAcp(id), record);
+    expect(r.ok, "the fake row must never return PASS").toBeUndefined();
+    expect(r.error).toBeInstanceOf(ReservedIdError);
+    expect((r.error as Error).message).toContain(`Feed row items[${acp.items.length}]`);
+    expect((r.error as Error).message).toContain(id === "catalog" ? 'reserved id "catalog"' : `("${id}")`);
+  });
+
+  it.each(["catalog#1", "catalog"])("UCP: a fake item %s priced 20.00 is refused by name", (id) => {
+    const r = check(fakeUcp(id), record, "ucp");
+    expect(r.ok).toBeUndefined();
+    expect(r.error).toBeInstanceOf(ReservedIdError);
+    expect((r.error as Error).message).toContain(`Feed row items[${ucp.items.length}]`);
+  });
+
+  it("catalog side: a record variation id `catalog` or `sku#1` is refused by location", () => {
+    for (const bad of ["catalog", "sku#1"]) {
+      const tampered: SyntheticCatalog = {
+        ...record,
+        items: record.items.map((it, i) => (i === 1 ? { ...it, variations: it.variations.map((v, k) => (k === 0 ? { ...v, id: bad } : v)) } : it)),
+      };
+      const r = check(acp, tampered);
+      expect(r.error, bad).toBeInstanceOf(ReservedIdError);
+      expect((r.error as Error).message).toContain("Catalog row items[1].variations[0]");
+    }
+  });
+
+  it("the browser's JSON door and the engine refuse through the same predicate", () => {
+    const parsed = parseAcpFeedText(JSON.stringify(fakeAcp("catalog#1")));
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) expect(parsed.error).toContain('has an `id` containing "#" ("catalog#1")');
+    expect(() => acpFeedToClaims(fakeAcp("catalog#1"))).toThrow('has an `id` containing "#" ("catalog#1")');
+  });
+});
+
+describe("S1.5 — F6: the same row id served twice on one copy is refused", () => {
+  const record = readFixture<SyntheticCatalog>("sor.catalog.json");
+  const acp = readFixture<AcpFeed>("acp-feed.faithful.json");
+  const ucp = readFixture<{ items: Array<Record<string, unknown>> }>("ucp-catalog-response.faithful.json");
+
+  it("ACP: an exact duplicate row is refused, naming the id and both rows", () => {
+    const r = check({ ...acp, items: [...acp.items, acp.items[2]] }, record);
+    expect(r.error).toBeInstanceOf(DuplicateFeedRowError);
+    expect((r.error as Error).message).toContain(`"${acp.items[2].item_id}" twice: items[2] and items[${acp.items.length}]`);
+  });
+
+  it("ACP: a duplicate row that disagrees with the record cannot hide behind the one that agrees", () => {
+    const r = check({ ...acp, items: [...acp.items, { ...acp.items[2], price: "0.01" }] }, record);
+    expect(r.error).toBeInstanceOf(DuplicateFeedRowError);
+  });
+
+  it("UCP: a duplicate item is refused the same way", () => {
+    const r = check({ ...ucp, items: [...ucp.items, ucp.items[0]] }, record, "ucp");
+    expect(r.error).toBeInstanceOf(DuplicateFeedRowError);
+  });
+});
+
+describe("S1.5 — F4: a field planted inside modifiers[] / hours[] / variant_dict never reaches the report", () => {
+  const record = generateMenuModelCatalog(CORPUS_SEED, CORPUS_AS_OF);
+  const faithful = buildFaithfulMenuFeed(record);
+  const PLANT = { customer_email: "planted-person@example.com" };
+
+  it("the planted key is dropped from every claim value, while the drift it rides on is still reported", () => {
+    // Plant on rows that ALSO drift, so the claim carrying the planted key is a finding's evidence.
+    const modRow = faithful.items.find((r) => (r.modifiers ?? []).some((m) => Number(m.price_delta) > 0))!;
+    const hoursRow = faithful.items.find((r) => r.hours !== undefined && r.item_id !== modRow.item_id)!;
+    const dictRow = faithful.items.find((r) => r.item_id !== modRow.item_id && r.item_id !== hoursRow.item_id)!;
+    const items = faithful.items.map((r): AcpFeedItem => {
+      if (r.item_id === modRow.item_id) {
+        return { ...r, modifiers: r.modifiers!.map((m, i) => (i === 0 ? { ...m, ...PLANT, price_delta: "9.99" } : m)) };
+      }
+      if (r.item_id === hoursRow.item_id) {
+        return { ...r, hours: r.hours!.map((w, i) => (i === 0 ? { ...w, ...PLANT, close: "03:00:00" } : w)) };
+      }
+      if (r.item_id === dictRow.item_id) return { ...r, variant_dict: { variation: "Not This One", ...PLANT } };
+      return r;
+    });
+    const r = check({ ...faithful, items }, record);
+    expect(r.error).toBeUndefined();
+    expect(r.ok).toBe(false);
+    for (const rule of ["LST-MOD-PRICE-VALUE", "LST-HOURS-WINDOW", "LST-IDENT-MODIFIER-AMBIG"]) expect(r.output).toContain(rule);
+    expect(r.output).not.toContain("customer_email");
+    expect(r.output).not.toContain("planted-person");
+  });
+});
+
+describe("S1.5 — F7: a malformed menu-extension value is a named refusal, not a TypeError", () => {
+  const record = generateMenuModelCatalog(CORPUS_SEED, CORPUS_AS_OF);
+  const faithful = buildFaithfulMenuFeed(record);
+  it.each([
+    ["modifiers", "extra cheese"],
+    ["modifiers", [null]],
+    ["hours", { day: "MON" }],
+  ] as const)("%s = %j is refused with a FeedShapeError naming the row and the field", (field, value) => {
+    const items = faithful.items.map((r, i) => (i === 0 ? ({ ...r, [field]: value } as unknown as AcpFeedItem) : r));
+    const r = check({ ...faithful, items }, record);
+    expect(r.error).toBeInstanceOf(FeedShapeError);
+    expect(r.error).toBeInstanceOf(ListingsInputError);
+    expect((r.error as Error).message).toContain(`items[0] (item_id "${faithful.items[0].item_id}") has a \`${field}\` value`);
   });
 });

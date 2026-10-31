@@ -36,6 +36,7 @@
  */
 import type { AcpAvailability, AcpFeed, AcpFeedItem } from "../packs/listings/acp-feed.ts";
 import { centsToDecimal } from "../packs/listings/acp-feed.ts";
+import { reservedIdProblem } from "../packs/listings/reference.ts";
 import type { SorItem, SorStockState, SorVariation, SyntheticCatalog } from "../packs/listings/types.ts";
 import { parseCsv, toCsv, type CsvRow } from "./csv.ts";
 
@@ -184,21 +185,10 @@ function readYesNo(raw: string, what: string, dflt: boolean): Cell<boolean> {
   return badCell(`${what} "${raw}" must be yes or no (blank means ${dflt ? "yes" : "no"}).`);
 }
 
-/**
- * Ids the ENGINE would misread — refused on both sides, same reasons as the
- * JSON parsers (verify-in-browser.ts `reservedIdProblem`): claim ids are built
- * as `<id>#<field>` and split on the first `#`, and `catalog` names catalog-level
- * metadata inside the reference resolver.
- */
-function idProblem(id: string): string | null {
-  if (id.includes("#")) {
-    return `its id "${id}" contains "#", which the checker uses internally to separate a row from a field — this row would be compared against "${id.split("#")[0]}" instead.`;
-  }
-  if (id === "catalog") {
-    return `its id is the reserved word "catalog", which names the whole record inside the checker, so this row would not be checked as a row.`;
-  }
-  return null;
-}
+// Ids the ENGINE would misread (an id containing "#", or the reserved
+// "catalog") are refused through the engine's own predicate,
+// lib/packs/listings/reference.ts `reservedIdProblem` (S1.5; security review
+// 2026-10-31 F1) — one function for this door, the JSON door and the CLI/MCP path.
 
 // ---------------------------------------------------------------------------
 // Table reading shared by both adapters: header → column index, ragged rows,
@@ -288,7 +278,7 @@ export function feedFromCsv(text: string): FeedCsvResult {
       error: `Row ${r.line}${id ? ` (item_id "${id}")` : ""}: ${reason}`,
     });
     if (!id) return at("has no item_id. Every row needs one so a finding can say which row it is about.");
-    const idp = idProblem(id);
+    const idp = reservedIdProblem(id);
     if (idp) return at(idp);
     if (seen.has(id)) {
       return at(
@@ -405,7 +395,7 @@ export function recordFromCsv(text: string, opts: RecordCsvOptions): RecordCsvRe
       error: `Row ${r.line}${id ? ` (item_id "${id}")` : ""}: ${reason}`,
     });
     if (!id) return at("has no item_id. The id is what a published row is matched against.");
-    const idp = idProblem(id);
+    const idp = reservedIdProblem(id);
     if (idp) return at(idp);
     if (seen.has(id)) {
       return at(

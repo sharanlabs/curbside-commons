@@ -351,14 +351,18 @@ describe("REFUSE — only what the engine cannot index, by spreadsheet row; wron
     expect(r).toMatchObject({ ok: false, error: expect.stringMatching(/Row 2 has 3 cells but the header names 2/) });
   });
 
+  // S1.5 (2026-10-31; security review F1): the reason now comes from the
+  // engine's own predicate (lib/packs/listings/reference.ts reservedIdProblem),
+  // shared with the JSON door and the CLI/MCP path, so the wording is that one
+  // function's — the row prefix is still this adapter's.
   it("ids the engine would misread are refused on both sides, naming the row", () => {
     expect(feedFromCsv(feedRow({ item_id: "sku#1", price: "1.00" }))).toMatchObject({
       ok: false,
-      error: expect.stringMatching(/^Row 2 \(item_id "sku#1"\): its id "sku#1" contains "#"/),
+      error: expect.stringMatching(/^Row 2 \(item_id "sku#1"\): has an `id` containing "#" \("sku#1"\)/),
     });
     expect(recordFromCsv(recordRows({ item_id: "catalog", name: "x", price: "1.00" }), { today: TODAY })).toMatchObject({
       ok: false,
-      error: expect.stringMatching(/reserved word "catalog"/),
+      error: expect.stringMatching(/reserved id "catalog"/),
     });
     expect(feedFromCsv(feedRow({ price: "1.00" }))).toMatchObject({ ok: false, error: expect.stringMatching(/^Row 2: has no item_id/) });
   });

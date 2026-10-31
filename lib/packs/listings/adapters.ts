@@ -18,7 +18,79 @@
 import type { Claim } from "../../verifier-core/index.ts";
 import type { AcpFeed, AcpFeedItem } from "./acp-feed.ts";
 import { menuModelClaims } from "./modifiers.ts";
+import { ListingsInputError, ReservedIdError, reservedIdProblem } from "./reference.ts";
 import type { UcpCatalogResponseFixture } from "./ucp.ts";
+
+/** A feed row the adapter cannot read as a row (S1.5; security review 2026-10-31 F7). */
+export class FeedShapeError extends ListingsInputError {
+  constructor(message: string) {
+    super(message);
+    this.name = "FeedShapeError";
+  }
+}
+
+/**
+ * The same row id served twice on one copy (S1.5; security review F6). Claims
+ * are keyed by row id, so the two rows would be judged as one and whichever
+ * disagreed with the record could hide behind the one that agreed. Refused.
+ */
+export class DuplicateFeedRowError extends ListingsInputError {
+  readonly id: string;
+  constructor(id: string, first: number, second: number) {
+    super(
+      `The copy serves the row id "${id}" twice: items[${first}] and items[${second}]. Claims are keyed by row id, ` +
+        `so the two rows would be judged as one and no report could say which it meant. Nothing was verified.`,
+    );
+    this.name = "DuplicateFeedRowError";
+    this.id = id;
+  }
+}
+
+const isPlainObject = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v);
+
+/**
+ * Refuse rows the engine would misread BEFORE any claim exists (S1.5): a
+ * non-object row, a non-string id, a reserved id (F1), a repeated id (F6), and
+ * — on the ACP surface — a `modifiers` / `hours` value that is not an array of
+ * objects (F7, which used to die as an opaque TypeError inside the projection).
+ */
+function guardRows(rows: readonly unknown[], idKey: "item_id" | "id", menuFields: boolean): void {
+  const seen = new Map<string, number>();
+  rows.forEach((row, i) => {
+    if (!isPlainObject(row)) throw new FeedShapeError(`Feed row items[${i}] is not an object — every row must be a JSON object.`);
+    const id = row[idKey];
+    if (typeof id !== "string" || id === "") {
+      throw new FeedShapeError(`Feed row items[${i}] has no string \`${idKey}\` — every row needs one so its findings can name it.`);
+    }
+    const problem = reservedIdProblem(id);
+    if (problem) throw new ReservedIdError(`Feed row items[${i}]`, id, problem);
+    const first = seen.get(id);
+    if (first !== undefined) throw new DuplicateFeedRowError(id, first, i);
+    seen.set(id, i);
+    if (!menuFields) return;
+    for (const field of ["modifiers", "hours"] as const) {
+      const v = row[field];
+      if (v === undefined) continue;
+      if (!Array.isArray(v) || !v.every(isPlainObject)) {
+        throw new FeedShapeError(
+          `Feed row items[${i}] (item_id "${id}") has a \`${field}\` value that is not an array of objects — ` +
+            `the menu extension lists ${field === "modifiers" ? "one object per served option" : "one object per served window"}.`,
+        );
+      }
+    }
+  });
+}
+
+/**
+ * The variant label a claim carries — DECLARED KEYS ONLY (S1.5; security
+ * review F4): the detectors read `variation`, so nothing else a copy planted
+ * in `variant_dict` (a customer field, say) can travel into a report.
+ */
+function variantDictValue(dict: unknown): Readonly<Record<string, string>> {
+  const v = isPlainObject(dict) ? dict.variation : undefined;
+  return v === undefined ? {} : { variation: v as string };
+}
 
 /** Cross-field tuple carried by the per-row `invariants` claim (ACP surface). */
 export interface AcpInvariantsValue {
@@ -43,6 +115,7 @@ function rowClaims(
 
 /** Normalize an ACP feed into claims. */
 export function acpFeedToClaims(feed: AcpFeed): readonly Claim[] {
+  guardRows(feed.items, "item_id", true);
   return feed.items.flatMap((r: AcpFeedItem) => {
     const invariants: AcpInvariantsValue = {
       price: r.price,
@@ -56,7 +129,7 @@ export function acpFeedToClaims(feed: AcpFeed): readonly Claim[] {
       ["price.amount", r.price],
       ["price.currency", r.currency],
       ["availability", r.availability],
-      ["variant_dict", { group: r.group_id, dict: r.variant_dict }],
+      ["variant_dict", { group: r.group_id, dict: variantDictValue(r.variant_dict) }],
       ...(r.expiration_date !== undefined
         ? ([["expiration_date", r.expiration_date]] as const)
         : []),
@@ -81,6 +154,7 @@ export function ucpResponseToClaims(resp: UcpCatalogResponseFixture): readonly C
     field: "spec.supported_versions",
     value: resp.supported_versions,
   };
+  guardRows(resp.items, "id", false);
   const perItem = resp.items.flatMap((it) =>
     rowClaims("ucp-catalog", it.id, [
       ["existence", true],
@@ -88,7 +162,7 @@ export function ucpResponseToClaims(resp: UcpCatalogResponseFixture): readonly C
       ["price.amount", it.price.amount],
       ["price.currency", it.price.currency],
       ["availability", it.availability === "available" ? "in_stock" : "out_of_stock"],
-      ["variant_dict", { group: it.group_id, dict: it.variant }],
+      ["variant_dict", { group: it.group_id, dict: variantDictValue(it.variant) }],
     ]),
   );
   return [meta, ...perItem];

@@ -27,6 +27,7 @@
  */
 import type { AcpFeed } from "@/lib/packs/listings/acp-feed";
 import { acpFeedToClaims } from "@/lib/packs/listings/adapters";
+import { reservedIdProblem } from "@/lib/packs/listings/reference";
 import { runListingsVerification } from "@/lib/packs/listings/run";
 import type { SorItem, SorVariation, SyntheticCatalog } from "@/lib/packs/listings/types";
 import {
@@ -272,30 +273,10 @@ export type CatalogParseResult =
 
 const STOCK_STATES = ["in_stock", "soldout_86", "hidden"] as const;
 
-/**
- * Two id values the engine cannot represent, refused on BOTH sides.
- *
- * Claim ids are built as `<rowId>#<field>` and split back on the first `#`
- * (adapters.ts:36, run.ts:36), so an id CONTAINING `#` is silently TRUNCATED —
- * `sku#1` becomes `sku`, and a catalog and feed that agree exactly report a
- * mismatch that does not exist. And `catalog` is the reserved row id for
- * catalog-level metadata (reference.ts:60), so a row using it is read as meta
- * and then reported missing. Both are wrong verdicts on correct data — the
- * failure this product exists to catch (gate finding 7).
- *
- * Containment, not a redesign: carrying row identity separately from claim ids
- * is an engine change with its own gate. Refusing at the door is honest today
- * and names the reason.
- */
-function reservedIdProblem(id: string): string | null {
-  if (id.includes("#")) {
-    return `has an \`id\` containing "#" ("${id}"). The verifier builds its internal references as id#field and splits on the first "#", so this id would be read as "${id.split("#")[0]}" and compared against the wrong row.`;
-  }
-  if (id === "catalog") {
-    return 'uses the reserved id "catalog", which names catalog-level metadata inside the verifier. A row with that id would not be checked as a row.';
-  }
-  return null;
-}
+// The reserved-id predicate (an id containing "#", or the reserved "catalog")
+// now lives in the engine — lib/packs/listings/reference.ts `reservedIdProblem`
+// (S1.5; security review 2026-10-31 F1) — and is imported above, so this door,
+// the spreadsheet door and the CLI/MCP path refuse through one function.
 
 /**
  * Parse pasted/uploaded text as a merchant catalog — the truth side of an

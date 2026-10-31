@@ -22,6 +22,7 @@ import { makeFinding } from "../../verifier-core/guard.ts";
 import { buildReport, verifyClaims } from "../../verifier-core/verify.ts";
 import { listingsDetectors } from "./detectors.ts";
 import {
+  assertNoReservedVariationIds,
   assertUniqueVariationIds,
   expectedTitle,
   indexCatalog,
@@ -241,10 +242,12 @@ export function runListingsVerification(
   provenance: ListingsRunProvenance = {},
 ): VerifierReport {
   // REFUSE an ambiguous reference before any claim is judged (S1.5; Codex
-  // cross-check 2026-10-12 § 4). Every caller — the CLI, the MCP `check_feed`
-  // tool, the demo, the scenario generator and the browser seam
-  // (`verifyAcpFeed`) — reaches the engine through here, so all of them share
-  // this one predicate. Throws DuplicateVariationIdError; never a PASS.
+  // cross-check 2026-10-12 § 4; security review 2026-10-31 F1). Every caller —
+  // the CLI, the MCP `check_feed` tool, the demo, the scenario generator and
+  // the browser seam (`verifyAcpFeed`) — reaches the engine through here, so
+  // all of them share these predicates. Throws a ListingsInputError; never a
+  // PASS. (Feed-side ids are refused by the adapters that build the claims.)
+  assertNoReservedVariationIds(sor);
   assertUniqueVariationIds(sor);
   const reference = sorReference(sor);
   const detected = verifyClaims(claims, reference, listingsDetectors);

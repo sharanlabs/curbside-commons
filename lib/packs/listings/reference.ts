@@ -28,6 +28,69 @@ export function expectedTitle(item: SorItem, variation: SorVariation): string {
   return item.variations.length > 1 ? `${item.name} (${variation.name})` : item.name;
 }
 
+/**
+ * Base class for every input the listings engine REFUSES rather than verifies
+ * (S1.5). A refusal is not a finding: it means the engine could not give the
+ * input an honest verdict, so it gives none. `bin/check.mjs` maps any throw to
+ * exit 2; the MCP server maps it to `isError: true`; the browser workbench
+ * shows the message.
+ */
+export class ListingsInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ListingsInputError";
+  }
+}
+
+/**
+ * THE reserved-id predicate (S1.5; security review 2026-10-31 F1 — moved into
+ * the engine from the two browser adapters, which now import it).
+ *
+ * Claim ids are built as `<rowId>#<field>` and split back on the FIRST `#`
+ * (adapters.ts, run.ts), so an id CONTAINING `#` is silently truncated — a
+ * feed row `sku#1` is read as `sku`. And `catalog` is the reserved row id for
+ * catalog-level metadata ({@link sorReference}): a feed row named `catalog` or
+ * `catalog#1` resolved to the metadata row, was skipped by the completeness
+ * sweep, and no detector fired — a fake row served at any price returned PASS.
+ * Refused on both sides (feed row ids and catalog variation ids).
+ *
+ * Returns the reason as a sentence fragment that follows a location
+ * ("items[3] has an `id` …"), or null when the id is usable.
+ */
+export function reservedIdProblem(id: string): string | null {
+  if (id.includes("#")) {
+    return `has an \`id\` containing "#" ("${id}"). The verifier builds its internal references as id#field and splits on the first "#", so this id would be read as "${id.split("#")[0]}" and compared against the wrong row.`;
+  }
+  if (id === "catalog") {
+    return 'uses the reserved id "catalog", which names catalog-level metadata inside the verifier. A row with that id would not be checked as a row.';
+  }
+  return null;
+}
+
+/** Thrown when a feed row id or a catalog variation id is one the engine cannot represent. */
+export class ReservedIdError extends ListingsInputError {
+  readonly id: string;
+  constructor(location: string, id: string, problem: string) {
+    super(`${location} ${problem} Nothing was verified.`);
+    this.name = "ReservedIdError";
+    this.id = id;
+  }
+}
+
+/** Refuse a catalog whose variation ids the engine would misread (throws {@link ReservedIdError}). */
+export function assertNoReservedVariationIds(sor: SyntheticCatalog): void {
+  for (let i = 0; i < sor.items.length; i++) {
+    const variations = (sor.items[i] as SorItem | undefined)?.variations;
+    if (!Array.isArray(variations)) continue;
+    for (let v = 0; v < variations.length; v++) {
+      const id = (variations[v] as SorVariation | undefined)?.id;
+      if (typeof id !== "string") continue;
+      const problem = reservedIdProblem(id);
+      if (problem) throw new ReservedIdError(`Catalog row items[${i}].variations[${v}]`, id, problem);
+    }
+  }
+}
+
 /** Where one variation sits in a catalog document: `items[i].variations[v]`. */
 export interface VariationLocation {
   readonly itemIndex: number;
@@ -91,7 +154,7 @@ export function duplicateVariationIdMessage(d: DuplicateVariationId): string {
 }
 
 /** Thrown when a catalog repeats a variation id; the CLI maps any throw to exit 2. */
-export class DuplicateVariationIdError extends Error {
+export class DuplicateVariationIdError extends ListingsInputError {
   readonly duplicate: DuplicateVariationId;
   constructor(duplicate: DuplicateVariationId) {
     super(duplicateVariationIdMessage(duplicate));
