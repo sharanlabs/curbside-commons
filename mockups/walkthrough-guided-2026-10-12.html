@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<title>Curbside Commons — one guided run, from the copy to the signature</title>
+<!--
+  ONE GUIDED RUN — mockup, 2026-10-12. Not the product. Design notes beside this file.
+  Owner words: "redesign the websiter from end to end. simple elegant premium walkthrough
+  navigation it should be as a user experience." · and, the same day, a pilot shown to a
+  platform CEO at enterprise level.
+
+  Eight steps on one page, carried by a progress rail (words, never numerals):
+  the problem · inputs · verdict · why · impact · governance · artifacts · proof.
+  The rail replaces the destination nav. Depth sits one <details> below each step.
+
+  Every figure a reader would take as data is a {{placeholder}}. The shipped page derives
+  them from the scenario fixtures and an engine run; none may be typed into a port of this.
+  Tokens are lifted from app/globals.css and DESIGN.md "Two schemes". No external requests:
+  Onest / JetBrains Mono resolve only if installed locally, else system-ui / ui-monospace.
+-->
+<style>
+  /* ================= TOKENS — light (globals.css :root, byte-equal values) ================= */
+  :root {
+    color-scheme: light;
+    --ff-sans: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --ff-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --bg: #ffffff; --bg-2: #fbfbfc; --bg-3: #f3f4f8;
+    --surface: #ffffff; --surface-raise: #ffffff;
+    --ink: #12141c; --ink-2: #22252f; --body: #3b3f4b;
+    --graphite: #4a4e5a; --muted: #585d69; --faint: #6a6e7a;
+    --ink-rgb: 18, 20, 28;
+    --rule: rgba(var(--ink-rgb), 0.09);
+    --rule-2: rgba(var(--ink-rgb), 0.15);
+    --rule-3: rgba(var(--ink-rgb), 0.24);
+    --glass-rgb: 255, 255, 255;
+    --shadow-rgb: 18, 20, 28;
+
+    --accent: #2438d6; --accent-fill: #2438d6; --accent-hi: #25329a; --link-hi: #1c2ba8;
+    --accent-rgb: 61, 92, 235;
+    --accent-tint: rgba(var(--accent-rgb), 0.055);
+    --accent-line: rgba(var(--accent-rgb), 0.22);
+    --on-accent: #ffffff;
+
+    /* lamps — gold = held, ember = FAIL, blue is never a lamp */
+    --ember: #b42318; --ember-rgb: 180, 35, 24;
+    --ember-tint: rgba(var(--ember-rgb), 0.07);
+    --ember-line: rgba(var(--ember-rgb), 0.25);
+    --gold: #ffb020; --gold-text: #9c6208;
+    --gold-tint: rgba(255, 176, 32, 0.07);
+    --gold-line: rgba(156, 98, 8, 0.35);
+    --ok: #067647;
+
+    --r-card: 16px; --r-ctrl: 12px; --r-chip: 9px; --r-pill: 999px;
+    --maxw: 1180px; --gutter: 32px;
+    --nav-h: 68px; --strip-h: 34px;
+    --rail-w: 172px;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-arrival: cubic-bezier(0, 0, 0.2, 1);
+    --ease-field: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur-1: 150ms; --dur-2: 240ms; --dur-3: 350ms; --dur-reveal: 460ms;
+  }
+
+  /* ================= TOKENS — dark (DESIGN.md "Two schemes": same roles, re-derived) =========
+     Two selectors, identical sets — the same mechanism the shipped stylesheet pins. */
+  @media screen {
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0e1016; --bg-2: #13151d; --bg-3: #1a1d27;
+      --surface: #13151d; --surface-raise: #222633;
+      --ink: #f2f3f8; --ink-2: #e3e5ec; --body: #c5c8d4;
+      --graphite: #abafbe; --muted: #9297a7; --faint: #82879a;
+      --ink-rgb: 242, 243, 248;
+      --rule: rgba(var(--ink-rgb), 0.10); --rule-2: rgba(var(--ink-rgb), 0.16); --rule-3: rgba(var(--ink-rgb), 0.26);
+      --glass-rgb: 14, 16, 22; --shadow-rgb: 0, 0, 0;
+      --accent: #93a2ff; --accent-fill: #4257e8; --accent-hi: #5468f0; --link-hi: #b8c4ff;
+      --accent-rgb: 147, 162, 255;
+      --accent-tint: rgba(var(--accent-rgb), 0.08); --accent-line: rgba(var(--accent-rgb), 0.28);
+      --ember: #ff8a7d; --ember-rgb: 255, 138, 125;
+      --ember-tint: rgba(var(--ember-rgb), 0.08); --ember-line: rgba(var(--ember-rgb), 0.30);
+      --gold-text: #e8a83c; --gold-tint: rgba(232, 168, 60, 0.08); --gold-line: rgba(232, 168, 60, 0.38);
+      --ok: #4fc08d;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0e1016; --bg-2: #13151d; --bg-3: #1a1d27;
+        --surface: #13151d; --surface-raise: #222633;
+        --ink: #f2f3f8; --ink-2: #e3e5ec; --body: #c5c8d4;
+        --graphite: #abafbe; --muted: #9297a7; --faint: #82879a;
+        --ink-rgb: 242, 243, 248;
+        --rule: rgba(var(--ink-rgb), 0.10); --rule-2: rgba(var(--ink-rgb), 0.16); --rule-3: rgba(var(--ink-rgb), 0.26);
+        --glass-rgb: 14, 16, 22; --shadow-rgb: 0, 0, 0;
+        --accent: #93a2ff; --accent-fill: #4257e8; --accent-hi: #5468f0; --link-hi: #b8c4ff;
+        --accent-rgb: 147, 162, 255;
+        --accent-tint: rgba(var(--accent-rgb), 0.08); --accent-line: rgba(var(--accent-rgb), 0.28);
+        --ember: #ff8a7d; --ember-rgb: 255, 138, 125;
+        --ember-tint: rgba(var(--ember-rgb), 0.08); --ember-line: rgba(var(--ember-rgb), 0.30);
+        --gold-text: #e8a83c; --gold-tint: rgba(232, 168, 60, 0.08); --gold-line: rgba(232, 168, 60, 0.38);
+        --ok: #4fc08d;
+      }
+    }
+  }
+
+  /* ================= BASE ================= */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--body);
+    font-family: var(--ff-sans); font-size: 17px; font-weight: 460; line-height: 1.7;
+    -webkit-font-smoothing: antialiased; text-wrap: pretty;
+  }
+  h1, h2, h3 { margin: 0; color: var(--ink); text-wrap: balance; }
+  h1 { font-size: clamp(32px, 3.4vw, 46px); font-weight: 680; letter-spacing: -0.028em; line-height: 1.08; max-width: 30ch; }
+  h2 { font-size: clamp(25px, 2.5vw, 35px); font-weight: 660; letter-spacing: -0.028em; line-height: 1.15; max-width: 24ch; }
+  h3 { font-size: 17px; font-weight: 700; letter-spacing: -0.014em; line-height: 1.3; }
+  p { margin: 0; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:hover { color: var(--link-hi); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  .mono { font-family: var(--ff-mono); }
+  .tab { font-variant-numeric: tabular-nums; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+
+  .eyebrow {
+    font-family: var(--ff-mono); font-size: 11px; font-weight: 590; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--graphite); margin: 0 0 12px;
+  }
+  .lede { font-size: 17.5px; line-height: 1.62; color: var(--body); max-width: 62ch; }
+  .note { font-size: 14px; line-height: 1.6; color: var(--muted); }
+
+  /* A placeholder is a SLOT, not a figure — it must never be mistaken for one. */
+  .ph {
+    font-family: var(--ff-mono); font-size: 0.86em; font-weight: 560;
+    color: var(--accent); background: var(--accent-tint);
+    border-bottom: 1px dashed var(--accent-line); border-radius: 3px;
+    padding: 0 3px; white-space: nowrap;
+  }
+
+  /* ================= BAR — brand, one honest link, scheme, the settled pill ================= */
+  .bar {
+    position: sticky; top: 0; z-index: 40; min-height: var(--nav-h);
+    background: rgba(var(--glass-rgb), 0.94);
+    border-bottom: 1px solid var(--rule);
+  }
+  @supports (backdrop-filter: blur(1px)) { .bar { backdrop-filter: blur(10px); } }
+  .bar-in { height: var(--nav-h); display: flex; align-items: center; gap: 6px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; margin-right: auto;
+    font-weight: 680; font-size: 17px; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+  .brand:hover { color: var(--ink); }
+  .brand-mark { width: 22px; height: 22px; border-radius: 7px; background: var(--accent-fill); position: relative; }
+  .brand-mark::after { content: ""; position: absolute; left: 6px; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--on-accent); }
+  .bar-link { font-size: 13.5px; font-weight: 560; color: var(--muted); text-decoration: none; padding: 7px 12px; border-radius: var(--r-pill); }
+  .bar-link:hover { color: var(--ink); background: var(--bg-3); }
+  .theme {
+    width: 36px; height: 36px; border-radius: var(--r-pill); border: 1px solid var(--rule-2);
+    background: transparent; color: var(--graphite); cursor: pointer; display: grid; place-items: center;
+    transition: transform var(--dur-1) var(--ease);
+  }
+  .theme:hover { color: var(--ink); border-color: var(--rule-3); }
+  .theme:active { transform: scale(0.96); }
+  .theme svg { width: 16px; height: 16px; }
+  .theme .l-dark, .theme .i-sun { display: none; }
+  :root[data-theme="dark"] .theme .l-light, :root[data-theme="dark"] .theme .i-moon { display: none; }
+  :root[data-theme="dark"] .theme .l-dark, :root[data-theme="dark"] .theme .i-sun { display: inline; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme .l-light, :root:not([data-theme="light"]) .theme .i-moon { display: none; }
+    :root:not([data-theme="light"]) .theme .l-dark, :root:not([data-theme="light"]) .theme .i-sun { display: inline; }
+  }
+  .pill {
+    font-size: 13.5px; font-weight: 590; text-decoration: none; margin-left: 6px;
+    color: var(--on-accent); background: var(--accent-fill); padding: 8px 16px; border-radius: var(--r-pill);
+  }
+  .pill:hover { color: var(--on-accent); background: var(--accent-hi); }
+
+  /* ================= FRAME — rail + the run ================= */
+  .frame { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); gap: 52px; }
+
+  /* The rail: words in order, the run's state beside them. It reports; it never drives. */
+  .rail { position: relative; }
+  .rail-in { position: sticky; top: calc(var(--nav-h) + 36px); padding-top: 38px; }
+  .rail-k { font-family: var(--ff-mono); font-size: 10px; font-weight: 590; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--faint); margin: 0 0 14px 18px; }
+  .rail ol { list-style: none; margin: 0; padding: 0; position: relative; }
+  .rail ol::before { content: ""; position: absolute; left: 4px; top: 8px; bottom: 8px; width: 1px; background: var(--rule-2); }
+  .rail li { position: relative; }
+  .rail a {
+    display: block; padding: 6px 0 6px 18px; text-decoration: none;
+    font-size: 13.5px; font-weight: 560; line-height: 1.35; color: var(--faint);
+    transition: color var(--dur-2) var(--ease);
+  }
+  .rail a::before {
+    content: ""; position: absolute; left: 1px; top: 12px; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--rule-3);
+    transition: transform var(--dur-2) var(--ease);
+  }
+  .rail a:hover { color: var(--ink-2); }
+  .rail .st { display: block; font-family: var(--ff-mono); font-size: 10.5px; font-weight: 560;
+    letter-spacing: 0.04em; color: var(--faint); margin-top: 1px; min-height: 14px; }
+  .rail a.is-done { color: var(--graphite); }
+  .rail a.is-done::before { background: var(--accent); box-shadow: none; }
+  .rail a.is-here { color: var(--ink); }
+  .rail a.is-here::before { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); transform: scale(1.15); }
+  .rail .st.fail { color: var(--ember); }
+  .rail .st.held { color: var(--gold-text); }
+  .rail .st.ok { color: var(--ok); }
+
+  .run { min-width: 0; }
+
+  /* ================= SCREEN ONE — the problem + the instrument ================= */
+  .s-one { padding: 38px 0 0; }
+  .h1-lit { color: var(--accent); }
+  .s-one .lede { margin-top: 14px; }
+
+  .inst {
+    margin-top: 26px; border: 1px solid var(--rule-2); border-radius: var(--r-card);
+    background: var(--surface); overflow: hidden;
+    box-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.03), 0 10px 30px rgba(var(--shadow-rgb), 0.035);
+    scroll-margin-top: calc(var(--nav-h) + 12px);
+  }
+  .inst-head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    padding: 12px 20px; border-bottom: 1px solid var(--rule); background: var(--bg-2);
+  }
+  .k { font-family: var(--ff-mono); font-size: 10.5px; font-weight: 590; letter-spacing: 0.13em; text-transform: uppercase; color: var(--graphite); }
+  .k-side { font-size: 12.5px; color: var(--muted); }
+  .k-side b { color: var(--graphite); font-weight: 590; }
+  .inst-body { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+  .col { padding: 16px 20px 16px; min-width: 0; }
+  .col + .col { border-left: 1px solid var(--rule); }
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  legend { padding: 0; margin-bottom: 10px; }
+
+  .scen { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .sc { position: relative; }
+  .sc input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .sc label {
+    display: block; padding: 7px 11px 7px; border-radius: var(--r-chip);
+    border: 1px solid var(--rule); background: var(--surface); cursor: pointer;
+    transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+  }
+  .sc label:hover { border-color: var(--rule-3); }
+  .sc .n { display: block; font-size: 13.5px; font-weight: 590; line-height: 1.3; color: var(--ink-2); }
+  .sc .id { display: block; font-family: var(--ff-mono); font-size: 10.5px; line-height: 1.4; color: var(--faint); }
+  .sc input:checked + label { border-color: var(--accent); background: var(--accent-tint); }
+  .sc input:checked + label .id { color: var(--accent); }
+  .sc input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .scen-note { margin-top: 10px; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+
+  .zones { display: grid; gap: 8px; }
+  .zone {
+    border: 1.5px dashed var(--rule-3); border-radius: var(--r-ctrl); background: var(--bg-2);
+    padding: 11px 14px 11px; transition: border-color var(--dur-2) var(--ease), background var(--dur-2) var(--ease);
+  }
+  .zone:hover, .zone.is-over { border-color: var(--accent); background: var(--accent-tint); }
+  .zone-t { font-size: 14px; font-weight: 600; color: var(--ink-2); line-height: 1.35; }
+  .zone-t .side { font-weight: 460; color: var(--muted); }
+  .zone-h { font-size: 12.5px; line-height: 1.5; color: var(--muted); margin-top: 3px; }
+  .linkbtn { font: inherit; color: var(--graphite); font-weight: 560; background: none; border: 0; padding: 0;
+    text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .linkbtn:hover { color: var(--ink); }
+  .zone-tpl { margin-top: 8px; font-size: 12.5px; }
+  .zone-tpl a { color: var(--graphite); }
+
+  .runrow {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    padding: 12px 20px 14px; border-top: 1px solid var(--rule);
+  }
+  .go {
+    font: inherit; font-size: 15px; font-weight: 590; color: var(--on-accent); background: var(--accent-fill);
+    border: 0; border-radius: var(--r-pill); padding: 11px 24px; cursor: pointer; white-space: nowrap;
+    transition: background var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+  }
+  .go:hover { background: var(--accent-hi); }
+  .go:active { transform: translateY(1px); }
+  .go:focus-visible { outline-offset: 3px; border-radius: var(--r-pill); }
+  .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 0; padding: 0; list-style: none;
+    font-family: var(--ff-mono); font-size: 11px; color: var(--faint); }
+  .chain li { display: inline-flex; align-items: center; gap: 6px; }
+  .chain li + li::before { content: ""; width: 10px; height: 1px; background: var(--rule-3); }
+  .chain .seat { transition: color var(--dur-2) var(--ease); }
+  .chain .seat.lit { color: var(--ink-2); }
+  .chain .seat.sign { color: var(--gold-text); }
+  .chain .sub { color: var(--faint); }
+
+  /* ================= STEPS ================= */
+  .step { padding: clamp(64px, 9vh, 92px) 0 0; scroll-margin-top: calc(var(--nav-h) + 8px); }
+  .step-h { display: grid; gap: 10px; margin-bottom: 22px; }
+  .step-h .lede { font-size: 16.5px; color: var(--muted); max-width: 64ch; }
+
+  .obj {
+    border: 1px solid var(--rule-2); border-radius: var(--r-card); background: var(--surface); overflow: hidden;
+  }
+  .thread {
+    display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline;
+    padding: 10px 20px; border-bottom: 1px solid var(--rule); background: var(--bg-2);
+    font-family: var(--ff-mono); font-size: 11px; color: var(--graphite);
+  }
+  .thread .lbl { color: var(--faint); }
+  .thread .right { margin-left: auto; }
+
+  /* idle — before the run, each object says what will fill it, and only that */
+  .obj-idle { display: none; padding: 26px 22px; font-size: 14.5px; color: var(--muted); }
+  .obj-idle b { color: var(--graphite); font-weight: 590; }
+  html.idle .obj-idle { display: block; }
+  html.idle .obj-body, html.idle .thread { display: none; }
+
+  .obj-body { animation: settle var(--dur-reveal) var(--ease-arrival) both; }
+  @keyframes settle { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* chips */
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--ff-mono); font-size: 10.5px;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-radius: var(--r-chip);
+    padding: 3px 8px; border: 1px solid var(--rule-2); color: var(--graphite); background: var(--bg-3); white-space: nowrap; }
+  .chip.rule { color: var(--accent); background: var(--accent-tint); border-color: var(--accent-line); text-transform: none; letter-spacing: 0.04em; }
+  .chip.err { color: var(--ember); background: var(--ember-tint); border-color: var(--ember-line); }
+  .chip.held { color: var(--gold-text); background: var(--gold-tint); border-color: var(--gold-line); }
+  .chip.status { border-radius: var(--r-pill); }
+
+  /* ---------- VERDICT ---------- */
+  .v-top { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; padding: 22px 24px; border-bottom: 1px solid var(--rule); }
+  .v-mark { display: flex; align-items: center; gap: 14px; }
+  .lamp { width: 10px; height: 10px; border-radius: 50%; background: var(--ember); box-shadow: 0 0 0 4px var(--ember-tint); }
+  .v-word { font-family: var(--ff-mono); font-size: 32px; font-weight: 600; letter-spacing: 0.04em; color: var(--ember); line-height: 1; }
+  .tally { display: flex; flex-wrap: wrap; gap: 10px 30px; }
+  .tally .n { display: block; font-family: var(--ff-mono); font-size: 19px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+  .tally .n .ph { font-size: 0.8em; }
+  .tally .kk { font-family: var(--ff-mono); font-size: 10px; font-weight: 590; letter-spacing: 0.13em; text-transform: uppercase; color: var(--faint); }
+  .receipt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .receipt > div { padding: 22px 24px; min-width: 0; }
+  .receipt > div + div { border-left: 1px solid var(--rule); }
+  .r-ids { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .math {
+    margin: 0; font-family: var(--ff-mono); font-size: 12.5px; line-height: 1.85; color: var(--ink-2);
+    background: var(--bg-3); border: 1px solid var(--rule); border-radius: var(--r-chip); padding: 12px 15px;
+  }
+  .math .row { display: grid; grid-template-columns: 15ch 1fr; gap: 12px; }
+  .math .l { color: var(--faint); }
+  .math .bad { color: var(--ember); font-weight: 600; }
+  .receipt h3 { margin-bottom: 10px; }
+  .receipt .note { margin-top: 12px; }
+  .ftable { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .ftable th { text-align: left; font-family: var(--ff-mono); font-size: 10px; font-weight: 590; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--faint); padding: 0 0 8px; border-bottom: 1px solid var(--rule); }
+  .ftable td { padding: 9px 0; border-bottom: 1px solid var(--rule); color: var(--body); vertical-align: baseline; }
+  .ftable td.m { font-family: var(--ff-mono); font-size: 11.5px; color: var(--graphite); }
+  .ftable tr:last-child td { border-bottom: 0; }
+
+  /* ---------- WHY ---------- */
+  .why { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+  .why > div { padding: 22px 24px; min-width: 0; }
+  .why > div + div { border-left: 1px solid var(--rule); background: var(--bg-2); }
+  .cause { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .cause .cls { font-family: var(--ff-mono); font-size: 15px; font-weight: 600; color: var(--ink); }
+  .why p.say { font-size: 16px; line-height: 1.6; color: var(--ink-2); max-width: 52ch; }
+  .events { margin: 16px 0 0; font-family: var(--ff-mono); font-size: 12px; line-height: 1.9; color: var(--graphite);
+    border-top: 1px solid var(--rule); padding-top: 12px; }
+  .events .ev { display: grid; grid-template-columns: 13ch 11ch 11ch 1fr; gap: 10px; }
+  .events .hit { color: var(--ink-2); }
+  .events .gap { color: var(--faint); }
+  .ruleline { margin-top: 12px; font-size: 13.5px; color: var(--muted); }
+  .ruleline b { color: var(--graphite); font-weight: 590; }
+  .seatcard h3 { font-size: 15px; margin: 10px 0 6px; }
+  .seatcard p { font-size: 14px; line-height: 1.6; color: var(--muted); }
+  .seatcard + .seatcard { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rule); }
+
+  /* ---------- IMPACT ---------- */
+  .sim { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 24px; border-bottom: 1px solid var(--rule); }
+  .sim p { font-size: 13.5px; color: var(--muted); }
+  .arith { width: 100%; border-collapse: collapse; }
+  .arith th, .arith td { padding: 15px 24px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: baseline; }
+  .arith tr:last-child th, .arith tr:last-child td { border-bottom: 0; }
+  .arith th { font-size: 15px; font-weight: 600; color: var(--ink-2); width: 26%; }
+  .arith th small { display: block; font-size: 12.5px; font-weight: 460; color: var(--muted); margin-top: 2px; }
+  .arith td.f { font-family: var(--ff-mono); font-size: 12px; line-height: 1.7; color: var(--graphite); }
+  .arith td.f .assume { color: var(--gold-text); }
+  .arith td.r { text-align: right; font-family: var(--ff-mono); font-size: 18px; font-weight: 600; color: var(--ink); white-space: nowrap; width: 1%; }
+
+  /* ---------- GOVERNANCE — one quiet panel ---------- */
+  .gov { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  .gov > div { padding: 20px 24px; min-width: 0; }
+  .gov > div + div { border-left: 1px solid var(--rule); background: var(--bg-2); }
+  .tiers { list-style: none; margin: 0; padding: 0; }
+  .tiers li { display: grid; grid-template-columns: 7.5ch minmax(0, 1fr) auto; gap: 14px; align-items: baseline;
+    padding: 11px 0; border-bottom: 1px solid var(--rule); }
+  .tiers li:first-child { padding-top: 0; }
+  .tiers li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .tiers .t { font-family: var(--ff-mono); font-size: 11px; font-weight: 590; letter-spacing: 0.08em; color: var(--faint); text-transform: uppercase; }
+  .tiers .w { font-size: 14.5px; font-weight: 600; color: var(--ink-2); }
+  .tiers .d { display: block; font-size: 13.5px; font-weight: 460; color: var(--muted); line-height: 1.55; margin-top: 2px; }
+  .tiers li.off .w { color: var(--graphite); }
+  .sign h3 { font-size: 16px; margin: 8px 0 10px; }
+  .sign dl { margin: 0 0 14px; display: grid; grid-template-columns: 9ch 1fr; gap: 4px 12px; font-size: 13px; }
+  .sign dt { font-family: var(--ff-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); padding-top: 2px; }
+  .sign dd { margin: 0; color: var(--body); min-width: 0; }
+  .sign-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .btn2 {
+    font: inherit; font-size: 14px; font-weight: 590; cursor: pointer; border-radius: var(--r-pill); padding: 9px 18px;
+    color: var(--accent); background: var(--accent-tint); border: 1px solid var(--accent-line);
+    transition: border-color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+  }
+  .btn2:hover { border-color: var(--accent); }
+  .btn2:active { transform: translateY(1px); }
+  .signed { display: none; font-size: 13.5px; line-height: 1.55; color: var(--body); }
+  .signed b { color: var(--ok); font-weight: 600; }
+  html.is-signed .signed { display: block; }
+  html.is-signed .sign-actions { display: none; }
+
+  /* ---------- ARTIFACTS ---------- */
+  .tabs { display: flex; gap: 4px; padding: 8px; border-bottom: 1px solid var(--rule); background: var(--bg-2); flex-wrap: wrap; }
+  .tabs [role="tab"] {
+    font: inherit; font-size: 13.5px; font-weight: 560; color: var(--muted); background: transparent;
+    border: 1px solid transparent; border-radius: var(--r-pill); padding: 6px 14px; cursor: pointer;
+    display: inline-flex; gap: 8px; align-items: baseline;
+  }
+  .tabs [role="tab"]:hover { color: var(--ink); }
+  .tabs [role="tab"][aria-selected="true"] { color: var(--ink); background: var(--surface-raise); border-color: var(--rule-2); }
+  .tabs .r { font-family: var(--ff-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--faint); }
+  .art-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 22px; border-bottom: 1px solid var(--rule); }
+  .art-body { padding: 20px 22px 22px; max-width: 78ch; }
+  [role="tabpanel"][hidden] { display: none; }
+  .banner { font-size: 13px; font-weight: 620; color: var(--ink-2); padding: 10px 13px; background: var(--bg-3);
+    border: 1px solid var(--rule); border-radius: var(--r-chip); margin-bottom: 14px; }
+  .banner-src { display: block; margin-top: 4px; font-family: var(--ff-mono); font-size: 10.5px; font-weight: 500; color: var(--faint); }
+  .sk-h { font-size: 16.5px; font-weight: 680; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 4px; }
+  .sk-v { font-size: 14px; font-weight: 590; color: var(--ember); }
+  .sk-sub { font-family: var(--ff-mono); font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .sk-div { height: 1px; background: var(--rule-2); margin: 14px 0; }
+  .sk-line { font-size: 14px; line-height: 1.6; color: var(--body); margin-bottom: 10px; }
+  .sk-line .t { font-weight: 620; color: var(--ink-2); }
+  .sk-line .ids { display: block; font-family: var(--ff-mono); font-size: 11px; color: var(--muted); }
+  .sk-ctx { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--rule); font-family: var(--ff-mono); font-size: 10.5px; color: var(--faint); }
+  .em-heads { font-family: var(--ff-mono); font-size: 12px; line-height: 1.85; color: var(--ink-2); padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--rule-2); }
+  .em-heads .h { color: var(--faint); display: inline-block; min-width: 9ch; }
+  .em-body { font-family: var(--ff-mono); font-size: 12px; line-height: 1.75; color: var(--graphite); white-space: pre-wrap; margin: 0; }
+  .art-foot { padding: 12px 22px; border-top: 1px solid var(--rule); background: var(--bg-2); font-size: 13px; color: var(--muted); }
+  .art-foot b { color: var(--graphite); font-weight: 590; }
+
+  /* ---------- PROOF ---------- */
+  .proof { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+  .proof > div { padding: 20px 24px; min-width: 0; }
+  .proof > div + div { border-left: 1px solid var(--rule); }
+  .ledger { margin: 8px 0 0; font-family: var(--ff-mono); font-size: 12px; line-height: 1.8; color: var(--ink-2);
+    background: var(--bg-3); border: 1px solid var(--rule); border-radius: var(--r-chip); padding: 14px 16px; overflow-x: auto; white-space: pre; }
+  .ledger .key { color: var(--faint); }
+  .counts { margin: 8px 0 0; display: grid; gap: 14px; }
+  .counts div { border-top: 1px solid var(--rule); padding-top: 12px; }
+  .counts div:first-child { border-top: 0; padding-top: 0; }
+  .counts dt { font-size: 15px; font-weight: 600; color: var(--ink-2); }
+  .counts dd { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+  .close { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  .ghost { font-size: 15px; font-weight: 590; text-decoration: none; color: var(--graphite);
+    border: 1px solid var(--rule-2); border-radius: var(--r-pill); padding: 10px 22px; }
+  .ghost:hover { color: var(--ink); border-color: var(--rule-3); }
+  .close .go { text-decoration: none; display: inline-block; }
+
+  /* ---------- DEPTH — one click below each step, no box ---------- */
+  .depth { margin-top: 2px; border-bottom: 1px solid var(--rule); }
+  .depth summary {
+    list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px;
+    padding: 14px 4px; font-size: 14px; font-weight: 590; color: var(--graphite);
+  }
+  .depth summary::-webkit-details-marker { display: none; }
+  .depth summary::before {
+    content: ""; width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+    transform: rotate(-45deg); transition: transform var(--dur-2) var(--ease); margin-left: 2px;
+  }
+  .depth[open] summary::before { transform: rotate(45deg); }
+  .depth summary:hover { color: var(--ink); }
+  .depth .in { padding: 0 4px 20px 21px; font-size: 14.5px; line-height: 1.65; color: var(--body); max-width: 72ch;
+    animation: settle var(--dur-3) var(--ease-arrival) both; }
+  .depth .in p + p, .depth .in ul { margin-top: 10px; }
+  .depth .in ul { padding-left: 18px; }
+  .depth .in code { font-family: var(--ff-mono); font-size: 12.5px; color: var(--ink-2); }
+
+  /* ---------- FOOTER ---------- */
+  footer { margin-top: clamp(72px, 10vh, 104px); border-top: 1px solid var(--rule-2); background: var(--bg-2); padding: 26px 0 36px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); }
+  footer a { color: var(--graphite); }
+
+  /* ================= TABLET (≤1023) — the rail lies down under the bar ================= */
+  @media (max-width: 1023px) {
+    .frame { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .rail { position: sticky; top: var(--nav-h); z-index: 30; margin: 0 calc(var(--gutter) * -1);
+      background: rgba(var(--glass-rgb), 0.96); border-bottom: 1px solid var(--rule); }
+    .rail-in { position: static; padding: 0 var(--gutter); }
+    .rail-k { display: none; }
+    .rail ol { display: flex; height: var(--strip-h); align-items: stretch; justify-content: space-between; }
+    .rail ol::before { display: none; }
+    .rail a { height: 100%; display: flex; align-items: center; gap: 6px; padding: 0 2px; font-size: 12.5px; position: relative; }
+    .rail a::before { position: static; width: 5px; height: 5px; flex: none; }
+    .rail a.is-here::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); }
+    .rail .st { display: none; }
+    .step { scroll-margin-top: calc(var(--nav-h) + var(--strip-h) + 8px); }
+    .inst { scroll-margin-top: calc(var(--nav-h) + var(--strip-h) + 12px); }
+    .s-one { padding-top: 30px; }
+    .inst-body { grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr); }
+    .scen { grid-template-columns: minmax(0, 1fr); }
+    .sc .id { display: none; }
+    .receipt, .why, .gov, .proof { grid-template-columns: minmax(0, 1fr); }
+    .receipt > div + div, .why > div + div, .gov > div + div, .proof > div + div { border-left: 0; border-top: 1px solid var(--rule); }
+    .arith th { width: 30%; }
+    .arith td.f { font-size: 11.5px; }
+    .events .ev { grid-template-columns: 12ch 10ch 10ch 1fr; }
+  }
+
+  /* ================= WIDE (≥1600) — the column holds; the rail breathes ================= */
+  @media (min-width: 1600px) {
+    :root { --rail-w: 196px; }
+    .frame { gap: 72px; }
+  }
+
+  /* ================= REDUCED MOTION — settled state, no travel ================= */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition-duration: 0ms !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add("idle");</script>
+
+<header class="bar">
+  <div class="wrap bar-in">
+    <a class="brand" href="#story"><span class="brand-mark" aria-hidden="true"></span>Curbside Commons</a>
+    <a class="bar-link" href="/docs">What is real</a>
+    <button class="theme" type="button" id="theme">
+      <span class="sr l-light">Switch to dark</span><span class="sr l-dark">Switch to light</span>
+      <svg class="i-moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 10.4A5.6 5.6 0 0 1 5.6 2.8a5.6 5.6 0 1 0 7.6 7.6Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      <svg class="i-sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </button>
+    <a class="pill" href="#audit">Run an audit</a>
+  </div>
+</header>
+
+<div class="wrap frame">
+
+  <!-- ================= PROGRESS RAIL ================= -->
+  <nav class="rail" aria-label="Walkthrough progress">
+    <div class="rail-in">
+      <p class="rail-k">One run</p>
+      <ol id="rail">
+        <li><a href="#story" data-s="story">The problem<span class="st"></span></a></li>
+        <li><a href="#audit" data-s="audit">Inputs<span class="st" data-st="audit">modifier-drift</span></a></li>
+        <li><a href="#verdict" data-s="verdict">Verdict<span class="st" data-st="verdict"></span></a></li>
+        <li><a href="#why" data-s="why">Why<span class="st" data-st="why"></span></a></li>
+        <li><a href="#impact" data-s="impact">Impact<span class="st" data-st="impact"></span></a></li>
+        <li><a href="#governance" data-s="governance">Governance<span class="st" data-st="governance"></span></a></li>
+        <li><a href="#artifacts" data-s="artifacts">Artifacts<span class="st" data-st="artifacts"></span></a></li>
+        <li><a href="#proof" data-s="proof">Proof<span class="st" data-st="proof"></span></a></li>
+      </ol>
+    </div>
+  </nav>
+
+  <main class="run">
+
+    <!-- ================= THE PROBLEM + INPUTS — screen one ================= -->
+    <section class="s-one" id="story" aria-labelledby="h1">
+      <div id="story-text">
+        <h1 id="h1">The menu customers order from is a copy. <span class="h1-lit">Copies drift.</span></h1>
+        <p class="lede">
+          A price, a modifier or a sold-out item changes in the merchant&rsquo;s record and the
+          platform&rsquo;s copy doesn&rsquo;t follow. People &mdash; and now AI agents &mdash; order from the copy,
+          and the mistake comes back as a refund. This finds the drift, explains and sizes it, and
+          drafts the message. A person signs before anything acts.
+        </p>
+      </div>
+
+      <div class="inst" id="audit" role="group" aria-labelledby="inst-k">
+        <div class="inst-head">
+          <span class="k" id="inst-k">Choose what to check</span>
+          <span class="k-side"><b>Runs in this tab.</b> Nothing you load leaves the page.</span>
+        </div>
+        <div class="inst-body">
+          <div class="col">
+            <fieldset>
+              <legend class="k">A scenario from the library</legend>
+              <div class="scen">
+                <div class="sc"><input type="radio" name="sc" id="sc-a86" value="agent-86"><label for="sc-a86"><span class="n">Sold out, ordered by an agent</span><span class="id">agent-86</span></label></div>
+                <div class="sc"><input type="radio" name="sc" id="sc-mod" value="modifier-drift" checked><label for="sc-mod"><span class="n">A modifier priced too high</span><span class="id">modifier-drift</span></label></div>
+                <div class="sc"><input type="radio" name="sc" id="sc-out" value="sync-outage"><label for="sc-out"><span class="n">Stale after a sync outage</span><span class="id">sync-outage</span></label></div>
+                <div class="sc"><input type="radio" name="sc" id="sc-ovr" value="platform-override"><label for="sc-ovr"><span class="n">A portal edit won</span><span class="id">platform-override</span></label></div>
+                <div class="sc"><input type="radio" name="sc" id="sc-onb" value="partner-onboarding"><label for="sc-onb"><span class="n">A new partner, scored</span><span class="id">partner-onboarding</span></label></div>
+                <div class="sc"><input type="radio" name="sc" id="sc-lie" value="spec-valid-lie"><label for="sc-lie"><span class="n">Valid to spec, wrong price</span><span class="id">spec-valid-lie</span></label></div>
+                <div class="sc"><input type="radio" name="sc" id="sc-fee" value="fee-precheck"><label for="sc-fee"><span class="n">Fees against NYC law</span><span class="id">fee-precheck</span></label></div>
+                <div class="sc"><input type="radio" name="sc" id="sc-inj" value="injected-artifact"><label for="sc-inj"><span class="n">A file that steers the crew</span><span class="id">injected-artifact</span></label></div>
+              </div>
+              <p class="scen-note">Synthetic, bundled. Platform-shaped files follow the public integration docs.</p>
+            </fieldset>
+          </div>
+          <div class="col">
+            <fieldset>
+              <legend class="k">Or your own two files</legend>
+              <div class="zones">
+                <div class="zone" data-zone="copy">
+                  <p class="zone-t">The platform&rsquo;s copy <span class="side">&middot; feed</span></p>
+                  <p class="zone-h">Drop JSON or a CSV, or <button class="linkbtn" type="button">choose a file</button></p>
+                </div>
+                <div class="zone" data-zone="record">
+                  <p class="zone-t">The merchant&rsquo;s record <span class="side">&middot; catalog</span></p>
+                  <p class="zone-h">Drop JSON or a CSV, or <button class="linkbtn" type="button">choose a file</button></p>
+                </div>
+              </div>
+              <p class="zone-tpl"><a href="#">Download the spreadsheet template</a></p>
+            </fieldset>
+          </div>
+        </div>
+        <div class="runrow">
+          <button class="go" type="button" id="go">Run this scenario</button>
+          <ol class="chain" id="chain" aria-label="The crew, in order">
+            <li><span class="seat" data-seat>Intake</span></li>
+            <li><span class="seat" data-seat>Audit</span></li>
+            <li><span class="seat" data-seat>Evidence</span></li>
+            <li><span class="seat" data-seat>Why</span></li>
+            <li><span class="seat" data-seat>Impact</span></li>
+            <li><span class="seat" data-seat>Route</span></li>
+            <li><span class="seat" data-seat>Reviewer</span></li>
+            <li><span class="seat" data-seat data-sign>a person signs</span></li>
+          </ol>
+          <p class="sr" aria-live="polite" id="live"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VERDICT ================= -->
+    <section class="step" id="verdict" aria-labelledby="verdict-h">
+      <div class="step-h">
+        <p class="eyebrow">Verdict</p>
+        <h2 id="verdict-h">What disagrees, with the receipt for each.</h2>
+      </div>
+      <div class="obj">
+        <p class="obj-idle">The verdict appears here after a run. <b>Choose a scenario and press Run.</b></p>
+        <div class="thread"><span><span class="lbl">scenario</span> modifier-drift</span><span><span class="lbl">run</span> <span class="ph">{{run_id}}</span></span><span class="right"><span class="lbl">engine</span> deterministic &middot; no model</span></div>
+        <div class="obj-body">
+          <div class="v-top">
+            <div class="v-mark"><span class="lamp" aria-hidden="true"></span><span class="v-word">FAIL</span></div>
+            <div class="tally">
+              <div><span class="n"><span class="ph">{{findings}}</span></span><span class="kk">Findings</span></div>
+              <div><span class="n"><span class="ph">{{errors}}</span></span><span class="kk">Errors</span></div>
+              <div><span class="n"><span class="ph">{{warnings}}</span></span><span class="kk">Warnings</span></div>
+              <div><span class="n"><span class="ph">{{rows_read}}</span></span><span class="kk">Rows read</span></div>
+            </div>
+          </div>
+          <div class="receipt">
+            <div>
+              <p class="r-ids"><span class="chip rule">LST-MOD-PRICE-VALUE</span><span class="chip err">Error</span></p>
+              <h3>A modifier priced above the merchant&rsquo;s record</h3>
+              <div class="math tab">
+                <div class="row"><span class="l">the copy says</span><span class="bad"><span class="ph">{{copy.option_price}}</span></span></div>
+                <div class="row"><span class="l">the record says</span><span><span class="ph">{{record.option_price}}</span></span></div>
+                <div class="row"><span class="l">on</span><span><span class="ph">{{item}}</span> &rsaquo; <span class="ph">{{option}}</span></span></div>
+              </div>
+              <p class="note">The claim, the reference row it was checked against, the rule and the severity travel together on every finding.</p>
+            </div>
+            <div>
+              <table class="ftable">
+                <caption class="sr">All findings on this run</caption>
+                <thead><tr><th scope="col">Item</th><th scope="col">Rule</th><th scope="col">Severity</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="ph">{{finding[0].item}}</span></td><td class="m">LST-MOD-PRICE-VALUE</td><td class="m">error</td></tr>
+                  <tr><td><span class="ph">{{finding[1].item}}</span></td><td class="m"><span class="ph">{{finding[1].rule}}</span></td><td class="m"><span class="ph">{{sev}}</span></td></tr>
+                  <tr><td><span class="ph">{{finding[2].item}}</span></td><td class="m"><span class="ph">{{finding[2].rule}}</span></td><td class="m"><span class="ph">{{sev}}</span></td></tr>
+                </tbody>
+              </table>
+              <p class="note" style="margin-top:12px"><a href="#">Open the full report</a> &mdash; every finding, none dropped.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <details class="depth">
+        <summary>How a receipt is computed</summary>
+        <div class="in">
+          <p>Each claim in the copy is matched to the record row it should agree with, by the id-mapping the merchant&rsquo;s operations team owns. The rule for that field is applied exactly &mdash; integer cents, no rounding, no clock, no model.</p>
+          <p>The same two files produce the same report, byte for byte. That is what lets a finding be argued about on its facts rather than on whether the tool was having a good day.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ================= WHY ================= -->
+    <section class="step" id="why" aria-labelledby="why-h">
+      <div class="step-h">
+        <p class="eyebrow">Why</p>
+        <h2 id="why-h">Why it happened, read from the event log.</h2>
+        <p class="lede">The cause is chosen by a rule table over who changed what, and when. It is not a guess.</p>
+      </div>
+      <div class="obj">
+        <p class="obj-idle">The explanation appears here after a run.</p>
+        <div class="thread"><span><span class="lbl">scenario</span> modifier-drift</span><span><span class="lbl">run</span> <span class="ph">{{run_id}}</span></span><span class="right"><span class="lbl">tool</span> explain_drift &middot; deterministic</span></div>
+        <div class="obj-body why">
+          <div>
+            <p class="cause"><span class="k">Cause</span><span class="cls">merchant-edit</span><span class="note">not yet carried to the copy</span></p>
+            <p class="say">The merchant changed the option price in its own record. No sync for that option followed, so the copy still carries the old price.</p>
+            <div class="events tab" role="table" aria-label="Events that decided the cause">
+              <div class="ev" role="row"><span role="cell"><span class="ph">{{t1}}</span></span><span role="cell" class="hit">merchant</span><span role="cell" class="hit">price_edit</span><span role="cell" class="hit"><span class="ph">{{option_id}}</span></span></div>
+              <div class="ev" role="row"><span role="cell"><span class="ph">{{t2}}</span></span><span role="cell">integrator</span><span role="cell">sync</span><span role="cell" class="gap">other targets only</span></div>
+              <div class="ev" role="row"><span role="cell"><span class="ph">{{t_run}}</span></span><span role="cell">audit</span><span role="cell">read</span><span role="cell" class="gap">copy &ne; record</span></div>
+            </div>
+            <p class="ruleline"><b>Rule applied:</b> an edit in the record with no later sync for the same target &rarr; merchant-edit.</p>
+          </div>
+          <div>
+            <div class="seatcard">
+              <span class="chip">Route &middot; deterministic</span>
+              <h3>Merchant operations</h3>
+              <p>Chosen by the route table from the finding&rsquo;s category and the trigger. Artifacts: Slack digest and email.</p>
+            </div>
+            <div class="seatcard">
+              <span class="chip held status">DEFER</span>
+              <h3>Model-written explanation</h3>
+              <p>The language-model seat that would add a written explanation has not passed its exam on this model. It stays off until it does.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <details class="depth">
+        <summary>The six causes the table can name</summary>
+        <div class="in">
+          <ul>
+            <li><code>sync-latency</code> &mdash; a sync is due and has not run yet.</li>
+            <li><code>merchant-edit</code> &mdash; the record changed and nothing carried it over.</li>
+            <li><code>integrator-bug</code> &mdash; a sync ran and wrote the wrong value.</li>
+            <li><code>platform-override</code> &mdash; a portal edit replaced the integration&rsquo;s value.</li>
+            <li><code>encoding</code> &mdash; the same value, misread (cents as dollars).</li>
+            <li><code>unknown</code> &mdash; the log does not say, and the output says so.</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <!-- ================= IMPACT ================= -->
+    <section class="step" id="impact" aria-labelledby="impact-h">
+      <div class="step-h">
+        <p class="eyebrow">Impact</p>
+        <h2 id="impact-h">What it puts at risk, with the arithmetic showing.</h2>
+      </div>
+      <div class="obj">
+        <p class="obj-idle">The exposure appears here after a run.</p>
+        <div class="thread"><span><span class="lbl">scenario</span> modifier-drift</span><span><span class="lbl">run</span> <span class="ph">{{run_id}}</span></span><span class="right"><span class="lbl">orders</span> synthetic &middot; <span class="ph">{{window_days}}</span> days</span></div>
+        <div class="obj-body">
+          <div class="sim"><span class="chip held status">Simulated</span><p>Computed from the bundled synthetic orders file. These are not any platform&rsquo;s figures.</p></div>
+          <table class="arith tab">
+            <caption class="sr">Exposure, with each formula</caption>
+            <tbody>
+              <tr><th scope="row">Orders at risk<small>touched the drifted option</small></th>
+                  <td class="f">orders in window whose lines include <span class="ph">{{option_id}}</span></td>
+                  <td class="r"><span class="ph">{{orders_at_risk}}</span></td></tr>
+              <tr><th scope="row">Refund exposure<small>already refunded, for this reason</small></th>
+                  <td class="f">&Sigma; refund_cents on those lines where reason = menu</td>
+                  <td class="r"><span class="ph">{{refund_exposure}}</span></td></tr>
+              <tr><th scope="row">Agent-cancel exposure<small>agent orders on hidden or sold-out items</small></th>
+                  <td class="f">count(channel = agent &and; item &isin; hidden &cup; soldout_86)</td>
+                  <td class="r"><span class="ph">{{agent_cancel}}</span></td></tr>
+              <tr><th scope="row">Error-charge exposure<small>charged back to the merchant</small></th>
+                  <td class="f">refund exposure &times; <span class="assume"><span class="ph">{{declared_share}}</span> declared share &mdash; an assumption</span></td>
+                  <td class="r"><span class="ph">{{error_charge}}</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <details class="depth">
+        <summary>Every assumption in this arithmetic</summary>
+        <div class="in">
+          <p>Three of the four lines are counts and sums over the orders file and need no assumption. The fourth multiplies by a share that is declared, not measured, and the output names it as an assumption every time it is used.</p>
+          <p>On a platform&rsquo;s own exports, inside its own environment, the same formulas run over its orders. This page never receives that data.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ================= GOVERNANCE ================= -->
+    <section class="step" id="governance" aria-labelledby="gov-h">
+      <div class="step-h">
+        <p class="eyebrow">Governance</p>
+        <h2 id="gov-h">The engine decides. The crew recommends. A person signs.</h2>
+      </div>
+      <div class="obj">
+        <p class="obj-idle">The proposal waiting for a signature appears here after a run.</p>
+        <div class="obj-body gov">
+          <div>
+            <ol class="tiers" aria-label="Action tiers">
+              <li><span class="t">Tier 0</span><span class="w">Notify<span class="d">Messages are built. Sending is not wired into this site.</span></span><span class="chip status">built</span></li>
+              <li><span class="t">Tier 1</span><span class="w">Propose<span class="d">Re-sync, hold on the agent surface, open a partner ticket. Needs a signature.</span></span><span class="chip held status" id="t1-state">awaiting</span></li>
+              <li class="off"><span class="t">Tier 2</span><span class="w">Act<span class="d">Call a platform&rsquo;s API after an approved audit. Outside the pilot.</span></span><span class="chip status">off</span></li>
+              <li class="off"><span class="t">Tier 3</span><span class="w">Never<span class="d">Change a merchant&rsquo;s record, issue a credit, file a dispute.</span></span><span class="chip status">never</span></li>
+            </ol>
+          </div>
+          <div class="sign">
+            <span class="chip held status">Tier 1 &middot; proposal</span>
+            <h3>Force a re-sync of <span class="ph">{{option}}</span></h3>
+            <dl>
+              <dt>Route</dt><dd>merchant operations</dd>
+              <dt>Reviewer</dt><dd>approve &middot; replayed turn</dd>
+              <dt>Bound to</dt><dd><span class="ph">{{run_digest}}</span></dd>
+              <dt>Expires</dt><dd><span class="ph">{{expiry}}</span></dd>
+            </dl>
+            <div class="sign-actions">
+              <button class="btn2" type="button" id="sign">Sign as reviewer</button>
+              <span class="note">Signing records a decision. It calls nothing.</span>
+            </div>
+            <p class="signed" role="status"><b>Signed.</b> Ed25519 &middot; <span class="ph">{{signature}}</span> &middot; written to the ledger. A wrong decision is withdrawn by a signed counter-decision, never edited.</p>
+          </div>
+        </div>
+      </div>
+      <details class="depth">
+        <summary>The full control register</summary>
+        <div class="in">
+          <p>Evidence on every finding by construction. A model pinned per seat, a budget guard that fails closed, an injection check before any model turn. Nothing leaves the tab, proven by import-graph tests. The run ledger is append-only, hash-chained and exportable.</p>
+          <p>The governance model, the model-risk register and the data-handling statement are in the pilot kit.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ================= ARTIFACTS ================= -->
+    <section class="step" id="artifacts" aria-labelledby="art-h">
+      <div class="step-h">
+        <p class="eyebrow">Artifacts</p>
+        <h2 id="art-h">What each team would receive. Built here, never sent.</h2>
+      </div>
+      <div class="obj">
+        <p class="obj-idle">The messages appear here after a run.</p>
+        <div class="obj-body">
+          <div class="tabs" role="tablist" aria-label="Artifacts">
+            <button role="tab" id="tab-slack" aria-controls="p-slack" aria-selected="true">Slack digest <span class="r">routed</span></button>
+            <button role="tab" id="tab-email" aria-controls="p-email" aria-selected="false" tabindex="-1">Email <span class="r">routed</span></button>
+            <button role="tab" id="tab-ticket" aria-controls="p-ticket" aria-selected="false" tabindex="-1">Partner ticket <span class="r">not on this route</span></button>
+          </div>
+
+          <div role="tabpanel" id="p-slack" aria-labelledby="tab-slack">
+            <div class="art-head"><span class="k">Block Kit payload &middot; #merchant-ops</span><span class="chip held">Built, not sent</span></div>
+            <div class="art-body">
+              <p class="banner">&#x1F9EA; SIMULATED DATA &mdash; Curbside Commons demonstration output. Not real merchant data, not legal advice.<span class="banner-src">first block &middot; written by the builder, not by this page</span></p>
+              <p class="sk-h">Menu drift: modifier-drift (simulated)</p>
+              <p class="sk-v">FAIL &mdash; <span class="ph">{{findings}}</span> findings</p>
+              <p class="sk-sub">cause merchant-edit &middot; route merchant-ops &middot; deterministic engine</p>
+              <div class="sk-div" aria-hidden="true"></div>
+              <p class="sk-line"><span class="t">[error]</span> The modifier is priced above the merchant&rsquo;s record.<span class="ids">LST-MOD-PRICE-VALUE &middot; <span class="ph">{{item}}</span></span></p>
+              <p class="sk-line"><span class="t">At risk</span> <span class="ph">{{orders_at_risk}}</span> orders &middot; <span class="ph">{{refund_exposure}}</span> refunded (simulated)</p>
+              <p class="sk-line"><span class="t">Proposed</span> force a re-sync &mdash; awaiting a signature</p>
+              <p class="sk-ctx">SIMULATED &middot; Curbside Commons &middot; recommendations only &mdash; the engine decides, humans approve.</p>
+            </div>
+          </div>
+
+          <div role="tabpanel" id="p-email" aria-labelledby="tab-email" hidden>
+            <div class="art-head"><span class="k">RFC 5322 message &middot; to the merchant</span><span class="chip held">Built, not sent</span></div>
+            <div class="art-body">
+              <div class="em-heads">
+                <span class="h">From:</span> truth-audit@sender.example<br />
+                <span class="h">To:</span> merchant-ops@recipient.example<br />
+                <span class="h">Subject:</span> [SIMULATED] Menu drift: modifier-drift &mdash; FAIL<br />
+                <span class="h">Date:</span> <span class="ph">{{built_at}}</span>
+              </div>
+<pre class="em-body">SIMULATED DATA — Curbside Commons demonstration output.
+Not real merchant data, not legal advice.
+
+One option on your menu is priced differently on the
+platform's copy than in your own record.
+
+  rule     LST-MOD-PRICE-VALUE
+  item     {{item}} › {{option}}
+  copy     {{copy.option_price}}
+  record   {{record.option_price}}
+
+Only findings that are yours to fix are in this message.</pre>
+            </div>
+          </div>
+
+          <div role="tabpanel" id="p-ticket" aria-labelledby="tab-ticket" hidden>
+            <div class="art-head"><span class="k">Partner ticket &middot; built for reference</span><span class="chip held">Built, not sent</span></div>
+            <div class="art-body">
+              <p class="banner">SIMULATED DATA &mdash; Curbside Commons demonstration output. Not real merchant data, not legal advice.<span class="banner-src">first field &middot; written by the builder, not by this page</span></p>
+              <div class="em-heads">
+                <span class="h">To:</span> integrations@partner.example<br />
+                <span class="h">Title:</span> [SIMULATED] Sync gap on modifier options<br />
+                <span class="h">Scorecard:</span> <span class="ph">{{scorecard_delta}}</span>
+              </div>
+              <p class="note">This run routes to merchant operations, so the ticket is shown and not routed. On the partner-onboarding scenario it is the primary artifact.</p>
+            </div>
+          </div>
+
+          <p class="art-foot"><b>Nothing is transmitted.</b> No send transport is wired into this site. You are looking at the end of the pipeline, on paper.</p>
+        </div>
+      </div>
+      <details class="depth">
+        <summary>The raw payload</summary>
+        <div class="in"><p>The exact JSON the Slack builder emits, block for block, banner first &mdash; the same bytes an owner-armed send would carry.</p></div>
+      </details>
+    </section>
+
+    <!-- ================= PROOF ================= -->
+    <section class="step" id="proof" aria-labelledby="proof-h">
+      <div class="step-h">
+        <p class="eyebrow">Proof</p>
+        <h2 id="proof-h">The same inputs give the same receipt, every time.</h2>
+      </div>
+      <div class="obj">
+        <p class="obj-idle">The ledger entry for this run appears here after a run.</p>
+        <div class="obj-body proof">
+          <div>
+            <span class="k">Ledger entry &middot; JSON-lines, append-only</span>
+<pre class="ledger"><span class="key">run</span>        <span class="ph">{{run_id}}</span>
+<span class="key">inputs</span>     sha256:<span class="ph">{{inputs_hash}}</span>
+<span class="key">rules</span>      <span class="ph">{{rule_versions}}</span>
+<span class="key">seats</span>      intake replay · why deterministic · root-cause DEFER
+<span class="key">route</span>      merchant-ops
+<span class="key">decision</span>   <span id="led-dec">awaiting signature</span>
+<span class="key">prevHash</span>   <span class="ph">{{prev_hash}}</span></pre>
+          </div>
+          <div>
+            <span class="k">Counted at build, never typed</span>
+            <dl class="counts">
+              <div><dt><span class="ph">{{tests_passed}}</span> automated tests passed</dt><dd>on commit <span class="ph">{{commit_sha}}</span></dd></div>
+              <div><dt><span class="ph">{{golden_files}}</span> golden files held</dt><dd>engine output compared to committed results</dd></div>
+              <div><dt><span class="ph">{{scenarios_built}}</span> of the library&rsquo;s scenarios run end to end</dt><dd>each one re-run by a test on every build</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <details class="depth">
+        <summary>Verify it yourself</summary>
+        <div class="in"><p>The command line runs the same scenario offline and prints the same ledger entry. The step-by-step guide is at <a href="/docs#test-it">How to test it</a>.</p></div>
+      </details>
+      <div class="close">
+        <a class="go" href="#audit">Run another scenario</a>
+        <a class="ghost" href="/docs">What is real, what is invented</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Synthetic data throughout. The rules and the arithmetic are real; the merchant is invented.</span>
+    <a href="/docs">What is real, what is invented</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var reduced = function () { return matchMedia("(prefers-reduced-motion: reduce)").matches; };
+
+  /* scheme toggle stub — a stored choice wins in both directions */
+  document.getElementById("theme").addEventListener("click", function () {
+    var dark = root.getAttribute("data-theme") === "dark" ||
+      (!root.hasAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+    root.setAttribute("data-theme", dark ? "light" : "dark");
+  });
+
+  /* rail — position marks; the run's outcome writes the state lines */
+  var links = [].slice.call(document.querySelectorAll("#rail a"));
+  var ids = links.map(function (a) { return a.getAttribute("data-s"); });
+  function setHere(id) {
+    var at = ids.indexOf(id);
+    links.forEach(function (a, i) {
+      a.classList.toggle("is-here", i === at);
+      a.classList.toggle("is-done", i < at);
+      if (i === at) a.setAttribute("aria-current", "step"); else a.removeAttribute("aria-current");
+    });
+  }
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) setHere(e.target.dataset.s); });
+  }, { rootMargin: "-40% 0px -55% 0px" });
+  ids.forEach(function (id) {
+    var el = document.getElementById(id === "story" ? "story-text" : id);
+    if (el) { el.dataset.s = id; io.observe(el); }
+  });
+  function top() { if (scrollY < 40) setHere("story"); }
+  addEventListener("scroll", top, { passive: true });
+  setHere("story");
+
+  function st(name, text, cls) {
+    var el = document.querySelector('[data-st="' + name + '"]');
+    if (!el) return; el.textContent = text; el.className = "st" + (cls ? " " + cls : "");
+  }
+
+  /* scenario choice names the run */
+  [].forEach.call(document.querySelectorAll('input[name="sc"]'), function (r) {
+    r.addEventListener("change", function () { st("audit", r.value); });
+  });
+
+  /* drop zones — visual only in the mockup */
+  [].forEach.call(document.querySelectorAll(".zone"), function (z) {
+    z.addEventListener("dragover", function (e) { e.preventDefault(); z.classList.add("is-over"); });
+    z.addEventListener("dragleave", function () { z.classList.remove("is-over"); });
+    z.addEventListener("drop", function (e) { e.preventDefault(); z.classList.remove("is-over"); });
+  });
+
+  /* the run — the crew lights in order, stops at the signature, then the page advances */
+  var go = document.getElementById("go");
+  var seats = [].slice.call(document.querySelectorAll("[data-seat]"));
+  var live = document.getElementById("live");
+  var running = false;
+  go.addEventListener("click", function () {
+    if (running) return; running = true;
+    go.textContent = "Running\u2026";
+    seats.forEach(function (s) { s.classList.remove("lit", "sign"); });
+    var i = 0, step = reduced() ? 0 : 140;
+    (function next() {
+      if (i < seats.length) {
+        var s = seats[i++];
+        s.classList.add(s.hasAttribute("data-sign") ? "sign" : "lit");
+        setTimeout(next, step);
+        return;
+      }
+      root.classList.remove("idle");
+      st("verdict", "FAIL", "fail");
+      st("why", "merchant-edit");
+      st("impact", "simulated");
+      st("governance", "awaiting signature", "held");
+      st("artifacts", "built, not sent", "held");
+      st("proof", "ledger written");
+      go.textContent = "Run again";
+      live.textContent = "Run complete. Verdict: fail. One proposal is waiting for a signature.";
+      running = false;
+      setTimeout(function () {
+        document.getElementById("verdict").scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
+      }, reduced() ? 0 : 300);
+    })();
+  });
+
+  /* signature — records, calls nothing */
+  document.getElementById("sign").addEventListener("click", function () {
+    root.classList.add("is-signed");
+    var t = document.getElementById("t1-state"); t.textContent = "signed"; t.className = "chip status";
+    document.getElementById("led-dec").textContent = "signed · reviewer role";
+    st("governance", "signed", "ok");
+  });
+
+  /* artifact tabs — roving tabindex, arrow keys */
+  var tabs = [].slice.call(document.querySelectorAll('[role="tab"]'));
+  function select(t) {
+    tabs.forEach(function (x) {
+      var on = x === t;
+      x.setAttribute("aria-selected", on ? "true" : "false");
+      x.tabIndex = on ? 0 : -1;
+      document.getElementById(x.getAttribute("aria-controls")).hidden = !on;
+    });
+    t.focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { select(t); });
+    t.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") select(tabs[(i + 1) % tabs.length]);
+      if (e.key === "ArrowLeft") select(tabs[(i - 1 + tabs.length) % tabs.length]);
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -156,3 +156,20 @@ PROVENANCE.json + README.md written); loader unchanged; active pin stays `2026-0
 parameterised over both folders (green on both; red with the new folder absent). Oracle diff on 2026-08-25: 33/35 agree, 2
 documented format-class divergences, 0 disagree (same as the 2026-04-08 run). New: `evals/agents/gemini-pins.test.ts` (+9).
 Skills: none beyond the startup contract and the playbook source-intake rule.
+
+## 2026-10-14 — Recovery / Wave 1 reconcile (recovery worker; no source edits, nothing committed)
+Cause: a Wave 1 lane committed its `node_modules -> main` symlink (9d0eedb); checking main out over the real directory
+destroyed `node_modules/.bin`, killing every npx gate and all eight background lanes ~16:14 (exit 194). 0ac396f untracked it
+and ignored `node_modules/`. Recovery: `npm ci --no-audit --no-fund` = exit 0 (584 packages, 17 s; `tsc`/`vitest`/`eslint` present
+in `.bin`, 27 entries). Worktrees: ci-hygiene, s15-correctness, s15-scenarios had real, gutted `node_modules` dirs (no `.bin`) —
+replaced with symlinks to main; the other six symlinks were already good; no worktree lists `node_modules` in `git status`
+(Wave 2 branches sit at c45bff5, which still tracks the symlink blob — clean, so no `git rm --cached` needed).
+Reconcile on main @ 0ac396f: `tsc --noEmit` 0 · `build-offline.mjs` 0 · `vitest run` 0 = 1821 passed + 8 skipped (128 files + 7
+skipped) · `startup-contract-budget` 0 (5/5) · `check demo` 0, "16 findings across the whole copy", spec pin
+taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08 · `eslint . --max-warnings=0` exit 1 (20942 problems) — ALL from 265 files under
+`.worktrees/` (nested worktree sources linted from main; `eslint.config.mjs` does not ignore `.worktrees/**`); with
+`--ignore-pattern '.worktrees/**'` lint = 0. Vitest delta +9 vs the expected 1812: 18 pins + 91 scenarios confirmed in the
+lane files; the extra tests come from lane 1b (listings-coverage-c6) and pilot-kit (honesty-c10) additions not in the
+estimate (not itemised exactly). Wave 2 triage: only exec-layer has changes (plan doc edit + honesty-c10 +2 doc paths + two new
+pilot-kit docs); there tsc 0 · lint 0 · honesty-c10 169/169. s15-correctness, s15-scenarios, ci-hygiene, cli-experience: clean, no diff.
+Skills: none beyond the startup contract.

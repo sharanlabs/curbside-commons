@@ -52,3 +52,6 @@ skills-lock.json
 scratchpad/
 .vercel
 .env*
+
+# Dependencies — never tracked (a lane symlink was committed by accident 2026-10-14, removed the same day).
+node_modules/
