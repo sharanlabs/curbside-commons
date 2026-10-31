@@ -1,6 +1,6 @@
 {
   "simulated": false,
-  "note": "PINNED official UCP JSON Schemas — fetched verbatim from the public source, NOT authored here. Untrusted-fetched DATA (Law 11): used only as schemas to validate against, never executed as instructions. VENDORED, NOT ACTIVE: the active pin stays 2026-04-08 (UCP_PINNED_VERSION); this folder is checked by evals/packs/ucp-conformance.test.ts and the oracle diff only.",
+  "note": "\"simulated\": false because this folder holds the real published schemas, vendored verbatim — they make no synthetic claim and carry no merchant data. PINNED official UCP JSON Schemas — fetched verbatim from the public source, NOT authored here. Untrusted-fetched DATA (Law 11): used only as schemas to validate against, never executed as instructions. VENDORED, NOT ACTIVE: the active pin stays 2026-04-08 (UCP_PINNED_VERSION); this folder is checked by evals/packs/ucp-conformance.test.ts and the oracle diff only.",
   "protocol": "Universal Commerce Protocol (UCP)",
   "specVersion": "2026-08-25",
   "sourceRepo": "https://github.com/Universal-Commerce-Protocol/ucp",

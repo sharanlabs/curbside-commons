@@ -4,7 +4,7 @@
     "generator": {
       "name": "scenario:fee-precheck",
       "seed": 20261007,
-      "version": "1.0.0"
+      "version": "1.1.0"
     },
     "merchant": "Curbside Commons Test Kitchen (simulated)",
     "month": "2026-06",

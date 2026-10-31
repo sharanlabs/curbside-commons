@@ -21,7 +21,14 @@ import type {
 import { makeFinding } from "../../verifier-core/guard.ts";
 import { buildReport, verifyClaims } from "../../verifier-core/verify.ts";
 import { listingsDetectors } from "./detectors.ts";
-import { expectedTitle, indexCatalog, sorReference, type SorTruth } from "./reference.ts";
+import {
+  assertNoReservedVariationIds,
+  assertUniqueVariationIds,
+  expectedTitle,
+  indexCatalog,
+  sorReference,
+  type SorTruth,
+} from "./reference.ts";
 import type { SyntheticCatalog } from "./types.ts";
 import { UCP_PINNED_VERSION } from "./ucp.ts";
 
@@ -32,10 +39,13 @@ import { UCP_PINNED_VERSION } from "./ucp.ts";
 // embedded in four frozen live-exam goldens (evals/crew/gold/**/l1-live-turns.json)
 // whose lock pins the engine-report hash the seats were examined on. Bumping it
 // here would force a re-pin of a pre-registered record as a merge side-effect;
-// S1.5 bumps it deliberately, regenerates the derived goldens by script, and
-// renders the Intake/Reviewer labels "requalification pending" (decision-log
-// 2026-10-14). Pre-existing feeds carry no menu fields and produce byte-identical
-// reports either way (evals/packs/listings-coverage-c6.test.ts).
+// S1.5 was to bump it deliberately, regenerate the derived goldens by script, and
+// render the Intake/Reviewer labels "requalification pending" (decision-log
+// 2026-10-14). NOT DONE in S1.5 (2026-10-31): the crew's pre-registered
+// `expectedEngineReportHash` pins sit outside that lane — see
+// docs/returns/2026-10-31-s15-correctness.md OPEN 1 for the file map. Pre-existing
+// feeds carry no menu fields and produce byte-identical reports either way
+// (evals/packs/listings-coverage-c6.test.ts).
 export const LISTINGS_SPEC_VERSION = `taxonomy-v1+acp-extract-2026-07-02+ucp-pin-${UCP_PINNED_VERSION}`;
 
 /**
@@ -234,6 +244,14 @@ export function runListingsVerification(
   sor: SyntheticCatalog,
   provenance: ListingsRunProvenance = {},
 ): VerifierReport {
+  // REFUSE an ambiguous reference before any claim is judged (S1.5; Codex
+  // cross-check 2026-10-12 § 4; security review 2026-10-31 F1). Every caller —
+  // the CLI, the MCP `check_feed` tool, the demo, the scenario generator and
+  // the browser seam (`verifyAcpFeed`) — reaches the engine through here, so
+  // all of them share these predicates. Throws a ListingsInputError; never a
+  // PASS. (Feed-side ids are refused by the adapters that build the claims.)
+  assertNoReservedVariationIds(sor);
+  assertUniqueVariationIds(sor);
   const reference = sorReference(sor);
   const detected = verifyClaims(claims, reference, listingsDetectors);
   const completeness = completenessSweep(claims, sor);

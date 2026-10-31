@@ -116,20 +116,34 @@ export function buildFaithfulMenuFeed(sor: SyntheticCatalog): AcpFeed {
 /** Copy → claims for the menu-model fields of one row (none when the row carries neither). */
 export function menuModelClaims(row: AcpFeedItem, source: Claim["source"]): readonly Claim[] {
   const claims: Claim[] = [];
+  // DECLARED KEYS ONLY (S1.5; security review 2026-10-31 F4): a claim value is
+  // evidence that is serialized into the report (and from there into MCP output
+  // and the Slack/email builders), so an unknown key a copy planted inside an
+  // option or a window — a customer field, say — must not ride along. The
+  // adapter has already refused a non-array / non-object shape (F7).
   if (row.modifiers !== undefined) {
     for (const m of row.modifiers) {
+      const value: ModifierOptionClaimValue = {
+        id: m.id,
+        list_id: m.list_id,
+        list_name: m.list_name,
+        name: m.name,
+        price_delta: m.price_delta,
+        availability: m.availability,
+      };
       claims.push({
         id: `${row.item_id}#modifier.${m.id}`,
         source,
         field: "modifier.option",
-        value: m satisfies ModifierOptionClaimValue,
+        value,
       });
     }
     const set: ModifierSetClaimValue = { served: row.modifiers.map((m) => ({ id: m.id, name: m.name })) };
     claims.push({ id: `${row.item_id}#modifiers`, source, field: "modifiers", value: set });
   }
   if (row.hours !== undefined) {
-    claims.push({ id: `${row.item_id}#hours`, source, field: "hours", value: row.hours });
+    const windows: readonly AcpFeedHoursWindow[] = row.hours.map((w) => ({ day: w.day, open: w.open, close: w.close }));
+    claims.push({ id: `${row.item_id}#hours`, source, field: "hours", value: windows });
   }
   return claims;
 }

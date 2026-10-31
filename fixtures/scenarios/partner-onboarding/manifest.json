@@ -4,7 +4,7 @@
   "simulated": true,
   "shapedLike": null,
   "seed": 20261005,
-  "generator": "generate-scenarios.mts@1.0.0",
+  "generator": "generate-scenarios.mts@1.1.0",
   "engine": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
   "pack": "listings",
   "derivedFrom": {

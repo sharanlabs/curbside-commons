@@ -1,0 +1,34 @@
+{
+  "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+  "matchingMode": "synthetic-controlled",
+  "simulated": true,
+  "findings": [
+    {
+      "claim": {
+        "id": "item-010-v1#price.amount",
+        "source": "ucp-catalog",
+        "field": "price.amount",
+        "value": "8.00"
+      },
+      "referenceRowId": "item-010-v1",
+      "ruleId": "LST-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The served price 8.00 does not match the catalog price 6.00."
+    },
+    {
+      "claim": {
+        "id": "item-011-v1#price.amount",
+        "source": "ucp-catalog",
+        "field": "price.amount",
+        "value": "23.00"
+      },
+      "referenceRowId": "item-011-v1",
+      "ruleId": "LST-PRICE-VALUE",
+      "severity": "error",
+      "category": "price",
+      "plainLine": "The served price 23.00 does not match the catalog price 21.00."
+    }
+  ],
+  "ok": false
+}
