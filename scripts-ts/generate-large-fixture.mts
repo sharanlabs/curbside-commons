@@ -375,7 +375,7 @@ export function buildDailySeries(record: SyntheticCatalog): DailySeries {
     ...faithful,
     items: faithful.items.map((row) => {
       if (seen.has(row.group_id)) {
-        const rest: Partial<AcpFeedItem> = { ...row };
+        const rest = { ...row } as { hours?: unknown };
         delete rest.hours;
         return rest as AcpFeedItem;
       }
