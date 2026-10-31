@@ -144,7 +144,7 @@ export const listingsDetectors: readonly Detector[] = [
         ruleId: "LST-AVAIL-HIDDEN-SHOWN",
         severity: "error",
         category: "availability",
-        plainLine: "This item is hidden in the merchant's own catalog but is being served to customers.",
+        plainLine: "This item is hidden in the merchant's own catalog but is served on the copy.",
       } satisfies FindingInput,
     ];
   },
@@ -163,7 +163,7 @@ export const listingsDetectors: readonly Detector[] = [
           ruleId: "LST-ENC-UTF8",
           severity: "warn",
           category: "encoding",
-          plainLine: `The name is garbled by a text-encoding error: served "${actual}" vs the real "${expected}".`,
+          plainLine: `The name is garbled by a text-encoding error: served "${actual}" vs the record's "${expected}".`,
         },
       ];
     }
@@ -174,7 +174,7 @@ export const listingsDetectors: readonly Detector[] = [
           ruleId: "LST-ENC-TRUNC",
           severity: "warn",
           category: "encoding",
-          plainLine: `The name is cut off in the feed: "${actual}" vs the real "${expected}".`,
+          plainLine: `The name is cut off in the feed: "${actual}" vs the record's "${expected}".`,
         },
       ];
     }
