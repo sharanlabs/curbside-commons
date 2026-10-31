@@ -188,6 +188,8 @@ interface Built {
   readonly engine: string;
   readonly inputs: Readonly<Record<string, string>>;
   readonly report: string;
+  /** Further byte-locked expected files beside report.json (spec-valid-lie only). */
+  readonly extraExpected?: Readonly<Record<string, string>>;
   readonly figures: Figures;
   readonly transform: Readonly<Record<string, unknown>>;
 }
@@ -552,6 +554,9 @@ function buildSpecValidLie(): Built {
   const events: Ev[] = [{ at: shiftMin(asOf, -90), actor: "integrator", action: "sync", target: "catalog" }];
   for (const rowId of picked) events.push({ at: shiftMin(asOf, -(20 + Math.floor(rand() * 40))), actor: "unknown", action: "price_edit", target: rowId });
 
+  // Two engine reports: expected/report.json is the feed → record run every listings
+  // scenario commits (so `check scenario` reads it the same way); the UCP answer's own
+  // truth-leg report is committed beside it as expected/ucp-truth-report.json.
   const report = runListingsVerification(ucpSearchResponseToClaims(wire), record);
   const acp = runListings(feed, record);
   const lies = report.findings.filter((f) => f.ruleId === "LST-PRICE-VALUE");
@@ -568,7 +573,8 @@ function buildSpecValidLie(): Built {
       "ucp-response.json": asJson(wire),
       "events.jsonl": eventsText(events),
     },
-    report: serializeReport(report),
+    report: serializeReport(acp),
+    extraExpected: { "ucp-truth-report.json": serializeReport(report) },
     figures: {
       verdict: report.ok ? "PASS" : "FAIL",
       findings: report.findings.length,
@@ -880,7 +886,7 @@ Root-cause, impact, route and recorded turns arrive in S2. They are deliberately
 /** spec-valid-lie runs the truth leg on the UCP answer, so its note says which input. */
 const EXPECTED_NOTE_SPEC_VALID_LIE = `# expected/
 
-The engine report only (\`report.json\`): the existing engine's truth leg run on \`inputs/ucp-response.json\` against \`inputs/record.json\`. The same document's conformance verdict (it passes the pinned UCP schemas) is recorded in \`manifest.json\` figures, not as a second report.
+Engine reports only. \`report.json\` is the existing engine on \`inputs/feed.json\` against \`inputs/record.json\` — the feed the UCP answer was built from, run the way every listings scenario is run. \`ucp-truth-report.json\` is the same engine's truth leg on the UCP answer itself, \`inputs/ucp-response.json\`. That answer's conformance verdict (it passes the pinned UCP schemas) is recorded in \`manifest.json\` figures, not as a third report.
 
 Root-cause, impact, route and recorded turns arrive in S2. They are deliberately absent here — not empty, not stubbed.
 `;
@@ -913,6 +919,7 @@ export function buildScenarioFiles(): Map<string, string> {
     const dir = `fixtures/scenarios/${id}`;
     for (const [name, bytes] of Object.entries(b.inputs)) files.set(`${dir}/inputs/${name}`, bytes);
     files.set(`${dir}/expected/report.json`, b.report);
+    for (const [name, bytes] of Object.entries(b.extraExpected ?? {})) files.set(`${dir}/expected/${name}`, bytes);
     files.set(`${dir}/expected/README.md`, id === "spec-valid-lie" ? EXPECTED_NOTE_SPEC_VALID_LIE : EXPECTED_NOTE);
     files.set(`${dir}/brief.md`, render(BRIEF_TEMPLATES[id], b.figures));
     files.set(
@@ -935,7 +942,7 @@ export function buildScenarioFiles(): Map<string, string> {
         },
         transform: b.transform,
         inputs: Object.keys(b.inputs).sort().map((n) => `inputs/${n}`),
-        expected: ["expected/report.json", "expected/README.md"],
+        expected: ["expected/report.json", "expected/README.md", ...Object.keys(b.extraExpected ?? {}).sort().map((n) => `expected/${n}`)],
         absentUntilS2: ["root-cause", "impact", "route", "turns"],
         figures: b.figures,
       }),

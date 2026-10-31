@@ -32,9 +32,10 @@ import { serializeReport } from "@/lib/verifier-core";
  *            committed file set IS the generated file set (nothing extra, nothing
  *            hand-added). One byte edited → red → `node scripts-ts/generate-scenarios.mts`
  *            → green.
- *  ENGINE    the EXISTING engine (listings pack for 1–6 — for 6 its truth leg on
- *            the UCP answer plus the conformance check on the same document;
- *            the fee audit for 7) is run here, on the committed inputs, and (a) must reproduce
+ *  ENGINE    the EXISTING engine (listings pack for 1–6 on feed + record — for 6
+ *            also its truth leg on the UCP answer, committed as
+ *            expected/ucp-truth-report.json, and the conformance check on the same
+ *            document; the fee audit for 7) is run here, on the committed inputs, and (a) must reproduce
  *            expected/report.json byte for byte, (b) must reproduce every figure
  *            the manifest records — derived by code written in THIS file,
  *            independently of the generator's own derivation.
@@ -208,6 +209,11 @@ describe("the seven scenario folders exist with the folder contract", () => {
     for (const f of ["brief.md", "manifest.json", "expected/report.json", "expected/README.md"]) {
       expect(files, `${id}: ${f}`).toContain(f);
     }
+    expect(files.filter((f) => f.startsWith("expected/"))).toEqual(
+      id === "spec-valid-lie"
+        ? ["expected/README.md", "expected/report.json", "expected/ucp-truth-report.json"]
+        : ["expected/README.md", "expected/report.json"],
+    );
     const inputs = files.filter((f) => f.startsWith("inputs/"));
     expect(inputs).toEqual(
       isFees(id)
@@ -485,11 +491,14 @@ describe("ENGINE — the existing engine, run on the committed inputs, reproduce
     if (isFees(id)) {
       const report = auditStatement(parseStatement(read(join(dirOf(id), "inputs", "statement.json"))));
       expect(serializeFeeReport(report)).toBe(expected);
-    } else if (id === "spec-valid-lie") {
-      expect(serializeReport(runSpecValidLie().report)).toBe(expected);
     } else {
       expect(serializeReport(runListings(id).report)).toBe(expected);
     }
+  });
+
+  it("spec-valid-lie: expected/ucp-truth-report.json is the truth leg on the UCP answer, byte for byte", () => {
+    const expected = read(join(dirOf("spec-valid-lie"), "expected", "ucp-truth-report.json"));
+    expect(serializeReport(runSpecValidLie().report)).toBe(expected);
   });
 
   it.each(IDS)("%s: manifest contract (simulated · shapedLike null · seed · generator · engine from code)", (id) => {

@@ -47,6 +47,7 @@ fixtures/scenarios/<id>/
     events.jsonl    # {at, actor, action, target} evidence of what happened, in time order
   expected/
     report.json     # the existing engine's report on inputs/ — nothing else
+    ucp-truth-report.json  # spec-valid-lie only: the same engine's truth leg on the UCP answer
     README.md       # why nothing else is here
 ```
 

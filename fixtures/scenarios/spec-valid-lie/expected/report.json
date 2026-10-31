@@ -6,7 +6,7 @@
     {
       "claim": {
         "id": "item-010-v1#price.amount",
-        "source": "ucp-catalog",
+        "source": "acp-feed",
         "field": "price.amount",
         "value": "8.00"
       },
@@ -19,7 +19,7 @@
     {
       "claim": {
         "id": "item-011-v1#price.amount",
-        "source": "ucp-catalog",
+        "source": "acp-feed",
         "field": "price.amount",
         "value": "23.00"
       },

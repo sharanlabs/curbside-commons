@@ -34,7 +34,8 @@
   ],
   "expected": [
     "expected/report.json",
-    "expected/README.md"
+    "expected/README.md",
+    "expected/ucp-truth-report.json"
   ],
   "absentUntilS2": [
     "root-cause",
