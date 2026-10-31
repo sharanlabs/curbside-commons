@@ -1,6 +1,6 @@
 {
   "caseId": "s2-im-fee-precheck",
-  "manifestDigest": "22d4e8c8776650accdbb605e1d957423ff3db11605dee8f186cf85b6b09edc22",
+  "manifestDigest": "9884bec8d96098ee48469b76c282782e1c2bedca70cd5bf4739b4b6188caa37c",
   "member": "impact",
   "inputArtifact": {
     "path": "fixtures/scenarios/fee-precheck/inputs/statement.json"
