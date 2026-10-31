@@ -1,6 +1,6 @@
 # Return packet: W3-a checkpoint 1 — crew cases, scenario 5 ownership, MCP advertisement (Wave 3, lane 1), 2026-10-31
 
-**Plain English:** every scenario folder now has a crew practice run that a replay test really plays, and a test reads the folders themselves so that claim cannot go stale. Scenario 5 now goes to the partner desk because the case states, from its brief, that the partner submitted the feed. MCP clients can now see and call the two crew tools. Three places where the packet and the code disagree are listed below with what was done about each.
+**Plain English:** every scenario folder now has a crew practice run that a replay test really plays, and a test reads the folders themselves so that claim cannot go stale. Scenario 5 now goes to the partner desk because the case states, from its brief, that the partner submitted the feed. MCP clients can now see and call the two crew tools, and the frozen MCP session calls every advertised tool once again (CP6, on the orchestrator's decision). Three places where the packet and the code disagree are listed below with what was done about each.
 
 ## SLICE
 
@@ -15,6 +15,7 @@ W3-a CP1 — a folder-driven crew-case coverage test · root-cause cases for mod
 | CP3 | `601ff67` | scenario 5 on the partner route | crew-route + crew-s2-replay + composition-lock-s2 + coverage + ledger-handoff → exit 0, 79 passed; `lib/crew/route.ts` and `evals/crew/crew-route.test.ts` unchanged (`git diff --quiet` → 0); `evals/crew` → exit 0, 299 passed; stamp `--check` → 0 |
 | CP4 | `8efc3ce` (schema files) · `52a6a91` (advertisement) | both tools on tools/list, callable over the real stdio server, transcript re-recorded | part 1: `evals/tools evals/crew` → exit 0, 429 passed (28 files). part 2: `evals/mcp evals/tools` → exit 0, 221 passed (14 files); honesty-c10 → exit 0, 312 passed; tsc 0; eslint `.` 0 |
 | CP5 | this packet | gates | see COMMANDS |
+| CP6 | `d326060` | orchestrator decision on OPEN 1: the recorder calls both S2 tools; the no-timestamp scan reads response bodies only; the remainder pin is `[]`; transcript re-recorded; GLOSSARY:53 and SHOWCASE:31 exception clauses dropped | `evals/mcp` → exit 0, 91 passed (6 files); build-offline 0; full vitest 0, 2438 passed + 8 skipped, 159 files (152 + 7 skipped); tsc 0; eslint `.` 0; honesty-c10 0 (312); stamp `--check` 0 |
 
 **CP1 detail.** The test reads every directory of `fixtures/scenarios/` holding a `manifest.json`, every `*.case.json` under `evals/crew/cases-s2/` and `cases-s3/`, and the `evals/crew/*.ts` sources. A directory counts as replayed when a source globs it as `readdirSync(DIR).filter((f) => f.endsWith(".case.json"))` with `DIR` declared as `join(<root>, "evals", "crew", "<dir>")` in the same file, and that source calls `runCase(` (a test file directly; a harness only when a `*.test.ts` imports it). Inverse: no case points outside `fixtures/scenarios/<existing id>/` or at a missing file. Mutations (header): M0 natural red 2 failed / 9 passed; M1 harness-s2 glob changed to `.case.jsonx` → 8 failed / 3 passed, restored; M2 stray case to `fixtures/scenarios/no-such-folder/` → 3 failed / 8 passed, deleted.
 
@@ -59,7 +60,7 @@ One-line diff of routes: `s2-rc-partner-onboarding human-escalation → partner`
 
 ## Transcript diff explanation (`evals/mcp/gold/mcp-session.transcript.json`)
 
-I re-recorded it with `node evals/mcp/record-transcript.mjs`, which is unchanged (exit 0). There are 11 steps before and 11 after, in two hunks:
+**At CP4** I re-recorded it with `node evals/mcp/record-transcript.mjs`, still unchanged then (exit 0). There were 11 steps before and 11 after, in two hunks:
 
 1. **Step 0 `initialize.instructions` (one line, `@@ -14 +14 @@`).**
    - "these seven tools' decision paths" → "these tools' decision paths". The count would be false at nine; the new wording carries no count.
@@ -73,7 +74,16 @@ I re-recorded it with `node evals/mcp/record-transcript.mjs`, which is unchanged
 
    The first seven entries are byte-identical.
 
-Steps 2–10 (seven happy calls and two invalid calls) are byte-identical. Nothing else moved.
+At CP4, steps 2–10 (seven happy calls and two invalid calls) were byte-identical, and nothing else moved.
+
+**At CP6** I re-recorded it again, with the recorder's `HAPPY_CALLS` now +2 (exit 0). Steps went 11 → 13, and the diff against CP4 (`52a6a91`) is one hunk (`@@ -1021,8 +1021,79 @@`): two `tools/call` steps added after `run_demo` and before the two invalid calls.
+
+| Added step | Request arguments (inline, synthetic, no file read) | Response |
+| --- | --- | --- |
+| `explain_drift` | one finding (`item-005-v1#availability`, LST-AVAIL-STATE) · one event `{at: "2026-07-02T21:46:00Z", actor: merchant, action: 86, target: item-005-v1}` · `asOf: "2026-07-03T00:00:00Z"` (fixed ISO strings we pass, deterministic by construction) | `isError: false`; text = class merchant-edit, citedEvents [0], label "deterministic baseline"; structuredContent `{tool: explain_drift, ok: true, exitCode: 0, demoOnly: false, advisory: false, earnsLabel: null}` |
+| `size_impact` | `{findings: [], orders: [], windowDays: 7, errorChargeShare: 0.5}` | `isError: false`; text = five zero figures, three echoed assumptions, label "simulated"; same structuredContent shape with tool size_impact |
+
+Each response text equals the registry's direct `callTool` canonical for the same arguments, checked by script. Against CP4, steps 0–8 are byte-identical, and the two invalid calls (now steps 11–12) equal CP4's steps 9–10. Against `e692e95`, the cumulative diff is exactly: the `initialize.instructions` line, two `tools/list` entries and these two steps; happy calls 2–8 and both invalid calls are byte-identical.
 
 ## CHANGED (`git diff e692e95..HEAD`, each file, one line)
 
@@ -88,7 +98,8 @@ Steps 2–10 (seven happy calls and two invalid calls) are byte-identical. Nothi
 - `lib/mcp/server.ts`: allowlist +2; count-free wording; one instructions sentence.
 - `lib/mcp/descriptions.ts`: header counts; the false "NOT yet advertised" comment (DEVIATION 4).
 - `evals/mcp/mcp-conformance.test.ts`: expected order +2; count-free titles; new real-server call describe.
-- `evals/mcp/mcp-transcript-freeze.test.ts`: happy-call count derived from the transcript.
+- `evals/mcp/mcp-transcript-freeze.test.ts`: happy-call count derived from the transcript; remainder pin `[]` (CP6); the ISO-timestamp scan reads response bodies only (CP6).
+- `evals/mcp/record-transcript.mjs` (CP6, orchestrator-approved): `HAPPY_CALLS` +2; header count-free.
 - `evals/mcp/gold/mcp-session.transcript.json`: re-recorded.
 - `evals/tools/registry-s2-tools.test.ts`, `evals/tools/registry-path-hardening.test.ts`: placeholder pins flipped (DEVIATIONS 2, 3).
 - `README.md`, `docs/GLOSSARY.md`, `docs/SHOWCASE.md`: MCP tool-count lines (below).
@@ -108,8 +119,8 @@ Steps 2–10 (seven happy calls and two invalid calls) are byte-identical. Nothi
 | `README.md:92` | "**Seven read-only tools over the same deterministic engine, exposed over stdio only**" | "**Read-only tools over the same deterministic engine, exposed over stdio only**" |
 | `README.md:106` | "the seven MCP tools expose" | "the MCP tools expose" |
 | `docs/GLOSSARY.md:52` | "(six engine tools + the E2 advisory `lookup_reference`, added 2026-07-12)" | "(six engine tools, the E2 advisory `lookup_reference` added 2026-07-12, and the crew's deterministic `explain_drift` and `size_impact`, advertised 2026-10-31)" |
-| `docs/GLOSSARY.md:53` | "initialize → tools/list → one call per tool → invalid calls" | "initialize → tools/list → one call per tool, except the two crew tools advertised 2026-10-31, which the conformance suite calls over a real spawned server → invalid calls" |
-| `docs/SHOWCASE.md:31` | "initialize → tools/list → every tool → invalid calls with typed errors." | "initialize → tools/list → every tool except the two crew tools advertised 2026-10-31 (the conformance suite calls those over a real spawned server) → invalid calls with typed errors." |
+| `docs/GLOSSARY.md:53` | "initialize → tools/list → one call per tool → invalid calls" | CP4 added an exception clause for the two crew tools; CP6 dropped it, so the line is back to its `e692e95` wording (true again) |
+| `docs/SHOWCASE.md:31` | "initialize → tools/list → every tool → invalid calls with typed errors." | same: clause added in CP4, dropped in CP6; byte-identical to `e692e95` |
 
 Hits left as they are:
 - `docs/decision-log.md:65`, `docs/reviews/*`, `docs/returns/2026-10-31-s2-crew.md`: historical records; the contract bars editing decision-log.
@@ -127,13 +138,13 @@ Contract baseline at `e692e95`: 2413 passed + 8 skipped. **Final: 2438 passed + 
 | `evals/crew/crew-s2-replay.test.ts` | 33 → 37 (+4) | 2 matrix rows (data-driven, one per new case) + 2 `EXPECTED` rows |
 | `evals/mcp/mcp-conformance.test.ts` | 33 → 43 (+10) | 4 per-tool locks × 2 new tools + 2 real-server call tests |
 | `evals/crew/crew-composition-lock-s2.test.ts` | 8 → 8 | pins edited, no new test |
-| `evals/mcp/mcp-transcript-freeze.test.ts` | 4 → 4 | assertion replaced |
+| `evals/mcp/mcp-transcript-freeze.test.ts` | 4 → 4 | assertions replaced (CP4, CP6) |
 | `evals/tools/registry-s2-tools.test.ts` | 29 → 29 | pin flipped |
 | `evals/tools/registry-path-hardening.test.ts` | 11 → 11 | pin flipped |
 
-The before-counts of the two grown files were measured by running their `e692e95` versions (temporary copies, deleted): crew-s2-replay 35 collected on today's data (33 + the 2 data-driven matrix rows), mcp-conformance 33. Proving mutations are recorded above and in each file header. `git diff --stat e692e95..HEAD -- evals/crew/cases evals/crew/cases-s3 evals/crew/cases-live evals/crew/gold fixtures` prints nothing (exit 0). No golden besides the MCP transcript moved: the A2 full-record gold, the replay-floors matrix, both render goldens, the S3 trajectory and every fixture are byte-identical.
+The before-counts of the two grown files were measured by running their `e692e95` versions (temporary copies, deleted): crew-s2-replay 35 collected on today's data (33 + the 2 data-driven matrix rows), mcp-conformance 33. Proving mutations are recorded above and in each file header. CP6 added no test, so the count is unchanged at 2438 + 8. CP6 mutation: a timestamp planted in `initialize.serverInfo.version` → the scoped scan and the byte-freeze red, 2 failed / 2 passed; restored → 4/4. So the response-body scan still bites. `git diff --stat e692e95..HEAD -- evals/crew/cases evals/crew/cases-s3 evals/crew/cases-live evals/crew/gold fixtures` prints nothing (exit 0). No golden besides the MCP transcript moved: the A2 full-record gold, the replay-floors matrix, both render goldens, the S3 trajectory and every fixture are byte-identical.
 
-## COMMANDS (final run, after the last source edit)
+## COMMANDS (final run, after the last source edit — re-run at CP6, same results)
 
 - `node scripts/build-offline.mjs`: exit 0, run immediately before the full suite
 - `npx vitest run` (JSON reporter, then the default reporter): exit 0, 2438 passed + 8 skipped, 159 files (152 + 7 skipped)
@@ -153,15 +164,15 @@ The before-counts of the two grown files were measured by running their `e692e95
 3. **`evals/tools/registry-path-hardening.test.ts` ~L159 edited (outside).** "A registered-but-unadvertised tool (explain_drift) is refused over MCP" has no subject once explain_drift is advertised. It now holds the same refusal on a name that is not registered (`not_a_registered_tool`), asserting the exact fixed text `unknown tool "not_a_registered_tool"`.
 4. **`lib/mcp/descriptions.ts` comments edited (outside, unless counted as "doc lines that state the MCP tool count").** The header counts, plus the S2 comment "registered but NOT yet advertised on tools/list", which became false. No description string changed.
 5. **spec-valid-lie runs `check_feed` on `inputs/feed.json`, surface `acp`, not `inputs/ucp-response.json`, surface `ucp` as the packet said.** `runCheck` refuses the UCP wire document by design (the shape guard of 2026-07-26). Exact refusal text, with the absolute worktree path shown as `<repo>`: "`<repo>/fixtures/scenarios/spec-valid-lie/inputs/ucp-response.json is a UCP WIRE document (has "products", no "items"), which the truth leg cannot compare against a system-of-record catalog. The truth and conformance legs answer different questions: run `check <repo>/fixtures/scenarios/spec-valid-lie/inputs/ucp-response.json --conformance` to validate it against the pinned UCP schemas. The truth leg takes a catalog-response FIXTURE (with "items") or an ACP feed via --surface acp.`" No registry tool exposes the generator's UCP truth leg (`ucpSearchResponseToClaims`). `feed.json` against `record.json` is what the folder's `expected/README.md` says `report.json` is ("run the way every listings scenario is run"), and the case's report hash equals that file's sha256. The brief states that the feed leg fires LST-PRICE-VALUE ×2 on the same rows as the UCP leg ("one comparator, two surfaces"). That is the brief's figure; this lane confirmed it independently by matching the report hash. See OWNER 1.
-6. **The transcript recorder is unchanged, so the frozen session does not call the two new tools.** `evals/mcp/record-transcript.mjs` is outside ALLOWED FILES. An `explain_drift` happy call would also need its required ISO `asOf` in the transcript, which the freeze test's no-timestamp scan (`/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/`, whole file) refuses. Changing that scan would loosen a determinism guard. Instead:
+6. **At CP4 the transcript recorder was left unchanged, so the frozen session did not call the two new tools (superseded at CP6 on the orchestrator's decision; see DONE CP6).** `evals/mcp/record-transcript.mjs` is outside ALLOWED FILES. An `explain_drift` happy call would also need its required ISO `asOf` in the transcript, which the freeze test's no-timestamp scan (`/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/`, whole file) refuses. Changing that scan would loosen a determinism guard. Instead:
    - the done-test "tools/call succeeds for both names through the real stdio server" is met in `mcp-conformance.test.ts` through `evals/mcp/harness.ts`;
    - the freeze test pins the uncalled remainder to exactly `["explain_drift", "size_impact"]`, so the gap is loud and goes red when the recorder catches up (OPEN 1).
 7. **One sentence added to `SERVER_INSTRUCTIONS`** for the two tools ("explain_drift is a deterministic baseline — an explanation, never a verdict; size_impact returns SIMULATED figures, never a saving claim."). The instructions give every other non-verdict tool's status, and without this a client reading only the instructions could take a cause class for a finding. It is part of hunk 1 of the transcript diff.
 
 ## OPEN (exact file map of what is left)
 
-1. **Recorder happy calls for the two S2 tools.**
-   - Files: `evals/mcp/record-transcript.mjs` (`HAPPY_CALLS` +2) · `evals/mcp/mcp-transcript-freeze.test.ts` (the no-timestamp scan must exclude `steps[].request.arguments`, or explain_drift's `asOf` trips it; then flip the remainder pin to `[]`) · `evals/mcp/gold/mcp-session.transcript.json` (re-record) · `docs/GLOSSARY.md:53` and `docs/SHOWCASE.md:31` (drop the exception clause).
+1. **CLOSED at CP6 (`d326060`) on the orchestrator's decision.** The recorder calls both tools, the scan is scoped to response bodies, the remainder pin is `[]`, the transcript is re-recorded and both doc clauses are dropped. The original item, kept for the record:
+   - **Recorder happy calls for the two S2 tools.** Files: `evals/mcp/record-transcript.mjs` (`HAPPY_CALLS` +2) · `evals/mcp/mcp-transcript-freeze.test.ts` (the no-timestamp scan must exclude `steps[].request.arguments`, or explain_drift's `asOf` trips it; then flip the remainder pin to `[]`) · `evals/mcp/gold/mcp-session.transcript.json` (re-record) · `docs/GLOSSARY.md:53` and `docs/SHOWCASE.md:31` (drop the exception clause).
    - The orchestrator decides whether that guard may be scoped this way.
    - size_impact accepts `{findings: [], orders: [], windowDays: 7, errorChargeShare: 0.5}` with no timestamp (measured: zero figures, label simulated).
    - The recorder's own header, `evals/mcp/record-transcript.mjs:7` ("one happy call per the six tools"), is already stale at seven and should be made count-free in the same change.
@@ -178,7 +189,6 @@ The before-counts of the two grown files were measured by running their `e692e95
 
 ## NOT DONE
 
-- Recorder happy calls for the two tools (OPEN 1).
 - The `/docs` table rows (OPEN 2, out of scope).
 - The fixture wording refresh (OPEN 3, generator-owned).
 - No Codex gate: deferred by the owner this run.
@@ -186,7 +196,7 @@ The before-counts of the two grown files were measured by running their `e692e95
 
 ## GIT
 
-At the packet commit: `git status --short` was clean; `git log --oneline -6` is in the final message to the orchestrator. Lane commits, oldest first: `dbaf3d6` CP1 · `833324f` CP2 · `601ff67` CP3 · `8efc3ce` CP4 part 1 · `52a6a91` CP4 part 2 · packet.
+At the packet commit: `git status --short` was clean; `git log --oneline -6` is in the final message to the orchestrator. Lane commits, oldest first: `dbaf3d6` CP1 · `833324f` CP2 · `601ff67` CP3 · `8efc3ce` CP4 part 1 · `52a6a91` CP4 part 2 · `1760a7e` packet · `09f9f63` packet corrections · `d326060` CP6 · the CP6 packet amendment.
 
 ## MODEL
 
