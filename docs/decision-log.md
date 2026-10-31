@@ -225,3 +225,176 @@ orchestrator reviews the diff in the tree and re-runs gates; nothing is done on 
 Still owner actions: commit · push · deploy · arming any live model · the five validation
 conversations · the local-model tier choice (D-6). Owed: Codex cross-check of the plan
 (owner-shell). RULES §4 unchanged.
+
+## 2026-10-12 — Delivery lead mandate · executive audience · free-only hard gate (owner words, session 49)
+
+Owner words, verbatim (2026-10-12 11:45–11:46): *"You are my CEO, lead this product delivery. Recruit resources,
+specialists, whoever you want how you want to drive it forwards. few floor not cieling that governance, failure,
+feedback, mostly areas ai fail in production, cost-efficiency, sustainability, feasbility, accuracy, reliability.
+you discover what is needed as well."* · *"I want to demostrate this pilot the ceo of doordash and uber as on a
+enterprise level. use only free sources and tools free tier, free credits applied."*
+
+**Decided (owner word):**
+1. **Delivery lead.** The orchestrator seat owns sequencing, staffing and scope *inside* the plan of record
+   (`docs/plan-menu-integrity-crew-2026-10-09.md`) — may reorder, add or kill slices with the reason recorded
+   here. **Not delegated:** commit · push · deploy · arming any live model · publishing — these stay the owner's
+   word (RULES §12; the orchestrator read "CEO" narrowly on purpose and asked the owner to widen it explicitly
+   if meant).
+2. **Production floors (minimums, not ceilings):** governance · failure handling · feedback loops · the known
+   AI-in-production failure modes · cost-efficiency · sustainability (episodic, free/local, one-person
+   maintainable) · feasibility · accuracy · reliability. Two read-only discovery passes dispatched the same
+   minute (guidelines-monitor adherence audit; blindspot-scout unknowns map); their findings become a dated
+   "production floors" section in the plan and concrete slices, after the owner has seen them.
+3. **Executive audience.** The demonstration target is a platform CEO; the pilot persona (Merchant-Ops /
+   Agentic-Commerce) is unchanged. Adds an **executive layer** slice to Wave 2: a one-page executive brief +
+   5-minute walk (what breaks today → what the crew catches → cost → governance → the one pre-registered pilot
+   number), figures derived never typed, on `/pilot` and as a document. RULES §4 unchanged and now
+   load-bearing in the room: built *for* a platform executive, never *from* or *with* the platform —
+   "shaped like the public integration docs, not from the platform", labeled on-screen.
+4. **Free-only becomes a hard gate again** for the product runtime and pilot: Vercel Hobby · GitHub Actions
+   free minutes · Groq free tier · Gemini AI Studio free tier (the owner's $10/mo Google Cloud credit via
+   Vertex = fallback only, as a credit not a charge) · Ollama local · Playwright · current OSS deps. Retired:
+   the $5 Gemini allowance and any paid tier. **Reverses** the 2026-06-25 "best-fit, cost-aware" relaxation
+   back to the 2026-06-11 free-first rule. Assumption surfaced to the owner: dev tooling (Cursor / Claude CLI /
+   Codex subscriptions) is unaffected, per CLAUDE.md's dev-tooling carve-out.
+
+**Process note:** the first Wave 1 launch (2026-10-09 12:12) died at 12:20 on all four lanes with the raw
+error *"Other Models usage limit reached. Switched to grok-4.6 after reaching Other Models usage limit."* —
+reported verbatim, no model switch accepted; relaunched 2026-10-12 11:43 on the same Claude 5.5 seats into
+the existing `wave1/*` worktrees. Cost-efficiency therefore also governs the orchestrator's own fan-out.
+
+**Amendment (owner word 2026-10-12 11:47):** *"use other models to develop as well if needed if they same output
+can be delivered in cheaper ways and also ensure the quality is same before hand or after."* — The 2026-10-09
+"Claude 5.5 family only" build rule is **relaxed**: any catalog model may build, provided same-output is
+**proved** either *before* (a calibration task scored against the reference model on the same brief) or *after*
+(diff-first review + three independent checks + full gates on the merged tree). Pattern-following work routes
+cheaper first; judgment work (detector design, LLM seats, honesty probes, public claims) stays on Opus/Sonnet 5.5
+until a calibration says otherwise. Each dispatch records model · tier reason · how equivalence was established ·
+result (task-log). Per-model cost on the owner's plan is UNVERIFIED until measured; Codex remains review/rescue
+unless the owner widens it. Lanes already in flight are not re-seated.
+*Owner, 11:47: "Deeper nuances should also be considered."* — Equivalence is judged beyond gates-green: edge-case
+correctness · the judgment calls a seat skipped (stop conditions, mark-not-fake, register nuance) · §4 at sentence
+level · maintainability (why-comments, mutation records) · security posture (egress, injection handling) · total
+cost per slice including fix-return loops. The same depth binds the floors: a doc is not governance, an ownerless
+loop is not feedback, bundled-data accuracy is not accuracy.
+*Owner, 11:48: "privacy, compliances, safety, legal, risk all to be considered."* — Added to the floors with
+concrete carriers: **privacy** (data-classification sheet · tested ingest rule dropping customer fields · local
+deletable ledger · data-handling statement · egress teeth) · **compliance** (NYC §20-563.3 pack as exhibit · FTC
+status dated never predicted · ledger as recordkeeping · governance doc mappable to NIST AI RMF / ISO 42001
+without claiming certification) · **safety** (tiers 0–3; Tier-3 tested unreachable; injection tripwire; DEFER;
+signed counter-decision, never edit) · **legal** (platform names as nominative references to public docs only —
+no logos, no implied endorsement/access/partnership; license inventory; synthetic contacts; no scraped data) ·
+**risk** (model-risk register + project risk register: owner · trigger · mitigation · retiring evidence).
+Staffing: a read-only security-specialist threat-model + privacy/legal review runs on the merged Wave 1 tree
+after the two discovery seats return (reviews artifacts, not intentions; no duplicate reads).
+*Owner, 11:49: "This is only for US region only."* — Reaffirms plan § 2. Applied to the new floors: privacy /
+compliance / legal are scoped to US frameworks only (state consumer-privacy law where the platform is based,
+FTC, NYC DCWP); no GDPR/UK language in any document; SF's 15 % cap remains a registered follow-on, out of scope.
+**Blindspot pass returned 11:49 → `docs/research/blindspot-pass-2026-10-12.md`.** Four feasibility claims
+verified by the orchestrator in code: the Reviewer seat is `approve | escalate` only (plan § 5's "route" is an
+unexamined capability wearing an earned label) · the live crew is hard-wired to one catalog path · the roster is
+a closed four-name union under a 20-case lock · no orders model exists for the Impact seat. **Decided (lead):**
+Wave 2 does not open until a **pre-build gap sheet** exists — one page each: Reviewer interface diff and which
+labels survive · Root-cause ground-truth source + minimum N (or drop the seat for the pilot) · real-data-leg data
+path (replay / Tier D only / neither — a sub-processor decision) · orders-fixture spec · crew file-ownership map
+(`crew-live.ts`, `crew/types.ts`, the composition lock). **Recommended to the owner:** move one of the five S5
+validation conversations before Wave 2 (interview guide first; a platform/sync-vendor intake veteran). Wave 1
+lanes are unaffected: S1-engine's contracts already fix the bundled tally and bar golden drift.
+**Adherence audit returned 11:51 → `docs/research/guidelines-adherence-2026-10-12.md`.** Verdict: engine and
+eval discipline above the guideline; gaps are plan-level. Code claims verified by the orchestrator (`budget.ts`
+header, `slack.ts:53`, `pricing.ts` throw, `ci.yml`, `package.json:60`). **Decided (lead):** gaps 2–10 are
+folded into the pre-build gap sheet and the Wave 2 packets (ingest allow-list + planted-field test → S3;
+root-cause input contract, post-call overflow stop + cumulative ledger, Groq $0 rows + RPD/TPD counters, n-per-class
++ leakage test, `prevHash` chain + `signers.json` → S2; NFKC + multilingual/Base64 fixtures → S3; NIST crosswalk
++ ISO non-claim → S4-docs; CI `npm audit`/SBOM + dependency prune → NEW tiny slice; provider canary → S5).
+**OPEN — OWNER DECISION D-7 (blocks S3 adapters and the pilot proposal):** plan § 6's pilot Phase 2 ("two weeks
+on the platform's own exports") contradicts RULES §4 ("a simulation on dummy data — always") and the hard-coded
+SIMULATED banner. Options: (a) **pilot stays synthetic-only** — Phase 2 becomes "the platform runs the tool on
+its own exports inside its own environment with its own banner"; we never touch real data (RULES §4 unchanged,
+cleanest for a CEO room); (b) RULES §4 amended for a customer-supplied mode with an `inputProvenance` flag
+selecting the banner and C10 probes for both modes (constitution change; owner word + Codex cross-check);
+(c) drop Phase 2. Lead recommendation: **(a)**. Not applied until the owner says.
+*Owner, 11:58: "go ahead complete step by step, i am handing over to you."* — **Handover grant.** Reading applied:
+the lead decides and executes the plan including open decisions, under RULES; commits/pushes of gated clean
+slices are covered (the deploy gate is closed, so a push changes nothing a stranger sees); the production deploy
+is put to the owner as one yes/no at wave close. **D-7 → (a) APPLIED under the grant:** the pilot is synthetic
+on our side, always; Phase 2 = the platform runs the tool on its own exports inside its own environment, under
+its own provenance label; this project never holds, receives or renders real platform data. RULES §4 unchanged.
+Reversible by owner word only.
+*Owner, 12:00: "also redesign the websiter from end to end. simple elegant premium walkthrough navigation it should
+be as a user experience."* — **Site redesign reopened by owner word** (the DESIGN.md mechanism): layout · navigation ·
+sections · motion · page structure, every route incl. the new `/pilot`. **Kept unless the owner says otherwise:**
+Onest + JetBrains Mono (data) · ultramarine/lamp palette · two schemes · desktop/tablet · production register ·
+no numbered-chapter chrome · run control on screen one (fold contract) · RULES §4. **Target:** one guided path a
+platform executive follows in five minutes (story → inputs/scenario → verdict → why → cost → governance →
+artifacts → proof) with a persistent progress rail instead of a destination nav; depth one click below each step;
+fewer surfaces, more whitespace. **Method:** design-first — rendered, fold-verified HTML mockup under `mockups/`
+(session-43 precedent) shown to the owner before any production CSS moves; the port is a Wave 2 lane after the
+scenario picker, `/pilot` and the executive brief exist, so it carries real content. Mockup lane dispatched 12:0x
+(Opus 5.5 — taste-bearing work).
+*Owner, 12:03: "It should have highest pixel quality."* — Acceptance bar for the redesign, measurable: all UI
+assets vector (inline SVG; no raster UI) · hairlines 1 physical px at DPR 2/3, rest-state transforms snapped to
+device pixels · Onest with `font-synthesis: none`, kerning, `tabular-nums` on every figure, weights verified by
+`getComputedStyle` · zero layout shift (CLS 0; motion on transform/opacity only; fixed aspect boxes) · contrast
+re-verified both schemes; light/dark pixel-diff changes color only, never geometry · reviewed by the lead in
+the IDE browser at 1280×900 and 1920×1080, DPR 2, before the owner sees it; the port lane pins DPR-2 border
+widths and CLS in e2e. Applies at mockup review and binds the port packet.
+**Redesign mockup reviewed 12:1x → ADOPTED with port conditions.** `mockups/walkthrough-guided-2026-10-12.html`
+(+ `.md` notes; renders in `mockups/renders/`). Measured by the lead in Chromium at DPR 2 (the lane's own fold
+number was an estimate and was not accepted): 1280×900 zones 583 / run 762 vs the 900 contract (shipped 581 /
+646) · 768 run 882 · 1920 holds · geometry identical light/dark · rail in words only · 0 page errors. Decisions
+under the grant: eight steps with FEES folded into scenario 7 · left progress rail, no destination nav, with
+`/docs` `/report` `/fees` `/proof` reachable from steps + footer and `canonical.spec.ts` pins moved with reasons ·
+seven scenarios runnable after Wave 1, `injected-artifact` labeled "arrives with the next build", default
+`modifier-drift`. **Port conditions (pixel bar 12:03):** `font-synthesis: none` · hairlines 1 physical px at DPR 2
+· reveals settle before programmatic scroll (a transient smear was visible in the dark fold mid-scroll) · `id` on
+the /docs "What is real" section · C10 probes must not over-match "partner" (= integration partner). DESIGN.md
+"six stations" row is superseded by owner word 2026-10-12; DESIGN.md itself is rewritten in the port slice.
+Port = Wave 2 lane after scenario picker + `/pilot` + exec brief exist. Instrument note: the IDE browser returned
+chrome-error for every localhost form this session (background servers die with the shell call); Playwright via
+`PLAYWRIGHT_BROWSERS_PATH=~/Library/Caches/ms-playwright` on `file://` is the working in-seat render path.
+**Wave 1 stall found and fixed (13:42).** All four build lanes had been stalled since ~11:50, not working: the
+`git worktree`s sat OUTSIDE the workspace, so the Write tool refused and every shell write needed an approval card
+no background agent can obtain after the orchestrator's turn ends; the `nohup` Codex job died with its shell call
+at 12:06 (echoed prompt only — the same signature as sessions 34/36/38). Fix: worktrees moved INSIDE the workspace
+(`.worktrees/<lane>`, excluded via `.git/info/exclude`, work preserved — W1b had its eight stubs + the C10
+`pilotDocs` extension; S1-pins its pins test + the schema bytes), the four agents RESUMED in place (context kept;
+cheaper than relaunch), build-offline centralised to the orchestrator (one export + C10 on the merged tree),
+and Codex re-run through the harness's background path. Lesson for the record: in this seat, background work
+survives only as a harness task or a subagent; worktrees must live under the workspace root.
+
+## 2026-10-14 — Codex cross-check applied · Wave 1 lanes exhausted the seat a second time · review moves in-seat
+
+**Codex cross-check (owed since 2026-10-09) returned 2026-10-12 17:56 → `docs/reviews/codex-2026-10-12-plan-xcheck.md`.**
+Verdict PROCEED WITH CHANGES. Four code defects found by offline probe and confirmed by the lead: duplicate variation
+ids silently overwrite in the CLI/MCP path (a $10/$20 duplicate against a $20 feed returned PASS; the browser path
+already rejects) · timestamps compared as strings (a +02:00 expired instant passes; invalid dates pass) · SDK retry
+amplification (no `maxRetries`; 3 requests per call) · replay keyed on `caseId` only (a changed case replays a
+stale answer). **Decided (lead):** these four become **S1.5 — correctness**, the first Wave 2 lane, before any
+new capability. Gap sheet amended: **Page 1** route by explicit ownership rules, unresolved → human; the Reviewer's
+label does NOT transfer to the expanded configuration — it renders "requalification pending" until fresh cases
+(prompt bytes + model are what the existing locks pin, not vocabulary). **Page 2** evidence validity and abstention
+("unknown") are GATING, not secondary; Wilson lower bound at 8/10 ≈ 0.49 → keep the smoke-scale label; the live
+LLM root-cause exam is CUT from this pilot (deterministic explanation + visible DEFER ship). **Page 3 / D-7 →
+(a′):** the pilot is synthetic THROUGHOUT; no operator-supplied mode and no real-export phase in this pilot;
+customer deployment is a separate future decision with its own data boundary and security assessment — the
+`inputProvenance` flag is dropped from S3. **Page 4** count each order once; explicit refund allocation; observed
+refunds vs prospective exposure as separate fields; multi-line/multi-finding orders in the first fixture.
+**Page 5** replay bound to a full scenario manifest (input · prompt · model · rule · roster versions); `prevHash`
+chain gets a trusted checkpoint. **Honesty:** C10's eight patterns accept "Trusted by DoorDash", "DoorDash-approved"
+and "We saved merchants $108,000" — new probes for endorsement/approval/saved-$ patterns land in S1.5, and a human
+claim-to-evidence review is a named step before any pilot-kit copy ships; plan § 7 phrases ("caught … before it
+becomes a refund", "a human signs the fix", "the design the platforms' own risk teams will accept", "replaced by
+the platform's export on day one") are rewritten as proposals/hypotheses in the exec-layer slice. **Hosting:**
+Vercel Hobby fair-use restricts to personal/non-commercial — eligibility for a sales-oriented demo UNVERIFIED;
+the executive demo also runs from the static export locally, and GitHub Pages (free, project sites) is the named
+fallback host. **Order of work** adopted: conversation (owner) · Wave 1 accept · S1.5 · routing/explanation/impact
+· signer + replay + ledger · quota controls before any arming · exec walkthrough + redesign port.
+
+**Wave 1 lanes died a second time** (13:57 on 2026-10-12, found 2026-10-14 15:41) — all four with the raw error
+*"Other Models usage limit reached. Switched to grok-4.6 after reaching Other Models usage limit."* No switch
+accepted. In the 15 minutes they ran they left: S1-pins (pins + conformance + PROVENANCE/README) · S1-engine
+(474 lines across the listings pack incl. `modifiers.ts`; no scenarios) · W1b (13,335 words, all eight docs) ·
+W1c (generator + test + folders). No packets. **The Claude 5.5 subagent pool on this seat is not a dependable
+build path.** Review and completion move in-seat (gates per worktree first); the Claude Code CLI seat (separate
+subscription, plan § 13) remains the designed build path when the owner is present to paste.

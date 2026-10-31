@@ -97,7 +97,7 @@ Why two new seats and not more: root-cause is the question an ops person actuall
 - Audit trail: → add the run ledger (inputs hashed · rule versions · model versions · recommendations · signer · timestamp), exportable as JSON-lines.
 - Operational: manual trigger only, no scheduler, no standing process. → add: incident/rollback note (a wrong recommendation is withdrawn by a signed counter-decision, never edited) · escalation path · RACI across merchant-ops / integrations / compliance.
 
-**Pilot governance.** Scope document (use case, scenarios, teams, in/out, four weeks on test data then two on the platform's own exports inside their environment) · pre-registered success metrics written before the pilot runs · data-request spec · security packet (zero-egress proof, dependency list, Apache-2.0, no telemetry) · weekly readout · exit criteria for "expand" and "stop" · honesty carried into the room (synthetic labeled; platform-shaped inputs labeled "shaped like the public integration docs, not from the platform"; no affiliation claim).
+**Pilot governance.** Scope document (use case, scenarios, teams, in/out, four weeks on the scenario library, then two in which the platform runs the tool on its own exports **inside its own environment, under its own provenance label — this project never holds, receives or renders real platform data; D-7(a), 2026-10-12**) · pre-registered success metrics written before the pilot runs · data-request spec · security packet (zero-egress proof, dependency list, Apache-2.0, no telemetry) · weekly readout · exit criteria for "expand" and "stop" · honesty carried into the room (synthetic labeled; platform-shaped inputs labeled "shaped like the public integration docs, not from the platform"; no affiliation claim).
 
 ## 7 · The business delivery point, effect and after
 
@@ -205,6 +205,7 @@ Effort, honest: S1–S4 ≈ three weeks of focused CLI-seat work with orchestrat
 - **D-3** Platform-shaped synthetic inputs under the "shaped like, not from" label. *Recommended; the alternative is ACP/UCP-only inputs, which weakens the pilot story.*
 - **D-4** Open auto-deploy on main. *Recommended — production has drifted behind main four times under the window pattern — but this REVERSES the owner's 2026-07-28 word ("push and deploy must be two acts, not one", pinned in `header-policy.test.ts` with its reasoning), so it is not applied under the grant; it waits for the owner's own word. Until then S0 deploys through the one-push window.*
 - **D-5** Order of build: S0 → S1 → S2 → S3 → S4 → S5 → S6 as written, one dispatch per slice. *Recommended.*
+- **D-7** (added 2026-10-12, adherence audit gap 1) Pilot Phase 2 vs RULES §4. **Applied (a) under the 2026-10-12 handover grant:** synthetic-only on our side; the platform runs the tool on its own data in its own environment; RULES §4 unchanged. (b) a customer-supplied mode behind an `inputProvenance` flag would be a constitutional amendment — owner word + Codex cross-check; not taken.
 - **D-6** The local tier (D) model: `gpt-oss:20b` if ≥ 24 GB RAM, else `qwen3:8b` — owner runs `sysctl -n hw.memsize` and says which.
 
 ---

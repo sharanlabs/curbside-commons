@@ -17,5 +17,8 @@ export default defineConfig([
     "reference/**",
     "evals/rag/corpus-snapshot/**",
     "screenshots/**",
+    // Lane worktrees (git worktree add .worktrees/<lane>) are full checkouts
+    // that lint on their own; linting them from main double-counts every file.
+    ".worktrees/**",
   ]),
 ]);
