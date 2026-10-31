@@ -166,3 +166,11 @@ export {
   parseMappingSheet,
   runListingsVerificationWithMapping,
 } from "./mapping-sheet.ts";
+export type { PartnerOpsRecord, PartnerScorecard, ScorecardRow, ScorecardState } from "./scorecard.ts";
+export {
+  PartnerOpsRecordError,
+  SCORECARD_CARRIER,
+  SCORECARD_CRITERIA_READ,
+  scorePartner,
+  serializeScorecard,
+} from "./scorecard.ts";
