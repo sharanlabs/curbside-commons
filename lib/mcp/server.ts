@@ -2,8 +2,9 @@
  * A1 MCP SERVER — the stdio Model Context Protocol server exposing the A0
  * tool registry's tools — six engine tools + the E2 lookup_reference lane (plan `docs/plan-agentic-extension.md` §3–§6,
  * §5 row A1) via the official TypeScript SDK
- * (`@modelcontextprotocol/sdk@1.29.0`, exact-pinned in `package.json`, MIT,
- * freshness-checked live 2026-07-07).
+ * (`@modelcontextprotocol/sdk@1.32.2`, exact-pinned in `package.json`, MIT,
+ * freshness-checked live 2026-07-07; bumped 1.29.0 → 1.32.2 on 2026-10-31 for the
+ * advisories recomputed in docs/research/external-references-2026-10-31.md § MCP SDK note).
  *
  * This file imports ONLY: the MCP SDK, node builtins, and
  * `lib/tools/registry.ts` (+ its re-exported types/errors) — NEVER
@@ -106,8 +107,8 @@ const TOOL_ORDER: readonly string[] = Object.freeze([...TOOLS.keys()].filter((na
  * SPEC CURRENCY (re-verified live 2026-07-26): `ToolAnnotations` entered the
  * spec at revision 2025-06-18, which this comment used to cite as though it were
  * current. It is not — the current MCP revision is **2025-11-25**, and the
- * pinned SDK (`@modelcontextprotocol/sdk` 1.29.0, confirmed latest on npm the
- * same day) already advertises it as `LATEST_PROTOCOL_VERSION`, negotiating
+ * pinned SDK (`@modelcontextprotocol/sdk` 1.29.0 at the time, confirmed latest on npm the
+ * same day; 1.32.2 since 2026-10-31, same constant) already advertises it as `LATEST_PROTOCOL_VERSION`, negotiating
  * downward through 2025-06-18 / 2025-03-26 / 2024-11-05 / 2024-10-07. So the
  * CODE was current and only the citation was stale — the annotations contract
  * these hints implement is unchanged across both revisions. Dates are stated

@@ -69,7 +69,7 @@ Runtime dependency licenses, read from the installed packages (2026-10-31):
 | --- | --- | --- |
 | @ai-sdk/google | 2.0.83 | Apache-2.0 |
 | @ai-sdk/groq | 2.0.45 | Apache-2.0 |
-| @modelcontextprotocol/sdk | 1.29.0 | MIT |
+| @modelcontextprotocol/sdk | 1.32.2 | MIT |
 | @number-flow/react | 0.6.1 | MIT |
 | ai | 5.0.217 | Apache-2.0 |
 | ajv | 8.20.0 | MIT |
