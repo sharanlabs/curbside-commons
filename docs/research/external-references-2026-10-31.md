@@ -78,7 +78,7 @@ Order Errors CSV headers (not published anywhere reachable) · DoorDash price un
 - DoorDash is pull-based (`MENU_PULL`), Uber is push-with-overwrite (PUT): the adapters treat both as document shapes, but scenario 3 (sync outage) behaves differently under each.
 
 ## Orchestrator dispositions (01:4x)
-- **MCP SDK 1.29.0 → 1.32.2:** same 1.x line, one advisory plausibly reaching stdio (-46jr). Attempted on `main` tonight if the registry is reachable from the sandbox; otherwise the exact command goes on the owner card. `lib/mcp/server.ts:90` comment corrected with the bump.
+- **MCP SDK 1.29.0 → 1.32.2:** same 1.x line, one advisory plausibly reaching stdio (-46jr). Attempted on `main` tonight if the registry is reachable from the sandbox; otherwise the exact command goes on the owner card. `lib/mcp/server.ts:90` comment corrected with the bump. **Outcome (session 51, 09:13):** landed from the seat with the npm cache redirected to the session scratch dir — the overnight failure was the cache path, not the registry; `e692e95`; tsc 0 · eslint 0 · build-offline 0 · vitest 2413 + 8; `LATEST_PROTOCOL_VERSION` unchanged at 2025-11-25; the two `server.ts` comments and the `SECURITY.md` row updated.
 - **Plan § 16 "integer cents":** reworded tonight to "integer price fields paired with dollar amounts in prose; cents inferred, not stated".
 - **Plan § 3 / § 16:** UCP PR #897 added as the food-schema watch trigger; menuconform note added to the competitor paragraph.
 - **S3 packet:** built from "Top 5" above when S3 dispatches (after S2-crew merges); the unofficial table stays internal.
