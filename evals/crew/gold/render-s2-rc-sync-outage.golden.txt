@@ -9,10 +9,10 @@ engine report consumed: sha256 b8a08ba6a2234d9f860bc1626a66aa4837f171ff5b6115aca
  4. ROOT-CAUSE · TOOL CALL [explain_drift] — explain_drift (deterministic baseline): sync-latency, citing 5 event(s)
  5. ROOT-CAUSE · DEFER — LLM root-cause seat: DEFER — not examined on any model; this run shows the deterministic baseline, never a model's guess
  6. IMPACT · SKIPPED [size_impact] — no orders data in this case — size_impact not called
- 7. EVIDENCE · ROUTE — route table (deterministic workflow) proposes partner → partner-ticket, slack — Row 2: the evidence names the integrator as owner, so it goes to the partner team with a partner ticket and a Slack digest.
+ 7. EVIDENCE · ROUTE — route table (deterministic workflow) proposes partner → partner-ticket, slack — Row 3: the evidence names the integrator as owner, so it goes to the partner team with a partner ticket and a Slack digest.
  8. REVIEWER · MODEL TURN — reviewer approved the recommendations
 
-route (deterministic workflow): partner → partner-ticket · slack — Row 2: the evidence names the integrator as owner, so it goes to the partner team with a partner ticket and a Slack digest.
+route (deterministic workflow): partner → partner-ticket · slack — Row 3: the evidence names the integrator as owner, so it goes to the partner team with a partner ticket and a Slack digest.
 root cause (deterministic baseline): sync-latency — cited events: #1 · #2 · #3 · #4 · #5 — All 10 finding(s) read as sync-latency: each row's copy is past its refresh and a sync is on record before it, so the copy missed a refresh.
 root-cause seat (LLM): DEFER — not examined on any model; never called in this run
 impact: no orders data in this case — no figures

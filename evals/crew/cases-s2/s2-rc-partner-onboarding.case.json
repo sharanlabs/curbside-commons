@@ -5,7 +5,7 @@
   "inputArtifact": {
     "path": "fixtures/scenarios/partner-onboarding/inputs/feed.json"
   },
-  "ask": "A new integration partner sent its first feed — score it against the merchant's record.",
+  "ask": "A new integration partner sent its first feed \u2014 score it against the merchant's record.",
   "allowedTools": [
     "check_feed",
     "explain_drift",
@@ -114,12 +114,9 @@
     }
   ],
   "expectedEngineReportHash": "cf3e432ecfee386096e0917ba0274e4956600f1fc176025215b5918323b3dd36",
-  "expectedRecommendationClass": "flag-violations",
-  "expectedFindingRefs": [
-    "item-007-v1#availability",
-    "item-009-v1#availability"
-  ],
-  "expectedGateState": "approve-recommendation",
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human",
   "s2": {
     "eventsPath": "fixtures/scenarios/partner-onboarding/inputs/events.jsonl",
     "asOf": "2026-07-03T00:00:00Z",

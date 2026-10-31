@@ -45,13 +45,13 @@ describe("route table — every row", () => {
     { name: "reviewer escalated → human-escalation", input: { reviewerDecision: "escalate" }, route: "human-escalation", artifacts: [], row: "Row 0" },
     { name: "an anomaly on record → human-escalation", input: { anomalies: 1 }, route: "human-escalation", artifacts: [], row: "Row 0" },
     { name: "fee pack → compliance {email, ledger}", input: { pack: "fees" }, route: "compliance", artifacts: ["email", "ledger"], row: "Row 1" },
-    { name: "partner-onboarding trigger → partner {partner-ticket, slack}", input: { triggerKind: "partner-onboarding" }, route: "partner", artifacts: ["partner-ticket", "slack"], row: "Row 2" },
-    { name: "integrator ownership on a sweep → partner", input: { ownership: "integrator" }, route: "partner", artifacts: ["partner-ticket", "slack"], row: "Row 2" },
-    { name: "unknown ownership → human-escalation", input: { ownership: "unknown" }, route: "human-escalation", artifacts: [], row: "Row 3" },
+    { name: "partner-onboarding trigger (owner established) → partner {partner-ticket, slack}", input: { triggerKind: "partner-onboarding", ownership: "integrator" }, route: "partner", artifacts: ["partner-ticket", "slack"], row: "Row 3" },
+    { name: "integrator ownership on a sweep → partner", input: { ownership: "integrator" }, route: "partner", artifacts: ["partner-ticket", "slack"], row: "Row 3" },
+    { name: "unknown ownership → human-escalation", input: { ownership: "unknown" }, route: "human-escalation", artifacts: [], row: "Row 2" },
     { name: "merchant ownership → merchant-ops {slack, email}", input: {}, route: "merchant-ops", artifacts: ["slack", "email"], row: "Row 4" },
     { name: "platform ownership → merchant-ops (no platform row exists)", input: { ownership: "platform" }, route: "merchant-ops", artifacts: ["slack", "email"], row: "Row 4" },
-    { name: "fees beat unknown ownership (row 1 before row 3)", input: { pack: "fees", ownership: "unknown" }, route: "compliance", artifacts: ["email", "ledger"], row: "Row 1" },
-    { name: "partner-onboarding beats unknown ownership (row 2 before row 3)", input: { triggerKind: "partner-onboarding", ownership: "unknown" }, route: "partner", artifacts: ["partner-ticket", "slack"], row: "Row 2" },
+    { name: "fees beat unknown ownership (row 1 before row 2)", input: { pack: "fees", ownership: "unknown" }, route: "compliance", artifacts: ["email", "ledger"], row: "Row 1" },
+    { name: "unknown ownership beats the partner-onboarding trigger (row 2 before row 3; Codex 2026-10-14 — unresolved responsibility goes to a person)", input: { triggerKind: "partner-onboarding", ownership: "unknown" }, route: "human-escalation", artifacts: [], row: "Row 2" },
   ];
   for (const r of rows) {
     it(r.name, () => {
@@ -113,10 +113,10 @@ describe("route table — exhaustive property: human-escalation dominates every 
       const expected =
         input.pack === "fees"
           ? "compliance"
-          : input.triggerKind === "partner-onboarding" || input.ownership === "integrator"
-            ? "partner"
-            : input.ownership === "unknown"
-              ? "human-escalation"
+          : input.ownership === "unknown"
+            ? "human-escalation"
+            : input.triggerKind === "partner-onboarding" || input.ownership === "integrator"
+              ? "partner"
               : "merchant-ops";
       expect(route(input).route, JSON.stringify(input)).toBe(expected);
     }
