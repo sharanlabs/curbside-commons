@@ -1023,6 +1023,77 @@
       }
     },
     {
+      "step": "tools/call",
+      "request": {
+        "name": "explain_drift",
+        "arguments": {
+          "findings": [
+            {
+              "id": "item-005-v1#availability",
+              "ruleId": "LST-AVAIL-STATE",
+              "category": "availability",
+              "referenceRowId": "item-005-v1"
+            }
+          ],
+          "events": [
+            {
+              "at": "2026-07-02T21:46:00Z",
+              "actor": "merchant",
+              "action": "86",
+              "target": "item-005-v1"
+            }
+          ],
+          "asOf": "2026-07-03T00:00:00Z"
+        }
+      },
+      "response": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"class\": \"merchant-edit\",\n  \"citedEvents\": [\n    0\n  ],\n  \"reason\": \"All 1 finding(s) read as merchant-edit: the latest event on each row is the merchant's own edit, made while the copy was inside its refresh window.\",\n  \"label\": \"deterministic baseline\"\n}\n"
+          }
+        ],
+        "structuredContent": {
+          "advisory": false,
+          "demoOnly": false,
+          "earnsLabel": null,
+          "exitCode": 0,
+          "ok": true,
+          "tool": "explain_drift"
+        }
+      }
+    },
+    {
+      "step": "tools/call",
+      "request": {
+        "name": "size_impact",
+        "arguments": {
+          "findings": [],
+          "orders": [],
+          "windowDays": 7,
+          "errorChargeShare": 0.5
+        }
+      },
+      "response": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"ordersAtRiskDistinct\": 0,\n  \"observedMenuRefundCents\": 0,\n  \"prospectiveExposureCents\": 0,\n  \"agentCancelExposureCents\": 0,\n  \"errorChargeExposureCents\": 0,\n  \"assumptions\": [\n    {\n      \"name\": \"windowDays\",\n      \"value\": 7\n    },\n    {\n      \"name\": \"errorChargeShare\",\n      \"value\": 0.5\n    },\n    {\n      \"name\": \"touchConvention\",\n      \"value\": \"variation-or-option-id\"\n    }\n  ],\n  \"label\": \"simulated\"\n}\n"
+          }
+        ],
+        "structuredContent": {
+          "advisory": false,
+          "demoOnly": false,
+          "earnsLabel": null,
+          "exitCode": 0,
+          "ok": true,
+          "tool": "size_impact"
+        }
+      }
+    },
+    {
       "step": "tools/call (invalid)",
       "request": {
         "name": "check_feed",

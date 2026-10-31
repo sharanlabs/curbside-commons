@@ -28,7 +28,7 @@ npx vitest run evals/rag         # E2: corpus-pin hard-block gate + gold composi
 npx vitest run evals/mcp         # THE showcase command: spawns the REAL server as a child process — conformance + differential + invalid-input legs
 ```
 (`npm run mcp` starts the stdio server itself for wiring into an MCP client like Claude Desktop — it is a server, not a demo; it waits silently for a client by design.)
-Official `@modelcontextprotocol/sdk` (exact-pinned), stdio-only (an SDK-internal import walk proves no HTTP transport is reachable). The committed, byte-frozen session transcript — `evals/mcp/gold/mcp-session.transcript.json` — is a REAL recorded client session: initialize → tools/list → every tool except the two crew tools advertised 2026-10-31 (the conformance suite calls those over a real spawned server) → invalid calls with typed errors.
+Official `@modelcontextprotocol/sdk` (exact-pinned), stdio-only (an SDK-internal import walk proves no HTTP transport is reachable). The committed, byte-frozen session transcript — `evals/mcp/gold/mcp-session.transcript.json` — is a REAL recorded client session: initialize → tools/list → every tool → invalid calls with typed errors.
 
 ## 3 · The crew orchestration harness (A2) — containment before capability
 
