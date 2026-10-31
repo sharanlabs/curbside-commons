@@ -346,6 +346,16 @@ export default function DocsPage() {
                   <td className="t-role">walks the shipped example</td>
                   <td><span className="dtag">DEMO-ONLY WALKTHROUGH — never an audit result</span></td>
                 </tr>
+                <tr>
+                  <td className="t-name">explain_drift</td>
+                  <td className="t-role">engine findings against the event evidence · a drift class or abstain</td>
+                  <td><span className="note-plain">deterministic baseline — an explanation, never a verdict</span></td>
+                </tr>
+                <tr>
+                  <td className="t-name">size_impact</td>
+                  <td className="t-role">findings against a seeded orders fixture · exposure arithmetic</td>
+                  <td><span className="dtag">SIMULATED FIGURES — the label travels with every number</span></td>
+                </tr>
               </tbody>
             </table>
           </Reveal>

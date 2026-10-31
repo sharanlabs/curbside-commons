@@ -469,9 +469,9 @@ test("docs: the architecture figure, the iron rule, the MCP tool table, and the 
     "Agents recommend; the engine decides; a human owns anything irreversible.",
   );
 
-  // The seven MCP tools, by name.
+  // Every advertised MCP tool, by name (the two S2 crew tools joined tools/list at W3-a CP4, 2026-10-31).
   const toolNames = page.locator(".tools .t-name");
-  await expect(toolNames).toHaveCount(7);
+  await expect(toolNames).toHaveCount(9);
   for (const tool of [
     "check_feed",
     "check_conformance",
@@ -480,6 +480,8 @@ test("docs: the architecture figure, the iron rule, the MCP tool table, and the 
     "get_rule",
     "lookup_reference",
     "run_demo",
+    "explain_drift",
+    "size_impact",
   ]) {
     await expect(toolNames.filter({ hasText: tool })).toHaveCount(1);
   }
