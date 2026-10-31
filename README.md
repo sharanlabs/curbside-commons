@@ -57,7 +57,7 @@ A human shrugs at a stale menu. **An AI agent doesn't shrug — it places the or
 
 ### It is an agentic system that deliberately does not act
 
-The referee is itself built as one: a **four-role crew** (intake · audit · evidence · reviewer) over a
+The referee is itself built as one: a **six-seat crew** (intake · audit · evidence · reviewer, plus the S2 root-cause and impact seats) over a
 **deterministic MCP tool surface**, with artifact content quarantined as untrusted, a deterministic injection
 tripwire that forces escalation before any model turn, and the engine's report hash pinned precisely
 *because* a model touched the run.
@@ -102,7 +102,7 @@ That sequence is the project's character: **the bar never moves after the run.**
 
 - **Truth, conformance, and fee-audit verdicts:** deterministic code. No LLM on any verdict path, ever.
 - **Advisory line-item classifier (calibrated):** the one LLM inside the fee-audit lane — flags fuzzy fee-relabeling *leads* that never gate a verdict, fed a leak-free input contract (no answer keys), measured against pre-registered floors (status above). Runs on the Groq free tier (an open-weight model); a self-hosted alternative (Ollama / llama.cpp with any open-weight model) works through the same seam.
-- **Agent extension (recommend-only):** a four-role crew over the tool registry; the two model-directed roles cleared live-run floors (status above). The engine still decides; a human still approves.
+- **Agent extension (recommend-only):** a six-seat crew over the tool registry; of the original four roles, the two model-directed ones cleared live-run floors (status above); the two S2 seats (root-cause · impact) run deterministic baselines in replay. The engine still decides; a human still approves.
 - **MCP tool surface (deterministic):** the MCP tools expose the same deterministic engine over stdio — no LLM sits on any tool path, and an import-walk eval proves the server path is $0 and network-free (status above).
 - **Legacy activation module (archived, replay-only):** the repo's first life used Gemini's free tier for bounded drafting; its public surfaces replay a **recorded** fixture — no live calls. A self-hosted open-weight model is the free alternative there too.
 

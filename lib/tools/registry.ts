@@ -2,10 +2,11 @@
  * A0 TOOL REGISTRY — the ONE seam over the gated engine's existing entry
  * points (plan `docs/plan-agentic-extension.md` §3–§6, §5 row A0).
  *
- * Seven typed JSON-in/JSON-out tools: six wrapping UNCHANGED engine entry
+ * Typed JSON-in/JSON-out tools (a count the tests derive, never this comment): six wrapping UNCHANGED engine entry
  * points (`lib/packs/listings/cli.ts`, `lib/packs/fees/*`) plus the E2
  * advisory retrieval lane (`lookup_reference`, added 2026-07-12 post-scoring
- * per its pre-registration §6) — each with a committed input/output JSON
+ * per its pre-registration §6) and, since S2-crew (2026-10-31), the crew's deterministic
+ * `explain_drift` and `size_impact` — each with a committed input/output JSON
  * Schema and a named canonical serializer. `callTool` is
  * the ONE call surface every later consumer (A1 MCP server, A2 agent crew,
  * A4 n8n lane) is meant to use: it validates `params` against the tool's
