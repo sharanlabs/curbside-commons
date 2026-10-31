@@ -1,6 +1,6 @@
 # Pilot kit — the documents a platform team is handed
 
-**Type:** how-to + index · **Written:** 2026-10-12, Wave 1 / S4-docs · **Contract:** `docs/plan-menu-integrity-crew-2026-10-09.md` §§ 6, 7, 17 as amended by `docs/plan-wave2-gap-sheet-2026-10-12.md` and decision D-7(a). `RULES.md` wins.
+**Type:** how-to + index · **Written:** 2026-10-12, Wave 1 / S4-docs · **Contract:** `docs/plan-menu-integrity-crew-2026-10-09.md` §§ 6, 7, 17 as amended by `docs/plan-wave2-gap-sheet-2026-10-12.md` and decision D-7(a). `RULES.md` wins. · **Corrected:** 2026-10-31, Wave 2 / exec-layer (status rows refreshed after Wave 1 merged; the executive brief, the five-minute walk and `/pilot` added).
 
 ## The answer first
 
@@ -21,7 +21,8 @@ This kit describes a **six-week pilot on the labeled scenario library** (replay 
 
 | Reader | Start with | Then |
 | --- | --- | --- |
-| **Executive sponsor / procurement** | [`pilot-proposal.md`](pilot-proposal.md) | [`success-metrics.md`](success-metrics.md) |
+| **Executive sponsor** | [`executive-brief.md`](executive-brief.md) and the site's `/pilot` page | [`five-minute-walk.md`](five-minute-walk.md) · [`pilot-proposal.md`](pilot-proposal.md) |
+| **Procurement** | [`pilot-proposal.md`](pilot-proposal.md) | [`success-metrics.md`](success-metrics.md) |
 | **Risk, security, privacy** | [`security-one-pager.md`](security-one-pager.md) | [`../governance-model.md`](../governance-model.md) · [`../model-risk-register.md`](../model-risk-register.md) · [`data-request-spec.md`](data-request-spec.md) |
 | **Operations (merchant-ops, integrations)** | [`demo-script-10min.md`](demo-script-10min.md) | [`data-request-spec.md`](data-request-spec.md) · [`pilot-proposal.md`](pilot-proposal.md) |
 | **Compliance / legal** | [`../governance-model.md`](../governance-model.md) | [`security-one-pager.md`](security-one-pager.md) |
@@ -30,6 +31,9 @@ This kit describes a **six-week pilot on the labeled scenario library** (replay 
 
 | File | What it is | Type |
 | --- | --- | --- |
+| [`executive-brief.md`](executive-brief.md) | One page for an executive sponsor: what breaks today, what the crew is designed to do, cost, governance, the one number measured later | explanation |
+| [`five-minute-walk.md`](five-minute-walk.md) | A five-minute walk of the live site for an executive, with the honest line for each beat | how-to |
+| `/pilot` (a page on the site, outside the navigation) | The delivery point, the cost model with every figure derived in `lib/landing/pilot-figures.ts`, governance tiers, the scenario library's state | reference |
 | [`pilot-proposal.md`](pilot-proposal.md) | Use case, pain with dated sources, scope, phases, cost-benefit model (illustrative), exit criteria | explanation |
 | [`data-request-spec.md`](data-request-spec.md) | What a platform's operator prepares for its own run: fields, classification, what is never needed, retention | reference |
 | [`security-one-pager.md`](security-one-pager.md) | The three-mode data path, sub-processors, controls and the evidence for each, known gaps | reference |
@@ -44,9 +48,13 @@ This kit describes a **six-week pilot on the labeled scenario library** (replay 
 | --- | --- |
 | Live site: the six-station walkthrough, the bundled pair, the spreadsheet template, `/docs#test-it` | **Exists** (production serves slice S3, verified 2026-10-09) |
 | Engine, receipts, Slack and email builders (built, not sent), fee audit, intake and reviewer seats, signed-approval simulator | **Exists** |
-| Scenario library, scenario picker, `/pilot` page | ARRIVES S1–S4 |
-| Explain-drift, impact, route table, ledger | ARRIVES S2 |
-| Platform-shaped adapters, id-mapping sheet, input-provenance label, ingest allow-list | ARRIVES S3 |
+| Scenario library: five folders (synthetic inputs and the engine's report) | **Exists** (Wave 1); scenarios 2 and 6 ARRIVE S1.5 (in progress); scenario 8 ARRIVES S3 |
+| Modifier checks in the listings engine (option price, missing option, hours window) | **Exists** (S1) |
+| `/pilot` page | In the build from Wave 2; reaches the live site at the next deploy (deferred by owner word, 2026-10-31) |
+| Scenario picker on the site | ARRIVES S4 |
+| Impact arithmetic (`lib/impact`), run-ledger library (`lib/ledger`) | **MERGED on `main` 2026-10-31**; not yet wired into a crew run |
+| Explain-drift, route table, and a crew run that sizes, routes and records | ARRIVES S2 (in progress) |
+| Platform-shaped adapters, id-mapping sheet, ingest allow-list | ARRIVES S3 |
 | Partner-ticket builder | ARRIVES S4 |
 | Root-cause LLM exam, provider canary, local-model smoke run | ARRIVES S5 |
 
