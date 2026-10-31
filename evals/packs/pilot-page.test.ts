@@ -40,11 +40,12 @@ import {
  * MUTATIONS (applied to app/pilot/page.tsx, out/ rebuilt with
  * build-offline, run, restored with `git checkout -- app/pilot/page.tsx`,
  * rebuilt, green — recorded in docs/returns/2026-10-31-exec-layer.md):
- *  P-a  a typed figure planted in the cost prose ("about 900,000 orders") →
- *       RED: NO TYPED DIGIT.
- *  P-b  one data-pilot cell rendered as `{formatValue(d.value + 1, d.unit)}`
- *       → RED: FIGURES.
- *  P-c  "Nothing acts." removed from the note → RED: §4 carriers.
+ *  P-a  a typed figure planted in the cost prose ("multiplies about 900,000
+ *       orders") → 1 RED: NO TYPED DIGIT.
+ *  P-b  the derived cells rendered as `{formatValue(d.value + 1, d.unit)}` →
+ *       2 RED: FIGURES (field equality; the exposure cell).
+ *  P-c  "<b>Nothing acts.</b>" removed from the note → 1 RED: §4 "nothing acts".
+ *  All three measured 2026-10-31 01:48–01:50 EDT; restored + rebuilt → 18 of 18.
  */
 
 const ROOT = process.cwd();
