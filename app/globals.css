@@ -5190,6 +5190,197 @@ h1.p2-h1 {
   }
 }
 
+/* ============================================================================
+   PILOT LAYER (Wave 2 exec-layer, 2026-10-31) — /pilot, the executive page.
+   It wears the docs reference layer (`<main class="docs-main pilot-main">`),
+   so the paper ground, the hairline sections, the type ladder and BOTH
+   schemes come from `.docs-main` and its element-scoped dark branch; nothing
+   below declares a token or a literal colour. Additions only: the "what this
+   is" note, the tables (prose cells, mono figure cells — figures are DATA),
+   the formula, and the technical line that sits beside each plain paragraph.
+   ========================================================================== */
+.pilot-note {
+  margin-top: 28px;
+  border: 1px solid var(--docs-rule-2);
+  border-radius: 13px;
+  background: var(--surface);
+  padding: 22px 26px;
+  max-width: 78ch;
+}
+.pilot-note .k {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--faint);
+}
+.pilot-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+.pilot-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--body);
+  max-width: 72ch;
+  text-wrap: pretty;
+}
+.pilot-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--graphite);
+}
+.pilot-list b,
+.pilot-main .prose b {
+  color: var(--ink);
+  font-weight: 590;
+}
+/* the technical line beside each plain paragraph: prose, so it is set in the
+   sans (DESIGN.md: mono is for data, never for prose); only its inline code
+   (paths, file names) takes the mono voice */
+.pilot-tech {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 76ch;
+  text-wrap: pretty;
+}
+.pilot-tech code,
+.pilot-table code,
+.pilot-m1 code {
+  font-family: var(--ff-mono);
+  font-size: 12.5px;
+  color: var(--ink);
+}
+.pilot-formula {
+  margin-top: 22px;
+  border-left: 2px solid var(--docs-rule-3);
+  padding: 4px 0 4px 18px;
+  max-width: 76ch;
+}
+.pilot-formula p {
+  font-family: var(--ff-mono);
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.pilot-scroll {
+  margin-top: 22px;
+  overflow-x: auto;
+}
+.pilot-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.pilot-table th[scope="col"] {
+  text-align: left;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding: 0 14px 11px 0;
+  border-bottom: 1px solid var(--docs-rule-2);
+  white-space: nowrap;
+}
+.pilot-table th[scope="row"] {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 590;
+  color: var(--ink);
+}
+.pilot-table th[scope="row"],
+.pilot-table td {
+  padding: 13px 14px 13px 0;
+  border-bottom: 1px solid var(--docs-rule);
+  vertical-align: top;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--body);
+  text-wrap: pretty;
+}
+.pilot-table tr:last-child th,
+.pilot-table tr:last-child td {
+  border-bottom: 0;
+}
+.pilot-table .pilot-fig {
+  font-family: var(--ff-mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.pilot-state {
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  color: var(--graphite);
+}
+.pilot-table .pilot-state {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--graphite);
+}
+.pilot-how {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+.pilot-table .pilot-how {
+  font-size: 12px;
+  color: var(--muted);
+}
+.pilot-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 4vw, 40px);
+  align-items: start;
+}
+.pilot-m1 {
+  margin-top: 18px;
+  border: 1px solid var(--docs-rule-2);
+  border-radius: 13px;
+  background: var(--surface);
+  padding: 22px 26px;
+}
+.pilot-m1-name {
+  font-size: clamp(17px, 1.6vw, 20px);
+  font-weight: 660;
+  line-height: 1.35;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  max-width: 48ch;
+  text-wrap: balance;
+}
+.pilot-m1-name code {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--graphite);
+  margin-right: 6px;
+}
+.pilot-m1 .prose {
+  margin-top: 10px;
+}
+@media (max-width: 980px) {
+  .pilot-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* --- fees print: paper shows ALL months (the mockup's print intent — the
        e2e rewrite's ambiguity observation resolved, 2026-07-20) --- */
 @media print {

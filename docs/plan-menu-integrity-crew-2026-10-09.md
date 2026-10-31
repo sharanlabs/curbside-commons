@@ -103,7 +103,7 @@ Why two new seats and not more: root-cause is the question an ops person actuall
 
 **The point (proposal):** drift in a platform's copy of a merchant's menu is **designed to be** caught, explained, sized and routed **in workflow** before it **would likely become** a refund, an error-charge dispute, a cancelled agent order, or a partner-quality enforcement — with an audit trail, if deployed and measured separately.
 
-**Before (per the platforms' own docs):** errors are discovered after the customer reports them; refunds are issued and clawed back from merchants as error adjustments, with disputes on both sides; menu accuracy is managed by advice to merchants and by integration thresholds enforced by sampling; an agent reads whatever the copy says.
+**Before (per the platforms' own docs):** errors are discovered after the customer reports them; refunds are issued and clawed back from merchants as error adjustments, with disputes on both sides; menu accuracy is managed by advice to merchants and by integration thresholds (whether they are enforced by sampling is UNVERIFIED — Wave 1 acceptance review item 9, 2026-10-31); an agent reads whatever the copy says.
 
 **After (hypothesis):** a sweep or trigger runs the crew; each wrong price, missing modifier, phantom or 86'd item is named with receipts; a deterministic explain path (S2) and optional root-cause seat **would** narrate why; impact **would** show arithmetic for exposure; the reviewer routes with a drafted artifact; **a human signs a proposal; nothing acts**; the ledger **would** record the decision. For agent orders: a pre-flight tool **is proposed to** confirm or hold an item an agent is about to order (scenario coverage arrives S1–S2).
 
@@ -232,7 +232,7 @@ Effort, honest: S1–S4 ≈ three weeks of focused CLI-seat work with orchestrat
 
 **Use case, in one sentence.** *A US delivery platform's operations team needs to know, with evidence, when its copy of a merchant's menu has stopped telling the truth — and what to do about it — before a customer, an AI agent, or a regulator finds out first.*
 
-**Pain point (theirs, in their words — § 3).** Order errors from stale prices, missing modifiers and 86'd items that still show → refunds, error-charge adjustments and disputes on both sides; integration partners held to a 99 % injection floor by sampling; portal edits silently overriding integration feeds; and now AI agents placing orders against whatever the copy says. Today the discovery mechanism is the customer complaint.
+**Pain point (theirs, in their words — § 3).** Order errors from stale prices, missing modifiers and 86'd items that still show → refunds, error-charge adjustments and disputes on both sides; integration partners held to an injection-success threshold (99.9 % baseline, revocation possible below 99 % — re-read 2026-10-31; enforcement by sampling UNVERIFIED); portal edits silently overriding integration feeds; and now AI agents placing orders against whatever the copy says. Today the discovery mechanism is the customer complaint.
 
 **End users (personas inside the platform; the pilot picks the first two).**
 1. *Merchant-Ops / Menu-Quality analyst* — owns order-accuracy metrics for a region; receives the Slack digest; signs Tier-1 proposals; wants fewer tickets and a defensible record.

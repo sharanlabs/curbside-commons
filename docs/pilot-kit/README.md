@@ -62,6 +62,7 @@ This kit describes a **six-week pilot on the labeled scenario library** (replay 
 
 - **No typed figure that the repo derives.** The bundled tally lives in `lib/landing/test-guide.ts` and is held equal to an engine run by `evals/packs/test-guide.test.ts`; documents here point to those, they do not retype them.
 - **Every figure is either cited with a date or labeled an assumption.** The cost-benefit fill is labeled ILLUSTRATIVE.
+- **`/pilot` renders fields, never typed figures.** Its cost model, bundled-pair tally and scenario-library state come from `lib/landing/pilot-figures.ts`; the one kit table that must type the same figures (`pilot-proposal.md` § 6) is held equal to that module by `evals/packs/pilot-figures.test.ts`, and the built page by `evals/packs/pilot-page.test.ts`.
 - **Every file is named in the C10 honesty scan** (`evals/packs/honesty-c10.test.ts`, the explicit `pilotDocs` list). A new kit document must be added to that list by hand; the scan never uses a directory glob.
 - **Free-only.** Only free tiers and free local models are named (decision 2026-10-12).
 - **United States only.** No non-US legal frame appears in any document.

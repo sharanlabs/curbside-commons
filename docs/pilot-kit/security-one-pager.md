@@ -44,7 +44,7 @@ The tool runs in **one of three modes**. In two of them no data leaves the machi
 ## 3 · Known gaps, stated
 
 - **No Content-Security-Policy header today.** Production verification on 2026-10-09 found four security headers plus HSTS on a subpath and **no CSP** (plan § 12, S0).
-- **The live budget guard is a pre-call estimate.** No active driver is wired to it, and the post-call overflow stop must be re-implemented before any live arming. See `docs/model-risk-register.md` § 5.
+- **The live budget guard is a pre-call estimate.** No active driver is wired to it. The post-call overflow stop merged as a library function on 2026-10-31 and must be wired before any live arming. See `docs/model-risk-register.md` § 5.
 - **Hosted model ids are unpinned.** Provider behavior can drift between runs; replay is what keeps a walkthrough stable. A canary arrives in S5.
 - **Hosting-provider logs are outside this repo.** The static site is hosted on a free hosting tier. What request logging the provider keeps for the project is **UNVERIFIED**; the site itself ships no analytics SDK.
 - **The local-model path (Tier D) has not been smoke-tested.** That run on the owner's machine arrives in S5.
