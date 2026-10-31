@@ -1,0 +1,23 @@
+[
+  {
+    "signerId": "owner-key-1",
+    "role": "approver",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAFeHJ3TNi5lOVAwrNAVFcBC9//Hfr5TSV+SjTL6zwKVA=\n-----END PUBLIC KEY-----\n",
+    "enrolledAt": "2026-10-31T00:00:00Z",
+    "revokedAt": null
+  },
+  {
+    "signerId": "owner-key-0",
+    "role": "approver",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAxd13h2XKHMc8ZTSWtQtCgBVF2feij+VouNjI1O8CQD0=\n-----END PUBLIC KEY-----\n",
+    "enrolledAt": "2026-10-12T00:00:00Z",
+    "revokedAt": "2026-10-31T00:00:00Z"
+  },
+  {
+    "signerId": "reviewer-key-1",
+    "role": "observer",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAgVcHFzSUvWpBu60kNVp4/xq8HfKm+9n6nl2VBX2/z0g=\n-----END PUBLIC KEY-----\n",
+    "enrolledAt": "2026-10-31T00:00:00Z",
+    "revokedAt": null
+  }
+]
