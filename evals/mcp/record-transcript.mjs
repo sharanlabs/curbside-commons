@@ -4,8 +4,8 @@
  *
  * Spawns `bin/mcp-server.mjs` as a REAL child process over stdio (the SDK's
  * `StdioClientTransport`) and runs the fixed scripted session: initialize
- * (performed by `client.connect`) -> tools/list -> one happy call per the six
- * tools -> two invalid calls. Writes a NORMALIZED, deterministic JSON
+ * (performed by `client.connect`) -> tools/list -> one happy call per
+ * advertised tool -> two invalid calls. Writes a NORMALIZED, deterministic JSON
  * transcript.
  *
  * Determinism / normalization (documented, per the dispatch packet's "if the
@@ -89,6 +89,20 @@ const HAPPY_CALLS = [
   // advisory/experimental-labeled lookup.
   { name: "lookup_reference", arguments: { question: "What does drift mean for a published menu?" } },
   { name: "run_demo", arguments: { format: "json" } },
+  // S2 crew tools (advertised W3-a CP4, called here since CP6, 2026-10-31). All
+  // inputs are inline and synthetic (no file read). explain_drift: one finding,
+  // one merchant 86 event before the as-of (→ merchant-edit); its `at` and
+  // `asOf` are fixed ISO strings we pass, so they are deterministic by
+  // construction. size_impact: no orders (→ zero figures, labeled simulated).
+  {
+    name: "explain_drift",
+    arguments: {
+      findings: [{ id: "item-005-v1#availability", ruleId: "LST-AVAIL-STATE", category: "availability", referenceRowId: "item-005-v1" }],
+      events: [{ at: "2026-07-02T21:46:00Z", actor: "merchant", action: "86", target: "item-005-v1" }],
+      asOf: "2026-07-03T00:00:00Z",
+    },
+  },
+  { name: "size_impact", arguments: { findings: [], orders: [], windowDays: 7, errorChargeShare: 0.5 } },
 ];
 
 // Two invalid (schema-INVALID) calls, per the dispatch packet's scripted

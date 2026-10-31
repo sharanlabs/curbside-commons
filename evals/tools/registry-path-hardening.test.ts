@@ -155,12 +155,14 @@ describe("F2 — the MCP surface returns fixed text for refusals and engine erro
     MCP_TEST_TIMEOUT_MS,
   );
 
+  // W3-a CP4 (2026-10-31): explain_drift is advertised now, so no registered tool
+  // sits off tools/list; the refusal is held on a name that is not registered at all.
   it(
-    "a registered-but-unadvertised tool (explain_drift) is refused over MCP like an unregistered one",
+    "a tool name off tools/list is refused over MCP with the fixed unknown-tool text",
     async () => {
-      const r = await client.callTool({ name: "explain_drift", arguments: { findings: [], events: [], asOf: "2026-07-03T00:00:00Z" } });
+      const r = await client.callTool({ name: "not_a_registered_tool", arguments: {} });
       expect(r.isError).toBe(true);
-      expect(textOf(r)).toContain('unknown tool "explain_drift"');
+      expect(textOf(r)).toBe('unknown tool "not_a_registered_tool"');
     },
     MCP_TEST_TIMEOUT_MS,
   );

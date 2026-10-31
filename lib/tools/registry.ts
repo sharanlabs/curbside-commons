@@ -121,7 +121,7 @@ export type ExplainDriftClass = (typeof EXPLAIN_DRIFT_CLASSES)[number];
 /** The label every explain_drift answer carries. */
 export const EXPLAIN_DRIFT_LABEL = "deterministic baseline";
 
-/** Params for `explain_drift` (schema: {@link EXPLAIN_DRIFT_INPUT_SCHEMA}). */
+/** Params for `explain_drift` (schema: `schemas/explain_drift.input.schema.json`). */
 export interface ExplainDriftParams {
   readonly findings: ReadonlyArray<{
     readonly id: string;
@@ -145,48 +145,6 @@ export interface ExplainDriftResult {
   readonly reason: string;
   readonly label: typeof EXPLAIN_DRIFT_LABEL;
 }
-
-const EXPLAIN_DRIFT_INPUT_SCHEMA: Readonly<Record<string, unknown>> = Object.freeze({
-  $schema: "https://json-schema.org/draft/2020-12/schema",
-  $id: "https://activationops.local/tools/explain_drift.input.schema.json",
-  title: "explain_drift input",
-  type: "object",
-  additionalProperties: false,
-  required: ["findings", "events", "asOf"],
-  properties: {
-    findings: {
-      type: "array",
-      maxItems: 5000,
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["id", "ruleId", "category", "referenceRowId"],
-        properties: {
-          id: { type: "string", minLength: 1, maxLength: 500 },
-          ruleId: { type: "string", minLength: 1, maxLength: 100 },
-          category: { type: ["string", "null"], maxLength: 100 },
-          referenceRowId: { type: ["string", "null"], maxLength: 500 },
-        },
-      },
-    },
-    events: {
-      type: "array",
-      maxItems: 10000,
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["at", "actor", "action", "target"],
-        properties: {
-          at: { type: "string", format: "date-time" },
-          actor: { type: "string", enum: ["merchant", "integrator", "platform", "unknown"] },
-          action: { type: "string", enum: ["price_edit", "86", "un86", "sync", "override"] },
-          target: { type: "string", minLength: 1, maxLength: 500 },
-        },
-      },
-    },
-    asOf: { type: "string", format: "date-time" },
-  },
-});
 
 const ENCODING_RULE_IDS: ReadonlySet<string> = new Set(["LST-PRICE-CENTS-AS-DECIMAL", "LST-PRICE-CURRENCY-FORM"]);
 const STALE_RULE_ID = "LST-STALE-EXPIRED";
@@ -292,79 +250,9 @@ function runExplainDriftTool(params: unknown): ToolResult {
 // engine error here. Every figure is labeled "simulated" by the module.
 // ---------------------------------------------------------------------------
 
-/** Params for `size_impact` — the lib/impact contract, verbatim. */
+/** Params for `size_impact` — the lib/impact contract, verbatim (schema: `schemas/size_impact.input.schema.json`). */
 export type SizeImpactParams = ImpactInput;
 export type { ImpactResult };
-
-const CENTS = { type: "integer", minimum: 0 } as const;
-
-const SIZE_IMPACT_INPUT_SCHEMA: Readonly<Record<string, unknown>> = Object.freeze({
-  $schema: "https://json-schema.org/draft/2020-12/schema",
-  $id: "https://activationops.local/tools/size_impact.input.schema.json",
-  title: "size_impact input",
-  type: "object",
-  additionalProperties: false,
-  required: ["findings", "orders", "windowDays", "errorChargeShare"],
-  properties: {
-    findings: {
-      type: "array",
-      maxItems: 5000,
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["id", "ruleId", "category", "referenceRowId"],
-        properties: {
-          id: { type: "string", minLength: 1, maxLength: 500 },
-          ruleId: { type: "string", minLength: 1, maxLength: 100 },
-          category: { type: "string", maxLength: 100 },
-          referenceRowId: { type: ["string", "null"], maxLength: 500 },
-        },
-      },
-    },
-    orders: {
-      type: "array",
-      maxItems: 100000,
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["order_id", "placed_at", "channel", "lines", "status", "refund_cents", "refund_allocation", "reason"],
-        properties: {
-          order_id: { type: "string", minLength: 1, maxLength: 200 },
-          placed_at: { type: "string", format: "date-time" },
-          channel: { type: "string", enum: ["app", "agent"] },
-          lines: {
-            type: "array",
-            items: {
-              type: "object",
-              additionalProperties: false,
-              required: ["variation_id", "modifier_option_ids", "qty", "unit_price_cents_charged"],
-              properties: {
-                variation_id: { type: "string", minLength: 1, maxLength: 200 },
-                modifier_option_ids: { type: "array", items: { type: "string", minLength: 1, maxLength: 200 } },
-                qty: { type: "integer", minimum: 1 },
-                unit_price_cents_charged: CENTS,
-              },
-            },
-          },
-          status: { type: "string", enum: ["fulfilled", "refunded", "cancelled"] },
-          refund_cents: CENTS,
-          refund_allocation: {
-            type: "array",
-            items: {
-              type: "object",
-              additionalProperties: false,
-              required: ["variation_id", "cents"],
-              properties: { variation_id: { type: "string", minLength: 1, maxLength: 200 }, cents: CENTS },
-            },
-          },
-          reason: { type: "string", enum: ["menu", "other", "none"] },
-        },
-      },
-    },
-    windowDays: { type: "number", exclusiveMinimum: 0 },
-    errorChargeShare: { type: "number", minimum: 0, maximum: 1 },
-  },
-});
 
 /** Run `size_impact`. `params` must already be ajv-validated by `callTool`. A failure inside lib/impact is never caught here. */
 function runSizeImpactTool(params: unknown): ToolResult {
@@ -440,19 +328,18 @@ const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     outputSchema: loadSchema("run_demo.output.schema.json"),
     run: runRunDemoTool,
   },
-  // S2-crew (2026-10-31): two deterministic seats' tools. Schemas are committed
-  // INLINE below (this lane may not add files under schemas/ or tools/); moving
-  // them to schema files is an OPEN item for the merge, together with MCP
-  // advertisement (lib/mcp/server.ts keeps them off tools/list until then).
+  // S2-crew (2026-10-31): two deterministic seats' tools. Their input schemas
+  // moved from inline objects to committed schema files in W3-a CP4
+  // (2026-10-31; canonical JSON unchanged), when MCP began advertising them.
   {
     name: "explain_drift",
-    inputSchema: EXPLAIN_DRIFT_INPUT_SCHEMA,
+    inputSchema: loadSchema("explain_drift.input.schema.json"),
     outputSchema: envelopeSchema("explain_drift"),
     run: runExplainDriftTool,
   },
   {
     name: "size_impact",
-    inputSchema: SIZE_IMPACT_INPUT_SCHEMA,
+    inputSchema: loadSchema("size_impact.input.schema.json"),
     outputSchema: envelopeSchema("size_impact"),
     run: runSizeImpactTool,
   },

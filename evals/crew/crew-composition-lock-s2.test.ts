@@ -40,8 +40,10 @@ const PINNED_S2_IDS = [
   "s2-im-fee-precheck",
   "s2-im-sync-outage-unowned",
   "s2-rc-agent-86",
+  "s2-rc-modifier-drift", // W3-a CP2 (2026-10-31): scenario 2's root-cause case
   "s2-rc-partner-onboarding",
   "s2-rc-platform-override",
+  "s2-rc-spec-valid-lie", // W3-a CP2 (2026-10-31): scenario 6's root-cause case
   "s2-rc-sync-outage",
   "s2-rc-uncontracted-explain",
 ] as const;
@@ -75,7 +77,7 @@ describe("S2 composition lock", () => {
   it("≥ 3 cases per new member, and only the new members", () => {
     const rc = cases.filter((c) => c.member === "root-cause").length;
     const im = cases.filter((c) => c.member === "impact").length;
-    expect(rc).toBe(5);
+    expect(rc).toBe(7); // 5 S2-crew + 2 W3-a CP2 (modifier-drift, spec-valid-lie)
     expect(im).toBe(4);
     expect(rc + im).toBe(cases.length);
   });

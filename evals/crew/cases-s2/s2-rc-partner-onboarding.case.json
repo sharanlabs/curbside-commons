@@ -1,6 +1,6 @@
 {
   "caseId": "s2-rc-partner-onboarding",
-  "manifestDigest": "bc455c215ec383d58719a3345b07f9b0bc97311f04186a6a2e3e2323448152bd",
+  "manifestDigest": "fdc77c76af4ea83a1e0f1d99d54ba9cb218d9bb71dcd895c794f91a505fd765e",
   "member": "root-cause",
   "inputArtifact": {
     "path": "fixtures/scenarios/partner-onboarding/inputs/feed.json"
@@ -114,16 +114,19 @@
     }
   ],
   "expectedEngineReportHash": "9850db69787359440889a7381e62f635c4b8266408f6e7f7246bc649c1fe20a9",
-  "expectedRecommendationClass": "none-escalated",
-  "expectedFindingRefs": [],
-  "expectedGateState": "escalate-to-human",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "item-007-v1#availability",
+    "item-009-v1#availability"
+  ],
+  "expectedGateState": "approve-recommendation",
   "s2": {
     "eventsPath": "fixtures/scenarios/partner-onboarding/inputs/events.jsonl",
     "asOf": "2026-07-03T00:00:00Z",
     "route": {
       "pack": "listings",
       "triggerKind": "partner-onboarding",
-      "ownership": "unknown"
+      "ownership": "integrator"
     }
   }
 }

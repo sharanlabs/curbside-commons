@@ -48,19 +48,34 @@ describe("MCP scripted-client transcript is byte-frozen", () => {
     // No obvious timestamp/PID keys.
     expect(/"pid"\s*:/i.test(committed)).toBe(false);
     expect(/"timestamp"\s*:/i.test(committed)).toBe(false);
-    expect(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(committed)).toBe(false);
+    // Response bodies only (W3-a CP6): steps[].request.arguments are ours and deterministic (explain_drift's fixed ISO `asOf`).
+    const responseBodies = JSON.stringify(
+      (JSON.parse(committed) as { steps: Array<Record<string, unknown>> }).steps.map((s) => Object.fromEntries(Object.entries(s).filter(([k]) => k !== "request"))),
+    );
+    expect(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(responseBodies)).toBe(false);
   });
 
-  // 7 happy calls since 2026-07-12: the E2 lookup_reference tool joined the
-  // registry (pre-reg §6) and the scripted session exercises every tool once.
-  it("the committed transcript's session shape matches the packet: initialize -> tools/list -> 7 happy calls -> 2 invalid calls", () => {
+  // The happy-call count is DERIVED from the transcript (W3-a CP4, 2026-10-31),
+  // never hand-typed: each happy call names a tool the same session listed, no
+  // tool is called twice, and no listed tool goes uncalled (the remainder is []
+  // since W3-a CP6 added the two S2 tools' happy calls to the recorder; under
+  // CP4 it was pinned to exactly ["explain_drift", "size_impact"]).
+  // MUTATION PROOF (2026-10-31): the run_demo happy call deleted from the golden
+  // → this test red ("run_demo" joins the uncalled remainder) and the byte-freeze
+  // red, 2 failed / 2 passed; golden restored → 4/4.
+  it("the committed transcript's session shape matches the packet: initialize -> tools/list -> one happy call per listed tool (count derived) -> 2 invalid calls", () => {
     const transcript = JSON.parse(readFileSync(golden, "utf8")) as {
-      steps: ReadonlyArray<{ step: string }>;
+      steps: ReadonlyArray<{ step: string; tools?: ReadonlyArray<{ name: string }>; request?: { name: string } }>;
     };
     const stepNames = transcript.steps.map((s) => s.step);
     expect(stepNames[0]).toBe("initialize");
     expect(stepNames[1]).toBe("tools/list");
-    expect(stepNames.filter((s) => s === "tools/call")).toHaveLength(7);
+    const listed = (transcript.steps[1].tools ?? []).map((t) => t.name);
+    const called = transcript.steps.filter((s) => s.step === "tools/call").map((s) => s.request?.name ?? "");
+    expect(listed.length).toBeGreaterThan(0);
+    expect(new Set(called).size, "a tool is called twice in the scripted session").toBe(called.length);
+    for (const name of called) expect(listed, `happy call "${name}" is not on tools/list`).toContain(name);
+    expect(listed.filter((name) => !called.includes(name)), "a listed tool has no happy call").toStrictEqual([]);
     expect(stepNames.filter((s) => s === "tools/call (invalid)")).toHaveLength(2);
   });
 

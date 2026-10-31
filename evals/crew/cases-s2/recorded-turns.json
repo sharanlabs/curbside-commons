@@ -45,7 +45,7 @@
     }
   },
   "s2-rc-partner-onboarding": {
-    "manifestDigest": "bc455c215ec383d58719a3345b07f9b0bc97311f04186a6a2e3e2323448152bd",
+    "manifestDigest": "fdc77c76af4ea83a1e0f1d99d54ba9cb218d9bb71dcd895c794f91a505fd765e",
     "intake": {
       "kind": "route",
       "tool": "check_feed",
@@ -126,6 +126,36 @@
       "params": {
         "feedPath": "fixtures/scenarios/agent-86/inputs/feed.json",
         "catalogPath": "fixtures/scenarios/agent-86/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    "reviewer": {
+      "kind": "approve"
+    }
+  },
+  "s2-rc-modifier-drift": {
+    "manifestDigest": "90ff13e11af435377951ed4fe150f20024670978645223b617b616a52dccf488",
+    "intake": {
+      "kind": "route",
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/modifier-drift/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/modifier-drift/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    "reviewer": {
+      "kind": "approve"
+    }
+  },
+  "s2-rc-spec-valid-lie": {
+    "manifestDigest": "f5bac0c983f50b22dbc7fdd0d801b9a9a605b9161b88ed16ea85dd3b76686930",
+    "intake": {
+      "kind": "route",
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/spec-valid-lie/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/spec-valid-lie/inputs/record.json",
         "surface": "acp"
       }
     },
