@@ -403,9 +403,20 @@ export interface DayMeasure {
   readonly byRuleId: Record<string, number>;
   readonly findingsPer100Items: number;
   readonly warnShare: number;
+  /** Findings whose key was not reported the previous day (day one: every finding). */
+  readonly newFindings: number;
+  readonly newFindingsPer100Items: number;
+  /** Keys reported the previous day and absent today (zero while nothing is repaired). */
+  readonly resolvedFindings: number;
 }
 
-export function measureReport(report: VerifierReport, items: number): DayMeasure {
+/** A finding's identity across days: the claim id as the engine reports it, plus the rule id. */
+export const findingKeys = (report: VerifierReport): ReadonlySet<string> =>
+  new Set(report.findings.map((f) => `${f.claim.id}|${f.ruleId}`));
+
+export function measureReport(report: VerifierReport, items: number, previous: ReadonlySet<string> = new Set()): DayMeasure {
+  const keys = findingKeys(report);
+  const newCount = report.findings.filter((f) => !previous.has(`${f.claim.id}|${f.ruleId}`)).length;
   const byRule: Record<string, number> = {};
   for (const f of report.findings) byRule[f.ruleId] = (byRule[f.ruleId] ?? 0) + 1;
   const errors = report.findings.filter((f) => f.severity === "error").length;
@@ -417,6 +428,9 @@ export function measureReport(report: VerifierReport, items: number): DayMeasure
     byRuleId: sortKeys(byRule),
     findingsPer100Items: per100(report.findings.length, items),
     warnShare: share(warnings, report.findings.length),
+    newFindings: newCount,
+    newFindingsPer100Items: per100(newCount, items),
+    resolvedFindings: [...previous].filter((k) => !keys.has(k)).length,
   };
 }
 
@@ -461,7 +475,7 @@ const RATE_KEY: Record<DriftKind, string> = {
 function buildReadmeTemplate(): string {
   const dayRows = Array.from({ length: DAYS }, (_, i) => {
     const d = `d${String(i + 1).padStart(2, "0")}`;
-    return `| \`${dayName(i + 1)}\` | {{${d}_findings}} | {{${d}_errors}} | {{${d}_warnings}} | {{${d}_per100}} | {{${d}_warn_share}} | {{${d}_rules}} |`;
+    return `| \`${dayName(i + 1)}\` | {{${d}_findings}} | {{${d}_errors}} | {{${d}_warnings}} | {{${d}_per100}} | {{${d}_warn_share}} | {{${d}_new}} | {{${d}_new_per100}} | {{${d}_rules}} |`;
   }).join("\n");
   const rateRows = DRIFT_ROWS.map(([k, what, unit]) => `| ${what} | ${unit} | {{${RATE_KEY[k]}}} |`).join("\n");
   return `# synthetic-restaurant-large — a menu-scale synthetic restaurant with a daily drift series
@@ -480,11 +494,13 @@ function buildReadmeTemplate(): string {
 
 ## What the checker found
 
-| Day | Findings | Errors | Warnings | Per hundred items | Warn share | Rules that fired |
-| --- | --- | --- | --- | --- | --- | --- |
+| Day | Findings | Errors | Warnings | Per hundred items | Warn share | New that day | New per hundred items | Rules that fired |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
 ${dayRows}
 
 "Per hundred items" is the day's findings divided by the {{items}} catalog items, times one hundred. "Warn share" is the day's warnings divided by its findings. By the last day the series stands at {{last_per100}} findings per hundred items, {{last_warn_share}} of them warnings.
+
+Two readings sit side by side. The cumulative columns count every finding standing on that day; because nothing is repaired between days, they only grow. "New that day" counts the findings that were not reported the day before, which is the number a person working through daily alerts would see arrive; its per-hundred figure uses the same denominator. No repair model is included: nothing is corrected. A finding leaves the list only when a later drift on the same option replaces it with a different finding; {{resolved_total}} did so across all days.
 
 ## Declared assumptions
 
@@ -534,6 +550,7 @@ export interface LargeManifest {
   readonly itemBand: { readonly target: number; readonly min: number; readonly max: number };
   readonly assumptions: {
     readonly note: string;
+    readonly readings: string;
     readonly accumulation: string;
     readonly ratesPerDay: Record<DriftKind, number>;
     readonly titleDriftShares: typeof TITLE_DRIFT_SHARES;
@@ -571,9 +588,12 @@ export function readmeFigures(m: LargeManifest): Record<string, string | number>
     f[`${p}_warnings`] = d.warnings;
     f[`${p}_per100`] = fixed2(d.findingsPer100Items);
     f[`${p}_warn_share`] = pct1(d.warnShare);
+    f[`${p}_new`] = d.newFindings;
+    f[`${p}_new_per100`] = fixed2(d.newFindingsPer100Items);
     f[`${p}_rules`] = tally(d.byRuleId);
   }
   const last = m.days[m.days.length - 1];
+  f.resolved_total = m.days.reduce((n, d) => n + d.resolvedFindings, 0);
   f.last_per100 = fixed2(last.findingsPer100Items);
   f.last_warn_share = pct1(last.warnShare);
   return f;
@@ -611,6 +631,7 @@ export function buildLargeFixtureFiles(): LargeBuild {
     itemBand: { target: ITEM_TARGET, min: ITEM_COUNT_BAND.min, max: ITEM_COUNT_BAND.max },
     assumptions: {
       note: "Declared assumptions set for this measurement; not measurements of any market, platform or merchant.",
+      readings: "Cumulative = nothing is repaired between days, so findings stand as a running stock; new-per-day = the operational alert-fatigue reading (findings not reported the day before); no repair model is included.",
       accumulation: "Only units still in sync with the record can drift; nothing is corrected between days, so later days carry earlier days' drift.",
       ratesPerDay: { ...DRIFT_RATES },
       titleDriftShares: TITLE_DRIFT_SHARES,
@@ -618,12 +639,15 @@ export function buildLargeFixtureFiles(): LargeBuild {
       modifierDriftStepsCents: MODIFIER_DRIFT_STEPS_CENTS,
       hoursShiftMinutes: HOURS_SHIFT_MINUTES,
     },
-    days: feeds.map((feed, i) => ({
-      day: i + 1,
-      file: `feeds/${dayName(i + 1)}.json`,
-      driftApplied: applied[i],
-      ...measureReport(runDay(feed, record), counts.items),
-    })),
+    days: ((): LargeManifest["days"] => {
+      let previous: ReadonlySet<string> = new Set();
+      return feeds.map((feed, i) => {
+        const report = runDay(feed, record);
+        const row = { day: i + 1, file: `feeds/${dayName(i + 1)}.json`, driftApplied: applied[i], ...measureReport(report, counts.items, previous) };
+        previous = findingKeys(report);
+        return row;
+      });
+    })(),
   };
   const figures = readmeFigures(manifest);
   const files = new Map<string, string>();

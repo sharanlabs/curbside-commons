@@ -67,6 +67,31 @@ Reading it: at the declared assumption rates, errors dominate (warn share 6% to 
 ## Engine wall time per day (informational, from the final two generator runs; not written to any file)
 Run A: 7.4, 7.3, 7.4, 7.7, 5.5, 6.2, 6.1 ms. Run B: 7.1, 9.5, 6.5, 9.5, 22.0, 7.3, 10.9 ms (days 1 to 7). Single-digit milliseconds on 463 rows.
 
+## CP6 (orchestrator addition) — both alert-volume readings, derived
+DONE. Generator adds per day `newFindings` (findings whose key, claim id as the engine reports it plus rule id, was not reported the day before; day 1 = every finding), `newFindingsPer100Items` (same denominator) and `resolvedFindings` (keys present yesterday, absent today), plus `assumptions.readings` (cumulative = nothing repaired; new-per-day = the alert-fatigue reading; no repair model). README table gains two placeholder columns and a two-readings paragraph. Tests: 26 to 36 (+10: 7 per-day re-derivations from consecutive engine runs, day-one new = findings, findings(day) = findings(day-1) - resolved + new, manifest states both readings).
+- Unchanged: `record.json` and `feeds/day-01..07.json` sha256 identical before and after CP6 (compared with `diff` on the two lists, no difference). First 16 hex: e68e8b17068fc517 record.json
+b8d289d86aadb193 feeds/day-01.json
+f95752bdee7d6657 feeds/day-02.json
+f1716eb83effb7f5 feeds/day-03.json
+1a770c85c064f9de feeds/day-04.json
+89a9317d88c0217f feeds/day-05.json
+386482514d54a3e8 feeds/day-06.json
+42ce7daa3c061da1 feeds/day-07.json
+- Gates: README placeholder typed over (day-03 new count set to 77) turned 2 red, restored by the generator. build-offline 0 · tsc 0 · eslint 0 · full vitest 0 with 2449 passed + 8 skipped (2413 + 36 exactly; 152 passed + 7 skipped files) · `git ls-files node_modules` empty. README and manifest.json bytes changed by design; their hashes now differ from the list above.
+- **Resolved is NOT zero**: day 5 has 1 and day 6 has 1 (total 2). Cause, read from the engine: a modifier option's `LST-MOD-PRICE-VALUE` finding is replaced when the same option later drops off the copy (it then reports `LST-MOD-MISSING` on the same claim id), so the price key disappears and a missing key appears. Day 5: `item-296-v1#modifier.item-296-m1-o2`; day 6: `item-217-v1#modifier.item-217-m2-o3`. Nothing was fixed; the README says so in plain words ("a finding leaves the list only when a later drift on the same option replaces it").
+
+Per-day table copied from manifest.json by code:
+
+| Day | Findings | Per 100 items | New that day | New per 100 items | Resolved |
+|---|---|---|---|---|---|
+| 1 | 21 | 7 | 21 | 7 | 0 |
+| 2 | 48 | 16 | 27 | 9 | 0 |
+| 3 | 61 | 20.33 | 13 | 4.33 | 0 |
+| 4 | 85 | 28.33 | 24 | 8 | 0 |
+| 5 | 93 | 31 | 9 | 3 | 1 |
+| 6 | 113 | 37.67 | 21 | 7 | 1 |
+| 7 | 127 | 42.33 | 14 | 4.67 | 0 |
+
 ## DEVIATIONS
 1. CP3 changed nothing in `detectors.ts`: the optional grace parameter already exists (`hoursWindowDetector(graceMinutes = HOURS_WINDOW_GRACE_MINUTES)`). The packet's "diff is only option plumbing" holds vacuously (zero lines). `runListingsVerification` and `listingsDetectors` still use the default; a caller wanting a different grace composes `verifyClaims(claims, sorReference(record), [hoursWindowDetector(n)])`, which is what the test does. Not plumbed through `run.ts`/`index.ts` (not required).
 2. The grace tests were written in CP2's file, so CP2 and CP3 turned green together; CP3's commit is empty by design.
@@ -76,8 +101,12 @@ Run A: 7.4, 7.3, 7.4, 7.7, 5.5, 6.2, 6.1 ms. Run B: 7.1, 9.5, 6.5, 9.5, 22.0, 7.
 6. The new README is not in honesty-c10's fixed scanned-file list (that test file is outside this lane); the lane's own test applies the register, named-party and banned-claim probes to it. `honesty-c10` itself ran green.
 7. Manifest adds a `driftApplied` block per day (events applied), re-derived in the test from consecutive-feed diffs.
 
-## OPEN
-1. Alert-rate semantics for /pilot: cumulative with no repair (this fixture) versus a daily new-alert rate or a repair model. Which the later /pilot lane should surface is an owner/orchestrator call; the manifest can support either with a small generator addition.
+## OPEN (decisions recorded, orchestrator review at 793a490)
+- OPEN 1 resolved by CP6: both readings are carried (cumulative and new-per-day); no repair model.
+- OPEN 2 accepted: hours once per item is the unit (existing corpus feeds carry hours on zero rows); the 5 MB cap stays.
+- OPEN 3 accepted: the declared rates stand as labelled assumptions; they go on the owner card.
+
+Original text of OPEN 1. Alert-rate semantics for /pilot: cumulative with no repair (this fixture) versus a daily new-alert rate or a repair model. Which the later /pilot lane should surface is an owner/orchestrator call; the manifest can support either with a small generator addition.
 2. Whether item-level-only hours on the feed is acceptable, or the folder budget should rise so every row carries hours.
 3. The declared rates (0.4% to 1.0% per day) are my placeholders for "ordinary drift"; they are assumptions with no source. The owner may want different values before any figure is shown on the site.
 

@@ -67,6 +67,9 @@ interface DayRow {
   byRuleId: Record<string, number>;
   findingsPer100Items: number;
   warnShare: number;
+  newFindings: number;
+  newFindingsPer100Items: number;
+  resolvedFindings: number;
 }
 interface Manifest {
   seed: number;
@@ -196,6 +199,33 @@ describe("DERIVED — alert-volume figures recomputed from the engine on the com
     expect(row.warnShare).toBe(findings.length === 0 ? 0 : round(warns / findings.length, 4));
   });
 
+  it.each(DAY_NUMBERS)("day %i: new and resolved findings re-derived from consecutive engine runs equal the manifest", (day) => {
+    const m = manifest();
+    const row = m.days[day - 1];
+    expect(row.newFindings).toBe(newOf(day));
+    expect(row.newFindingsPer100Items).toBe(round((newOf(day) / record().items.length) * 100, 2));
+    expect(row.resolvedFindings).toBe(resolvedOf(day));
+    expect(row.newFindings).toBeLessThanOrEqual(row.findings);
+  });
+
+  it("day one: every finding is new and nothing is resolved", () => {
+    const row = manifest().days[0];
+    expect(row.newFindings).toBe(row.findings);
+    expect(row.resolvedFindings).toBe(0);
+  });
+
+  it("the new-finding counts are the findings that were not there before: findings(day) = carried + new, carried = findings(day-1) - resolved", () => {
+    const days = manifest().days;
+    days.slice(1).forEach((d, i) => expect(d.findings, `day ${d.day}`).toBe(days[i].findings - d.resolvedFindings + d.newFindings));
+  });
+
+  it("the manifest states both readings and that no repair model is included", () => {
+    const readings = (manifest().assumptions as unknown as { readings: string }).readings;
+    expect(readings).toMatch(/cumulative/i);
+    expect(readings).toMatch(/alert-fatigue/i);
+    expect(readings).toMatch(/no repair model/i);
+  });
+
   it("the series is non-empty on every day and never shrinks (drift accumulates; nothing is corrected)", () => {
     const counts = manifest().days.map((d) => d.findings);
     counts.forEach((c) => expect(c).toBeGreaterThan(0));
@@ -279,6 +309,18 @@ function capture(template: string, text: string): { keys: string[]; values: stri
   return m ? { keys, values: m.slice(1) } : null;
 }
 
+/** Finding keys of a committed day: the claim id as reported plus the rule id (derived here, from the engine). */
+const keysOf = (day: number): string[] => engine(day).findings.map((f) => `${f.claim.id}|${f.ruleId}`);
+const newOf = (day: number): number => {
+  const prev = new Set(day === 1 ? [] : keysOf(day - 1));
+  return keysOf(day).filter((k) => !prev.has(k)).length;
+};
+const resolvedOf = (day: number): number => {
+  if (day === 1) return 0;
+  const today = new Set(keysOf(day));
+  return new Set(keysOf(day - 1)).size - [...new Set(keysOf(day - 1))].filter((k) => today.has(k)).length;
+};
+
 /** The README's figures, derived HERE from the engine run on the committed files and the record. */
 function liveFigures(): Record<string, string | number> {
   const r = record();
@@ -316,10 +358,13 @@ function liveFigures(): Record<string, string | number> {
     f[`${p}_warnings`] = warns;
     f[`${p}_per100`] = round((findings.length / items) * 100, 2).toFixed(2);
     f[`${p}_warn_share`] = `${(round(warns / findings.length, 4) * 100).toFixed(1)}%`;
+    f[`${p}_new`] = newOf(day);
+    f[`${p}_new_per100`] = round((newOf(day) / items) * 100, 2).toFixed(2);
     f[`${p}_rules`] = [...tally.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([k, n]) => `${k} ×${n}`).join(", ");
     lastPer100 = String(f[`${p}_per100`]);
     lastShare = String(f[`${p}_warn_share`]);
   }
+  f.resolved_total = DAY_NUMBERS.reduce((n, d) => n + resolvedOf(d), 0);
   f.last_per100 = lastPer100;
   f.last_warn_share = lastShare;
   return f;

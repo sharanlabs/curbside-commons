@@ -14,17 +14,19 @@
 
 ## What the checker found
 
-| Day | Findings | Errors | Warnings | Per hundred items | Warn share | Rules that fired |
-| --- | --- | --- | --- | --- | --- | --- |
-| `day-01` | 21 | 19 | 2 | 7.00 | 9.5% | LST-AVAIL-STATE ×4, LST-ENC-TRUNC ×1, LST-HOURS-WINDOW ×1, LST-IDENT-NAME ×1, LST-MOD-MISSING ×5, LST-MOD-PRICE-VALUE ×7, LST-PRICE-VALUE ×2 |
-| `day-02` | 48 | 45 | 3 | 16.00 | 6.3% | LST-AVAIL-STATE ×13, LST-ENC-TRUNC ×2, LST-HOURS-WINDOW ×1, LST-IDENT-NAME ×2, LST-MOD-MISSING ×11, LST-MOD-PRICE-VALUE ×15, LST-PRICE-VALUE ×4 |
-| `day-03` | 61 | 53 | 8 | 20.33 | 13.1% | LST-AVAIL-STATE ×16, LST-ENC-TRUNC ×4, LST-HOURS-WINDOW ×4, LST-IDENT-NAME ×2, LST-MOD-MISSING ×12, LST-MOD-PRICE-VALUE ×18, LST-PRICE-VALUE ×5 |
-| `day-04` | 85 | 72 | 13 | 28.33 | 15.3% | LST-AVAIL-STATE ×18, LST-ENC-TRUNC ×7, LST-HOURS-WINDOW ×6, LST-IDENT-NAME ×3, LST-MOD-MISSING ×16, LST-MOD-PRICE-VALUE ×24, LST-PRICE-VALUE ×11 |
-| `day-05` | 93 | 79 | 14 | 31.00 | 15.0% | LST-AVAIL-STATE ×20, LST-ENC-TRUNC ×8, LST-HOURS-WINDOW ×6, LST-IDENT-NAME ×3, LST-MOD-MISSING ×19, LST-MOD-PRICE-VALUE ×25, LST-PRICE-VALUE ×12 |
-| `day-06` | 113 | 95 | 18 | 37.67 | 15.9% | LST-AVAIL-STATE ×23, LST-ENC-TRUNC ×9, LST-HOURS-WINDOW ×9, LST-IDENT-NAME ×5, LST-MOD-MISSING ×26, LST-MOD-PRICE-VALUE ×27, LST-PRICE-VALUE ×14 |
-| `day-07` | 127 | 105 | 22 | 42.33 | 17.3% | LST-AVAIL-STATE ×26, LST-ENC-TRUNC ×9, LST-HOURS-WINDOW ×13, LST-IDENT-NAME ×5, LST-MOD-MISSING ×28, LST-MOD-PRICE-VALUE ×30, LST-PRICE-VALUE ×16 |
+| Day | Findings | Errors | Warnings | Per hundred items | Warn share | New that day | New per hundred items | Rules that fired |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `day-01` | 21 | 19 | 2 | 7.00 | 9.5% | 21 | 7.00 | LST-AVAIL-STATE ×4, LST-ENC-TRUNC ×1, LST-HOURS-WINDOW ×1, LST-IDENT-NAME ×1, LST-MOD-MISSING ×5, LST-MOD-PRICE-VALUE ×7, LST-PRICE-VALUE ×2 |
+| `day-02` | 48 | 45 | 3 | 16.00 | 6.3% | 27 | 9.00 | LST-AVAIL-STATE ×13, LST-ENC-TRUNC ×2, LST-HOURS-WINDOW ×1, LST-IDENT-NAME ×2, LST-MOD-MISSING ×11, LST-MOD-PRICE-VALUE ×15, LST-PRICE-VALUE ×4 |
+| `day-03` | 61 | 53 | 8 | 20.33 | 13.1% | 13 | 4.33 | LST-AVAIL-STATE ×16, LST-ENC-TRUNC ×4, LST-HOURS-WINDOW ×4, LST-IDENT-NAME ×2, LST-MOD-MISSING ×12, LST-MOD-PRICE-VALUE ×18, LST-PRICE-VALUE ×5 |
+| `day-04` | 85 | 72 | 13 | 28.33 | 15.3% | 24 | 8.00 | LST-AVAIL-STATE ×18, LST-ENC-TRUNC ×7, LST-HOURS-WINDOW ×6, LST-IDENT-NAME ×3, LST-MOD-MISSING ×16, LST-MOD-PRICE-VALUE ×24, LST-PRICE-VALUE ×11 |
+| `day-05` | 93 | 79 | 14 | 31.00 | 15.0% | 9 | 3.00 | LST-AVAIL-STATE ×20, LST-ENC-TRUNC ×8, LST-HOURS-WINDOW ×6, LST-IDENT-NAME ×3, LST-MOD-MISSING ×19, LST-MOD-PRICE-VALUE ×25, LST-PRICE-VALUE ×12 |
+| `day-06` | 113 | 95 | 18 | 37.67 | 15.9% | 21 | 7.00 | LST-AVAIL-STATE ×23, LST-ENC-TRUNC ×9, LST-HOURS-WINDOW ×9, LST-IDENT-NAME ×5, LST-MOD-MISSING ×26, LST-MOD-PRICE-VALUE ×27, LST-PRICE-VALUE ×14 |
+| `day-07` | 127 | 105 | 22 | 42.33 | 17.3% | 14 | 4.67 | LST-AVAIL-STATE ×26, LST-ENC-TRUNC ×9, LST-HOURS-WINDOW ×13, LST-IDENT-NAME ×5, LST-MOD-MISSING ×28, LST-MOD-PRICE-VALUE ×30, LST-PRICE-VALUE ×16 |
 
 "Per hundred items" is the day's findings divided by the 300 catalog items, times one hundred. "Warn share" is the day's warnings divided by its findings. By the last day the series stands at 42.33 findings per hundred items, 17.3% of them warnings.
+
+Two readings sit side by side. The cumulative columns count every finding standing on that day; because nothing is repaired between days, they only grow. "New that day" counts the findings that were not reported the day before, which is the number a person working through daily alerts would see arrive; its per-hundred figure uses the same denominator. No repair model is included: nothing is corrected. A finding leaves the list only when a later drift on the same option replaces it with a different finding; 2 did so across all days.
 
 ## Declared assumptions
 
