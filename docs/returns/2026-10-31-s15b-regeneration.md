@@ -16,16 +16,20 @@ S1.5b per `docs/packets/2026-10-31-s15b-regeneration.md`, under `docs/wave2-lane
 
 ## GIT
 
-`git status --short` → empty (before this packet's commit).
+`git status --short` → empty at return.
 
 ```
-2af8573 wip(s15b-regeneration): CP3 — one dated paragraph in docs/model-risk-register.md § 1 …
-cc8d76b wip(s15b-regeneration): ONE regeneration for CP1+CP2 — every generator run once …
-078fa60 wip(s15b-regeneration): deviations for the pin move — ucp-corpus schemaSource … four hard-coded pin literals …
-b748af6 wip(s15b-regeneration): CP2 source — UCP_PINNED_VERSION 2026-04-08 → 2026-08-25 …
-48bb904 wip(s15b-regeneration): CP1 source — three plainLine register fixes in detectors.ts …
-22b9220 docs(state): session-50 blocks after the S2-crew merge   ← main, merged in
+68d0579 docs(s15b-regeneration): packet records the post-commit gate re-run (C10 rebuild after the proof's checkout round-trip)
+377f222 docs(s15b-regeneration): return packet — one regeneration, 23 crew hashes re-pinned by running the engine (cases 6 · cases-live 9 · cases-s2 8), canonical proof 40/40, oracle 33/35 at 2026-08-25, suite 2293+8 unchanged; OPEN 1: /proof still states the 04-08 pin (lib/dashboard/evidence.ts, outside lane)
+2af8573 wip(s15b-regeneration): CP3 — one dated paragraph in docs/model-risk-register.md § 1 recording the exam-record re-pin (spec label + three finding sentences; turns unchanged; re-pinned by re-running the engine)
+cc8d76b wip(s15b-regeneration): ONE regeneration for CP1+CP2 — every generator run once (wedge · fees · orders · browser · csv · ucp-conformance corpus · scenarios · demo transcript · entity corpus · demo.svg · mcp transcript); crew expectedEngineReportHash re-pinned by running the engine (cases 6 · cases-live 9 via generate-l1-live-cases · cases-s2 8; fees and null unchanged); 2 A2 cases + recorded-turns re-stamped (conformance-ci inputs carry the pin); replay-records-a2, l1-live-records x4, two S2 renders, tools/delivery/landing goldens re-derived through the harness; matrices + consistency report byte-identical
+078fa60 wip(s15b-regeneration): deviations for the pin move — ucp-corpus schemaSource derives from UCP_PINNED_VERSION (the corpus manifest would otherwise name the 04-08 folder beside specVersion 08-25); four hard-coded pin literals in cli-c1 (3) and report-view-c1 (1) follow the pin (S1.5 OPEN 1 named them in scope)
+b748af6 wip(s15b-regeneration): CP2 source — UCP_PINNED_VERSION 2026-04-08 → 2026-08-25; ucp-conformance asserts the new active pin with both vendored folders still exercised
+48bb904 wip(s15b-regeneration): CP1 source — three plainLine register fixes in detectors.ts (vs the record's · is served on the copy); goldens regenerate in the single pass after CP2's source edit
+22b9220 docs(state): session-50 blocks after the S2-crew merge
 ```
+
+(The return-packet commits follow `2af8573`. The commit carrying this refreshed GIT block is the branch tip, one above the list.)
 
 Totals: 101 files changed, 165 insertions, 162 deletions (against `22b9220`, before this packet). `git ls-files node_modules` → empty.
 
@@ -136,7 +140,8 @@ Hash map (old → new, first 12 hex): `756a27ee7aa0→b5ef1e775b0b` ACP faithful
 4. **Stale comments outside the lane:** `lib/packs/listings/run.ts:36-47` still says the S1.5 pin and plainLine work is "NOT DONE". The pin and plainLine parts are now done. The `+menu-model-<date>` segment of `LISTINGS_SPEC_VERSION` is still deferred, and it would be a second exam-record re-pin, best batched with the next deliberate engine-string change. `evals/crew/crew-ledger-handoff.test.ts:19` passes a fixed `RULES` input naming the old strings. It is green: it is a ledger input, not an engine comparison.
 5. **`replay-records-a2.golden.json` note:** suggest appending "engineReportHash re-pinned 2026-10-31 (S1.5b, spec label + three finding sentences)" at merge, if the orchestrator wants the note exact.
 6. **Landing copy review:** the three re-worded lines in `fixtures/landing/finding-browse.golden.json` are page copy (its lock requires a human-reviewed re-commit). "served on the copy" relies on the page's own decode of "copy" (the platform's copy of the menu); worth one read on the rendered landing.
-7. **Codex gates owed** (contract § 7): a review of this diff, especially DEVIATIONS 1–2 and the exam-record re-pin, when limits reset.
+7. **`docs/crew-live-l1-status.md` derivation history:** that document records the 2026-07-24 recomputation of the derived live records, and the register points to it. The 2026-10-31 re-derivation of `l1-live-records.json` (main run and three reps; `engineReportHash` only) is the same kind of event and is not noted there, because the file is outside this lane. Suggested line: "Derived records re-pinned 2026-10-31 (S1.5b): engine report bytes changed (spec label + three finding sentences); turns unchanged; re-derived by replaying the committed turns, never by hand; matrices and consistency report byte-identical."
+8. **Codex gates owed** (contract § 7): a review of this diff, especially DEVIATIONS 1–2 and the exam-record re-pin, when limits reset.
 
 ## NOT DONE
 
