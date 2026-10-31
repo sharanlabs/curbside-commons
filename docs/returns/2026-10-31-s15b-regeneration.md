@@ -118,6 +118,7 @@ Hash map (old → new, first 12 hex): `756a27ee7aa0→b5ef1e775b0b` ACP faithful
 - the canonical proof (appendix D) → 40 hashed · 23 moved · 0 bad
 - bundled tally from `expected-report.acp.json`: ok=false · 16 findings · 11 error · 5 warn · 25 feed rows
 - `git ls-files node_modules` → empty
+- after the packet commit: `npx vitest run evals/packs/honesty-c10.test.ts` → 1 (3 failed). This is the known sandbox case: the canonical proof's `git checkout` round-trip touched `lib/` mtimes, so the rendered leg tried `npm run build` and was denied `fonts.googleapis.com`. Then `node scripts/build-offline.mjs` → 0, honesty-c10 → 0 · 281, the full `npx vitest run` → 0 · 2293 passed + 8 skipped, and `stamp-case-digests --check` → 0.
 
 ## DEVIATIONS
 
