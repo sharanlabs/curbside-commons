@@ -1,0 +1,268 @@
+{
+  "id": "synthetic-restaurant-large",
+  "simulated": true,
+  "generator": "generate-large-fixture.mts@1.0.0",
+  "seed": 20261101,
+  "asOf": "2026-11-01T00:00:00Z",
+  "engine": {
+    "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-08-25",
+    "hoursWindowGraceMinutes": 15
+  },
+  "counts": {
+    "categories": 10,
+    "items": 300,
+    "variations": 478,
+    "feedRows": 463,
+    "modifierGroups": 139,
+    "modifierOptions": 458
+  },
+  "itemBand": {
+    "target": 300,
+    "min": 270,
+    "max": 330
+  },
+  "assumptions": {
+    "note": "Declared assumptions set for this measurement; not measurements of any market, platform or merchant.",
+    "readings": "Cumulative = nothing is repaired between days, so findings stand as a running stock; new-per-day = the operational alert-fatigue reading (findings not reported the day before); no repair model is included.",
+    "accumulation": "Only units still in sync with the record can drift; nothing is corrected between days, so later days carry earlier days' drift.",
+    "ratesPerDay": {
+      "price": 0.006,
+      "availability": 0.008,
+      "title": 0.004,
+      "modifierPrice": 0.006,
+      "modifierDrop": 0.004,
+      "hours": 0.01
+    },
+    "titleDriftShares": {
+      "mojibake": 0.4,
+      "truncation": 0.3,
+      "rename": 0.3
+    },
+    "priceDriftStepsCents": [
+      -200,
+      -100,
+      -50,
+      50,
+      100,
+      200
+    ],
+    "modifierDriftStepsCents": [
+      50,
+      100,
+      150
+    ],
+    "hoursShiftMinutes": [
+      5,
+      10,
+      20,
+      30,
+      45,
+      60
+    ]
+  },
+  "days": [
+    {
+      "day": 1,
+      "file": "feeds/day-01.json",
+      "driftApplied": {
+        "price": 2,
+        "availability": 4,
+        "title": 2,
+        "modifierPrice": 7,
+        "modifierDrop": 5,
+        "hours": 1
+      },
+      "findings": 21,
+      "errors": 19,
+      "warnings": 2,
+      "byRuleId": {
+        "LST-AVAIL-STATE": 4,
+        "LST-ENC-TRUNC": 1,
+        "LST-HOURS-WINDOW": 1,
+        "LST-IDENT-NAME": 1,
+        "LST-MOD-MISSING": 5,
+        "LST-MOD-PRICE-VALUE": 7,
+        "LST-PRICE-VALUE": 2
+      },
+      "findingsPer100Items": 7,
+      "warnShare": 0.0952,
+      "newFindings": 21,
+      "newFindingsPer100Items": 7,
+      "resolvedFindings": 0
+    },
+    {
+      "day": 2,
+      "file": "feeds/day-02.json",
+      "driftApplied": {
+        "price": 2,
+        "availability": 9,
+        "title": 2,
+        "modifierPrice": 8,
+        "modifierDrop": 6,
+        "hours": 0
+      },
+      "findings": 48,
+      "errors": 45,
+      "warnings": 3,
+      "byRuleId": {
+        "LST-AVAIL-STATE": 13,
+        "LST-ENC-TRUNC": 2,
+        "LST-HOURS-WINDOW": 1,
+        "LST-IDENT-NAME": 2,
+        "LST-MOD-MISSING": 11,
+        "LST-MOD-PRICE-VALUE": 15,
+        "LST-PRICE-VALUE": 4
+      },
+      "findingsPer100Items": 16,
+      "warnShare": 0.0625,
+      "newFindings": 27,
+      "newFindingsPer100Items": 9,
+      "resolvedFindings": 0
+    },
+    {
+      "day": 3,
+      "file": "feeds/day-03.json",
+      "driftApplied": {
+        "price": 1,
+        "availability": 3,
+        "title": 2,
+        "modifierPrice": 3,
+        "modifierDrop": 1,
+        "hours": 3
+      },
+      "findings": 61,
+      "errors": 53,
+      "warnings": 8,
+      "byRuleId": {
+        "LST-AVAIL-STATE": 16,
+        "LST-ENC-TRUNC": 4,
+        "LST-HOURS-WINDOW": 4,
+        "LST-IDENT-NAME": 2,
+        "LST-MOD-MISSING": 12,
+        "LST-MOD-PRICE-VALUE": 18,
+        "LST-PRICE-VALUE": 5
+      },
+      "findingsPer100Items": 20.33,
+      "warnShare": 0.1311,
+      "newFindings": 13,
+      "newFindingsPer100Items": 4.33,
+      "resolvedFindings": 0
+    },
+    {
+      "day": 4,
+      "file": "feeds/day-04.json",
+      "driftApplied": {
+        "price": 6,
+        "availability": 2,
+        "title": 4,
+        "modifierPrice": 6,
+        "modifierDrop": 4,
+        "hours": 2
+      },
+      "findings": 85,
+      "errors": 72,
+      "warnings": 13,
+      "byRuleId": {
+        "LST-AVAIL-STATE": 18,
+        "LST-ENC-TRUNC": 7,
+        "LST-HOURS-WINDOW": 6,
+        "LST-IDENT-NAME": 3,
+        "LST-MOD-MISSING": 16,
+        "LST-MOD-PRICE-VALUE": 24,
+        "LST-PRICE-VALUE": 11
+      },
+      "findingsPer100Items": 28.33,
+      "warnShare": 0.1529,
+      "newFindings": 24,
+      "newFindingsPer100Items": 8,
+      "resolvedFindings": 0
+    },
+    {
+      "day": 5,
+      "file": "feeds/day-05.json",
+      "driftApplied": {
+        "price": 1,
+        "availability": 2,
+        "title": 1,
+        "modifierPrice": 2,
+        "modifierDrop": 3,
+        "hours": 0
+      },
+      "findings": 93,
+      "errors": 79,
+      "warnings": 14,
+      "byRuleId": {
+        "LST-AVAIL-STATE": 20,
+        "LST-ENC-TRUNC": 8,
+        "LST-HOURS-WINDOW": 6,
+        "LST-IDENT-NAME": 3,
+        "LST-MOD-MISSING": 19,
+        "LST-MOD-PRICE-VALUE": 25,
+        "LST-PRICE-VALUE": 12
+      },
+      "findingsPer100Items": 31,
+      "warnShare": 0.1505,
+      "newFindings": 9,
+      "newFindingsPer100Items": 3,
+      "resolvedFindings": 1
+    },
+    {
+      "day": 6,
+      "file": "feeds/day-06.json",
+      "driftApplied": {
+        "price": 2,
+        "availability": 3,
+        "title": 3,
+        "modifierPrice": 3,
+        "modifierDrop": 7,
+        "hours": 4
+      },
+      "findings": 113,
+      "errors": 95,
+      "warnings": 18,
+      "byRuleId": {
+        "LST-AVAIL-STATE": 23,
+        "LST-ENC-TRUNC": 9,
+        "LST-HOURS-WINDOW": 9,
+        "LST-IDENT-NAME": 5,
+        "LST-MOD-MISSING": 26,
+        "LST-MOD-PRICE-VALUE": 27,
+        "LST-PRICE-VALUE": 14
+      },
+      "findingsPer100Items": 37.67,
+      "warnShare": 0.1593,
+      "newFindings": 21,
+      "newFindingsPer100Items": 7,
+      "resolvedFindings": 1
+    },
+    {
+      "day": 7,
+      "file": "feeds/day-07.json",
+      "driftApplied": {
+        "price": 2,
+        "availability": 3,
+        "title": 0,
+        "modifierPrice": 3,
+        "modifierDrop": 2,
+        "hours": 6
+      },
+      "findings": 127,
+      "errors": 105,
+      "warnings": 22,
+      "byRuleId": {
+        "LST-AVAIL-STATE": 26,
+        "LST-ENC-TRUNC": 9,
+        "LST-HOURS-WINDOW": 13,
+        "LST-IDENT-NAME": 5,
+        "LST-MOD-MISSING": 28,
+        "LST-MOD-PRICE-VALUE": 30,
+        "LST-PRICE-VALUE": 16
+      },
+      "findingsPer100Items": 42.33,
+      "warnShare": 0.1732,
+      "newFindings": 14,
+      "newFindingsPer100Items": 4.67,
+      "resolvedFindings": 0
+    }
+  ]
+}
