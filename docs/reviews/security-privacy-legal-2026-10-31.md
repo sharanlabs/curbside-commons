@@ -34,3 +34,21 @@ Path guard resolves real paths, case-sensitive, judges a missing path by its nea
 - **F3(a):** the flag-attention human gate is prompt-enforced, not a code boundary. Tonight: S2-crew states that truthfully in render/register wording ("model-enforced; code forces escalation on anomalies only"). Code enforcement would retire a case class the L-1 Reviewer exam measures and force a golden re-pin → **deferred to S5 with the re-exam**, recorded in the model-risk register.
 - The reviewer's requested fresh refute passes (F1–F4) are **not dispatched separately**: each finding was reproduced in a harness, each fix lands with a regression test in its lane, and the orchestrator re-applies the F1 probe at the S1.5 merge. Recorded as the verification path.
 - Instruments not run by the reviewer (`npm audit`, secret scanners, `vuln-scan`): `npm audit` arrives via the ci-hygiene lane's CI step; the rest are candidates for the S6 pre-ship gate.
+
+## Verification at merge (orchestrator, 03:1x)
+
+| id | fix landed in | evidence on `main` |
+| --- | --- | --- |
+| F1 (MEDIUM) | S1.5 `7857966` | one shared reserved/duplicate-id predicate in the engine adapters; the two browser copies deleted; orchestrator probe through the real CLI: a `catalog#1` feed row → "Nothing was verified", exit 2 |
+| F2 | S2-crew `7215a46` | `ALLOWED_ROOTS` = fixtures/evals/temp; dot-segments refused; fixed-text error mapping; `registry-path-hardening.test.ts` |
+| F3b/F3c | S2-crew | NFKC + `\p{Cf}` + Hangul fillers, two folded views (incl. a spaced view for zero-width separators), confusables; per-run crypto nonce on the quarantine markers + look-alike neutralization; `crew-quarantine-hardening.test.ts`, obfuscated fixtures |
+| F3a | S2-crew render + exec-layer register | stated as model-enforced; code enforcement deferred to S5 with a re-exam |
+| F4 | S1.5 | declared-key projection of menu claims; planted-field test; S3's adapters carry their own allow-list with planted-field tests |
+| F5 | S2-crew | shared size check before every registry file read |
+| F6 / F7 | S1.5 | duplicate feed row refused; named shape guard for a malformed `modifiers` value |
+| F8 / F9 | S2-crew | `inputArtifact.path` through `resolveInAllowedRoot`; surface chosen from the case |
+| F10 | open | `executed: true` on a reject — follow-up (approvals) |
+| F11 | main `756c9fb` | `.telemetry/` in `.gitignore` |
+| F12 | owner | retired RAG code still imports `@huggingface/transformers` — delete or keep is the owner's call |
+| F13 | contract | lanes never ran npm (one indirect `npm run build` via a test fallback, disclosed by S3; `node_modules` unchanged) |
+| F14 | main `756c9fb` + exec-layer | NOTICE names both UCP tags; the one-pager describes both input paths |
