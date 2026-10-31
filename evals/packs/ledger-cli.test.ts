@@ -10,10 +10,9 @@ import { hashInputs, type LedgerEntryInput } from "../../lib/ledger/index.ts";
 /**
  * cli-experience (Wave 2 lane 7): `check.mjs ledger verify|checkpoint|diff` as a
  * real child process over ledgers built with lib/ledger. Mutation proofs
- * (2026-10-31, each reverted):
- *  - lib/cli/ledger.ts ledgerVerify exit code forced to 0: the tamper test went RED.
- *  - ledgerDiff `changed` section dropped: the diff test went RED.
- *  - ledgerCheckpoint printing `c.hash` only (no seq): the checkpoint test went RED.
+ *  - ledger.ts ledgerVerify failure exit code 1 -> 0: the tamper and checkpoint tests RED.
+ *  - ledger.ts diff `changed` section dropped: the diff test RED.
+ *  - ledger.ts checkpoint prints the hash without the seq: the checkpoint test RED.
  */
 
 const root = process.cwd();

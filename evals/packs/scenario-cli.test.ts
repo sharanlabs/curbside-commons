@@ -7,11 +7,10 @@ import { describe, expect, it } from "vitest";
 /**
  * cli-experience (Wave 2 lane 7): `check.mjs scenario` exercised as a real child
  * process. Mutation proofs (2026-10-31, each reverted):
- *  - lib/cli/scenario.ts `goldenMatch: serialized === golden` -> `true`: the
- *    "one-byte change exits 1" test went RED (exit 0); restored -> green.
- *  - runScenario figures `manifest.figures` -> `{}`: the figures-equal test went RED.
- *  - listScenarios filter hard-coded to one id: the --list enumeration test went RED.
- *  - banned-import tooth: added `import "node:https"` to lib/cli/scenario.ts -> RED.
+ *  - scenario.ts `goldenMatch: serialized === golden` -> `true`: the one-byte-change test RED.
+ *  - scenario.ts `figures: manifest.figures` -> `{}`: the figures-equal test RED.
+ *  - scenario.ts directory filter pinned to one id: the --list and every-scenario tests RED.
+ *  - scenario.ts gains `import "node:https"`: the lib/cli egress-tooth test RED.
  */
 
 const root = process.cwd();
