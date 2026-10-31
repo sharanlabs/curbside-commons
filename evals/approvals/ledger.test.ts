@@ -3,15 +3,12 @@
  * names its seq, truncation past a trusted checkpoint fails, diff golden, and
  * the pure core reaches no file / network / model module.
  *
- * MUTATION PROOFS (each applied to lib/ledger/chain.ts, red observed, restored):
- *  M1  appendLine writes prevHash = GENESIS_PREV_HASH always (drop the link)
- *      -> "chain verifies" stays green only if verify ignores links; with the
- *         link check intact verify went RED at seq 1 (test "chain verifies").
- *      The inverse, verify skipping the prevHash comparison, turned
- *      "a removed middle line" GREEN-when-it-should-be-red (red proves the test bites).
- *  M2  verify skips the checkpoint block -> "truncation past the checkpoint" RED.
- *  M3  verify skips the hash recompute -> "one byte changed" RED.
- *  (exact reds are recorded in docs/returns/2026-10-31-s2-ledger.md)
+ * MUTATION PROOFS (each applied to lib/ledger/chain.ts, red observed, restored; 2026-10-31):
+ *  M1  verify's prevHash comparison disabled        -> RED: "a rewritten entry with a RECOMPUTED hash..." (1 failed)
+ *  M2  verify's checkpoint block disabled           -> RED: the three checkpoint tests (3 failed)
+ *  M3  verify's content-hash recompute disabled     -> RED: "one byte changed in a middle entry..." (1 failed)
+ *  M4  appendLine always chains to the genesis hash -> RED: 6 tests (chain, byte-change, forgery, 3 checkpoint)
+ *  M5  `import "node:https";` appended to chain.ts  -> RED: the egress tooth (walk violation + source scan)
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
