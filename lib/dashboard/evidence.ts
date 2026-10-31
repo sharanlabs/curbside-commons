@@ -16,6 +16,7 @@
  */
 
 import entitySummary from "@/evals/entity/results/results-summary.json";
+import { UCP_PINNED_VERSION } from "../packs/listings/ucp.ts";
 import l1Matrix from "@/evals/crew/gold/l1-live-matrix.json";
 import ragSummary from "@/evals/rag/results/results-summary.json";
 import expectedAcpReport from "@/fixtures/synthetic-restaurant/expected-report.acp.json";
@@ -152,13 +153,15 @@ export const ENGINE = {
     date: "2026-07-04",
   } satisfies Provenance,
 
-  /** PINNED (recomputed by the evidence test from the pinned schema dir). */
-  ucpSchemaCount: 78,
-  ucpSpecVersion: "2026-04-08",
+  /** PINNED (recomputed by the evidence test from the pinned schema dir). The spec
+   *  version is the engine's own pin, never retyped here (S1.5b moved it to
+   *  2026-08-25 on 2026-10-31; 2026-04-08 stays vendored for comparison). */
+  ucpSchemaCount: 116,
+  ucpSpecVersion: UCP_PINNED_VERSION,
   ucpProvenance: {
-    file: "fixtures/ucp-schemas/2026-04-08/PROVENANCE.json",
-    frozenAt: "1d0697e",
-    date: "2026-07-03",
+    file: `fixtures/ucp-schemas/${UCP_PINNED_VERSION}/PROVENANCE.json`,
+    frozenAt: "9d0eedb",
+    date: "2026-10-12",
   } satisfies Provenance,
 
   /** COMPUTED from the committed golden report the /report and /demo pages render. */

@@ -6,9 +6,7 @@ Professional register leads; *plain-English lines are marked ▸*.
 
 The official **Universal Commerce Protocol (UCP)** JSON Schemas, vendored verbatim
 at spec version **`2026-08-25`** (the `v2026-08-25` release tag of the
-`Universal-Commerce-Protocol/ucp` spec repository). This folder is **vendored, not
-active**: the listings pack still pins `2026-04-08` (`UCP_PINNED_VERSION`), and
-nothing in the runtime reads this folder. It is checked by the conformance eval
+`Universal-Commerce-Protocol/ucp` spec repository). This folder is **vendored and ACTIVE since 2026-10-31** (Wave 2 / S1.5b): the listings pack pins `2026-08-25` (`UCP_PINNED_VERSION`), and the `2026-04-08` folder stays vendored for comparison. It is checked by the conformance eval
 (`evals/packs/ucp-conformance.test.ts`, which runs over both vendored versions) and
 by the differential oracle, so the move to `2026-08-25` is a measured, separate
 decision rather than a silent one.

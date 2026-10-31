@@ -25,7 +25,7 @@ their generators so the corpus cannot be hand-tampered without CI failing.
 | **Synthetic restaurant** | [`synthetic-restaurant/`](synthetic-restaurant/README.md) | Truth leg (`LST-*`) | A simulated restaurant system-of-record, faithful + deliberately-drifted serving copies (ACP feed + a constructed UCP response), a ground-truth drift manifest, and the golden verifier reports. |
 | **Fee-audit (UC-1)** | [`synthetic-restaurant/fees/`](synthetic-restaurant/fees/README.md) | Fee truth leg (`NYC-563.3-*`) | Simulated monthly delivery **fee statements** (faithful + drifted + refund-window cases) audited against the real codified NYC §20-563.3 caps, with a machine answer key keyed to the plan §7 fee-line classes and golden fee-audit reports. |
 | **UCP conformance CI** | [`ucp-conformance-ci/`](ucp-conformance-ci/manifest.json) | Conformance leg (`LST-CONF-*`) | 35 real-UCP-wire-shape catalog-response documents (14 valid + 21 each violating exactly one named schema rule) + a `manifest.json` ground-truth key, plus the headline `conformant-but-false.json` exhibit. |
-| **UCP schemas (reference)** | [`ucp-schemas/`](ucp-schemas/2026-04-08/README.md) | Conformance leg (reference) | The 78 official UCP JSON Schemas (`v2026-04-08`), pinned + sha256-locked, Apache-2.0. This is upstream reference data, not our synthetic corpus — its own LICENSE stands and is untouched. |
+| **UCP schemas (reference)** | [`ucp-schemas/`](ucp-schemas/2026-08-25/README.md) | Conformance leg (reference) | The 116 official UCP JSON Schemas (`v2026-08-25`, the active pin since 2026-10-31; `v2026-04-08` kept vendored for comparison), pinned + sha256-locked, Apache-2.0. This is upstream reference data, not our synthetic corpus — its own LICENSE stands and is untouched. |
 
 Each set has its own README/manifest with the full contents table; this index
 covers what spans both.
@@ -119,7 +119,7 @@ synthetic, simulated-labeled, and carries no real merchant data to restrict.
 
 *(Separate and untouched: `ucp-schemas/` carries the upstream **Apache-2.0**
 license of the official UCP schemas, pinned from `Universal-Commerce-Protocol/ucp
-@ v2026-04-08`. That is upstream reference data with its own standing license;
+@ v2026-04-08` and `v2026-08-25`. That is upstream reference data with its own standing license;
 this "pending" decision is about OUR synthetic corpus only.)*
 
 ## Honesty box

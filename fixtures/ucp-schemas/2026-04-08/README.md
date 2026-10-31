@@ -1,5 +1,7 @@
 # Pinned UCP JSON Schemas — `2026-04-08`
 
+> **Superseded as the active pin on 2026-10-31** (Wave 2 / S1.5b moved `UCP_PINNED_VERSION` to `2026-08-25`). This folder stays vendored and is still exercised by the conformance eval so the previous pin remains a measured comparison.
+
 Professional register leads; *plain-English lines are marked ▸*.
 
 ## What this is

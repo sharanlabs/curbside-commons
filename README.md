@@ -72,7 +72,7 @@ output of a completed, human-approved audit, never inside it — is in
 [`docs/decisions/crew-acts-2026-07-26.md`](docs/decisions/crew-acts-2026-07-26.md).)
 
 1. **Truth leg** — compare a published feed (an ACP-style feed, or a UCP catalog response) line by line against the merchant's system of record. Deterministic. No LLM anywhere on this path.
-2. **Conformance leg** — validate a UCP catalog response against the **78 pinned official UCP JSON Schemas** (spec `v2026-04-08`). A document can be perfectly spec-shaped and still false, which is the point:
+2. **Conformance leg** — validate a UCP catalog response against the **116 pinned official UCP JSON Schemas** (spec `v2026-08-25`, active since 2026-10-31; the earlier `v2026-04-08` set stays vendored and exercised for comparison). A document can be perfectly spec-shaped and still false, which is the point:
 
 > **The headline exhibit, machine-checked in CI:** `fixtures/ucp-conformance-ci/valid/conformant-but-false.json` **passes** official-schema conformance and **fails** the truth leg on a price lie. Shape-valid is not true. *(Reproduce it with `node bin/check.mjs demo`, which runs both legs over this exact document — it is a UCP **wire** response, and the standalone truth-leg command takes a catalog-response fixture or an ACP feed, so the two legs are wired together in the demo rather than run by hand.)* *(CI = the real thing, not a figure of speech: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `npm run verify` — which includes this differential — plus the legacy suite on every push and PR; first green run observed 2026-07-11 (run 29133350771), most recent observed green 2026-07-12 (run 29208347657 on `d6c7a4d`).)*
 
@@ -111,7 +111,7 @@ Every finding carries **receipts**: the claim, the reference row, the rule or sp
 ## Why now (as of 2026-07)
 
 - Agentic ordering is live: major consumer AI assistants began placing real food orders through published commerce protocols in mid-2026, and marketplace ordering inside an assistant has been piloting since March 2026. (Named, dated citations live in `docs/research/` — genericized here by policy; the research digests carry the specifics.)
-- The protocol layer is settling: ACP and UCP (spec `v2026-04-08`, the version pinned here) are both Apache-2.0 and moving fast; UCP's Food vertical schemas were still pending at the pinned tag.
+- The protocol layer is settling: ACP and UCP (spec `v2026-08-25`, the version pinned here since 2026-10-31) are both Apache-2.0 and moving fast; UCP's Food vertical schemas were still pending at the pinned tag.
 - Fee enforcement is real: NYC's first restaurant-side fee-cap enforcement was an **$875,000+ settlement, including over $580,000 in restitution to 380+ restaurants** (announced 2026-04-08), and DCWP has an active rulemaking on recordkeeping for delivery-fee-cap compliance (hearing July 2026).
 
 Dated source records for these claims live in `docs/research/` (source lockfile included).
