@@ -7,7 +7,9 @@
  * top to bottom — who did what, what got blocked, and whether the run ended as
  * a suggestion for the human or a hand-off to the human.
  */
-import type { TrajectoryRecord } from "./types.ts";
+import { ROOT_CAUSE_SEAT_STATE } from "./classification.ts";
+import { ROUTE_TABLE_LABEL } from "./route.ts";
+import type { CrewImpact, TrajectoryRecord } from "./types.ts";
 
 const KIND_TAG: Readonly<Record<string, string>> = {
   model_turn: "MODEL TURN",
@@ -17,7 +19,64 @@ const KIND_TAG: Readonly<Record<string, string>> = {
   recommendation: "RECOMMENDATION",
   forced_escalation: "FORCED ESCALATION",
   escalation: "ESCALATION",
+  route: "ROUTE",
+  deferred: "DEFER",
+  skipped: "SKIPPED",
 };
+
+/** The exact chip on every impact figure line. */
+export const IMPACT_CHIP = "simulated";
+
+/**
+ * What the code does and does not enforce about the Reviewer's policy
+ * (security review 2026-10-31 F3a, orchestrator decision): the
+ * "flag-attention → escalate" rule lives in the Reviewer's prompt only.
+ */
+export const REVIEWER_ENFORCEMENT_NOTE =
+  "flag-attention → escalate is model-enforced; code forces escalation on anomalies only; code enforcement deferred to S5 with a re-exam";
+
+/** Cents → "$d.cc" (every figure is derived from the record, never typed). */
+function dollars(cents: number): string {
+  const sign = cents < 0 ? "-" : "";
+  const abs = Math.abs(cents);
+  return `${sign}$${Math.floor(abs / 100)}.${String(abs % 100).padStart(2, "0")}`;
+}
+
+function impactLine(impact: CrewImpact): string {
+  if (impact.kind === "skipped") return `impact: ${impact.reason} — no figures`;
+  const assumptions = impact.assumptions.map((a) => `${a.name} = ${String(a.value)}`).join("; ");
+  return (
+    `impact [${IMPACT_CHIP}]: ${impact.ordersAtRiskDistinct} distinct order(s) at risk · ` +
+    `observed menu refunds ${dollars(impact.observedMenuRefundCents)} · ` +
+    `prospective exposure ${dollars(impact.prospectiveExposureCents)} · ` +
+    `agent-cancel exposure ${dollars(impact.agentCancelExposureCents)} · ` +
+    `error-charge exposure ${dollars(impact.errorChargeExposureCents)}` +
+    (assumptions.length > 0 ? ` (assumptions: ${assumptions})` : "")
+  );
+}
+
+/** The S2 block — rendered ONLY for a run of a case carrying `s2`; a legacy render is byte-unchanged. */
+function s2Lines(record: TrajectoryRecord): string[] {
+  if (record.route === undefined) return [];
+  const lines: string[] = [];
+  lines.push(
+    `route (${ROUTE_TABLE_LABEL}): ${record.route.route}${record.route.artifacts.length > 0 ? ` → ${record.route.artifacts.join(" · ")}` : ""} — ${record.route.reason}`,
+  );
+  lines.push(
+    record.explanation === undefined
+      ? "root cause (deterministic baseline): not computed — see the steps above"
+      : `root cause (${record.explanation.label}): ${record.explanation.class} — cited events: ${
+          record.explanation.citedEvents.length > 0 ? record.explanation.citedEvents.map((i) => `#${i}`).join(" · ") : "none"
+        } — ${record.explanation.reason}`,
+  );
+  lines.push(`root-cause seat (LLM): ${record.rootCauseSeat ?? ROOT_CAUSE_SEAT_STATE} — not examined on any model; never called in this run`);
+  if (record.impact !== undefined) lines.push(impactLine(record.impact));
+  if (record.reviewerLabelState !== undefined) {
+    lines.push(`reviewer seat: ${record.reviewerLabelState} (approve | escalate only; ${REVIEWER_ENFORCEMENT_NOTE})`);
+  }
+  lines.push("");
+  return lines;
+}
 
 /** Render one trajectory as deterministic plain text (byte-frozen goldens assert this exact output). */
 export function renderTrajectory(record: TrajectoryRecord): string {
@@ -39,6 +98,7 @@ export function renderTrajectory(record: TrajectoryRecord): string {
     }
   });
   lines.push("");
+  lines.push(...s2Lines(record));
   if (record.anomalies.length > 0) {
     lines.push(`anomalies (${record.anomalies.length}):`);
     for (const a of record.anomalies) lines.push(`  ⚠ ${a}`);

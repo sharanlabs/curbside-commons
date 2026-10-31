@@ -29,12 +29,18 @@ import { assertDecisionGrade, callTool, type ToolResult } from "../tools/registr
 import { argsDigest, sha256Hex } from "./canonical.ts";
 import { detectInjectionSignatures } from "./injection-scan.ts";
 import { buildCaseManifest, manifestDigestOf, REPLAY_MODEL_ID } from "./manifest.ts";
-import { quarantineExcerpt, type CrewModel, type IntakeDecision } from "./model.ts";
+import { quarantineExcerpt, reviewerLabelStateFor, type CrewModel, type IntakeDecision } from "./model.ts";
+import { route, ROUTE_TABLE_LABEL, type RouteInput, type RouteResult } from "./route.ts";
 import {
   deriveRecommendationClass,
   makeRecommendation,
   parseReportCanonical,
   type CrewCase,
+  type CrewCaseS2,
+  type CrewExplanation,
+  type CrewImpact,
+  type CrewMemberName,
+  type ParsedReport,
   type Recommendation,
   type TerminalClass,
   type TrajectoryRecord,
@@ -217,20 +223,52 @@ export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord 
     });
   }
 
+  // ---- S2 SEATS (S2-crew CP4): only on a case carrying `s2`. Root-cause runs
+  // the deterministic explain_drift baseline (the LLM seat renders DEFER),
+  // Impact runs size_impact when the case names an orders file, then the
+  // deterministic route table proposes where the run goes. Every call is
+  // contracted in expectedToolCalls exactly like the routed call above. ----
+  const s2 =
+    crewCase.s2 === undefined
+      ? undefined
+      : runS2Seats(crewCase, crewCase.s2, consumedReport, steps, anomalies, consumedReport === null ? 0 : 1);
+
   // ---- REVIEWER (model-directed + the HUMAN GATE; containment overrides approval) ----
-  const review = model.reviewerTurn({
+  const reviewerInput = {
     caseId: crewCase.caseId,
     terminalClassSoFar: terminalClass,
     findingCount: consumedReport?.findings.length ?? 0,
     anomalies,
     quarantinedArtifactExcerpt: quarantineExcerpt(rawArtifact),
     manifestDigest,
-  });
+    ...(s2 !== undefined ? { computedRoute: s2.proposedRoute } : {}),
+  };
+  const review = model.reviewerTurn(reviewerInput);
   steps.push({
     member: "reviewer",
     kind: "model_turn",
     note: review.kind === "approve" ? "reviewer approved the recommendations" : `reviewer escalated: ${review.reason}`,
   });
+
+  // The final route re-applies the table with the Reviewer's actual decision.
+  let extras: S2RecordExtras | undefined;
+  if (s2 !== undefined) {
+    const finalRoute = route({ ...s2.routeInput, reviewerDecision: review.kind, anomalies: anomalies.length });
+    if (finalRoute.route !== s2.proposedRoute.route) {
+      steps.push({
+        member: "evidence",
+        kind: "route",
+        note: `route table (${ROUTE_TABLE_LABEL}) re-applied after the reviewer's decision: ${finalRoute.route} — ${finalRoute.reason}`,
+      });
+    }
+    extras = {
+      route: finalRoute,
+      ...(s2.explanation !== undefined ? { explanation: s2.explanation } : {}),
+      impact: s2.impact,
+      rootCauseSeat: "DEFER",
+      reviewerLabelState: reviewerLabelStateFor(reviewerInput),
+    };
+  }
 
   if (anomalies.length > 0) {
     if (review.kind === "approve") {
@@ -242,15 +280,247 @@ export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord 
     } else {
       steps.push({ member: "reviewer", kind: "escalation", note: "escalated to the human (anomalies on record)" });
     }
-    return freezeRecord(crewCase.caseId, steps, "escalate-to-human", "none-escalated", [], anomalies, engineReportHash, consumedReport?.findingIds ?? null);
+    return freezeRecord(crewCase.caseId, steps, "escalate-to-human", "none-escalated", [], anomalies, engineReportHash, consumedReport?.findingIds ?? null, extras);
   }
 
   if (review.kind === "escalate") {
     steps.push({ member: "reviewer", kind: "escalation", note: "escalated to the human by reviewer decision" });
-    return freezeRecord(crewCase.caseId, steps, "escalate-to-human", "none-escalated", [], anomalies, engineReportHash, consumedReport?.findingIds ?? null);
+    return freezeRecord(crewCase.caseId, steps, "escalate-to-human", "none-escalated", [], anomalies, engineReportHash, consumedReport?.findingIds ?? null, extras);
   }
 
-  return freezeRecord(crewCase.caseId, steps, "recommendation", terminalClass, recommendations, anomalies, engineReportHash, consumedReport?.findingIds ?? null);
+  // S2: a route of human-escalation (no owner established) lands the run at the
+  // human gate even over an approve — responsibility is never guessed.
+  if (extras?.route?.route === "human-escalation") {
+    steps.push({
+      member: "evidence",
+      kind: "escalation",
+      note: `route table sent the run to a person: ${extras.route.reason}`,
+    });
+    return freezeRecord(crewCase.caseId, steps, "escalate-to-human", "none-escalated", [], anomalies, engineReportHash, consumedReport?.findingIds ?? null, extras);
+  }
+
+  return freezeRecord(crewCase.caseId, steps, "recommendation", terminalClass, recommendations, anomalies, engineReportHash, consumedReport?.findingIds ?? null, extras);
+}
+
+/** The S2 fields a record carries — present only on S2 runs. */
+interface S2RecordExtras {
+  readonly route?: RouteResult;
+  readonly explanation?: CrewExplanation;
+  readonly impact?: CrewImpact;
+  readonly rootCauseSeat?: "DEFER";
+  readonly reviewerLabelState?: string;
+}
+
+interface S2SeatsOutcome {
+  readonly routeInput: RouteInput;
+  readonly proposedRoute: RouteResult;
+  readonly explanation?: CrewExplanation;
+  readonly impact: CrewImpact;
+}
+
+/** Parse a JSON-lines event log; LOUD on any malformed line (evidence is never guessed at). */
+function readEventLog(path: string): unknown[] {
+  return readFileSync(path, "utf8")
+    .split("\n")
+    .filter((line) => line.trim().length > 0)
+    .map((line, i) => {
+      try {
+        return JSON.parse(line) as unknown;
+      } catch {
+        throw new Error(`crew: ${path} line ${i + 1} is not JSON — an event log is read whole or not at all`);
+      }
+    });
+}
+
+/** Parse explain_drift's canonical payload at the JSON level; LOUD on any shape surprise. */
+function parseExplanation(canonical: string): CrewExplanation {
+  const raw = JSON.parse(canonical) as Record<string, unknown>;
+  const cited = raw.citedEvents;
+  if (
+    typeof raw.class !== "string" ||
+    !Array.isArray(cited) ||
+    !cited.every((n) => Number.isInteger(n)) ||
+    typeof raw.reason !== "string" ||
+    typeof raw.label !== "string"
+  ) {
+    throw new Error("crew: explain_drift payload has an unrecognized shape — refusing to consume it");
+  }
+  return Object.freeze({
+    class: raw.class,
+    citedEvents: Object.freeze([...(cited as number[])]),
+    reason: raw.reason,
+    label: raw.label,
+  });
+}
+
+/** Parse size_impact's canonical payload at the JSON level; LOUD unless every figure is an integer and the label is "simulated". */
+function parseImpact(canonical: string): CrewImpact {
+  const raw = JSON.parse(canonical) as Record<string, unknown>;
+  const figures = [
+    "ordersAtRiskDistinct",
+    "observedMenuRefundCents",
+    "prospectiveExposureCents",
+    "agentCancelExposureCents",
+    "errorChargeExposureCents",
+  ] as const;
+  if (raw.label !== "simulated" || !Array.isArray(raw.assumptions) || figures.some((k) => !Number.isInteger(raw[k]))) {
+    throw new Error('crew: size_impact payload is not integer figures labeled "simulated" — refusing to consume it');
+  }
+  return Object.freeze({
+    kind: "figures" as const,
+    ordersAtRiskDistinct: raw.ordersAtRiskDistinct as number,
+    observedMenuRefundCents: raw.observedMenuRefundCents as number,
+    prospectiveExposureCents: raw.prospectiveExposureCents as number,
+    agentCancelExposureCents: raw.agentCancelExposureCents as number,
+    errorChargeExposureCents: raw.errorChargeExposureCents as number,
+    assumptions: Object.freeze(
+      (raw.assumptions as Array<{ name: unknown; value: unknown }>).map((a) => {
+        if (typeof a?.name !== "string" || (typeof a.value !== "string" && typeof a.value !== "number")) {
+          throw new Error("crew: size_impact assumption has an unrecognized shape — refusing to consume it");
+        }
+        return Object.freeze({ name: a.name, value: a.value });
+      }),
+    ),
+    label: "simulated" as const,
+  });
+}
+
+/**
+ * One CONTRACTED deterministic call (S2 seats): the same containment the routed
+ * call gets — allowed/forbidden, then the contract at `contractIndex` must name
+ * this tool with this exact argument digest, BEFORE execution. Returns the
+ * parsed payload, or null with an anomaly + typed step on record.
+ */
+function contractedCall<T>(
+  crewCase: CrewCase,
+  member: CrewMemberName,
+  tool: string,
+  params: Readonly<Record<string, unknown>>,
+  contractIndex: number,
+  parse: (canonical: string) => T,
+  describe: (parsed: T) => string,
+  steps: TrajectoryStep[],
+  anomalies: string[],
+): T | null {
+  const contract = crewCase.expectedToolCalls[contractIndex];
+  if (crewCase.forbiddenTools.includes(tool) || !crewCase.allowedTools.includes(tool)) {
+    anomalies.push(`blocked out-of-contract tool request "${tool}"`);
+    steps.push({ member, kind: "blocked_tool_call", toolName: tool, note: `tool "${tool}" is outside this case's contract — BLOCKED at the call site` });
+    return null;
+  }
+  if (contract === undefined || contract.tool !== tool) {
+    anomalies.push(`blocked "${tool}": not the contracted next call`);
+    steps.push({ member, kind: "blocked_tool_call", toolName: tool, note: `tool "${tool}" is allowed but not contracted as the next call — BLOCKED before execution` });
+    return null;
+  }
+  if (argsDigest(contract.params) !== argsDigest(params)) {
+    anomalies.push(`blocked "${tool}": argument digest deviates from the case's call contract`);
+    steps.push({ member, kind: "blocked_tool_call", toolName: tool, note: `tool "${tool}" built with NON-CONTRACTED arguments — BLOCKED before execution` });
+    return null;
+  }
+  try {
+    const result = callTool(tool, params);
+    const parsed = parse(result.canonical);
+    steps.push({ member, kind: "tool_call", toolName: tool, argsDigest: argsDigest(params), note: describe(parsed) });
+    return parsed;
+  } catch (err) {
+    anomalies.push(`tool "${tool}" failed: ${err instanceof Error ? err.message : String(err)}`);
+    steps.push({ member, kind: "refused_result", toolName: tool, note: `tool "${tool}" failed loudly — no result to consume` });
+    return null;
+  }
+}
+
+function runS2Seats(
+  crewCase: CrewCase,
+  s2: CrewCaseS2,
+  report: ParsedReport | null,
+  steps: TrajectoryStep[],
+  anomalies: string[],
+  firstContractIndex: number,
+): S2SeatsOutcome {
+  let next = firstContractIndex;
+  let explanation: CrewExplanation | undefined;
+  let impact: CrewImpact;
+
+  // ---- ROOT-CAUSE: the deterministic baseline, then the LLM seat's DEFER ----
+  if (report === null) {
+    steps.push({ member: "root-cause", kind: "skipped", toolName: "explain_drift", note: "no engine report was consumed — explain_drift not called (nothing to explain)" });
+  } else {
+    const params = {
+      findings: report.findings.map((f) => ({ id: f.id, ruleId: f.ruleId, category: f.category, referenceRowId: f.referenceRowId })),
+      events: readEventLog(s2.eventsPath),
+      asOf: s2.asOf,
+    };
+    explanation =
+      contractedCall(
+        crewCase,
+        "root-cause",
+        "explain_drift",
+        params,
+        next,
+        parseExplanation,
+        (e) => `explain_drift (${e.label}): ${e.class}, citing ${e.citedEvents.length} event(s)`,
+        steps,
+        anomalies,
+      ) ?? undefined;
+    next += 1;
+  }
+  steps.push({
+    member: "root-cause",
+    kind: "deferred",
+    note: "LLM root-cause seat: DEFER — not examined on any model; this run shows the deterministic baseline, never a model's guess",
+  });
+
+  // ---- IMPACT: size_impact only when the case supplies an orders file ----
+  if (s2.impact === undefined) {
+    impact = Object.freeze({ kind: "skipped" as const, reason: "no orders data in this case" });
+    steps.push({ member: "impact", kind: "skipped", toolName: "size_impact", note: "no orders data in this case — size_impact not called" });
+  } else if (report === null) {
+    impact = Object.freeze({ kind: "skipped" as const, reason: "no engine report was consumed" });
+    steps.push({ member: "impact", kind: "skipped", toolName: "size_impact", note: "no engine report was consumed — size_impact not called" });
+  } else if (report.findings.some((f) => f.category === null)) {
+    impact = Object.freeze({ kind: "skipped" as const, reason: "a consumed finding carries no category" });
+    steps.push({ member: "impact", kind: "skipped", toolName: "size_impact", note: "a consumed finding carries no category — size_impact input cannot be built without inventing one" });
+  } else {
+    const params = {
+      findings: report.findings.map((f) => ({ id: f.id, ruleId: f.ruleId, category: f.category as string, referenceRowId: f.referenceRowId })),
+      orders: readEventLog(s2.impact.ordersPath),
+      windowDays: s2.impact.windowDays,
+      errorChargeShare: s2.impact.errorChargeShare,
+    };
+    const figures = contractedCall(
+      crewCase,
+      "impact",
+      "size_impact",
+      params,
+      next,
+      parseImpact,
+      (i) => (i.kind === "figures" ? `size_impact (simulated): ${i.ordersAtRiskDistinct} distinct order(s) at risk` : "size_impact"),
+      steps,
+      anomalies,
+    );
+    impact = figures ?? Object.freeze({ kind: "skipped" as const, reason: "size_impact did not return figures (see the step above)" });
+    next += 1;
+  }
+
+  // ---- ROUTE (deterministic workflow): the route if the Reviewer approves ----
+  const findings = report?.findings ?? [];
+  const routeInput: RouteInput = {
+    pack: s2.route.pack,
+    triggerKind: s2.route.triggerKind,
+    ownership: s2.route.ownership,
+    findingCategories: [...new Set(findings.map((f) => f.category ?? "uncategorized"))].sort(),
+    maxSeverity: findings.some((f) => f.severity === "error") ? "error" : findings.some((f) => f.severity === "warn") ? "warn" : "none",
+    reviewerDecision: "approve",
+    anomalies: anomalies.length,
+  };
+  const proposedRoute = route(routeInput);
+  steps.push({
+    member: "evidence",
+    kind: "route",
+    note: `route table (${ROUTE_TABLE_LABEL}) proposes ${proposedRoute.route}${proposedRoute.artifacts.length > 0 ? ` → ${proposedRoute.artifacts.join(", ")}` : ""} — ${proposedRoute.reason}`,
+  });
+  return { routeInput, proposedRoute, ...(explanation !== undefined ? { explanation } : {}), impact };
 }
 
 function freezeRecord(
@@ -262,6 +532,7 @@ function freezeRecord(
   anomalies: readonly string[],
   engineReportHash: string | null,
   consumedFindingIds: readonly string[] | null,
+  extras?: S2RecordExtras,
 ): TrajectoryRecord {
   return Object.freeze({
     caseId,
@@ -272,5 +543,7 @@ function freezeRecord(
     anomalies: Object.freeze([...anomalies]),
     engineReportHash,
     consumedFindingIds: consumedFindingIds === null ? null : Object.freeze([...consumedFindingIds]),
+    // S2 fields appear ONLY on S2 runs (a legacy record gains no key at all).
+    ...(extras ?? {}),
   });
 }
