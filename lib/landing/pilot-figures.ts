@@ -48,7 +48,7 @@ export const STATE = {
   modifierChecks: "BUILT (S1)",
   explainAndRoute: "BUILT 2026-10-31 (S2-crew): a deterministic route table and the explain_drift baseline",
   impactArithmetic: "BUILT 2026-10-31: shown in a crew run (size_impact) when the case supplies orders",
-  ledger: "library MERGED 2026-10-31; a crew run yields a ledger entry; the command that appends it to a file ARRIVES W3",
+  ledger: "library MERGED 2026-10-31; a crew run yields a ledger entry; the command that appends it to a file ARRIVES with the next wave",
   signing: "BUILT as an offline simulator",
   rootCauseSeat: "DEFER by design: no live exam inside this pilot (decision 2026-10-14); the explain_drift deterministic baseline stands in (S2-crew, 2026-10-31)",
   intakeReviewer: "BUILT; examined on one model only",
