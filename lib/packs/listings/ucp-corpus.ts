@@ -183,7 +183,7 @@ export function buildUcpConformanceCorpus(sor: SyntheticCatalog): UcpConformance
     seed: sor.generator.seed,
     asOf: sor.asOf,
     specVersion: UCP_PINNED_VERSION,
-    schemaSource: "fixtures/ucp-schemas/2026-04-08 (Universal-Commerce-Protocol/ucp @ v2026-04-08, Apache-2.0)",
+    schemaSource: `fixtures/ucp-schemas/${UCP_PINNED_VERSION} (Universal-Commerce-Protocol/ucp @ v${UCP_PINNED_VERSION}, Apache-2.0)`,
     counts: { total: entries.length, valid: validEntries.length, invalid: invalidEntries.length },
     violationClasses,
     headlineExhibit: "valid/conformant-but-false.json",
