@@ -65,4 +65,21 @@ export const TOOL_DESCRIPTIONS: Readonly<Record<string, string>> = Object.freeze
     "data): plays the scripted demonstration in which a spec-valid-but-false surface is caught " +
     "against the SOR catalog. Always exits successfully; this is a narration, not a pass/fail " +
     "check.",
+  // S2-crew (2026-10-31): committed descriptions for the two S2 tools. They are
+  // registered but NOT yet advertised on tools/list (lib/mcp/server.ts,
+  // MCP_ADVERTISED_TOOLS) — advertisement needs the MCP conformance test, a
+  // transcript re-record and schema files, all outside the S2-crew lane.
+  explain_drift:
+    "DETERMINISTIC BASELINE — an explanation, never a verdict. SIMULATED data (never real " +
+    "merchant data): classes the cause of a set of engine findings from the scenario's event " +
+    "log (timestamp and actor rules only) as one of sync-latency, merchant-edit, integrator-bug, " +
+    "platform-override, encoding or unknown, citing the events it rests on. It abstains with " +
+    "unknown when the evidence is missing or conflicting, and never guesses. No AI call sits " +
+    "in this tool; the separate model-driven root-cause seat is DEFER (not examined).",
+  size_impact:
+    "SIMULATED figures (never real merchant data, never a prevention or saving claim): " +
+    "deterministic $0 arithmetic over engine findings and a synthetic orders file — distinct " +
+    "orders touching a flagged row, observed menu refunds, prospective exposure, agent-order " +
+    "cancel exposure and an error-charge exposure under a declared share, with every " +
+    "assumption echoed. No AI call sits in this tool's arithmetic.",
 });

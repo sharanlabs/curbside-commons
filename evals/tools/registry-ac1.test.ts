@@ -33,16 +33,18 @@ function expectValidEnvelope(toolName: string, result: unknown): void {
 }
 
 describe("AC-1 registry contract — every tool", () => {
-  it("all seven tools are registered under their exact names (six plan §3 engine tools + the E2 §6 lookup_reference)", () => {
+  it("all nine tools are registered under their exact names (six plan §3 engine tools + the E2 §6 lookup_reference + the S2-crew explain_drift and size_impact)", () => {
     expect([...TOOLS.keys()].sort()).toStrictEqual(
       [
         "audit_statement",
         "check_conformance",
         "check_feed",
         "classify_and_audit",
+        "explain_drift",
         "get_rule",
         "lookup_reference",
         "run_demo",
+        "size_impact",
       ].sort(),
     );
   });
