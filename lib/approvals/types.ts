@@ -89,7 +89,7 @@ export interface ApprovalRequest {
  * BATCH-D P1 FIX (2026-07-12): `caseId`, `action`, and `expiresAtMs` are now
  * SIGNED. Before this, the request object was unsigned and unbound: an
  * attacker who could alter a request after signing could swap the case, swap
- * the action, or EXTEND THE EXPIRY, and all seven checks still passed (the
+ * the action, or EXTEND THE EXPIRY, and all the checks still passed (the
  * reviewer demonstrated exactly that with a read-only exploit probe). These
  * three fields are sourced from the REQUEST at both signing and verification,
  * so any post-signature tamper of them changes the recomputed payload and the
@@ -114,7 +114,7 @@ export interface SigningPayloadFields {
  * nonce} (the last, `nonce`, is the REQUEST's nonce at signing time; see
  * `signDecision`). `subjectDigest` is carried here — not sourced from the request
  * at verify time — so the "does this decision bind to THIS request's content?"
- * check is an explicit, independently-testable step (see verify step 7).
+ * check is an explicit, independently-testable step (see verify step 8).
  */
 export interface SignedDecision {
   readonly requestId: string;
@@ -131,6 +131,13 @@ export interface SignedDecision {
 export interface AuthorizedSigner {
   readonly publicKey: KeyObject;
   readonly role: SignerRole;
+  /**
+   * Epoch ms at which this signer's key was revoked, or absent/null if it never
+   * was. Revocation is a VERIFICATION-TIME rule (door 5): a decision is refused
+   * when `now >= revokedAtMs` at the moment of verification, even if it was
+   * signed before the revocation. Rotation = enrol the new key, revoke the old.
+   */
+  readonly revokedAtMs?: number | null;
 }
 
 /** Options for {@link verifyAndExecute}. All time comes from `clock`; `seenNonces` is caller-owned, mutated on success. */
@@ -165,12 +172,13 @@ export interface ExecutionRecord {
   readonly auditLine: string;
 }
 
-/** Stable machine codes for every failure mode — one per frozen verify check. */
+/** Stable machine codes for every failure mode — one per frozen verify check (eight doors). */
 export type ApprovalErrorCode =
   | "REQUEST_MISMATCH"
   | "EXPIRED"
   | "REPLAY"
   | "UNAUTHORIZED_SIGNER"
+  | "SIGNER_REVOKED"
   | "ROLE_NOT_AUTHORIZED"
   | "SIGNATURE_INVALID"
   | "SUBJECT_MISMATCH";
@@ -214,21 +222,28 @@ export class UnauthorizedSignerError extends ApprovalError {
   }
 }
 
-/** Step 5: a known signer, but its role is not the required role (authorization failure). */
+/** Step 5: a known signer whose key was revoked at or before the moment of verification (verification-time rule). */
+export class SignerRevokedError extends ApprovalError {
+  constructor(message: string) {
+    super("SIGNER_REVOKED", message);
+  }
+}
+
+/** Step 6: a known signer, but its role is not the required role (authorization failure). */
 export class RoleNotAuthorizedError extends ApprovalError {
   constructor(message: string) {
     super("ROLE_NOT_AUTHORIZED", message);
   }
 }
 
-/** Step 6: the signature does not verify over the recomputed canonical payload (tamper/forgery/empty). */
+/** Step 7: the signature does not verify over the recomputed canonical payload (tamper/forgery/empty). */
 export class SignatureInvalidError extends ApprovalError {
   constructor(message: string) {
     super("SIGNATURE_INVALID", message);
   }
 }
 
-/** Step 7: a validly-signed decision whose attested subjectDigest is bound to a DIFFERENT crew record than the request. */
+/** Step 8: a validly-signed decision whose attested subjectDigest is bound to a DIFFERENT crew record than the request. */
 export class SubjectMismatchError extends ApprovalError {
   constructor(message: string) {
     super("SUBJECT_MISMATCH", message);

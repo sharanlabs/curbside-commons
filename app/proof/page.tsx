@@ -122,13 +122,14 @@ const CREW_MEMBERS = CREW_ORDER.map(
   (name) => L1.perMember.find((m) => m.member === name) ?? { member: name },
 );
 
-// Approvals: the seven check titles derive from the pinned check order.
+// Approvals: the check titles (and their count) derive from the pinned check order — eight since the revocation door landed 2026-10-31.
 const CHECK_TITLES = E3.checkOrder.split(" -> ").map((t) => t.replace(/\s*\(.*\)$/, ""));
 const CHECK_DESCS = [
   "the decision names this request",
   "the approval has not lapsed",
   "this token has not been seen",
   "the key is on the roster",
+  "the key has not been revoked",
   "the signer may approve this",
   "signed against the bytes, re-derived",
   "the approval is bound to this exact content",
@@ -376,7 +377,7 @@ export default function ProofPage() {
           <p className="lp-eyebrow">SIGNED APPROVALS</p>
           <span className="lp-sec-rule" aria-hidden="true" />
           <h2 className="lp-h2" id="sig-h">
-            A signed decision, then seven checks.
+            {`A signed decision, then ${spelled(CHECK_TITLES.length)} checks.`}
           </h2>
           <p className="lp-foot">{E3.what}.</p>
         </Reveal>

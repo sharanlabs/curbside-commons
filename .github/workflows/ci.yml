@@ -34,6 +34,26 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # Supply-chain hygiene (Wave 2, lane ci-hygiene). NON-blocking tonight: the audit
+      # step reports advisories but never fails the build; a follow-up can flip it to
+      # blocking once the first run's advisories have been read. Both files are CI
+      # artifacts (14-day retention), runtime dependencies only (--omit=dev).
+      - name: npm audit (runtime deps, non-blocking)
+        continue-on-error: true
+        run: npm audit --omit=dev --audit-level=high
+      - name: npm audit JSON
+        run: npm audit --omit=dev --json > audit.json || true
+      - name: CycloneDX SBOM (runtime deps)
+        run: npm sbom --sbom-format cyclonedx --omit=dev > sbom.cdx.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (node24 runtime; inputs name/path/if-no-files-found/retention-days verified in its action.yml, cloned at tag 2026-10-31; v4.6.2 = node20 runtime)
+        if: ${{ !cancelled() }}
+        with:
+          name: supply-chain-audit-and-sbom
+          path: |
+            audit.json
+            sbom.cdx.json
+          retention-days: 14
+          if-no-files-found: error
       - run: npm run verify        # typecheck + lint + vitest suites + build
       - run: npm run test:legacy   # the archived legacy module's 306-test suite
       - run: npx playwright install --with-deps chromium

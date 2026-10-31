@@ -130,6 +130,8 @@ const pilotDocs = [
   join(root, "docs", "pilot-kit", "security-one-pager.md"),
   join(root, "docs", "pilot-kit", "success-metrics.md"),
   join(root, "docs", "pilot-kit", "demo-script-10min.md"),
+  join(root, "docs", "pilot-kit", "executive-brief.md"),
+  join(root, "docs", "pilot-kit", "five-minute-walk.md"),
 ];
 
 const scannedFiles = [
@@ -137,6 +139,7 @@ const scannedFiles = [
   ...publicProse,
   ...siteShell,
   ...pilotDocs,
+  join(root, "SECURITY.md"),
   join(root, "bin", "check.mjs"),
   join(root, "fixtures", "README.md"),
   join(root, "fixtures", "synthetic-restaurant", "README.md"),

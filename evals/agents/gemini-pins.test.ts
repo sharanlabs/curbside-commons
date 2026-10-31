@@ -10,6 +10,12 @@ import { costUsd, GEMINI_PRICING, PRICING_VERSION } from "@/lib/agents/pricing";
  *
  * Sources (RULES §6, read 2026-10-12): https://ai.google.dev/gemini-api/docs/pricing and
  * https://ai.google.dev/gemini-api/docs/models. Paid-tier STANDARD per-1M-token text prices.
+ *
+ * RED-BEFORE PROOF (measured 2026-10-31 01:14, Wave 1 acceptance review): changing
+ * gemini-3.5-flash-lite outputPerMillionUsd 2.5 -> 2.6 in lib/agents/pricing.ts turned 2 tests red
+ * ("gemini-3.5-flash-lite (the default) is priced $0.30 in / $2.50 out per 1M" and "costUsd prices
+ * both current models..."); restored byte-exact -> green.
+ * 2026-10-31 (S2-ledger): PRICING_VERSION assertion follows the bump to "2026-10-31" (new $0 rows only).
  */
 
 afterEach(() => {
@@ -17,8 +23,8 @@ afterEach(() => {
 });
 
 describe("S1-pins — the pinned price list", () => {
-  it("PRICING_VERSION is the 2026-10-12 re-verification date", () => {
-    expect(PRICING_VERSION).toBe("2026-10-12");
+  it("PRICING_VERSION is the 2026-10-31 pin (new $0 free-tier rows only; paid prices unchanged, last re-verified 2026-10-12)", () => {
+    expect(PRICING_VERSION).toBe("2026-10-31");
   });
 
   it("gemini-3.5-flash-lite (the default) is priced $0.30 in / $2.50 out per 1M", () => {

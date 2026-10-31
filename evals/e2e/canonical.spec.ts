@@ -441,8 +441,8 @@ test("proof: the logbook masthead, the calibration plate, the crew, and the door
   // the calibration sr-sentence also contains the phrase).
   await expect(page.locator(".spec4 .vd.defer")).toHaveText("LABEL DEFERRED");
 
-  // Signed approvals — the seven checks.
-  await expect(page.locator("ol.checks > li.check")).toHaveCount(7);
+  // Signed approvals — the eight checks (the page derives the list from E3.checkOrder; the revocation door landed 2026-10-31).
+  await expect(page.locator("ol.checks > li.check")).toHaveCount(8);
 
   // The doors: back to 01, plus the /docs reference line.
   // The last door goes to the TOOL, not back into the narrative: after the

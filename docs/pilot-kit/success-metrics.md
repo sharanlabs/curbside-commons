@@ -55,7 +55,7 @@ Measured, not assumed (plan § 17). They sit beside the business number so that 
 | ID | Metric | Instrument | Floor |
 | --- | --- | --- | --- |
 | **A1** | Digests opened versus acted on | Ledger and the platform's channel records | TBD at pilot start — set before the first run |
-| **A2** | Proposals signed, withdrawn and expired | Ledger (ARRIVES S2) | TBD at pilot start — set before the first run |
+| **A2** | Proposals signed, withdrawn and expired | Ledger (library MERGED 2026-10-31; run wiring ARRIVES S2, in progress) | TBD at pilot start — set before the first run |
 | **A3** | Time to acknowledge a finding | Ledger | TBD at pilot start — set before the first run |
 | **A4** | Which role uses which artifact | Ledger | TBD at pilot start — set before the first run |
 | **A5** | Repeat alerts on an unchanged finding (the alert-fatigue guard) | Ledger | TBD at pilot start — set before the first run |
@@ -77,7 +77,7 @@ Any one of these, at any time, stops the pilot. They are not traded against M1.
 
 Phase 1 measures whether the workflow behaves, not whether a platform benefits. These are deterministic and are held by tests, so they are not typed here.
 
-- **Every planted drift is caught,** and each scenario's expected report equals a live engine run. The scenario tests hold this (they arrive with the Wave 1 scenario lanes and S1–S3).
+- **Every planted drift is caught,** and each scenario's expected report equals a live engine run. For the five scenario folders built today (`agent-86`, `sync-outage`, `platform-override`, `partner-onboarding`, `fee-precheck`), `evals/packs/scenarios.test.ts` holds this. Scenarios 2 and 6 ARRIVE S1.5 (in progress) and scenario 8 ARRIVES S3; until then nothing holds it for them.
 - **Every figure a reader sees is derived** from fixtures, not typed. The bundled-pair tally lives in `lib/landing/test-guide.ts` and `evals/packs/test-guide.test.ts` holds it equal to an engine run.
 - **Alert volume.** Findings per 100 items and the share that are warnings at realistic drift rates are measured before the pilot (a Wave 3 item in the gap sheet, page 4), so alert fatigue is a known number and not a surprise.
 
