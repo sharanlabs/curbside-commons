@@ -480,15 +480,15 @@ function buildReadmeTemplate(): string {
 
 ## What the checker found
 
-| Day | Findings | Errors | Warnings | Per 100 items | Warn share | Rules that fired |
+| Day | Findings | Errors | Warnings | Per hundred items | Warn share | Rules that fired |
 | --- | --- | --- | --- | --- | --- | --- |
 ${dayRows}
 
-"Per 100 items" is the day's findings divided by the {{items}} catalog items, times one hundred. "Warn share" is the day's warnings divided by its findings. By the last day the series stands at {{last_per100}} findings per 100 items, {{last_warn_share}} of them warnings.
+"Per hundred items" is the day's findings divided by the {{items}} catalog items, times one hundred. "Warn share" is the day's warnings divided by its findings. By the last day the series stands at {{last_per100}} findings per hundred items, {{last_warn_share}} of them warnings.
 
 ## Declared assumptions
 
-The drift rates are **assumptions we set for this measurement**. They are not measurements of any market, platform or merchant, and nothing here states how often a real menu drifts.
+The drift rates are **assumptions we set for this measurement**. They are not measurements of any market, platform or merchant, and nothing here states how often any menu drifts.
 
 Each day, every unit that is still in sync with the record has this chance of drifting:
 

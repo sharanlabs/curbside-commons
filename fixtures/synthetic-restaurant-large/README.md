@@ -14,7 +14,7 @@
 
 ## What the checker found
 
-| Day | Findings | Errors | Warnings | Per 100 items | Warn share | Rules that fired |
+| Day | Findings | Errors | Warnings | Per hundred items | Warn share | Rules that fired |
 | --- | --- | --- | --- | --- | --- | --- |
 | `day-01` | 21 | 19 | 2 | 7.00 | 9.5% | LST-AVAIL-STATE ×4, LST-ENC-TRUNC ×1, LST-HOURS-WINDOW ×1, LST-IDENT-NAME ×1, LST-MOD-MISSING ×5, LST-MOD-PRICE-VALUE ×7, LST-PRICE-VALUE ×2 |
 | `day-02` | 48 | 45 | 3 | 16.00 | 6.3% | LST-AVAIL-STATE ×13, LST-ENC-TRUNC ×2, LST-HOURS-WINDOW ×1, LST-IDENT-NAME ×2, LST-MOD-MISSING ×11, LST-MOD-PRICE-VALUE ×15, LST-PRICE-VALUE ×4 |
@@ -24,11 +24,11 @@
 | `day-06` | 113 | 95 | 18 | 37.67 | 15.9% | LST-AVAIL-STATE ×23, LST-ENC-TRUNC ×9, LST-HOURS-WINDOW ×9, LST-IDENT-NAME ×5, LST-MOD-MISSING ×26, LST-MOD-PRICE-VALUE ×27, LST-PRICE-VALUE ×14 |
 | `day-07` | 127 | 105 | 22 | 42.33 | 17.3% | LST-AVAIL-STATE ×26, LST-ENC-TRUNC ×9, LST-HOURS-WINDOW ×13, LST-IDENT-NAME ×5, LST-MOD-MISSING ×28, LST-MOD-PRICE-VALUE ×30, LST-PRICE-VALUE ×16 |
 
-"Per 100 items" is the day's findings divided by the 300 catalog items, times one hundred. "Warn share" is the day's warnings divided by its findings. By the last day the series stands at 42.33 findings per 100 items, 17.3% of them warnings.
+"Per hundred items" is the day's findings divided by the 300 catalog items, times one hundred. "Warn share" is the day's warnings divided by its findings. By the last day the series stands at 42.33 findings per hundred items, 17.3% of them warnings.
 
 ## Declared assumptions
 
-The drift rates are **assumptions we set for this measurement**. They are not measurements of any market, platform or merchant, and nothing here states how often a real menu drifts.
+The drift rates are **assumptions we set for this measurement**. They are not measurements of any market, platform or merchant, and nothing here states how often any menu drifts.
 
 Each day, every unit that is still in sync with the record has this chance of drifting:
 
