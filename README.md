@@ -23,6 +23,8 @@ node bin/check.mjs demo                                          # the scripted 
 node bin/check.mjs check <feed.json> --against <catalog.json>    # truth leg (exit 1 = drift found)
 node bin/check.mjs check <doc.json> --conformance                # conformance leg (pinned UCP schemas)
 node bin/check.mjs fees <statement.json>                         # NYC §20-563.3 fee audit
+node bin/check.mjs scenario <id>                                 # one labeled scenario through the engine, compared to its committed expectation
+node bin/check.mjs ledger verify <file>                           # the run ledger's hash chain
 npm run verify                                                   # typecheck + lint + tests + build
 ```
 
