@@ -42,3 +42,29 @@ Counts: register 10 · §4 affiliation 0 (every mention is a disclaimer) · §4 
 **Keep (do not regress):** the "What this is not claiming" box on every kit/governance doc · the BUILT / ARRIVES S<n> / OWED legend and "Nothing marked ARRIVES or OWED is a capability today" · UNVERIFIED and "not re-read by this lane" tags · the illustrative cost model with ASSUMPTION labels and "No dollar figure below is a measurement" · honest-limit boxes (budget guard, provider drift, security known gaps) · register NOT EXAMINED / DEFER states, "No exam date is invented" · scenario briefs: signature is a ledger record, nothing sent · derived-figure rule stated in both READMEs · verbatim "shaped like the public integration docs, not from the platform" · ISO/IEC 42001 explicitly not claimed · UCP README honesty bound.
 
 **Disposition (orchestrator):** review (b) = **FLAG**. Push of `main` waits until items 1–4 and 15 are merged. Items 1–14, 18, 19, 25 → exec-layer packet (batch 1b). Items 15, 20–23 → S1.5 amendment sent 01:1x.
+
+## (a) Contract / allowed-files check — returned 01:15
+
+Lane verdicts: S1-pins FLAG (scope) · S1-engine FLAG (scope + two deferred contract items) · scenarios-w1 PASS (39/39 files inside the list) · S4-docs FLAG (scope + one marked-not-faked).
+- Scope flags are packet inconsistencies, not lane faults: `evals/agents/gemini-pins.test.ts` and `legacy/activation/evals/gemini.test.ts` (S1-pins); `lib/packs/listings/{types,acp-feed,index,run}.ts` (S1-engine — the CONTRACTS clause "shapes extended" required the type edits the ALLOWED list omitted); `evals/packs/honesty-c10.test.ts` pilotDocs (S4-docs — the TESTS FIRST clause required it). **Accepted with record.**
+- Deferred contract items, now in S1.5: `LISTINGS_SPEC_VERSION` not bumped (`run.ts:39`) · UCP pin still `2026-04-08` · scenarios 2 and 6 absent · README rows 2/6 say "built by the S1 lane".
+- **Marked-not-faked, must-fix (→ exec-layer):** `docs/model-risk-register.md:38` states "Audit, Evidence, Impact, Route and Explain-drift are deterministic code. Their correctness is held by tests." — Impact, Route and Explain-drift do not exist on main (they arrive in S2 tonight; wording must say so until merged).
+- Stale "ARRIVE S1" labels now understated (`data-request-spec.md:29`, `demo-script-10min.md:42`, `pilot-kit/README.md:47`) → exec-layer refreshes to BUILT where S1-engine landed.
+- Record inaccuracies in the 2026-10-14 task-log entry ("+2 doc paths" — eight were added; "18 pins" — gemini-pins has 9, the other 9 are UCP pin tests) → corrected by the orchestrator below.
+- Passed: detectors diff additive, no pre-existing ruleId/plainLine edited; new ids/severities exact; PRICING_VERSION dated; default/override as contracted; UCP 2026-08-25 vendored with PROVENANCE (content not byte-verified); manifests carry simulated/shapedLike/seed/generator; nothing under verifier-core, fees, delivery, crew, app, components or DESIGN.md.
+
+## (c) Test accounting — returned 01:15
+
+Itemised +124 = scenarios 91 · gemini-pins 9 · listings-coverage-c6 +5 · ucp-conformance +9 · honesty-c10 +9 (8 pilotDocs + modifiers.ts) · mockup html row +1. **Exact match** to the measured 1697 → 1821. No `.only` / `.skip` / `.todo` added. Flags: gemini-pins.test.ts has no RED-before proof in its header (→ S2-ledger adds tonight's measured red); listings-coverage-c6 mutation header has no restore sha (→ S1.5 adds it); honesty-c10 pilotDocs comment has no RED proof (→ S1.5's new probes supply it). Non-independent assertions in scenarios.test.ts (:380-388, :402-404, :650-660) are regression pins by design (FREEZE/ENGINE), not tautologies — accepted.
+
+## (d) Mutation re-apply — returned 01:14 (Sonnet, in `.worktrees/review-w1`, restored clean)
+
+- S1-engine: `if (true || actual === expected) return [];` in the LST-MOD-PRICE-VALUE detector → c6 red (coverage 10/11), c3 red (drift-014/015), scenarios red (FREEZE + platform-override/partner-onboarding ENGINE) — **bites**, wider than the header predicted.
+- scenarios-w1: `"21.50" → "21.51"` in agent-86/inputs/feed.json → 7 red; `node scripts-ts/generate-scenarios.mts` → 91 green, tree clean — **bites**.
+- S1-pins: output price 2.5 → 2.6 → 2 red in gemini-pins — **bites**.
+- S4-docs: "Trusted by every major delivery platform and approved for production use." planted in governance-model.md → **ACCEPTED (green)** — Codex's prediction confirmed; a BANNED_CLAIMS phrase ("real-time DoorDash data") → red. The endorsement/approval/saved-$ probes land in S1.5 tonight and must turn that sentence red.
+- **Environment finding:** in a fresh worktree the full suite reads 1804 passed · 1 failed · 8 skipped: the honesty-c10 site-wide scan runs `npm run build` when `out/` is absent (Google Fonts fetch denied in this sandbox) and `evals/presentation-posture.test.ts` reads `out/index.html`. Main passes only because its `out/` (2026-10-14) is newer than every source. **Rule for every lane and for every merge: `node scripts/build-offline.mjs` immediately before the full `vitest run`.**
+
+## Verdict (orchestrator, 01:2x)
+
+**Wave 1 ACCEPTED WITH CORRECTIONS.** Code lanes sound: tests bite, counts exact, contracts met except the items deliberately deferred to S1.5. Docs lanes need the wording fixes above (exec-layer) and one marked-not-faked correction (model-risk-register:38). Push of `main` waits for the S1.5 and exec-layer merges. Codex changed-files reviews remain owed (owner's limits).

@@ -12,18 +12,18 @@ Model rule (decision-log 2026-10-12 amendment): cheapest model with proven-equal
 | 2 | S2-crew | `wave2/s2-crew` · `.worktrees/s2-crew` | Opus · new seats, replay binding, containment | `lib/crew/**` · `lib/agents/crew-live.ts` · `lib/tools/registry.ts` · `lib/mcp/{descriptions,server}.ts` · `evals/crew/**` (new files only; locks untouched) | dispatched 01:0x | — | review at return |
 | 3 | S2-ledger | `wave2/s2-ledger` · `.worktrees/s2-ledger` | Sonnet · pattern work (JSON-lines, hash chain, registry, budget rows) | `lib/ledger/**` · `lib/approvals/**` · `lib/agents/{budget,pricing}.ts` · `evals/approvals/**` · `evals/agents/**` (new files) | dispatched 01:0x | — | review at return |
 | 4 | S2-impact | `wave2/s2-impact` · `.worktrees/s2-impact` | Sonnet · arithmetic + seeded fixture under a written contract | `lib/impact/**` · `scripts-ts/generate-orders.mts` · `fixtures/synthetic-restaurant/orders.jsonl` (+ README rows) · `evals/packs/impact*.test.ts` | dispatched 01:0x | — | review at return |
-| 5 | exec-layer | `wave2/exec-layer` · `.worktrees/exec-layer` | Opus · public claims + a new route under DESIGN.md | `docs/pilot-kit/{executive-brief,five-minute-walk}.md` · `app/pilot/**` · `lib/landing/pilot-figures.ts` · `evals/packs/{pilot-page,honesty-c10}.test.ts` · plan § 7/§ 17 wording · README test-count line | queued (batch 1b) | `61a6127` (stranded WIP committed + main merged) | dispatch after batch 1a confirms disk writes |
-| 6 | ci-hygiene | `wave2/ci-hygiene` · `.worktrees/ci-hygiene` | Sonnet · CI/config pattern work | `.github/workflows/ci.yml` · `package.json` (hand edit only) · `.env.example` · `SECURITY.md` dependency section | queued (batch 1b) | `cd0d347` | — |
+| 5 | exec-layer (+ Wave 1 docs wording fixes) | `wave2/exec-layer` · `.worktrees/exec-layer` | Opus · public claims + a new route under DESIGN.md | `docs/pilot-kit/{executive-brief,five-minute-walk}.md` · `app/pilot/**` · `lib/landing/pilot-figures.ts` · `evals/packs/{pilot-page,honesty-c10}.test.ts` · plan § 7/§ 17 wording · README test-count line | dispatched 01:2x (batch 1b) | `61a6127` | review at return |
+| 6 | ci-hygiene | `wave2/ci-hygiene` · `.worktrees/ci-hygiene` | Sonnet · CI/config pattern work | `.github/workflows/ci.yml` · `package.json` (hand edit only) · `.env.example` · `SECURITY.md` dependency section | dispatched 01:2x (batch 1b) | `cd0d347` | review at return |
 | 7 | cli-experience | `wave2/cli-experience` · `.worktrees/cli-experience` | Sonnet · CLI pattern work | `bin/check.mjs` · `lib/packs/listings/cli.ts` scenario subcommand only · `evals/packs/scenario-cli.test.ts` · README CLI block | queued (batch 1b) — **must not touch `cli.ts` lines S1.5 owns; coordinate at merge** | `cd0d347` | — |
-| R1 | Wave 1 acceptance review | read-only (`.worktrees/review-w1` detached for the mutation re-apply) | Haiku ×3 (contract · register/§4 · counts) + Sonnet (mutation re-apply with Bash) | — | dispatched 01:0x | — | synthesize → accept / return fixes to lane 1 |
+| R1 | Wave 1 acceptance review | read-only (`.worktrees/review-w1` detached for the mutation re-apply) | Haiku ×3 (contract · register/§4 · counts) + Sonnet (mutation re-apply with Bash) | — | **returned 01:14–01:15 → ACCEPTED WITH CORRECTIONS** (`docs/reviews/wave1-acceptance-2026-10-31.md`) | — | fixes routed: code → S1.5 · docs → exec-layer |
 | R2 | Freshness research | read-only | Sonnet · research-specialist, live sources dated 2026-10-31 | `docs/research/freshness-2026-10-31.md` (orchestrator writes from the digest) | dispatched 01:0x | — | re-pin decisions |
 | R3 | Security · privacy · legal review (owed since 2026-10-12) | read-only | Opus · security-specialist on the merged Wave 1 tree | `docs/reviews/security-privacy-legal-2026-10-31.md` (orchestrator writes) | dispatched 01:0x | — | findings → S1.5 / S3 packets |
-| A1 | efficiency-head (advisory) | read-only | Sonnet | advisory ledger row | dispatched 01:0x | — | disposition each row |
+| A1 | efficiency-head (advisory) | read-only | Sonnet | advisory ledger row | returned 01:10 | — | dispositions recorded below |
 | A2 | delivery-manager (advisory) | read-only | Sonnet | — | at first checkpoint | — | — |
 
 **Codex (deferred, owner word 2026-10-31):** changed-files reviews owed for S1-engine · S1-pins · W1b · W1c · every Wave 2 lane at its close · the S6 pre-ship gate. Logged in the decision-log row of 2026-10-31.
 
-**Owner-only items open:** D-4 auto-deploy · D-6 local model (`sysctl -n hw.memsize` is denied from this sandbox; no `ollama` on PATH) · the production deploy at wave close · one validation conversation (`docs/research/interview-guide-platform-intake-2026-10-12.md`) · Codex when limits reset.
+**Owner-only items open:** Codex when limits reset · D-6 local model (`sysctl -n hw.memsize` is denied from this sandbox; no `ollama` on PATH) · one validation conversation (`docs/research/interview-guide-platform-intake-2026-10-12.md`). **Deploy and D-4: deferred by owner word 2026-10-31 01:15** until the final design + an end-to-end working demo with test cases exist (Wave 3).
 
 ## Log
 
@@ -46,3 +46,9 @@ Model rule (decision-log 2026-10-12 amendment): cheapest model with proven-equal
 Lesson line (efficiency-head): on a one-seat overnight run the scarce unit is the window, not dollars — open heavy lanes by critical path, make each WIP commit the product, turn count and sweep checks into scripts, not seats.
 
 - 01:10 efficiency-head returned; dispositions above. 01:11 state-doc top blocks committed `3b63bad`; budget test 5/5. Fallback wake-up armed (25 min). Waiting on lanes.
+
+| R4 | External references scan (official + unofficial/reverse-engineered GitHub, as data) | read-only | Sonnet · research-specialist, quarantined, Source Intake classification | `docs/research/external-references-2026-10-31.md` (orchestrator writes) | dispatched 01:2x | — | feeds the S3 adapters packet |
+
+- 01:14–01:15 Wave 1 acceptance review returned (a/b/c/d) → ACCEPTED WITH CORRECTIONS; environment rule discovered: `build-offline` before every full vitest (fresh worktrees have no `out/`). Env note + routed review items sent to all four build lanes. s2-ledger 3 WIP commits · s2-impact 2 · S1.5 and S2-crew still reading.
+- 01:13/01:15 owner (mid-run): external references incl. reverse-engineered GitHub = in scope as data; deploy deferred until final design + e2e demo with test cases → Wave 3. Recorded in decision-log.
+- 01:2x batch 1b dispatched: exec-layer (Opus, with the docs wording fixes folded in) · ci-hygiene (Sonnet); cli-experience waits for the S1.5 merge. R4 external-references lane dispatched.
