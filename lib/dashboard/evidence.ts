@@ -292,9 +292,9 @@ export const E2 = {
 /* ----------------------------------------------------------------------- */
 
 export const E3 = {
-  what: "An approvals flow, fully offline: a request, a cryptographically signed human decision, and a seven-check verification before anything runs",
+  what: "An approvals flow, fully offline: a request, a cryptographically signed human decision, and an eight-check verification before anything runs",
   checkOrder:
-    "id match -> expiry (injected clock) -> nonce reuse -> signer known -> role authorized -> signature over recomputed canonical bytes -> content-digest binding",
+    "id match -> expiry (injected clock) -> nonce reuse -> signer known -> signer not revoked -> role authorized -> signature over recomputed canonical bytes -> content-digest binding",
   threatSuiteFile: "evals/approvals/threat-model.test.ts",
   noSendProofFile: "evals/approvals/no-send-import-graph.test.ts",
   liveNote: "a live interactive version is a future decision — this rehearsal cannot send anything, and its send paths are proven unreachable",

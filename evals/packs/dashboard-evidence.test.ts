@@ -415,7 +415,7 @@ describe("E1b evidence — E2/E3/E4 figures are bound to their committed results
     expect(existsSync(join(root, E3.noSendProofFile))).toBe(true);
     const sim = read("lib/approvals/simulator.ts");
     // Bind the rendered check-order phrasing to the simulator's own frozen list.
-    for (const step of ["id match", "expiry", "nonce replay", "signer known", "role", "canonical", "digest"]) {
+    for (const step of ["id match", "expiry", "nonce replay", "signer known", "revoked", "role", "canonical", "digest"]) {
       expect(E3.checkOrder.toLowerCase()).toContain(step.split(" ")[0]);
       void step;
     }
