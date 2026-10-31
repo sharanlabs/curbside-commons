@@ -61,6 +61,9 @@ export {
   ToolNotFoundError,
   RuleNotFoundError,
 } from "./types.ts";
+// The path guard, re-exported so the crew (whose import boundary admits only
+// this seam) reads case artifacts through the SAME containment (security review F8).
+export { MAX_TOOL_FILE_BYTES, resolveInAllowedRoot, ToolPathError } from "./paths.ts";
 
 // ---------------------------------------------------------------------------
 // S2-crew · explain_drift — the DETERMINISTIC root-cause baseline

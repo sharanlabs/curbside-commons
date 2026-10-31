@@ -30,6 +30,7 @@
  * longer fits, so the replay stops instead of reusing it.
  */
 import { readFileSync } from "node:fs";
+import { resolveInAllowedRoot } from "../tools/registry.ts";
 import { argsDigest, canonicalJson, sha256Hex } from "./canonical.ts";
 import type { CrewCase } from "./types.ts";
 
@@ -68,7 +69,7 @@ export interface CaseManifest {
 
 /** Read a file as raw bytes (the manifest hashes bytes, not decoded text). */
 function fileSha256(path: string): string {
-  return sha256Hex(readFileSync(path));
+  return sha256Hex(readFileSync(resolveInAllowedRoot(path, "s2 evidence path")));
 }
 
 /**
@@ -105,5 +106,7 @@ export function manifestDigestOf(manifest: CaseManifest): string {
 
 /** Convenience: the digest of a case as it stands on disk (the stamp script and tests use this). */
 export function caseManifestDigest(crewCase: CrewCase, modelId: string = REPLAY_MODEL_ID): string {
-  return manifestDigestOf(buildCaseManifest(crewCase, readFileSync(crewCase.inputArtifact.path), modelId));
+  return manifestDigestOf(
+    buildCaseManifest(crewCase, readFileSync(resolveInAllowedRoot(crewCase.inputArtifact.path, "inputArtifact.path")), modelId),
+  );
 }

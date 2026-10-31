@@ -25,7 +25,7 @@
  * point, the run is handed to the human, even when the brain says "all good."
  */
 import { readFileSync } from "node:fs";
-import { assertDecisionGrade, callTool, type ToolResult } from "../tools/registry.ts";
+import { assertDecisionGrade, callTool, resolveInAllowedRoot, type ToolResult } from "../tools/registry.ts";
 import { argsDigest, sha256Hex } from "./canonical.ts";
 import { detectInjectionSignatures } from "./injection-scan.ts";
 import { buildCaseManifest, manifestDigestOf, REPLAY_MODEL_ID } from "./manifest.ts";
@@ -65,7 +65,9 @@ export function runCase(crewCase: CrewCase, model: CrewModel): TrajectoryRecord 
   let engineReportHash: string | null = null;
 
   // ---- INTAKE (model-directed routing; decision contained below, never trusted) ----
-  const artifactBytes = readFileSync(crewCase.inputArtifact.path);
+  // Security review F8: the case's artifact path passes the registry's own
+  // containment (allowed folders, no hidden segments, size cap) before it is read.
+  const artifactBytes = readFileSync(resolveInAllowedRoot(crewCase.inputArtifact.path, "inputArtifact.path"));
   const rawArtifact = artifactBytes.toString("utf8");
 
   // ---- REPLAY BINDING (S2-crew CP1; Codex § 4): recompute the manifest from
@@ -320,7 +322,7 @@ interface S2SeatsOutcome {
 
 /** Parse a JSON-lines event log; LOUD on any malformed line (evidence is never guessed at). */
 function readEventLog(path: string): unknown[] {
-  return readFileSync(path, "utf8")
+  return readFileSync(resolveInAllowedRoot(path, "s2 evidence path"), "utf8")
     .split("\n")
     .filter((line) => line.trim().length > 0)
     .map((line, i) => {

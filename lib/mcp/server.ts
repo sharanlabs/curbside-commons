@@ -49,7 +49,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import type { CallToolResult, Tool } from "@modelcontextprotocol/sdk/types.js";
 
-import { callTool, TOOLS, ToolInputError, ToolNotFoundError, type ToolResult } from "../tools/registry.ts";
+import { callTool, TOOLS, ToolInputError, ToolNotFoundError, ToolPathError, type ToolResult } from "../tools/registry.ts";
 import { TOOL_DESCRIPTIONS } from "./descriptions.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -265,8 +265,21 @@ function toolCallResult(name: string, rawArgs: unknown): CallToolResult {
       // wire, so this stays mapped rather than left to throw uncaught.
       return { content: [{ type: "text", text: err.message }], isError: true };
     }
-    const message = err instanceof Error ? err.message : String(err);
-    return { content: [{ type: "text", text: message }], isError: true };
+    // Security review 2026-10-31 F2: an engine/runtime error's own message can
+    // echo file contents (a JSON.parse error quotes the first bytes), file
+    // existence and absolute home paths. This surface returns FIXED text: the
+    // tool, the error class and — for a refused path — the parameter name only.
+    if (err instanceof ToolPathError) {
+      return {
+        content: [{ type: "text", text: `tool "${name}": path "${err.param}" escapes the allowed root — refused (the path is not echoed)` }],
+        isError: true,
+      };
+    }
+    const errorClass = err instanceof Error && err.name ? err.name : "Error";
+    return {
+      content: [{ type: "text", text: `tool "${name}": the tool could not run (${errorClass}); details are withheld on this surface` }],
+      isError: true,
+    };
   }
 }
 
