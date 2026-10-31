@@ -1,0 +1,75 @@
+{
+  "simulated": true,
+  "carrier": "Scored against criteria shaped like the public partner documentation of DoorDash and Uber Eats (read 2026-10-31), cited per row — nominative references only; not from either platform; never called; not affiliated. All data is synthetic; \"met\" means this check found no disagreement or the supplied record clears the stated line, never a platform's decision.",
+  "criteriaRead": "2026-10-31",
+  "rows": [
+    {
+      "criterion": "Real-time menu syncing — menu updates, pricing and modifiers",
+      "source": "DoorDash Preferred Integrations criteria (merchants.doordash.com, page dated 2025-07-31) — public partner documentation, read 2026-10-31; nominative reference, not affiliated",
+      "measured": "4 disagreements with the supplied record on names, items, prices and add-ons in this check (LST-IDENT-NAME ×2, LST-PRICE-VALUE ×2)",
+      "threshold": "0 disagreements on names, items, prices and add-ons in this check — one snapshot; how fast the partner syncs is not measured here",
+      "state": "not met"
+    },
+    {
+      "criterion": "Real-time 86'ing (sold-out state)",
+      "source": "DoorDash Preferred Integrations criteria (merchants.doordash.com, page dated 2025-07-31) — public partner documentation, read 2026-10-31; nominative reference, not affiliated",
+      "measured": "2 disagreements with the supplied record on sold-out state in this check (LST-AVAIL-STATE ×2)",
+      "threshold": "0 disagreements on sold-out state in this check — one snapshot; how fast the partner syncs is not measured here",
+      "state": "not met"
+    },
+    {
+      "criterion": "Detailed order error reporting",
+      "source": "DoorDash Preferred Integrations criteria (merchants.doordash.com, page dated 2025-07-31) — public partner documentation, read 2026-10-31; nominative reference, not affiliated",
+      "measured": "not observable from a menu check",
+      "threshold": "the partner reports order errors in detail",
+      "state": "not measured here"
+    },
+    {
+      "criterion": "At least 250 stores on the integration",
+      "source": "DoorDash Preferred Integrations criteria (merchants.doordash.com, page dated 2025-07-31) — public partner documentation, read 2026-10-31; nominative reference, not affiliated",
+      "measured": "not observable from one merchant's menu",
+      "threshold": "at least 250 stores",
+      "state": "not measured here"
+    },
+    {
+      "criterion": "Certification demonstrations — menu pull, deactivate and reactivate, failed-order message",
+      "source": "DoorDash public partner documentation on integration quality and certification, read 2026-10-31 (as itemized in docs/research/external-references-2026-10-31.md, Top 5 #5); nominative reference, not affiliated",
+      "measured": "not observable from a menu check",
+      "threshold": "each demonstration completed",
+      "state": "not measured here"
+    },
+    {
+      "criterion": "Visible menu issues resolved within 48 hours",
+      "source": "DoorDash public partner documentation on integration quality and certification, read 2026-10-31 (as itemized in docs/research/external-references-2026-10-31.md, Top 5 #5); nominative reference, not affiliated",
+      "measured": "5 of 7 visible menu issues open past 48 hours, from the supplied partner-operations record",
+      "threshold": "0 visible menu issues open past 48 hours",
+      "state": "not met"
+    },
+    {
+      "criterion": "Order failure and cancellation below 1 %",
+      "source": "DoorDash public partner documentation on integration quality and certification, read 2026-10-31 (as itemized in docs/research/external-references-2026-10-31.md, Top 5 #5); nominative reference, not affiliated",
+      "measured": "7 of 1249 (0.56 %) orders failed or cancelled, from the supplied partner-operations record",
+      "threshold": "below 1 % of orders failed or cancelled",
+      "state": "met"
+    },
+    {
+      "criterion": "Menu injection success at the 99.9 % baseline",
+      "source": "Uber Eats integration quality program (developer.uber.com/docs/eats/quality-and-performance) — public partner documentation, read 2026-10-31; nominative reference, not affiliated",
+      "measured": "2193 of 2194 (99.95 %) menu injections succeeded, from the supplied partner-operations record",
+      "threshold": "at least 99.9 % of menu injections succeed",
+      "state": "met"
+    },
+    {
+      "criterion": "Menu injection success at or above 99 % (below it, API access \"can be subject to\" revocation — conditional, not automatic)",
+      "source": "Uber Eats integration quality program (developer.uber.com/docs/eats/quality-and-performance) — public partner documentation, read 2026-10-31; nominative reference, not affiliated",
+      "measured": "2193 of 2194 (99.95 %) menu injections succeeded, from the supplied partner-operations record",
+      "threshold": "at least 99 % of menu injections succeed",
+      "state": "met"
+    }
+  ],
+  "tally": {
+    "met": 3,
+    "notMet": 3,
+    "notMeasuredHere": 3
+  }
+}

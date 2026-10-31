@@ -27,7 +27,8 @@
  *     channel is an explicit choice, never guessed (Codex 2026-10-12 § 2 A);
  *   availability ← `active:false` on the item (or on its category or menu) is the
  *     86, served as out_of_stock;
- *   modifiers ← extras[].options[] (option `active:false` = an 86'd option);
+ *   modifiers ← extras[].options[] (option `active:false` = an 86'd option); an item
+ *     that omits `extras` makes no add-on claim, `extras: []` claims "none";
  *   hours ← the menu's open_hours, attached to every item in that menu.
  * An item listed in two menus (lunch and dinner, say) is one row whose hours are
  * both menus' windows; if the two listings state anything else differently, the
@@ -112,7 +113,7 @@ export interface DoorDashShapedItem {
   readonly active: boolean;
   readonly price: number;
   readonly base_price?: number;
-  readonly extras: readonly DoorDashShapedExtra[];
+  readonly extras?: readonly DoorDashShapedExtra[];
 }
 export interface DoorDashShapedCategory {
   readonly name: string;
@@ -227,8 +228,13 @@ export function doordashShapedToFeed(doc: unknown, opts: DoorDashShapedOptions =
         const cents = integerPriceAt(ctx, item, priceField, ip);
         if (cents === undefined) fail(ctx, "missing-key", `${ip}.${priceField}`, `the item states no \`${priceField}\`.`);
         const out = catOut || !booleanAt(ctx, item, "active", ip, true);
-        const modifiers: AcpFeedModifier[] = [];
-        readOptions(ctx, arrayAt(ctx, item, "extras", ip, false), `${ip}.extras`, 1, false, toPrice, priceField, modifiers);
+        // An item that omits `extras` states nothing about add-ons (the documentation's
+        // omit-don't-null rule); `extras: []` states "none" — a claim the record can contradict.
+        let modifiers: AcpFeedModifier[] | undefined;
+        if (item.extras !== undefined) {
+          modifiers = [];
+          readOptions(ctx, arrayAt(ctx, item, "extras", ip, true), `${ip}.extras`, 1, false, toPrice, priceField, modifiers);
+        }
         const row: AcpFeedItem = {
           ...UNSTATED_ROW_FIELDS,
           item_id: id,
@@ -237,7 +243,7 @@ export function doordashShapedToFeed(doc: unknown, opts: DoorDashShapedOptions =
           price: toPrice(cents),
           availability: out ? "out_of_stock" : "in_stock",
           group_id: id,
-          modifiers,
+          ...(modifiers !== undefined ? { modifiers } : {}),
           ...(hours.length > 0 ? { hours } : {}),
         };
         const prior = rows.get(id);
@@ -307,7 +313,9 @@ export function acpFeedToDoorDashShaped(feed: AcpFeed, opts: ReshapeOptions): Do
               merchant_supplied_id: row.item_id,
               active: row.availability === "in_stock",
               price: decimalToCents(row.price),
-              extras: [...lists.entries()].map(([id, l]) => ({ name: l.name, merchant_supplied_id: id, active: true, options: l.options })),
+              ...(row.modifiers !== undefined
+                ? { extras: [...lists.entries()].map(([id, l]) => ({ name: l.name, merchant_supplied_id: id, active: true, options: l.options })) }
+                : {}),
             };
           }),
         },

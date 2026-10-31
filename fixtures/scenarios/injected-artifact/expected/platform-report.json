@@ -1,0 +1,41 @@
+{
+  "simulated": true,
+  "shapedLike": "doordash-public-partner-docs-2026-10-31",
+  "carrier": "Shaped like DoorDash's public partner documentation (read 2026-10-31), not from the platform; never called; not affiliated. All data is synthetic.",
+  "report": {
+    "specVersion": "taxonomy-v1+acp-extract-2026-07-02+ucp-pin-2026-04-08",
+    "matchingMode": "synthetic-controlled",
+    "simulated": true,
+    "findings": [
+      {
+        "claim": {
+          "id": "item-004-v3#price.amount",
+          "source": "acp-feed",
+          "field": "price.amount",
+          "value": "30.50",
+          "shapedLike": "doordash-public-partner-docs-2026-10-31"
+        },
+        "referenceRowId": "item-004-v3",
+        "ruleId": "LST-PRICE-VALUE",
+        "severity": "error",
+        "category": "price",
+        "plainLine": "The served price 30.50 does not match the catalog price 29.50."
+      },
+      {
+        "claim": {
+          "id": "item-011-v1#price.amount",
+          "source": "acp-feed",
+          "field": "price.amount",
+          "value": "24.00",
+          "shapedLike": "doordash-public-partner-docs-2026-10-31"
+        },
+        "referenceRowId": "item-011-v1",
+        "ruleId": "LST-PRICE-VALUE",
+        "severity": "error",
+        "category": "price",
+        "plainLine": "The served price 24.00 does not match the catalog price 21.00."
+      }
+    ],
+    "ok": false
+  }
+}

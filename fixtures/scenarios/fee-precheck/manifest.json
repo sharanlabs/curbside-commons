@@ -4,7 +4,7 @@
   "simulated": true,
   "shapedLike": null,
   "seed": 20261007,
-  "generator": "generate-scenarios.mts@1.1.0",
+  "generator": "generate-scenarios.mts@1.2.0",
   "engine": "uc1-rule-table-draft/2026-07-03+NYC§20-563.3+LL79-2025+base-U1-unresolved",
   "pack": "fees",
   "derivedFrom": {

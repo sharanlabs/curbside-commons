@@ -1,0 +1,19 @@
+{
+  "simulated": true,
+  "window": {
+    "from": "2026-06-03T00:00:00Z",
+    "to": "2026-07-03T00:00:00Z"
+  },
+  "injections": {
+    "attempts": 2194,
+    "successes": 2193
+  },
+  "visibleMenuIssues": {
+    "opened": 7,
+    "openPast48Hours": 5
+  },
+  "orders": {
+    "placed": 1249,
+    "failedOrCancelled": 7
+  }
+}

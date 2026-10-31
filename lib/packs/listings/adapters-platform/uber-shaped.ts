@@ -27,6 +27,9 @@
  * null, absent or not after `asOf` = available, later than `asOf` = out_of_stock.
  * `asOf` is a required parameter — an instant passed as data, never a clock read.
  *
+ * An item that omits modifier_group_ids makes no add-on claim; `{ ids: [] }`
+ * claims "none".
+ *
  * Rows: an item referenced as a modifier option is read as an add-on, not as a
  * menu row (an item that is both is read as an add-on only — the record then
  * reports the row missing, loudly, never silently).
@@ -147,7 +150,8 @@ export function uberShapedToFeed(doc: unknown, opts: UberShapedOptions): Platfor
     readonly description: string;
     readonly cents: number;
     readonly out: boolean;
-    readonly groupIds: readonly string[];
+    /** undefined = the item states nothing about add-ons; [] = it states "none". */
+    readonly groupIds: readonly string[] | undefined;
     readonly row: number;
     readonly path: string;
   }
@@ -164,7 +168,7 @@ export function uberShapedToFeed(doc: unknown, opts: UberShapedOptions): Platfor
     let description = "";
     if (typeof item.description === "string") description = item.description;
     else if (item.description !== undefined) description = textAt(ctx, item, "description", ip, true) as string;
-    let groupIds: readonly string[] = [];
+    let groupIds: readonly string[] | undefined;
     if (item.modifier_group_ids !== undefined) {
       const g = objectAt(ctx, item.modifier_group_ids, `${ip}.modifier_group_ids`);
       groupIds = arrayAt(ctx, g, "ids", `${ip}.modifier_group_ids`, true).map((v, k) => {
@@ -234,7 +238,7 @@ export function uberShapedToFeed(doc: unknown, opts: UberShapedOptions): Platfor
   for (const it of items.values()) {
     if (optionItemIds.has(it.id)) continue;
     ctx.row = it.row;
-    const modifiers: AcpFeedModifier[] = it.groupIds.flatMap((gid, k) => {
+    const modifiers: AcpFeedModifier[] | undefined = it.groupIds?.flatMap((gid, k) => {
       const group = groups.get(gid);
       if (!group) fail(ctx, "reference", `${it.path}.modifier_group_ids.ids[${k}]`, `the item references modifier group "${gid}", which modifier_groups does not list.`);
       return group.optionIds.map((oid): AcpFeedModifier => {
@@ -250,7 +254,7 @@ export function uberShapedToFeed(doc: unknown, opts: UberShapedOptions): Platfor
       price: centsText(it.cents),
       availability: it.out ? "out_of_stock" : "in_stock",
       group_id: it.id,
-      modifiers,
+      ...(modifiers !== undefined ? { modifiers } : {}),
       ...(hours.length > 0 ? { hours } : {}),
     });
   }
@@ -311,7 +315,7 @@ export function acpFeedToUberShaped(feed: AcpFeed, opts: { readonly categoryOf: 
       title: text(r.title),
       description: text(r.description),
       price_info: { price: decimalToCents(r.price) },
-      ...(groupIds.length > 0 ? { modifier_group_ids: { ids: groupIds } } : {}),
+      ...(r.modifiers !== undefined ? { modifier_group_ids: { ids: groupIds } } : {}),
       ...suspension(r.availability === "in_stock"),
     });
   }
