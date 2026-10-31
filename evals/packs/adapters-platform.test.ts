@@ -57,16 +57,23 @@ import { serializeReport } from "@/lib/verifier-core";
  *  TRIGGER      the order-errors CSV: our column names, read by header name,
  *               unknown columns ignored, variation tolerated, refusals by line.
  *
- * ── Mutation record (2026-10-31; each red observed, then restored) ──
+ * ── Mutation record (2026-10-31; each red observed, then restored; counts re-taken
+ *    at 02:58 on the final 30 tests) ──
  *  M1 shared.ts `platformFeedToClaims`: the UNSTATED_FIELDS filter removed →
- *     ROUND TRIP + DRIFT + LABELS red, 12 failed / 17 passed (the variant-label,
- *     currency and eligibility claims the shape never states were judged anyway)
- *     — restored, 29/29.
+ *     13 failed / 17 passed (the variant-label, currency and eligibility claims the
+ *     shape never states were judged anyway) — restored, 30/30.
  *  M2 doordash-shaped.ts: `...item` spread into the produced row → ALLOW-LIST red,
- *     1 failed / 28 passed (the planted customer_email reached the adapted feed)
- *     — restored, 29/29.
+ *     1 failed / 29 passed (the planted customer_email reached the adapted feed)
+ *     — restored, 30/30.
  *  M3 uber-shaped.ts: `out = until > asOfSeconds` → `out = until >= 0` → DRIFT red,
- *     1 failed / 28 passed (a past suspension read as an 86) — restored, 29/29.
+ *     1 failed / 29 passed (a past suspension read as an 86) — restored, 30/30.
+ *  M4 doordash-shaped.ts: an omitted `extras` read as present (`if (true)`) →
+ *     1 failed / 29 passed (omit-don't-null) — restored, 30/30.
+ * Golden re-pin (02:57, explained): the Uber-shaped document pin moved
+ * 6fc37d6e9022de4c → c777d201b2e1945d when the builder began writing
+ * `modifier_group_ids: { ids: [] }` for a row that states "no add-ons" (it used to
+ * omit the key, which the adapter now reads as "states nothing" — the
+ * omit-don't-null distinction CP4 needed). The DoorDash pins did not move.
  * (Commands and counts are in docs/returns/2026-10-31-s3-adapters.md.)
  */
 
@@ -148,7 +155,7 @@ describe("ROUND TRIP — the faithful copy, shaped like each documentation, read
 
   it("goldens: the shaped documents and the wrapped clean report are byte-pinned", () => {
     expect(sha(JSON.stringify(ddOf(SOR)))).toBe("f42a1eb4d855c74b");
-    expect(sha(JSON.stringify(uberOf(SOR)))).toBe("6fc37d6e9022de4c");
+    expect(sha(JSON.stringify(uberOf(SOR)))).toBe("c777d201b2e1945d");
     const dd = runPlatformShapedCheck(doordashShapedToFeed(roundTripJson(ddOf(SOR))), SOR);
     expect(sha(serializePlatformShapedReport(dd))).toBe("7962af6f03279704");
   });
@@ -198,6 +205,24 @@ describe("DRIFT — written in the platform shape, caught by the existing rules,
     expect(at(asOfSeconds).ok).toBe(true);
     expect(at(asOfSeconds - 3600).ok).toBe(true);
     expect(at(null).ok).toBe(true);
+  });
+
+  it("omit-don't-null: an item that omits its add-on list states nothing; an empty list states \"none\" and is checked", () => {
+    const doc = mut(ddOf(SOR));
+    const items = (doc.menus as Json[]).flatMap((m) => ((m.menu as Json).categories as Json[]).flatMap((c) => c.items as Json[]));
+    const target = items.find((i) => (i.extras as Json[]).length > 0)!;
+    delete target.extras;
+    expect(runPlatformShapedCheck(doordashShapedToFeed(doc), SOR).report.ok).toBe(true);
+    target.extras = [];
+    const said = runPlatformShapedCheck(doordashShapedToFeed(doc), SOR).report.findings;
+    expect(new Set(said.map((f) => f.ruleId))).toEqual(new Set(["LST-MOD-MISSING"]));
+    expect(said.every((f) => f.claim.id.startsWith(`${target.merchant_supplied_id as string}#`))).toBe(true);
+    const u = mut(uberOf(SOR));
+    const row = (u.items as Json[]).find((i) => ((i.modifier_group_ids as Json | undefined)?.ids as unknown[] | undefined)?.length)!;
+    delete row.modifier_group_ids;
+    expect(runPlatformShapedCheck(uberShapedToFeed(u, { asOf: SOR.asOf }), SOR).report.ok).toBe(true);
+    row.modifier_group_ids = { ids: [] };
+    expect(new Set(runPlatformShapedCheck(uberShapedToFeed(u, { asOf: SOR.asOf }), SOR).report.findings.map((f) => f.ruleId))).toEqual(new Set(["LST-MOD-MISSING"]));
   });
 
   it("price unit is a parameter: cents by default (inferred, not stated); dollars reads the same integers as whole dollars", () => {
