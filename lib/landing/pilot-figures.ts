@@ -54,12 +54,12 @@ export const STATE = {
   intakeReviewer: "BUILT; examined on one model only",
   slackEmail: "BUILT, not sent",
   partnerTicket: "ARRIVES S4",
-  orderErrorTrigger: "ARRIVES S3",
+  orderErrorTrigger: "BUILT 2026-10-31 (S3) as a parsed trigger, column names ours; the crew's intake reading it ARRIVES with the next wave",
   preflightTool: "PROPOSED; not built",
   picker: "ARRIVES S4",
   csvIngestDrop: "BUILT; it reads named columns only",
   jsonIngestDrop: "BUILT 2026-10-31 (S1.5): declared keys only, on both paths",
-  adapters: "ARRIVES S3",
+  adapters: "BUILT 2026-10-31 (S3): shaped like the public partner documentation, not from the platform; never called",
 } as const;
 
 // ---------------------------------------------------------------------------
