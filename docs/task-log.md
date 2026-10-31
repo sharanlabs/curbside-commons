@@ -173,3 +173,10 @@ lane files; the extra tests come from lane 1b (listings-coverage-c6) and pilot-k
 estimate (not itemised exactly). Wave 2 triage: only exec-layer has changes (plan doc edit + honesty-c10 +2 doc paths + two new
 pilot-kit docs); there tsc 0 · lint 0 · honesty-c10 169/169. s15-correctness, s15-scenarios, ci-hygiene, cli-experience: clean, no diff.
 Skills: none beyond the startup contract.
+
+## 2026-10-31 — SESSION 50 (Fable 5.1, Claude Code seat, effort high): takeover · audit · Wave 2 opened in parallel lanes · Codex deferred
+
+- **Classification.** Task type: takeover of a half-complete multi-lane build → audit → orchestration. Stage: Wave 2 of the plan of record (`docs/plan-menu-integrity-crew-2026-10-09.md`). Risk: medium-high (engine correctness fixes, new crew seats, public surfaces, public claims) — full mode. Effort: **high** on the audit and the packets (judgment); lanes routed per the 2026-10-12 model rule (Opus judgment / Sonnet pattern / Haiku review). Validation: gates re-measured on arrival (tsc 0 · eslint 0 · vitest 1821 + 8 on `0ac396f`), re-run on every merged lane. Codex: **deferred by owner word, logged** (decision-log 2026-10-31). Human approval: the goal stands; owner-only items listed in the run ledger.
+- **Skills:** `claude-os` (front door, half-done branch) · `intent` (raw words → structured ask; interpretation: *caffinate ims* = `caffeinate -ims`, run for 12 h) · `postures` tier 1 + execution pack · advisor consult before dispatch · `agent-dispatch-packet` shape for every lane.
+- **Done in-seat:** `.telemetry/` excluded locally · record committed `cd0d347` · exec-layer stranded WIP committed `61a6127` + main merged · four wave2 branches fast-forwarded · worktrees `s2-crew` · `s2-ledger` · `s2-impact` · `review-w1` created with the node_modules symlink · `docs/wave2-lane-contract-2026-10-31.md` · `docs/wave2-run-ledger-2026-10-31.md` · decision-log row · `caffeinate -ims -t 43200` running in the background.
+- **Not done, on purpose:** push (after the Wave 1 acceptance review) · deploy (owner) · Codex (owner's limits) · D-4 · D-6.
