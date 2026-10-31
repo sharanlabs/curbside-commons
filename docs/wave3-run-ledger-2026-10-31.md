@@ -55,6 +55,8 @@
 - 10:1x — **CI #93 (`fa14f10`) read:** `npm ci` fixed by the RAG removal (58 s, clean); vitest 2449 + 8 and legacy 306 + 5 green in CI; Playwright **7 failed**: the ribbon test ×3 STILL red and axe ×4 NEW on `/pilot` (both schemes, in `a11y.spec.ts` and `pilot.spec.ts`). Diagnosis without the raw log (GitHub returns 403 for job logs without admin rights; the signed blob URL defeats the browser script tool): `.docs-wrap` caps the measure at 1040px, so the two cost-model tables shared 968px at EVERY desktop width; the 160px floor moved the squeeze onto the label column — one derived label is 66 characters ("Refund flow exposed to this class per month, before any catch rate") — and the table overflowed its wrapper, which then scrolls sideways (axe: scrollable region without keyboard focus). **Fix** `fa027a8`: the two tables stack in one column; each gets the full measure; nothing scrolls. CI #94 adjudicates. Stated as a diagnosis, not a measurement: the seat cannot bind a local port (EPERM), so the page was not rendered here.
 - 10:1x — Codex gates: still not started by the owner (no `run` line in `/tmp/codex-gates.log`); the watch stays armed.
 
+- 10:3x — **CI #95 on `b5a1012` GREEN** — the whole job, Playwright battery included: `main` is green for the first time since `cc5f248` (#84). The stacked cost-model tables resolved both the ribbon test and the axe violations on `/pilot` (a diagnosis made without rendering; CI measured it). #94 on `b37fae4` was cancelled by the wrap push after `npm ci`, vitest and the legacy suite had passed.
+
 ## Pins moved by the orchestrator at merge — before → after
 
 (none yet)

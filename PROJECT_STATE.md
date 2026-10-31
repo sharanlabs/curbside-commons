@@ -1,6 +1,6 @@
 # Project State
 
-> **2026-10-31 (session 51):** Wave 3 OPEN — W3-d and W3-a CP1 merged (vitest 2474 + 8); MCP SDK 1.32.2; the retired RAG lane and its `@huggingface/transformers` dependency removed; the CI red since Wave 2 traced to the `/pilot` cost-model tables and fixed by stacking them (CI #94 adjudicates); Codex seat live, gates runner ready for the owner start; deploy still deferred. Board: `docs/wave3-run-ledger-2026-10-31.md`.
+> **2026-10-31 (session 51):** Wave 3 OPEN — W3-d and W3-a CP1 merged (vitest 2474 + 8); MCP SDK 1.32.2; the retired RAG lane and its `@huggingface/transformers` dependency removed; the CI red since Wave 2 traced to the `/pilot` cost-model tables and fixed by stacking them — CI #95 GREEN, the first green since `cc5f248`; Codex seat live, gates runner ready for the owner start; deploy still deferred. Board: `docs/wave3-run-ledger-2026-10-31.md`.
 >
 > **2026-10-31 (session 50):** Wave 2 of the Menu Integrity Crew plan is COMPLETE on `main` (nine build lanes merged; vitest 2413 + 8; `/pilot` executive page; UCP pin 2026-08-25; pushed to origin pre-Codex; deploy deferred by owner word). Live board: `docs/wave2-run-ledger-2026-10-31.md`. Next: Wave 3 (`docs/plan-wave3-2026-10-31.md`).
 
