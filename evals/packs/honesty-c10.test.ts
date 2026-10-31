@@ -229,15 +229,26 @@ const BANNED_PROBES: ReadonlyArray<readonly [RegExp, string]> = [
 //    docs/governance-model.md (sha256/16 ee8cf657f22ab766 → 7ca5719b41ee22f3)
 //    → this file 1 failed / 267 passed, on the governance-model row of the
 //    new-family scan (the eight old patterns still accept it); the saved copy
-//    restored → ee8cf657f22ab766, 268/268;
+//    restored → ee8cf657f22ab766, 268/268. Re-run at 01:50 on the doc as
+//    rewritten by the exec-layer lane (main 204ade5 merged in): 40e5a7dec9133864
+//    → 5daee02dabed78e5 → 1 failed / 274 passed; restored → 40e5a7dec9133864,
+//    275/275 (no sentence of the rewritten pilot kit, governance model or
+//    risk register trips a new probe);
 //  - the attribute probe: alt="Trusted by DoorDash" planted after <body> in the
 //    built out/index.html (05d70866ce86938a → 3502792dce26421d) → the
 //    attribute test RED while both visible-text scans stayed GREEN (the gap it
 //    closes); the saved copy restored → 05d70866ce86938a, green.
 // ---------------------------------------------------------------------------
 
-/** Named platforms a sentence could falsely claim a relationship with. */
-const PLATFORM = String.raw`(?:DoorDash|Uber\s?Eats|Uber|Grubhub|Square|Toast|Instacart|Postmates)`;
+/**
+ * Named platforms a sentence could falsely claim a relationship with (the
+ * orchestrator's anchor list of 2026-10-31 — DoorDash, Uber Eats, Grubhub,
+ * Square, Toast, Google, OpenAI — plus Uber, Instacart and Postmates). The
+ * endorsement probes anchor on one of these, or on an unnamed "…platform(s)"
+ * party, so governance terms like "human-approved audit" or "approved by a
+ * named person" stay green.
+ */
+const PLATFORM = String.raw`(?:DoorDash|Uber\s?Eats|Uber|Grubhub|Square|Toast|Instacart|Postmates|Google|OpenAI)`;
 /** Unnamed parties an endorsement claim can lean on ("every major delivery platform"). */
 const PLATFORMS_GENERIC = String.raw`(?:(?:every|all|the|major|leading|top|big|large|national|several|many)\s+)*(?:(?:US|food|delivery|ordering|marketplace|commerce|restaurant)\s+)*(?:platforms?|marketplaces?)`;
 const PARTY = `(?:${PLATFORM}|${PLATFORMS_GENERIC})`;
@@ -310,8 +321,8 @@ const NEW_PROBE_PLANTS: ReadonlyArray<readonly [number, string]> = [
   [3, "The workflow is endorsed by Grubhub."],
   [4, "We partnered with Square on menus."],
   [5, "Built in partnership with Toast."],
-  [6, "An official DoorDash partner tool."],
-  [7, "The report reads DoorDash data nightly."],
+  [6, "An official OpenAI partner tool."],
+  [7, "The report reads Google data nightly."],
   [8, "We replay Uber Eats's export each morning."],
   [9, "The verifier is integrated with Grubhub."],
   [10, "Our checker is connected to Toast."],
@@ -328,6 +339,7 @@ const NEW_PROBE_EXEMPT: readonly string[] = [
   "An illustrative model: a merchant who saved $1,000 a month would recover the fee.",
   "Under the stated assumption, the crew could have prevented 12 refunds.",
   "Not affiliated with, endorsed by, or connected to DoorDash, Uber Eats or Grubhub.",
+  "Every proposal is a human-approved audit step, approved by a named person.",
 ];
 
 describe("C10 platform-claims grep-gate (no real-platform-access claims)", () => {
