@@ -28,13 +28,23 @@
  * `ai` + `@ai-sdk/groq`) over an offline TRANSPORT stub — no network, no key,
  * `ENABLE_LIVE_AI` untouched (an injected generate bypasses the gate) — and
  * counts requests at the transport.
+ * BUDGET TRUTH (S2-crew amendment, 2026-10-31): the same real-SDK path, booked
+ * against the S2-ledger budget API — overflow halts the ledger and the next
+ * turn is refused before any request; unknown usage is charged at the
+ * reservation; the default live path refuses to run without a ledger.
+ * MUTATION PROOF (recorded 2026-10-31): `settleCall` replaced by a no-op in
+ * `liveCall` → 3 RED (overflow-halts, no-usage-charged-at-reservation, within-
+ * reservation booking); restored → 16/16 green.
  * MUTATION PROOF (recorded 2026-10-31): `maxRetries: 0` deleted from
  * `createCrewLiveGenerate` → both 503 cases (Intake, Reviewer) see 3 requests
  * (2 RED, "expected 3 to be 1"); restored → 1 request each, 12/12 green.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  buildIntakeLivePrompt,
+  createCrewLiveBudgetLedger,
   createCrewLiveGenerate,
+  crewLiveEstimate,
   fetchIntakeTurnLive,
   fetchReviewerTurnLive,
   IntakeLiveOutputSchema,
@@ -232,5 +242,83 @@ describe("crew live fetchers — the REAL SDK path over an offline transport stu
     expect(out.ok).toBe(true);
     if (!out.ok) throw new Error("unreachable");
     expect(out.usage.attempts).toBe(1);
+  });
+});
+
+describe("crew live fetchers — BUDGET TRUTH on the live path (reserve → one request → settle)", () => {
+  const PRICED = "gemini-3.5-flash-lite"; // a priced row, so a dollar overflow is possible offline
+  const clock = { nowMs: () => Date.parse("2026-10-31T06:00:00Z") };
+
+  function stub(body: unknown): { transport: (i: RequestInfo | URL, init?: RequestInit) => Promise<Response>; count: () => number } {
+    let n = 0;
+    return {
+      count: () => n,
+      transport: async () => {
+        n += 1;
+        return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+      },
+    };
+  }
+  const completion = (usage?: Record<string, number>) => ({
+    id: "chatcmpl-offline-stub",
+    object: "chat.completion",
+    created: 0,
+    model: PRICED,
+    choices: [{ index: 0, message: { role: "assistant", content: JSON.stringify({ decision: "route", tool: "audit_statement" }) }, finish_reason: "stop" }],
+    ...(usage !== undefined ? { usage } : {}),
+  });
+
+  it("usage ABOVE the reservation halts the ledger, and the NEXT turn is refused before any request", async () => {
+    vi.stubEnv("CREW_LIVE_MODEL", PRICED);
+    const ledger = createCrewLiveBudgetLedger(PRICED);
+    const s = stub(completion({ prompt_tokens: 5_000_000, completion_tokens: 100, total_tokens: 5_000_100 }));
+    const generate = createCrewLiveGenerate({ transport: s.transport, apiKey: "offline-stub-not-a-key" });
+    const first = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate, budget: { ledger, clock } });
+    expect(first.ok).toBe(false);
+    if (first.ok) throw new Error("unreachable");
+    expect(first.errorClass).toBe("BudgetOverflowError");
+    expect(ledger.halted).toBe(true);
+    expect(s.count()).toBe(1);
+    const second = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate, budget: { ledger, clock } });
+    expect(second.ok).toBe(false);
+    if (second.ok) throw new Error("unreachable");
+    expect(second.errorClass).toBe("BudgetBlockedError");
+    expect(second.attempts).toBe(0);
+    expect(s.count()).toBe(1); // the refused turn made no request
+  });
+
+  it("NO reported usage is charged at the reservation (never zero), with one request", async () => {
+    vi.stubEnv("CREW_LIVE_MODEL", PRICED);
+    const ledger = createCrewLiveBudgetLedger(PRICED);
+    const s = stub(completion());
+    const generate = createCrewLiveGenerate({ transport: s.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate, budget: { ledger, clock } });
+    expect(out.ok).toBe(true);
+    expect(s.count()).toBe(1);
+    const reserved = crewLiveEstimate(PRICED, buildIntakeLivePrompt(INTAKE_INPUT)).costUsd;
+    expect(reserved).toBeGreaterThan(0);
+    expect(ledger.spentUsd).toBeCloseTo(reserved, 12);
+    expect(ledger.reservedUsd).toBe(0);
+    expect(ledger.halted).toBe(false);
+  });
+
+  it("usage within the reservation books the actual figure and leaves the ledger open (Groq $0 row: counted, not free of accounting)", async () => {
+    const ledger = createCrewLiveBudgetLedger(); // default model: the Groq free-tier row
+    const s = stub(completion({ prompt_tokens: 300, completion_tokens: 12, total_tokens: 312 }));
+    const generate = createCrewLiveGenerate({ transport: s.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate, budget: { ledger, clock } });
+    expect(out.ok).toBe(true);
+    expect(ledger.spentUsd).toBe(0);
+    expect(ledger.calls).toBe(1);
+    expect(ledger.providers.groq.requestsToday).toBe(1);
+    expect(ledger.providers.groq.tokensToday).toBe(312);
+    expect(ledger.halted).toBe(false);
+  });
+
+  it("the default live path (gate open, no DI) refuses to run without a ledger — fail closed, before any request", async () => {
+    vi.stubEnv("ENABLE_LIVE_AI", "true");
+    vi.stubEnv("GROQ_API_KEY", "offline-test-placeholder-not-a-key");
+    await expect(fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH)).rejects.toThrow(/CREW_LIVE_BUDGET_REQUIRED/);
+    await expect(fetchReviewerTurnLive(REVIEWER_INPUT)).rejects.toThrow(/CREW_LIVE_BUDGET_REQUIRED/);
   });
 });

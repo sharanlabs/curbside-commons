@@ -43,6 +43,16 @@
  */
 import { z } from "zod";
 import { groqLiveEnabled } from "../server/env-flags.ts";
+import {
+  createBudgetLedger,
+  reserveCall,
+  settleCall,
+  type BudgetClock,
+  type BudgetLedger,
+  type CallEstimate,
+  type Reservation,
+} from "./budget.ts";
+import { costUsd, freeTierLimits, GEMINI_PRICING } from "./pricing.ts";
 import type {
   IntakeDecision,
   IntakeTurnInput,
@@ -338,63 +348,146 @@ function assertGate(generate: GenerateFn | undefined): void {
   }
 }
 
+// ─── BUDGET TRUTH ON THE LIVE PATH (S2-crew, 2026-10-31; Codex order of work:
+// "quota controls before any arming"; wiring note in docs/returns/2026-10-31-s2-ledger.md).
+// Every live turn RESERVES before its one request and SETTLES after it against
+// the S2-ledger budget API: unknown usage is charged at the reservation, a call
+// that billed above its reservation halts the ledger (BudgetOverflowError), and
+// a halted / capped ledger refuses the next turn before any request is made.
+// The default live path REFUSES to run without a ledger (fail closed); the DI
+// `generate` path runs unbudgeted only when no budget is passed (offline tests).
+
+/** A run's budget: the ledger every live turn books against, and the injected clock. */
+export interface CrewLiveBudget {
+  readonly ledger: BudgetLedger;
+  readonly clock: BudgetClock;
+}
+
+/** The ledger provider a model id books against ("groq", "ollama", or "gemini" for a priced row). */
+export function crewLiveProviderOf(model: string): string {
+  return GEMINI_PRICING[model.replace(/^models\//, "").trim()]?.provider ?? "gemini";
+}
+
+/** One ledger per run: the resolved model's free-tier caps on its provider, plus a counted, uncapped gemini row. */
+export function createCrewLiveBudgetLedger(model: string = resolvedCrewLiveModel(), capUsd?: number): BudgetLedger {
+  const limits = freeTierLimits(model);
+  const provider = crewLiveProviderOf(model);
+  return createBudgetLedger({
+    ...(capUsd !== undefined ? { capUsd } : {}),
+    providers: {
+      gemini: { rpdCap: null, tpdCap: null },
+      [provider]: { rpdCap: limits?.rpd ?? null, tpdCap: limits?.tpd ?? null },
+    },
+  });
+}
+
+/**
+ * The reservation for one turn: a CONSERVATIVE token estimate (prompt chars / 2 —
+ * about twice the usual ~4 chars per token — plus the full output cap) priced at
+ * the model's pinned row. Trued up at settle.
+ */
+export function crewLiveEstimate(model: string, prompt: string): CallEstimate {
+  const inputTokens = Math.ceil(prompt.length / 2);
+  return { costUsd: costUsd(model, inputTokens, MAX_CREW_LIVE_OUTPUT_TOKENS), tokens: inputTokens + MAX_CREW_LIVE_OUTPUT_TOKENS };
+}
+
+type LiveCall =
+  | { ok: true; object: unknown; usage: CrewLiveUsage }
+  | { ok: false; errorClass: string; raw?: unknown; attempts: number };
+
+/** One budgeted live request: reserve → generate (one request) → settle. Never retries. */
+async function liveCall(
+  schema: z.ZodTypeAny,
+  prompt: string,
+  opts: { generate?: GenerateFn; budget?: CrewLiveBudget } | undefined,
+): Promise<LiveCall> {
+  assertGate(opts?.generate);
+  if (opts?.generate === undefined && opts?.budget === undefined) {
+    throw new Error(
+      "CREW_LIVE_BUDGET_REQUIRED: the live crew lane books every turn against a budget ledger — pass " +
+        "{ budget: { ledger: createCrewLiveBudgetLedger(), clock } } (fail closed: no ledger, no live call).",
+    );
+  }
+  const model = resolvedCrewLiveModel();
+  let reservation: Reservation | undefined;
+  if (opts?.budget !== undefined) {
+    try {
+      reservation = reserveCall(opts.budget.ledger, crewLiveProviderOf(model), crewLiveEstimate(model, prompt), opts.budget.clock);
+    } catch (err) {
+      return { ok: false, errorClass: errorClassOf(err), attempts: 0 }; // refused before any request
+    }
+  }
+  let out: { object: unknown; usage?: CrewGenerateUsage };
+  try {
+    out = await (opts?.generate ?? defaultCrewLiveGenerate)({ model, schema, prompt });
+  } catch (err) {
+    if (reservation !== undefined) settleCall(reservation, undefined); // unknown usage → charged at the reservation
+    return { ok: false, errorClass: errorClassOf(err), attempts: attemptsOf(err) };
+  }
+  const usage = withAttempts(out.usage);
+  if (reservation !== undefined) {
+    const known = usage.inputTokens !== undefined && usage.outputTokens !== undefined;
+    try {
+      settleCall(
+        reservation,
+        known
+          ? {
+              costUsd: costUsd(model, usage.inputTokens, usage.outputTokens),
+              tokens: usage.totalTokens ?? (usage.inputTokens as number) + (usage.outputTokens as number),
+            }
+          : undefined,
+      );
+    } catch (err) {
+      // BudgetOverflowError: this call billed above its reservation; the ledger is halted.
+      return { ok: false, errorClass: errorClassOf(err), raw: out.object, attempts: usage.attempts };
+    }
+  }
+  return { ok: true, object: out.object, usage };
+}
+
 /**
  * ONE live Intake fetch (no retry, ever). `artifactPath` is the case's
- * committed artifact path — the mapper's only input besides the chosen tool.
+ * committed artifact path — the mapper's only input besides the chosen tool
+ * (plus, for a scenario run, its own record as `catalogPath` and the feed
+ * `surface` chosen by the case).
  */
 export async function fetchIntakeTurnLive(
   input: IntakeTurnInput,
   artifactPath: string,
-  opts?: { generate?: GenerateFn; catalogPath?: string; surface?: "acp" | "ucp" },
+  opts?: { generate?: GenerateFn; budget?: CrewLiveBudget; catalogPath?: string; surface?: "acp" | "ucp" },
 ): Promise<LiveTurnOutcome<IntakeDecision>> {
-  assertGate(opts?.generate);
-  try {
-    const out = await (opts?.generate ?? defaultCrewLiveGenerate)({
-      model: resolvedCrewLiveModel(),
-      schema: IntakeLiveOutputSchema,
-      prompt: buildIntakeLivePrompt(input),
-    });
-    const parsed = IntakeLiveOutputSchema.safeParse(out.object);
-    if (!parsed.success) {
-      return { ok: false, errorClass: "SCHEMA_VALIDATION_FAILED", raw: out.object, attempts: withAttempts(out.usage).attempts };
-    }
-    const decision: IntakeDecision =
-      parsed.data.decision === "route"
-        ? {
-            kind: "route",
-            tool: parsed.data.tool,
-            params: mapParamsForTool(parsed.data.tool, artifactPath, {
-              ...(opts?.catalogPath !== undefined ? { catalogPath: opts.catalogPath } : {}),
-              ...(opts?.surface !== undefined ? { surface: opts.surface } : {}),
-            }),
-          }
-        : { kind: "reject", reason: parsed.data.reason };
-    return { ok: true, decision, raw: out.object, usage: withAttempts(out.usage) };
-  } catch (err) {
-    return { ok: false, errorClass: errorClassOf(err), attempts: attemptsOf(err) };
+  const call = await liveCall(IntakeLiveOutputSchema, buildIntakeLivePrompt(input), opts);
+  if (!call.ok) return call;
+  const parsed = IntakeLiveOutputSchema.safeParse(call.object);
+  if (!parsed.success) {
+    return { ok: false, errorClass: "SCHEMA_VALIDATION_FAILED", raw: call.object, attempts: call.usage.attempts };
   }
+  const decision: IntakeDecision =
+    parsed.data.decision === "route"
+      ? {
+          kind: "route",
+          tool: parsed.data.tool,
+          params: mapParamsForTool(parsed.data.tool, artifactPath, {
+            ...(opts?.catalogPath !== undefined ? { catalogPath: opts.catalogPath } : {}),
+            ...(opts?.surface !== undefined ? { surface: opts.surface } : {}),
+          }),
+        }
+      : { kind: "reject", reason: parsed.data.reason };
+  return { ok: true, decision, raw: call.object, usage: call.usage };
 }
 
 /** ONE live Reviewer fetch (no retry, ever). */
 export async function fetchReviewerTurnLive(
   input: ReviewerTurnInput,
-  opts?: { generate?: GenerateFn },
+  opts?: { generate?: GenerateFn; budget?: CrewLiveBudget },
 ): Promise<LiveTurnOutcome<ReviewerDecision>> {
-  assertGate(opts?.generate);
-  try {
-    const out = await (opts?.generate ?? defaultCrewLiveGenerate)({
-      model: resolvedCrewLiveModel(),
-      schema: ReviewerLiveOutputSchema,
-      prompt: buildReviewerLivePrompt(input),
-    });
-    const parsed = ReviewerLiveOutputSchema.safeParse(out.object);
-    if (!parsed.success) {
-      return { ok: false, errorClass: "SCHEMA_VALIDATION_FAILED", raw: out.object, attempts: withAttempts(out.usage).attempts };
-    }
-    const decision: ReviewerDecision =
-      parsed.data.decision === "approve" ? { kind: "approve" } : { kind: "escalate", reason: parsed.data.reason };
-    return { ok: true, decision, raw: out.object, usage: withAttempts(out.usage) };
-  } catch (err) {
-    return { ok: false, errorClass: errorClassOf(err), attempts: attemptsOf(err) };
+  const call = await liveCall(ReviewerLiveOutputSchema, buildReviewerLivePrompt(input), opts);
+  if (!call.ok) return call;
+  const parsed = ReviewerLiveOutputSchema.safeParse(call.object);
+  if (!parsed.success) {
+    return { ok: false, errorClass: "SCHEMA_VALIDATION_FAILED", raw: call.object, attempts: call.usage.attempts };
   }
+  const decision: ReviewerDecision =
+    parsed.data.decision === "approve" ? { kind: "approve" } : { kind: "escalate", reason: parsed.data.reason };
+  return { ok: true, decision, raw: call.object, usage: call.usage };
 }
