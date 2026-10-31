@@ -1,5 +1,6 @@
 {
   "caseId": "evi-fees-conditional",
+  "manifestDigest": "f0947ec852d6fd02af054681403fb40de8b919444ce87e7bef1c98bdb432f9fd",
   "member": "evidence",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/fees/statement.conditional.json"

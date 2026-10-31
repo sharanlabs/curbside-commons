@@ -1,0 +1,94 @@
+{
+  "caseId": "s2-im-fee-precheck",
+  "manifestDigest": "22d4e8c8776650accdbb605e1d957423ff3db11605dee8f186cf85b6b09edc22",
+  "member": "impact",
+  "inputArtifact": {
+    "path": "fixtures/scenarios/fee-precheck/inputs/statement.json"
+  },
+  "ask": "Audit this month's fee statement against the NYC fee caps before it is paid.",
+  "allowedTools": [
+    "audit_statement",
+    "explain_drift",
+    "size_impact"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "audit_statement",
+      "params": {
+        "statementPath": "fixtures/scenarios/fee-precheck/inputs/statement.json"
+      }
+    },
+    {
+      "tool": "explain_drift",
+      "params": {
+        "findings": [
+          {
+            "id": "ORD-5#service_and_delivery#L15",
+            "ruleId": "NYC-563.3-d-1",
+            "category": "bundling",
+            "referenceRowId": "§ 20-563.3(d) (category lock)"
+          },
+          {
+            "id": "ORD-7#transaction_fee#L21",
+            "ruleId": "NYC-563.3-c-1",
+            "category": "processing-fee-base-inflation",
+            "referenceRowId": "§ 20-563.3(c)"
+          },
+          {
+            "id": "ORD-6#transaction_fee#L18",
+            "ruleId": "NYC-563.3-c-2",
+            "category": "processing-fee-base-inflation",
+            "referenceRowId": "§ 20-563.3(c)(i)-(ii)"
+          }
+        ],
+        "events": [
+          {
+            "at": "2026-08-12T00:00:00Z",
+            "actor": "platform",
+            "action": "sync",
+            "target": "statement"
+          },
+          {
+            "at": "2026-08-12T22:47:00Z",
+            "actor": "platform",
+            "action": "price_edit",
+            "target": "ORD-5#service_and_delivery"
+          },
+          {
+            "at": "2026-08-12T23:33:00Z",
+            "actor": "platform",
+            "action": "price_edit",
+            "target": "ORD-7#transaction_fee"
+          },
+          {
+            "at": "2026-08-12T23:45:00Z",
+            "actor": "platform",
+            "action": "price_edit",
+            "target": "ORD-6#transaction_fee"
+          }
+        ],
+        "asOf": "2026-08-15T00:00:00Z"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "7873f50ed2ea6cf3291d06ccfc8f9779ce678fc7bb69a52b876c9e8163928ca4",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "ORD-5#service_and_delivery#L15",
+    "ORD-7#transaction_fee#L21"
+  ],
+  "expectedGateState": "approve-recommendation",
+  "s2": {
+    "eventsPath": "fixtures/scenarios/fee-precheck/inputs/events.jsonl",
+    "asOf": "2026-08-15T00:00:00Z",
+    "route": {
+      "pack": "fees",
+      "triggerKind": "sweep",
+      "ownership": "platform"
+    }
+  }
+}

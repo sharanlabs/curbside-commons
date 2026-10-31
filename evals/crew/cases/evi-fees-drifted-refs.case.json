@@ -1,5 +1,6 @@
 {
   "caseId": "evi-fees-drifted-refs",
+  "manifestDigest": "30ae88e3a36376aa159f37fa5198cf91b96e3d1341b851d964a95ac2586d5594",
   "member": "evidence",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/fees/statement.drifted.json"

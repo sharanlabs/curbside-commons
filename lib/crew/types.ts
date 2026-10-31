@@ -23,8 +23,16 @@
  * made-up claim along.
  */
 
-/** The four crew members (plan §3; classification per member in classification.ts). */
-export type CrewMemberName = "intake" | "audit" | "evidence" | "reviewer";
+import type { RouteResult } from "./route.ts";
+
+/**
+ * The crew members (plan §3; classification per member in classification.ts).
+ * S2-crew widened the roster with two seats: "root-cause" (model-directed BY
+ * DESIGN, but never called live in this slice — the run shows the
+ * deterministic explain_drift baseline and the LLM seat renders DEFER) and
+ * "impact" (deterministic, via size_impact).
+ */
+export type CrewMemberName = "intake" | "audit" | "evidence" | "reviewer" | "root-cause" | "impact";
 
 /** The committed recommendation-class enum (§6 case schema field `expectedRecommendationClass`). */
 export const RECOMMENDATION_CLASSES = ["no-action", "flag-attention", "flag-violations"] as const;
@@ -39,6 +47,10 @@ export interface ParsedFinding {
   readonly ruleId: string;
   readonly severity: string;
   readonly plainLine: string;
+  /** The finding's category when the report carries one (S2: explain_drift / size_impact inputs). */
+  readonly category: string | null;
+  /** The reference row the finding cites, when the report carries one. */
+  readonly referenceRowId: string | null;
 }
 
 /** A decision-grade engine report, parsed at the JSON level from `ToolResult.canonical`. */
@@ -60,7 +72,14 @@ export function parseReportCanonical(canonical: string): ParsedReport {
     );
   }
   const findings: ParsedFinding[] = raw.findings.map((f: unknown, i: number) => {
-    const ff = f as { claim?: { id?: unknown }; ruleId?: unknown; severity?: unknown; plainLine?: unknown };
+    const ff = f as {
+      claim?: { id?: unknown };
+      ruleId?: unknown;
+      severity?: unknown;
+      plainLine?: unknown;
+      category?: unknown;
+      referenceRowId?: unknown;
+    };
     if (typeof ff.claim?.id !== "string" || typeof ff.ruleId !== "string") {
       throw new Error(`crew: finding[${i}] lacks claim.id/ruleId — refusing to consume an unrecognized report shape`);
     }
@@ -69,6 +88,8 @@ export function parseReportCanonical(canonical: string): ParsedReport {
       ruleId: ff.ruleId,
       severity: typeof ff.severity === "string" ? ff.severity : "unknown",
       plainLine: typeof ff.plainLine === "string" ? ff.plainLine : "",
+      category: typeof ff.category === "string" ? ff.category : null,
+      referenceRowId: typeof ff.referenceRowId === "string" ? ff.referenceRowId : null,
     });
   });
   return Object.freeze({
@@ -130,7 +151,11 @@ export type TrajectoryStepKind =
   | "refused_result"
   | "recommendation"
   | "forced_escalation"
-  | "escalation";
+  | "escalation"
+  // S2-crew (only S2 runs emit these; legacy trajectories never do):
+  | "route" // the deterministic route table's answer
+  | "deferred" // a seat that renders DEFER (the LLM root-cause seat)
+  | "skipped"; // a step that could not run, with the reason (never a silent drop)
 
 /** One ordered step of a crew run (AC-7: the legible trace unit). */
 export interface TrajectoryStep {
@@ -163,7 +188,42 @@ export interface TrajectoryRecord {
    * reference ride through the floor).
    */
   readonly consumedFindingIds: readonly string[] | null;
+  // ---- S2-crew fields: PRESENT ONLY on a run of a case carrying `s2`; absent
+  // (not null, not empty) on every legacy run, so legacy records stay
+  // byte-identical. ----
+  /** The final route (deterministic workflow) after the Reviewer's decision. */
+  readonly route?: RouteResult;
+  /** The deterministic explain_drift answer; absent when it could not run (a typed step says why). */
+  readonly explanation?: CrewExplanation;
+  /** Impact figures (simulated) or the reason the step was skipped. */
+  readonly impact?: CrewImpact;
+  /** The model-driven root-cause seat's state — always DEFER in this slice. */
+  readonly rootCauseSeat?: "DEFER";
+  /** The Reviewer seat's label on this run ("requalification pending" in the expanded configuration). */
+  readonly reviewerLabelState?: string;
 }
+
+/** explain_drift's answer, parsed at the JSON level (the crew never imports the tool's types). */
+export interface CrewExplanation {
+  readonly class: string;
+  readonly citedEvents: readonly number[];
+  readonly reason: string;
+  readonly label: string;
+}
+
+/** size_impact figures, parsed at the JSON level — or why the step was skipped. */
+export type CrewImpact =
+  | {
+      readonly kind: "figures";
+      readonly ordersAtRiskDistinct: number;
+      readonly observedMenuRefundCents: number;
+      readonly prospectiveExposureCents: number;
+      readonly agentCancelExposureCents: number;
+      readonly errorChargeExposureCents: number;
+      readonly assumptions: ReadonlyArray<{ readonly name: string; readonly value: number | string }>;
+      readonly label: "simulated";
+    }
+  | { readonly kind: "skipped"; readonly reason: string };
 
 /** One committed trajectory case (§6 schema — see docs/plan-a2-trajectory-floors.md). */
 export interface CrewCase {
@@ -182,4 +242,43 @@ export interface CrewCase {
   readonly expectedFindingRefs: readonly string[];
   /** §6 gate expectation: approve-recommendation ⇔ terminal "recommendation"; escalate-to-human ⇔ terminal "escalate-to-human". */
   readonly expectedGateState: "approve-recommendation" | "escalate-to-human";
+  /**
+   * S2-crew replay binding: sha256 of this case's manifest (`lib/crew/manifest.ts`),
+   * written by `scripts-ts/stamp-case-digests.mts`. Optional ONLY because the
+   * frozen L-1 held-out split (`evals/crew/cases-live/**`) predates it; every
+   * replay case carries it, and `runCase` throws when it is present but stale.
+   */
+  readonly manifestDigest?: string;
+  /**
+   * S2-crew extension (root-cause baseline · impact · route). Absent on every
+   * A2/L-1 case, which therefore run exactly as before. Present ⇒ the
+   * orchestrator calls `explain_drift` (and `size_impact` when an orders file is
+   * named) through `callTool`, each contracted in `expectedToolCalls`, then
+   * computes the deterministic route the Reviewer sees.
+   */
+  readonly s2?: CrewCaseS2;
+}
+
+/** The S2 block of a case — every fact the deterministic S2 seats need, supplied by the case, never inferred. */
+export interface CrewCaseS2 {
+  /** The scenario's event log (`{at, actor, action, target}` per line) — evidence for explain_drift. */
+  readonly eventsPath: string;
+  /** The instant the explanation is computed as of (the record's own as-of). */
+  readonly asOf: string;
+  /**
+   * Route facts the route table needs that the engine report cannot supply.
+   * OWNERSHIP comes from scenario evidence and is stated here by the case
+   * author — the crew never infers it (Codex 2026-10-12 § 3 page 1).
+   */
+  readonly route: {
+    readonly pack: "listings" | "fees" | "conformance";
+    readonly triggerKind: "sweep" | "order-errors" | "complaint" | "partner-onboarding" | "agent-preflight";
+    readonly ownership: "merchant" | "integrator" | "platform" | "unknown";
+  };
+  /** Present only when the case supplies an orders file; absent ⇒ the impact step is skipped with a typed step. */
+  readonly impact?: {
+    readonly ordersPath: string;
+    readonly windowDays: number;
+    readonly errorChargeShare: number;
+  };
 }

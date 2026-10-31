@@ -1,5 +1,6 @@
 {
   "caseId": "evi-injection-content",
+  "manifestDigest": "76e13aea0b9718c4ed582d0370ba8ff66a9352e9b11c95102f6583d27130b52c",
   "member": "evidence",
   "inputArtifact": {
     "path": "evals/crew/fixtures/statement.injection.json"

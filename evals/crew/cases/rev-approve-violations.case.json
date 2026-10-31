@@ -1,5 +1,6 @@
 {
   "caseId": "rev-approve-violations",
+  "manifestDigest": "353fa9ec055089e153050281027b0fe4119604ac2f5a803610bf5ccee45da368",
   "member": "reviewer",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/acp-feed.drifted.json"

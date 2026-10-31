@@ -1,0 +1,129 @@
+{
+  "caseId": "s2-rc-partner-onboarding",
+  "manifestDigest": "bc455c215ec383d58719a3345b07f9b0bc97311f04186a6a2e3e2323448152bd",
+  "member": "root-cause",
+  "inputArtifact": {
+    "path": "fixtures/scenarios/partner-onboarding/inputs/feed.json"
+  },
+  "ask": "A new integration partner sent its first feed \u2014 score it against the merchant's record.",
+  "allowedTools": [
+    "check_feed",
+    "explain_drift",
+    "size_impact"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/partner-onboarding/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/partner-onboarding/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    {
+      "tool": "explain_drift",
+      "params": {
+        "findings": [
+          {
+            "id": "item-007-v1#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-007-v1"
+          },
+          {
+            "id": "item-009-v1#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-009-v1"
+          },
+          {
+            "id": "item-010-v1#title",
+            "ruleId": "LST-IDENT-NAME",
+            "category": "identity",
+            "referenceRowId": "item-010-v1"
+          },
+          {
+            "id": "item-011-v2#title",
+            "ruleId": "LST-IDENT-NAME",
+            "category": "identity",
+            "referenceRowId": "item-011-v2"
+          },
+          {
+            "id": "item-003-v1#price.amount",
+            "ruleId": "LST-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-003-v1"
+          },
+          {
+            "id": "item-004-v2#price.amount",
+            "ruleId": "LST-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-004-v2"
+          }
+        ],
+        "events": [
+          {
+            "at": "2026-07-02T23:00:00Z",
+            "actor": "integrator",
+            "action": "sync",
+            "target": "catalog"
+          },
+          {
+            "at": "2026-07-02T23:07:00Z",
+            "actor": "integrator",
+            "action": "price_edit",
+            "target": "item-004-v2"
+          },
+          {
+            "at": "2026-07-02T23:27:00Z",
+            "actor": "integrator",
+            "action": "86",
+            "target": "item-007-v1"
+          },
+          {
+            "at": "2026-07-02T23:27:00Z",
+            "actor": "unknown",
+            "action": "override",
+            "target": "item-011-v2"
+          },
+          {
+            "at": "2026-07-02T23:36:00Z",
+            "actor": "integrator",
+            "action": "86",
+            "target": "item-009-v1"
+          },
+          {
+            "at": "2026-07-02T23:42:00Z",
+            "actor": "integrator",
+            "action": "price_edit",
+            "target": "item-003-v1"
+          },
+          {
+            "at": "2026-07-02T23:44:00Z",
+            "actor": "unknown",
+            "action": "override",
+            "target": "item-010-v1"
+          }
+        ],
+        "asOf": "2026-07-03T00:00:00Z"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "cf3e432ecfee386096e0917ba0274e4956600f1fc176025215b5918323b3dd36",
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human",
+  "s2": {
+    "eventsPath": "fixtures/scenarios/partner-onboarding/inputs/events.jsonl",
+    "asOf": "2026-07-03T00:00:00Z",
+    "route": {
+      "pack": "listings",
+      "triggerKind": "partner-onboarding",
+      "ownership": "unknown"
+    }
+  }
+}

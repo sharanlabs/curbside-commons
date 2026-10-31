@@ -1,5 +1,6 @@
 {
   "caseId": "aud-fees-clean",
+  "manifestDigest": "c1d7c67d06dcc9e2174f543a78db8164ad3eaae545d5065a756e855a8de13c55",
   "member": "audit",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/fees/statement.faithful.json"

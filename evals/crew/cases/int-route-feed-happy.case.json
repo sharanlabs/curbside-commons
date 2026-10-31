@@ -1,5 +1,6 @@
 {
   "caseId": "int-route-feed-happy",
+  "manifestDigest": "8c70261ca99c0fccee4ec359b2eb0e737382b801e0deb36f81f3994eee78a3b9",
   "member": "intake",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/acp-feed.drifted.json"

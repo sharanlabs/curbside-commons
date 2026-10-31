@@ -16,15 +16,26 @@
  *
  * ALLOWED ROOTS (what today's real inputs actually need — checked against the
  * live call sites, never overspecified):
- *  - the REPO ROOT — every committed input lives here (`fixtures/**`,
- *    `evals/**`); relative paths resolve against it exactly as `readFileSync`
- *    resolves them against a repo-root cwd.
+ *  - `fixtures/` and `evals/` UNDER THE REPO ROOT — every committed input lives
+ *    there; relative paths resolve against the repo root exactly as
+ *    `readFileSync` resolves them against a repo-root cwd. NARROWED 2026-10-31
+ *    (security review F2, `docs/reviews/security-privacy-legal-2026-10-31.md`):
+ *    the whole repo root used to be allowed, and it holds `.env`, `.git/` and
+ *    the agent settings — a tool could be pointed at any of them.
  *  - the OS TEMP DIR — tests legitimately write ephemeral statement/feed
  *    fixtures to `os.tmpdir()` and point a tool at that absolute path
  *    (`registry-advisory-never-gates.test.ts`), a supported, non-secret scratch
  *    location.
  * `/etc/passwd`, `~/.ssh/*`, and any `..`-climb out of the project stay outside
- * BOTH and are refused.
+ * every root and are refused. Inside a root, any DOT-SEGMENT (`.env*`, `.git`,
+ * `.claude`, `.vercel`, any hidden name) is refused too, and an existing file
+ * larger than {@link MAX_TOOL_FILE_BYTES} is refused BEFORE it is read (F5: the
+ * 5 MB cap used to exist in the browser only — this is the one shared check
+ * every registry file read passes through).
+ *
+ * The error MESSAGE never echoes the caller's value or an absolute path (F2:
+ * the MCP server used to relay messages verbatim, leaking file existence and
+ * home paths). The fields keep the detail for programmatic callers.
  *
  * Containment is checked on CANONICALIZED (`realpathSync`) paths so a symlinked
  * prefix — e.g. macOS `/var` → `/private/var` for the temp dir — never causes a
@@ -34,16 +45,23 @@
  * at a file INSIDE this project (or the disposable temp scratch dir) — never at
  * your SSH keys, never at `/etc/passwd` — before the tool opens it.
  */
-import { realpathSync } from "node:fs";
+import { realpathSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, resolve, sep } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 /** This file lives at `<repo>/lib/tools/paths.ts`; the repo root is two levels up. */
 const REPO_ROOT = realpathSync(resolve(fileURLToPath(import.meta.url), "..", "..", ".."));
 
 /** The canonical allowed roots a tool path may resolve within (see file header). */
-const ALLOWED_ROOTS: readonly string[] = Object.freeze([REPO_ROOT, realpathSync(tmpdir())]);
+const ALLOWED_ROOTS: readonly string[] = Object.freeze([
+  realpathSync(join(REPO_ROOT, "fixtures")),
+  realpathSync(join(REPO_ROOT, "evals")),
+  realpathSync(tmpdir()),
+]);
+
+/** The largest file a registry tool will read (5 MB — the browser surface's own cap, now shared). */
+export const MAX_TOOL_FILE_BYTES = 5 * 1024 * 1024;
 
 /**
  * Thrown BEFORE any `readFileSync` when a caller-supplied path escapes the
@@ -62,10 +80,10 @@ export class ToolPathError extends Error {
   readonly resolved: string;
   /** The allowed roots the path had to stay within. */
   readonly roots: readonly string[];
-  constructor(param: string, value: string, resolved: string, roots: readonly string[]) {
+  constructor(param: string, value: string, resolved: string, roots: readonly string[], why?: string) {
     super(
-      `tool path "${param}" escapes the allowed root: "${value}" resolves to "${resolved}", ` +
-        `which is outside [${roots.join(", ")}] — path traversal and absolute-path escapes are refused`,
+      `tool path "${param}" escapes the allowed root — ${why ?? "it resolves outside the allowed input folders"}; ` +
+        "path traversal, absolute-path escapes, hidden (dot) segments and oversized files are refused (the path is not echoed)",
     );
     this.name = "ToolPathError";
     this.param = param;
@@ -91,7 +109,12 @@ export class ToolPathError extends Error {
  * adjudicated: keep case-sensitive, document the intent.)
  */
 function withinAllowedRoot(p: string): boolean {
-  return ALLOWED_ROOTS.some((root) => p === root || p.startsWith(root + sep));
+  const root = ALLOWED_ROOTS.find((r) => p === r || p.startsWith(r + sep));
+  if (root === undefined) return false;
+  // F2: no hidden segment below the root (.env*, .git, .claude, .vercel, …).
+  return !relative(root, p)
+    .split(sep)
+    .some((segment) => segment.startsWith("."));
 }
 
 /**
@@ -104,10 +127,12 @@ function canonicalNearestExisting(p: string): string {
   let cur = p;
   for (;;) {
     try {
-      return realpathSync(cur);
+      // The canonical ancestor, with the not-yet-existing remainder re-attached,
+      // so the dot-segment rule also sees the segments that do not exist yet.
+      return join(realpathSync(cur), relative(cur, p));
     } catch {
       const parent = dirname(cur);
-      if (parent === cur) return cur;
+      if (parent === cur) return p;
       cur = parent;
     }
   }
@@ -139,6 +164,11 @@ export function resolveInAllowedRoot(candidate: string, param: string): string {
   }
   if (!withinAllowedRoot(real)) {
     throw new ToolPathError(param, candidate, real, ALLOWED_ROOTS);
+  }
+  // F5: one shared size check before ANY registry tool reads the file.
+  const st = statSync(real);
+  if (st.isFile() && st.size > MAX_TOOL_FILE_BYTES) {
+    throw new ToolPathError(param, candidate, real, ALLOWED_ROOTS, `the file is larger than the ${MAX_TOOL_FILE_BYTES}-byte cap`);
   }
   return real;
 }

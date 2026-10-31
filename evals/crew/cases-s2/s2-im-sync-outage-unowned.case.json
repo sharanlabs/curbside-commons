@@ -1,0 +1,147 @@
+{
+  "caseId": "s2-im-sync-outage-unowned",
+  "manifestDigest": "f79656490402b37643c7035a8666e5fb765f9e63d452cdbfd049e8b3894d3f6f",
+  "member": "impact",
+  "inputArtifact": {
+    "path": "fixtures/scenarios/sync-outage/inputs/feed.json"
+  },
+  "ask": "Order-error reports are coming in — check this marketplace copy against the merchant's record.",
+  "allowedTools": [
+    "check_feed",
+    "explain_drift",
+    "size_impact"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/sync-outage/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/sync-outage/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    {
+      "tool": "explain_drift",
+      "params": {
+        "findings": [
+          {
+            "id": "item-001-v1#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-001-v1"
+          },
+          {
+            "id": "item-011-v1#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-011-v1"
+          },
+          {
+            "id": "item-001-v3#price.amount",
+            "ruleId": "LST-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-001-v3"
+          },
+          {
+            "id": "item-011-v2#price.amount",
+            "ruleId": "LST-PRICE-VALUE",
+            "category": "price",
+            "referenceRowId": "item-011-v2"
+          },
+          {
+            "id": "item-001-v1#expiration_date",
+            "ruleId": "LST-STALE-EXPIRED",
+            "category": "staleness",
+            "referenceRowId": "item-001-v1"
+          },
+          {
+            "id": "item-001-v2#expiration_date",
+            "ruleId": "LST-STALE-EXPIRED",
+            "category": "staleness",
+            "referenceRowId": "item-001-v2"
+          },
+          {
+            "id": "item-001-v3#expiration_date",
+            "ruleId": "LST-STALE-EXPIRED",
+            "category": "staleness",
+            "referenceRowId": "item-001-v3"
+          },
+          {
+            "id": "item-006-v1#expiration_date",
+            "ruleId": "LST-STALE-EXPIRED",
+            "category": "staleness",
+            "referenceRowId": "item-006-v1"
+          },
+          {
+            "id": "item-011-v1#expiration_date",
+            "ruleId": "LST-STALE-EXPIRED",
+            "category": "staleness",
+            "referenceRowId": "item-011-v1"
+          },
+          {
+            "id": "item-011-v2#expiration_date",
+            "ruleId": "LST-STALE-EXPIRED",
+            "category": "staleness",
+            "referenceRowId": "item-011-v2"
+          }
+        ],
+        "events": [
+          {
+            "at": "2026-06-30T12:00:00Z",
+            "actor": "integrator",
+            "action": "sync",
+            "target": "catalog"
+          },
+          {
+            "at": "2026-07-01T12:00:00Z",
+            "actor": "integrator",
+            "action": "sync",
+            "target": "Appetizers"
+          },
+          {
+            "at": "2026-07-02T07:12:00Z",
+            "actor": "merchant",
+            "action": "price_edit",
+            "target": "item-001-v3"
+          },
+          {
+            "at": "2026-07-02T11:52:00Z",
+            "actor": "merchant",
+            "action": "86",
+            "target": "item-001-v1"
+          },
+          {
+            "at": "2026-07-02T16:08:00Z",
+            "actor": "merchant",
+            "action": "86",
+            "target": "item-011-v1"
+          },
+          {
+            "at": "2026-07-02T17:39:00Z",
+            "actor": "merchant",
+            "action": "price_edit",
+            "target": "item-011-v2"
+          }
+        ],
+        "asOf": "2026-07-03T00:00:00Z"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "b8a08ba6a2234d9f860bc1626a66aa4837f171ff5b6115acabad61b0c4a8544e",
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human",
+  "s2": {
+    "eventsPath": "fixtures/scenarios/sync-outage/inputs/events.jsonl",
+    "asOf": "2026-07-03T00:00:00Z",
+    "route": {
+      "pack": "listings",
+      "triggerKind": "order-errors",
+      "ownership": "unknown"
+    }
+  }
+}

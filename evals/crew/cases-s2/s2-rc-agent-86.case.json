@@ -1,0 +1,132 @@
+{
+  "caseId": "s2-rc-agent-86",
+  "manifestDigest": "8924b9471b3f4f005c5497ef305ef04aef3330378bca9e12158150f423b01c8b",
+  "member": "root-cause",
+  "inputArtifact": {
+    "path": "fixtures/scenarios/agent-86/inputs/feed.json"
+  },
+  "ask": "An agent is about to order from this marketplace copy — check it against the merchant's record first.",
+  "allowedTools": [
+    "check_feed",
+    "explain_drift",
+    "size_impact"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/agent-86/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/agent-86/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    {
+      "tool": "explain_drift",
+      "params": {
+        "findings": [
+          {
+            "id": "item-005-v1#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-005-v1"
+          },
+          {
+            "id": "item-005-v2#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-005-v2"
+          },
+          {
+            "id": "item-005-v3#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-005-v3"
+          },
+          {
+            "id": "item-006-v1#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-006-v1"
+          },
+          {
+            "id": "item-011-v1#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-011-v1"
+          },
+          {
+            "id": "item-011-v2#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-011-v2"
+          }
+        ],
+        "events": [
+          {
+            "at": "2026-07-02T00:00:00Z",
+            "actor": "integrator",
+            "action": "sync",
+            "target": "catalog"
+          },
+          {
+            "at": "2026-07-02T21:25:00Z",
+            "actor": "merchant",
+            "action": "86",
+            "target": "item-006-v1"
+          },
+          {
+            "at": "2026-07-02T21:32:00Z",
+            "actor": "merchant",
+            "action": "86",
+            "target": "item-005-v3"
+          },
+          {
+            "at": "2026-07-02T21:38:00Z",
+            "actor": "merchant",
+            "action": "86",
+            "target": "item-005-v2"
+          },
+          {
+            "at": "2026-07-02T21:46:00Z",
+            "actor": "merchant",
+            "action": "86",
+            "target": "item-005-v1"
+          },
+          {
+            "at": "2026-07-02T21:51:00Z",
+            "actor": "merchant",
+            "action": "86",
+            "target": "item-011-v2"
+          },
+          {
+            "at": "2026-07-02T21:56:00Z",
+            "actor": "merchant",
+            "action": "86",
+            "target": "item-011-v1"
+          }
+        ],
+        "asOf": "2026-07-03T00:00:00Z"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "3e90810909ff168930a114acc24f7de10b7c17529bcc7865143ecd9f647d03c6",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "item-005-v1#availability",
+    "item-005-v2#availability"
+  ],
+  "expectedGateState": "approve-recommendation",
+  "s2": {
+    "eventsPath": "fixtures/scenarios/agent-86/inputs/events.jsonl",
+    "asOf": "2026-07-03T00:00:00Z",
+    "route": {
+      "pack": "listings",
+      "triggerKind": "agent-preflight",
+      "ownership": "merchant"
+    }
+  }
+}

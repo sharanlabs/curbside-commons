@@ -1,0 +1,22 @@
+CREW RUN — case s2-rc-sync-outage (SIMULATED data; orchestration harness — offline replay)
+terminal: recommendation · class: flag-violations
+engine report consumed: sha256 b8a08ba6a2234d9f860bc1626a66aa4837f171ff5b6115acabad61b0c4a8544e
+
+ 1. INTAKE · MODEL TURN — intake routed the ask to tool "check_feed"
+ 2. AUDIT · TOOL CALL [check_feed] — executed "check_feed" via the registry (exit 1)
+ 3. EVIDENCE · RECOMMENDATION — evidence assembled 1 recommendation (flag-violations) referencing 10 engine finding(s)
+      refs: item-001-v1#availability · item-011-v1#availability · item-001-v3#price.amount · item-011-v2#price.amount · item-001-v1#expiration_date · item-001-v2#expiration_date · item-001-v3#expiration_date · item-006-v1#expiration_date · item-011-v1#expiration_date · item-011-v2#expiration_date
+ 4. ROOT-CAUSE · TOOL CALL [explain_drift] — explain_drift (deterministic baseline): sync-latency, citing 5 event(s)
+ 5. ROOT-CAUSE · DEFER — LLM root-cause seat: DEFER — not examined on any model; this run shows the deterministic baseline, never a model's guess
+ 6. IMPACT · SKIPPED [size_impact] — no orders data in this case — size_impact not called
+ 7. EVIDENCE · ROUTE — route table (deterministic workflow) proposes partner → partner-ticket, slack — Row 3: the evidence names the integrator as owner, so it goes to the partner team with a partner ticket and a Slack digest.
+ 8. REVIEWER · MODEL TURN — reviewer approved the recommendations
+
+route (deterministic workflow): partner → partner-ticket · slack — Row 3: the evidence names the integrator as owner, so it goes to the partner team with a partner ticket and a Slack digest.
+root cause (deterministic baseline): sync-latency — cited events: #1 · #2 · #3 · #4 · #5 — All 10 finding(s) read as sync-latency: each row's copy is past its refresh and a sync is on record before it, so the copy missed a refresh.
+root-cause seat (LLM): DEFER — not examined on any model; never called in this run
+impact: no orders data in this case — no figures
+reviewer seat: requalification pending (approve | escalate only; flag-attention → escalate is model-enforced; code forces escalation on anomalies only; code enforcement deferred to S5 with a re-exam)
+
+anomalies: none
+outcome: 1 recommendation(s) for the human — the engine's verdicts are untouched; these are references, not decisions.

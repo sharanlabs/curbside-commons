@@ -31,6 +31,20 @@
  *
  * Pure + deterministic: no I/O, no state, same input → same output, matches
  * returned in a stable order (SIGNATURES array order, de-duplicated).
+ *
+ * OBFUSCATION FOLDING (security review 2026-10-31 F3b): the signatures used to
+ * miss a payload split by zero-width characters or soft hyphens, written in
+ * fullwidth letters, or spelled with Cyrillic/Greek look-alikes. The scan now
+ * runs on the raw text and TWO folded views — {@link foldForScan} (NFKC, every
+ * invisible removed, a fixed confusables table mapped to Latin) and
+ * {@link spacedForScan} (the same, but every invisible becomes one space, for
+ * zero-width characters used as word separators) — and reports the union, so
+ * every prior hit still fires and the folded views can only ADD hits. The zero-false-positive corpus is
+ * re-proven on the folded view by the same suites.
+ * KNOWN RESIDUAL (recorded, not solved): a NON-ENGLISH PARAPHRASE ("ignorez les
+ * instructions précédentes") and any paraphrase outside the signature
+ * families pass this tripwire. It is a tripwire, not a classifier; the
+ * forced-escalation path and the human gate remain the control.
  */
 
 interface InjectionSignature {
@@ -224,11 +238,63 @@ const SIGNATURES: readonly InjectionSignature[] = [
  * (which is NOT a certificate of safety — see the module header).
  */
 export function detectInjectionSignatures(rawContent: string): string[] {
+  const views = [rawContent, foldForScan(rawContent), spacedForScan(rawContent)].filter((v, i, all) => all.indexOf(v) === i);
   const hits: string[] = [];
   for (const sig of SIGNATURES) {
-    if (sig.pattern.test(rawContent)) hits.push(sig.name);
+    if (views.some((v) => sig.pattern.test(v))) hits.push(sig.name);
   }
   return hits;
+}
+
+/** Invisible characters a payload can hide behind: every format character, plus the Hangul fillers (category Lo, so not in \p{Cf}). */
+const INVISIBLE_RE = /[\p{Cf}\u115F\u1160\u3164\uFFA0]/gu;
+
+/**
+ * Cyrillic and Greek letters that render like Latin ones — a FIXED table (no
+ * runtime Unicode data), enough to defeat the look-alike spellings the
+ * security review reproduced. Extending it needs the same zero-FP proof.
+ */
+const CONFUSABLES: Readonly<Record<string, string>> = {
+  // Cyrillic lower
+  "\u0430": "a", "\u0435": "e", "\u043e": "o", "\u0440": "p", "\u0441": "c", "\u0443": "y", "\u0445": "x",
+  "\u0456": "i", "\u0458": "j", "\u0455": "s", "\u0501": "d", "\u04bb": "h", "\u0457": "i", "\u0261": "g",
+  // Cyrillic upper
+  "\u0410": "A", "\u0412": "B", "\u0415": "E", "\u041a": "K", "\u041c": "M", "\u041d": "H", "\u041e": "O",
+  "\u0420": "P", "\u0421": "C", "\u0422": "T", "\u0425": "X", "\u0423": "Y", "\u0406": "I", "\u0408": "J", "\u0405": "S",
+  // Greek lower / upper
+  "\u03bf": "o", "\u03b1": "a", "\u03b5": "e", "\u03b9": "i", "\u03bd": "v", "\u03c1": "p", "\u03c4": "t", "\u03ba": "k",
+  "\u039f": "O", "\u0391": "A", "\u0395": "E", "\u0399": "I", "\u039a": "K", "\u039c": "M", "\u039d": "N", "\u03a1": "P",
+  "\u03a4": "T", "\u03a7": "X", "\u03a5": "Y", "\u0392": "B", "\u0396": "Z", "\u0397": "H",
+};
+const CONFUSABLE_RE = new RegExp(`[${Object.keys(CONFUSABLES).join("")}]`, "g");
+
+/**
+ * The folded view the scan also matches: NFKC (fullwidth → ASCII, compatibility
+ * forms → base letters), every Unicode format character removed (zero-width
+ * space/joiners, soft hyphen, bidi controls — `\p{Cf}`), then look-alikes
+ * mapped to Latin. Pure.
+ */
+export function foldForScan(text: string): string {
+  return text
+    .normalize("NFKC")
+    .replace(INVISIBLE_RE, "")
+    .replace(CONFUSABLE_RE, (ch) => CONFUSABLES[ch] ?? ch);
+}
+
+/**
+ * The SECOND folded view (orchestrator amendment 4, 2026-10-31): stripping
+ * invisibles JOINS words, so a payload that uses zero-width characters AS WORD
+ * SEPARATORS ("ignore<ZWSP>all<ZWSP>previous") folds to "ignoreallprevious"
+ * and slips past the phrase patterns. Here every invisible becomes ONE space
+ * and runs of horizontal whitespace collapse to one (newlines are kept, since
+ * several signatures stop at a line break). A hit in either view is a hit.
+ */
+export function spacedForScan(text: string): string {
+  return text
+    .normalize("NFKC")
+    .replace(INVISIBLE_RE, " ")
+    .replace(/[^\S\n]+/g, " ")
+    .replace(CONFUSABLE_RE, (ch) => CONFUSABLES[ch] ?? ch);
 }
 
 /** The committed signature names, for tests that enumerate the set. */

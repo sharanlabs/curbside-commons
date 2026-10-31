@@ -1,5 +1,6 @@
 {
   "caseId": "int-route-fees-happy",
+  "manifestDigest": "c34e2310db4de1a1edd70a3fe89a0f7d876445749fff1cdec33902bc373b5a70",
   "member": "intake",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/fees/statement.faithful.json"

@@ -1,0 +1,41 @@
+{
+  "caseId": "s2-rc-uncontracted-explain",
+  "manifestDigest": "fd9d13daa6ed091c99442e53bab38fc1ab1c8caa59830b990ec12ddb6851a74e",
+  "member": "root-cause",
+  "inputArtifact": {
+    "path": "fixtures/scenarios/agent-86/inputs/feed.json"
+  },
+  "ask": "An agent is about to order from this marketplace copy — check it against the merchant's record first.",
+  "allowedTools": [
+    "check_feed",
+    "explain_drift",
+    "size_impact"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/agent-86/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/agent-86/inputs/record.json",
+        "surface": "acp"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "3e90810909ff168930a114acc24f7de10b7c17529bcc7865143ecd9f647d03c6",
+  "expectedRecommendationClass": "none-escalated",
+  "expectedFindingRefs": [],
+  "expectedGateState": "escalate-to-human",
+  "s2": {
+    "eventsPath": "fixtures/scenarios/agent-86/inputs/events.jsonl",
+    "asOf": "2026-07-03T00:00:00Z",
+    "route": {
+      "pack": "listings",
+      "triggerKind": "agent-preflight",
+      "ownership": "merchant"
+    }
+  }
+}

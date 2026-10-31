@@ -20,15 +20,40 @@
  * lane; the regressions they catch are exactly the edits an audit fears — a
  * retry loop (breaks the one-fetch assertion), a schema-invalid → default
  * decision (breaks the degraded-record assertions), or a dropped env gate.
+ *
+ * S2-crew CP1(ii) — SDK RETRY AMPLIFICATION (Codex 2026-10-12 § 4). The DI
+ * `generate` seam above sits ABOVE the SDK, so it could never see the SDK's own
+ * default `maxRetries: 2` turning one fetch into three. The last describe block
+ * therefore builds the REAL live generate (`createCrewLiveGenerate`: real
+ * `ai` + `@ai-sdk/groq`) over an offline TRANSPORT stub — no network, no key,
+ * `ENABLE_LIVE_AI` untouched (an injected generate bypasses the gate) — and
+ * counts requests at the transport.
+ * BUDGET TRUTH (S2-crew amendment, 2026-10-31): the same real-SDK path, booked
+ * against the S2-ledger budget API — overflow halts the ledger and the next
+ * turn is refused before any request; unknown usage is charged at the
+ * reservation; the default live path refuses to run without a ledger.
+ * MUTATION PROOF (recorded 2026-10-31): `settleCall` replaced by a no-op in
+ * `liveCall` → 3 RED (overflow-halts, no-usage-charged-at-reservation, within-
+ * reservation booking); restored → 16/16 green.
+ * MUTATION PROOF (recorded 2026-10-31): `maxRetries: 0` deleted from
+ * `createCrewLiveGenerate` → both 503 cases (Intake, Reviewer) see 3 requests
+ * (2 RED, "expected 3 to be 1"); restored → 1 request each, 12/12 green.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  buildIntakeLivePrompt,
+  createCrewLiveBudgetLedger,
+  createCrewLiveGenerate,
+  CREW_LIVE_TOOL_NAMES,
+  CREW_LIVE_TOOL_NAMES_S2,
+  crewLiveEstimate,
   fetchIntakeTurnLive,
   fetchReviewerTurnLive,
   IntakeLiveOutputSchema,
   mapParamsForTool,
   resolvedCrewLiveModel,
   ReviewerLiveOutputSchema,
+  SOR_CATALOG_PATH,
 } from "../../lib/agents/crew-live.ts";
 import type { IntakeTurnInput, ReviewerTurnInput } from "../../lib/crew/model.ts";
 
@@ -160,5 +185,182 @@ describe("crew live fetchers — Reviewer DI happy path + failure semantics", ()
   it("a live call WITHOUT the owner-gated env flags (and without DI) throws loudly", async () => {
     vi.stubEnv("ENABLE_LIVE_AI", "false");
     await expect(fetchReviewerTurnLive(REVIEWER_INPUT)).rejects.toThrow(/CREW_LIVE_DISABLED/);
+  });
+});
+
+describe("crew live fetchers — the REAL SDK path over an offline transport stub: one request per turn (maxRetries 0)", () => {
+  /** An offline transport: records every request, answers with a fixed status/body. Never touches the network. */
+  function stubTransport(status: number, body: unknown): { transport: (i: RequestInfo | URL, init?: RequestInit) => Promise<Response>; urls: string[] } {
+    const urls: string[] = [];
+    return {
+      urls,
+      transport: async (input) => {
+        urls.push(typeof input === "string" ? input : input instanceof URL ? input.href : input.url);
+        return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+      },
+    };
+  }
+
+  const okCompletion = (content: string) => ({
+    id: "chatcmpl-offline-stub",
+    object: "chat.completion",
+    created: 0,
+    model: "openai/gpt-oss-120b",
+    choices: [{ index: 0, message: { role: "assistant", content }, finish_reason: "stop" }],
+    usage: { prompt_tokens: 300, completion_tokens: 12, total_tokens: 312 },
+  });
+
+  it("a retryable provider failure (503) is ONE transport request, reported as attempts: 1 on the degraded record", async () => {
+    const stub = stubTransport(503, { error: { message: "offline stub: service unavailable", type: "server_error" } });
+    const generate = createCrewLiveGenerate({ transport: stub.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate });
+    expect(out.ok).toBe(false);
+    if (out.ok) throw new Error("unreachable");
+    expect(stub.urls.length).toBe(1);
+    expect(out.attempts).toBe(1);
+  });
+
+  it("the same for the Reviewer turn: one request, attempts: 1", async () => {
+    const stub = stubTransport(503, { error: { message: "offline stub: service unavailable", type: "server_error" } });
+    const generate = createCrewLiveGenerate({ transport: stub.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchReviewerTurnLive(REVIEWER_INPUT, { generate });
+    expect(out.ok).toBe(false);
+    expect(stub.urls.length).toBe(1);
+  });
+
+  it("a valid structured answer is ONE request, parsed into the closed vocabulary, with usage.attempts === 1", async () => {
+    const stub = stubTransport(200, okCompletion(JSON.stringify({ decision: "route", tool: "audit_statement" })));
+    const generate = createCrewLiveGenerate({ transport: stub.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate });
+    expect(stub.urls.length).toBe(1);
+    expect(stub.urls[0]).toMatch(/\/chat\/completions$/);
+    expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error("unreachable");
+    expect(out.decision).toEqual({ kind: "route", tool: "audit_statement", params: mapParamsForTool("audit_statement", ARTIFACT_PATH) });
+    expect(out.usage.attempts).toBe(1);
+  });
+
+  it("an injected generate that reports no attempt count is the fetcher's single call (attempts: 1), never omitted", async () => {
+    const out = await fetchReviewerTurnLive(REVIEWER_INPUT, { generate: async () => ({ object: { decision: "approve" } }) });
+    expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error("unreachable");
+    expect(out.usage.attempts).toBe(1);
+  });
+});
+
+describe("crew live fetchers — BUDGET TRUTH on the live path (reserve → one request → settle)", () => {
+  const PRICED = "gemini-3.5-flash-lite"; // a priced row, so a dollar overflow is possible offline
+  const clock = { nowMs: () => Date.parse("2026-10-31T06:00:00Z") };
+
+  function stub(body: unknown): { transport: (i: RequestInfo | URL, init?: RequestInit) => Promise<Response>; count: () => number } {
+    let n = 0;
+    return {
+      count: () => n,
+      transport: async () => {
+        n += 1;
+        return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+      },
+    };
+  }
+  const completion = (usage?: Record<string, number>) => ({
+    id: "chatcmpl-offline-stub",
+    object: "chat.completion",
+    created: 0,
+    model: PRICED,
+    choices: [{ index: 0, message: { role: "assistant", content: JSON.stringify({ decision: "route", tool: "audit_statement" }) }, finish_reason: "stop" }],
+    ...(usage !== undefined ? { usage } : {}),
+  });
+
+  it("usage ABOVE the reservation halts the ledger, and the NEXT turn is refused before any request", async () => {
+    vi.stubEnv("CREW_LIVE_MODEL", PRICED);
+    const ledger = createCrewLiveBudgetLedger(PRICED);
+    const s = stub(completion({ prompt_tokens: 5_000_000, completion_tokens: 100, total_tokens: 5_000_100 }));
+    const generate = createCrewLiveGenerate({ transport: s.transport, apiKey: "offline-stub-not-a-key" });
+    const first = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate, budget: { ledger, clock } });
+    expect(first.ok).toBe(false);
+    if (first.ok) throw new Error("unreachable");
+    expect(first.errorClass).toBe("BudgetOverflowError");
+    expect(ledger.halted).toBe(true);
+    expect(s.count()).toBe(1);
+    const second = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate, budget: { ledger, clock } });
+    expect(second.ok).toBe(false);
+    if (second.ok) throw new Error("unreachable");
+    expect(second.errorClass).toBe("BudgetBlockedError");
+    expect(second.attempts).toBe(0);
+    expect(s.count()).toBe(1); // the refused turn made no request
+  });
+
+  it("NO reported usage is charged at the reservation (never zero), with one request", async () => {
+    vi.stubEnv("CREW_LIVE_MODEL", PRICED);
+    const ledger = createCrewLiveBudgetLedger(PRICED);
+    const s = stub(completion());
+    const generate = createCrewLiveGenerate({ transport: s.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate, budget: { ledger, clock } });
+    expect(out.ok).toBe(true);
+    expect(s.count()).toBe(1);
+    const reserved = crewLiveEstimate(PRICED, buildIntakeLivePrompt(INTAKE_INPUT)).costUsd;
+    expect(reserved).toBeGreaterThan(0);
+    expect(ledger.spentUsd).toBeCloseTo(reserved, 12);
+    expect(ledger.reservedUsd).toBe(0);
+    expect(ledger.halted).toBe(false);
+  });
+
+  it("usage within the reservation books the actual figure and leaves the ledger open (Groq $0 row: counted, not free of accounting)", async () => {
+    const ledger = createCrewLiveBudgetLedger(); // default model: the Groq free-tier row
+    const s = stub(completion({ prompt_tokens: 300, completion_tokens: 12, total_tokens: 312 }));
+    const generate = createCrewLiveGenerate({ transport: s.transport, apiKey: "offline-stub-not-a-key" });
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH, { generate, budget: { ledger, clock } });
+    expect(out.ok).toBe(true);
+    expect(ledger.spentUsd).toBe(0);
+    expect(ledger.calls).toBe(1);
+    expect(ledger.providers.groq.requestsToday).toBe(1);
+    expect(ledger.providers.groq.tokensToday).toBe(312);
+    expect(ledger.halted).toBe(false);
+  });
+
+  it("the default live path (gate open, no DI) refuses to run without a ledger — fail closed, before any request", async () => {
+    vi.stubEnv("ENABLE_LIVE_AI", "true");
+    vi.stubEnv("GROQ_API_KEY", "offline-test-placeholder-not-a-key");
+    await expect(fetchIntakeTurnLive(INTAKE_INPUT, ARTIFACT_PATH)).rejects.toThrow(/CREW_LIVE_BUDGET_REQUIRED/);
+    await expect(fetchReviewerTurnLive(REVIEWER_INPUT)).rejects.toThrow(/CREW_LIVE_BUDGET_REQUIRED/);
+  });
+});
+
+describe("crew live mapper — de-hardwired catalog + case-chosen surface (S2-crew CP4; security review F9)", () => {
+  it("defaults are byte-stable: the committed SOR catalog and the L-1 'ucp-in-path' surface rule", () => {
+    expect(mapParamsForTool("check_feed", "fixtures/synthetic-restaurant/ucp-catalog-response.drifted.json")).toEqual({
+      feedPath: "fixtures/synthetic-restaurant/ucp-catalog-response.drifted.json",
+      catalogPath: SOR_CATALOG_PATH,
+      surface: "ucp",
+    });
+  });
+
+  it("a scenario run passes its own record and the case's surface; the path's spelling no longer decides", () => {
+    expect(
+      mapParamsForTool("check_feed", "fixtures/scenarios/ucp-looking-name/inputs/feed.json", {
+        catalogPath: "fixtures/scenarios/agent-86/inputs/record.json",
+        surface: "acp",
+      }),
+    ).toEqual({ feedPath: "fixtures/scenarios/ucp-looking-name/inputs/feed.json", catalogPath: "fixtures/scenarios/agent-86/inputs/record.json", surface: "acp" });
+  });
+
+  it("fetchIntakeTurnLive threads catalogPath + surface into the mapped params", async () => {
+    const out = await fetchIntakeTurnLive(INTAKE_INPUT, "fixtures/scenarios/agent-86/inputs/feed.json", {
+      generate: async () => ({ object: { decision: "route", tool: "check_feed" } }),
+      catalogPath: "fixtures/scenarios/agent-86/inputs/record.json",
+      surface: "acp",
+    });
+    expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error("unreachable");
+    expect(out.decision).toEqual({
+      kind: "route",
+      tool: "check_feed",
+      params: { feedPath: "fixtures/scenarios/agent-86/inputs/feed.json", catalogPath: "fixtures/scenarios/agent-86/inputs/record.json", surface: "acp" },
+    });
+  });
+
+  it("the S2 tool list extends the examined Intake enum without touching it", () => {
+    expect([...CREW_LIVE_TOOL_NAMES_S2]).toStrictEqual([...CREW_LIVE_TOOL_NAMES, "explain_drift", "size_impact"]);
+    expect(CREW_LIVE_TOOL_NAMES).not.toContain("explain_drift");
   });
 });

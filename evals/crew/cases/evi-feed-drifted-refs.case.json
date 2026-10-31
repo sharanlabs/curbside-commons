@@ -1,5 +1,6 @@
 {
   "caseId": "evi-feed-drifted-refs",
+  "manifestDigest": "5685719ff518ce07a86f44ca821dd176c39a3ec06ed30107a2efe74e51161cf1",
   "member": "evidence",
   "inputArtifact": {
     "path": "fixtures/synthetic-restaurant/acp-feed.drifted.json"

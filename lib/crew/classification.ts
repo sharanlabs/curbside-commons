@@ -49,4 +49,20 @@ export const MEMBER_CLASSIFICATION: readonly MemberClassification[] = Object.fre
     rationale:
       "Judging whether recommendations warrant human attention is model-directed — but it sits UNDER the human gate, and containment overrides any approval when anomalies exist.",
   }),
+  // S2-crew (2026-10-31): the two new seats.
+  Object.freeze({
+    member: "root-cause" as const,
+    designedClass: "model-directed step" as const,
+    rationale:
+      "Explaining WHY a copy drifted is model-directed by design — but in this slice the seat is NEVER called live: the orchestrator runs the deterministic explain_drift baseline and renders the LLM seat DEFER until it passes a pre-registered exam.",
+  }),
+  Object.freeze({
+    member: "impact" as const,
+    designedClass: "deterministic workflow" as const,
+    rationale:
+      "Sizing orders at risk and refund exposure is arithmetic over findings and a synthetic orders file (size_impact) — no model in the loop; every figure is labeled simulated.",
+  }),
 ]);
+
+/** The state the LLM root-cause seat renders in this slice (never called live; no exam on any model). */
+export const ROOT_CAUSE_SEAT_STATE = "DEFER";

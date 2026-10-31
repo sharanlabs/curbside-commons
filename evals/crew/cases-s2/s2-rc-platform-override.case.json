@@ -1,0 +1,156 @@
+{
+  "caseId": "s2-rc-platform-override",
+  "manifestDigest": "67dd9086dc01a64a20b60f4556d247f9a924c165a08f8518fd6c532661012841",
+  "member": "root-cause",
+  "inputArtifact": {
+    "path": "fixtures/scenarios/platform-override/inputs/feed.json"
+  },
+  "ask": "A customer complaint says item names are wrong — check this copy against the merchant's record.",
+  "allowedTools": [
+    "check_feed",
+    "explain_drift",
+    "size_impact"
+  ],
+  "forbiddenTools": [
+    "run_demo",
+    "classify_and_audit"
+  ],
+  "expectedToolCalls": [
+    {
+      "tool": "check_feed",
+      "params": {
+        "feedPath": "fixtures/scenarios/platform-override/inputs/feed.json",
+        "catalogPath": "fixtures/scenarios/platform-override/inputs/record.json",
+        "surface": "acp"
+      }
+    },
+    {
+      "tool": "explain_drift",
+      "params": {
+        "findings": [
+          {
+            "id": "item-006-v1#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-006-v1"
+          },
+          {
+            "id": "item-009-v1#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-009-v1"
+          },
+          {
+            "id": "item-009-v2#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-009-v2"
+          },
+          {
+            "id": "item-009-v3#availability",
+            "ruleId": "LST-AVAIL-STATE",
+            "category": "availability",
+            "referenceRowId": "item-009-v3"
+          },
+          {
+            "id": "item-004-v1#title",
+            "ruleId": "LST-IDENT-NAME",
+            "category": "identity",
+            "referenceRowId": "item-004-v1"
+          },
+          {
+            "id": "item-004-v2#title",
+            "ruleId": "LST-IDENT-NAME",
+            "category": "identity",
+            "referenceRowId": "item-004-v2"
+          },
+          {
+            "id": "item-004-v3#title",
+            "ruleId": "LST-IDENT-NAME",
+            "category": "identity",
+            "referenceRowId": "item-004-v3"
+          },
+          {
+            "id": "item-005-v1#title",
+            "ruleId": "LST-IDENT-NAME",
+            "category": "identity",
+            "referenceRowId": "item-005-v1"
+          },
+          {
+            "id": "item-005-v2#title",
+            "ruleId": "LST-IDENT-NAME",
+            "category": "identity",
+            "referenceRowId": "item-005-v2"
+          },
+          {
+            "id": "item-005-v3#title",
+            "ruleId": "LST-IDENT-NAME",
+            "category": "identity",
+            "referenceRowId": "item-005-v3"
+          }
+        ],
+        "events": [
+          {
+            "at": "2026-06-30T23:48:00Z",
+            "actor": "platform",
+            "action": "override",
+            "target": "item-006"
+          },
+          {
+            "at": "2026-06-30T23:49:00Z",
+            "actor": "platform",
+            "action": "override",
+            "target": "item-007"
+          },
+          {
+            "at": "2026-06-30T23:50:00Z",
+            "actor": "platform",
+            "action": "override",
+            "target": "item-005"
+          },
+          {
+            "at": "2026-06-30T23:51:00Z",
+            "actor": "platform",
+            "action": "override",
+            "target": "item-004"
+          },
+          {
+            "at": "2026-06-30T23:53:00Z",
+            "actor": "platform",
+            "action": "override",
+            "target": "item-009"
+          },
+          {
+            "at": "2026-06-30T23:57:00Z",
+            "actor": "platform",
+            "action": "override",
+            "target": "item-001"
+          },
+          {
+            "at": "2026-07-02T23:00:00Z",
+            "actor": "integrator",
+            "action": "sync",
+            "target": "catalog"
+          }
+        ],
+        "asOf": "2026-07-03T00:00:00Z"
+      }
+    }
+  ],
+  "expectedEngineReportHash": "fb2dfabf5fc14aa83a3e28b6d76e0463853042e98142d82ff69bb85d4e2d6180",
+  "expectedRecommendationClass": "flag-violations",
+  "expectedFindingRefs": [
+    "item-006-v1#availability",
+    "item-009-v1#availability"
+  ],
+  "expectedGateState": "approve-recommendation",
+  "s2": {
+    "eventsPath": "fixtures/scenarios/platform-override/inputs/events.jsonl",
+    "asOf": "2026-07-03T00:00:00Z",
+    "route": {
+      "pack": "listings",
+      "triggerKind": "complaint",
+      "ownership": "platform"
+    }
+  }
+}
