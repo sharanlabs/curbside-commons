@@ -1,6 +1,6 @@
 /**
  * E3 — the THREAT-MODEL suite (plan §E3): every registered threat gets its
- * own test against the frozen seven-check order — signer identity,
+ * own test against the frozen eight-door order (revocation added 2026-10-31; see signer-registry.test.ts for the per-door and ordering tests) — signer identity,
  * authorization (role), forgery, tamper (payload + digest re-binding),
  * replay (same request + cross-request), expiry via the injected clock
  * (before/at/after the boundary), request mismatch, empty signature — plus
@@ -153,7 +153,7 @@ describe("E3 threats — each dies on its own typed door", () => {
     expect(subjectDigestOf(otherRecord)).not.toBe(request.subjectDigest);
   });
 
-  it("DIGEST DOOR (step 7): a signature crafted over THIS request's id+nonce but a FOREIGN content digest dies on SubjectMismatchError", () => {
+  it("DIGEST DOOR (step 8): a signature crafted over THIS request's id+nonce but a FOREIGN content digest dies on SubjectMismatchError", () => {
     const { request, opts } = freshFlow("n-t5b");
     const foreignDigest = subjectDigestOf({ ...crewRecord, caseId: "int-a-different-case" });
     expect(foreignDigest).not.toBe(request.subjectDigest);
@@ -186,7 +186,7 @@ describe("E3 threats — each dies on its own typed door", () => {
   // ── batch-D P1: the REQUEST is now signature-bound (case · action · expiry) ──
   // Before the fix these three fields were unsigned: an attacker who could alter
   // the request after signing could redirect the case, swap the action, or EXTEND
-  // A DEAD APPROVAL'S EXPIRY, and all seven checks still passed. Each is now its
+  // A DEAD APPROVAL'S EXPIRY, and all the checks still passed. Each is now its
   // own test — the absence of exactly these tests is what let the hole through.
 
   it("TAMPERED EXPIRY: extending a signed request's expiry breaks the signature (the expiry is signed)", () => {

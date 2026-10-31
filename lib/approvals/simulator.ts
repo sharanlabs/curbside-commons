@@ -11,9 +11,10 @@
  *   2. expiry (expired AT expiresAtMs)  → ExpiredError
  *   3. nonce replay                     → ReplayError
  *   4. signer known                     → UnauthorizedSignerError
- *   5. signer role authorized           → RoleNotAuthorizedError
- *   6. Ed25519 over the RECOMPUTED canonical payload → SignatureInvalidError
- *   7. attested subjectDigest == request's           → SubjectMismatchError
+ *   5. signer not revoked (AT VERIFICATION TIME) → SignerRevokedError
+ *   6. signer role authorized           → RoleNotAuthorizedError
+ *   7. Ed25519 over the RECOMPUTED canonical payload → SignatureInvalidError
+ *   8. attested subjectDigest == request's           → SubjectMismatchError
  * Only then execute. Ordering rationale: cheap structural checks first,
  * replay consumed only on success (a rejected attempt must not burn the
  * nonce), signature verified over bytes THIS module rebuilds — never bytes
@@ -26,11 +27,11 @@
  * signature-bound now, which is what makes step 2's expiry check and the
  * execution record's case/action fields trustworthy rather than decorative.
  *
- * Plain: seven locked doors in a fixed order between "someone sent a signed
+ * Plain: eight locked doors in a fixed order between "someone sent a signed
  * yes" and "the simulator records it as done" — wrong paperwork, stale
- * paperwork, reused paperwork, unknown signer, under-powered signer, fake
- * signature, or paperwork about a different case each slam their own door,
- * loudly.
+ * paperwork, reused paperwork, unknown signer, a signer whose key has since been
+ * withdrawn, under-powered signer, fake signature, or paperwork about a
+ * different case each slam their own door, loudly.
  */
 import { createHash, verify as edVerify, sign as edSign, type KeyObject } from "node:crypto";
 
@@ -43,6 +44,7 @@ import {
   RoleNotAuthorizedError,
   SignatureInvalidError,
   SubjectMismatchError,
+  SignerRevokedError,
   UnauthorizedSignerError,
   type ApprovalAction,
   type ApprovalRequest,
@@ -139,7 +141,7 @@ export function signDecision(
 }
 
 /**
- * The verifier-executor. Runs the seven frozen checks (docstring above) and,
+ * The verifier-executor. Runs the eight frozen checks (docstring above) and,
  * only if ALL pass, consumes the nonce and returns the frozen
  * {@link ExecutionRecord}. Every failure throws its typed error — there is
  * no false return.
@@ -170,14 +172,20 @@ export function verifyAndExecute(
   if (signer === undefined) {
     throw new UnauthorizedSignerError(`signerKeyId "${decision.signerKeyId}" is not a registered signer`);
   }
-  // 5 — signer authorization (role).
+  // 5 — revocation, judged at VERIFICATION time (now), not signing time.
+  if (signer.revokedAtMs !== undefined && signer.revokedAtMs !== null && now >= signer.revokedAtMs) {
+    throw new SignerRevokedError(
+      `signer "${decision.signerKeyId}" was revoked at ${signer.revokedAtMs} (verification time ${now}); a decision signed earlier is still refused`,
+    );
+  }
+  // 6 — signer authorization (role).
   if (signer.role !== opts.requiredRole) {
     throw new RoleNotAuthorizedError(
       `signer "${decision.signerKeyId}" holds role "${signer.role}" but this action requires "${opts.requiredRole}"`,
     );
   }
-  // 6 — signature over the RECOMPUTED canonical payload (nonce from the
-  // REQUEST; digest as attested by the decision — cross-checked in step 7).
+  // 7 — signature over the RECOMPUTED canonical payload (nonce from the
+  // REQUEST; digest as attested by the decision — cross-checked in step 8).
   // caseId / action / expiresAtMs come from the REQUEST — so a request tampered
   // after signing (swapped case, swapped action, EXTENDED EXPIRY) changes these
   // bytes and the signature fails. That is the batch-D P1 fix.
@@ -203,14 +211,14 @@ export function verifyAndExecute(
       `signature by "${decision.signerKeyId}" does not verify over the canonical payload`,
     );
   }
-  // 7 — content binding: the SIGNED digest must be THIS request's content.
+  // 8 — content binding: the SIGNED digest must be THIS request's content.
   if (decision.subjectDigest !== request.subjectDigest) {
     throw new SubjectMismatchError(
       `decision is signed over content ${decision.subjectDigest.slice(0, 12)}…, but this request covers ${request.subjectDigest.slice(0, 12)}…`,
     );
   }
 
-  // All seven held — consume the nonce, then execute (= record, nothing else).
+  // All eight held — consume the nonce, then execute (= record, nothing else).
   opts.seenNonces.add(request.nonce);
   return Object.freeze({
     executed: true,
@@ -223,7 +231,7 @@ export function verifyAndExecute(
     subjectDigest: request.subjectDigest,
     decidedAtMs: decision.decidedAtMs,
     verifiedAtMs: now,
-    reason: "all seven verification checks passed (SIMULATED offline approvals lane)",
+    reason: "all eight verification checks passed (SIMULATED offline approvals lane)",
     auditLine: `SIMULATED-APPROVAL executed=${true} request=${request.requestId} case=${request.caseId} action=${request.action} decision=${decision.decision} signer=${decision.signerKeyId} verifiedAt=${now}`,
   });
 }
